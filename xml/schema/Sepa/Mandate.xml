@@ -12,6 +12,7 @@
     <required>true</required>  
     <comment>ID</comment>  
     <add>4.3</add>
+    <export>true</export>
   </field>  
   <primaryKey>  
     <name>id</name>  
@@ -19,6 +20,7 @@
   </primaryKey>  
   <field>
     <name>reference</name>
+    <export>true</export>
     <type>varchar</type>
     <length>35</length>
     <required>true</required>
@@ -26,6 +28,14 @@
     <comment>The unique mandate reference</comment>
     <add>4.3</add>
   </field>
+  <index>
+    <name>reference</name>
+    <fieldName>reference</fieldName>
+    <unique>unique</unique>
+    <add>4.3</add>
+  </index>
+
+
   <field>
     <name>source</name>
     <type>varchar</type>
@@ -34,17 +44,38 @@
     <add>4.3</add>
   </field>
 
+  <field> 
+    <name>contribution_recur_id</name> 
+    <title>Recuring Contribution ID</title>
+    <type>int unsigned</type> 
+    <unique>true</unique>
+    <comment>FK to Contact Recuring Contribution associated with the mandate</comment>
+    <add>4.3</add> 
+  </field> 
+  <foreignKey> 
+    <name>contribution_recur_id</name> 
+    <table>civicrm_contribution_recur</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
 
 
+  <field> 
+    <name>creditor_id</name> 
+    <title>Creditor ID</title>
+    <type>int unsigned</type> 
+    <comment>FK to ssd_creditor</comment>
+    <add>4.3</add> 
+  </field> 
+  <foreignKey> 
+    <name>creditor_sdd_id</name> 
+    <table>civicrm_sdd_creditor</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
 
-  <field>
-    <name>iban</name>
-    <type>varchar</type>
-    <length>42</length>
-    <required>false</required>
-    <comment></comment>
-    <add>4.3</add>
-  </field>
   <field> 
     <name>contact_id</name> 
     <title>Contact ID</title>
@@ -59,34 +90,59 @@
     <add>4.3</add> 
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field>  
-    <name>type_id</name>  
-    <type>int unsigned</type>  
-    <required>true</required>  
-    <add>3.2</add> 
-    <drop>4.3</drop>
-  </field> 
-  <field>  
-    <name>status_id</name>  
-    <type>int unsigned</type>  
-    <required>true</required>  
-    <default>3</default> 
-    <add>4.3</add>
-    <comment>pseudo FK into civicrm_option_value.</comment>
-  </field>
+
   <field>
-    <name>BIX</name>
-    <title>don't know</title>
+    <name>iban</name>
     <type>varchar</type>
-    <length>64</length>
-    <export>true</export>
-    <comment>don't know</comment>
+    <length>42</length>
+    <required>false</required>
+    <comment>Iban of the debtor</comment>
     <add>4.3</add>
   </field>
   <index>
     <name>iban</name>
     <fieldName>iban</fieldName>
-    <unique>false</unique>
     <add>4.3</add>
   </index>
+
+  <field>
+    <name>bic</name>
+    <type>varchar</type>
+    <length>11</length>
+    <comment>BIC of the debtor</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>  
+    <name>type</name>  
+    <type>varchar</type>  
+    <length>1</length>
+    <required>true</required>  
+    <default>R</default> 
+    <add>4.3</add> 
+    <comment>R for recurrent (default) O for one-shot</comment>
+  </field> 
+
+  <field>  
+    <name>enabled_id</name>  
+    <type>boolean</type>  
+    <required>true</required>  
+    <default>1</default> 
+    <add>4.3</add>
+    <comment>If the mandate has been validated</comment>
+  </field>
+  <field>
+    <name>creation_date</name>
+    <title>creation date</title>
+    <type>datetime</type>
+    <export>true</export>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>validation_date</name>
+    <title>validation date</title>
+    <type>datetime</type>
+    <add>4.3</add>
+  </field>
 </table>

@@ -40,6 +40,24 @@
     <add>4.3</add>
   </field>
 
+  <field>
+    <name>name</name>
+    <title>name of the creditor</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>by default creditor_id.display_name?</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>address</name>
+    <title>Address of the creditor</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>by default creditor_id.address (billing)</comment>
+    <add>4.3</add>
+  </field>
+
 
   <field>
     <name>mandate_prefix</name>

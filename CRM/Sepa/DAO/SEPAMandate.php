@@ -99,10 +99,17 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    */
   public $source;
   /**
+   * FK to Contact Recuring Contribution associated with the mandate
    *
-   * @var string
+   * @var int unsigned
    */
-  public $iban;
+  public $contribution_recur_id;
+  /**
+   * FK to ssd_creditor
+   *
+   * @var int unsigned
+   */
+  public $creditor_id;
   /**
    * FK to Contact ID that owns that account
    *
@@ -110,17 +117,39 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    */
   public $contact_id;
   /**
-   * pseudo FK into civicrm_option_value.
-   *
-   * @var int unsigned
-   */
-  public $status_id;
-  /**
-   * don't know
+   * Iban of the debtor
    *
    * @var string
    */
-  public $BIX;
+  public $iban;
+  /**
+   * BIC of the debtor
+   *
+   * @var string
+   */
+  public $bic;
+  /**
+   * R for recurrent (default) O for one-shot
+   *
+   * @var string
+   */
+  public $type;
+  /**
+   * If the mandate has been validated
+   *
+   * @var boolean
+   */
+  public $enabled_id;
+  /**
+   *
+   * @var datetime
+   */
+  public $creation_date;
+  /**
+   *
+   * @var datetime
+   */
+  public $validation_date;
   /**
    * class constructor
    *
@@ -142,6 +171,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
   {
     if (!(self::$_links)) {
       self::$_links = array(
+        'contribution_recur_id' => 'civicrm_contribution_recur:id',
         'contact_id' => 'civicrm_contact:id',
       );
     }
@@ -161,6 +191,10 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
           'required' => true,
+          'export' => true,
+          'where' => 'civicrm_sdd_mandate.id',
+          'headerPattern' => '',
+          'dataPattern' => '',
         ) ,
         'reference' => array(
           'name' => 'reference',
@@ -169,6 +203,10 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'required' => true,
           'maxlength' => 35,
           'size' => CRM_Utils_Type::BIG,
+          'export' => true,
+          'where' => 'civicrm_sdd_mandate.reference',
+          'headerPattern' => '',
+          'dataPattern' => '',
         ) ,
         'source' => array(
           'name' => 'source',
@@ -176,6 +214,23 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'title' => ts('Source') ,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+        ) ,
+        'contribution_recur_id' => array(
+          'name' => 'contribution_recur_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Recuring Contribution ID') ,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
+        ) ,
+        'creditor_id' => array(
+          'name' => 'creditor_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Creditor ID') ,
+        ) ,
+        'contact_id' => array(
+          'name' => 'contact_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID') ,
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'iban' => array(
           'name' => 'iban',
@@ -185,105 +240,113 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'maxlength' => 42,
           'size' => CRM_Utils_Type::BIG,
         ) ,
-        'contact_id' => array(
-          'name' => 'contact_id',
-          'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Contact ID') ,
-          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        'bic' => array(
+          'name' => 'bic',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Bic') ,
+          'maxlength' => 11,
+          'size' => CRM_Utils_Type::TWELVE,
         ) ,
-        'status_id' => array(
-          'name' => 'status_id',
-          'type' => CRM_Utils_Type::T_INT,
+        'type' => array(
+          'name' => 'type',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Type') ,
+          'required' => true,
+          'maxlength' => 1,
+          'size' => CRM_Utils_Type::TWO,
+          'default' => '',
+        ) ,
+        'enabled_id' => array(
+          'name' => 'enabled_id',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
           'required' => true,
           'default' => '',
         ) ,
-        'BIX' => array(
-          'name' => 'BIX',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('don'tknow'),
-                       'maxlength' => 64,
-                       'size'      => CRM_Utils_Type::BIG,
-   
-                       'export'    => true,
-                                                            'where'     => 'civicrm_sdd_mandate . BIX',
-                                      'headerPattern' => '',
-                                      'dataPattern' => '',
-                  
-                                                                      ),
-                                       );
+        'creation_date' => array(
+          'name' => 'creation_date',
+          'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+          'title' => ts('creation date') ,
+          'export' => true,
+          'where' => 'civicrm_sdd_mandate.creation_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+        ) ,
+        'validation_date' => array(
+          'name' => 'validation_date',
+          'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+          'title' => ts('validation date') ,
+        ) ,
+      );
+    }
+    return self::$_fields;
+  }
+  /**
+   * returns the names of this table
+   *
+   * @access public
+   * @static
+   * @return string
+   */
+  static function getTableName()
+  {
+    return self::$_tableName;
+  }
+  /**
+   * returns if this table needs to be logged
+   *
+   * @access public
+   * @return boolean
+   */
+  function getLog()
+  {
+    return self::$_log;
+  }
+  /**
+   * returns the list of fields that can be imported
+   *
+   * @access public
+   * return array
+   * @static
+   */
+  static function &import($prefix = false)
+  {
+    if (!(self::$_import)) {
+      self::$_import = array();
+      $fields = self::fields();
+      foreach($fields as $name => $field) {
+        if (CRM_Utils_Array::value('import', $field)) {
+          if ($prefix) {
+            self::$_import['sdd_mandate'] = & $fields[$name];
+          } else {
+            self::$_import[$name] = & $fields[$name];
           }
-          return self::$_fields;
+        }
       }
-
-      /**
-       * returns the names of this table
-       *
-       * @access public
-       * @static
-       * @return string
-       */
-      static function getTableName( ) {
-                  return self::$_tableName;
-              }
-
-      /**
-       * returns if this table needs to be logged
-       *
-       * @access public
-       * @return boolean
-       */
-      function getLog( ) {
-          return self::$_log;
+    }
+    return self::$_import;
+  }
+  /**
+   * returns the list of fields that can be exported
+   *
+   * @access public
+   * return array
+   * @static
+   */
+  static function &export($prefix = false)
+  {
+    if (!(self::$_export)) {
+      self::$_export = array();
+      $fields = self::fields();
+      foreach($fields as $name => $field) {
+        if (CRM_Utils_Array::value('export', $field)) {
+          if ($prefix) {
+            self::$_export['sdd_mandate'] = & $fields[$name];
+          } else {
+            self::$_export[$name] = & $fields[$name];
+          }
+        }
       }
-
-      /**
-       * returns the list of fields that can be imported
-       *
-       * @access public
-       * return array
-       * @static
-       */
-       static function &import( $prefix = false ) {
-            if ( ! ( self::$_import ) ) {
-               self::$_import = array ( );
-               $fields = self::fields( );
-               foreach ( $fields as $name => $field ) {
-                 if ( CRM_Utils_Array::value( 'import', $field ) ) {
-                   if ( $prefix ) {
-                     self::$_import['sdd_mandate'] =& $fields[$name];
-                   } else {
-                     self::$_import[$name] =& $fields[$name];
-                   }
-                 }
-               }
-                                                                                                 }
-          return self::$_import;
-      }
-
-       /**
-       * returns the list of fields that can be exported
-       *
-       * @access public
-       * return array
-       * @static
-       */
-       static function &export( $prefix = false ) {
-            if ( ! ( self::$_export ) ) {
-               self::$_export = array ( );
-               $fields = self::fields( );
-               foreach ( $fields as $name => $field ) {
-                 if ( CRM_Utils_Array::value( 'export', $field ) ) {
-                   if ( $prefix ) {
-                     self::$_export['sdd_mandate'] =& $fields[$name];
-                   } else {
-                     self::$_export[$name] =& $fields[$name];
-                   }
-                 }
-               }
-                                                                                                     }
-          return self::$_export;
-      }
-
-
+    }
+    return self::$_export;
+  }
 }
-
