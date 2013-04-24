@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<extension key="org.project60.sepa" type="module">
+  <file>sepa</file>
+  <name>SEPA Direct Debit</name>
+  <description>This extension provides a new payement processor SEPA Direct Debit</description>
+  <license>aGPL3</license>
+  <maintainer>
+    <author>xavier</author>
+    <email>xavier@tttp.eu</email>
+  </maintainer>
+  <releaseDate>2013-03-06</releaseDate>
+  <version>0.1</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.3</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <civix>
+    <namespace>CRM/Sepa</namespace>
+  </civix>
+</extension>
