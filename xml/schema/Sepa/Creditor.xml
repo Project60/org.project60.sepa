@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>  
+
+<table>  
+  <base>CRM/Sepa</base>  
+  <class>SEPACreditor</class>  
+  <name>civicrm_sdd_creditor</name>  
+  <add>4.3</add> 
+  <log>true</log> 
+  <field>  
+    <name>id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <comment>ID</comment>  
+    <add>4.3</add>
+  </field>  
+  <primaryKey>  
+    <name>id</name>  
+    <autoincrement>true</autoincrement>  
+  </primaryKey>  
+  <field> 
+    <name>creditor_id</name> 
+    <title>Creditor Contact ID</title>
+    <type>int unsigned</type> 
+    <comment>FK to Contact ID that owns that account</comment>
+    <add>4.3</add> 
+  </field> 
+  <foreignKey> 
+    <name>creditor_id</name> 
+    <table>civicrm_contact</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>identifier</name>
+    <title>SEPA Creditor identifier</title>
+    <type>varchar</type>
+    <length>35</length>
+    <comment>Provided by the bank. ISO country code+check digit+ZZZ+country specific identifier</comment>
+    <add>4.3</add>
+  </field>
+
+
+  <field>
+    <name>mandate_prefix</name>
+    <title>Mandate numering prefix</title>
+    <type>varchar</type>
+    <length>3</length>
+    <comment>prefix for mandate identifiers</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>category</name>
+    <title>Category purpose of the collection</title>
+    <type>varchar</type>
+    <length>4</length>
+    <comment>Default value</comment>
+    <add>4.3</add>
+  </field>
+
+</table>

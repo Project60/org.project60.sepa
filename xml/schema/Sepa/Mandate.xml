@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>  
+
+<table>  
+  <base>CRM/Sepa</base>  
+  <class>SEPAMandate</class>  
+  <name>civicrm_sdd_mandate</name>  
+  <add>4.3</add> 
+  <log>true</log> 
+  <field>  
+    <name>id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <comment>ID</comment>  
+    <add>4.3</add>
+  </field>  
+  <primaryKey>  
+    <name>id</name>  
+    <autoincrement>true</autoincrement>  
+  </primaryKey>  
+  <field>
+    <name>reference</name>
+    <type>varchar</type>
+    <length>35</length>
+    <required>true</required>
+    <unique>true</unique>
+    <comment>The unique mandate reference</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>source</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Needed or coming from ContributionRecur? phoning/online/face 2 face....</comment>
+    <add>4.3</add>
+  </field>
+
+
+
+
+  <field>
+    <name>iban</name>
+    <type>varchar</type>
+    <length>42</length>
+    <required>false</required>
+    <comment></comment>
+    <add>4.3</add>
+  </field>
+  <field> 
+    <name>contact_id</name> 
+    <title>Contact ID</title>
+    <type>int unsigned</type> 
+    <comment>FK to Contact ID that owns that account</comment>
+    <add>4.3</add> 
+  </field> 
+  <foreignKey> 
+    <name>contact_id</name> 
+    <table>civicrm_contact</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>  
+    <name>type_id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <add>3.2</add> 
+    <drop>4.3</drop>
+  </field> 
+  <field>  
+    <name>status_id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <default>3</default> 
+    <add>4.3</add>
+    <comment>pseudo FK into civicrm_option_value.</comment>
+  </field>
+  <field>
+    <name>BIX</name>
+    <title>don't know</title>
+    <type>varchar</type>
+    <length>64</length>
+    <export>true</export>
+    <comment>don't know</comment>
+    <add>4.3</add>
+  </field>
+  <index>
+    <name>iban</name>
+    <fieldName>iban</fieldName>
+    <unique>false</unique>
+    <add>4.3</add>
+  </index>
+</table>

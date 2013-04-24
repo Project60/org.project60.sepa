@@ -1,0 +1,7 @@
+To generate the DAO, you have to symlink to xml/schema/SEPA from your civicrm
+and symlink xml/SepaSchema.xml
+
+to generate the DAO+xml, you need to 
+$cd civicrm_root/xml
+$php Gencode.php SepaSchema.xml
+
