@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Sepa_Form_Report_SEPA_Mandate',
+    'name' => 'CRM_Sepa_Form_Report_SEPAMandate',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'SEPA_Mandate',
-      'description' => 'SEPA_Mandate (org.project60.sepa)',
-      'class_name' => 'CRM_Sepa_Form_Report_SEPA_Mandate',
-      'report_url' => 'org.project60.sepa/sepa_mandate',
+      'label' => 'SEPAMandate',
+      'description' => 'SEPAMandate (org.project60.sepa)',
+      'class_name' => 'CRM_Sepa_Form_Report_SEPAMandate',
+      'report_url' => 'org.project60.sepa/sepamandate',
       'component' => 'CiviContribute',
     ),
   ),

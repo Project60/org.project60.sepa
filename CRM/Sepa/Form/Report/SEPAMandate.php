@@ -2,7 +2,7 @@
 
 require_once 'CRM/Report/Form.php';
 
-class CRM_Sepa_Form_Report_SEPA_Mandate extends CRM_Report_Form {
+class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
 
   protected $_addressField = FALSE;
 
