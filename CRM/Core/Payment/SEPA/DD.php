@@ -44,7 +44,24 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
    * @public
    */
   function doDirectPayment(&$params) {
-die ("It's never used, but needs to be declared as it's an abstract method");
+    $component = strtolower($component);
+
+    if (CRM_Utils_Array::value('is_recur', $params) &&
+      $params['contributionRecurID']
+    ) {
+// TODO link the mandate to the recurring contrib
+    }
+//single debit? 
+    if (CRM_Utils_Array::value('selectMembership', $params))   {
+    // TODO: link mandate to membership
+    }
+
+    $params['trxn_id'] = "TODO GENERATE MANDATE ID";
+    if ($this->_mode == 'test') {
+      $params['trxn_id'] = "TEST:".$params['trxn_id'];
+    }
+//TODO
+//civicrm_api ("SepaMandate","create", array ("version"=>3...);
   }
 
   function &error($errorCode = NULL, $errorMessage = NULL) {
@@ -83,6 +100,7 @@ die ("It's never used, but needs to be declared as it's an abstract method");
    *
    */
   function doTransferCheckout(&$params, $component) {
+die ("It's never used, but might if we switch mode");
 /*
 Array
 (
