@@ -1,12 +1,13 @@
-DROP TABLE IF EXISTS `civicrm_sdd_creditor`;
-DROP TABLE IF EXISTS `civicrm_sdd_mandate`;
+
+--DROP TABLE IF EXISTS 'civicrm_sdd_creditor';
+--DROP TABLE IF EXISTS `civicrm_sdd_mandate`;
 
 -- /*******************************************************
 -- *
 -- * civicrm_sdd_mandate
 -- *
 -- *******************************************************/
-CREATE TABLE `civicrm_sdd_mandate` (
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate`(
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
@@ -32,7 +33,7 @@ CREATE TABLE `civicrm_sdd_mandate` (
 -- * civicrm_sdd_mandate
 -- *
 -- *******************************************************/
-CREATE TABLE `civicrm_sdd_mandate` (
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
@@ -43,7 +44,7 @@ CREATE TABLE `civicrm_sdd_mandate` (
      `contact_id` int unsigned    COMMENT 'FK to Contact ID that owns that account',
      `iban` varchar(42) NULL   COMMENT 'Iban of the debtor',
      `bic` varchar(11) NULL   COMMENT 'BIC of the debtor',
-     `type` varchar(1) NOT NULL  DEFAULT R COMMENT 'R for recurrent (default) O for one-shot',
+     `type` varchar(1) NOT NULL  DEFAULT "R" COMMENT 'R for recurrent (default) O for one-shot',
      `enabled_id` tinyint NOT NULL  DEFAULT 1 COMMENT 'If the mandate has been validated',
      `creation_date` datetime    ,
      `validation_date` datetime     
