@@ -2,6 +2,27 @@
 
 require_once 'sepa.civix.php';
 
+function sepa_civicrm_buildForm ( $formName, &$form ){
+$form->_paymentFields["account_holder"] = null;
+$form->_paymentFields["bank_name"] = null;
+print_r($form->_paymentFields);
+  if(isset($form->_paymentProcessor['class_name'])
+    && $form->_paymentProcessor['class_name'] == 'Payment_SEPA_DD') {
+    if(!stristr($formName, '_Confirm') && !stristr($formName, '_ThankYou')) {
+      foreach (array( 'bank_account_number' ) as $f) {
+        if (!$form->elementExists($f)) {
+          continue;
+        }
+//       print_r($form->removeElement($f));
+      }
+        $form->addElement('text', 'iban', NULL, array('id'=> 'iban'));
+
+    }
+
+  }
+}
+
+
 /**
  * Implementation of hook_civicrm_config
  */

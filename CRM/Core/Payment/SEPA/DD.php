@@ -92,6 +92,47 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
 
   }
 
+  function buildForm(&$form) {
+//   $form->_paymentFields = array(); //remove existing fields
+    //e.g. IBAN can have maxlength of 34 digits
+    $form->_paymentFields['bank_iban'] = array(
+      'htmlType' => 'text',
+      'name' => 'bank_iban',
+      'title' => ts('IBAN'),
+      'cc_field' => TRUE,
+      'attributes' => array('size' => 20, 'maxlength' => 34, 'autocomplete' => 'off'),
+      'is_required' => FALSE,
+    );
+
+    //e.g. SWIFT-BIC can have maxlength of 11 digits
+    $form->_paymentFields['bank_bic'] = array(
+      'htmlType' => 'text',
+      'name' => 'bank_bic',
+      'title' => ts('BIC'),
+      'cc_field' => TRUE,
+      'attributes' => array('size' => 20, 'maxlength' => 11, 'autocomplete' => 'off'),
+      'is_required' => FALSE,
+    );
+
+      foreach ( $form->_paymentFields as $name => $field ) {
+        if ( isset($field['cc_field'] ) &&
+          $field['cc_field']
+        ) {
+          $form->add( $field['htmlType'],
+                      $field['name'],
+                      $field['title'],
+                      $field['attributes'],
+                      $field['is_required']
+                    );
+        }
+      }
+
+        CRM_Core_Region::instance('billing-block')->update( 'default', array( 'disabled' => TRUE ) ); 
+        CRM_Core_Region::instance('billing-block')->add( array( 'template' => 'CRM/Sepa/AAA.tpl', 
+          'weight'   => -1));
+
+  }
+
    /* @param array $params  name value pair of contribution data
    * This creates the mandate, should it be where the pdf mandate is generated and mailed to the supporter?
    * TODO: Write this
