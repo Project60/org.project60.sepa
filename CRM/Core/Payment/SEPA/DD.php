@@ -128,7 +128,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       }
 
         CRM_Core_Region::instance('billing-block')->update( 'default', array( 'disabled' => TRUE ) ); 
-        CRM_Core_Region::instance('billing-block')->add( array( 'template' => 'CRM/Sepa/AAA.tpl', 
+        CRM_Core_Region::instance('billing-block')->add( array( 'template' => 'CRM/Sepa/Mandate.tpl', 
           'weight'   => -1));
 
   }
