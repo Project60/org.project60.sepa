@@ -21,7 +21,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
     $dao->save();
 
     CRM_Utils_Hook::post($hook, 'SepaCreditor', $dao->id, $dao);
-    return $phone;
+    return $dao;
   }
 
 }

@@ -10,7 +10,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    *
    * @return object       CRM_Core_BAO_SEPAMandate object on success, null otherwise
    * @access public
-   * @static
+   * @static (I do appologize, I don't want to)
    */
   static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -18,10 +18,13 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
-    $dao->save();
-
+    try {
+      $dao->save();
+    } catch(PEAR_Exception $e) {
+      return civicrm_api3_create_error($e->getMessage());
+    }
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
-    return $phone;
+    return $this;
   }
 
 }
