@@ -46,7 +46,7 @@
  * @access public
  */
 function civicrm_api3_sepa_mandate_create($params) {
-  return _civicrm_api3_basic_create("CRM_Sepa_DAO_SEPAMandate", $params);
+  return _civicrm_api3_basic_create("CRM_Sepa_BAO_SEPAMandate", $params);
 }
 
 /**
