@@ -1,13 +1,13 @@
 
---DROP TABLE IF EXISTS 'civicrm_sdd_creditor';
---DROP TABLE IF EXISTS `civicrm_sdd_mandate`;
+-- DROP TABLE IF EXISTS 'civicrm_sdd_creditor';
+-- DROP TABLE IF EXISTS `civicrm_sdd_mandate`;
 
 -- /*******************************************************
 -- *
 -- * civicrm_sdd_mandate
 -- *
 -- *******************************************************/
-CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate`(
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate`(
      `iban` varchar(42) NULL   ,
      `contact_id` int unsigned    COMMENT 'FK to Contact ID that owns that account',
      `status_id` int unsigned NOT NULL  DEFAULT 3 COMMENT 'pseudo FK into civicrm_option_value.',
-     `BIX` varchar(64)    COMMENT 'don\'t know' 
+     `BIX` varchar(64)    COMMENT '  ' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate`(
         iban
   )
   
-,          CONSTRAINT FK_civicrm_sdd_mandate_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL  
+,          CONSTRAINT FK_civicrm_sdd_creditor_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
