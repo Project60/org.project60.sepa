@@ -39,13 +39,12 @@
     <comment>Provided by the bank. ISO country code+check digit+ZZZ+country specific identifier</comment>
     <add>4.3</add>
   </field>
-
   <field>
     <name>name</name>
     <title>name of the creditor</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>by default creditor_id.display_name?</comment>
+    <comment>by default creditor_id.display_name snapshot at creation</comment>
     <add>4.3</add>
   </field>
 
@@ -54,9 +53,27 @@
     <title>Address of the creditor</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>by default creditor_id.address (billing)</comment>
+    <comment>by default creditor_id.address (billing) at creation</comment>
     <add>4.3</add>
   </field>
+
+ <field>
+      <name>country_id</name>
+      <title>Country</title>
+      <type>int unsigned</type>
+      <comment>Which Country does this address belong to.</comment>
+       <add>4.3</add>
+  </field>
+ <foreignKey>
+       <name>country_id</name>
+       <table>civicrm_country</table>
+       <key>id</key>
+       <import>true</import>
+       <headerPattern>/country/i</headerPattern>
+       <dataPattern>/\w+(\s\w+)?/</dataPattern>
+       <add>1.1</add>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
 
 
   <field>
