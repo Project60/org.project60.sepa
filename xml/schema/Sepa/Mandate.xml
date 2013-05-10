@@ -76,7 +76,6 @@
     <name>date</name>
     <title>Signature date</title>
     <type>datetime</type>
-    <default>now()</default>
     <required>true</required>
     <comment>by default now()</comment>
     <add>4.3</add>
