@@ -46,7 +46,7 @@
  * @access public
  */
 function civicrm_api3_sepa_creditor_create($params) {
-  return _civicrm_api3_basic_create("CRM_Sepa_DAO_SEPACreditor", $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -74,7 +74,7 @@ function _civicrm_api3_sepa_creditor_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_sepa_creditor_delete($params) {
-  return _civicrm_api3_basic_delete("CRM_Sepa_DAO_SEPACreditor", $params);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -93,6 +93,6 @@ function civicrm_api3_sepa_creditor_delete($params) {
  */
 function civicrm_api3_sepa_creditor_get($params) {
 
-  return _civicrm_api3_basic_get("CRM_Sepa_DAO_SEPACreditor", $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
