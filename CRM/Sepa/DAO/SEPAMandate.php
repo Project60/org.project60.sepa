@@ -248,7 +248,6 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Signature date') ,
           'required' => true,
-          'default' => 'ow(',
         ) ,
         'creditor_id' => array(
           'name' => 'creditor_id',

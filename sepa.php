@@ -5,7 +5,6 @@ require_once 'sepa.civix.php';
 function sepa_civicrm_buildForm ( $formName, &$form ){
 $form->_paymentFields["account_holder"] = null;
 $form->_paymentFields["bank_name"] = null;
-print_r($form->_paymentFields);
   if(isset($form->_paymentProcessor['class_name'])
     && $form->_paymentProcessor['class_name'] == 'Payment_SEPA_DD') {
     if(!stristr($formName, '_Confirm') && !stristr($formName, '_ThankYou')) {
@@ -27,6 +26,8 @@ print_r($form->_paymentFields);
  * Implementation of hook_civicrm_config
  */
 function sepa_civicrm_config(&$config) {
+CRM_Core_DAO_AllCoreTables::$daoToClass["SepaMandate"] = "CRM_Sepa_DAO_SEPAMandate";
+CRM_Core_DAO_AllCoreTables::$daoToClass["SepaCreditor"] = "CRM_Sepa_DAO_SEPACreditor";
   _sepa_civix_civicrm_config($config);
 }
 
