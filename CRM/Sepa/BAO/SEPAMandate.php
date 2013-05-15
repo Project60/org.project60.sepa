@@ -5,7 +5,14 @@
 class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   // TODO: generate a more meaningful reference?
-  function generateReference () {
+  /**
+   * @param array ref object, eg. the recurring contribution or membership
+   * @param string type, ie. "R"ecurring "M"embership 
+   * format type+contact_id+"-"+ref object
+   */
+
+  function generateReference (&$ref = null, $type = "R") {
+    //format 
     return md5(uniqid(rand(), TRUE));
   }
 
@@ -24,13 +31,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
 
+    if (!array_key_exists("date",$params)){
+      $params["date"]= date("YmdHis");
+    }
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
-    try {
-      $dao->save();
-    } catch(PEAR_Exception $e) {
-      return civicrm_api3_create_error($e->getMessage());
-    }
+    $dao->save();
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }

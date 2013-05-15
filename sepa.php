@@ -1,5 +1,4 @@
 <?php
-
 require_once 'sepa.civix.php';
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
@@ -26,8 +25,11 @@ $form->_paymentFields["bank_name"] = null;
  * Implementation of hook_civicrm_config
  */
 function sepa_civicrm_config(&$config) {
+/*
+when civi 4.4, not sure how to make it compatible with both
 CRM_Core_DAO_AllCoreTables::$daoToClass["SepaMandate"] = "CRM_Sepa_DAO_SEPAMandate";
 CRM_Core_DAO_AllCoreTables::$daoToClass["SepaCreditor"] = "CRM_Sepa_DAO_SEPACreditor";
+*/ 
   _sepa_civix_civicrm_config($config);
 }
 
