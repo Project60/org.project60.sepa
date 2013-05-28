@@ -19,7 +19,8 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
      ));
   }
 
-  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["name"] == "sepa") {
+
+  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );
     $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
     if (!array_key_exists("id",$mandate))
