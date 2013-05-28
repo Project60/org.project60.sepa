@@ -2,7 +2,8 @@
 require_once 'sepa.civix.php';
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
-  if ("CRM_Contribute_Form_Contribution" == $formName) {
+  if ("CRM_Contribute_Form_Contribution" == $formName) { 
+    //should we be able to set the mandate info from the contribution?
     if (!array_key_exists("contribution_recur_id",$form->_values))
       return;
     $id=$form->_values['contribution_recur_id'];
@@ -15,8 +16,23 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
      ));
-    
+  }
 
+  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["name"] == "sepa") {
+    $id= $form->getVar( '_crid' );
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
+    if (!array_key_exists("id",$mandate))
+      return;
+    //TODO, add in the form, as a region?
+    $form->add( 'text', 'bank_bic',  ts('BIC'));
+    $e=$form->getElement('bank_bic');
+    $e->setValue($mandate["bic"]);
+    $form->add( 'text', 'bank_iban',  ts('IBAN'));
+    $e=$form->getElement('bank_iban');
+    $e->setValue($mandate["iban"]);
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
+     ));
   }
 }
 
