@@ -65,12 +65,15 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       die ("TODO manage memberships in SEPA. It's supposed to be with with a recurring membership.");
       // TODO: link mandate to membership
     } else {
-      die ("is this a single payment. We don't do that in SEPA (yet)");
+      die ("is this a single payment? We don't do that in SEPA (yet)");
     }
+    $apiParams["creation_date"]= date('Y-m-d G:i:s');
     $r = civicrm_api ("SepaMandate","create", $apiParams);
     if ($r["is_error"]) {
       CRM_Core_Error::fatal($r["error_message"]);
     }
+    // process the new mandate
+    CRM_Sepa_Logic_Mandates::mandateCreated( $r['id']);
   }
 
   function &error($errorCode = NULL, $errorMessage = NULL) {

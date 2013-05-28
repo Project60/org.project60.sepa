@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class contains functions for Sepa mandates
  */
@@ -10,10 +11,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    * @param string type, ie. "R"ecurring "M"embership 
    * format type+contact_id+"-"+ref object
    */
-
-  function generateReference (&$ref = null, $type = "R") {
+  function generateReference(&$ref = null, $type = "R") {
     //format 
-    return md5(uniqid(rand(), TRUE));
+    // return md5(uniqid(rand(), TRUE));
+    return CRM_Sepa_Logic_Mandates::createMandateReference($ref, $type);
   }
 
   /**
@@ -27,12 +28,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if (!CRM_Utils_Array::value('reference', $params)) {
       $params["reference"] = CRM_Sepa_BAO_SEPAMandate::generateReference();
     }
- 
+
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
 
-    if (!array_key_exists("date",$params)){
-      $params["date"]= date("YmdHis");
+    if (!array_key_exists("date", $params)) {
+      $params["date"] = date("YmdHis");
     }
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
@@ -40,5 +41,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }
+
 }
 
