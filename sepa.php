@@ -26,15 +26,11 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     if (!array_key_exists("id",$mandate))
       return;
     //TODO, add in the form, as a region?
-    $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'));
-    $e=$form->getElement('sepa_active');
-    $e->setValue($mandate["is_active"]);
-    $form->add( 'text', 'bank_bic',  ts('BIC'));
-    $e=$form->getElement('bank_bic');
-    $e->setValue($mandate["bic"]);
-    $form->add( 'text', 'bank_iban',  ts('IBAN'));
-    $e=$form->getElement('bank_iban');
-    $e->setValue($mandate["iban"]);
+    $e=$form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_active"]);
+    $e=$form->add( 'text', 'bank_bic',  ts('BIC'))->setValue($mandate["bic"]);
+    $form->add( 'text', 'bank_iban',  ts('IBAN'))->setValue($mandate["iban"]);
+//    $e=$form->getElement('bank_iban');
+//    $e->setValue($mandate["iban"]);
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
      ));
