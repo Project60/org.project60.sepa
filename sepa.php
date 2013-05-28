@@ -2,20 +2,20 @@
 require_once 'sepa.civix.php';
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
-$form->_paymentFields["account_holder"] = null;
-$form->_paymentFields["bank_name"] = null;
-  if(isset($form->_paymentProcessor['class_name'])
-    && $form->_paymentProcessor['class_name'] == 'Payment_SEPA_DD') {
-    if(!stristr($formName, '_Confirm') && !stristr($formName, '_ThankYou')) {
-      foreach (array( 'bank_account_number' ) as $f) {
-        if (!$form->elementExists($f)) {
-          continue;
-        }
-//       print_r($form->removeElement($f));
-      }
-        $form->addElement('text', 'iban', NULL, array('id'=> 'iban'));
-
-    }
+  if ("CRM_Contribute_Form_Contribution" == $formName) {
+    if (!array_key_exists("contribution_recur_id",$form->_values))
+      return;
+    $id=$form->_values['contribution_recur_id'];
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
+    if (!array_key_exists("id",$mandate))
+      return;
+    //TODO, add in the form, as a region?
+    $form->add( 'text', 'bank_bic',  ts('BIC'));
+    $form->add( 'text', 'bank_iban',  ts('IBAN'));
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
+     ));
+    
 
   }
 }

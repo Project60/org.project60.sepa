@@ -60,16 +60,18 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     ) {
       $apiParams["entity_table"]="civicrm_contribution_recur";
       $apiParams["entity_id"]= $params['contributionRecurID'];
-    }
-//single debit? 
-    if (CRM_Utils_Array::value('selectMembership', $params))   {
+    } elseif (CRM_Utils_Array::value('selectMembership', $params))   {
 print_r($params);
 die ("TODO manage memberships in SEPA");
     // TODO: link mandate to membership
+    } else {
+print_r($params);
+die ("is this a single payment. Tell Xavier you found this message?");
     }
-$r = civicrm_api ("SepaMandate","create", $apiParams);
-print_r($r);
-die ("ttt");
+    $r = civicrm_api ("SepaMandate","create", $apiParams);
+    if ($r["is_error"]) {
+      CRM_Core_Error::fatal($r["error_message"]);
+    }
   }
 
   function &error($errorCode = NULL, $errorMessage = NULL) {
@@ -101,6 +103,7 @@ die ("ttt");
   }
 
   function buildForm(&$form) {
+   $form->setDefaults(array('is_recur'=>true));
    $form->_paymentFields = array(); //remove existing fields
     //e.g. IBAN can have maxlength of 34 digits
     $form->_paymentFields['bank_iban'] = array(
