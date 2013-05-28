@@ -1,5 +1,6 @@
 <?php
 require_once 'sepa.civix.php';
+require_once 'hooks.php';
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
   if ("CRM_Contribute_Form_Contribution" == $formName) {
