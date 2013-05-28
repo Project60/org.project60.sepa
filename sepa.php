@@ -25,6 +25,9 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     if (!array_key_exists("id",$mandate))
       return;
     //TODO, add in the form, as a region?
+    $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'));
+    $e=$form->getElement('sepa_active');
+    $e->setValue($mandate["is_active"]);
     $form->add( 'text', 'bank_bic',  ts('BIC'));
     $e=$form->getElement('bank_bic');
     $e->setValue($mandate["bic"]);
