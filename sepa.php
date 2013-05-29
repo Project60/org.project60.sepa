@@ -3,14 +3,12 @@ require_once 'sepa.civix.php';
 require_once 'hooks.php';
 
 function sepa_civicrm_pageRun( &$page ) {
+  if ( get_class($page) != "CRM_Contribute_Page_ContributionRecur")
+    return;
   $recur = $page->getTemplate()->get_template_vars("recur");
 
-print_r($recur);
-//print_r($recur->get_template_vars("rows"));
-//return;
   $pp = civicrm_api('PaymentProcessor', 'getsingle', 
     array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
-  print_r($pp);
   if ("Payment_SEPA_DD" !=  $pp["class_name"])
     return;
   $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$recur["id"]));
