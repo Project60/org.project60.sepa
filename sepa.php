@@ -2,6 +2,24 @@
 require_once 'sepa.civix.php';
 require_once 'hooks.php';
 
+function sepa_civicrm_pageRun( &$page ) {
+  $recur = $page->getTemplate()->get_template_vars("recur");
+
+print_r($recur);
+//print_r($recur->get_template_vars("rows"));
+//return;
+  $pp = civicrm_api('PaymentProcessor', 'getsingle', 
+    array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
+  print_r($pp);
+  if ("Payment_SEPA_DD" !=  $pp["class_name"])
+    return;
+die ("tt".$recur["payment_processor_id"]);
+  $page->assign("aaa","bbb");
+  CRM_Core_Region::instance('page-body')->add(array(
+    'template' => 'CRM/Contribute/Page/ContributionRecur.page-body.tpl'
+  ));
+}
+
 function sepa_civicrm_buildForm ( $formName, &$form ){
   if ("CRM_Contribute_Form_Contribution" == $formName) { 
     //should we be able to set the mandate info from the contribution?
