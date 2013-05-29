@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
      `iban` varchar(42) NULL   COMMENT 'Iban of the debtor',
      `bic` varchar(11)    COMMENT 'BIC of the debtor',
      `type` varchar(1) NOT NULL  DEFAULT 'R' COMMENT 'R for recurrent (default) O for one-shot',
-     `enabled_id` tinyint NOT NULL  DEFAULT 1 COMMENT 'If the mandate has been validated',
+     `is_enabled` tinyint NOT NULL  DEFAULT 1 COMMENT 'If the mandate has been validated',
      `creation_date` datetime    ,
      `validation_date` datetime     
 ,

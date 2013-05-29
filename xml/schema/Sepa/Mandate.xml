@@ -144,7 +144,7 @@
   </field> 
 
   <field>  
-    <name>enabled_id</name>  
+    <name>is_enabled</name>  
     <type>boolean</type>  
     <required>true</required>  
     <default>1</default> 
