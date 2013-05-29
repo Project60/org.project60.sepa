@@ -13,8 +13,11 @@ print_r($recur);
   print_r($pp);
   if ("Payment_SEPA_DD" !=  $pp["class_name"])
     return;
-die ("tt".$recur["payment_processor_id"]);
-  $page->assign("aaa","bbb");
+  $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$recur["id"]));
+  if (!array_key_exists("id",$mandate)) {
+      CRM_Core_Error::fatal(ts("Can't find the sepa mandate"));
+  }
+  $page->assign("sepa",$mandate);
   CRM_Core_Region::instance('page-body')->add(array(
     'template' => 'CRM/Contribute/Page/ContributionRecur.page-body.tpl'
   ));
