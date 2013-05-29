@@ -24,7 +24,11 @@
 {literal}
 <script>
 cj(function($) {
-$('#sepa').insertAfter('#paymentDetails_Information');
+  if ($('#paymentDetails_Information').length >0) { 
+    $('#sepa').insertAfter('#paymentDetails_Information');
+  } else {
+    $('#sepa').insertAfter('.form-layout');
+  } 
 });
 </script>
 {/literal}
