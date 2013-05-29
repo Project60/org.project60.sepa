@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS civicrm_sdd_creditor;
 DROP TABLE IF EXISTS civicrm_sdd_mandate;
+DROP TABLE IF EXISTS civicrm_sdd_creditor;
 
 -- /*******************************************************
 -- *

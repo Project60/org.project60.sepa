@@ -20,7 +20,7 @@ return array (
     "url_recur_test_default"=>"",
     "billing_mode"=>"1", //form, seems to be the easiest
     "is_recur"=>"1",
-    "payment_type"=>"2" // direct debit
+    "payment_type"=>"9000" // SDD
     ),
   ),
 );

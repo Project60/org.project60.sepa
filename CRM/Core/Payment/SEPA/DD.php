@@ -67,13 +67,12 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     } else {
       die ("is this a single payment? We don't do that in SEPA (yet)");
     }
-    $apiParams["creation_date"]= date('Y-m-d G:i:s');
+    $apiParams["creation_date"]= date("YmdHis");
     $r = civicrm_api ("SepaMandate","create", $apiParams);
+    //die(print_r($r));
     if ($r["is_error"]) {
       CRM_Core_Error::fatal($r["error_message"]);
     }
-    // process the new mandate
-    CRM_Sepa_Logic_Mandates::mandateCreated( $r['id']);
   }
 
   function &error($errorCode = NULL, $errorMessage = NULL) {

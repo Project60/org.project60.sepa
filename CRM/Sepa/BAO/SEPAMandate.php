@@ -22,7 +22,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    *
    * @return object       CRM_Core_BAO_SEPAMandate object on success, null otherwise
    * @access public
-   * @static (I do appologize, I don't want to)
+   * @static (I do apologize, I don't want to)
    */
   static function add(&$params) {
     if (!CRM_Utils_Array::value('reference', $params)) {
@@ -35,9 +35,16 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if (!array_key_exists("date", $params)) {
       $params["date"] = date("YmdHis");
     }
+    //die(print_r($params));
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
     $dao->save();
+
+    // process the new mandate
+    $bao = new CRM_Sepa_BAO_SEPAMandate();
+    $bao->get('id',$dao->id);
+    CRM_Sepa_Logic_Mandates::fix_initial_contribution( $bao );
+
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }

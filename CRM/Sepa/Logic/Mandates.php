@@ -2,7 +2,7 @@
 
 class CRM_Sepa_Logic_Mandates {
 
-  /** 
+  /**
    * Handle creation of mandate references. 
    * TODO: make this modifiable using a hook
    * 
@@ -10,10 +10,10 @@ class CRM_Sepa_Logic_Mandates {
    * @param type $type
    * @return type
    */
-  public static function createMandateReference( &$ref = null, $type = "R") {
+  public static function createMandateReference(&$ref = null, $type = "R") {
     return 'MANDATE-R-' . sprintf("%08d", rand(0, 999999));
   }
-  
+
   /**
    * Handle the creation of a mandate
    * By default, there is an initial contribution which is created for a recurring contrib. Its status is set
@@ -22,8 +22,22 @@ class CRM_Sepa_Logic_Mandates {
    * 
    * @param type $id
    */
-  public static function mandateCreated( $id ) {
-    
+  public static function fix_initial_contribution(CRM_Sepa_BAO_SEPAMandate $bao) {
+    // for now, assume we can set the status to 'Pending' -- until we decide what the SEPA status should be
+    // as this is the current status which is created, do nothing
+  }
+
+  //hook which batches the contribution when it is created (using the hook magic function)
+  public static function hook_post_contribution_create($objectId, $objectRef) {
+    self::post_contribution_modify( $objectId, $objectRef);
+  }
+  public static function hook_post_contribution_edit($objectId, $objectRef) {
+    self::post_contribution_modify( $objectId, $objectRef);
+  }
+  public static function post_contribution_modify($objectId, $objectRef) {
+    // check whether this is a SDD contribution
+//    echo '<pre>';
+//    die(print_r($objectRef));
   }
 
 }

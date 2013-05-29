@@ -122,7 +122,71 @@ function sepa_civicrm_install() {
   $sql = file_get_contents(dirname( __FILE__ ) .'/sql/sepa.sql', true);
   CRM_Utils_File::sourceSQLFile($config->dsn, $sql, NULL, true);
 
+    //add the required option groups
+  sepa_civicrm_install_options(sepa_civicrm_options());
+
   return _sepa_civix_civicrm_install();
+}
+
+
+function sepa_civicrm_install_options($data) {
+  foreach ($data as $groupName => $group) {
+    // check group existence
+    $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => $groupName));
+    if ($result['is_error']) {
+      $params = array(
+          'version' => 3,
+          'sequential' => 1,
+          'name' => $groupName,
+          'is_reserved' => 1,
+          'is_active' => 1,
+          'title' => $group['title'],
+          'description' => $group['description'],
+      );
+      $result = civicrm_api('option_group', 'create', $params);
+      $group_id = $result['values'][0]['id'];
+    } else
+      $group_id = $result['id'];
+
+    if (is_array($group['values'])) {
+      $groupValues = $group['values'];
+      $weight = 1;
+      foreach ($groupValues as $valueName => $value) {
+        $result = civicrm_api('option_value', 'getsingle', array('version' => 3, 'name' => $valueName));
+        if ($result['is_error']) {
+          $params = array(
+              'version' => 3,
+              'sequential' => 1,
+              'option_group_id' => $group_id,
+              'name' => $valueName,
+              'label' => $value['label'],
+              'value' => $value['value'],
+              'weight' => $weight,
+              'is_default' => $value['is_default'],
+              'is_active' => 1,
+          );
+          $result = civicrm_api('option_value', 'create', $params);
+        } else {
+          $weight = $result['weight'] + 1;
+        }
+      }
+    }
+  }
+}
+
+function sepa_civicrm_options() {
+  // start with the lowest weight value
+  return array(
+      'payment_instrument' => array(
+          'values' => array(
+              'SEPA DD' => array(
+                  'label' => 'SEPA DD',
+                  'value' => 9000,
+                  'is_default' => 0,
+              ),
+          ),
+      ),
+  );
 }
 
 /**
