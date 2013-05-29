@@ -11,12 +11,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
     if (!array_key_exists("id",$mandate))
       return;
-    //TODO, add in the form, as a region?
-    $form->add( 'text', 'bank_bic',  ts('BIC'));
-    $form->add( 'text', 'bank_iban',  ts('IBAN'));
-    CRM_Core_Region::instance('page-body')->add(array(
-      'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
-     ));
+    //TODO, add in the form? link to something else?
   }
 
 
@@ -25,8 +20,12 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
     if (!array_key_exists("id",$mandate))
       return;
+    if (!$form->getVar("_subscriptionDetails")->installments) {
+      $form->getElement('installments')->setValue(0);//by default, sepa is without end date
+    }
+    $form->getElement('is_notify')->setValue(0); // the notification isn't clear, disable it
     //TODO, add in the form, as a region?
-    $e=$form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_active"]);
+    $e=$form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
     $e=$form->add( 'text', 'bank_bic',  ts('BIC'))->setValue($mandate["bic"]);
     $form->add( 'text', 'bank_iban',  ts('IBAN'))->setValue($mandate["iban"]);
 //    $e=$form->getElement('bank_iban');
@@ -37,6 +36,40 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
   }
 }
 
+function sepa_civicrm_postProcess( $formName, &$form ) {
+  $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic","sepa_active"=>"is_enabled");
+  $newMandate = array();
+
+  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
+    $id= $form->getVar( '_crid' );
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur","entity_id"=>$id));
+    if (!array_key_exists("id",$mandate))
+      return;
+    if (!array_key_exists("is_enabled",$mandate)) {
+      $mandate["is_enabled"] = false;
+    }
+    if (!array_key_exists("sepa_active",$form->_submitValues)) {
+      $form->_submitValues["sepa_active"] = false;
+    }
+    foreach ($fieldMapping as $field => $api) {
+      if($mandate[$api] !=$form->_submitValues[$field]) {
+        $newMandate[$api] = $form->_submitValues[$field];
+      }
+    }
+//TODO pdelbar:process properly (eg. update the first contribution linked to the recurring contrib...
+    if ($newMandate) {
+      $newMandate["id"]=$mandate["id"];
+      //not strictly needed, uncomment if proven handy in the underlying api/bao
+      //$newMandate["entity_id"]=$mandate["entity_id"];
+      //$newMandate["entity_table"]=$mandate["entity_table"];
+      $newMandate["version"] = 3;
+      $mandate = civicrm_api("SepaMandate","create",$newMandate);
+      if ($mandate["is_error"]) {
+        CRM_Core_Error::fatal($r["error_message"]);
+      }
+    }
+  }
+}
 
 /**
  * Implementation of hook_civicrm_config

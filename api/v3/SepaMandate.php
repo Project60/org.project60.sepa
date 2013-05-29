@@ -59,6 +59,7 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
   $params['entity_table']['api.default'] = "civicrm_contribution_recur";
   $params['type']['api.default'] = "R";
+  $params['is_enabled']['api.default'] = false;
 
 }
 
