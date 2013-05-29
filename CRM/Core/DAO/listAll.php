@@ -53,7 +53,6 @@ $dao['Friend'] = 'CRM_Friend_DAO_Friend';
 $dao['PledgeBlock'] = 'CRM_Pledge_DAO_PledgeBlock';
 $dao['QueueItem'] = 'CRM_Queue_DAO_QueueItem';
 $dao['PCP'] = 'CRM_PCP_DAO_PCP';
-$dao['SepaCreditor'] = 'CRM_Sepa_DAO_SEPACreditor';
 $dao['Cache'] = 'CRM_Core_DAO_Cache';
 $dao['Country'] = 'CRM_Core_DAO_Country';
 $dao['CustomGroup'] = 'CRM_Core_DAO_CustomGroup';
@@ -136,7 +135,6 @@ $dao['Field'] = 'CRM_Price_DAO_Field';
 $dao['FieldValue'] = 'CRM_Price_DAO_FieldValue';
 $dao['LineItem'] = 'CRM_Price_DAO_LineItem';
 $dao['PCPBlock'] = 'CRM_PCP_DAO_PCPBlock';
-$dao['SepaMandate'] = 'CRM_Sepa_DAO_SEPAMandate';
 $dao['Address'] = 'CRM_Core_DAO_Address';
 $dao['LocBlock'] = 'CRM_Core_DAO_LocBlock';
 $dao['GroupContact'] = 'CRM_Contact_DAO_GroupContact';
@@ -150,3 +148,9 @@ $dao['Participant'] = 'CRM_Event_DAO_Participant';
 $dao['ParticipantPayment'] = 'CRM_Event_DAO_ParticipantPayment';
 $dao['EventInCart'] = 'CRM_Event_Cart_DAO_EventInCart';
 $dao['PledgePayment'] = 'CRM_Pledge_DAO_PledgePayment';
+
+$dao['SepaMandate'] = 'CRM_Sepa_DAO_SEPAMandate';
+$dao['SepaCreditor'] = 'CRM_Sepa_DAO_SEPACreditor';
+
+$dao['BankAccount'] = 'CRM_Banking_DAO_BankAccount';
+$dao['BankTransaction'] = 'CRM_Banking_DAO_BankTransaction';
