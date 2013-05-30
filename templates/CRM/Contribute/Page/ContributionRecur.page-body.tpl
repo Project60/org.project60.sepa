@@ -1,4 +1,5 @@
-<h3>{ts}Sepa Mandate{/ts}</h3>
+<div class="crm-container">
+<h3>{ts}Sepa Mandate n°{$sepa.id}{/ts}</h3>
         <div class="crm-block crm-content-block crm-sdd-mandate">
           <table class="crm-info-panel">
             <tr><td class="label">{ts}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
@@ -10,16 +11,27 @@
             <tr><td class="label">{ts}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
 </table></div>
  
+{assign var="mid" value=$sepa.id}
 <div class="crm-submit-buttons">
-<a class="button" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}"><span><div class="icon ui-icon-close"></div>{ts}Done{/ts}</span></a>
+<form action="{crmURL p='civicrm/sepa/pdf' q="reset=1&id=$mid"}" amethod="post">
+<input type="hidden" name="id" value="{$sepa.id}"/>
+<input type="hidden" name="reset" value="1"/>
+<a class="button" href="{crmURL p='civicrm/contact/view' q="action=browse&selectedChild=contribute&cid=$contactId"}"><span><div class="icon ui-icon-close"></div>{ts}Done{/ts}</span></a>
 
 {assign var="crid" value=$recur.id}
 <a class="button" href="{crmURL p='civicrm/contribute/updaterecur' q="reset=1&crid=$crid&cid=$contactId&context=contribution"}"><span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+<button name="action" value="print" class="ui-button ui-button-text-icon-primary">
+<span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
+<span class="ui-button-text">Print</span>
+</button>
+<button name="action" value="email" class="ui-button ui-button-text-icon-primary">
+<span class="ui-button-icon-primary ui-icon ui-icon-mail-closed"></span>
+<span class="ui-button-text">Email</span>
+</button>
 
-<a class="button" href="#"><span><div class="icon print-icon"></div>{ts}Print{/ts}</span></a>
-<a class="button" href="#"><span><div class="icon email-icon"></div>{ts}Email{/ts}</span></a>
+</form>
 </div>
-
+</div>
 {literal}
 <style>
 .crm-recurcontrib-view-block .crm-submit-buttons {display:none;}

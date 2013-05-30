@@ -59,8 +59,6 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     $e=$form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
     $e=$form->add( 'text', 'bank_bic',  ts('BIC'))->setValue($mandate["bic"]);
     $form->add( 'text', 'bank_iban',  ts('IBAN'))->setValue($mandate["iban"]);
-//    $e=$form->getElement('bank_iban');
-//    $e->setValue($mandate["iban"]);
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
      ));
@@ -187,6 +185,15 @@ function sepa_civicrm_install_options($data) {
 function sepa_civicrm_options() {
   // start with the lowest weight value
   return array(
+      'msg_tpl_workflow_contribution' => array(
+          'values' => array(
+              'sepa_mandate_pdf' => array(
+                  'label' => 'PDF Mandate',
+                  'value' => 1,
+                  'is_default' => 0,
+              ),
+          ),
+       ),
       'payment_instrument' => array(
           'values' => array(
               'SEPA DD' => array(

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/sepa/pdf</path>
+    <page_callback>CRM_Sepa_Page_SepaMandatePdf</page_callback>
+    <title>PDF Sepa Mandate</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/sepa</path>
+    <page_callback>CRM_Sepa_Page_SepaMandate</page_callback>
+    <title>Sepa Mandate</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+</menu>

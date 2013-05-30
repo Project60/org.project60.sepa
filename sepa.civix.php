@@ -31,7 +31,7 @@ function _sepa_civix_civicrm_config(&$config = NULL) {
  * @param $files array(string)
  */
 function _sepa_civix_civicrm_xmlMenu(&$files) {
-  foreach (glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
+  foreach (_sepa_civix_glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
     $files[] = $file;
   }
 }
@@ -115,7 +115,7 @@ function _sepa_civix_find_files($dir, $pattern) {
   $result = array();
   while (!empty($todos)) {
     $subdir = array_shift($todos);
-    foreach (glob("$subdir/$pattern") as $match) {
+    foreach (_sepa_civix_glob("$subdir/$pattern") as $match) {
       if (!is_dir($match)) {
         $result[] = $match;
       }
@@ -149,4 +149,21 @@ function _sepa_civix_civicrm_managed(&$entities) {
       $entities[] = $e;
     }
   }
+}
+
+/**
+ * Glob wrapper which is guaranteed to return an array.
+ *
+ * The documentation for glob() says, "On some systems it is impossible to
+ * distinguish between empty match and an error." Anecdotally, the return
+ * result for an empty match is sometimes array() and sometimes FALSE.
+ * This wrapper provides consistency.
+ *
+ * @see http://php.net/glob
+ * @param string $pattern
+ * @return array, possibly empty
+ */
+function _sepa_civix_glob($pattern) {
+  $result = glob($pattern);
+  return is_array($result) ? $result : array();
 }
