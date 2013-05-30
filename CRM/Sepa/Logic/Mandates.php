@@ -10,8 +10,14 @@ class CRM_Sepa_Logic_Mandates {
    * @param type $type
    * @return type
    */
-  public static function createMandateReference(&$ref = null, $type = "R") {
-    return 'MANDATE-R-' . sprintf("%08d", rand(0, 999999));
+  public static function createMandateReference(&$ref = null, $type= "R") {
+    $r = "MANDATE";
+    if ($ref) {
+      $r .="-".$ref["entity_id"];
+    } else {
+      $r .= "-RAND".sprintf("%08d", rand(0, 999999));
+    }
+    return $r;
   }
 
   /**

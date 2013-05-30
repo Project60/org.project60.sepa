@@ -99,6 +99,8 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
 
   function buildForm(&$form) {
     $form->_paymentFields = array(); //remove existing fields (bank account, branch, bla)
+    //TODO input:[name="is_recur"]')[0].checked = true;
+
     //e.g. IBAN can have maxlength of 34 digits
     $form->_paymentFields['bank_iban'] = array(
         'htmlType' => 'text',

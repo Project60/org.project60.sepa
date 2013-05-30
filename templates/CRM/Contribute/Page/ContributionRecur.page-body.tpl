@@ -9,11 +9,15 @@
             <tr><td class="label">{ts}Signature date{/ts}</td><td>{$sepa.date}</td></tr>
             <tr><td class="label">{ts}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
 </table></div>
+ 
 <div class="crm-submit-buttons">
-<div class="crm-button"><div class="icon"></div>{ts}Done{/ts}</div>
-<div class="crm-button"><div class="icon"></div>{ts}Edit{/ts}</div>
-<div class="crm-button"><div class="icon ui-icon-print"></div>{ts}Print{/ts}</div>
-<div class="crm-button"><div class="icon ui-icon-mail-closed"></div>{ts}Mail{/ts}</div>
+<a class="button" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}"><span><div class="icon ui-icon-close"></div>{ts}Done{/ts}</span></a>
+
+{assign var="crid" value=$recur.id}
+<a class="button" href="{crmURL p='civicrm/contribute/updaterecur' q="reset=1&crid=$crid&cid=$contactId&context=contribution"}"><span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+
+<a class="button" href="#"><span><div class="icon print-icon"></div>{ts}Print{/ts}</span></a>
+<a class="button" href="#"><span><div class="icon email-icon"></div>{ts}Email{/ts}</span></a>
 </div>
 
 {literal}

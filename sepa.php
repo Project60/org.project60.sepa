@@ -2,7 +2,19 @@
 require_once 'sepa.civix.php';
 require_once 'hooks.php';
 
+function sepa_pageRun_contribute( &$page ) {
+  $recur = $page->getTemplate()->get_template_vars("contribution_recur_id");
+print_r($recur);
+  CRM_Core_Region::instance('page-body')->add(array(
+    'markup' => "AAAAAAAAAAA"
+  ));
+}
+
 function sepa_civicrm_pageRun( &$page ) {
+//die (get_class($page));
+  if (get_class($page) == "CRM_Contribute_Page_Tab") {
+    return sepa_pageRun_contribute( &$page );
+  }
   if ( get_class($page) != "CRM_Contribute_Page_ContributionRecur")
     return;
   $recur = $page->getTemplate()->get_template_vars("recur");

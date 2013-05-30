@@ -26,7 +26,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   static function add(&$params) {
     if (!CRM_Utils_Array::value('reference', $params)) {
-      $params["reference"] = CRM_Sepa_BAO_SEPAMandate::generateReference();
+      $params["reference"] = CRM_Sepa_BAO_SEPAMandate::generateReference($params);
     }
 
     $hook = empty($params['id']) ? 'create' : 'edit';
