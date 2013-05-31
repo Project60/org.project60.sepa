@@ -20,11 +20,11 @@
 
 {assign var="crid" value=$recur.id}
 <a class="button" href="{crmURL p='civicrm/contribute/updaterecur' q="reset=1&crid=$crid&cid=$contactId&context=contribution"}"><span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
-<button name="action" value="print" class="ui-button ui-button-text-icon-primary">
+<button name="pdfaction" value="print" class="ui-button ui-button-text-icon-primary">
 <span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
 <span class="ui-button-text">Print</span>
 </button>
-<button name="action" value="email" class="ui-button ui-button-text-icon-primary">
+<button name="pdfaction" value="email" class="ui-button ui-button-text-icon-primary">
 <span class="ui-button-icon-primary ui-icon ui-icon-mail-closed"></span>
 <span class="ui-button-text">Email</span>
 </button>
