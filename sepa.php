@@ -4,7 +4,6 @@ require_once 'hooks.php';
 
 function sepa_pageRun_contribute( &$page ) {
   $recur = $page->getTemplate()->get_template_vars("contribution_recur_id");
-print_r($recur);
   CRM_Core_Region::instance('page-body')->add(array(
     'markup' => "AAAAAAAAAAA"
   ));
@@ -33,7 +32,21 @@ function sepa_civicrm_pageRun( &$page ) {
   ));
 }
 
+function _sepa_buildForm_Contribution_Main ($formName, &$form ){
+  $pp= civicrm_api("PaymentProcessor","getsingle"
+    ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
+  if("Payment_SEPA_DD" != $pp["class_name"])
+    return;
+  $form->getElement('is_recur')->setValue(1); // if sepa, it's recurring contrib
+}
+
 function sepa_civicrm_buildForm ( $formName, &$form ){
+  //todo, implement as switch?
+  if ("CRM_Contribute_Form_Contribution_Main" == $formName) { 
+    _sepa_buildForm_Contribution_Main ($formName, &$form );
+    return;
+  }
+
   if ("CRM_Contribute_Form_Contribution" == $formName) { 
     //should we be able to set the mandate info from the contribution?
     if (!array_key_exists("contribution_recur_id",$form->_values))
