@@ -42,3 +42,19 @@ function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
     CRM_Sepa_Logic_Mandates::$methodName($objectId, $objectRef);
   }
 }
+
+
+// totten's addition
+function sepa_civicrm_entityTypes(&$entityTypes) {
+  // add my DAO's
+  $entityTypes[] = array(
+      'name' => 'SepaMandate',
+      'class' => 'CRM_Sepa_DAO_SEPAMandate',
+      'table' => 'civicrm_sepa_mandate',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaCreditor',
+      'class' => 'CRM_Sepa_DAO_SEPACreditor',
+      'table' => 'civicrm_sepa_creditor',
+  );
+}
