@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Sepa_Logic_Mandates {
+class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
 
   /**
    * Handle creation of mandate references. 
@@ -10,12 +10,12 @@ class CRM_Sepa_Logic_Mandates {
    * @param type $type
    * @return type
    */
-  public static function createMandateReference(&$ref = null, $type= "R") {
+  public static function createMandateReference(&$ref = null, $type = "R") {
     $r = "MANDATE";
     if ($ref) {
-      $r .="-".$ref["entity_id"];
+      $r .="-" . $ref["entity_id"];
     } else {
-      $r .= "-RAND".sprintf("%08d", rand(0, 999999));
+      $r .= "-RAND" . sprintf("%08d", rand(0, 999999));
     }
     return $r;
   }
@@ -35,15 +35,23 @@ class CRM_Sepa_Logic_Mandates {
 
   //hook which batches the contribution when it is created (using the hook magic function)
   public static function hook_post_contribution_create($objectId, $objectRef) {
-    self::post_contribution_modify( $objectId, $objectRef);
+    self::post_contribution_modify($objectId, $objectRef);
   }
+
   public static function hook_post_contribution_edit($objectId, $objectRef) {
-    self::post_contribution_modify( $objectId, $objectRef);
+    self::post_contribution_modify($objectId, $objectRef);
   }
+
   public static function post_contribution_modify($objectId, $objectRef) {
-    // check whether this is a SDD contribution
-//    echo '<pre>';
-//    die(print_r($objectRef));
+    // check whether this is a SDD contribution. This could be done using a financial_type_id created specially 
+    // for that purpose, or by examining the contrib->payment_instrument->pptype
+    if (CRM_Sepa_Logic_Base::isSDDContribution($objectRef)) {
+      $objectRef->payment_instrument_id = CRM_Core_OptionGroup::getValue('payment_instrument', 'SEPADD', 'name', 'String', 'id');
+      $objectRef->save();
+    } else {
+      
+    }
   }
 
 }
+
