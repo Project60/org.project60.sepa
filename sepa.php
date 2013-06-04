@@ -28,7 +28,7 @@ function sepa_civicrm_pageRun( &$page ) {
   }
   $page->assign("sepa",$mandate);
   CRM_Core_Region::instance('page-body')->add(array(
-    'template' => 'CRM/Contribute/Page/ContributionRecur.page-body.tpl'
+    'template' => 'Sepa/Contribute/Form/ContributionRecur.tpl'
   ));
 }
 
@@ -41,7 +41,29 @@ function _sepa_buildForm_Contribution_Main ($formName, &$form ){
 }
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
-  //todo, implement as switch?
+  if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
+    $form->add('text', 'creditor_name', ts('Organisation Name'));
+    $form->add('textarea', 'creditor_address', ts('Address'), array('cols' => '60', 'rows' => '3'));
+    $form->add('checkbox', 'mandate_active', ts('Mandate created are active by default?'));
+    $form->add( 'text', 'creditor_prefix',  ts('Mandate Prefix'))->setValue($mandate["iban"]);
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'Sepa/Admin/Form/PaymentProcessor.tpl'
+    ));
+  }
+
+  if ("CRM_Contribute_Form_Contribution_ThankYou" == $formName) {
+    $form->assign("iban",$form->_params["bank_iban"]);
+    $form->assign("bic",$form->_params["bank_bic"]);
+    CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
+      'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
+  }
+
+  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName) {
+    $form->assign("iban",$form->_params["bank_iban"]);
+    $form->assign("bic",$form->_params["bank_bic"]);
+    CRM_Core_Region::instance('contribution-confirm-billing-block')->add(array(
+      'template' => 'Sepa/Contribute/Form/Contribution/Confirm.tpl'));
+  };
   if ("CRM_Contribute_Form_Contribution_Main" == $formName) { 
     _sepa_buildForm_Contribution_Main ($formName, &$form );
     return;
@@ -79,9 +101,17 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
 }
 
 function sepa_civicrm_postProcess( $formName, &$form ) {
+//print_r($form);die("aaa".$formName);
   $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic","sepa_active"=>"is_enabled");
   $newMandate = array();
 
+  if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
+    $values=$form->getVar("_values");
+    if ($values["class_name"]!="Payment_SEPA_DD") return;
+print_r(    $values = $form->controller->exportValues($form->getVar("_name")));
+//print_r($values);
+die ("aaa");
+  }
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );
     $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur","entity_id"=>$id));
