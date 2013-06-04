@@ -10,7 +10,6 @@ function sepa_pageRun_contribute( &$page ) {
 }
 
 function sepa_civicrm_pageRun( &$page ) {
-//die (get_class($page));
   if (get_class($page) == "CRM_Contribute_Page_Tab") {
     return sepa_pageRun_contribute( &$page );
   }
@@ -28,7 +27,7 @@ function sepa_civicrm_pageRun( &$page ) {
   }
   $page->assign("sepa",$mandate);
   CRM_Core_Region::instance('page-body')->add(array(
-    'template' => 'Sepa/Contribute/Form/ContributionRecur.tpl'
+    'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
   ));
 }
 
@@ -38,6 +37,10 @@ function _sepa_buildForm_Contribution_Main ($formName, &$form ){
   if("Payment_SEPA_DD" != $pp["class_name"])
     return;
   $form->getElement('is_recur')->setValue(1); // if sepa, it's recurring contrib
+  //workaround the notice message, as ContributionBase assumes these fields exist in the confirm step
+  foreach (array("account_holder","bank_identification_number","bank_name","bank_account_number") as $field){
+    $form->addElement("hidden",$field);
+  }
 }
 
 function sepa_civicrm_buildForm ( $formName, &$form ){

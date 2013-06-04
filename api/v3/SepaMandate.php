@@ -45,8 +45,6 @@
  * @access public
  */
 function civicrm_api3_sepa_mandate_create($params) {
-  echo 'mandate create called';
-  die(_civicrm_api3_get_BAO(__FUNCTION__));
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
