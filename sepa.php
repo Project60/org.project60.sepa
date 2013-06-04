@@ -3,10 +3,12 @@ require_once 'sepa.civix.php';
 require_once 'hooks.php';
 
 function sepa_pageRun_contribute( &$page ) {
+/*
   $recur = $page->getTemplate()->get_template_vars("contribution_recur_id");
   CRM_Core_Region::instance('page-body')->add(array(
-    'markup' => "AAAAAAAAAAA"
+    'markup' => "Should we mention special steps to update/alter the contribution, eg if part of a batch already"
   ));
+*/
 }
 
 function sepa_civicrm_pageRun( &$page ) {
@@ -235,6 +237,11 @@ function sepa_civicrm_options() {
           'values' => array(
               'sepa_mandate_pdf' => array(
                   'label' => 'PDF Mandate',
+                  'value' => 1,
+                  'is_default' => 0,
+              ),
+              'sepa_mandate' => array(
+                  'label' => 'Mail Sepa Mandate',
                   'value' => 1,
                   'is_default' => 0,
               ),
