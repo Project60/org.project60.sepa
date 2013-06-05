@@ -105,8 +105,18 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
   }
 }
 
+function sepa_civicrm_validate ( $formName, &$fields, &$files, &$form ) {
+  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName) { 
+    $pp= civicrm_api("PaymentProcessor","getsingle"
+      ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
+    if("Payment_SEPA_DD" != $pp["class_name"])
+      return;
+    $GLOBALS["sepa_context"]["processor"]=1;
+    return;
+  }
+}
+
 function sepa_civicrm_postProcess( $formName, &$form ) {
-//print_r($form);die("aaa".$formName);
   $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic","sepa_active"=>"is_enabled");
   $newMandate = array();
 
@@ -115,7 +125,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     if ($values["class_name"]!="Payment_SEPA_DD") return;
 print_r(    $values = $form->controller->exportValues($form->getVar("_name")));
 //print_r($values);
-die ("aaa");
+//die ("aaa");
   }
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );
