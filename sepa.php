@@ -38,7 +38,9 @@ function _sepa_buildForm_Contribution_Main ($formName, &$form ){
     ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
   if("Payment_SEPA_DD" != $pp["class_name"])
     return;
-  $form->getElement('is_recur')->setValue(1); // if sepa, it's recurring contrib
+  //$form->getElement('is_recur')->setValue(1); // recurring contrib as an option
+  $form->removeElement('is_recur'); // force recurring contrib
+  $form->addElement('hidden','is_recur',1);
   //workaround the notice message, as ContributionBase assumes these fields exist in the confirm step
   foreach (array("account_holder","bank_identification_number","bank_name","bank_account_number") as $field){
     $form->addElement("hidden",$field);
