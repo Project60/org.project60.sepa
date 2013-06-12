@@ -9,12 +9,6 @@
  * @param type $params
  */
 function sepa_civicrm_pre($op, $objectName, $id, &$params) {
-  if ($objectName != "Contribution") // && $objectName != "ContributionRecur")
-    return;
-  if (array_key_exists("sepa_context",$GLOBALS) && $GLOBALS["sepa_context"]["processor"]) {
-  $params["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', 'SEPADD', 'name', 'String', 'id');
-  }
-
   $parts = array(
       'hook',
       'pre',

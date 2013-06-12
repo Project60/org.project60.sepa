@@ -58,14 +58,14 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     ));
   }
 
-  if ("CRM_Contribute_Form_Contribution_ThankYou" == $formName) {
+  if ("CRM_Contribute_Form_Contribution_ThankYou" == $formName && array_key_exists("bank_iban",$form->_params)) {
     $form->assign("iban",$form->_params["bank_iban"]);
     $form->assign("bic",$form->_params["bank_bic"]);
     CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
       'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
   }
 
-  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName) {
+  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName && array_key_exists("bank_iban",$form->_params) ) {
     $form->assign("iban",$form->_params["bank_iban"]);
     $form->assign("bic",$form->_params["bank_bic"]);
     CRM_Core_Region::instance('contribution-confirm-billing-block')->add(array(
