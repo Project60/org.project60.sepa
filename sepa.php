@@ -58,15 +58,9 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     ));
   }
 
-  if ("CRM_Contribute_Form_Contribution_ThankYou" == $formName && array_key_exists("bank_iban",$form->_params)) {
-    $form->assign("iban",$form->_params["bank_iban"]);
-    $form->assign("bic",$form->_params["bank_bic"]);
-    CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
-      'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
-  }
-
   if ("CRM_Contribute_Form_Contribution_Confirm" == $formName && array_key_exists("bank_iban",$form->_params) ) {
-    $form->assign("iban",$form->_params["bank_iban"]);
+    require_once("packages/php-iban-1.4.0/php-iban.php");
+    $form->assign("iban",iban_to_human_format($form->_params["bank_iban"]));
     $form->assign("bic",$form->_params["bank_bic"]);
     CRM_Core_Region::instance('contribution-confirm-billing-block')->add(array(
       'template' => 'Sepa/Contribute/Form/Contribution/Confirm.tpl'));
@@ -74,6 +68,13 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
   if ("CRM_Contribute_Form_Contribution_Main" == $formName) { 
     _sepa_buildForm_Contribution_Main ($formName, &$form );
     return;
+  }
+
+  if ("CRM_Contribute_Form_Contribution_ThankYou" == $formName && array_key_exists("bank_iban",$form->_params)) {
+    $form->assign("iban",$form->_params["bank_iban"]);
+    $form->assign("bic",$form->_params["bank_bic"]);
+    CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
+      'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
   }
 
   if ("CRM_Contribute_Form_Contribution" == $formName) { 
@@ -104,17 +105,6 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
      ));
-  }
-}
-
-function sepa_civicrm_validate ( $formName, &$fields, &$files, &$form ) {
-  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName) { 
-    $pp= civicrm_api("PaymentProcessor","getsingle"
-      ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
-    if("Payment_SEPA_DD" != $pp["class_name"])
-      return;
-    $GLOBALS["sepa_context"]["processor"]=1;
-    return;
   }
 }
 
