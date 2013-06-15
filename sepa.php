@@ -45,6 +45,14 @@ function _sepa_buildForm_Contribution_Main ($formName, &$form ){
   foreach (array("account_holder","bank_identification_number","bank_name","bank_account_number") as $field){
     $form->addElement("hidden",$field);
   }
+$js= <<<'EOD'
+cj(function($) {
+ $('#bank_iban,#bank_bic').keyup(function() {
+   this.value = this.value.toUpperCase();
+ });
+});
+EOD;
+  CRM_Core_Region::instance('page-header')->add(array('script' => $js));
 }
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
