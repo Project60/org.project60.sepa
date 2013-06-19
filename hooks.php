@@ -48,7 +48,6 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
       strtolower($op)
   );
   $methodName = implode('_', $parts);
-  CRM_Core_Session::setStatus(ts('SEPA hook response'), $methodName, 'alert');
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName))
     CRM_Sepa_Logic_Mandates::$methodName($id, $params);
 }

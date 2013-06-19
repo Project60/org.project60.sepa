@@ -35,7 +35,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
   }
 
   //hook which batches the contribution when it is created (using the hook magic function)
-  public static function hook_post_contribution_create($objectId, $objectRef) {
+  public static function disabled_hook_post_contribution_create($objectId, $objectRef) {
     self::post_contribution_modify($objectId, $objectRef);
   }
 
