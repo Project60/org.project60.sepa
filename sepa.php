@@ -123,9 +123,6 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
     $values=$form->getVar("_values");
     if ($values["class_name"]!="Payment_SEPA_DD") return;
-print_r(    $values = $form->controller->exportValues($form->getVar("_name")));
-//print_r($values);
-//die ("aaa");
   }
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );
@@ -143,7 +140,6 @@ print_r(    $values = $form->controller->exportValues($form->getVar("_name")));
         $newMandate[$api] = $form->_submitValues[$field];
       }
     }
-//TODO pdelbar:process properly (eg. update the first contribution linked to the recurring contrib...
     if ($newMandate) {
       $newMandate["id"]=$mandate["id"];
       //not strictly needed, uncomment if proven handy in the underlying api/bao

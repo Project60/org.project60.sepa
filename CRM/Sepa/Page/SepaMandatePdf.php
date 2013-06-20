@@ -29,9 +29,15 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
 
 
-  function generateHTML() {
+  function generateHTML($mandate) {
+    if (is_array($mandate)) {
+       $mandate= json_decode(json_encode($mandate), FALSE);
+    }
+    $this->mandate = $mandate;
+    if (!$this->api)
+      $this->api = new civicrm_api3();
     $api = $this->api;
-    $mandate = $this->mandate;
+
     if ($mandate->entity_table != "civicrm_contribution_recur")
       return CRM_Core_Error::fatal("We don't know how to handle mandates for ".$mandate->entity_table);
 
@@ -113,8 +119,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       CRM_Core_Error::fatal($api->errorMsg());
       return;
     }
-    $this->mandate = $api->values[0];
-    $this->generateHTML ();
+    $this->generateHTML ($api->values[0]);
     if (!$action) {
       $this->assign("html",$this->html);
       parent::run();

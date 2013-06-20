@@ -45,10 +45,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
    * @public
    */
   function doDirectPayment(&$params) {
-    $component = strtolower($component);
-
     $params['trxn_id'] = "TODO GENERATE MANDATE ID";
-
     // create the mandate
     if ($this->_mode == 'test') {
       $params['trxn_id'] = "TEST:" . $params['trxn_id'];
@@ -70,10 +67,17 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       die ("is this a single payment? We don't do that in SEPA (yet)");
     }
     $apiParams["creation_date"]= date("YmdHis");
+    $apiParams["sequential"]= 1;
     $r = civicrm_api ("SepaMandate","create", $apiParams);
     if ($r["is_error"]) {
       CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
     }
+    //send email
+    $pdf= new CRM_Sepa_Page_SepaMandatePdf();
+    $pdf->generateHTML($r["values"][0]);
+    $pdf->generatePDF(true);
+
+die ("send email");
   }
 
   function &error($errorCode = NULL, $errorMessage = NULL) {

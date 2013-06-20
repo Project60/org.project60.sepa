@@ -46,14 +46,13 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
   //hook which batches the contribution when it is created (using the hook magic function)
   // uses the global variable (set by the form) "sepa_context" to identify it's a sepa contrib
   public static function hook_pre_contribution($op, $objectName, $id, &$params) {
-echo "pre save";
     if (array_key_exists("sepa_context",$GLOBALS) && $GLOBALS["sepa_context"]["processor"]) {
     $params["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', 'SEPADD', 'name', 'String', 'id');
     }
   }
 
+  //not needed, checked in the pre
   public static function post_contribution_modify($objectId, $objectRef) {
-print_r($ObjectRef);die("toto");
     // check whether this is a SDD contribution. This could be done using a financial_type_id created specially 
     // for that purpose, or by examining the contrib->payment_instrument->pptype
     if (CRM_Sepa_Logic_Base::isSDDContribution($objectRef)) {
