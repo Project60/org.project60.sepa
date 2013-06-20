@@ -27,8 +27,76 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
   
   }
 
+
+
+  function generateHTML() {
+    $api = $this->api;
+    $mandate = $this->mandate;
+    if ($mandate->entity_table != "civicrm_contribution_recur")
+      return CRM_Core_Error::fatal("We don't know how to handle mandates for ".$mandate->entity_table);
+
+    $api->ContributionRecur->getsingle(array("id"=>$mandate->entity_id));
+    $recur=$api->result;
+    $api->Contact->getsingle(array("id"=>$recur->contact_id));
+    $this->contact=$api->result;
+
+    $msg = $this->getMessage("sepa_mandate_pdf");
+    CRM_Utils_System::setTitle($msg["msg_title"]  ." ". $mandate->reference);
+    $this->assign("contact",(array) $this->contact);
+    $this->assign("contactId",$this->contact->contact_id);
+    $this->assign("sepa",(array) $mandate);
+    $this->assign("recur",(array) $recur);
+
+    $api->PaymentProcessor->getsingle((int)$recur->payment_processor_id);
+    $pp=$api->result;
+    $this->assign("creditor",$pp->user_name);
+
+    $this->html = $this->getTemplate()->fetch("string:".$msg["msg_html"]);
+  }
+
+  function generatePDF($send =false) {
+    require_once 'CRM/Utils/PDF/Utils.php';
+    $fileName = $this->mandate->reference.".pdf";
+    if ($send) {
+      $config = CRM_Core_Config::singleton();
+      //$pdfFullFilename = $config->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
+      $pdfFullFilename = '/tmp/'.$fileName;
+      file_put_contents($pdfFullFilename, CRM_Utils_PDF_Utils::html2pdf( $this->html,$fileName, true, null ));
+      list($domainEmailName,$domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+      $params              = array();
+      $params['groupName'] = 'SEPA Email Sender';
+      $params['from']      = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
+      $params['toEmail'] = $this->contact->email;
+      $params['toName']  = $params['toEmail'];
+      //$params['toEmail'] = "debug@sydesy.com";
+
+      if (empty ($params['toEmail'])){
+        CRM_Core_Session::setStatus(ts("Error sending $fileName: Contact doesn't have an email."));
+        return false;
+      }
+      $params['subject'] = "SEPA " . $fileName;
+      if (!CRM_Utils_Array::value('attachments', $instanceInfo)) {
+        $instanceInfo['attachments'] = array();
+      }
+      $params['attachments'][] = array(
+          'fullPath' => $pdfFullFilename,
+          'mime_type' => 'application/pdf',
+          'cleanName' => $fileName,
+          );
+      ;
+      $mail = $this->getMessage("sepa_mandate");
+      $params['text'] = "this is the mandate, please return signed";
+      $params['html'] = $this->getTemplate()->fetch("string:".$mail["msg_html"]);
+      CRM_Utils_Mail::send($params);
+      CRM_Core_Session::setStatus(ts("Mail sent"));
+    }  else {
+      CRM_Utils_PDF_Utils::html2pdf( $this->html, $fileName, false, null );
+    } 
+  }
+
   function run() {
-    $api = new civicrm_api3();
+    $this->api = new civicrm_api3();
+    $api = $this->api;
     $id = (int)CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $reference = CRM_Utils_Request::retrieve('ref', 'String', $this);
     //TODO: once debugged, force POST, not GET
@@ -45,72 +113,18 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       CRM_Core_Error::fatal($api->errorMsg());
       return;
     }
-    $mandate = $api->values[0];
-    if ($mandate->entity_table != "civicrm_contribution_recur")
-      return CRM_Core_Error::fatal("We don't know how to handle mandates for ".$mandate->entity_table);
-
-    $api->ContributionRecur->getsingle(array("id"=>$mandate->entity_id));
-    $recur=$api->result;
-    $api->Contact->getsingle(array("id"=>$recur->contact_id));
-    $contact=$api->result;
-
-    $msg = $this->getMessage("sepa_mandate_pdf");
-    CRM_Utils_System::setTitle($msg["msg_title"]  ." ". $mandate->reference);
-    $this->assign("contact",(array) $contact);
-    $this->assign("contactId",$contact->contact_id);
-    $this->assign("sepa",(array) $mandate);
-    $this->assign("recur",(array) $recur);
-
-    $api->PaymentProcessor->getsingle((int)$recur->payment_processor_id);
-    $pp=$api->result;
-    $this->assign("creditor",$pp->user_name);
-
-    $html = $this->getTemplate()->fetch("string:".$msg["msg_html"]);
-    if ($action) {
-      require_once 'CRM/Utils/PDF/Utils.php';
-      $fileName = $mandate->reference.".pdf";
-      if ($action == "email") {
-        $config = CRM_Core_Config::singleton();
-        $pdfFullFilename = $config->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
-        $pdfFullFilename = '/tmp/'.$fileName;
-        file_put_contents($pdfFullFilename, CRM_Utils_PDF_Utils::html2pdf( $html,$fileName, true, null ));
-        list($domainEmailName,$domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
-        $params              = array();
-        $params['groupName'] = 'SEPA Email Sender';
-        $params['from']      = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
-        $params['toEmail'] = $contact->email;
-        $params['toName']  = $params['toEmail'];
-        //$params['toEmail'] = "debug@sydesy.com";
-
-        if (empty ($params['toEmail'])){
-          CRM_Core_Session::setStatus(ts("Error sending $fileName: Contact doesn't have an email."));
-          return false;
-        }
-        $params['subject'] = "SEPA " . $fileName;
-        if (!CRM_Utils_Array::value('attachments', $instanceInfo)) {
-          $instanceInfo['attachments'] = array();
-        }
-        $params['attachments'][] = array(
-            'fullPath' => $pdfFullFilename,
-            'mime_type' => 'application/pdf',
-            'cleanName' => $fileName,
-            );
-        ;
-        $mail = $this->getMessage("sepa_mandate");
-        $params['text'] = "this is the mandate, please return signed";
-        $params['html'] = $this->getTemplate()->fetch("string:".$mail["msg_html"]);
-        CRM_Utils_Mail::send($params);
-        CRM_Core_Session::setStatus(ts("Mail sent"));
-
-
-
-      }  else {
-        CRM_Utils_PDF_Utils::html2pdf( $html, $fileName, false, null );
-        CRM_Utils_System::civiExit();
-      } 
+    $this->mandate = $api->values[0];
+    $this->generateHTML ();
+    if (!$action) {
+      $this->assign("html",$this->html);
+      parent::run();
+      return;
     }
-
-    $this->assign("html",$html);
-    parent::run();
+    if ($action != "email") {
+      $this->generatePDF (false);
+      CRM_Utils_System::civiExit();
+    } 
+    $this->generatePDF (true);
   }
+
 }
