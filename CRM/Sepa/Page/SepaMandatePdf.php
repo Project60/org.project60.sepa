@@ -34,7 +34,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
        $mandate= json_decode(json_encode($mandate), FALSE);
     }
     $this->mandate = $mandate;
-    if (!$this->api)
+    if (!isset($this->api))
       $this->api = new civicrm_api3();
     $api = $this->api;
 
