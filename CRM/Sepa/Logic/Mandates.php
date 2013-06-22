@@ -11,7 +11,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * @return type
    */
   public static function createMandateReference(&$ref = null, $type = "R") {
-    $r = "MANDATE";
+    $r = "WMFR-".date("Y");
     if ($ref) {
       $r .="-" . $ref["entity_id"];
     } else {
