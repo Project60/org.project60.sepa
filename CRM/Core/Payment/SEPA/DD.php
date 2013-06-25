@@ -45,7 +45,10 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
    * @public
    */
   function doDirectPayment(&$params) {
+    $component = strtolower($component);
+
     $params['trxn_id'] = "TODO GENERATE MANDATE ID";
+
     // create the mandate
     if ($this->_mode == 'test') {
       $params['trxn_id'] = "TEST:" . $params['trxn_id'];
@@ -67,15 +70,12 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       die ("is this a single payment? We don't do that in SEPA (yet)");
     }
     $apiParams["creation_date"]= date("YmdHis");
-    $apiParams["sequential"]= 1;
+    //echo 'creating mandate';
     $r = civicrm_api ("SepaMandate","create", $apiParams);
+    //die(print_r($r));
     if ($r["is_error"]) {
       CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
     }
-    //send email
-    $pdf= new CRM_Sepa_Page_SepaMandatePdf();
-    $pdf->generateHTML($r["values"][0]);
-    $pdf->generatePDF(true);
   }
 
   function &error($errorCode = NULL, $errorMessage = NULL) {
@@ -104,12 +104,6 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     $form->_paymentFields = array(); //remove existing fields (bank account, branch, bla)
     //TODO input:[name="is_recur"]')[0].checked = true;
 
-/*
-    $dummy = array("account_holder","bank_identification_number","bank_name","bank_account_number");
-    foreach($dummy as $d){
-        $form->add("hidden", $d, "", array(), 0);
-    } 
-*/ 
     //e.g. IBAN can have maxlength of 34 digits
     $form->_paymentFields['bank_iban'] = array(
         'htmlType' => 'text',
@@ -117,7 +111,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'title' => ts('IBAN'),
         'cc_field' => TRUE,
         'attributes' => array('size' => 34, 'maxlength' => 34, 'autocomplete' => 'off'),
-        'is_required' => TRUE,
+        'is_required' => FALSE,
         );
 
     //e.g. SWIFT-BIC can have maxlength of 11 digits
@@ -127,7 +121,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'title' => ts('BIC'),
         'cc_field' => TRUE,
         'attributes' => array('size' => 11, 'maxlength' => 11, 'autocomplete' => 'off'),
-        'is_required' => TRUE,
+        'is_required' => FALSE,
         );
 
     foreach ($form->_paymentFields as $name => $field) {
