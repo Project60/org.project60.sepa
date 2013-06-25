@@ -110,14 +110,6 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         $form->add("hidden", $d, "", array(), 0);
     } 
 */ 
-    $form->_paymentFields['bank_iban'] = array(
-        'htmlType' => 'text',
-        'name' => 'bank_iban',
-        'title' => ts('IBAN'),
-        'cc_field' => TRUE,
-        'attributes' => array('size' => 34, 'maxlength' => 34, 'autocomplete' => 'off'),
-        'is_required' => FALSE,
-        );
     //e.g. IBAN can have maxlength of 34 digits
     $form->_paymentFields['bank_iban'] = array(
         'htmlType' => 'text',
@@ -125,7 +117,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'title' => ts('IBAN'),
         'cc_field' => TRUE,
         'attributes' => array('size' => 34, 'maxlength' => 34, 'autocomplete' => 'off'),
-        'is_required' => FALSE,
+        'is_required' => TRUE,
         );
 
     //e.g. SWIFT-BIC can have maxlength of 11 digits
@@ -135,7 +127,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'title' => ts('BIC'),
         'cc_field' => TRUE,
         'attributes' => array('size' => 11, 'maxlength' => 11, 'autocomplete' => 'off'),
-        'is_required' => FALSE,
+        'is_required' => TRUE,
         );
 
     foreach ($form->_paymentFields as $name => $field) {
