@@ -25,5 +25,5 @@ class CRM_Sepa_Logic_Base {
 
     return false;
   }
-
+  
 }

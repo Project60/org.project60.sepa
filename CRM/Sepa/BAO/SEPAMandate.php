@@ -5,8 +5,9 @@
  */
 class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
-  // TODO: generate a more meaningful reference?
   /**
+   * Create a mandate reference. Use the logic class for this. 
+   * 
    * @param array ref object, eg. the recurring contribution or membership
    * @param string type, ie. "R"ecurring "M"embership 
    * format type+contact_id+"-"+ref object
@@ -42,11 +43,62 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // process the new mandate
     $bao = new CRM_Sepa_BAO_SEPAMandate();
-    $bao->get('id',$dao->id);
-    CRM_Sepa_Logic_Mandates::fix_initial_contribution( $bao );
+    $bao->get('id', $dao->id);
+    CRM_Sepa_Logic_Mandates::fix_initial_contribution($bao);
 
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
+  }
+
+  /**
+   * getParent() returns the contribution or recurring contribution this mandate uses as a contract
+   */
+  function getParent() {
+    $etp = $this->entity_table;
+    $eid = $this->entity_id;
+//    echo "<br>Entity type is $etp($eid).";
+    switch ($etp) {
+      case 'civicrm_contribution_recur' :
+        $recur = new CRM_Contribute_BAO_ContributionRecur();
+        $recur->get('id', $eid);
+        return $recur;
+        break;
+      case 'civicrm_contribution' :
+        $contr = new CRM_Contribute_BAO_Contribution();
+        $contr->get('id', $eid);
+        return $contr;
+        break;
+      default: 
+        echo 'Huh ? ' . $etp;
+    }
+    return null;
+  }
+
+  
+  /**
+   * getParentContribution() returns the 'end' contribution this mandate uses as a contract
+   *   MANDATE -> CONTRIBUTION_RECUR -> CONTRIBUTION
+   * or
+   *   MANDATE -> CONTRIBUTION
+   */
+  function getParentContribution() {
+    $etp = $this->entity_table;
+    $eid = $this->entity_id;
+    switch ($etp) {
+      case 'civicrm_contribution_recur' :
+        $contr = new CRM_Contribute_BAO_Contribution();
+        $contr->get('contribution_recur_id', $eid);
+        return $contr;
+        break;
+      case 'civicrm_contribution' :
+        $contr = new CRM_Contribute_BAO_Contribution();
+        $contr->get('id', $eid);
+        return $contr;
+        break;
+      default: 
+        echo 'Huh ? ' . $etp;
+    }
+    return null;
   }
 
 }

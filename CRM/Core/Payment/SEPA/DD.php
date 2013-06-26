@@ -110,7 +110,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'name' => 'bank_iban',
         'title' => ts('IBAN'),
         'cc_field' => TRUE,
-        'attributes' => array('size' => 34, 'maxlength' => 34, 'autocomplete' => 'off'),
+        'attributes' => array('size' => 34, 'maxlength' => 34, /* 'autocomplete' => 'off' */ ),
         'is_required' => FALSE,
         );
 
@@ -120,7 +120,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'name' => 'bank_bic',
         'title' => ts('BIC'),
         'cc_field' => TRUE,
-        'attributes' => array('size' => 11, 'maxlength' => 11, 'autocomplete' => 'off'),
+        'attributes' => array('size' => 11, 'maxlength' => 11, /* 'autocomplete' => 'off' */ ),
         'is_required' => FALSE,
         );
 

@@ -11,7 +11,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * @return type
    */
   public static function createMandateReference(&$ref = null, $type = "R") {
-    $r = "WMFR-".date("Y");
+    $r = "WMFR-" . date("Y");
     if ($ref) {
       $r .="-" . $ref["entity_id"];
     } else {
@@ -20,18 +20,30 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     return $r;
   }
 
-
   /**
    * Handle the creation of a mandate
+   * 
    * By default, there is an initial contribution which is created for a recurring contrib. Its status is set
    * to pending. We want to make sure the mandate is valid before we activate this payment, so we need to give it
    * a certain status. This obviously depends on the options set for the PP (make active immediately etc).
    * 
-   * @param type $id
+   * @param CRM_Sepa_BAO_SEPAMandate $bao
    */
   public static function fix_initial_contribution(CRM_Sepa_BAO_SEPAMandate $bao) {
     // for now, assume we can set the status to 'Pending' -- until we decide what the SEPA status should be
     // as this is the current status which is created, do nothing
+    
+    // at the same time, set the type of the contribution to FIRST (ignore one-off)
+    /*
+    $con = $bao->getParentContribution();
+    echo '<pre>';
+    print_r($con);
+    if ($con) {
+      $con->type = 'F';
+      //$con->save();
+      die;
+    }
+     */
   }
 
   //hook which batches the contribution when it is created (using the hook magic function)
@@ -45,9 +57,10 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
 
   //hook which batches the contribution when it is created (using the hook magic function)
   // uses the global variable (set by the form) "sepa_context" to identify it's a sepa contrib
+  // PD: Boo ! Bad coding !
   public static function hook_pre_contribution($op, $objectName, $id, &$params) {
-    if (array_key_exists("sepa_context",$GLOBALS) && $GLOBALS["sepa_context"]["processor"]) {
-    $params["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', 'SEPADD', 'name', 'String', 'id');
+    if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["processor"]) {
+      $params["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', 'SEPADD', 'name', 'String', 'id');
     }
   }
 
