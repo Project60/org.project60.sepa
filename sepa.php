@@ -85,7 +85,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
   }
 
-  if ("CRM_Contribute_Form_Contribution" == $formName) { 
+  if (false && "CRM_Contribute_Form_Contribution" == $formName) { //TODO remove definitely if we don't do anything with it
     //should we be able to set the mandate info from the contribution?
     if (!array_key_exists("contribution_recur_id",$form->_values))
       return;
