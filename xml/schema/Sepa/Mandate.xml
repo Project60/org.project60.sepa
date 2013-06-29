@@ -159,6 +159,19 @@
     <add>4.3</add>
   </field>
 
+  <field> 
+    <name>first_contribution_id</name> 
+    <title>First Contribution</title>
+    <type>int unsigned</type> 
+    <comment>FK to civicrm_contribution</comment>
+    <add>4.3</add> 
+  </field> 
+  <foreignKey> 
+    <name>first_contribution_id</name> 
+    <table>civicrm_contribution</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+  </foreignKey>
   <field>
     <name>validation_date</name>
     <title>validation date</title>

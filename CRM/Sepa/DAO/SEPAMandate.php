@@ -158,6 +158,12 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    */
   public $creation_date;
   /**
+   * FK to civicrm_contribution
+   *
+   * @var int unsigned
+   */
+  public $first_contribution_id;
+  /**
    *
    * @var datetime
    */
@@ -185,6 +191,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
       self::$_links = array(
         'creditor_id' => 'civicrm_sdd_creditor:id',
         'contact_id' => 'civicrm_contact:id',
+        'first_contribution_id' => 'civicrm_contribution:id',
       );
     }
     return self::$_links;
@@ -296,6 +303,12 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'where' => 'civicrm_sdd_mandate.creation_date',
           'headerPattern' => '',
           'dataPattern' => '',
+        ) ,
+        'first_contribution_id' => array(
+          'name' => 'first_contribution_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('First Contribution') ,
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'validation_date' => array(
           'name' => 'validation_date',
