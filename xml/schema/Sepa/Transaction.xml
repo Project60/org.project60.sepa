@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>  
+
+<table>  
+  <base>CRM/Sepa</base>  
+  <class>SEPATransaction</class>  
+  <name>civicrm_sdd_tx</name>  
+  <add>4.3</add> 
+  <log>true</log> 
+  <field>  
+    <name>id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <comment>ID</comment>  
+    <add>4.3</add>
+    <export>true</export>
+  </field>  
+  <primaryKey>  
+    <name>id</name>  
+    <autoincrement>true</autoincrement>  
+  </primaryKey>  
+
+  <field>
+    <name>type</name>
+    <export>true</export>
+    <type>varchar</type>
+    <length>4</length>
+    <required>true</required>
+    <comment>FRST, RCUR or OOFF</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+      <name>contribution_id</name>
+      <type>int unsigned</type>
+      <title>Contribution ID</title>
+      <required>true</required>
+      <comment>FK to civicrm_contribution table.</comment>
+      <add>4.3</add>
+  </field>
+  <foreignKey> 
+    <name>contribution_id</name> 
+    <table>civicrm_contribution</table> 
+    <key>id</key> 
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add> 
+  </foreignKey>
+  <index>
+       <name>index_contrib</name>
+       <fieldName>contribution_id</fieldName>
+       <add>4.3</add>
+  </index>
+
+  <field> 
+    <name>mandate_id</name> 
+    <title>Mandate ID</title>
+    <type>int unsigned</type> 
+    <comment>FK to ssd_mandate</comment>
+    <add>4.3</add> 
+  </field> 
+  <foreignKey> 
+    <name>mandate_id</name> 
+    <table>civicrm_sdd_mandate</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  
+</table>
