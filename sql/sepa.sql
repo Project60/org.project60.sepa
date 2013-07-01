@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS civicrm_sdd_creditor;
 -- * civicrm_sdd_creditor
 -- *
 -- *******************************************************/
+
 CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
      `creditor_id` int unsigned    COMMENT 'FK to Contact ID that owns that account',
@@ -14,12 +15,15 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `address` varchar(255)    COMMENT 'by default creditor_id.address (billing) at creation',
      `country_id` int unsigned    COMMENT 'Which Country does this address belong to.',
      `mandate_prefix` varchar(3)    COMMENT 'prefix for mandate identifiers',
-     `category` varchar(4)    COMMENT 'Default value' ,
+     `payment_instrument_id` int unsigned    COMMENT 'FK to Payment Instrument',
+     `payment_processor_id` int unsigned    ,
+     `category` varchar(4)    COMMENT 'Default value'
+,
     PRIMARY KEY ( `id` )
- 
- 
-,          CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_sdd_creditor_country_id FOREIGN KEY (`country_id`) REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL  
+
+,          CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_sdd_creditor_country_id FOREIGN KEY (`country_id`) REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_sdd_creditor_payment_processor_id FOREIGN KEY (`payment_processor_id`) REFERENCES `civicrm_payment_processor`(`id`)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
 
 -- /*******************************************************
 -- *

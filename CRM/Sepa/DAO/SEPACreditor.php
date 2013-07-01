@@ -124,6 +124,17 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $mandate_prefix;
   /**
+   * FK to Payment Instrument
+   *
+   * @var int unsigned
+   */
+  public $payment_instrument_id;
+  /**
+   *
+   * @var int unsigned
+   */
+  public $payment_processor_id;
+  /**
    * Default value
    *
    * @var string
@@ -152,6 +163,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
       self::$_links = array(
         'creditor_id' => 'civicrm_contact:id',
         'country_id' => 'civicrm_country:id',
+        'payment_processor_id' => 'civicrm_payment_processor:id',
       );
     }
     return self::$_links;
@@ -210,6 +222,21 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'title' => ts('Mandate numering prefix') ,
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
+        ) ,
+        'contribution_payment_instrument_id' => array(
+          'name' => 'payment_instrument_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Payment Instrument') ,
+          'pseudoconstant' => array(
+            'name' => 'paymentInstrument',
+            'optionGroupName' => 'paymentInstrument',
+            'class' => 'CRM_Contribute_PseudoConstant',
+          )
+        ) ,
+        'payment_processor_id' => array(
+          'name' => 'payment_processor_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
         ) ,
         'category' => array(
           'name' => 'category',
