@@ -239,6 +239,14 @@ function sepa_civicrm_install_options($data) {
 function sepa_civicrm_options() {
   // start with the lowest weight value
   return array(
+      'batch_type' => array(
+          'values' => array(
+              'SEPA Transaction group' => array(
+                  'label' => 'SEPA Transaction Group',
+                  'is_default' => 0,
+              ),
+          ),
+      ),
       'msg_tpl_workflow_contribution' => array(
           'values' => array(
               'sepa_mandate_pdf' => array(

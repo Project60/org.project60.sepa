@@ -22,12 +22,23 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     }
   }
 
-  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName) { 
+  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || 
+      "CRM_Contribute_Form_Contribution_Main" == $formName) { 
+    // check whether this is a SDD contribution, in which case we need to build
+    // the context for the mandate logic to pickup up some values
     $pp= civicrm_api("PaymentProcessor","getsingle"
       ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
     if("Payment_SEPA_DD" != $pp["class_name"])
       return;
-    $GLOBALS["sepa_context"]["processor"]=1;
+    $GLOBALS["sepa_context"]["processor_id"] = $pp['id'];
+
+    // get the creditor info as well
+    $cred = civicrm_api("SepaCreditor","getsingle"
+      ,array("version"=>3,"payment_processor_id"=>$pp['id']));
+    $GLOBALS["sepa_context"]["payment_instrument_id"] = $cred['payment_instrument_id'];
+    CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
+
+
     return;
   }
 }
@@ -48,8 +59,14 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
       strtolower($op)
   );
   $methodName = implode('_', $parts);
-  if (method_exists('CRM_Sepa_Logic_Mandates', $methodName))
+  if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
+    CRM_Core_Session::setStatus(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');
     CRM_Sepa_Logic_Mandates::$methodName($id, $params);
+  }
+  if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
+    CRM_Core_Session::setStatus(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');
+    CRM_Sepa_Logic_Batching::$methodName($id, $params);
+  }
 }
 
 /**
@@ -68,9 +85,13 @@ function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
       strtolower($op)
   );
   $methodName = implode('_', $parts);
-  //CRM_Core_Session::setStatus(ts('SEPA hook response'), $methodName, 'alert');
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
+    CRM_Core_Session::setStatus(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');
     CRM_Sepa_Logic_Mandates::$methodName($objectId, $objectRef);
+  }
+  if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
+    CRM_Core_Session::setStatus(ts('Calling SEPA Logic for Batching'), $methodName, 'alert');
+    CRM_Sepa_Logic_Batching::$methodName($objectId, $objectRef);
   }
 }
 

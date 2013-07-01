@@ -57,6 +57,8 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         "iban"=> $params["bank_iban"],
         "bic" => $params["bank_bic"],
         );
+    
+    // set the contract entity for this mandate
     if (CRM_Utils_Array::value('is_recur', $params) &&
         $params['contributionRecurID']
        ) {
@@ -69,6 +71,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     } else {
       die ("is this a single payment? We don't do that in SEPA (yet)");
     }
+
     $apiParams["creation_date"]= date("YmdHis");
     //echo 'creating mandate';
     $r = civicrm_api ("SepaMandate","create", $apiParams);
@@ -78,6 +81,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     }
   }
 
+  
   function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {

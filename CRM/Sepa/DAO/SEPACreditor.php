@@ -223,7 +223,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
         ) ,
-        'contribution_payment_instrument_id' => array(
+        'payment_instrument_id' => array(
           'name' => 'payment_instrument_id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Payment Instrument') ,

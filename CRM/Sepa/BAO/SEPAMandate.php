@@ -44,16 +44,15 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     // process the new mandate
     $bao = new CRM_Sepa_BAO_SEPAMandate();
     $bao->get('id', $dao->id);
-    CRM_Sepa_Logic_Mandates::fix_initial_contribution($bao);
-
+    
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }
 
   /**
-   * getParent() returns the contribution or recurring contribution this mandate uses as a contract
+   * getContract() returns the contribution or recurring contribution this mandate uses as a contract
    */
-  function getParent() {
+  function getContract() {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
 //    echo "<br>Entity type is $etp($eid).";
@@ -76,12 +75,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   
   /**
-   * getParentContribution() returns the 'end' contribution this mandate uses as a contract
+   * findContribution() locates a contribution created within the scope of the contract. 
    *   MANDATE -> CONTRIBUTION_RECUR -> CONTRIBUTION
    * or
    *   MANDATE -> CONTRIBUTION
    */
-  function getParentContribution() {
+  public function findContribution() {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
     switch ($etp) {
@@ -101,5 +100,34 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     return null;
   }
 
+  
+  public function getUnbatchedContributionIds() {
+    // 1.determine the contract (ie. find out how to get contributions)
+    $contrib = $bao->getContract();
+
+    // 2. if it is a recurring one, get the contribs that match the pattern
+    if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
+      $query = "SELECT        c.id AS id, b.id  AS batch_id 
+                FROM          civicrm_contribution c
+                LEFT JOIN     civicrm_entity_batch eb ON ( c.id = eb.entity_id AND eb.entity_table = 'civicrm_contribution' )
+                LEFT JOIN     civicrm_batch b ON ( b.id = eb.batch_id )
+                WHERE         c.contribution_recur_id = " . $contrib->id . "
+                AND           b.type_id IN ( " . 222 . " )
+                HAVING        batch_id IS NULL
+                ";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
+        $contribs[] = $dao->id;
+      }
+      return $contribs;
+    }
+    
+    if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
+      $contribs = array($contrib->id);
+    }
+    
+    return array();
+  }
+  
 }
 
