@@ -56,10 +56,10 @@ function civicrm_api3_sepa_sdd_file_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_sepa_sdd_file_create_spec(&$params) {
-  // TODO a 'clever' default should be introduced
-  $params['mandate_prefix']['api.default'] = "ZZZ";
-  $params['identifier']['api.default'] = "FIXME";
-  $params['name']['api.default'] = "FIXME";
+  $params['reference']['api.required'] = 1;
+  $params['filename']['api.required'] = 1;
+  $params['created_date']['api.default'] = "now";
+  $params['created_id']['api.default'] = "user_contact_id";
 }
 
 /**

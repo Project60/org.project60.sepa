@@ -56,10 +56,8 @@ function civicrm_api3_sepa_contribution_group_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_sepa_contribution_group_create_spec(&$params) {
-  // TODO a 'clever' default should be introduced
-  $params['mandate_prefix']['api.default'] = "ZZZ";
-  $params['identifier']['api.default'] = "FIXME";
-  $params['name']['api.default'] = "FIXME";
+  $params['contribution_id']['api.required'] = 1;
+  $params['txgroup_id']['api.required'] = 1;
 }
 
 /**
