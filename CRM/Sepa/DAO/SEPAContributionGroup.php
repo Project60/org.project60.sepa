@@ -119,6 +119,7 @@ class CRM_Sepa_DAO_SEPAContributionGroup extends CRM_Core_DAO
   {
     if (!(self::$_links)) {
       self::$_links = array(
+        'contribution_id' => 'civicrm_contribution:id',
         'txgroup_id' => 'civicrm_sdd_txgroup:id',
       );
     }
@@ -137,17 +138,15 @@ class CRM_Sepa_DAO_SEPAContributionGroup extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
-          'required' => true,
         ) ,
         'contribution_id' => array(
           'name' => 'contribution_id',
           'type' => CRM_Utils_Type::T_INT,
-          'required' => true,
+          'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'txgroup_id' => array(
           'name' => 'txgroup_id',
           'type' => CRM_Utils_Type::T_INT,
-          'required' => true,
           'FKClassName' => 'CRM_Sepa_DAO_SEPATransactionGroup',
         ) ,
       );

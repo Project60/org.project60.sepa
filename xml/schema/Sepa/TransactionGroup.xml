@@ -58,7 +58,7 @@
     <name>status_id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>fk to Batch Status options in civicrm_option_values</comment>
+    <comment>fk sepa group Status options in civicrm_option_values</comment>
     <add>4.3</add>
   </field>
   <field>
@@ -67,6 +67,11 @@
     <comment>fk to SDD Creditor Id</comment>
     <add>4.3</add>
   </field>
+  <index>
+    <name>creditor_id</name>
+    <fieldName>sdd_creditor_id</fieldName>
+    <add>4.3</add>
+  </index>
   <foreignKey> 
     <name>sdd_creditor_id</name> 
     <table>civicrm_sdd_creditor</table> 
@@ -81,6 +86,11 @@
     <comment>fk to SDD File Id</comment>
     <add>4.3</add>
   </field>
+  <index>
+    <name>file_id</name>
+    <fieldName>sdd_file_id</fieldName>
+    <add>4.3</add>
+  </index>
   <foreignKey> 
     <name>sdd_file_id</name> 
     <table>civicrm_sdd_file</table> 

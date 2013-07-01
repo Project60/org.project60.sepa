@@ -8,7 +8,6 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
-    <required>true</required>
     <comment>primary key</comment>
     <add>4.3</add>
   </field>
@@ -20,21 +19,25 @@
   <field>
     <name>contribution_id</name>
     <type>int unsigned</type>
-    <required>true</required>
     <comment>FK to Contribution ID</comment>
     <add>4.3</add>
   </field>
   <index>
     <name>contriblookup</name>
     <fieldName>contribution_id</fieldName>
-    <unique>true</unique>
     <add>4.3</add>
   </index>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
   
   <field>
     <name>txgroup_id</name>
     <type>int unsigned</type>
-    <required>true</required>
     <comment>FK to civicrm_sdd_txgroup</comment>
     <add>4.3</add>
   </field>
@@ -49,7 +52,6 @@
   <index>
     <name>txglookup</name>
     <fieldName>txgroup_id</fieldName>
-    <unique>true</unique>
     <add>4.3</add>
   </index>
   

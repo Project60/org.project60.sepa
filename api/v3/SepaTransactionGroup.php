@@ -58,9 +58,9 @@ function civicrm_api3_sepa_transaction_group_create($params) {
 function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
   $params['reference']['api.required'] = 1;
   $params['type']['api.required'] = 1;
-  $params['status_id']['api.default'] = 2;
+  $params['status_id']['api.default'] = 2; //not that sure of the meaning of 2
   $params['sdd_creditor_id']['api.required'] = 1;
-//  $params['created_date']['api.default'] = //now();
+  $params['created_date']['api.default'] = 'now';
 }
 
 /**
