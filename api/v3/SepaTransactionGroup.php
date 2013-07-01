@@ -56,10 +56,11 @@ function civicrm_api3_sepa_transaction_group_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
-  // TODO a 'clever' default should be introduced
-  $params['mandate_prefix']['api.default'] = "ZZZ";
-  $params['identifier']['api.default'] = "FIXME";
-  $params['name']['api.default'] = "FIXME";
+  $params['reference']['api.required'] = 1;
+  $params['type']['api.required'] = 1;
+  $params['status_id']['api.default'] = 2;
+  $params['sdd_creditor_id']['api.required'] = 1;
+//  $params['created_date']['api.default'] = //now();
 }
 
 /**
