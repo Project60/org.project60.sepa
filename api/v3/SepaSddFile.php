@@ -35,11 +35,11 @@
 
 
 /**
- * Add an SepaCreditor for a contact
+ * Add an SepaSddFile for a contact
  *
  * Allowed @params array keys are:
  *
- * @example SepaCreditorCreate.php Standard Create Example
+ * @example SepaSddFileCreate.php Standard Create Example
  *
  * @return array API result array
  * {@getfields sepa_sdd_file_create}
@@ -63,11 +63,11 @@ function _civicrm_api3_sepa_sdd_file_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing SepaCreditor
+ * Deletes an existing SepaSddFile
  *
  * @param  array  $params
  *
- * @example SepaCreditorDelete.php Standard Delete Example
+ * @example SepaSddFileDelete.php Standard Delete Example
  *
  * @return boolean | error  true if successfull, error otherwise
  * {@getfields sepa_sdd_file_delete}
@@ -83,7 +83,7 @@ function civicrm_api3_sepa_sdd_file_delete($params) {
  * @param  array input parameters
  *
  *
- * @example SepaCreditorGet.php Standard Get Example
+ * @example SepaSddFileGet.php Standard Get Example
  *
  * @param  array $params  an associative array of name/value pairs.
  *

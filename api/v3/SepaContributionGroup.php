@@ -35,11 +35,11 @@
 
 
 /**
- * Add an SepaCreditor for a contact
+ * Add an SepaContributionGroup for a contact
  *
  * Allowed @params array keys are:
  *
- * @example SepaCreditorCreate.php Standard Create Example
+ * @example SepaContributionGroupCreate.php Standard Create Example
  *
  * @return array API result array
  * {@getfields sepa_contribution_group_create}
@@ -63,11 +63,11 @@ function _civicrm_api3_sepa_contribution_group_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing SepaCreditor
+ * Deletes an existing SepaContributionGroup
  *
  * @param  array  $params
  *
- * @example SepaCreditorDelete.php Standard Delete Example
+ * @example SepaContributionGroupDelete.php Standard Delete Example
  *
  * @return boolean | error  true if successfull, error otherwise
  * {@getfields sepa_contribution_group_delete}
@@ -83,7 +83,7 @@ function civicrm_api3_sepa_contribution_group_delete($params) {
  * @param  array input parameters
  *
  *
- * @example SepaCreditorGet.php Standard Get Example
+ * @example SepaContributionGroupGet.php Standard Get Example
  *
  * @param  array $params  an associative array of name/value pairs.
  *

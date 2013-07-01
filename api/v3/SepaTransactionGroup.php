@@ -35,11 +35,11 @@
 
 
 /**
- * Add an SepaCreditor for a contact
+ * Add an SepaTransactionGroup for a contact
  *
  * Allowed @params array keys are:
  *
- * @example SepaCreditorCreate.php Standard Create Example
+ * @example SepaTransactionGroupCreate.php Standard Create Example
  *
  * @return array API result array
  * {@getfields sepa_transaction_group_create}
@@ -63,11 +63,11 @@ function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing SepaCreditor
+ * Deletes an existing SepaTransactionGroup
  *
  * @param  array  $params
  *
- * @example SepaCreditorDelete.php Standard Delete Example
+ * @example SepaTransactionGroupDelete.php Standard Delete Example
  *
  * @return boolean | error  true if successfull, error otherwise
  * {@getfields sepa_transaction_group_delete}
@@ -83,7 +83,7 @@ function civicrm_api3_sepa_transaction_group_delete($params) {
  * @param  array input parameters
  *
  *
- * @example SepaCreditorGet.php Standard Get Example
+ * @example SepaTransactionGroupGet.php Standard Get Example
  *
  * @param  array $params  an associative array of name/value pairs.
  *

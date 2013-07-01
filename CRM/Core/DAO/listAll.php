@@ -151,9 +151,9 @@ $dao['PledgePayment'] = 'CRM_Pledge_DAO_PledgePayment';
 
 $dao['SepaMandate'] = 'CRM_Sepa_DAO_SEPAMandate';
 $dao['SepaCreditor'] = 'CRM_Sepa_DAO_SEPACreditor';
-$dao['SEPASddFile'] = 'CRM_Sepa_DAO_SEPASddFile';
-$dao['SEPATransactionGroup'] = 'CRM_Sepa_DAO_SEPATransactionGroup';
-$dao['SEPAContributionGroup'] = 'CRM_Sepa_DAO_SEPAContributionGroup';
+$dao['SepaSddFile'] = 'CRM_Sepa_DAO_SEPASddFile';
+$dao['SepaTransactionGroup'] = 'CRM_Sepa_DAO_SEPATransactionGroup';
+$dao['SepaContributionGroup'] = 'CRM_Sepa_DAO_SEPAContributionGroup';
 
 $dao['BankAccount'] = 'CRM_Banking_DAO_BankAccount';
 $dao['BankTransaction'] = 'CRM_Banking_DAO_BankTransaction';
