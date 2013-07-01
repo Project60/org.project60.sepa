@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>  
+
+<table>  
+  <base>CRM/Sepa</base>  
+  <class>SEPATransactionGroup</class>  
+  <name>civicrm_sdd_txgroup</name>  
+  <add>4.3</add> 
+  <log>true</log> 
+
+  <field>  
+    <name>id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <comment>ID</comment>  
+    <add>4.3</add>
+    <export>true</export>
+  </field>  
+  <primaryKey>  
+    <name>id</name>  
+    <autoincrement>true</autoincrement>  
+  </primaryKey>  
+
+  <field>
+    <name>reference</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>End-to-end reference for this tx group.</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>type</name>
+    <type>char</type>
+    <length>4</length>
+    <comment>FRST, RCUR or OOFF</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>collection_date</name>
+    <type>datetime</type>
+    <comment>Target collection date</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>latest_submission_date</name>
+    <type>datetime</type>
+    <comment>Latest submission date</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <comment>When was this item created</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>status_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>fk to Batch Status options in civicrm_option_values</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>sdd_creditor_id</name>
+    <type>int unsigned</type>
+    <comment>fk to SDD Creditor Id</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey> 
+    <name>creditor_id</name> 
+    <table>civicrm_sdd_creditor</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>sdd_file_id</name>
+    <type>int unsigned</type>
+    <comment>fk to SDD File Id</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey> 
+    <name>sdd_file_id</name> 
+    <table>civicrm_sdd_file</table> 
+    <key>id</key> 
+    <add>4.3</add> 
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+</table>

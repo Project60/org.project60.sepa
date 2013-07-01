@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>  
+
+<table>  
+  <base>CRM/Sepa</base>  
+  <class>SEPASddFile</class>  
+  <name>civicrm_sdd_file</name>  
+  <add>4.3</add> 
+  <log>true</log> 
+
+  <field>  
+    <name>id</name>  
+    <type>int unsigned</type>  
+    <required>true</required>  
+    <comment>ID</comment>  
+    <add>4.3</add>
+    <export>true</export>
+  </field>  
+  <primaryKey>  
+    <name>id</name>  
+    <autoincrement>true</autoincrement>  
+  </primaryKey>  
+
+  <field>
+    <name>reference</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>End-to-end reference for this sdd file.</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>filename</name>
+    <type>char</type>
+    <length>64</length>
+    <comment>Name of the generated file</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>latest_submission_date</name>
+    <type>datetime</type>
+    <comment>Latest submission date</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <comment>When was this item created</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID of creator</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>status_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>fk to Batch Status options in civicrm_option_values</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>comments</name>
+    <type>text</type>
+    <comment>Comments about processing of this file</comment>
+    <add>4.3</add>
+  </field>
+</table>
