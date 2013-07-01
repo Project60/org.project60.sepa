@@ -68,7 +68,7 @@
     <add>4.3</add>
   </field>
   <foreignKey> 
-    <name>creditor_id</name> 
+    <name>sdd_creditor_id</name> 
     <table>civicrm_sdd_creditor</table> 
     <key>id</key> 
     <add>4.3</add> 
