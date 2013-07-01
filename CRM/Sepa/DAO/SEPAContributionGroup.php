@@ -33,7 +33,7 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
-class CRM_Sepa_DAO_ContributionToGroup extends CRM_Core_DAO
+class CRM_Sepa_DAO_SEPAContributionGroup extends CRM_Core_DAO
 {
   /**
    * static instance to hold the table name

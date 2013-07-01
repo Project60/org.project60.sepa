@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/Sepa</base>
-  <class>ContributionToGroup</class>
+  <class>SEPAContributionGroup</class>
   <name>civicrm_sdd_contribution_txgroup</name>
   <comment>Link Contributions to TX Group</comment>
   <field>
