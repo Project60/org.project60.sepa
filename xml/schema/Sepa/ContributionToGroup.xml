@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 
 <table>
-  <base>CRM/Batch</base>
+  <base>CRM/Sepa</base>
   <class>ContributionToGroup</class>
   <name>civicrm_sdd_contribution_txgroup</name>
   <comment>Link Contributions to TX Group</comment>
@@ -24,7 +24,7 @@
     <comment>FK to Contribution ID</comment>
     <add>4.3</add>
   </field>
-    <index>
+  <index>
     <name>contriblookup</name>
     <fieldName>contribution_id</fieldName>
     <unique>true</unique>
@@ -46,7 +46,7 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
 
-    <index>
+  <index>
     <name>txglookup</name>
     <fieldName>txgroup_id</fieldName>
     <unique>true</unique>
