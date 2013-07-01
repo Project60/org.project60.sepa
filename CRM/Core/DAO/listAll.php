@@ -157,3 +157,4 @@ $dao['ContributionToGroup'] = 'CRM_Sepa_DAO_ContributionToGroup';
 
 $dao['BankAccount'] = 'CRM_Banking_DAO_BankAccount';
 $dao['BankTransaction'] = 'CRM_Banking_DAO_BankTransaction';
+$dao['PluginInstance'] = 'CRM_Banking_DAO_PluginInstance';
