@@ -20,7 +20,6 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     return $r;
   }
 
-
   /**
    * Fix the initial contribution if it exists. 
    * 
@@ -32,9 +31,15 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    */
   public static function hook_post_sepamandate_create($objectId, $objectRef) {
     CRM_Sepa_Logic_Mandates::fix_initial_contribution($objectRef);
-    CRM_Sepa_Logic_Batching::batch_initial_contribution($objectId,$objectRef);
+    CRM_Sepa_Logic_Batching::batch_initial_contribution($objectId, $objectRef);
   }
 
+  public static function hook_post_contributionrecur_create($objectId, $objectRef) {
+    // todo: check if sepa
+    $objectRef->cycle_day = 18;
+    $objectRef->save();
+    CRM_Core_Session::setStatus('Set recurring contribution cycle date to ' . $objectRef->cycle_day );
+  }
 
   /**
    * Fix the initial contribution created by the PP
@@ -51,7 +56,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    */
   public static function fix_initial_contribution(CRM_Sepa_DAO_SEPAMandate $dao) {
     $bao = new CRM_Sepa_BAO_SEPAMandate();
-    $bao->get( $dao->id );
+    $bao->get($dao->id);
     // figure out whether there is a contribution for this mandate
     $contrib = $bao->findContribution();
     // if we find a contribution, mark it as first for this mandate
@@ -61,8 +66,6 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $dao->save();
     }
   }
-  
-  
 
   //hook which batches the contribution when it is created (using the hook magic function)
   public static function disabled_hook_post_contribution_create($objectId, $objectRef) {
@@ -87,14 +90,14 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * @param type $params
    */
   /*
-  public static function hook_pre_contribution_create($op, $objectName, $id, &$params) {
+    public static function hook_pre_contribution_create($op, $objectName, $id, &$params) {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
-      $params["payment_instrument_id"] = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
+    $params["payment_instrument_id"] = $GLOBALS["sepa_context"]["payment_instrument_id"];
+    CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
     }
-  }
-  */
-  
+    }
+   */
+
   public static function hook_post_contribution_create($objectId, $objectRef) {
     // check whether this is a SDD contribution. This could be done using a financial_type_id created specially 
     // for that purpose, or by examining the contrib->payment_instrument->pptype

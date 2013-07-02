@@ -44,8 +44,18 @@ Finding an appropriate TXG for a contribution hence means finding a TXG with sam
 
 The second and final of batching is called an **SDD file** most commonly referred to as the **XML file**. In reality, every SDD file will correspond to an XML format of it. 
 
-## Closing a TXG
+### Closing a TXG
 
 As indicated before, a TXG has a 'send before' date defined by the `earliest collection date - delay - 1`. At that time, the TXG needs to be closed and no more contributions can be added. The SDD file it belongs to will also be closed and marked for sending. 
 
 Any other contribution with a collection date compatible with this TXG will cause another TXG to be created, but this one will have the earliest collection date indicated earlier.
+
+
+## Determining collection dates
+
+Controlling collection dates is one of the most important elements of using SDD. This can happen at various levels :
+
+* (for recurring contributions) setting contribution_recur.cycle_day
+* setting contribution.receive_date
+* manipulating the collection dates of TXG and SDD Files.
+
