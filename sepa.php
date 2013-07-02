@@ -107,9 +107,9 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     }
     $form->getElement('is_notify')->setValue(0); // the notification isn't clear, disable it
     //TODO, add in the form, as a region?
-    $e=$form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
-    $e=$form->add( 'text', 'bank_bic',  ts('BIC'))->setValue($mandate["bic"]);
-    $form->add( 'text', 'bank_iban',  ts('IBAN'))->setValue($mandate["iban"]);
+    $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
+    $form->add( 'text', 'bank_bic',  ts('BIC'))->setValue($mandate["bic"],array('size' => 11, 'maxlength' => 11));
+ $form->add( 'text', 'bank_iban',  ts('IBAN'))->setValue($mandate["iban"],array('size' => 34, 'maxlength' => 34));
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
      ));
@@ -148,7 +148,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
       $newMandate["version"] = 3;
       $mandate = civicrm_api("SepaMandate","create",$newMandate);
       if ($mandate["is_error"]) {
-        CRM_Core_Error::fatal($r["error_message"]);
+        CRM_Core_Error::fatal($mandate["error_message"]);
       }
     }
   }
