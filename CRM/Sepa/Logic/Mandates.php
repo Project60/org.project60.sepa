@@ -35,10 +35,11 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
   }
 
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
-    // todo: check if sepa
-    $objectRef->cycle_day = 18;
-    $objectRef->save();
-    CRM_Core_Session::setStatus('Set recurring contribution cycle date to ' . $objectRef->cycle_day );
+    if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
+      $objectRef->cycle_day = 18;
+      $objectRef->save();
+      CRM_Core_Session::setStatus('Set recurring contribution cycle date to ' . $objectRef->cycle_day);
+    }
   }
 
   /**
@@ -61,6 +62,28 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     $contrib = $bao->findContribution();
     // if we find a contribution, mark it as first for this mandate
     if ($contrib !== null) {
+      // check recurring and set receive_date correctly wrt. cycle_day
+      if ($contrib->contribution_recur_id) {
+        $rc = new CRM_Contribute_BAO_ContributionRecur();
+        $rc->get('id', $contrib->contribution_recur_id);
+        if ($rc->cycle_day) {
+          $rday = date('d', strtotime($contrib->receive_date));
+          if ($rday <= $rc->cycle_day) {
+            $contrib->receive_date = date('Ym', strtotime($contrib->receive_date)) . sprintf("%02d", $rc->cycle_day);
+          } else {
+            $ryr = date('Y', strtotime($contrib->receive_date));
+            $rmo = date('m', strtotime($contrib->receive_date));
+            if ($rmo == 12) {
+              $rmo = 1;
+              $ryr++;
+            }
+            $contrib->receive_date = sprintf("%04d%02d%02d", $ryr, $rmo, $rc->cycle_day);
+          }
+          CRM_Core_Session::setStatus('Pushed out first contribution collection day from ' . $rday . ' to ' . $rc->cycle_day);
+          $contrib->save();
+        }
+      }
+
       CRM_Core_Session::setStatus('Found first contribution ' . $contrib->id);
       $dao->first_contribution_id = $contrib->id;
       $dao->save();
