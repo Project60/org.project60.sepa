@@ -32,7 +32,6 @@
     <table>civicrm_contribution</table>
     <key>id</key>
     <add>4.3</add>
-    <onDelete>SET NULL</onDelete>
   </foreignKey>
   
   <field>
@@ -46,7 +45,6 @@
     <table>civicrm_sdd_txgroup</table>
     <key>id</key>
     <add>4.3</add>
-    <onDelete>SET NULL</onDelete>
   </foreignKey>
 
   <index>

@@ -36,7 +36,7 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     $cred = civicrm_api("SepaCreditor","getsingle"
       ,array("version"=>3,"payment_processor_id"=>$pp['id']));
     $GLOBALS["sepa_context"]["payment_instrument_id"] = $cred['payment_instrument_id'];
-    CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
+    //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
 
     return;

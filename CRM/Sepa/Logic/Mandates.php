@@ -56,7 +56,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     $contrib = $bao->findContribution();
     // if we find a contribution, mark it as first for this mandate
     if ($contrib !== null) {
-      CRM_Core_Session::setStatus('First contribution was found', $contrib->id, 'alert');
+      CRM_Core_Session::setStatus('Found first contribution ' . $contrib->id);
       $dao->first_contribution_id = $contrib->id;
       $dao->save();
     }
@@ -101,7 +101,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
       $objectRef->save();
-      CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
+      //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
     }
   }
 
