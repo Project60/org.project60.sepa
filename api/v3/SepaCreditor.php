@@ -57,7 +57,7 @@ function civicrm_api3_sepa_creditor_create($params) {
  */
 function _civicrm_api3_sepa_creditor_create_spec(&$params) {
   // TODO a 'clever' default should be introduced
-  $params['mandate_prefix']['api.default'] = "ZZZ";
+  $params['mandate_prefix']['api.default'] = "SEPA";
   $params['identifier']['api.default'] = "FIXME";
   $params['name']['api.default'] = "FIXME";
 }
