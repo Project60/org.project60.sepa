@@ -220,7 +220,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'name' => 'mandate_prefix',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Mandate numering prefix') ,
-          'maxlength' => 3,
+          'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
         ) ,
         'payment_instrument_id' => array(

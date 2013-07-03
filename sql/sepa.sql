@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `name` varchar(255)    COMMENT 'by default creditor_id.display_name snapshot at creation',
      `address` varchar(255)    COMMENT 'by default creditor_id.address (billing) at creation',
      `country_id` int unsigned    COMMENT 'Which Country does this address belong to.',
-     `mandate_prefix` varchar(3)    COMMENT 'prefix for mandate identifiers',
+     `mandate_prefix` varchar(4)    COMMENT 'prefix for mandate identifiers',
      `payment_instrument_id` int unsigned    COMMENT 'FK to Payment Instrument',
      `payment_processor_id` int unsigned    ,
      `category` varchar(4)    COMMENT 'Default value'
