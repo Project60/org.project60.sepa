@@ -13,7 +13,7 @@
 class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
   public static function batch_initial_contribution($objectId, $objectRef) {
-    CRM_Core_Session::setStatus('Running initial contribution batching process for mandate ' . $objectId);
+    self::debug('Running initial contribution batching process for mandate ' . $objectId);
     $mandate = new CRM_Sepa_BAO_SEPAMandate();
     $mandate->get('id', $objectId);
 
@@ -29,7 +29,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    * @param CRM_Sepa_BAO_SEPATransaction $bao
    */
   public static function batchContribution(CRM_Contribute_BAO_Contribution $contrib, CRM_Sepa_BAO_SEPAMandate $mandate) {
-    CRM_Core_Session::setStatus('Batching contribution '. $contrib->id);
+    self::debug('Batching contribution '. $contrib->id);
 
     // what are the criteria to find an existing suitable batch ?
     $type = self::getSDDType($contrib);
@@ -40,7 +40,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     );
     $result = civicrm_api('SepaCreditor', 'getsingle', $params);
     if ($result['is_error']) {
-      CRM_Core_Session::setStatus('No creditor found for payment instrument '. $payment_instrument_id);
+      self::debug('No creditor found for payment instrument '. $payment_instrument_id);
       return null;
     }
     $creditor_id = $result['id'];
@@ -77,7 +77,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    * @return CRM_Sepa_BAO_SepaTransactionGroup or null
    */
   public static function findTxGroup($creditor_id, $type, $earliest_date, $latest_date) {
-    CRM_Core_Session::setStatus("Locating suitable TXG : CRED=$creditor_id TYPE=$type RANGE=" . substr($earliest_date,0,10) . ' / ' . substr($latest_date,0,10));
+    CRM_Sepa_Logic_Base::debug("Locating suitable TXG : CRED=$creditor_id TYPE=$type RANGE=" . substr($earliest_date,0,10) . ' / ' . substr($latest_date,0,10));
     $openStatus = CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value');
     $query = "SELECT 
                 id 
@@ -105,7 +105,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   }
 
   public static function createTxGroup($creditor_id, $type, $receive_date) {
-    CRM_Core_Session::setStatus("Creating new TXG CRED=$creditor_id TYPE=$type COLLDATE=" . substr($receive_date,0,10));
+    CRM_Sepa_Logic_Base::debug("Creating new TXG CRED=$creditor_id TYPE=$type COLLDATE=" . substr($receive_date,0,10));
 
     // as per Batching.md
     // submission_date = latest( today, tx.collection_date - delay - 1 )
@@ -140,7 +140,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   }
 
   public static function addToTxGroup($contrib, $txGroup) {
-    CRM_Core_Session::setStatus('Adding Contrib(' . $contrib->id . ') to TXG(' . $txGroup->id . ')');
+    self::debug('Adding Contrib(' . $contrib->id . ') to TXG(' . $txGroup->id . ')');
     $params = array(
         'contribution_id' => $contrib->id,
         'txgroup_id' => $txGroup->id,
@@ -155,7 +155,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   }
 
   public static function batchTxGroup($objectId, $objectRef) {
-    CRM_Core_Session::setStatus('Batching TXG('. $objectId . ')');
+    self::debug('Batching TXG('. $objectId . ')');
 
     // look for the earliest SDD File (based on latest_submission_date)
     $sddFile = self::findSddFile($objectRef->latest_submission_date);
@@ -170,7 +170,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   }
 
   public static function findSddFile($latest_submission_date) {
-    CRM_Core_Session::setStatus('Locating suitable SDD File LATEST_SUBMISSION=' . substr($latest_submission_date,0,8));
+    self::debug('Locating suitable SDD File LATEST_SUBMISSION=' . substr($latest_submission_date,0,8));
     $openStatus = CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value');
     $query = "SELECT 
                 id 
@@ -195,7 +195,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   }
 
   public static function createSddFile($latest_submission_date) {
-    CRM_Core_Session::setStatus('Creating new SDD File LATEST_SUBMISSION=' . substr($latest_submission_date,0,8));
+    self::debug('Creating new SDD File LATEST_SUBMISSION=' . substr($latest_submission_date,0,8));
 
     $reference = "SDDXML_" . substr($latest_submission_date,0,8);
     $filename = $reference . ".xml";
@@ -212,7 +212,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     );
     $result = civicrm_api('SepaSddFile', 'create', $params);
     if ($result['is_error']) {
-      CRM_Core_Session::setStatus('ERROR creating SDD file');
+      self::debug('ERROR creating SDD file');
       return null;
     }
     $sddfile_id = $result['id'];
@@ -223,7 +223,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   }
 
   public static function addToSddFile($txGroup, $sddFile) {
-    CRM_Core_Session::setStatus('Adding TXG(' . $txGroup->id . ') to SDD File(' . $sddFile->id . ')', '', 'info');
+    self::debug('Adding TXG(' . $txGroup->id . ') to SDD File(' . $sddFile->id . ')', '', 'info');
     $params = array(
         'id' => $txGroup->id,
         'sdd_file_id' => $sddFile->id,

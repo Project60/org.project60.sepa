@@ -1,6 +1,14 @@
 <?php
 
+
+CRM_Sepa_Logic_Base::setDebug(true, true, '/tmp/sepadd.log');
+
+
 class CRM_Sepa_Logic_Base {
+
+  public static $debugByStatus = 1;
+  public static $debugByLog = 1;
+  public static $debugLogPath = '';
 
   /**
    * Determine whether there is a mandate attached, so it's a SDD TX
@@ -57,8 +65,36 @@ class CRM_Sepa_Logic_Base {
    * @return type
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
-    $date_part = substr($date_to_adjust,0,10);
+    $date_part = substr($date_to_adjust, 0, 10);
     return $date_part;
   }
 
+  /**
+   * Debug, used for tracing all kinds of logic for SDD
+   * 
+   * @param string $message
+   * @param string $title
+   * @param string $type
+   */
+  public static function debug($message, $title = '', $type = 'alert') {
+    if (self::$debugByStatus) {
+      CRM_Core_Session::setStatus($message, $title, $type);
+    }
+    if (self::$debugByLog && (self::$debugLogPath != '')) {
+      $tag = date("Y-m-d G:i:s") . "\t";
+      if ($title) $msg = $tag . '*** ' . $title . "\n";
+      $msg .= $tag . $message . "\n";
+      file_put_contents( self::$debugLogPath, $msg, FILE_APPEND );
+    } else die('no logging');
+  }
+
+  public static function setDebug($byStatus, $byLog, $logFilePath = '') {
+    self::$debugByStatus = $byStatus;
+    self::$debugByLog = $byLog;
+    if ($logFilePath)
+      self::$debugLogPath = $logFilePath;
+  }
+
 }
+
+

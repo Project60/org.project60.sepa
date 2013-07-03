@@ -38,7 +38,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->cycle_day = 18;
       $objectRef->save();
-      CRM_Core_Session::setStatus('Set recurring contribution cycle date to ' . $objectRef->cycle_day);
+      self::debug('Set recurring contribution cycle date to ' . $objectRef->cycle_day);
     }
   }
 
@@ -79,12 +79,12 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
             }
             $contrib->receive_date = sprintf("%04d%02d%02d", $ryr, $rmo, $rc->cycle_day);
           }
-          CRM_Core_Session::setStatus('Pushed out first contribution collection day from ' . $rday . ' to ' . $rc->cycle_day);
+          self::debug('Pushed out first contribution collection day from ' . $rday . ' to ' . $rc->cycle_day);
           $contrib->save();
         }
       }
 
-      CRM_Core_Session::setStatus('Found first contribution ' . $contrib->id);
+      self::debug('Found first contribution ' . $contrib->id);
       $dao->first_contribution_id = $contrib->id;
       $dao->save();
     }
