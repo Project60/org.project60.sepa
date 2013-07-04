@@ -1,3 +1,4 @@
+<h3>Sepa Mandate {$sepa.id}</h3>
 <div class="crm-container">
         <div class="crm-block crm-content-block crm-sdd-mandate">
           <table class="crm-info-panel">
