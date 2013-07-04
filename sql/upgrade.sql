@@ -58,8 +58,7 @@ CREATE TABLE IF NOT EXISTS  `civicrm_sdd_txgroup` (
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
-
-CREATE TABLE  IF NOT EXISTS `civicrm_sdd_contribution_txgroup` (
+CREATE TABLE `civicrm_sdd_contribution_txgroup` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'primary key',
@@ -71,11 +70,11 @@ CREATE TABLE  IF NOT EXISTS `civicrm_sdd_contribution_txgroup` (
     ,     UNIQUE INDEX `contriblookup`(
         contribution_id
   )
-  ,     UNIQUE INDEX `txglookup`(
+  ,     INDEX `txglookup`(
         txgroup_id
   )
 
-,          CONSTRAINT FK_civicrm_sdd_contribution_txgroup_txgroup_id FOREIGN KEY (`txgroup_id`) REFERENCES `civicrm_sdd_txgroup`(`id`) ON DELETE SET NULL
+,          CONSTRAINT FK_civicrm_sdd_cGGoup_id FOREIGN KEY (`txgroup_id`) REFERENCES `civicrm_sdd_txgroup`(`id`) 
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
