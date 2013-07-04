@@ -81,6 +81,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     }
     
     $page = CRM_Sepa_Page_SepaMandatePdf();
+    $page->generateHTML($r);
     $page->generatePDF (true);
   }
 
