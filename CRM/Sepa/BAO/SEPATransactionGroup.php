@@ -24,5 +24,17 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     return $dao;
   }
 
+  generateXML () {
+    if (empty ($this->id)) {
+      CRM_Core_Error::fatal("missing id of the transaction group");
+    } 
+    $queryParams= array ($this->id, 'Positive'));
+    $query="SELECT c.* FROM civicrm_contribution as c, civicrm_sdd_contribution_txgroup as g where g.contribution_id=c.id AND g.txgroup_id=%1";
+    $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
+    while ($contrib->fetch()) {
+print_r($contrib); die ("TT");
+    }
+
+  }
 }
 
