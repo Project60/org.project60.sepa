@@ -10,7 +10,6 @@ update civicrm_sdd_mandate,civicrm_contribution set first_contribution_id=civicr
 #issue 13: creditor more complete
 alter table civicrm_sdd_creditor add column `payment_instrument_id` int unsigned    COMMENT 'FK to civicrm_payment_instrument';
 alter table civicrm_sdd_creditor add column `payment_processor_id` int unsigned    COMMENT 'FK to civicrm_payment_processor';
-alter table civicrm_sdd_creditor add column `payment_processor_id` int unsigned    COMMENT 'FK to civicrm_payment_processor';
 
 
 
