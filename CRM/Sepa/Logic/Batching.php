@@ -214,12 +214,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     );
     $result = civicrm_api('SepaSddFile', 'create', $params);
     if ($result['is_error']) {
-<<<<<<< HEAD
       CRM_Core_Error::fatal(ts("ERROR creating SDD file"));
-=======
-      self::debug('ERROR creating SDD file');
->>>>>>> 6b3009902f2ecb60e7dfe95f9b5cc30e2cc7a61e
-      return null;
     }
     $sddfile_id = $result['id'];
     $sddfile = new CRM_Sepa_BAO_SepaSddFile();
