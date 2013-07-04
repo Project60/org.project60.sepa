@@ -28,7 +28,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
   static function add(&$params) {
     if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
       $params["reference"] = CRM_Sepa_BAO_SEPAMandate::generateReference($params);
-      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this);
+      //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
     }
 
    if (CRM_Utils_Array::value('is_enabled', $params)) {
