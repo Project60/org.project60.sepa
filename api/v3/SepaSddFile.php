@@ -96,3 +96,10 @@ function civicrm_api3_sepa_sdd_file_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+function civicrm_api3_sepa_sdd_file_generatexml($params) {
+//fetch the file, then the group
+
+  $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
+  $txgroup->id=2;
+  return civicrm_api3_create_success($txgroup->generateXML());
+}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class contains functions for Sepa mandates
+ * Class contains  functions for Sepa mandates
  */
 class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGroup {
 
@@ -24,17 +24,22 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     return $dao;
   }
 
-  generateXML () {
+  function generateXML () {
     if (empty ($this->id)) {
       CRM_Core_Error::fatal("missing id of the transaction group");
     } 
-    $queryParams= array ($this->id, 'Positive'));
-    $query="SELECT c.* FROM civicrm_contribution as c, civicrm_sdd_contribution_txgroup as g where g.contribution_id=c.id AND g.txgroup_id=%1";
+    $queryParams= array (1=>array($this->id, 'Positive'));
+    $query="SELECT c.id, currency, total_amount,receive_date,contribution_recur_id, contribution_status_id FROM civicrm_contribution as c, civicrm_sdd_contribution_txgroup as g where g.contribution_id=c.id AND g.txgroup_id= %1";
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $r=array(); 
+    $template = CRM_Core_Smarty::singleton();
     while ($contrib->fetch()) {
-print_r($contrib); die ("TT");
+print_r($contrib);
+      $r[]=$contrib->toArray();
     }
-
+    $template->assign("contributions",$r);
+die ($template->fetch('CRM/Sepa/xml/TransactionGroup.tpl'));
+    return $template->fetch('CRM/Sepa/xml/TransactionGroup.tpl');
   }
 }
 
