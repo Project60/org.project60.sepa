@@ -74,6 +74,8 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
 
     $apiParams["creation_date"]= date("YmdHis");
     //echo 'creating mandate';
+    $apiParams["sequential"]= 1;
+
     $r = civicrm_api ("SepaMandate","create", $apiParams);
     //die(print_r($r));
     if ($r["is_error"]) {
@@ -81,7 +83,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     }
     
     $page = new CRM_Sepa_Page_SepaMandatePdf();
-    $page->generateHTML($r);
+    $page->generateHTML($r["values"][0]);
     $page->generatePDF (true);
   }
 
