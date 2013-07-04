@@ -30,15 +30,52 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * @param type $objectRef
    */
   public static function hook_post_sepamandate_create($objectId, $objectRef) {
-    CRM_Sepa_Logic_Mandates::fix_initial_contribution($objectRef);
-    CRM_Sepa_Logic_Batching::batch_initial_contribution($objectId, $objectRef);
   }
 
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
-      $objectRef->cycle_day = 18;
+      $objectRef->cycle_day = 8; //TODO read from creditor. and not save again? ugly code
       $objectRef->save();
       CRM_Core_Session::setStatus('Set recurring contribution cycle date to ' . $objectRef->cycle_day);
+    }
+  }
+
+
+  /**
+   * Fix the recurring contribution created by the PP
+   * 
+   * If the mandate is created by the PP, it has a recurring contrib, when the status changes, the recurring contrib has the appropriate status too
+   */
+  public static function fix_recurring_contribution($api_mandate) {
+    $bao = new CRM_Sepa_BAO_SEPAMandate();
+    $bao->get($api_mandate["id"]);
+    if ($bao->entity_table == "civicrm_contribution_recur") {
+      $rcid=$bao->entity_id;
+      $rc = new CRM_Contribute_BAO_ContributionRecur();
+      $rc->get('id', $bao->entity_id);
+      if($rc->cycle_day ==1)
+        $rc->cycle_day=8; // TODO read this info from the creditor
+      $rc->start_date = date('Y-m', strtotime("now"))."-".$rc->cycle_day;
+      $j = intval(date('j', strtotime("now")));
+      if ((date('j', strtotime("now"))+5) > $rc->cycle_day) {
+        $rc->start_date = date("Ymd",strtotime('+1 month',strtotime($rc->start_date)));
+      } else {
+        $rc->start_date = date("Ymd",strtotime($rc->start_date));
+      };
+    //$rc->get();$rc->save(); doesn't work if datetime is a field. php hates mankind
+      $rc->create_date = date("YmdHis",strtotime($rc->create_date));
+      $rc->modified_date = null;
+      if (!$bao->is_enabled && $api_mandate["is_enabled"]) {
+        $rc->contribution_status_id=1; //TODO match the status to the mandate is_enabled
+        // figure out whether there is a contribution for this mandate
+        $contrib = $bao->findContribution();
+        $contrib->receive_date = $rc->start_date;
+        $contrib->save();
+      } elseif (!$bao->is_enabled && !$api_mandate["is_enabled"]) {
+        // TODO should we disable the next contribution or only the recurring contrib? 
+        $rc->contribution_status_id=3; //TODO match the status to the mandate is_enabled
+      }
+      $rc->save();
     }
   }
 
@@ -51,7 +88,8 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * be registered as the first contribution in the mandate (FRST for now, OOFF later).
    * 
    * Note: PP settings will need to include a 'make active immediately' flag (or 
-   * set initial status to <dropdown>).
+   * set initial status to <dropdown>). It's part of the "creditor" info that needs to be exposed 
+   * "custom fields" of the PP
    * 
    * @param CRM_Sepa_BAO_SEPAMandate $bao
    */
@@ -81,7 +119,9 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
           }
           CRM_Core_Session::setStatus('Pushed out first contribution collection day from ' . $rday . ' to ' . $rc->cycle_day);
           $contrib->save();
+        } else {
         }
+        $rc->receive_date = sprintf("%04d%02d%02d", $ryr, $rmo, $rc->cycle_day);
       }
 
       CRM_Core_Session::setStatus('Found first contribution ' . $contrib->id);

@@ -25,7 +25,6 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
   /**
    * Batch a contribution into a TXG.
-   * 
    * @param CRM_Sepa_BAO_SEPATransaction $bao
    */
   public static function batchContribution(CRM_Contribute_BAO_Contribution $contrib, CRM_Sepa_BAO_SEPAMandate $mandate) {
@@ -35,13 +34,14 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $type = self::getSDDType($contrib);
     $payment_instrument_id = $contrib->payment_instrument_id;
     $params = array(
-        'contribution_payment_instrument_id' => $payment_instrument_id,
+        'payment_instrument_id' => $payment_instrument_id,
         'version' => 3,
     );
     $result = civicrm_api('SepaCreditor', 'getsingle', $params);
     if ($result['is_error']) {
-      CRM_Core_Session::setStatus('No creditor found for payment instrument '. $payment_instrument_id);
-      return null;
+      $result = civicrm_api('SepaCreditor', 'create', array("version"=>3,"identifier"=>"FIXME","name"=>"Workaround","payment_instrument_id" => $payment_instrument_id,));
+      if ($result['is_error']) 
+        CRM_Core_Error::fatal($result['error_message']);
     }
     $creditor_id = $result['id'];
 
@@ -74,7 +74,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    * @param date $earliest_date
    * @param date $latest_date
    * 
-   * @return CRM_Sepa_BAO_SepaTransactionGroup or null
+   * @return CRM_Sepa_BAO_SEPATransactionGroup or null
    */
   public static function findTxGroup($creditor_id, $type, $earliest_date, $latest_date) {
     CRM_Core_Session::setStatus("Locating suitable TXG : CRED=$creditor_id TYPE=$type RANGE=" . substr($earliest_date,0,10) . ' / ' . substr($latest_date,0,10));
@@ -97,7 +97,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               ";
     $dao = CRM_Core_DAO::executeQuery($query);
     if ($dao->fetch()) {
-      $txgroup = new CRM_Sepa_BAO_SepaTransactionGroup();
+      $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
       $txgroup->get('id', $dao->id);
       return $txgroup;
     }
@@ -134,7 +134,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     if ($result['is_error'])
       return null;
     $txgroup_id = $result['id'];
-    $txgroup = new CRM_Sepa_BAO_SepaTransactionGroup();
+    $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->get('id', $txgroup_id);
     return $txgroup;
   }
@@ -186,7 +186,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               ";
     $dao = CRM_Core_DAO::executeQuery($query);
     if ($dao->fetch()) {
-      $sddfile = new CRM_Sepa_BAO_SepaSddFile();
+      $sddfile = new CRM_Sepa_BAO_SEPASddFile();
       $sddfile->get('id', $dao->id);
       return $sddfile;
     }
@@ -212,7 +212,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     );
     $result = civicrm_api('SepaSddFile', 'create', $params);
     if ($result['is_error']) {
-      CRM_Core_Session::setStatus('ERROR creating SDD file');
+      CRM_Core_Error::fatal(ts("ERROR creating SDD file"));
       return null;
     }
     $sddfile_id = $result['id'];

@@ -1,3 +1,5 @@
+update civicrm_contribution_recur set cycle_day=8 where cycle_day = 1;
+
 alter table civicrm_sdd_creditor modify mandate_prefix VARCHAR(4);
 
 # issue 12: first contrib on mandate

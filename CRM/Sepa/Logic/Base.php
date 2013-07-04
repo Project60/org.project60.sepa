@@ -41,8 +41,8 @@ class CRM_Sepa_Logic_Base {
    * @return string
    */
   public static function getSDDType(CRM_Contribute_BAO_Contribution $bao) {
-    $a = civicrm_api('SepaMandate', 'getsingle', array('version' => 3, 'first_contribution_id' => $bao->id));
-    if (!$a['is_error']) {
+    $a = civicrm_api('SepaMandate', 'getcount', array('version' => 3, 'first_contribution_id' => $bao->id));
+    if ($a['count'] == 1) {
       // check OOFF in function of mandate
       return 'FRST';
     }

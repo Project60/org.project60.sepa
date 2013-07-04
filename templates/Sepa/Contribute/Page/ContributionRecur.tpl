@@ -1,5 +1,4 @@
 <div class="crm-container">
-<h3>{ts}Sepa Mandate n°{$sepa.id}{/ts}</h3>
         <div class="crm-block crm-content-block crm-sdd-mandate">
           <table class="crm-info-panel">
             <tr><td class="label">{ts}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
@@ -9,6 +8,9 @@
             <tr><td class="label">{ts}Creation date{/ts}</td><td>{$sepa.creation_date}</td></tr>
             <tr><td class="label">{ts}Signature date{/ts}</td><td>{$sepa.date}</td></tr>
             <tr><td class="label">{ts}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
+{assign var="cid" value=$recur.contact_id}
+{assign var="fcid" value=$sepa.first_contribution_id}
+          <tr><td class="label">{ts}1st contribution{/ts}</td><td><a href="{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=view&id=$fcid&cid=$cid"}">{$sepa.first_contribution_id}</a></td></tr>
 </table></div>
  
 {assign var="mid" value=$sepa.id}

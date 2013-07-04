@@ -26,9 +26,16 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    * @static (I do apologize, I don't want to)
    */
   static function add(&$params) {
-    if (!CRM_Utils_Array::value('reference', $params)) {
+    if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
       $params["reference"] = CRM_Sepa_BAO_SEPAMandate::generateReference($params);
+      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this);
     }
+
+   if (CRM_Utils_Array::value('is_enabled', $params)) {
+      CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);     
+   }
+    $hook = empty($params['id']) ? 'create' : 'edit';
+   CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
 
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
@@ -36,15 +43,16 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if (!array_key_exists("date", $params)) {
       $params["date"] = date("YmdHis");
     }
-    //die(print_r($params));
+    
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
+    if (CRM_Utils_Array::value('is_enabled', $params)) { 
+      $dao->validation_date  = date("YmdHis");
+    }
     $dao->save();
-
-    // process the new mandate
-    $bao = new CRM_Sepa_BAO_SEPAMandate();
-    $bao->get('id', $dao->id);
-    
+    if (CRM_Utils_Array::value('is_enabled', $params)) { //only batching enabled
+      CRM_Sepa_Logic_Batching::batch_initial_contribution($dao->id, $dao);
+    }
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }

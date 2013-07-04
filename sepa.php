@@ -106,6 +106,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       $form->getElement('installments')->setValue(0);//by default, sepa is without end date
     }
     $form->getElement('is_notify')->setValue(0); // the notification isn't clear, disable it
+$form->assign($mandate);
     //TODO, add in the form, as a region?
     $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
     $form->add( 'text', 'bank_bic',  ts('BIC'))->setValue($mandate["bic"],array('size' => 11, 'maxlength' => 11));
