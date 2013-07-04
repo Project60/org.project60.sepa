@@ -1,7 +1,7 @@
 <?php
 
 
-CRM_Sepa_Logic_Base::setDebug(false, true, '/tmp/sepadd.log');
+CRM_Sepa_Logic_Base::setDebug(true, true, '/tmp/sepadd.log');
 
 
 class CRM_Sepa_Logic_Base {
@@ -66,6 +66,41 @@ class CRM_Sepa_Logic_Base {
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
     $date_part = substr($date_to_adjust, 0, 10);
+    if ($days_delta > 0) {
+      // adjust for bankdays -> real days
+      $delta = floor($days_delta/5)*7 + ($days_delta % 5);
+      date_add($date_part, date_interval_create_from_date_string( $delta . ' days'));
+      // push forward if on a weekend
+      $tinfo = getdate(strtotime($date_part));
+      switch ($tinfo['wday']) {
+        case 0 : // Sunday
+          $date_part = date_add($date_part, date_interval_create_from_date_string('1 days'));
+          break;
+        case 6 : // Saturday
+          $date_part = date_add($date_part, date_interval_create_from_date_string('2 days'));
+          break;
+         default:
+           break;
+      }
+    } else if ($days_delta < 0) {
+      $days_delta = - $days_delta;
+      // adjust for bankdays -> real days
+      $delta = floor($days_delta/5)*7 + ($days_delta % 5);
+      date_sub($date_part, date_interval_create_from_date_string( $delta . ' days'));
+      // pull back if on a weekend
+      $tinfo = getdate(strtotime($date_part));
+      switch ($tinfo['wday']) {
+        case 0 : // Sunday
+          $date_part = date_sub($date_part, date_interval_create_from_date_string('2 days'));
+          break;
+        case 6 : // Saturday
+          $date_part = date_sub($date_part, date_interval_create_from_date_string('1 days'));
+          break;
+         default:
+           break;
+      }
+    }
+    
     return $date_part;
   }
 
