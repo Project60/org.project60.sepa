@@ -12,6 +12,31 @@ alter table civicrm_sdd_creditor add column `payment_instrument_id` int unsigned
 alter table civicrm_sdd_creditor add column `payment_processor_id` int unsigned    COMMENT 'FK to civicrm_payment_processor';
 
 
+-- /*******************************************************
+-- *
+-- * civicrm_sdd_file
+-- *
+-- *******************************************************/
+CREATE TABLE `civicrm_sdd_file` (
+
+
+     `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
+     `reference` varchar(64)    COMMENT 'End-to-end reference for this sdd file.',
+     `filename` char(64)    COMMENT 'Name of the generated file',
+     `latest_submission_date` datetime    COMMENT 'Latest submission date',
+     `created_date` datetime    COMMENT 'When was this item created',
+     `created_id` int unsigned    COMMENT 'FK to Contact ID of creator',
+     `status_id` int unsigned NOT NULL   COMMENT 'fk to Batch Status options in civicrm_option_values',
+     `comments` text    COMMENT 'Comments about processing of this file'
+,
+    PRIMARY KEY ( `id` )
+
+
+,          CONSTRAINT FK_civicrm_sdd_file_created_id FOREIGN KEY (`created_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+
+
 
 CREATE TABLE IF NOT EXISTS  `civicrm_sdd_txgroup` (
 
@@ -53,14 +78,4 @@ CREATE TABLE  IF NOT EXISTS `civicrm_sdd_contribution_txgroup` (
 ,          CONSTRAINT FK_civicrm_sdd_contribution_txgroup_txgroup_id FOREIGN KEY (`txgroup_id`) REFERENCES `civicrm_sdd_txgroup`(`id`) ON DELETE SET NULL
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
-
--- /*******************************************************
--- *
--- * civicrm_sdd_file
--- *
--- *******************************************************/
-CREATE TABLE  IF NOT EXISTS `civicrm_sdd_file` (
-
-
-     `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
 
