@@ -80,7 +80,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
     }
     
-    $page = CRM_Sepa_Page_SepaMandatePdf();
+    $page = new CRM_Sepa_Page_SepaMandatePdf();
     $page->generateHTML($r);
     $page->generatePDF (true);
   }
