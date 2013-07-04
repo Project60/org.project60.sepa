@@ -34,6 +34,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
 
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
+      $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
       $objectRef->cycle_day = 8; //TODO read from creditor. and not save again? ugly code
       $objectRef->save();
       self::debug('Set recurring contribution cycle date to ' . $objectRef->cycle_day);
