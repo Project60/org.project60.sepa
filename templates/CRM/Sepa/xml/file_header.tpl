@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-intance">
+  <CstmrDrctDbtInitn>
+    <GrpHdr>
+      <MsgId>{$file.name}</MsgId>
+      <CreDtTm>{$file.date}</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+      <CtrlSum>{$file.total}</CtrlSum>
+      <InitgPty>
+        <Nm>{$creditor.name}</Nm>
+      </InitgPty>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>{$group.name}</PmtInfId>
+      <PmtMtd>DD</PmtMtd>
+      <BtchBookg>false</BtchBookg>
+      <NbOfTxs>{$group.nb}</NbOfTxs>
+      <CtrlSum>{$group.total}</CtrlSum>
+      <PmtTpInf>
+        <SvcLvl>
+          <Cd>SEPA</Cd>
+        </SvcLvl>
+        <LclInstrm>
+          <Cd>CORE</Cd>
+        </LclInstrm>
+        <SeqTp>FRST</SeqTp>
+      </PmtTpInf>
+      <ReqdColltnDt>2010-09-12</ReqdColltnDt>
+      <Cdtr>
+        <Nm>NGO International</Nm>
+      </Cdtr>
+      <CdtrAcct>
+        <Id>
+          <IBAN>NL90ABNA0111111111</IBAN>
+        </Id>
+      </CdtrAcct>
+      <CdtrAgt>
+        <FinInstnId>
+          <BIC>ABNANL2A</BIC>
+        </FinInstnId>
+      </CdtrAgt>
+      <ChrgBr>SLEV</ChrgBr>
+      <CdtrSchmeId>
+        <Nm>NGO International</Nm>
+        <Id>
+          <PrvtId>
+            <Othr>
+              <Id>NL64ZZZ321096320000</Id>
+              <SchmeNm>
+                <Prtry>SEPA</Prtry>
+              </SchmeNm>
+            </Othr>
+          </PrvtId>
+        </Id>
+      </CdtrSchmeId>
