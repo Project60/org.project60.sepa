@@ -1,28 +1,75 @@
-      <DrctDbtTxInf>
-        <PmtId>
-          <EndToEndId>NGO-FRST-7553-A01</EndToEndId>
+    <PmtInf>
+      <PmtInfId>{$group.reference}</PmtInfId>
+      <PmtMtd>DD</PmtMtd>
+      <BtchBookg>false</BtchBookg>
+      <NbOfTxs>{$nbtransactions}</NbOfTxs>
+      <CtrlSum>{$total}</CtrlSum>
+      <PmtTpInf>
+        <SvcLvl>
+          <Cd>SEPA</Cd>
+        </SvcLvl>
+        <LclInstrm>
+          <Cd>CORE</Cd>
+        </LclInstrm>
+        <SeqTp>{$group->type}</SeqTp>
+      </PmtTpInf>
+      <ReqdColltnDt>{$group.collection_date}</ReqdColltnDt>
+      <Cdtr>
+        <Nm>{$creditor.name}</Nm>
+      </Cdtr>
+      <CdtrAcct>
+        <Id>
+          <IBAN>{$creditr.iban}</IBAN>
+        </Id>
+      </CdtrAcct>
+      <CdtrAgt>
+        <FinInstnId>
+          <BIC>{$creditor.bic}</BIC>
+        </FinInstnId>
+      </CdtrAgt>
+      <ChrgBr>SLEV</ChrgBr>
+      <CdtrSchmeId>
+        <Nm>{$creditor.name}</Nm>
+        <Id>
+          <PrvtId>
+            <Othr>
+              <Id>{$creditor.reference}</Id>
+              <SchmeNm>
+                <Prtry>SEPA</Prtry>
+              </SchmeNm>
+            </Othr>
+          </PrvtId>
+        </Id>
+      </CdtrSchmeId>
+
+{foreach from=$contributions item="contribution"}
+      <DrctDbtTx{$creditor.reference}>
+          <EndToEndId>{$contribution.id}</EndToEndId>
         </PmtId>
-        <InstdAmt Ccy="EUR">10.1</InstdAmt>
+        <InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</InstdAmt>
         <DrctDbtTx>
           <MndtRltdInf>
-            <MndtId>NGO-5673824</MndtId>
-            <DtOfSgntr>2008-07-13</DtOfSgntr>
+            <MndtId>{$contribution.reference}</MndtId>
+            <DtOfSgntr>{$contribution.validation_date}</DtOfSgntr>
           </MndtRltdInf>
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
-            <BIC>RABONL2U</BIC>
+            <BIC>{$contribution.bic}</BIC>
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
-          <Nm>Joe Donor</Nm>
+          <Nm>{$contribution.display_name}</Nm>
         </Dbtr>
         <DbtrAcct>
           <Id>
-            <IBAN>NL44RABO0123456789</IBAN>
+            <IBAN>{$contribution.iban}</IBAN>
           </Id>
         </DbtrAcct>
         <RmtInf>
-          <Ustrd>Your mandate NGO-5673824, payment for Sep 2012</Ustrd>
+          <Ustrd>{$message}</Ustrd>
         </RmtInf>
       </DrctDbtTxInf>
+{/foreach}
+
+    </PmtInf>
