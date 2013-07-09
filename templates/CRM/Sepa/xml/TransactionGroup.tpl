@@ -13,7 +13,7 @@
         </LclInstrm>
         <SeqTp>{$group->type}</SeqTp>
       </PmtTpInf>
-      <ReqdColltnDt>{$group.collection_date}</ReqdColltnDt>
+      <ReqdColltnDt>{$group.collection_date|crmDate:"%b %d, %Y %l:%M %P"}</ReqdColltnDt>
       <Cdtr>
         <Nm>{$creditor.name}</Nm>
       </Cdtr>
