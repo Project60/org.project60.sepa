@@ -24,8 +24,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     return $dao;
   }
 
-  function generateXML () {
+  function generateXML ($id = null) {
     $template = CRM_Core_Smarty::singleton();
+    if ($id) {
+      $this->id=$id;
+    }
     if (empty ($this->id)) {
       CRM_Core_Error::fatal("missing id of the transaction group");
     } 

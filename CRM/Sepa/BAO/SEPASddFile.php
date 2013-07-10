@@ -24,5 +24,17 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     return $dao;
   }
 
+  function generatexml($id) {
+    $template = CRM_Core_Smarty::singleton();
+    $this->get((int)$id);
+    $template->assign("file", $template->assign("file",$this->toArray());
+    $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
+    $txgroup->sdd_file_id=$this->id;
+    $txgroup->find();
+    $txgroup->fetch();
+print_r($txgroup);
+die ("toto");
+    return civicrm_api3_create_success($txgroup->generateXML());
+  }
 }
 
