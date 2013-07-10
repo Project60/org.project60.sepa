@@ -34,7 +34,6 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     while ($txgroup->fetch()) {
       echo $txgroup->generateXML();
     }
-die ("toto");
   }
 }
 
