@@ -31,10 +31,10 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->sdd_file_id=$this->id;
     $txgroup->find();
-    $txgroup->fetch();
-print_r($txgroup);
+    while ($txgroup->fetch()) {
+      echo $txgroup->generateXML();
+    }
 die ("toto");
-    return civicrm_api3_create_success($txgroup->generateXML());
   }
 }
 

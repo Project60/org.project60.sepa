@@ -43,7 +43,8 @@
       </CdtrSchmeId>
 
 {foreach from=$contributions item="contribution"}
-      <DrctDbtTx{$creditor.reference}>
+      <DrctDbtTxInf>
+        <PmtId>
           <EndToEndId>{$contribution.id}</EndToEndId>
         </PmtId>
         <InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</InstdAmt>
