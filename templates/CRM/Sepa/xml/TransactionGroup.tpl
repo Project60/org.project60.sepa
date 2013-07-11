@@ -11,7 +11,7 @@
         <LclInstrm>
           <Cd>CORE</Cd>
         </LclInstrm>
-        <SeqTp>{$group->type}</SeqTp>
+        <SeqTp>{$group.type}</SeqTp>
       </PmtTpInf>
       <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
       <Cdtr>
@@ -19,7 +19,7 @@
       </Cdtr>
       <CdtrAcct>
         <Id>
-          <IBAN>{$creditr.iban}</IBAN>
+          <IBAN>{$creditor.iban}</IBAN>
         </Id>
       </CdtrAcct>
       <CdtrAgt>
