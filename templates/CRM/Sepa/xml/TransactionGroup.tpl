@@ -13,7 +13,7 @@
         </LclInstrm>
         <SeqTp>{$group->type}</SeqTp>
       </PmtTpInf>
-      <ReqdColltnDt>{$group.collection_date|crmDate:"%b %d, %Y %l:%M %P"}</ReqdColltnDt>
+      <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
       <Cdtr>
         <Nm>{$creditor.name}</Nm>
       </Cdtr>
@@ -51,7 +51,7 @@
         <DrctDbtTx>
           <MndtRltdInf>
             <MndtId>{$contribution.reference}</MndtId>
-            <DtOfSgntr>{$contribution.validation_date}</DtOfSgntr>
+            <DtOfSgntr>{$contribution.validation_date|crmDate:"%Y-%m-%d"}</DtOfSgntr>
           </MndtRltdInf>
         </DrctDbtTx>
         <DbtrAgt>

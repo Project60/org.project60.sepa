@@ -3,7 +3,7 @@
   <CstmrDrctDbtInitn>
     <GrpHdr>
       <MsgId>{$file.reference}</MsgId>
-      <CreDtTm>{$file.created_date}</CreDtTm>
+      <CreDtTm>{$file.created_date|crmDate:"%Y-%m-%dT%H:%i:42"}</CreDtTm>
       <NbOfTxs>{$nbtransactions}</NbOfTxs>
       <CtrlSum>{$total}</CtrlSum>
       <InitgPty>
