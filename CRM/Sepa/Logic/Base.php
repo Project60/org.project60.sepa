@@ -1,7 +1,7 @@
 <?php
 
 
-CRM_Sepa_Logic_Base::setDebug(true, true, '/tmp/sepadd.log');
+CRM_Sepa_Logic_Base::setDebug(false, true, '/tmp/sepadd.log');
 
 
 class CRM_Sepa_Logic_Base {
