@@ -131,12 +131,13 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
   }
 
   //hook which batches the contribution when it is created (using the hook magic function)
+  // @pdelbar: this creates more problems than it solves, as the mandate isn't validated yet
   public static function disabled_hook_post_contribution_create($objectId, $objectRef) {
-    self::post_contribution_modify($objectId, $objectRef);
+//    self::post_contribution_modify($objectId, $objectRef);
   }
 
   public static function hook_post_contribution_edit($objectId, $objectRef) {
-    self::post_contribution_modify($objectId, $objectRef);
+//    self::post_contribution_modify($objectId, $objectRef);
   }
 
   /**
