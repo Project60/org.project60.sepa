@@ -6,7 +6,7 @@ CRM_Sepa_Logic_Base::setDebug(true, true, '/tmp/sepadd.log');
 
 class CRM_Sepa_Logic_Base {
 
-  public static $debugByStatus = 1;
+  public static $debugByStatus = 0;
   public static $debugByLog = 1;
   public static $debugLogPath = '';
 
