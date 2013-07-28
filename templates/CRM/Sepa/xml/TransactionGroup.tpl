@@ -33,7 +33,7 @@
         <Id>
           <PrvtId>
             <Othr>
-              <Id>{$creditor.reference}</Id>
+              <Id>{$creditor.identifier}</Id>
               <SchmeNm>
                 <Prtry>SEPA</Prtry>
               </SchmeNm>
