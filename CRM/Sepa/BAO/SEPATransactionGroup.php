@@ -45,7 +45,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $query="SELECT c.id, civicrm_contact.display_name, invoice_id,currency, total_amount,receive_date,contribution_recur_id, contribution_status_id, mandate.* FROM civicrm_contribution as c JOIN civicrm_sdd_contribution_txgroup as g on g.contribution_id=c.id JOIN civicrm_sdd_mandate as mandate on c.contribution_recur_id = mandate.entity_id JOIN civicrm_contact on c.contact_id = civicrm_contact.id WHERE g.txgroup_id= %1 AND contribution_status_id != 3"; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
     while ($contrib->fetch()) {
-      $r[]=$contrib->toArray();
+      $t=$contrib->toArray();
+      $t["iban"]=str_replace(' ', '', $t["iban"]);
+      $r[]=$t;
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
       } elseif ($creditor_id != $contrib->creditor_id){
