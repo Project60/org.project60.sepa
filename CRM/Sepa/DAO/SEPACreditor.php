@@ -118,6 +118,18 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $country_id;
   /**
+   * Iban of the creditor
+   *
+   * @var string
+   */
+  public $iban;
+  /**
+   * BIC of the creditor
+   *
+   * @var string
+   */
+  public $bic;
+  /**
    * prefix for mandate identifiers
    *
    * @var string
@@ -215,6 +227,21 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Country') ,
           'FKClassName' => 'CRM_Core_DAO_Country',
+        ) ,
+        'iban' => array(
+          'name' => 'iban',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Iban') ,
+          'required' => false,
+          'maxlength' => 42,
+          'size' => CRM_Utils_Type::BIG,
+        ) ,
+        'bic' => array(
+          'name' => 'bic',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Bic') ,
+          'maxlength' => 11,
+          'size' => CRM_Utils_Type::TWELVE,
         ) ,
         'mandate_prefix' => array(
           'name' => 'mandate_prefix',
