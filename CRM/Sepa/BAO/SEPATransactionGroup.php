@@ -47,6 +47,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     while ($contrib->fetch()) {
       $t=$contrib->toArray();
       $t["iban"]=str_replace(' ', '', $t["iban"]);
+      $t["display_name"]=htmlspecialchars($t["display_name"]);
       $r[]=$t;
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
