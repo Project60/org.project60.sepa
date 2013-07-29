@@ -1,3 +1,7 @@
+
+alter table civicrm_sdd_creditor add column   `iban` varchar(42) NULL   COMMENT 'Iban of the creditor';
+alter table civicrm_sdd_creditor add column      `bic` varchar(11)    COMMENT 'BIC of the creditor';
+
 update civicrm_contribution_recur set cycle_day=8 where cycle_day = 1;
 
 alter table civicrm_sdd_creditor modify mandate_prefix VARCHAR(4);

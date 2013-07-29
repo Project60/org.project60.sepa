@@ -75,6 +75,22 @@
        <onDelete>SET NULL</onDelete>
   </foreignKey>
 
+  <field>
+    <name>iban</name>
+    <type>varchar</type>
+    <length>42</length>
+    <required>false</required>
+    <comment>Iban of the creditor</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>bic</name>
+    <type>varchar</type>
+    <length>11</length>
+    <comment>BIC of the creditor</comment>
+    <add>4.3</add>
+  </field>
+
 
   <field>
     <name>mandate_prefix</name>
