@@ -44,6 +44,10 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="SELECT c.id, civicrm_contact.display_name, invoice_id,currency, total_amount,receive_date,contribution_recur_id, contribution_status_id, mandate.* FROM civicrm_contribution as c JOIN civicrm_sdd_contribution_txgroup as g on g.contribution_id=c.id JOIN civicrm_sdd_mandate as mandate on c.contribution_recur_id = mandate.entity_id JOIN civicrm_contact on c.contact_id = civicrm_contact.id WHERE g.txgroup_id= %1 AND contribution_status_id != 3 AND mandate.is_enabled = true"; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
+
+    setlocale(LC_CTYPE, 'en_US.utf8');
+    //dear dear, it might work, but seems to be highly dependant of the system running it, without any way to know what is available, or if the setting was done properly #phpeature
+ 
     while ($contrib->fetch()) {
       $t=$contrib->toArray();
       $t["iban"]=str_replace(' ', '', $t["iban"]);
