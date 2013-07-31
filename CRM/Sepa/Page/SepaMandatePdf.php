@@ -65,8 +65,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     $fileName = $this->mandate->reference.".pdf";
     if ($send) {
       $config = CRM_Core_Config::singleton();
-      //$pdfFullFilename = $config->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
-      $pdfFullFilename = '/tmp/'.$fileName;
+      $pdfFullFilename = $config->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
       file_put_contents($pdfFullFilename, CRM_Utils_PDF_Utils::html2pdf( $this->html,$fileName, true, null ));
       list($domainEmailName,$domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
       $params              = array();
@@ -74,7 +73,6 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $params['from']      = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
       $params['toEmail'] = $this->contact->email;
       $params['toName']  = $params['toEmail'];
-      //$params['toEmail'] = "debug@sydesy.com";
 
       if (empty ($params['toEmail'])){
         CRM_Core_Session::setStatus(ts("Error sending $fileName: Contact doesn't have an email."));

@@ -12,7 +12,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    * @param string type, ie. "R"ecurring "M"embership 
    * format type+contact_id+"-"+ref object
    */
-  function generateReference(&$ref = null, $type = "R") {
+  public static function generateReference(&$ref = null, $type = "R") {
     //format 
     // return md5(uniqid(rand(), TRUE));
     return CRM_Sepa_Logic_Mandates::createMandateReference($ref, $type);

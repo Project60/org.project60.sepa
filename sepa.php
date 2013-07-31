@@ -13,7 +13,7 @@ function sepa_pageRun_contribute( &$page ) {
 
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contribute_Page_Tab") {
-    return sepa_pageRun_contribute( &$page );
+    return sepa_pageRun_contribute( $page );
   }
   if ( get_class($page) != "CRM_Contribute_Page_ContributionRecur")
     return;
@@ -74,7 +74,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       'template' => 'Sepa/Contribute/Form/Contribution/Confirm.tpl'));
   };
   if ("CRM_Contribute_Form_Contribution_Main" == $formName) { 
-    _sepa_buildForm_Contribution_Main ($formName, &$form );
+    _sepa_buildForm_Contribution_Main ($formName, $form );
     return;
   }
 
