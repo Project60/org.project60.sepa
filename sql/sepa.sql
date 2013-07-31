@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
      `contact_id` int unsigned    COMMENT 'FK to Contact ID that owns that account',
      `iban` varchar(42) NULL   COMMENT 'Iban of the debtor',
      `bic` varchar(11)    COMMENT 'BIC of the debtor',
-     `type` varchar(1) NOT NULL  DEFAULT R COMMENT 'R for recurrent (default) O for one-shot',
+     `type` varchar(1) NOT NULL  DEFAULT 'R' COMMENT 'R for recurrent (default) O for one-shot',
      `is_enabled` tinyint NOT NULL  DEFAULT 1 COMMENT 'If the mandate has been validated',
      `creation_date` datetime    ,
      `first_contribution_id` int unsigned    COMMENT 'FK to civicrm_contribution',
