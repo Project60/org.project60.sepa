@@ -45,8 +45,6 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
    * @public
    */
   function doDirectPayment(&$params) {
-    $component = strtolower($component);
-
     $params['trxn_id'] = "TODO GENERATE MANDATE ID";
 
     // create the mandate

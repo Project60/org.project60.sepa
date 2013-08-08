@@ -6,6 +6,8 @@ It sends them an email with a pdf mandate to sign and return to you (you might w
 
 Once you receive back this mandate signed, you can edit the recurring contribution and validate the mandate. This will automatically set the date of the first contribution to be debited to the next available slot (cf under for the detail of the batching logic).
 
+See more detailed installation [instruction here](Install.md)
+
 # Batching Logic
 
 ## General principles

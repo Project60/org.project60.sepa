@@ -1,9 +1,5 @@
 <?php
 
-
-CRM_Sepa_Logic_Base::setDebug(false, true, '/tmp/sepadd.log');
-
-
 class CRM_Sepa_Logic_Base {
 
   public static $debugByStatus = 0;
@@ -120,7 +116,7 @@ class CRM_Sepa_Logic_Base {
       if ($title) $msg = $tag . '*** ' . $title . "\n";
       $msg .= $tag . $message . "\n";
       file_put_contents( self::$debugLogPath, $msg, FILE_APPEND );
-    } else die('no logging');
+    }
   }
 
   public static function setDebug($byStatus, $byLog, $logFilePath = '') {
