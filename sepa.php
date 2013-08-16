@@ -58,9 +58,35 @@ EOD;
 function sepa_civicrm_buildForm ( $formName, &$form ){
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
     $form->add('text', 'creditor_name', ts('Organisation Name'));
+    $form->addRule("creditor_name", ts('%1 is a required field.', array(1 => ts('Organisation Name'))), 'required');
+
     $form->add('textarea', 'creditor_address', ts('Address'), array('cols' => '60', 'rows' => '3'));
-    $form->add('checkbox', 'mandate_active', ts('Mandate created are active by default?'));
-    $form->add( 'text', 'creditor_prefix',  ts('Mandate Prefix'))->setValue($mandate["iban"]);
+//not implemented yet    $form->add('checkbox', 'mandate_active', ts('Mandate created are active by default?'));
+    $form->add( 'text', 'creditor_prefix',  ts('Mandate Prefix'));
+    $form->add( 'text', 'creditor_contact_id',  ts('Contact ID'));
+    $form->add( 'text', 'creditor_bic',  ts('BIC'),"size=11 maxlength=11");
+    $form->addElement( 'text', 'creditor_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34));
+    $form->addRule("creditor_contact_id", ts('%1 must be a number', array(1 => ts('Contact ID'))),'numeric');
+    $form->add( 'hidden', 'creditor_id');
+    $form->addRule("creditor_prefix", ts('%1 is a required field.', array(1 => ts('Mandate Prefix'))), 'required');
+    // get the creditor info as well
+    $ppid=$form->getVar("_id");
+    $cred = civicrm_api("SepaCreditor","get",array("sequential"=>1,"version"=>3,"payment_processor_id"=>$ppid));
+    if ($cred["count"] >0) {
+      $cred = $cred["values"][0];
+      $form->setDefaults(array(
+        "creditor_id"=>$cred["id"],
+        "creditor_name"=>$cred["name"],
+        "creditor_contact_id"=>$cred["creditor_id"],
+        "creditor_address"=>$cred["address"],
+        "creditor_prefix"=>$cred["mandate_prefix"],
+        "creditor_iban"=>$cred["iban"],
+        "creditor_bic"=>$cred["bic"],
+      ));
+    } else {
+      $session = CRM_Core_Session::singleton();
+      $form->setDefaults(array("creditor_prefix"=>"SEPA","creditor_contact_id"=>$session->get('userID')));
+    }
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'Sepa/Admin/Form/PaymentProcessor.tpl'
     ));
@@ -106,7 +132,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       $form->getElement('installments')->setValue(0);//by default, sepa is without end date
     }
     $form->getElement('is_notify')->setValue(0); // the notification isn't clear, disable it
-$form->assign($mandate);
+    $form->assign($mandate);
     //TODO, add in the form, as a region?
     $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
     $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
@@ -124,6 +150,21 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
     $values=$form->getVar("_values");
     if ($values["class_name"]!="Payment_SEPA_DD") return;
+      $fields= $form->_submitValues;
+    $creditor = array ("version"=>3,"payment_processor_id"=>$values["id"],"payment_instrument_id"=>$values["payment_type"],"identifier"=>$values["user_name"]);
+    foreach (array("creditor_name"=>"name","creditor_id"=>"id","creditor_address"=>"address","creditor_prefix"=>"mandate_prefix","creditor_contact_id"=>"creditor_id","creditor_iban"=>"iban","creditor_bic"=>"bic") as $field => $api) {
+      $creditor[$api] = $form->_submitValues[$field];
+    }
+    if (!$creditor["id"]) {
+      unset($creditor["id"]);
+    } 
+    $r= civicrm_api("SepaCreditor","create",$creditor);
+    if ($r["is_error"]) {
+      CRM_Core_Session::setStatus($r["error_message"], ts("SEPA Creditor"), "error");
+    } else {
+     CRM_Core_Session::setStatus("created new creditor ".$r["id"], ts("SEPA Creditor"), "error");
+    }
+//CRM_Admin_Form_PaymentProcessor
   }
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );

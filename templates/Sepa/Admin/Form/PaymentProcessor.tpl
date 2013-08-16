@@ -1,9 +1,22 @@
+{$form.creditor_id.html}
 <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="sepa">
       <div class="crm-accordion-header">
         {ts}Sepa Creditor{/ts}
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
+<tr id="crmf-creditor_id">
+  <td class="label">{$form.creditor_contact_id.label}</td>
+  <td>{$form.creditor_contact_id.html}</td>
+</tr>
+<tr id="crmf-iban">
+  <td class="label">{$form.creditor_iban.label}</td>
+  <td>{$form.creditor_iban.html}</td>
+</tr>
+<tr id="crmf-bic">
+  <td class="label">{$form.creditor_bic.label}</td>
+  <td>{$form.creditor_bic.html}</td>
+</tr>
 <tr id="crmf-is_active">
   <td class="label">{$form.creditor_name.label}</td>
   <td>{$form.creditor_name.html}</td>
