@@ -39,7 +39,9 @@ function _sepa_buildForm_Contribution_Main ($formName, &$form ){
   if("Payment_SEPA_DD" != $pp["class_name"])
     return;
   //$form->getElement('is_recur')->setValue(1); // recurring contrib as an option
-  $form->removeElement('is_recur'); // force recurring contrib
+  if (isset($form->_elementIndex['is_recur'])) {
+    $form->removeElement('is_recur'); // force recurring contrib
+  }
   $form->addElement('hidden','is_recur',1);
   //workaround the notice message, as ContributionBase assumes these fields exist in the confirm step
   foreach (array("account_holder","bank_identification_number","bank_name","bank_account_number") as $field){
@@ -237,7 +239,7 @@ function sepa_civicrm_install_options($data) {
   foreach ($data as $groupName => $group) {
     // check group existence
     $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => $groupName));
-    if ($result['is_error']) {
+    if (isset($result['is_error']) && $result['is_error']) {
       $params = array(
           'version' => 3,
           'sequential' => 1,
@@ -249,26 +251,29 @@ function sepa_civicrm_install_options($data) {
       );
       $result = civicrm_api('option_group', 'create', $params);
       $group_id = $result['values'][0]['id'];
-    } else
+    } else {
       $group_id = $result['id'];
+    }
 
     if (is_array($group['values'])) {
       $groupValues = $group['values'];
       $weight = 1;
       foreach ($groupValues as $valueName => $value) {
         $result = civicrm_api('option_value', 'getsingle', array('version' => 3, 'name' => $valueName));
-        if ($result['is_error']) {
+        if (isset($result['is_error']) && $result['is_error']) {
           $params = array(
               'version' => 3,
               'sequential' => 1,
               'option_group_id' => $group_id,
               'name' => $valueName,
               'label' => $value['label'],
-              'value' => $value['value'],
               'weight' => $weight,
               'is_default' => $value['is_default'],
               'is_active' => 1,
           );
+          if (isset($value['value'])) {
+            $params['value'] = $value['value'];
+          }
           $result = civicrm_api('option_value', 'create', $params);
         } else {
           $weight = $result['weight'] + 1;
