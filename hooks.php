@@ -33,11 +33,12 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     $GLOBALS["sepa_context"]["processor_id"] = $pp['id'];
 
     // get the creditor info as well
-    $cred = civicrm_api("SepaCreditor","getsingle"
-      ,array("version"=>3,"payment_processor_id"=>$pp['id']));
-    if (!array_key_exists($cred,'is_error')) {
-       CRM_Core_Error::fatal('creditor not set for the payment processor '. $pp["id"]. ": ".$cred["error_message"]);   
+    $cred = civicrm_api("SepaCreditor","get"
+      ,array("version"=>3,"sequential"=>0,"payment_processor_id"=>$pp['id']));
+    if ($cred["count"] == 0) {
+       CRM_Core_Error::fatal('creditor not set for the payment processor '. $pp["id"]);   
     }
+    $cred = $cred["values"][0];
     $GLOBALS["sepa_context"]["payment_instrument_id"] = $cred['payment_instrument_id'];
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
