@@ -12,6 +12,5 @@ class CRM_Sepa_Page_SepaMandate extends CRM_Core_Page {
 
   function getTemplateFileName() {
     return "Sepa/Page/DashBoard.tpl";
-//die ("toto");
 }
 }

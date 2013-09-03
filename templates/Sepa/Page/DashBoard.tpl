@@ -1,10 +1,18 @@
 {foreach from=$files item=file}
-<h2>{$file.reference}</h2>
+<h1>{$file.reference}</h1>
 {assign var='key' value="api.SepaTransactionGroup.get"}
 {assign var='groups' value=$file.$key.values}
 <hr>
 {foreach from=$groups item=group}
-<li>{$group.latest_submission_date}{$group.reference}</li>
+  {crmAPI var='result' entity='SepaTransactionGroup' action='getdetail' sequential=1 id=$group.id}
+<li><h3>{$group.latest_submission_date}:{$group.reference} <i>{$result.count} transactions</i></h3>
+  <table>
+  {foreach from=$result.values item=tx}
+{assign var="reference" value=$tx.reference}
+    <tr><td><a href="{crmURL p='civicrm/sepa/pdf' q="ref=$reference"}">{$tx.reference}</a></td><td>{$tx.total_amount}</td><td>{$tx.validation_date}</td></tr>
+  {/foreach} 
+  </table>
+</li>
 {/foreach}
 {/foreach}
 
