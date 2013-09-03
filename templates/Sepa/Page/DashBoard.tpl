@@ -5,7 +5,7 @@
 <hr>
 {foreach from=$groups item=group}
   {crmAPI var='result' entity='SepaTransactionGroup' action='getdetail' sequential=1 id=$group.id}
-<li><h3>{$group.latest_submission_date}:{$group.reference} <i>{$result.count} transactions</i></h3>
+<li><h3>{$group.latest_submission_date}:{$group.reference} <i>{$result.count} transactions for {$result.total_amount}€</i></h3>
   <table>
   {foreach from=$result.values item=tx}
 {assign var="reference" value=$tx.reference}

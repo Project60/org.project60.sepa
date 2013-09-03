@@ -107,9 +107,11 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
   $sql = "select contribution_id, contrib.contact_id, contrib.financial_type_id, contrib.payment_instrument_id, total_amount, receipt_date, mandate.reference, mandate.validation_date FROM civicrm_sdd_contribution_txgroup, civicrm_contribution as contrib, civicrm_contribution_recur as recur, civicrm_sdd_mandate as mandate where mandate.entity_id= recur.id and contribution_id = contrib.id and contribution_recur_id=recur.id AND mandate.is_enabled=1 AND txgroup_id=$group";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
+  $total =0;
   while ($dao->fetch()) {
     $result[] = $dao->toArray();
+    $total += $dao->total_amount;
   }
-  return civicrm_api3_create_success($result, $params);
+  return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = array("total_amount"=>$total));
 }
 
