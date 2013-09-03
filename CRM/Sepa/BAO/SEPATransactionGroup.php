@@ -50,7 +50,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
  
     while ($contrib->fetch()) {
       $t=$contrib->toArray();
-      $t["iban"]=str_replace(' ', '', $t["iban"]);
+      $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
       $t["display_name"]=str_replace('&','+',$t["display_name"]);// french banks don't like & nor &amp;
       if (function_exists("iconv")){
         $t["display_name"]=iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
