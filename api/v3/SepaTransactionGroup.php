@@ -104,7 +104,8 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
   $group = (int) $params["id"];
   if (!$group)
     throw new API_Exception("Incorrect or missing value for group id");
-  $sql = "select contribution_id, contrib.contact_id, contrib.financial_type_id, contrib.payment_instrument_id, total_amount, receive_date, mandate.reference, mandate.validation_date, recur.id as recur_id, recur.frequency_unit, recur.cycle_day FROM civicrm_sdd_contribution_txgroup, civicrm_contribution as contrib, civicrm_contribution_recur as recur, civicrm_sdd_mandate as mandate where mandate.entity_id= recur.id and contribution_id = contrib.id and contribution_recur_id=recur.id AND mandate.is_enabled=1 AND txgroup_id=$group";
+  $sql = "select contribution_id, contrib.contact_id, contrib.financial_type_id, contrib.payment_instrument_id, total_amount, receive_date, mandate.id as mandate_id, mandate.reference, mandate.validation_date, recur.id as recur_id, recur.frequency_interval ,recur.frequency_unit, recur.cycle_day, recur.next_sched_contribution
+ FROM civicrm_sdd_contribution_txgroup, civicrm_contribution as contrib, civicrm_contribution_recur as recur, civicrm_sdd_mandate as mandate where mandate.entity_id= recur.id and contribution_id = contrib.id and contribution_recur_id=recur.id AND mandate.is_enabled=1 AND txgroup_id=$group";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
   $total =0;
@@ -125,8 +126,56 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
   if (!$group)
     throw new API_Exception("Incorrect or missing value for group id");
   $contribs = civicrm_api("sepa_transaction_group","getdetail", $params);
-  foreach ($contribs["values"] as $contrib) {
-print_r($contrib);
+
+
+  foreach ($contribs["values"] as $old) {
+     $temp_date = strtotime($old["next_sched_contribution"]);
+     $next_collectionDate = strtotime ("+". $old["frequency_interval"] . $old["frequency_unit"], $temp_date);
+     $next_collectionDate = date('YmdHis', $next_collectionDate);
+   $new = $old;
+   $new["hash"] = md5(uniqid(rand(), true));
+   $new["source"] = "SEPA recurring contribution";
+   unset($new["id"]);
+   unset($new["contribution_id"]);
+   $new["receive_date"] = $next_collectionDate;
+   $new["contribution_status_id"]= 2;
+   $new["contribution_recur_id"] = $new["recur_id"];     
+   unset($new["recur_id"]);
+
+/*
+        CRM_Core_DAO::executeQuery("
+            UPDATE civicrm_contribution_recur 
+               SET next_sched_contribution = %1 
+             WHERE id = %2
+        ", array(
+               1 => array($next_collectionDate, 'String'),
+               2 => array($new["contribution_recur_id"], 'Integer')
+           )
+        );
+  */
+   $new["version"] =3;       
+   $new["sequential"] =1;       
+//print_r($new);die ("toto");
+        $result = civicrm_api('contribution', 'create',$new);
+        if ($result['is_error']) {
+            $output[] = $result['error_message'];
+            ++$errors;
+            ++$counter;
+            continue;
+        } else {
+         $mandate = new CRM_Sepa_BAO_SEPAMandate();
+         $contrib = new CRM_Contribute_BAO_Contribution();
+         $contrib->get('id', $result["id"]);//it sucks to have to fetch again, just to get the BAO
+         $mandate->get('id', $old["mandate_id"]);
+
+         CRM_Sepa_Logic_Batching::batchContribution($contrib, $mandate);
+print_r($result); die ("toto");
+            $contribution = reset($result['values']);
+            $contribution_id = $contribution['id'];
+            $output[] = ts('Created contribution record for contact id %1', array(1 => $contact_id)); 
+        }
+
+
     $d = substr ($contrib["receive_date"], 8,2);
     $m = substr ($contrib["receive_date"], 5,2);
     $y = substr ($contrib["receive_date"], 0,4);
