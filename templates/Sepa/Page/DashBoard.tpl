@@ -5,7 +5,7 @@
 {foreach from=$groups item=group}
   {crmAPI var='result' entity='SepaTransactionGroup' action='getdetail' sequential=1 id=$group.id}
 <div class="status_{$result.status_id}">
-<h3>{$group.reference}</h3>
+<h3 title="id {$group.id}">{$group.reference}</h3>
 <ul>
 <li>Type: {$group.type}</li>
 <li>Creation: {$group.created_date}</li>
@@ -17,7 +17,10 @@
   <table>
   {foreach from=$result.values item=tx}
 {assign var="reference" value=$tx.reference}
-    <tr><td><a href="{crmURL p='civicrm/sepa/pdf' q="ref=$reference"}">{$tx.reference}</a></td><td>{$tx.total_amount}</td><td>{$tx.validation_date}</td></tr>
+{assign var="contact_id" value=$tx.contact_id}
+{assign var="contribution_id" value=$tx.contribution_id}
+    <tr><td><a href="{crmURL p='civicrm/contact/view/contribution' q="reset=1&id=$contribution_id&cid=$contact_id&action=view&context=contribution&selectedChild=contribute"}">{$tx.contribution_id}</a></td>
+<td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}">{$tx.contact_id}</a></td><td><a href="{crmURL p='civicrm/sepa/pdf' q="ref=$reference"}">{$tx.reference}</a></td><td>{$tx.total_amount}</td><td>{$tx.validation_date}</td></tr>
   {/foreach} 
   </table>
 </li>
