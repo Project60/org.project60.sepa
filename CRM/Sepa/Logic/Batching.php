@@ -49,6 +49,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     $receive_date = $contrib->receive_date;
 
+
     // the range for batch collection date is [ this date - MAXPULL, this date + MAXPUSH ]
     $maxpull = 0;
     $maxpush = 0;
@@ -61,11 +62,12 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     // if not found, create a nex batch 
     if ($txGroup === null) {
-      $txGroup = self::createTxGroup($creditor_id, $type, $receive_date);
+      $txGroup = self::createTxGroup($creditor_id, $type, $receive_date,$payment_instrument_id);
     }
 
     // now add the tx to teh batch
     self::addToTxGroup($contrib, $txGroup);
+    return $txGroup;
   }
 
   /**
@@ -106,17 +108,16 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     return null;
   }
 
-  public static function createTxGroup($creditor_id, $type, $receive_date) {
+  public static function createTxGroup($creditor_id, $type, $receive_date,$payment_instrument_id=9000) {
     CRM_Sepa_Logic_Base::debug("Creating new TXG CRED=$creditor_id TYPE=$type COLLDATE=" . substr($receive_date,0,10));
-
     // as per Batching.md
     // submission_date = latest( today, tx.collection_date - delay - 1 )
     $delay = ($type == 'RCUR') ? 2 : 5;
     $submission_date = self::adjustBankDays($receive_date, - $delay - 1);
     // effective_collection_date = submission_date + delay + 1
     $collection_date = self::adjustBankDays($receive_date, $delay + 1);
-    $session = CRM_Core_Session::singleton();
 
+    $session = CRM_Core_Session::singleton();
     $reference = "TXG - $type - $collection_date";
     $params = array(
         'reference' => $reference,
