@@ -121,8 +121,8 @@ function _civicrm_api3_sepa_transaction_group_createnext_spec (&$params) {
 }
 
 function civicrm_api3_sepa_transaction_group_createnext ($params) {
-  $errors=0;
-  $counter=0;
+  $errors=$counter=0;
+  $values=array();
   $group = (int) $params["id"];
   if (!$group)
     throw new API_Exception("Incorrect or missing value for group id");
@@ -130,7 +130,6 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
 
 
   foreach ($contribs["values"] as $old) {
-    $temp_date = strtotime($old["next_sched_contribution"]);
     $next_collectionDate = strtotime ("+". $old["frequency_interval"] . $old["frequency_unit"], $temp_date);
     $next_collectionDate = date('YmdHis', $next_collectionDate);
     $new = $old;
@@ -156,6 +155,12 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
      */
     $new["version"] =3;       
     $new["sequential"] =1;       
+
+/*
+$total += $new["total_amount"];
+++$counter;
+continue;
+*/
     $result = civicrm_api('contribution', 'create',$new);
     if ($result['is_error']) {
       $output[] = $result['error_message'];
@@ -163,6 +168,7 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
       continue;
     } else {
       ++$counter;
+      $total += $result["total_amount"];
       $mandate = new CRM_Sepa_BAO_SEPAMandate();
       $contrib = new CRM_Contribute_BAO_Contribution();
       $contrib->get('id', $result["id"]);//it sucks to have to fetch again, just to get the BAO
@@ -173,8 +179,11 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
       $values = $group->toArray();
     }
   }
-  if (!$error) {
-    return civicrm_api3_create_success($values, $params, 'address', $contrib);
+  if (!$errors) {
+    $values["nb_contrib"] = $counter;
+    $values["total"]=$total;
+print_r($values);
+    return civicrm_api3_create_success(array($values), $params, 'address', $contrib);
   } else {
     civicrm_api3_create_error("Could not create ".$errors. " new contributions",$output);
   }
