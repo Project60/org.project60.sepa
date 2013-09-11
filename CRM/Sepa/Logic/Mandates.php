@@ -35,7 +35,9 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      //$objectRef->cycle_day = 8; //TODO read from creditor. and not save again? ugly code
+      //$objectRef->cycle_day = 8; 
+      // X+: TODO read from creditor. and not save again? ugly code
+      // Björn: I disagree, this messes up the data if it was set correctly. Inject the right cycle_day where the create command comes from!
       $objectRef->save();
       self::debug('Set recurring contribution cycle date to ' . $objectRef->cycle_day);
     }
@@ -56,19 +58,15 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $rc->get('id', $bao->entity_id);
 
       // set start date if not set
-      error_log("TEst".$rc->start_date);
       if (strlen($rc->start_date)>0) {
         $rc->start_date = date('Y-m', strtotime("now"))."-".$rc->cycle_day;
         $rc->start_date = date("Ymd",strtotime($rc->start_date));             // copied that from X+, must be sth about the format...
       }
 
       // adjust start date, if in the past or less than five days in the future
-      error_log("TEst".$rc->start_date);
       if (strtotime($rc->start_date) < strtotime("now + 5 days")) {
-        $rc->start_date = date("Ymd", strtotime('+1 month'.$rc->, strtotime($rc->start_date)));
+        $rc->start_date = date("Ymd", strtotime('+1 month', strtotime($rc->start_date)));
       }
-
-      error_log("TEst".$rc->start_date);
 
       $rc->create_date = date("YmdHis",strtotime($rc->create_date));
       $rc->modified_date = date("YmdHis",strtotime("now"));
