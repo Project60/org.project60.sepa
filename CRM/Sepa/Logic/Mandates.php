@@ -35,7 +35,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      $objectRef->cycle_day = 8; //TODO read from creditor. and not save again? ugly code
+      //$objectRef->cycle_day = 8; //TODO read from creditor. and not save again? ugly code
       $objectRef->save();
       self::debug('Set recurring contribution cycle date to ' . $objectRef->cycle_day);
     }
@@ -54,18 +54,25 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $rcid=$bao->entity_id;
       $rc = new CRM_Contribute_BAO_ContributionRecur();
       $rc->get('id', $bao->entity_id);
-      if($rc->cycle_day ==1)
-        $rc->cycle_day=8; // TODO read this info from the creditor
-      $rc->start_date = date('Y-m', strtotime("now"))."-".$rc->cycle_day;
-      $j = intval(date('j', strtotime("now")));
-      if ((date('j', strtotime("now"))+5) > $rc->cycle_day) {
-        $rc->start_date = date("Ymd",strtotime('+1 month',strtotime($rc->start_date)));
-      } else {
-        $rc->start_date = date("Ymd",strtotime($rc->start_date));
-      };
-    //$rc->get();$rc->save(); doesn't work if datetime is a field. php hates mankind
+
+      // set start date if not set
+      error_log("TEst".$rc->start_date);
+      if (strlen($rc->start_date)>0) {
+        $rc->start_date = date('Y-m', strtotime("now"))."-".$rc->cycle_day;
+        $rc->start_date = date("Ymd",strtotime($rc->start_date));             // copied that from X+, must be sth about the format...
+      }
+
+      // adjust start date, if in the past or less than five days in the future
+      error_log("TEst".$rc->start_date);
+      if (strtotime($rc->start_date) < strtotime("now + 5 days")) {
+        $rc->start_date = date("Ymd", strtotime('+1 month'.$rc->, strtotime($rc->start_date)));
+      }
+
+      error_log("TEst".$rc->start_date);
+
       $rc->create_date = date("YmdHis",strtotime($rc->create_date));
-      $rc->modified_date = null;
+      $rc->modified_date = date("YmdHis",strtotime("now"));
+
       if (!$bao->is_enabled && $api_mandate["is_enabled"]) {
         $rc->contribution_status_id=1; //TODO match the status to the mandate is_enabled
         // figure out whether there is a contribution for this mandate

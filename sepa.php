@@ -164,7 +164,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     if ($r["is_error"]) {
       CRM_Core_Session::setStatus($r["error_message"], ts("SEPA Creditor"), "error");
     } else {
-     CRM_Core_Session::setStatus("created new creditor ".$r["id"], ts("SEPA Creditor"), "error");
+     CRM_Core_Session::setStatus("created new creditor ".$r["id"], ts("SEPA Creditor"), "info");
     }
 //CRM_Admin_Form_PaymentProcessor
   }
