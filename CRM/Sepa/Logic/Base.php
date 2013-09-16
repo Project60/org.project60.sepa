@@ -54,18 +54,23 @@ class CRM_Sepa_Logic_Base {
   }
 
   /**
-   * Adjust this date by a number of bank working days. For now, do nothing.
+   * Adjust this date by a number of bank working days. 
    * 
    * @param type $date_to_adjust
    * @param type $days_delta
    * @return type
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
+
+return $date_to_adjust;
+//absolutely broken, right now do nothing is better
     $date_part = substr($date_to_adjust, 0, 10);
+
     if ($days_delta > 0) {
       // adjust for bankdays -> real days
       $delta = floor($days_delta/5)*7 + ($days_delta % 5);
-      date_add($date_part, date_interval_create_from_date_string( $delta . ' days'));
+      $date_part = date_add($date_part, date_interval_create_from_date_string( $delta . ' days'));
+die ();
       // push forward if on a weekend
       $tinfo = getdate(strtotime($date_part));
       switch ($tinfo['wday']) {

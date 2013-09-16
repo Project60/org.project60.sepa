@@ -16,6 +16,6 @@
     <path>civicrm/sepa/xml</path>
     <page_callback>CRM_Sepa_Page_SepaFile</page_callback>
     <title>SepaFile</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
   </item>
 </menu>
