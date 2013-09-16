@@ -6,19 +6,6 @@
 class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   /**
-   * Create a mandate reference. Use the logic class for this. 
-   * 
-   * @param array ref object, eg. the recurring contribution or membership
-   * @param string type, ie. "R"ecurring "M"embership 
-   * format type+contact_id+"-"+ref object
-   */
-  public static function generateReference(&$ref = null, $type = "R") {
-    //format 
-    // return md5(uniqid(rand(), TRUE));
-    return CRM_Sepa_Logic_Mandates::createMandateReference($ref, $type);
-  }
-
-  /**
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_SEPAMandate object on success, null otherwise
@@ -27,7 +14,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   static function add(&$params) {
     if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
-      $params["reference"] = CRM_Sepa_BAO_SEPAMandate::generateReference($params);
+      $params["reference"] = CRM_Sepa_Logic_Parameters::getParameters()->createMandateReference($params);
       //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
     }
 

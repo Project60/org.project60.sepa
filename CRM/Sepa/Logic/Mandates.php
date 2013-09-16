@@ -3,24 +3,6 @@
 class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
 
   /**
-   * Handle creation of mandate references. 
-   * TODO: make this modifiable using a hook
-   * 
-   * @param type $ref
-   * @param type $type
-   * @return type
-   */
-  public static function createMandateReference(&$ref = null, $type = "R") {
-    $r = "WMFR-" . date("Y");
-    if ($ref) {
-      $r .="-" . $ref["entity_id"];
-    } else {
-      $r .= "-RAND" . sprintf("%08d", rand(0, 999999));
-    }
-    return $r;
-  }
-
-  /**
    * Fix the initial contribution if it exists. 
    * 
    * Assuming that we will have a case later where we import/create mandates and this function is 
@@ -35,7 +17,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      //$objectRef->cycle_day = 8; 
+      //$objectRef->cycle_day = CRM_Sepa_Logic_Parameters::getParameters()->getCycleDay();
       // X+: TODO read from creditor. and not save again? ugly code
       // Björn: I disagree, this messes up the data if it was set correctly. Inject the right cycle_day where the create command comes from!
       $objectRef->save();

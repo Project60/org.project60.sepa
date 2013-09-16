@@ -68,7 +68,7 @@
           </Id>
         </DbtrAcct>
         <RmtInf>
-          <Ustrd>{$message}</Ustrd>
+          <Ustrd>{$contribution.message}</Ustrd>
         </RmtInf>
       </DrctDbtTxInf>
 {/foreach}

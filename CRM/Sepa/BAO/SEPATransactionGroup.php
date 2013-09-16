@@ -56,6 +56,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         $t["display_name"]=iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
         //french banks like utf8 as long as it's ascii7 only
       }
+      $t["message"] = CRM_Sepa_Logic_Parameters::getParameters()->createTXMessage($contrib);
+
       $r[]=$t;
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
@@ -67,7 +69,6 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $this->nbtransactions++;
     }
     $template->assign("total",$this->total );
-    $template->assign("message","thanks" );
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
     return $template->fetch('CRM/Sepa/xml/TransactionGroup.tpl');
