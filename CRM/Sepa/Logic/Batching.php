@@ -31,7 +31,6 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     self::debug('Batching contribution '. $contrib->id);
 
     // what are the criteria to find an existing suitable batch ?
-    $type = self::getSDDType($contrib);
     $payment_instrument_id = $contrib->payment_instrument_id;
     $params = array(
         'payment_instrument_id' => $payment_instrument_id,
@@ -47,8 +46,16 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     }
     $creditor_id = $result['id'];
 
-    $receive_date = $contrib->receive_date;
+    CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib,$creditor_id);
+}
 
+  /**
+   * Batch a contribution into a TXG.
+   * @param CRM_Sepa_BAO_SEPATransaction $bao
+   */
+  public static function batchContributionByCreditor (CRM_Contribute_BAO_Contribution $contrib, int $creditor_id,$payment_instrument_id) {
+    $receive_date = $contrib->receive_date;
+    $type = self::getSDDType($contrib);
 
     // the range for batch collection date is [ this date - MAXPULL, this date + MAXPUSH ]
     $maxpull = 0;

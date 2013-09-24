@@ -130,7 +130,8 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
 
 
   foreach ($contribs["values"] as $old) {
-    $next_collectionDate = strtotime ("+". $old["frequency_interval"] . $old["frequency_unit"], $temp_date);
+    $date = strtotime(substr($old["receive_date"], 0, 10));
+    $next_collectionDate = strtotime ("+". $old["frequency_interval"] . " ".$old["frequency_unit"],$date);
     $next_collectionDate = date('YmdHis', $next_collectionDate);
     $new = $old;
     $new["hash"] = md5(uniqid(rand(), true));
@@ -172,10 +173,9 @@ continue;
       $mandate = new CRM_Sepa_BAO_SEPAMandate();
       $contrib = new CRM_Contribute_BAO_Contribution();
       $contrib->get('id', $result["id"]);//it sucks to have to fetch again, just to get the BAO
-      $mandate->get('id', $old["mandate_id"]);
+//      $mandate->get('id', $old["mandate_id"]);
 //      $values[] = $result["values"];
-
-      $group = CRM_Sepa_Logic_Batching::batchContribution($contrib, $mandate);
+      $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib, $old["creditor_id"],$old["payment_instrument_id"]);
       $values = $group->toArray();
     }
   }
