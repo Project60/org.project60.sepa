@@ -14,7 +14,20 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   static function add(&$params) {
     if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
-      $params["reference"] = CRM_Sepa_Logic_Parameters::getParameters()->createMandateReference($params);
+      // i.e. this mandate is being newly created (no reference set yet...)
+      CRM_Utils_SepaCustomisationHooks::create_mandate($params);
+
+      if (!array_key_exists("reference", $params)) {
+        // if no mandate reference was set, fallback to this:
+        $reference = "SDD-" . date("Y");
+        if ($params) {
+          $reference .="-" . $params["entity_id"];
+        } else {
+          $reference .= "-RAND" . sprintf("%08d", rand(0, 999999));
+        }
+        $params['reference'] = $reference;
+      }
+
       //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
     }
 
