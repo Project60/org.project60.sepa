@@ -97,12 +97,16 @@ function civicrm_api3_sepa_transaction_group_get($params) {
 }
 
 function civicrm_api3_sepa_transaction_group_getdetail($params) {
+  $where = "txgroup.id= txgroup_contrib.txgr  oup_id AND txgroup_contrib.contribution_id = contrib.id";
   $group = (int) $params["id"];
+  if ($group) {
+    $where .= " AND txgroup.id = $group ";
+  }
   $file_id = (int) $params["file_id"];
   if ($file_id) {
-    $where = " AND sdd_file_id = $file_id ";
+    $where .= " AND sdd_file_id = $file_id ";
   }
-$sql="select txgroup.id, txgroup.reference, sdd_file_id as file_id, txgroup.type , txgroup.collection_date, txgroup.status_id , count(*) as nb_contrib, sum( contrib.total_amount) as total from civicrm_sdd_txgroup as txgroup, civicrm_sdd_contribution_txgroup as txgroup_contrib, civicrm_contribution as contrib where txgroup.id= txgroup_contrib.txgroup_id AND txgroup_contrib.contribution_id = contrib.id $where group by txgroup_id";
+$sql="select txgroup.id, txgroup.reference, sdd_file_id as file_id, txgroup.type , txgroup.collection_date, txgroup.status_id , count(*) as nb_contrib, sum( contrib.total_amount) as total from civicrm_sdd_txgroup as txgroup, civicrm_sdd_contribution_txgroup as txgroup_contrib, civicrm_contribution as contrib where $where group by txgroup_id";
 
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
