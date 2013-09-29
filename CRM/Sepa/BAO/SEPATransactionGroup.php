@@ -56,7 +56,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         $t["display_name"]=iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
         //french banks like utf8 as long as it's ascii7 only
       }
-      $t["message"] = CRM_Sepa_Logic_Parameters::getParameters()->createTXMessage($contrib);
+
+      // create an individual transaction message
+      $tx_message = "thanks!";
+      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
+      $t["message"] = $tx_message;
 
       $r[]=$t;
       if ($creditor_id == null) {
