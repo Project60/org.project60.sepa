@@ -12,14 +12,14 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * @param type $objectRef
    */
   public static function hook_post_sepamandate_create($objectId, $objectRef) {
-    // TODO: move this to CRM_Utils_SepaCustomisationHooks?
+    // TODO: move this to CRM_Utils_SEPACustomisationHooks?
   }
 
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
-    // TODO: move this whole thing to CRM_Utils_SepaCustomisationHooks::mend_rcontrib? When is it called anyways?
+    // TODO: move this whole thing to CRM_Utils_SEPACustomisationHooks::mend_rcontrib? When is it called anyways?
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      CRM_Utils_SepaCustomisationHooks::mend_rcontrib($objectId, $objectRef);
+      CRM_Utils_SEPACustomisationHooks::mend_rcontrib($objectId, $objectRef);
       $objectRef->save();
     }
   }
@@ -31,7 +31,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * If the mandate is created by the PP, it has a recurring contrib, when the status changes, the recurring contrib has the appropriate status too
    */
   public static function fix_recurring_contribution($api_mandate) {
-    // TODO: merge with CRM_Utils_SepaCustomisationHooks::mend_rcontrib?
+    // TODO: merge with CRM_Utils_SEPACustomisationHooks::mend_rcontrib?
     $bao = new CRM_Sepa_BAO_SEPAMandate();
     $bao->get($api_mandate["id"]);
     if ($bao->entity_table == "civicrm_contribution_recur") {
