@@ -19,7 +19,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     // TODO: move this whole thing to CRM_Utils_SepaCustomisationHooks::mend_rcontrib? When is it called anyways?
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      CRM_Utils_SepaCustomisationHooks::mend_rcontrib($objectId, $objectRef);
+      CRM_Utils_SEPACustomisationHooks::mend_rcontrib($objectId, $objectRef);
       $objectRef->save();
     }
   }
