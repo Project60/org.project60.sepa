@@ -39,6 +39,9 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $rc = new CRM_Contribute_BAO_ContributionRecur();
       $rc->get('id', $bao->entity_id);
 
+      // the one from "hook_post_contributionrecur_create" doesn't get called
+      CRM_Utils_SEPACustomisationHooks::mend_rcontrib($rcid, $rc);
+
       // set start date if not set
       if (strlen($rc->start_date)>0) {
         $rc->start_date = date('Y-m', strtotime("now"))."-".$rc->cycle_day;
