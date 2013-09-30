@@ -97,23 +97,29 @@ function civicrm_api3_sepa_transaction_group_get($params) {
 }
 
 function civicrm_api3_sepa_transaction_group_getdetail($params) {
-  $where = "txgroup.id= txgroup_contrib.txgr  oup_id AND txgroup_contrib.contribution_id = contrib.id";
-  $group = (int) $params["id"];
-  if ($group) {
+//  $where = "txgroup.id= txgroup_contrib.txgroup_id AND txgroup_contrib.contribution_id = contrib.id";
+  $where = " (1=1) ";
+  if (array_key_exists("id",$params)) {
+    $group = (int) $params["id"];
     $where .= " AND txgroup.id = $group ";
   }
-  $file_id = (int) $params["file_id"];
-  if ($file_id) {
+  if (array_key_exists("file_id",$params)) {
+    $file_id = (int) $params["file_id"];
     $where .= " AND sdd_file_id = $file_id ";
   }
-$sql="select txgroup.id, txgroup.reference, sdd_file_id as file_id, txgroup.type , txgroup.collection_date, txgroup.status_id , count(*) as nb_contrib, sum( contrib.total_amount) as total from civicrm_sdd_txgroup as txgroup, civicrm_sdd_contribution_txgroup as txgroup_contrib, civicrm_contribution as contrib where $where group by txgroup_id";
-
+$sql="select txgroup.id, txgroup.reference, sdd_file_id as file_id, txgroup.type , txgroup.collection_date, txgroup.status_id , count(*) as nb_contrib, sum( contrib.total_amount) as total 
+, civicrm_sdd_file.reference as file
+from civicrm_sdd_txgroup as txgroup 
+left join civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id= txgroup_contrib.txgroup_id 
+left join civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id 
+left join civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id 
+where $where group by txgroup_id";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
   $total =0;
   while ($dao->fetch()) {
     $result[] = $dao->toArray();
-    $total += $dao->total_amount;
+    $total += $dao->total;
   }
   return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = array("total_amount"=>$total));
 }
