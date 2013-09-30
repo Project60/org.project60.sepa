@@ -125,6 +125,16 @@ where $where group by txgroup_id";
 }
 
 
+function _civicrm_api3_sepa_transaction_group_close_spec (&$params) {
+  $params['id']['api.required'] = 1;
+}
+
+function civicrm_api3_sepa_transaction_group_close($params) {
+  $result=array();
+    throw new API_Exception("Need to implement this one");
+  return civicrm_api3_create_success($result, $params);
+}
+
 
 function _civicrm_api3_sepa_transaction_group_createnext_spec (&$params) {
   $params['id']['api.required'] = 1;
