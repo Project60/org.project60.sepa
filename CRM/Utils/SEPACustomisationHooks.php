@@ -3,7 +3,7 @@
 /**
  * Defines the hooks that allow the customisation of SEPA related data
  */
-class CRM_Utils_SepaCustomisationHooks {
+class CRM_Utils_SEPACustomisationHooks {
 
   static $null = NULL;
 
