@@ -3,29 +3,6 @@
 class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
 
   /**
-   * Fix the initial contribution if it exists. 
-   * 
-   * Assuming that we will have a case later where we import/create mandates and this function is 
-   * more comples ... for now, we'll assume it's DD-created
-   * 
-   * @param type $objectId
-   * @param type $objectRef
-   */
-  public static function hook_post_sepamandate_create($objectId, $objectRef) {
-    // TODO: move this to CRM_Utils_SepaCustomisationHooks?
-  }
-
-  public static function hook_post_contributionrecur_create($objectId, $objectRef) {
-    // TODO: move this whole thing to CRM_Utils_SepaCustomisationHooks::mend_rcontrib? When is it called anyways?
-    if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
-      $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      CRM_Utils_SepaCustomisationHooks::mend_rcontrib($objectId, $objectRef);
-      $objectRef->save();
-    }
-  }
-
-
-  /**
    * Fix the recurring contribution created by the PP
    * 
    * If the mandate is created by the PP, it has a recurring contrib, when the status changes, the recurring contrib has the appropriate status too
@@ -38,6 +15,9 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $rcid=$bao->entity_id;
       $rc = new CRM_Contribute_BAO_ContributionRecur();
       $rc->get('id', $bao->entity_id);
+
+      // call customization hook
+      CRM_Utils_SEPACustomisationHooks::mend_rcontrib($rcid, $rc);
 
       // set start date if not set
       if (strlen($rc->start_date)>0) {
