@@ -8,8 +8,8 @@
   </item>
   <item>
     <path>civicrm/sepa</path>
-    <page_callback>CRM_Sepa_Page_SepaMandate</page_callback>
-    <title>Sepa Mandate</title>
+    <page_callback>CRM_Sepa_Page_DashBoard</page_callback>
+    <title>Sepa Direct Debit</title>
     <access_arguments>access CiviContribute</access_arguments>
   </item>
   <item>
