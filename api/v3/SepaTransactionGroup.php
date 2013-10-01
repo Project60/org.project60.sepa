@@ -195,7 +195,6 @@ continue;
       $contrib->get('id', $result["id"]);//it sucks to have to fetch again, just to get the BAO
 //      $mandate->get('id', $old["mandate_id"]);
 //      $values[] = $result["values"];
-print_r($old);
       $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib, $old["creditor_id"],$old["payment_instrument_id"]);
       $values = $group->toArray();
     }
@@ -203,7 +202,6 @@ print_r($old);
   if (!$errors) {
     $values["nb_contrib"] = $counter;
     $values["total"]=$total;
-print_r($values);
     return civicrm_api3_create_success(array($values), $params, 'address', $contrib);
   } else {
     civicrm_api3_create_error("Could not create ".$errors. " new contributions",$output);

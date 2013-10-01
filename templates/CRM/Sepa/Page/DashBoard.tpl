@@ -22,8 +22,8 @@
 <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
 <td>{$group.total} &euro;</td>
 <td>
-<a href="#" class="button" id="button_close">Close</a>
-<a href="#" class="button" id="button_generate">Generate next batch</a>
+<a href="#" class="button button_close">Close</a>
+<a href="#" class="button button_generate">Generate next batch</a>
 </td>
 </tr>
 {/foreach}
@@ -61,17 +61,20 @@
 </script>
 <script>
 cj(function($){
-  $("#button_close").click(function() {
+  $(".button_close").click(function() {
     var $tr=$(this).closest("tr");
     CRM.api("SepaTransactionGroup","close",{"id":$tr.data("id")},{"success":function(data) {
       console.log(data);
     }});
   });
-  $("#button_generate").click(function() {
+  $(".button_generate").click(function() {
+console.log ("click");
     var $tr=$(this).closest("tr");
     CRM.api("SepaTransactionGroup","createnext",{"id":$tr.data("id")},{"success":function(data) {
+      CRM.alert(ts('reload to see it'), 'New batch '+ data.values[0].reference, 'success');
       console.log(data);
     }});
+    return false;
   });
   $(".nb_contrib").click(function(){
     var $tr=$(this).closest("tr");
