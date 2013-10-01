@@ -58,8 +58,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       }
 
       // create an individual transaction message
-      $tx_message = "thanks!";
-      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
+      $tx_message = "Merci!";
+//TODO @systopia      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
       $t["message"] = $tx_message;
 
       $r[]=$t;

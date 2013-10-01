@@ -1,6 +1,7 @@
 <table>
 <tr>
 <th>Reference</th>
+<th>status</th>
 <th>type</th>
 <th>created</th>
 <th>collection</th>
@@ -12,10 +13,12 @@
 {foreach from=$groups item=group}
 <tr class="status_{$result.status_id}" data-id="{$group.id}">
 <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
+<td>{$group.status_id}</td>
 <td>{$group.type}</td>
 <td>{$group.created_date}</td>
 <td>{$group.collection_date}</td>
-<td class="file_{$group.file_id}">{$group.file}</td>
+{assign var='file_id' value=$group.file_id}
+<td class="file_{$group.file_id}"><a href='{crmURL p="civicrm/sepa/xml" q="id=$file_id"}'>{$group.file}</a></td>
 <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
 <td>{$group.total} &euro;</td>
 <td>
