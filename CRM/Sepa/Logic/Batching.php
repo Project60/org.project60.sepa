@@ -53,7 +53,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    * Batch a contribution into a TXG.
    * @param CRM_Sepa_BAO_SEPATransaction $bao
    */
-  public static function batchContributionByCreditor (CRM_Contribute_BAO_Contribution $contrib, int $creditor_id,$payment_instrument_id) {
+  public static function batchContributionByCreditor (CRM_Contribute_BAO_Contribution $contrib, $creditor_id,$payment_instrument_id) {
     $receive_date = $contrib->receive_date;
     $type = self::getSDDType($contrib);
 
@@ -97,7 +97,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               WHERE         
                 status_id = " . $openStatus . "
                 AND
-                sdd_creditor_id = " . $creditor_id . "
+                sdd_creditor_id = " . (int) $creditor_id . "
                 AND 
                 collection_date >= '" . $earliest_date . "'
                 AND 

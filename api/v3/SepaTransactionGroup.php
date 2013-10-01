@@ -195,6 +195,7 @@ continue;
       $contrib->get('id', $result["id"]);//it sucks to have to fetch again, just to get the BAO
 //      $mandate->get('id', $old["mandate_id"]);
 //      $values[] = $result["values"];
+print_r($old);
       $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib, $old["creditor_id"],$old["payment_instrument_id"]);
       $values = $group->toArray();
     }
