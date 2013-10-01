@@ -65,6 +65,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $r[]=$t;
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
+      } elseif ($contrib->creditor_id == null) { // it shouldn't happen.
+        $contrib->creditor_id = $creditor_id;
       } elseif ($creditor_id != $contrib->creditor_id){
         CRM_Core_Error::fatal("mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
         //to fix the mandate: update civicrm_sdd_mandate set creditor_id=1;
