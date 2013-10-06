@@ -141,8 +141,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'version' => 3,
     );
     $result = civicrm_api('SepaTransactionGroup', 'create', $params);
-    if ($result['is_error'])
+    if ($result['is_error']) {
+      CRM_Core_Error::fatal($result["error_message"]);
       return null;
+    }
     $txgroup_id = $result['id'];
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->get('id', $txgroup_id);
