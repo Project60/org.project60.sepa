@@ -113,7 +113,7 @@ from civicrm_sdd_txgroup as txgroup
 left join civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id= txgroup_contrib.txgroup_id 
 left join civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id 
 left join civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id 
-where $where group by txgroup_id";
+where $where group by txgroup_id ORDER BY id DESC";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
   $total =0;
