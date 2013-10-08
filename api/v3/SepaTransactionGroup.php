@@ -148,7 +148,6 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
     throw new API_Exception("Incorrect or missing value for group id");
   $contribs = civicrm_api("sepa_contribution_group","getdetail", $params);
 
-
   foreach ($contribs["values"] as $old) {
     $date = strtotime(substr($old["receive_date"], 0, 10));
     $next_collectionDate = strtotime ("+". $old["frequency_interval"] . " ".$old["frequency_unit"],$date);
