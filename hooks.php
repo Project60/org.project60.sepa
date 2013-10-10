@@ -34,12 +34,13 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
 
     // get the creditor info as well
     $cred = civicrm_api("SepaCreditor","get"
-      ,array("version"=>3,"sequential"=>0,"payment_processor_id"=>$pp['id']));
+      ,array("version"=>3,"sequential"=>1,"payment_processor_id"=>$pp['id']));
     if ($cred["count"] == 0) {
        CRM_Core_Error::fatal('creditor not set for the payment processor '. $pp["id"]);   
     }
     $cred = $cred["values"][0];
     $GLOBALS["sepa_context"]["payment_instrument_id"] = $cred['payment_instrument_id'];
+    $GLOBALS["sepa_context"]["creditor_id"] = $cred['creditor_id'];
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
 
@@ -63,9 +64,11 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
       strtolower($op)
   );
   $methodName = implode('_', $parts);
+
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');
     CRM_Sepa_Logic_Mandates::$methodName($id, $params);
+  } else {
   }
   if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');

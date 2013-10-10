@@ -55,7 +55,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         "iban"=> $params["bank_iban"],
         "bic" => $params["bank_bic"],
         );
-    
+    $apiParams ["creditor_id"] = $GLOBALS["sepa_context"]["creditor_id"];
     // set the contract entity for this mandate
     if (CRM_Utils_Array::value('is_recur', $params) &&
         $params['contributionRecurID']

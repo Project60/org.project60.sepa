@@ -92,7 +92,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $params['text'] = "this is the mandate, please return signed";
       $params['html'] = $this->getTemplate()->fetch("string:".$mail["msg_html"]);
       CRM_Utils_Mail::send($params);
-      CRM_Core_Session::setStatus(ts("Mail sent"));
+//      CRM_Core_Session::setStatus(ts("Mail sent"));
     }  else {
       CRM_Utils_PDF_Utils::html2pdf( $this->html, $fileName, false, null );
     } 
