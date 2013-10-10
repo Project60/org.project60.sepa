@@ -19,7 +19,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
       if (!array_key_exists("reference", $params)) {
         // if no mandate reference was set, fallback to this:
-        $reference = "SDD-" . date("Y");
+        $reference = "WMFR-" . date("Y");
         if ($params) {
           $reference .="-" . $params["entity_id"];
         } else {
