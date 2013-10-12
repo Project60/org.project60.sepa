@@ -40,7 +40,7 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     }
     $cred = $cred["values"][0];
     $GLOBALS["sepa_context"]["payment_instrument_id"] = $cred['payment_instrument_id'];
-    $GLOBALS["sepa_context"]["creditor_id"] = $cred['creditor_id'];
+    $GLOBALS["sepa_context"]["creditor_id"] = $cred['id'];
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
 
