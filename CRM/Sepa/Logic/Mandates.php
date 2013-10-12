@@ -140,7 +140,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
    * @param type $id
    * @param type $params
    */
-    public static function hook_pre_contribution_create($op, $objectName, $id, &$params) {
+    public static function hook_pre_contribution_create($id, &$params) {
       if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
         $params["payment_instrument_id"] = $GLOBALS["sepa_context"]["payment_instrument_id"];
 //        CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
