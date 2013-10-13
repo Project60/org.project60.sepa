@@ -58,7 +58,7 @@ function civicrm_api3_sepa_transaction_group_create($params) {
 function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
   $params['reference']['api.required'] = 1;
   $params['type']['api.required'] = 1;
-  $params['status_id']['api.default'] = 2; //not that sure of the meaning of 2
+  $params['status_id']['api.default'] = 2; //Close
   $params['sdd_creditor_id']['api.required'] = 1;
   $params['created_date']['api.default'] = 'now';
 }
@@ -131,8 +131,12 @@ function _civicrm_api3_sepa_transaction_group_close_spec (&$params) {
 
 function civicrm_api3_sepa_transaction_group_close($params) {
   $result=array();
-    throw new API_Exception("Need to implement this one");
-  return civicrm_api3_create_success($result, $params);
+  // a single query much better for perf, but no hook called. To be revised later?
+  $sql="update civicrm_contribution as contrib, civicrm_sdd_contribution_txgroup
+    set contribution_status_id=1
+    where contribution_id = contrib.id and txgroup_id=%1";
+  $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['id'], 'Integer')));
+  return civicrm_api3_sepa_transaction_group_create (array("id"=>$params['id'],status_id=>2));
 }
 
 
