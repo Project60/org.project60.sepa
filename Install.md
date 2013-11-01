@@ -15,25 +15,24 @@ Installation
 </tr><tr>
 <td>ID</td><td>Levae blank</td><td>1</td></tr>
 <tr><td>Creditor_id</td><td>Contact ID of the organisation (probably contact 1)</td><td>1</td></tr>
-<tr><td>identifier</td><td>Creditor Identifier (calculation differs per country)</td><td>NL51ZZZ405365330000</td></tr>
-<tr><td>name</td><td>Name of the creditor</td><td>CiviCoop</td></tr>
-<tr><td>address</td><td>Address of the creditor</td><td>Valkseweg 92a Barneveld</td></tr>
+<tr><td>identifier</td><td>Creditor Identifier (calculation differs per country)</td><td>EU51ZZZ12345</td></tr>
+<tr><td>name</td><td>Name of the creditor</td><td>Example</td></tr>
+<tr><td>address</td><td>Address of the creditor</td><td>10 downing street</td></tr>
 <tr><td>Country_id</td><td>ID of the country</td><td>1152 for the Netherland</td></tr>
-<tr><td>iban</td><td>Iban number of the creditor</td><td>NL05RABO0181892106</td></tr>
-<tr><td>bic</td><td>Bic of the creditor bank</td><td>RABONL2U</td></tr>
+<tr><td>iban</td><td>Iban number of the creditor</td><td>GR12930482038349</td></tr>
+<tr><td>bic</td><td>Bic of the creditor bank</td><td>YOURBIC</td></tr>
 <tr><td>Mandate_prefix</td><td>Prefix for the mandate numbers</td><td>SEPA</td></tr>
-<tr><td>Payment_instrument_id</td><td>The ID of the payment instrument (9000 for SEPA DD)</td><td>9000</td></tr>
 <tr><td>Payment processor id</td><td>ID of the payment processor</td><td>3</td></tr>
 <tr><td>Category</td><td>Unknown</td><td></td></tr>
 </table>
 
-In the Netherlands the creditor identifier is calculated based on the chamber of commerce number. 
+The creditor identifier is provided by your bank. Fair warning, it takes forever to get it. 
 
-3. Create a recurring contribution form
+3. Create a contribution page, choose the payment processor sepa
 
-4. After a user has filled in this contribution form, the mandate is generated (but at the moment no creditor ID is set for this mandate). You have to do this manually go to the database and in the table civicrm_sdd_mandate and fill in the creditor_id
+4. After a user has filled in this contribution form, the mandate is generated.
 
-5. When the mandate got returned (signed) you go to the contribution and set the first contribution to active
+5. When the mandate got returned (signed) you go to the recurring contribution and set the mandate as active
 
-6. When you point your browser to http://<yourhost>/civicrm/sepa/xml?id=1 you will get the pain.008 file
+6. Go to civicrm/sepa, you have a dashboard with all your groups of transaction (if you click on the name, you get the detail of the transaction in that group)
 
