@@ -284,16 +284,19 @@ function sepa_civicrm_install_options($data) {
 }
 
 function sepa_civicrm_options() {
+  $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => 'payment_instrument'));
+  if (!is_set($result['id']))
+    die ($result["error_message"]);
+  $gid= $result['id'];
+  //find the value to give to the payment instruments
+  $query = "SELECT max( `weight` ) as weight FROM `civicrm_option_value` where option_group_id=" . $gid;
+  $dao = new CRM_Core_DAO();
+  $dao->query($query);
+  $dao->fetch();
+  $weight = $dao->weight + 1;
+
   // start with the lowest weight value
   return array(
-      'batch_type' => array(
-          'values' => array(
-              'SEPA Transaction group' => array(
-                  'label' => 'SEPA Transaction Group',
-                  'is_default' => 0,
-              ),
-          ),
-      ),
       'msg_tpl_workflow_contribution' => array(
           'values' => array(
               'sepa_mandate_pdf' => array(
@@ -314,19 +317,19 @@ function sepa_civicrm_options() {
       
       'payment_instrument' => array(
           'values' => array(
-              'SEPA DD FRST' => array(
+              'FRST' => array(
                   'label' => 'SEPA DD First Transaction',
-                  'value' => 9000,
+                  'weight' => $weight,
                   'is_default' => 0,
               ),
-              'SEPA DD RCUR' => array(
+              'RCUR' => array(
                   'label' => 'SEPA DD Recurring Transaction',
-                  'value' => 9001,
+                  'weight' => $weight+1,
                   'is_default' => 0,
               ),
-              'SEPA DD OOFF' => array(
+              'OOFF' => array(
                   'label' => 'SEPA DD One-off Transaction',
-                  'value' => 9002,
+                  'weight' => $weight+2,
                   'is_default' => 0,
               ),
           ),
