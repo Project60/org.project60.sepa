@@ -75,7 +75,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     $apiParams["sequential"]= 1;
 
     $r = civicrm_api ("SepaMandate","create", $apiParams);
-    //die(print_r($r));
+    die(print_r($r));
     if ($r["is_error"]) {
       CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
     }

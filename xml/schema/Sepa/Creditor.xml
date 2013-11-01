@@ -101,24 +101,11 @@
     <add>4.3</add>
   </field>
 
-  <field>
-    <name>payment_instrument_id</name>
-    <uniqueName>payment_instrument_id</uniqueName>
-    <title>Payment Instrument</title>
-    <type>int unsigned</type>
-    <comment>FK to Payment Instrument</comment>
-    <pseudoconstant>
-      <name>paymentInstrument</name>
-      <optionGroupName>paymentInstrument</optionGroupName>
-      <class>CRM_Contribute_PseudoConstant</class>
-    </pseudoconstant>
-    <add>1.3</add>
-  </field>
-
  <field>
     <name>payment_processor_id</name>
     <type>int unsigned</type>
     <length>10</length>
+    <comment>Payment processor link (to be deprecated)</comment>
     <add>4.3</add>
   </field>
   <foreignKey>

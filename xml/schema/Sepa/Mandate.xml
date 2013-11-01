@@ -25,7 +25,7 @@
     <length>35</length>
     <required>true</required>
     <unique>true</unique>
-    <comment>The unique mandate reference</comment>
+    <comment>A unique mandate reference</comment>
     <add>4.3</add>
   </field>
   <index>
@@ -40,7 +40,7 @@
     <name>source</name>
     <type>varchar</type>
     <length>64</length>
-    <comment>Needed or coming from ContributionRecur? phoning/online/face 2 face....</comment>
+    <comment>Information about the source of registration of the mandate</comment>
     <add>4.3</add>
   </field>
 
@@ -49,7 +49,7 @@
        <type>varchar</type>
        <title>Entity Table</title>
        <length>64</length>
-       <comment>physical tablename for entity being joined, eg contributionRecur or Membership</comment>
+       <comment>Physical tablename for the contract entity being joined, eg contributionRecur or Membership</comment>
        <add>3.2</add>
   </field>
   <field>
@@ -57,7 +57,7 @@
       <type>int unsigned</type>
       <title>Entity ID</title>
       <required>true</required>
-      <comment>FK to entity table specified in entity_table column.</comment>
+      <comment>FK to contract entity table specified in entity_table column.</comment>
       <add>4.3</add>
   </field>
   <dynamicForeignKey>
@@ -74,7 +74,7 @@
 
   <field>
     <name>date</name>
-    <title>Signature date</title>
+    <title>Mandate signature date</title>
     <type>datetime</type>
     <required>true</required>
     <comment>by default now()</comment>
@@ -100,7 +100,7 @@
     <name>contact_id</name> 
     <title>Contact ID</title>
     <type>int unsigned</type> 
-    <comment>FK to Contact ID that owns that account</comment>
+    <comment>FK to Contact ID of the debtor</comment>
     <add>4.3</add> 
   </field> 
   <foreignKey> 
@@ -136,21 +136,23 @@
   <field>  
     <name>type</name>  
     <type>varchar</type>  
-    <length>1</length>
+    <length>4</length>
     <required>true</required>  
-    <default>R</default> 
+    <default>RCUR</default> 
     <add>4.3</add> 
-    <comment>R for recurrent (default) O for one-shot</comment>
+    <comment>RCUR for recurrent (default), OOFF for one-shot</comment>
   </field> 
 
   <field>  
-    <name>is_enabled</name>  
-    <type>boolean</type>  
+    <name>status</name>  
+    <type>varchar</type>  
+    <length>8</length>
     <required>true</required>  
-    <default>1</default> 
+    <default>INIT</default> 
     <add>4.3</add>
-    <comment>If the mandate has been validated</comment>
+    <comment>Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)</comment>
   </field>
+  
   <field>
     <name>creation_date</name>
     <title>creation date</title>
@@ -161,7 +163,7 @@
 
   <field> 
     <name>first_contribution_id</name> 
-    <title>First Contribution</title>
+    <title>First Contribution (to be deprecated)</title>
     <type>int unsigned</type> 
     <comment>FK to civicrm_contribution</comment>
     <add>4.3</add> 
