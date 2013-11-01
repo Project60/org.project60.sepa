@@ -87,25 +87,25 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    */
   public $id;
   /**
-   * The unique mandate reference
+   * A unique mandate reference
    *
    * @var string
    */
   public $reference;
   /**
-   * Needed or coming from ContributionRecur? phoning/online/face 2 face....
+   * Information about the source of registration of the mandate
    *
    * @var string
    */
   public $source;
   /**
-   * physical tablename for entity being joined, eg contributionRecur or Membership
+   * Physical tablename for the contract entity being joined, eg contributionRecur or Membership
    *
    * @var string
    */
   public $entity_table;
   /**
-   * FK to entity table specified in entity_table column.
+   * FK to contract entity table specified in entity_table column.
    *
    * @var int unsigned
    */
@@ -123,7 +123,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    */
   public $creditor_id;
   /**
-   * FK to Contact ID that owns that account
+   * FK to Contact ID of the debtor
    *
    * @var int unsigned
    */
@@ -141,17 +141,17 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    */
   public $bic;
   /**
-   * R for recurrent (default) O for one-shot
+   * RCUR for recurrent (default), OOFF for one-shot
    *
    * @var string
    */
   public $type;
   /**
-   * If the mandate has been validated
+   * Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)
    *
-   * @var boolean
+   * @var string
    */
-  public $is_enabled;
+  public $status;
   /**
    *
    * @var datetime
@@ -250,7 +250,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'date' => array(
           'name' => 'date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Signature date') ,
+          'title' => ts('Mandate signature date') ,
           'required' => true,
         ) ,
         'creditor_id' => array(
@@ -285,15 +285,18 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Type') ,
           'required' => true,
-          'maxlength' => 1,
-          'size' => CRM_Utils_Type::TWO,
-          'default' => '',
+          'maxlength' => 4,
+          'size' => CRM_Utils_Type::FOUR,
+          'default' => 'CU',
         ) ,
-        'is_enabled' => array(
-          'name' => 'is_enabled',
-          'type' => CRM_Utils_Type::T_BOOLEAN,
+        'status' => array(
+          'name' => 'status',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Status') ,
           'required' => true,
-          'default' => '',
+          'maxlength' => 8,
+          'size' => CRM_Utils_Type::EIGHT,
+          'default' => 'NI',
         ) ,
         'creation_date' => array(
           'name' => 'creation_date',
@@ -307,7 +310,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'first_contribution_id' => array(
           'name' => 'first_contribution_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('First Contribution') ,
+          'title' => ts('First Contribution (to be deprecated)') ,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'validation_date' => array(

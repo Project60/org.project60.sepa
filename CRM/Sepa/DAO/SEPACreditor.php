@@ -136,12 +136,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $mandate_prefix;
   /**
-   * FK to Payment Instrument
-   *
-   * @var int unsigned
-   */
-  public $payment_instrument_id;
-  /**
+   * Payment processor link (to be deprecated)
    *
    * @var int unsigned
    */
@@ -249,16 +244,6 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'title' => ts('Mandate numering prefix') ,
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
-        ) ,
-        'payment_instrument_id' => array(
-          'name' => 'payment_instrument_id',
-          'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Payment Instrument') ,
-          'pseudoconstant' => array(
-            'name' => 'paymentInstrument',
-            'optionGroupName' => 'paymentInstrument',
-            'class' => 'CRM_Contribute_PseudoConstant',
-          )
         ) ,
         'payment_processor_id' => array(
           'name' => 'payment_processor_id',
