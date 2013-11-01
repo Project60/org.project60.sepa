@@ -108,9 +108,7 @@
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
     <pseudoconstant>
-      <name>paymentInstrument</name>
-      <optionGroupName>paymentInstrument</optionGroupName>
-      <class>CRM_Contribute_PseudoConstant</class>
+      <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
     <add>1.3</add>
   </field>
