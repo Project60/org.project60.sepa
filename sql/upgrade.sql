@@ -1,3 +1,9 @@
+alter table civicrm_sdd_mandate  modify type varchar(4);
+update table civicrm_sdd_mandate set type = "RCUR";
+ 
+alter table civicrm_sdd_mandate add column    `status` varchar(8) NOT NULL  DEFAULT INIT COMMENT 'Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)';
+ 
+
 
 alter table civicrm_sdd_creditor add column   `iban` varchar(42) NULL   COMMENT 'Iban of the creditor';
 alter table civicrm_sdd_creditor add column      `bic` varchar(11)    COMMENT 'BIC of the creditor';

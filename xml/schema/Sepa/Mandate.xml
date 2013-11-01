@@ -148,7 +148,7 @@
     <type>varchar</type>  
     <length>8</length>
     <required>true</required>  
-    <default>INIT</default> 
+    <default>"INIT"</default> 
     <add>4.3</add>
     <comment>Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)</comment>
   </field>

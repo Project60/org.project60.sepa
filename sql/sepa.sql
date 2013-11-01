@@ -17,13 +17,12 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `iban` varchar(42) NULL   COMMENT 'Iban of the creditor',
      `bic` varchar(11)    COMMENT 'BIC of the creditor',
      `mandate_prefix` varchar(4)    COMMENT 'prefix for mandate identifiers',
-     `payment_instrument_id` int unsigned    COMMENT 'FK to Payment Instrument',
      `payment_processor_id` int unsigned    ,
      `category` varchar(4)    COMMENT 'Default value'
 ,
     PRIMARY KEY ( `id` )
 
-,          CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_sdd_creditor_country_id FOREIGN KEY (`country_id`) REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_sdd_creditor_payment_processor_id FOREIGN KEY (`payment_processor_id`) REFERENCES `civicrm_payment_processor`(`id`)
+,          CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_sdd_creditor_country_id FOREIGN KEY (`country_id`) REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
@@ -43,7 +42,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
      `contact_id` int unsigned    COMMENT 'FK to Contact ID that owns that account',
      `iban` varchar(42) NULL   COMMENT 'Iban of the debtor',
      `bic` varchar(11)    COMMENT 'BIC of the debtor',
-     `type` varchar(1) NOT NULL  DEFAULT 'R' COMMENT 'R for recurrent (default) O for one-shot',
+    `type` varchar(4) NOT NULL  DEFAULT RCUR COMMENT 'RCUR for recurrent (default), OOFF for one-shot',
+     `status` varchar(8) NOT NULL  DEFAULT INIT COMMENT 'Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)',
      `is_enabled` tinyint NOT NULL  DEFAULT 1 COMMENT 'If the mandate has been validated',
      `creation_date` datetime    ,
      `first_contribution_id` int unsigned    COMMENT 'FK to civicrm_contribution',

@@ -296,7 +296,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'required' => true,
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
-          'default' => 'NI',
+          'default' => 'INIT',
         ) ,
         'creation_date' => array(
           'name' => 'creation_date',
