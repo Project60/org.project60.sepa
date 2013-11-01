@@ -138,7 +138,7 @@
     <type>varchar</type>  
     <length>4</length>
     <required>true</required>  
-    <default>RCUR</default> 
+    <default>"RCUR"</default> 
     <add>4.3</add> 
     <comment>RCUR for recurrent (default), OOFF for one-shot</comment>
   </field> 
