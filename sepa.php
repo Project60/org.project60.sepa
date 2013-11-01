@@ -308,11 +308,25 @@ function sepa_civicrm_options() {
               ),
           ),
        ),
+      
+      // These will be used to mark a contribution with the correct type and will
+      // greatly facilitate batching later on
+      
       'payment_instrument' => array(
           'values' => array(
-              'SEPA DD' => array(
-                  'label' => 'SEPA DD',
+              'SEPA DD FRST' => array(
+                  'label' => 'SEPA DD First Transaction',
                   'value' => 9000,
+                  'is_default' => 0,
+              ),
+              'SEPA DD RCUR' => array(
+                  'label' => 'SEPA DD Recurring Transaction',
+                  'value' => 9001,
+                  'is_default' => 0,
+              ),
+              'SEPA DD OOFF' => array(
+                  'label' => 'SEPA DD One-off Transaction',
+                  'value' => 9002,
                   'is_default' => 0,
               ),
           ),
