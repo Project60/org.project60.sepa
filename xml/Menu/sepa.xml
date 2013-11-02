@@ -13,6 +13,12 @@
     <access_arguments>access CiviContribute</access_arguments>
   </item>
   <item>
+    <path>civicrm/sepa/test</path>
+    <page_callback>CRM_Sepa_Page_Testrig</page_callback>
+    <title>Sepa Direct Debit Testrig</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
     <path>civicrm/sepa/xml</path>
     <page_callback>CRM_Sepa_Page_SepaFile</page_callback>
     <title>SepaFile</title>
