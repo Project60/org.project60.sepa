@@ -13,8 +13,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    * @static (I do apologize, I don't want to)
    */
   static function add(&$params) {
+
+    // handle creation of a new mandate 
+
     if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
-      // i.e. this mandate is being newly created (no reference set yet...)
       CRM_Utils_SepaCustomisationHooks::create_mandate($params);
 
       if (!array_key_exists("reference", $params)) {
@@ -27,40 +29,58 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         }
         $params['reference'] = $reference;
       }
-
       //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
     }
 
-   if (CRM_Utils_Array::value('is_enabled', $params)) {
-      CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);     
-   }
+    // fix payment processor-created contributions before continuing
+    if (CRM_Utils_Array::value('is_enabled', $params)) {
+      CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);
+    }
+    
+    // handle 'normal' creation process inlcuding hooks
+    
     $hook = empty($params['id']) ? 'create' : 'edit';
-   CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
 
+    // set default date to today
     if (!array_key_exists("date", $params)) {
       $params["date"] = date("YmdHis");
     }
-    
+
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
-    if (CRM_Utils_Array::value('is_enabled', $params)) { 
-      $dao->validation_date  = date("YmdHis");
+    if (self::is_active(CRM_Utils_Array::value('status', $params))) {
+      $dao->validation_date = date("YmdHis");
     }
     $dao->save();
-    if (CRM_Utils_Array::value('is_enabled', $params)) { //only batching enabled
+    
+    // if the mandate is enabled, kick off the batching process
+    if (self::is_active(CRM_Utils_Array::value('status', $params))) {
       CRM_Sepa_Logic_Batching::batch_initial_contribution($dao->id, $dao);
     }
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }
 
+  static function is_active($mandateStatus) {
+    switch ($mandateStatus) {
+      case 'INIT' :
+      case 'ONHOLD' :
+      case 'CANCELLED' :
+      case 'INVALID' :
+        return false;
+        break;
+      default :
+        return true;
+    }
+  }
+  
   /**
    * getContract() returns the contribution or recurring contribution this mandate uses as a contract
    */
   function getContract() {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
-//    echo "<br>Entity type is $etp($eid).";
     switch ($etp) {
       case 'civicrm_contribution_recur' :
         $recur = new CRM_Contribute_BAO_ContributionRecur();
@@ -72,13 +92,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         $contr->get('id', $eid);
         return $contr;
         break;
-      default: 
+      default:
         echo 'Huh ? ' . $etp;
     }
     return null;
   }
 
-  
   /**
    * findContribution() locates a contribution created within the scope of the contract. 
    *   MANDATE -> CONTRIBUTION_RECUR -> CONTRIBUTION
@@ -99,13 +118,18 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         $contr->get('id', $eid);
         return $contr;
         break;
-      default: 
+      default:
         echo 'Huh ? ' . $etp;
     }
     return null;
   }
 
   
+  /**
+   * Looks like an unused function, candidate for deprecation because of nasty code
+   * 
+   * @return type
+   */
   public function getUnbatchedContributionIds() {
     // 1.determine the contract (ie. find out how to get contributions)
     $contrib = $bao->getContract();
@@ -126,13 +150,13 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       }
       return $contribs;
     }
-    
+
     if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
       $contribs = array($contrib->id);
     }
-    
+
     return array();
   }
-  
+
 }
 

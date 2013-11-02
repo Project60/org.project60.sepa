@@ -9,8 +9,8 @@ Batching will occur in a waterfall model, ie. every SDD contribution created sho
 The first level of batching is called a **SEPA transaction group** (TXG).
 TXG unites contributions which share
  
-* a same type (FRST, RCUR or OOFF)
-* a same `sdd_creditor` (identified by a common payment_instrument_id)
+* a same payment instrument is (for FRST, RCUR or OOFF)
+* a same `sdd_creditor` (identified by its id)
 * a same collection date (`receive_date` is used for that)
 
 Conditions (a) and (b) are 'hard' conditions, but (c) gives us a bit of leeway. Imagine the following calendar (# indicates a bank work day, *blank* a non-working day) :

@@ -4,7 +4,7 @@
  * Sepa Direct Debit Batching Logic
  * Author: Project60 
  * 
- * See Batching.md for more info (Seriously, read it. Now.)
+ * See Batching.md for more info (Seriously, read it. Now. Until you understand it.)
  */
 
 /**
@@ -13,7 +13,7 @@
 class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
   public static function batch_initial_contribution($objectId, $objectRef) {
-    self::debug('Running initial contribution batching process for mandate ' . $objectId);
+    self::debug('Running initial contribution batching process for mandate #' . $objectId);
     $mandate = new CRM_Sepa_BAO_SEPAMandate();
     $mandate->get('id', $objectId);
 
@@ -28,7 +28,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    * @param CRM_Sepa_BAO_SEPATransaction $bao
    */
   public static function batchContribution(CRM_Contribute_BAO_Contribution $contrib, CRM_Sepa_BAO_SEPAMandate $mandate) {
-    self::debug('Batching contribution '. $contrib->id);
+    self::debug('Batching contribution #'. $contrib->id);
 
     // what are the criteria to find an existing suitable batch ?
     $payment_instrument_id = $contrib->payment_instrument_id;
@@ -46,7 +46,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     }
     $creditor_id = $result['id'];
 
-    CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib,$creditor_id);
+    CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib,$creditor_id,$payment_instrument_id);
 }
 
   /**
@@ -55,7 +55,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    */
   public static function batchContributionByCreditor (CRM_Contribute_BAO_Contribution $contrib, $creditor_id,$payment_instrument_id) {
     $receive_date = $contrib->receive_date;
-    $type = self::getSDDType($contrib);
+//    $type = self::getSDDType($contrib);
+    $type = CRM_Core_OptionGroup::getValue('payment_instrument', $contrib->payment_instrument_id, 'value', 'String', 'name');
+    self::debug(' Contribution is of type ', $type);
 
     // the range for batch collection date is [ this date - MAXPULL, this date + MAXPUSH ]
     $maxpull = 0;
@@ -97,6 +99,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               WHERE         
                 status_id = " . $openStatus . "
                 AND
+                type = '" . $type . "'
+                AND
                 sdd_creditor_id = " . (int) $creditor_id . "
                 AND 
                 collection_date >= '" . $earliest_date . "'
@@ -115,7 +119,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     return null;
   }
 
-  public static function createTxGroup($creditor_id, $type, $receive_date,$payment_instrument_id=9000) {
+  public static function createTxGroup($creditor_id, $type, $receive_date,$payment_instrument_id) {
     CRM_Sepa_Logic_Base::debug("Creating new TXG CRED=$creditor_id TYPE=$type COLLDATE=" . substr($receive_date,0,10));
     // as per Batching.md
     // submission_date = latest( today, tx.collection_date - delay - 1 )
@@ -138,9 +142,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'modified_date' => date('Ymdhis'),
         'created_id' => $session->get('userID'),
         'modified_id' => $session->get('userID'),
-        'version' => 3,
     );
-    $result = civicrm_api('SepaTransactionGroup', 'create', $params);
+    $result = civicrm_api3('SepaTransactionGroup', 'create', $params);
     if ($result['is_error']) {
       CRM_Core_Error::fatal($result["error_message"]);
       return null;
