@@ -34,3 +34,48 @@
 </form>
 
 
+{literal}
+<script>
+  cj(function() {
+    cj("ul#sdd li ul").click( function() { cj(this).children("li").toggle(); return false; });
+  });
+</script>
+<style>
+ul#sdd {
+  margin-left: 0px;
+  padding: 0px;
+  color: #999;
+}
+ul#sdd li {
+  list-style: none;
+  background-color: #eeffee;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-width: 1px 1px 1px 4px;
+  border-radius: 6px;
+  margin: 10px 10px 10px 20px;
+}
+ul#sdd li ul {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+ul#sdd li span {
+  color: #333;
+  font-weight: bold;
+  margin-left: 10px;
+}
+ul#sdd li ul li {
+  background-color: #ccffcc;
+}
+ul#sdd li ul li ul li {
+  background-color: #fff;
+  display: none;
+}
+ul#sdd li.sddfileopen { border-color: #009900;background-color: #eeffee;}
+ul#sdd li.sddfileclosed { border-color: #990000; background-color: #ffeeee;}
+ul#sdd li.txgopen { border-color: #009900; background-color: #ccffcc;}
+ul#sdd li.txgclosed { border-color: #990000; background-color: #ffcccc;}
+</style>
+{/literal}
+  

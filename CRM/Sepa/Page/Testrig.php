@@ -14,6 +14,7 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
       self::$methodName();
     }
 
+    self::showme();
     /*
       $r = civicrm_api("SepaTransactionGroup","getdetail",array("version"=>3,"sequential"=>1,
       'options' => array(
@@ -32,6 +33,7 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_mandate");
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup");
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_txgroup");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_file");
   }
       
   public static function doDummyCreditor() {
@@ -164,6 +166,47 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
     return false;
   }
 
+  public static function showme() {
+    $files = array();
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_file");
+    while ($dao->fetch()) $files[ $dao->latest_submission_date ] = $dao->toArray();
+
+    $txgs = array();
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_txgroup");
+    while ($dao->fetch()) $txgs[ $dao->sdd_file_id ][] = $dao->toArray();
+    
+    $contribs = array();
+    $dao = CRM_Core_DAO::executeQuery("SELECT *, ctxg.id as id FROM civicrm_sdd_contribution_txgroup ctxg JOIN civicrm_contribution c ON c.id = ctxg.contribution_id ");
+    while ($dao->fetch()) $contribs[ $dao->txgroup_id ][] = $dao->toArray();
+    
+    echo '<ul id="sdd">';
+    foreach ($files as $filedate => $file) {
+      $cls = $file['status_id'] == 1 ? "sddfileopen" : "sddfileclosed";
+      echo '<li class="' . $cls . '"><ul>';
+        echo '<span>', $file['reference'], '</span>';
+        echo ' - latest submission date <b>', substr($file['latest_submission_date'],0,10) . '</b>';
+        $gs = $txgs[ $file['id'] ];
+        echo ' (', count($gs), ' txgroups)';
+        foreach ($gs as $txgdate => $txg) {
+          $cls = $txg['status_id'] == 1 ? "txgopen" : "txgclosed";
+          echo '<li class="' . $cls . '"><ul>';
+          echo '<span>', $txg['reference'], '</span>';
+          echo ' - collection date <b>', substr($txg['collection_date'],0,10) . '</b>';
+            $cons = $contribs[ $txg['id'] ];
+            echo ' (', count($cons), ' transactions)';
+            foreach ($cons as $contrib) {
+              echo '<li>';
+              echo '<span>', '#', $contrib['contribution_id'], '</span>';
+              echo ' - ' . $contrib['receive_date'];
+              echo ' - ' . $contrib['total_amount'] . ' ' . $contrib['currency'];
+              echo '</li>';
+            }
+          echo '</ul></li>';
+        }
+      echo '</ul></li>';
+    }
+    echo '</ul>';
+  }
   
   function getTemplateFileName() {
     return "CRM/Sepa/Page/Testrig.tpl";
