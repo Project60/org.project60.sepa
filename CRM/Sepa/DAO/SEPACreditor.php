@@ -148,6 +148,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $category;
   /**
+   * Tag
+   *
+   * @var text
+   */
+  public $tag;
+  /**
    * class constructor
    *
    * @access public
@@ -256,6 +262,13 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'title' => ts('Category purpose of the collection') ,
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
+        ) ,
+        'tag' => array(
+          'name' => 'tag',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Tag') ,
+          'maxlength' => 64,
+          'size' => CRM_Utils_Type::BIG,
         ) ,
       );
     }
