@@ -125,4 +125,12 @@
     <add>4.3</add>
   </field>
 
+  <field>
+    <name>tag</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Place this creditor's transaction groups in an XML file tagged with this value.</comment>
+    <add>4.3</add>
+  </field>
+  
 </table>

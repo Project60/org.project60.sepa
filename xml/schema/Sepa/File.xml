@@ -76,4 +76,12 @@
     <comment>Comments about processing of this file</comment>
     <add>4.3</add>
   </field>
+  
+  <field>
+    <name>tag</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Tag used to group multiple creditors in this XML file.</comment>
+    <add>4.3</add>
+  </field>
 </table>

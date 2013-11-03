@@ -129,6 +129,12 @@ class CRM_Sepa_DAO_SEPASddFile extends CRM_Core_DAO
    */
   public $comments;
   /**
+   * Tag
+   *
+   * @var text
+   */
+  public $tag;
+  /**
    * class constructor
    *
    * @access public
@@ -211,6 +217,13 @@ class CRM_Sepa_DAO_SEPASddFile extends CRM_Core_DAO
           'name' => 'comments',
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Comments') ,
+        ) ,
+        'tag' => array(
+          'name' => 'tag',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Tag') ,
+          'maxlength' => 64,
+          'size' => CRM_Utils_Type::BIG,
         ) ,
       );
     }

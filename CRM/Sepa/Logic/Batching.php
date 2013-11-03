@@ -173,19 +173,19 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     self::debug('Batching TXG#'. $objectId);
 
     // look for the earliest SDD File (based on latest_submission_date)
-    $sddFile = self::findSddFile($objectRef->latest_submission_date);
+    $sddFile = self::findSddFile($objectRef);
 
     // if not found, create a new SDD File 
     if ($sddFile === null) {
-      $sddFile = self::createSddFile($objectRef->latest_submission_date);
+      $sddFile = self::createSddFile($objectRef);
     }
 
     // now add the txGroup to the SDD File
     self::addToSddFile($objectRef, $sddFile);
   }
 
-  public static function findSddFile($latest_submission_date) {
-    self::debug('Locating suitable SDDFILE with LATEST_SUBMISSION=' . substr($latest_submission_date,0,8));
+  public static function findSddFile($txgroup) {
+    self::debug('Locating suitable SDDFILE with LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8));
     $openStatus = CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value');
     $query = "SELECT 
                 id 
@@ -194,7 +194,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               WHERE         
                 status_id = " . $openStatus . "
                 AND 
-                latest_submission_date >= '" . $latest_submission_date . "'
+                latest_submission_date >= '" . $txgroup->latest_submission_date . "'
               ORDER BY 
                 latest_submission_date ASC
               LIMIT 1
@@ -209,18 +209,18 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     
   }
 
-  public static function createSddFile($latest_submission_date) {
-    self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($latest_submission_date,0,8) . ')');
+  public static function createSddFile($txgroup) {
+    self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ')');
 
-    $reference = "SDDXML_" . substr($latest_submission_date,0,8);
-    $filename = $reference . ".xml";
+    $reference = "SDDXML-" . substr($txgroup->latest_submission_date,0,8);
+    $filename = str_replace($reference . ".xml",'-','_');
 
     $session = CRM_Core_Session::singleton();
     $params = array(
         'reference' => $reference,
         'filename' => $filename,
         'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value'),
-        'latest_submission_date' => $latest_submission_date,
+        'latest_submission_date' => $txgroup->latest_submission_date,
         'created_date' => date('Ymdhis'),
         'created_id' => $session->get('userID'),
         'version' => 3,

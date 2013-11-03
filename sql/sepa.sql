@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `bic` varchar(11)    COMMENT 'BIC of the creditor',
      `mandate_prefix` varchar(4)    COMMENT 'prefix for mandate identifiers',
      `payment_processor_id` int unsigned    ,
-     `category` varchar(4)    COMMENT 'Default value'
+     `category` varchar(4)    COMMENT 'Default value',
+     `tag` varchar(64) NULL   COMMENT 'Place this creditor\'s transaction groups in an XML file tagged with this value.'
 ,
     PRIMARY KEY ( `id` )
 
@@ -113,7 +114,8 @@ CREATE TABLE `civicrm_sdd_file` (
      `created_date` datetime    COMMENT 'When was this item created',
      `created_id` int unsigned    COMMENT 'FK to Contact ID of creator',
      `status_id` int unsigned NOT NULL   COMMENT 'fk to Batch Status options in civicrm_option_values',
-     `comments` text    COMMENT 'Comments about processing of this file'
+     `comments` text    COMMENT 'Comments about processing of this file',
+     `tag` varchar(64) NULL   COMMENT 'Tag used to group multiple creditors in this XML file.'
 ,
     PRIMARY KEY ( `id` )
 
