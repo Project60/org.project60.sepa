@@ -172,20 +172,22 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function batchTxGroup($objectId, $objectRef) {
     self::debug('Batching TXG#'. $objectId);
 
+    $cred = civicrm_api3('SepaCreditor','getsingle',array('id'=>$objectRef->creditor_id));
+    
     // look for the earliest SDD File (based on latest_submission_date)
-    $sddFile = self::findSddFile($objectRef);
+    $sddFile = self::findSddFile($objectRef, $cred['tag']);
 
     // if not found, create a new SDD File 
     if ($sddFile === null) {
-      $sddFile = self::createSddFile($objectRef);
+      $sddFile = self::createSddFile($objectRef, $cred['tag']);
     }
 
     // now add the txGroup to the SDD File
     self::addToSddFile($objectRef, $sddFile);
   }
 
-  public static function findSddFile($txgroup) {
-    self::debug('Locating suitable SDDFILE with LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8));
+  public static function findSddFile($txgroup, $tag) {
+    self::debug('Locating suitable SDDFILE with LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ' and TAG = ' . $tag);
     $openStatus = CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value');
     $query = "SELECT 
                 id 
@@ -195,6 +197,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
                 status_id = " . $openStatus . "
                 AND 
                 latest_submission_date >= '" . $txgroup->latest_submission_date . "'
+                AND 
+                tag = '" . $tag . "'
               ORDER BY 
                 latest_submission_date ASC
               LIMIT 1
@@ -209,10 +213,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     
   }
 
-  public static function createSddFile($txgroup) {
-    self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ')');
+  public static function createSddFile($txgroup, $tag) {
+    self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ', TAG=' . $tag . ')');
 
-    $reference = "SDDXML-" . substr($txgroup->latest_submission_date,0,8);
+    $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date,0,8);
     $filename = str_replace($reference . ".xml",'-','_');
 
     $session = CRM_Core_Session::singleton();
@@ -221,6 +225,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'filename' => $filename,
         'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value'),
         'latest_submission_date' => $txgroup->latest_submission_date,
+        'tag' => $tag,
         'created_date' => date('Ymdhis'),
         'created_id' => $session->get('userID'),
         'version' => 3,
