@@ -2,7 +2,7 @@
 
 class CRM_Sepa_Logic_Base {
 
-  public static $debugByStatus = 1;
+  public static $debugByStatus = 0;
   public static $debugByEcho = 1;
   public static $debugByLog = 1;
   public static $debugLogPath = '';
@@ -74,9 +74,9 @@ class CRM_Sepa_Logic_Base {
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
 
-    return $date_to_adjust;
 //absolutely broken, right now do nothing is better
     $date_part = substr($date_to_adjust, 0, 10);
+    return $date_part;
 
     if ($days_delta > 0) {
       // adjust for bankdays -> real days

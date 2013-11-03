@@ -66,18 +66,18 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
   $methodName = implode('_', $parts);
 
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');
+    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
     CRM_Sepa_Logic_Mandates::$methodName($id, $params);
   } else {
   }
   if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');
+    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
     CRM_Sepa_Logic_Batching::$methodName($id, $params);
   }
 }
 
 /**
- * This hook makes it possible to implement POST ooks by definine the appropriate method in a logic class
+ * This hook makes it possible to implement POST hooks by definine the appropriate method in a logic class
  * 
  * @param type $op
  * @param type $objectName
@@ -93,11 +93,11 @@ function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
   );
   $methodName = implode('_', $parts);
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Logic for Mandates'), $methodName, 'alert');
+    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
     CRM_Sepa_Logic_Mandates::$methodName($objectId, $objectRef);
   }
   if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Logic for Batching'), $methodName, 'alert');
+    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
     CRM_Sepa_Logic_Batching::$methodName($objectId, $objectRef);
   }
 }
@@ -115,6 +115,21 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
       'name' => 'SepaCreditor',
       'class' => 'CRM_Sepa_DAO_SEPACreditor',
       'table' => 'civicrm_sepa_creditor',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaTransactionGroup',
+      'class' => 'CRM_Sepa_BAO_SEPATransactionGroup',
+      'table' => 'civicrm_sepa_txgroup',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaSddFile',
+      'class' => 'CRM_Sepa_DAO_SEPASddFile',
+      'table' => 'civicrm_sepa_file',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaContributionGroup',
+      'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
+      'table' => 'civicrm_sepa_contribution_txgroup',
   );
 }
 
