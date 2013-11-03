@@ -48,6 +48,7 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
         'mandate_prefix' => 'DUMM',
         'payment_processor_id' => 1,
         'category' => '',
+        'tag' => 'DUMMY',
     );
     $r = civicrm_api3( 'sepa_creditor','create',$params);
     if(!$r['is_error']) {
@@ -185,6 +186,7 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
       echo '<li class="' . $cls . '"><ul>';
         echo '<span>', $file['reference'], '</span>';
         echo ' - latest submission date <b>', substr($file['latest_submission_date'],0,10) . '</b>';
+        echo ' - tag <b>', $file['tag'] . '</b>';
         $gs = $txgs[ $file['id'] ];
         echo ' (', count($gs), ' txgroups)';
         foreach ($gs as $txgdate => $txg) {
