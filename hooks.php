@@ -7,6 +7,17 @@ This hook has two aims:
 */
 
 function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$errors ){
+  $tag = str_replace('_', '', $formName);
+  if (stream_resolve_include_path('CRM/Sepa/Hooks/'.$tag.'.php')) {
+    $className = 'CRM_Sepa_Hooks_' . $tag;
+    if (class_exists($className)) {
+      if (method_exists($className, 'validateForm')) {
+        CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Hook '), $className . '::validateForm', 'alert');
+        $className::validateForm($form);
+      }
+    }
+  }
+  
   if ("CRM_Contribute_Form_Contribution_Main"  == $formName) { 
     require_once("packages/php-iban-1.4.0/php-iban.php");
     if (array_key_exists ("bank_iban",$fields)) {
@@ -45,33 +56,6 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
 
     }
 
-    if ("CRM_Member_Form_Membership" == $formName) {
-      $is_sdd = CRM_Utils_Array::value('is_sdd', $fields);
-      if ($is_sdd) {
-        $bank_iban = CRM_Utils_Array::value('bank_iban', $fields);
-        if (!$bank_iban) {
-          $errors['bank_iban'] = ts('IBAN is a required field');
-        }
-        $bank_bic = CRM_Utils_Array::value('bank_bic', $fields);
-        if (!$bank_bic) {
-          $errors['bank_bic'] = ts('BIC is a required field');
-        }
-        $amt = floatval(CRM_Utils_Array::value('sdd_amount', $fields));
-        if (!$amt) {
-          $errors['sdd_amount'] = ts('Debit amount invalid/empty');
-        }
-        // validate uniqueness of the mandate reference
-        $mref = CRM_Utils_Array::value('mref', $fields);
-        if ($mref) {
-          $r = civicrm_api3('SepaMandate','get',array('reference'=>$mref));
-          if ($r['count'] > 0) {
-            $errors['mref'] = ts('This mandate reference already exists');
-          }
-        }
-      }
-      
-    return;
-  }
 }
 
 /**
