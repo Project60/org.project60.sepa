@@ -8,29 +8,55 @@
   <input type="hidden" name="action" value="newMandate">
   <fieldset>
     <legend style="margin-left: 20px;" >Create a mandate</legend>
-    Mandate status : 
-    <select name="status">
-      <option value="INIT">INIT</option>
-      <option value="FRST">FRST</option>
-      <option value="RCUR">RCUR</option>
-      <option value="OOFF">OOFF</option>
-      <option value="ONHOLD">ONHOLD</option>
-      <option value="INVALID">INVALIE</option>
-      <option value="CANCELLED">CANCELLED</option>
-      <option value="COMPLETE">COMPLETE</option>
-    </select>
-    <br/>
-    Create contract object : 
-    <br/>
-    <input type="radio" name="contract" value="none"> None
-    <br/>
-    <input type="radio" name="contract" value="rc0"> Recurring contribution, no initial contribution
-    <br/>
-    <input type="radio" name="contract" value="rc1"> Recurring contribution, with initial contribution
-    <br/>
-    <input type="radio" name="contract" value="running"> Recurring contribution, with next contribution (forces RCUR status on mandate)
+    <p>
+      Type
+      <select name="type">
+        <option value="RCUR">RCUR - for recurring payments</option>
+        <option value="OOFF">OOFF - for one-off payments</option>
+      </select>
+      with status
+      <select name="status">
+        <option value="INIT">INIT - any mandate which has not yet been activated</option>
+        <option value="FRST">FRST - RCUR mandate while its FRST is absent or pending</option>
+        <option value="RCUR">RCUR - RCUR mandate after the FRST is completed</option>
+        <option value="OOFF">OOFF - OOFF mandate</option>
+        <option value="ONHOLD">ONHOLD - mandate which is temporarily disabled</option>
+        <option value="INVALID">INVALID - mandate which could never be consumed</option>
+        <option value="CANCELLED">CANCELLED - mandate cancelled by debtor or creditor</option>
+        <option value="COMPLETE">COMPLETE - mandate completely consumed (temporary or OOFF)</option>
+      </select>
+    </p>
+    <p>
+      Use as contract object: 
+      <br/>
+      <input type="radio" name="contract" value="single"> single contribution
+      <br/>
+      <input type="radio" name="contract" value="rc0"> recurring contribution, no initial contribution created
+      <br/>
+      <input type="radio" name="contract" value="rc1"> recurring contribution, with initial contribution created
+      <br/>
+      <input type="radio" name="contract" value="running"> recurring contribution, with next contribution created
+    </p>
+    <p>
+      for 
+      <input type="text" name="amount" size="8" value="{$amount}">
+      EUR
+      <select name="freq">
+        <option value="month">every month</option>
+        <option value="quarter">every quarter</option>
+        <option value="year">every year</option>
+      </select>
+      on the 
+      <input type="text" name="pivot" size="3" value="8">th
+      starting on
+      <input type="text" name="startdate" size="10" value="{$startdate}">
+
+    </p>
+    <p>
+      <input type="checkbox" name="member" disabled> Create a membership for the contract object
+    </p>
   </fieldset>
-  <button>Create a mandate</button>
+  <button>Create</button>
 </form>
 
 

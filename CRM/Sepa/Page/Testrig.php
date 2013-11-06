@@ -15,15 +15,9 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
     }
 
     self::showme();
-    /*
-      $r = civicrm_api("SepaTransactionGroup","getdetail",array("version"=>3,"sequential"=>1,
-      'options' => array(
-      'sort' => 'created_date DESC',
-      'limit' => 1,
-      ),
-      ));
-      $this->assign("groups",$r["values"]);
-     */
+
+    $this->assign("amount",round(rand(100,1000),2)/100);
+    $this->assign("startdate",date('Y-m-d'));
     parent::run();
   }
 
@@ -63,19 +57,19 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
     $ref = strtoupper(md5(date('YmdHis')));
 
     $status = isset($_REQUEST['status']) ? trim($_REQUEST['status']) : '';
+    $type = isset($_REQUEST['type']) ? trim($_REQUEST['type']) : 'RCUR';
+    $start = isset($_REQUEST['startdate']) ? trim($_REQUEST['startdate']) : date("Y-m-d");
     $contract = isset($_REQUEST['contract']) ? trim($_REQUEST['contract']) : '';
     
     $mparams = array(
         "reference" => "M-" . $ref,
         "source" => "Testrig",
-        "entity_table" => "civicrm_contribution_recur",
-        "entity_id" => "1",
-        "date" => date("Y-m-d H:i:s"),
-        "creditor_id" => "1",
+        "date" => $start,
+        "creditor_id" => "1",       // make variable as well
         "contact_id" => "1",
         "iban" => "IBAN",
         "bic" => "BIC",
-        "type" => "RCUR",
+        "type" => $type,
         "status" => $status,
         "creation_date" => date("Y-m-d H:i:s"),
         );
@@ -87,8 +81,6 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
     }
     
     switch ($contract) {
-      case 'none' :
-        break;
       case 'rc0' :
         echo 'Creating recurring contribution without a contribution ...';
         $rcontrib = self::createRecurringContrib($ref);
@@ -109,7 +101,7 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
         $status = 'RCUR';
         break;
     }
-    
+    //die(print_r($mparams));
     $r = civicrm_api3( 'sepa_mandate','create',$mparams);
     if(!$r['is_error']) {
       echo '<br/>Successfully created mandate #', $r['id'], ' M-' . $ref;
@@ -120,15 +112,19 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
   
   
   private static function createRecurringContrib($ref) {
+    $freq = isset($_REQUEST['freq']) ? trim($_REQUEST['freq']) : '';
+    $amount = floatval(isset($_REQUEST['amount']) ? trim($_REQUEST['amount']) : 5);
+    $start = isset($_REQUEST['startdate']) ? trim($_REQUEST['startdate']) : date("Y-m-d");
+
     $pi_rcur = CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name', 'String', 'value');
     
     $params = array(
       'contact_id' => 1,
       'frequency_interval' => '1',
-      'frequency_unit' => 'day',
-      'amount' => '5',
+      'frequency_unit' => $freq,
+      'amount' => $amount,
       'contribution_status_id' => 1,
-      'start_date' => date("Y-m-d H:i:s"),
+      'start_date' => $start,
       'currency' => 'EUR',
       'payment_instrument_id' => $pi_rcur,
       'trxn_id' => 'RTX-' . $ref,
@@ -144,12 +140,15 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
 
   
   private static function createContrib($rcontrib,$type) {
+    $start = isset($_REQUEST['startdate']) ? trim($_REQUEST['startdate']) : date("Y-m-d");
+    $amount = floatval(isset($_REQUEST['amount']) ? trim($_REQUEST['amount']) : 5);
+
     $pi = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name', 'String', 'value');
     
     $params = array(
       'contact_id' => 1,
-      'receive_date' => date("Y-m-d H:i:s"),
-      'total_amount' => '5',
+      'receive_date' => $start,
+      'total_amount' => $amount,
       'financial_type_id' => 1,
       'trxn_id' => 'TX-'.$rcontrib['trxn_id'],
       'invoice_id' => 'IX-'.$rcontrib['trxn_id'],
