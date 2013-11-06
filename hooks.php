@@ -43,7 +43,33 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     $GLOBALS["sepa_context"]["creditor_id"] = $cred['id'];
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
+    }
 
+    if ("CRM_Member_Form_Membership" == $formName) {
+      $is_sdd = CRM_Utils_Array::value('is_sdd', $fields);
+      if ($is_sdd) {
+        $bank_iban = CRM_Utils_Array::value('bank_iban', $fields);
+        if (!$bank_iban) {
+          $errors['bank_iban'] = ts('IBAN is a required field');
+        }
+        $bank_bic = CRM_Utils_Array::value('bank_bic', $fields);
+        if (!$bank_bic) {
+          $errors['bank_bic'] = ts('BIC is a required field');
+        }
+        $amt = floatval(CRM_Utils_Array::value('sdd_amount', $fields));
+        if (!$amt) {
+          $errors['sdd_amount'] = ts('Debit amount invalid/empty');
+        }
+        // validate uniqueness of the mandate reference
+        $mref = CRM_Utils_Array::value('mref', $fields);
+        if ($mref) {
+          $r = civicrm_api3('SepaMandate','get',array('reference'=>$mref));
+          if ($r['count'] > 0) {
+            $errors['mref'] = ts('This mandate reference already exists');
+          }
+        }
+      }
+      
     return;
   }
 }
@@ -63,6 +89,7 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
       strtolower($objectName),
       strtolower($op)
   );
+//  CRM_Sepa_Logic_Base::debug('pre-'.$objectName.'-'.$op);
   $methodName = implode('_', $parts);
 
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
@@ -91,6 +118,7 @@ function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
       strtolower($objectName),
       strtolower($op)
   );
+//  CRM_Sepa_Logic_Base::debug('post-'.$objectName.'-'.$op);
   $methodName = implode('_', $parts);
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
