@@ -129,9 +129,9 @@ class CRM_Sepa_DAO_SEPASddFile extends CRM_Core_DAO
    */
   public $comments;
   /**
-   * Tag
+   * Tag used to group multiple creditors in this XML file.
    *
-   * @var text
+   * @var string
    */
   public $tag;
   /**
