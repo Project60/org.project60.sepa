@@ -174,6 +174,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     $mparams = array();
     $membership = civicrm_api3('Membership','getsingle',array('id'=>$membership_id));
     $membershipType = civicrm_api3('MembershipType','getsingle',array('id'=>$membership['membership_type_id']));
+    $start = isset($params['contract_start_date']) ? trim($params['contract_start_date']) : date("Y-m-d");
     
     // create the contract object that goes with this membership
     switch ($params['contract_frequency']) {
@@ -197,6 +198,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
         $contractType = 'civicrm_contribution_recur';
         // create recurring contribution
         $freq = isset($_REQUEST['freq']) ? trim($_REQUEST['freq']) : '';
+        $start = isset($params['contract_start_date']) ? trim($params['contract_start_date']) : date("Y-m-d");
         $pi_rcur = CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name', 'String', 'value');
         $rparams = array(
           'contact_id' => $membership['contact_id'],
@@ -204,12 +206,12 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
           'frequency_unit' => 'month',
           'amount' => $params['contract_amount'],
           'contribution_status_id' => 1,
-          'start_date' => $params['contract_start_date'],
+          'start_date' => $start,
           'currency' => $params['contract_currency'],
           'payment_instrument_id' => $pi_rcur,
           'trxn_id' => $ref,
         );
-        //print_r($rparams);
+//        print_r($rparams);
         $rcontrib = civicrm_api3('contribution_recur', 'create', $rparams);
         if($rcontrib['is_error']) {
           echo '<br/>Error creating recurring contribution :';
@@ -228,11 +230,10 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     }
 
     // create simple contribution
-    $start = isset($params['contract_start_date']) ? trim($params['contract_start_date']) : date("Y-m-d");
     $pi = CRM_Core_OptionGroup::getValue('payment_instrument', $mparams['status'], 'name', 'String', 'value');
     $cparams = array(
       'contact_id' => $membership['contact_id'],
-      'receive_date' => $params['contract_start_date'],
+      'receive_date' => $start,
       'total_amount' => $params['contract_amount'],
       'currency' => $params['contract_currency'],
       'financial_type_id' => $membershipType['financial_type_id'],
@@ -254,13 +255,12 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     echo '<br/>Successfully created contribution #', $contrib['id'];
     
     // link membership and contribution
-    civicrm_api3('membership_payment', 'create', array('membership_id' => $membership_id, 'contribution_id' => $contrib['id']));
+    $r = civicrm_api3('membership_payment', 'create', array('membership_id' => $membership_id, 'contribution_id' => $contrib['id']));
 
     // create the mandate
     $moreparams = array(
-      "reference" => $params['reference'],
       "source" => $membership['source'],
-      "date" => $params['contract_start_date'],
+      "date" => $start,
       "creditor_id" => "1",       // make variable as well
       "contact_id" => $membership['contact_id'],
       "iban" => $params['iban'],
@@ -270,6 +270,9 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       'entity_id' => $rcontrib ? $rcontrib['id'] : $contrib['id'],
     );
     $mparams = array_merge($mparams,$moreparams);
+    if ($params['reference']) $mparams['reference'] = $params['reference'];
+
+    print_r($mparams);
     $m = civicrm_api3( 'SepaMandate','create', $mparams);
     if($m['is_error']) {
       echo '<br/>Error creating mandate : ';
