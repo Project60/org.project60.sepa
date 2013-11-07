@@ -74,47 +74,67 @@ class CRM_Sepa_Logic_Base {
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
 
+    $days = array( 1=>'Monday',2=>'Tuesday',3=>'Wednesday',4=>'Thursday', 5=>'Friday');
 //absolutely broken, right now do nothing is better
     $date_part = substr($date_to_adjust, 0, 10);
-    return $date_part;
+    //return $date_part;
 
+    // convert to date
+    $date_ta = date_create($date_part);
+    $tinfo = getdate(strtotime($date_part));
+    $wday = $tinfo['wday'];   // 0 is Sunday, 6 is Saturday
+    
     if ($days_delta > 0) {
+      // echo ' moving forward from ', $date_part, ' (', $wday, ')';
       // adjust for bankdays -> real days
       $delta = floor($days_delta / 5) * 7 + ($days_delta % 5);
-      $date_part = date_add($date_part, date_interval_create_from_date_string($delta . ' days'));
-      die();
+      // adjust for first weekend jump, if today's weekday + delta would land in a weekend (6 or 7/0)
+      if ($wday + $delta > 6) $delta += 2; 
+      else if ($wday + $delta == 6) $delta += 1;
+      $date_ta = date_add($date_ta, date_interval_create_from_date_string($delta . ' days'));
+      //echo ' +', $delta, ' days to become ', date_format($date_ta,'Y-m-d');
       // push forward if on a weekend
-      $tinfo = getdate(strtotime($date_part));
+      $tinfo = getdate(strtotime(date_format($date_ta,'Y-m-d')));
       switch ($tinfo['wday']) {
         case 0 : // Sunday
-          $date_part = date_add($date_part, date_interval_create_from_date_string('1 days'));
+          $date_ta = date_add($date_ta, date_interval_create_from_date_string('1 days'));
+          //echo ' -- on a Sunday so adding 1 day to become ', date_format($date_ta,'Y-m-d');
           break;
         case 6 : // Saturday
-          $date_part = date_add($date_part, date_interval_create_from_date_string('2 days'));
+          $date_ta = date_add($date_ta, date_interval_create_from_date_string('2 days'));
+          //echo ' -- on a Saturday so adding 2 days to become ', date_format($date_ta,'Y-m-d');
           break;
         default:
+          //echo ' -- on ', $days[$tinfo['wday']];
           break;
       }
     } else if ($days_delta < 0) {
+      //echo ' moving backward from ', $date_part;
       $days_delta = - $days_delta;
       // adjust for bankdays -> real days
       $delta = floor($days_delta / 5) * 7 + ($days_delta % 5);
-      date_sub($date_part, date_interval_create_from_date_string($delta . ' days'));
+      if ($wday - $delta < 0) $delta += 1; 
+      else if ($wday - $delta == 0) $delta += 2;
+      $date_ta = date_sub($date_ta, date_interval_create_from_date_string($delta . ' days'));
+      //echo ' -', $delta, ' days to become ', date_format($date_ta,'Y-m-d');
       // pull back if on a weekend
-      $tinfo = getdate(strtotime($date_part));
+      $tinfo = getdate(strtotime(date_format($date_ta,'Y-m-d')));
       switch ($tinfo['wday']) {
         case 0 : // Sunday
-          $date_part = date_sub($date_part, date_interval_create_from_date_string('2 days'));
+          $date_ta = date_sub($date_ta, date_interval_create_from_date_string('2 days'));
+          //echo ' -- on a Sunday so subtracting 2 days to become ', date_format($date_ta,'Y-m-d');
           break;
         case 6 : // Saturday
-          $date_part = date_sub($date_part, date_interval_create_from_date_string('1 days'));
+          $date_ta = date_sub($date_ta, date_interval_create_from_date_string('1 days'));
+          //echo ' -- on a Saturday so subtracting 1 day to become ', date_format($date_ta,'Y-m-d');
           break;
         default:
+          //echo ' -- on ', $days[$tinfo['wday']];
           break;
       }
     }
 
-    return $date_part;
+    return date_format($date_ta,'Y-m-d');
   }
 
   /**
