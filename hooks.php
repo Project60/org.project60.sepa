@@ -50,8 +50,10 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
        CRM_Core_Error::fatal('creditor not set for the payment processor '. $pp["id"]);   
     }
     $cred = $cred["values"][0];
-    $GLOBALS["sepa_context"]["payment_instrument_id"] = $cred['payment_instrument_id'];
     $GLOBALS["sepa_context"]["creditor_id"] = $cred['id'];
+
+    $type = $fields['is_recur'] ? 'FRST' : 'OOFF';
+    $GLOBALS["sepa_context"]["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
     }

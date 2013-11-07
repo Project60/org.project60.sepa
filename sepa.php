@@ -70,9 +70,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
   }
 
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
-    $values = $form->getVar("_values");
-    $type = $values ["payment_processor_type_id"]; 
-    $pp=civicrm_api("PaymentProcessorType","getsingle",array("id"=>$type, "version"=>3));
+    $pp=civicrm_api("PaymentProcessorType","getsingle",array("id"=>$form->_ppType, "version"=>3));
     if("Payment_SEPA_DD" != $pp["class_name"])
       return;
     $form->add('text', 'creditor_name', ts('Organisation Name'));
@@ -409,18 +407,5 @@ function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * is installed, disabled, uninstalled.
  */
 function sepa_civicrm_managed(&$entities) {
-  $entities[] = array(
-    'module' => 'org.project60.sepa',
-    'name' => 'SEPA Direct Debit',
-    'entity' => 'PaymentProcessorType',
-    'params' => array(
-      'version' => 3,
-      'name' => 'SEPA Direct Debit',
-      'title' => 'SEPA Direct Debit',
-      'is_active' => 1,
-      'class_name' => 'CRM_Core_Payment_SEPA_DD',
-        'billing_mode' => 1,
-    ),
-  );
   return _sepa_civix_civicrm_managed($entities);
 }
