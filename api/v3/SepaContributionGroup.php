@@ -102,8 +102,13 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
   $group = (int) $params["id"];
   if (!$group)
     throw new API_Exception("Incorrect or missing value for group id");
-  $sql = "select contribution_id, contrib.contact_id, contrib.financial_type_id, contrib.payment_instrument_id, total_amount, receive_date, mandate.id as mandate_id, mandate.reference, mandate.creditor_id, mandate.validation_date, recur.id as recur_id, recur.frequency_interval ,recur.frequency_unit, recur.cycle_day, recur.next_sched_contribution
-    FROM civicrm_sdd_contribution_txgroup, civicrm_contribution as contrib, civicrm_contribution_recur as recur, civicrm_sdd_mandate as mandate where mandate.entity_id= recur.id and contribution_id = contrib.id and contribution_recur_id=recur.id AND mandate.is_enabled=1 AND txgroup_id=$group";
+  $sql = "select contribution_id, contrib.contact_id, contrib.financial_type_id, contrib.payment_instrument_id, total_amount, receive_date, mandate.id as mandate_id, mandate.reference, mandate.creditor_id, mandate.validation_date, recur.id as recur_id, recur.frequency_interval ,recur.frequency_unit, 
+    recur.cycle_day, 
+    recur.next_sched_contribution_date
+    FROM civicrm_sdd_contribution_txgroup, civicrm_contribution as contrib, civicrm_contribution_recur as recur, civicrm_sdd_mandate as mandate where mandate.entity_id= recur.id and contribution_id = contrib.id and contribution_recur_id=recur.id 
+    /* AND mandate.is_enabled=1 */
+    AND mandate.status IN ('FRST','OOFF','RCUR')
+    AND txgroup_id=$group";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
   $total =0;
