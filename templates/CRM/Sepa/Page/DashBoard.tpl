@@ -51,7 +51,7 @@
     <td><a href="<%= CRM.url("civicrm/contact/view/contribution",{"id":item.contribution_id,"cid":item.contact_id,"action":"view"}) %>"><%= item.contribution_id %></a></td>
     <td><%= item.receive_date.substring(0,10) %></td>
     <td><a href="<%= CRM.url("civicrm/contact/view/contributionrecur",{"id":item.recur_id,"cid":item.contact_id,"a  ction":"view"}) %>"><%= item.recur_id %></a></td>
-    <td><%= item.next_sched_contribution.substring(0,10) %></td>
+    <td><%= item.next_sched_contribution_date.substring(0,10) %></td>
     <td><%= item.payment_instrument_id %></td>
   </tr>
 <%  }); %>
