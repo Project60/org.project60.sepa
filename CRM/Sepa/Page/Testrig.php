@@ -192,9 +192,10 @@ class CRM_Sepa_Page_Testrig extends CRM_Core_Page {
           $cls = $txg['status_id'] == 1 ? "txgopen" : "txgclosed";
           echo '<li class="' . $cls . '"><ul>';
           echo '<span>', $txg['reference'], '</span>';
-          echo ' - collection date <b>', substr($txg['collection_date'],0,10) . '</b>';
+          echo ' - collection <b>', substr($txg['collection_date'],0,10) . '</b>';
+          echo ' - latest submission <b>', substr($txg['latest_submission_date'],0,10) . '</b>';
             $cons = $contribs[ $txg['id'] ];
-            echo ' (', count($cons), ' transactions)';
+            echo ' (', count($cons), ' tx)';
             foreach ($cons as $contrib) {
               echo '<li>';
               echo '<span>', '#', $contrib['contribution_id'], '</span>';

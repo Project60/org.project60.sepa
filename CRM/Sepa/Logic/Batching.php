@@ -54,16 +54,39 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    * @param CRM_Sepa_BAO_SEPATransaction $bao
    */
   public static function batchContributionByCreditor (CRM_Contribute_BAO_Contribution $contrib, $creditor_id,$payment_instrument_id) {
-    $receive_date = $contrib->receive_date;
-//    $type = self::getSDDType($contrib);
     $type = CRM_Core_OptionGroup::getValue('payment_instrument', $contrib->payment_instrument_id, 'value', 'String', 'name');
     self::debug(' Contribution is of type '. $type);
+
+    // calculate the ideal times
+    $receive_date = $contrib->receive_date;
+    $tomorrow = date('Y-m-d',strtotime("+1days"));
+    $delay = ($type == 'RCUR') ? 2 : 5;
+    echo '<br>Calculation latest submission date ... ';
+    $submission_date = self::adjustBankDays($receive_date, - $delay - 1);
+    if ($submission_date < $tomorrow) {
+      $submission_date = $tomorrow;
+      echo '<br>In the past, so pushing out latest submission date to tomorrow ...';
+    }
+    // effective_collection_date = submission_date + delay + 1
+    echo '<br>Calculation corresponding collection date based on a delay of ', $delay, ' bank days ... ';
+    $collection_date = self::adjustBankDays($submission_date, $delay);
 
     // the range for batch collection date is [ this date - MAXPULL, this date + MAXPUSH ]
     $maxpull = 0;
     $maxpush = 0;
-    $earliest_date = self::adjustBankDays($receive_date, - $maxpull);
-    $latest_date = self::adjustBankDays($receive_date, $maxpush);
+
+    echo '<br>Calculating earliest date for search window ... ';
+    $earliest_date = self::adjustBankDays($collection_date, - $maxpull);
+    if ($earliest_date < $tomorrow) {
+      $earliest_date = $tomorrow;
+      echo ' ... pushing out earliest date to tomorrow ...';
+    }
+    echo '<br>Calculating corresponding latest date for window ... ';
+    $latest_date = self::adjustBankDays($collection_date, $maxpush );
+    if ($latest_date < $tomorrow) {
+      $latest_date = $tomorrow;
+      echo ' ... pushing out latest date to tomorrow ...';
+    }
 
     // we have a query : look for an open batch in this date range and of the 
     // appropriate type and creditor
@@ -123,10 +146,17 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     CRM_Sepa_Logic_Base::debug("Creating new TXG( CRED=$creditor_id, TYPE=$type, COLLDATE=" . substr($receive_date,0,10) . ')');
     // as per Batching.md
     // submission_date = latest( today, tx.collection_date - delay - 1 )
+    $tomorrow = date('Y-m-d',strtotime("+1days"));
     $delay = ($type == 'RCUR') ? 2 : 5;
+    echo '<br>Calculation latest submission date ... ';
     $submission_date = self::adjustBankDays($receive_date, - $delay - 1);
+    if ($submission_date < $tomorrow) {
+      $submission_date = $tomorrow;
+      echo '<br>Pushing out latest submission date to tomorrow ...';
+    }
     // effective_collection_date = submission_date + delay + 1
-    $collection_date = self::adjustBankDays($receive_date, $delay + 1);
+    echo '<br>Calculation corresponding collection date based on a delay of ', $delay, ' bank days ... ';
+    $collection_date = self::adjustBankDays($submission_date, $delay);
 
     $session = CRM_Core_Session::singleton();
     $reference = "TXG-$creditor_id-$type-$collection_date";
@@ -155,7 +185,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   }
 
   public static function addToTxGroup($contrib, $txGroup) {
-    self::debug('Adding C#' . $contrib->id . ') to TXG#' . $txGroup->id);
+    self::debug('Adding C#' . $contrib->id . ' to TXG#' . $txGroup->id);
     $params = array(
         'contribution_id' => $contrib->id,
         'txgroup_id' => $txGroup->id,
@@ -196,7 +226,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               WHERE         
                 status_id = " . $openStatus . "
                 AND 
-                latest_submission_date >= '" . $txgroup->latest_submission_date . "'
+                latest_submission_date = '" . $txgroup->latest_submission_date . "'
                 AND 
                 tag = '" . $tag . "'
               ORDER BY 
