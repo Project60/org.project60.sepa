@@ -189,7 +189,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function batchTxGroup($objectId, $objectRef) {
     self::debug('Batching TXG#'. $objectId);
 
-    $cred = civicrm_api3('SepaCreditor','getsingle',array('id'=>$objectRef->creditor_id));
+    $cred = civicrm_api3('SepaCreditor','getsingle',array('id'=>$objectRef->sdd_creditor_id));
     
     // look for the earliest SDD File (based on latest_submission_date)
     $sddFile = self::findSddFile($objectRef, $cred['tag']);
