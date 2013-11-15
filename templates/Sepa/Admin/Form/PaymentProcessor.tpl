@@ -33,6 +33,10 @@
   <td class="label">{$form.creditor_prefix.label}</td>
   <td>{$form.creditor_prefix.html}</td>
 </tr>
+<tr id="crmf-sepa_file_format_id">
+  <td class="label">{$form.sepa_file_format_id.label}</td>
+  <td>{$form.sepa_file_format_id.html}</td>
+</tr>
           
 </table>
 </div>
