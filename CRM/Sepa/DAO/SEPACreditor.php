@@ -168,6 +168,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $mandate_active;
   /**
+   * Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.
+   *
+   * @var int unsigned
+   */
+  public $sepa_file_format_id;
+  /**
    * class constructor
    *
    * @access public
@@ -290,6 +296,14 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Immediately activate new Mandates') ,
         ) ,
+        'sepa_file_format_id' => array(
+          'name' => 'sepa_file_format_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('SEPA File Format') ,
+          'pseudoconstant' => array(
+            'optionGroupName' => 'sepa_file_format',
+          )
+        ) ,
       );
     }
     return self::$_fields;
@@ -318,6 +332,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'category' => 'category',
         'tag' => 'tag',
         'mandate_active' => 'mandate_active',
+        'sepa_file_format_id' => 'sepa_file_format_id',
       );
     }
     return self::$_fieldKeys;

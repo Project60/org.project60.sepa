@@ -140,4 +140,15 @@
     <comment>If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.</comment>
     <add>4.4</add>
   </field>
+
+  <field>
+    <name>sepa_file_format_id</name>
+    <title>SEPA File Format</title>
+    <type>int unsigned</type>
+    <comment>Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.</comment>
+    <pseudoconstant>
+      <optionGroupName>sepa_file_format</optionGroupName>
+    </pseudoconstant>
+    <add>4.4</add>
+  </field>
 </table>
