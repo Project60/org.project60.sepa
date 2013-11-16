@@ -133,4 +133,11 @@
     <add>4.3</add>
   </field>
   
+  <field>
+    <name>mandate_active</name>
+    <title>Immediately activate new Mandates</title>
+    <type>boolean</type>
+    <comment>If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.</comment>
+    <add>4.4</add>
+  </field>
 </table>

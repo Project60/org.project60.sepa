@@ -162,6 +162,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $tag;
   /**
+   * If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.
+   *
+   * @var boolean
+   */
+  public $mandate_active;
+  /**
    * class constructor
    *
    * @access public
@@ -279,6 +285,11 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
         ) ,
+        'mandate_active' => array(
+          'name' => 'mandate_active',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Immediately activate new Mandates') ,
+        ) ,
       );
     }
     return self::$_fields;
@@ -306,6 +317,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'payment_processor_id' => 'payment_processor_id',
         'category' => 'category',
         'tag' => 'tag',
+        'mandate_active' => 'mandate_active',
       );
     }
     return self::$_fieldKeys;
