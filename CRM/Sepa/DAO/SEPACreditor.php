@@ -148,9 +148,9 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $category;
   /**
-   * Tag
+   * Place this creditor's transaction groups in an XML file tagged with this value.
    *
-   * @var text
+   * @var string
    */
   public $tag;
   /**

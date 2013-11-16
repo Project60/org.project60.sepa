@@ -287,7 +287,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'required' => true,
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
-          'default' => 'CU',
+          'default' => 'RCUR',
         ) ,
         'status' => array(
           'name' => 'status',
