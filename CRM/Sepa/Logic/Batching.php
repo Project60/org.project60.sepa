@@ -32,20 +32,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     // what are the criteria to find an existing suitable batch ?
     $payment_instrument_id = $contrib->payment_instrument_id;
-    $params = array(
-        'payment_instrument_id' => $payment_instrument_id,
-        'version' => 3,
-    );
-    $result = civicrm_api('SepaCreditor', 'getsingle', $params);
-    if ($result['is_error']) {
-      $result = civicrm_api('SepaCreditor', 'create', array("version"=>3,"identifier"=>"FIXME","name"=>"Workaround","payment_instrument_id" => $payment_instrument_id,));
-      if ($result['is_error']) {
-        CRM_Core_Error::fatal($result['error_message']);
-        return null;
-      }
-    }
-    $creditor_id = $result['id'];
-
+    $creditor_id = $mandate->creditor_id;
     CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib,$creditor_id,$payment_instrument_id);
 }
 
@@ -202,7 +189,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function batchTxGroup($objectId, $objectRef) {
     self::debug('Batching TXG#'. $objectId);
 
-    $cred = civicrm_api3('SepaCreditor','getsingle',array('id'=>$objectRef->creditor_id));
+    $cred = civicrm_api3('SepaCreditor','getsingle',array('id'=>$objectRef->sdd_creditor_id));
     
     // look for the earliest SDD File (based on latest_submission_date)
     $sddFile = self::findSddFile($objectRef, $cred['tag']);
