@@ -20,14 +20,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       CRM_Utils_SepaCustomisationHooks::create_mandate($params);
 
       if (!array_key_exists("reference", $params)) {
-        // if no mandate reference was set, fallback to this:
-        $reference = "WMFR-" . date("Y");
-        if ($params) {
-          $reference .="-" . $params["entity_id"];
-        } else {
-          $reference .= "-RAND" . sprintf("%08d", rand(0, 999999));
-        }
-        $params['reference'] = $reference;
+        $fallback_reference = true;
+        // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
+        $params['reference'] = time() . rand();
       }
       //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
     }
@@ -53,6 +48,13 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $dao->validation_date = date("YmdHis");
     }
     $dao->save();
+
+    if ($fallback_reference) {
+      // If no mandate reference was supplied by the caller nor the customisation hook, create a nice default one.
+      $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix'));
+      $dao->reference = $creditor['mandate_prefix'] . '-' . $params['type'] . '-' . date("Y") . '-' . $dao->id;
+      $dao->save();
+    }
     
     // if the mandate is enabled, kick off the batching process
     if (self::is_active(CRM_Utils_Array::value('status', $params))) {
