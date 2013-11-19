@@ -13,9 +13,9 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $tpl= civicrm_api('OptionValue', 'create', array('version' => 3,'option_group_id' => $grp["id"],'name'=>$name,"label"=>$name));
     }
 
-    $msg =  civicrm_api('MessageTemplates','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
+    $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
     if (array_key_exists("is_error",$msg)) {
-      $msg =  civicrm_api('MessageTemplates','create',array("version"=>3,"workflow_id"=>$tpl["id"],
+      $msg =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
             "msg_title"=>$name,
             "msg_subject"=>$name,
             "is_reserved"=>0,
