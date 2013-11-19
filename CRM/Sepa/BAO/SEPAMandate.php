@@ -21,7 +21,8 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
       if (!array_key_exists("reference", $params)) {
         // if no mandate reference was set, fallback to this:
-        $reference = "WMFR-" . date("Y");
+        $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix'));
+        $reference = $creditor['mandate_prefix'] . '-' . date("Y");
         if ($params) {
           $reference .="-" . $params["entity_id"];
         } else {
