@@ -190,7 +190,6 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
     $values=$form->getVar("_values");
     if ($values["class_name"]!="Payment_SEPA_DD") return;
-      $fields= $form->_submitValues;
     $creditor = array ("version"=>3,"payment_processor_id"=>$values["id"],"identifier"=>$values["user_name"]);
     foreach (array("creditor_name"=>"name","creditor_id"=>"id","creditor_address"=>"address","creditor_prefix"=>"mandate_prefix","creditor_contact_id"=>"creditor_id","creditor_iban"=>"iban","creditor_bic"=>"bic","sepa_file_format_id"=>"sepa_file_format_id") as $field => $api) {
       $creditor[$api] = $form->_submitValues[$field];
