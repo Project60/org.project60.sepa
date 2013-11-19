@@ -77,7 +77,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     $form->addRule("creditor_name", ts('%1 is a required field.', array(1 => ts('Organisation Name'))), 'required');
 
     $form->add('textarea', 'creditor_address', ts('Address'), array('cols' => '60', 'rows' => '3'));
-//not implemented yet    $form->add('checkbox', 'mandate_active', ts('Mandate created are active by default?'));
+    $form->add('checkbox', 'mandate_active', ts('Activate new mandates directly when submitted'));
     $form->add( 'text', 'creditor_prefix',  ts('Mandate Prefix'));
     $form->add( 'text', 'creditor_contact_id',  ts('Contact ID'));
     $form->add( 'text', 'creditor_bic',  ts('BIC'),"size=11 maxlength=11");
@@ -95,6 +95,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         "creditor_name"=>$cred["name"],
         "creditor_contact_id"=>$cred["creditor_id"],
         "creditor_address"=>$cred["address"],
+        "mandate_active"=>$cred["mandate_active"],
         "creditor_prefix"=>$cred["mandate_prefix"],
         "creditor_iban"=>$cred["iban"],
         "creditor_bic"=>$cred["bic"],
@@ -182,6 +183,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     foreach (array("creditor_name"=>"name","creditor_id"=>"id","creditor_address"=>"address","creditor_prefix"=>"mandate_prefix","creditor_contact_id"=>"creditor_id","creditor_iban"=>"iban","creditor_bic"=>"bic") as $field => $api) {
       $creditor[$api] = $form->_submitValues[$field];
     }
+    $creditor['mandate_active'] = isset($form->_submitValues['mandate_active']);
     if (!$creditor["id"]) {
       unset($creditor["id"]);
     } 

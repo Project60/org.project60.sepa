@@ -25,7 +25,7 @@
   <td class="label">{$form.creditor_address.label}</td>
   <td>{$form.creditor_address.html}</td>
 </tr>
-<tr id="crmf-country-idd">
+<tr id="crmf-mandate_active">
   <td class="label">{$form.mandate_active.label}</td>
   <td>{$form.mandate_active.html}</td>
 </tr>

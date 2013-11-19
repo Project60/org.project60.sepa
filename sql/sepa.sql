@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `mandate_prefix` varchar(4)    COMMENT 'prefix for mandate identifiers',
      `payment_processor_id` int unsigned    ,
      `category` varchar(4)    COMMENT 'Default value',
-     `tag` varchar(64) NULL   COMMENT 'Place this creditor\'s transaction groups in an XML file tagged with this value.'
+     `tag` varchar(64) NULL   COMMENT 'Place this creditor\'s transaction groups in an XML file tagged with this value.',
+     `mandate_active` tinyint    COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.'
 ,
     PRIMARY KEY ( `id` )
 

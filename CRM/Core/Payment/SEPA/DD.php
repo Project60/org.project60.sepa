@@ -70,6 +70,13 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       die ("is this a single payment? We don't do that in SEPA (yet)");
     }
 
+    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $GLOBALS["sepa_context"]["creditor_id"], 'return' => 'mandate_active'));
+    if ($creditor['mandate_active']) {
+      $apiParams['status'] = CRM_Utils_Array::value('is_recur', $params) ? 'FRST' : 'OOFF';
+    } else {
+      $apiParams['status'] = 'INIT';
+    }
+
     $apiParams["creation_date"]= date("YmdHis");
     //echo 'creating mandate';
     $apiParams["sequential"]= 1;
