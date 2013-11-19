@@ -98,8 +98,10 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
 
     // get the creditor info as well
     $ppid=$form->getVar("_id");
-    $cred = civicrm_api("SepaCreditor","get",array("sequential"=>1,"version"=>3,"payment_processor_id"=>$ppid));
-    if ($cred["count"] >0) {
+    if (isset($ppid)) {
+      $cred = civicrm_api3("SepaCreditor","get",array("sequential"=>1,"payment_processor_id"=>$ppid));
+    }
+    if (isset($ppid) && $cred['count']) {
       $cred = $cred["values"][0];
       $form->setDefaults(array(
         "creditor_id"=>$cred["id"],
