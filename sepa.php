@@ -98,8 +98,10 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
 
     // get the creditor info as well
     $ppid=$form->getVar("_id");
-    $cred = civicrm_api("SepaCreditor","get",array("sequential"=>1,"version"=>3,"payment_processor_id"=>$ppid));
-    if ($cred["count"] >0) {
+    if (isset($ppid)) {
+      $cred = civicrm_api3("SepaCreditor","get",array("sequential"=>1,"payment_processor_id"=>$ppid));
+    }
+    if (isset($ppid) && $cred['count']) {
       $cred = $cred["values"][0];
       $form->setDefaults(array(
         "creditor_id"=>$cred["id"],
@@ -188,11 +190,11 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
   }
  
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
-    $values=$form->getVar("_values");
-    if ($values["class_name"]!="Payment_SEPA_DD") return;
-      $fields= $form->_submitValues;
-    $creditor = array ("version"=>3,"payment_processor_id"=>$values["id"],"payment_instrument_id"=>$values["payment_type"],"identifier"=>$values["user_name"]);
-    foreach (array("creditor_name"=>"name","creditor_id"=>"id","creditor_address"=>"address","creditor_prefix"=>"mandate_prefix","creditor_contact_id"=>"creditor_id","creditor_iban"=>"iban","creditor_bic"=>"bic","sepa_file_format_id"=>"sepa_file_format_id") as $field => $api) {
+    $ppType = civicrm_api3('PaymentProcessorType', 'getsingle', array('id' => $form->_ppType));
+    if ($ppType["class_name"]!="Payment_SEPA_DD") return;
+    $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', array('name' => $form->_submitValues['name'], 'is_test' => 0));
+    $creditor = array ("version"=>3,"payment_processor_id"=>$paymentProcessor['id']);
+    foreach (array("user_name"=>"identifier","creditor_name"=>"name","creditor_id"=>"id","creditor_address"=>"address","creditor_prefix"=>"mandate_prefix","creditor_contact_id"=>"creditor_id","creditor_iban"=>"iban","creditor_bic"=>"bic","sepa_file_format_id"=>"sepa_file_format_id") as $field => $api) {
       $creditor[$api] = $form->_submitValues[$field];
     }
     $creditor['mandate_active'] = isset($form->_submitValues['mandate_active']);
