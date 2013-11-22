@@ -1,6 +1,14 @@
 ALTER TABLE `civicrm_sdd_creditor` ADD `mandate_active` tinyint COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.';
 UPDATE `civicrm_sdd_creditor` SET `mandate_active` = 0;
 
+ALTER TABLE `civicrm_sdd_creditor` ADD `sepa_file_format_id` int unsigned COMMENT 'Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.';
+INSERT INTO `civicrm_option_group` (`name`, `title`, `is_active`) VALUES ('sepa_file_format', 'SEPA XML File Format Variants', 1);
+SET @option_group_id = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'sepa_file_format');
+INSERT INTO `civicrm_option_value` (`option_group_id`, `name`, `label`, `value`, `is_default`, `weight`, `is_reserved`) VALUES
+  (@option_group_id, 'pain.008.001.02', 'pain.008.001.02 (ISO 20022/official SEPA guidelines)', 1, 1, 1, 1),
+  (@option_group_id, 'pain.008.003.02', 'pain.008.003.02 (German Sonderwurst)', 2, 0, 2, 1);
+UPDATE `civicrm_sdd_creditor` SET `sepa_file_format_id` = (SELECT `value` FROM `civicrm_option_value` WHERE `name` = 'pain.008.001.02' AND `option_group_id` = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'sepa_file_format'));
+
 
 alter table civicrm_sdd_mandate  modify type varchar(4);
 update table civicrm_sdd_mandate set type = "RCUR";

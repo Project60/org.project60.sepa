@@ -85,6 +85,17 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     $form->addRule("creditor_contact_id", ts('%1 must be a number', array(1 => ts('Contact ID'))),'numeric');
     $form->add( 'hidden', 'creditor_id');
     $form->addRule("creditor_prefix", ts('%1 is a required field.', array(1 => ts('Mandate Prefix'))), 'required');
+
+    $fileFormatOptions = array();
+    $fileFormats = CRM_Core_PseudoConstant::get('CRM_Sepa_DAO_SEPACreditor', 'sepa_file_format_id', array('localize' => TRUE));
+    foreach ($fileFormats as $key => $var) {
+      $fileFormatOptions[$key] = $form->createElement('radio', NULL,
+        ts('SEPA File Format'), $var, $key,
+        array('id' => "civicrm_sepa_file_format_{$var}_{$key}")
+      );
+    }
+    $form->addGroup($fileFormatOptions, 'sepa_file_format_id', ts('SEPA File Format'));
+
     // get the creditor info as well
     $ppid=$form->getVar("_id");
     $cred = civicrm_api("SepaCreditor","get",array("sequential"=>1,"version"=>3,"payment_processor_id"=>$ppid));
@@ -99,10 +110,11 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         "creditor_prefix"=>$cred["mandate_prefix"],
         "creditor_iban"=>$cred["iban"],
         "creditor_bic"=>$cred["bic"],
+        "sepa_file_format_id"=>$cred["sepa_file_format_id"],
       ));
     } else {
       $session = CRM_Core_Session::singleton();
-      $form->setDefaults(array("creditor_prefix"=>"SEPA","creditor_contact_id"=>$session->get('userID')));
+      $form->setDefaults(array("creditor_prefix"=>"SEPA","creditor_contact_id"=>$session->get('userID'),"sepa_file_format_id"=>CRM_Core_OptionGroup::getDefaultValue('sepa_file_format')));
     }
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'Sepa/Admin/Form/PaymentProcessor.tpl'
@@ -180,7 +192,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     if ($values["class_name"]!="Payment_SEPA_DD") return;
       $fields= $form->_submitValues;
     $creditor = array ("version"=>3,"payment_processor_id"=>$values["id"],"payment_instrument_id"=>$values["payment_type"],"identifier"=>$values["user_name"]);
-    foreach (array("creditor_name"=>"name","creditor_id"=>"id","creditor_address"=>"address","creditor_prefix"=>"mandate_prefix","creditor_contact_id"=>"creditor_id","creditor_iban"=>"iban","creditor_bic"=>"bic") as $field => $api) {
+    foreach (array("creditor_name"=>"name","creditor_id"=>"id","creditor_address"=>"address","creditor_prefix"=>"mandate_prefix","creditor_contact_id"=>"creditor_id","creditor_iban"=>"iban","creditor_bic"=>"bic","sepa_file_format_id"=>"sepa_file_format_id") as $field => $api) {
       $creditor[$api] = $form->_submitValues[$field];
     }
     $creditor['mandate_active'] = isset($form->_submitValues['mandate_active']);

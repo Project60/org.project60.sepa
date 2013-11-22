@@ -29,7 +29,9 @@
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
       <CdtrSchmeId>
+{if $fileFormat != 'pain.008.003.02'}{* Element doesn't exist in German non-standard. *}
         <Nm>{$creditor.name}</Nm>
+{/if}
         <Id>
           <PrvtId>
             <Othr>

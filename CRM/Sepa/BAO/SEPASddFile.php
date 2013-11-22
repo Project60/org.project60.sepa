@@ -34,10 +34,15 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     $txgroup->find();
     $total =0; 
     $nbtransactions =0; 
+    $fileFormats = array();
     while ($txgroup->fetch()) {
       $xml .= $txgroup->generateXML();
       $total += $txgroup->total;
       $nbtransactions += $txgroup->nbtransactions;
+      $fileFormats[] = $txgroup->fileFormat;
+    }
+    if (count(array_unique($fileFormats)) > 1) {
+      throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
     }
     $template->assign("file",$this->toArray());
     $template->assign("total",$total );
