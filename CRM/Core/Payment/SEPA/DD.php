@@ -67,7 +67,11 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       die ("TODO manage memberships in SEPA. It's supposed to be with with a recurring membership.");
       // TODO: link mandate to membership
     } else {
-      die ("is this a single payment? We don't do that in SEPA (yet)");
+      // Probably a one-off contribution.
+      $apiParams['entity_table'] = 'civicrm_contribution';
+      // Note: for one-off contributions,
+      // the contribution record is created only *after* invoking doDirectPayment() --
+      // so we don't have an entity ID here yet...
     }
 
     $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $GLOBALS["sepa_context"]["creditor_id"], 'return' => 'mandate_active'));
@@ -79,7 +83,12 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
 
     $apiParams["creation_date"]= date("YmdHis");
 
-    CRM_Sepa_Logic_Mandates::createMandate($apiParams);
+    if (isset($apiParams['entity_id'])) {
+      CRM_Sepa_Logic_Mandates::createMandate($apiParams);
+    } else {
+      // If we don't yet have an entity to attach the mandate to, we need to postpone the mandate creation.
+      $GLOBALS['sepa_context']['mandateParams'] = $apiParams;
+    }
     return array(true); // Need to return a non-empty array to indicate success...
   }
 

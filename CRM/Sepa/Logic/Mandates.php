@@ -165,6 +165,14 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $objectRef->save();
       //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
     }
+
+    // If this is a one-off payment, doDirectPayment() has already been invoked before creating the contribution.
+    // However, we can only create the mandate once the contribution record is in place, i.e. now.
+    if (isset($GLOBALS['sepa_context']['mandateParams'])) {
+      $mandateParams = $GLOBALS['sepa_context']['mandateParams'];
+      $mandateParams["entity_id"] = $objectId;
+      self::createMandate($mandateParams);
+    }
   }
 
   /**
