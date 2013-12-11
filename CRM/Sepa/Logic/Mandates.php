@@ -167,6 +167,23 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     }
   }
 
+  /**
+   * Create a SEPA mandate for a new contribution
+   */
+  public static function createMandate($params) {
+    $apiParams = array('version' => 3, 'sequential' => 1);
+    $apiParams = array_merge($apiParams, $params);
+
+    $r = civicrm_api ("SepaMandate","create", $apiParams);
+    if ($r["is_error"]) {
+      CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
+    }
+
+    $page = new CRM_Sepa_Page_SepaMandatePdf();
+    $page->generateHTML($r["values"][0]);
+    $page->generatePDF (true);
+  }
+
   
   public static function handleMembershipSepaPayment($membership_id,$params) {
     self::debug('Creating mandate for membership ' . $membership_id);

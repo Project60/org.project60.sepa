@@ -51,7 +51,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     if ($this->_mode == 'test') {
       $params['trxn_id'] = "TEST:" . $params['trxn_id'];
     }
-    $apiParams = array ("version"=>3, 
+    $apiParams = array (
         "iban"=> $params["bank_iban"],
         "bic" => $params["bank_bic"],
         );
@@ -78,18 +78,8 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     }
 
     $apiParams["creation_date"]= date("YmdHis");
-    //echo 'creating mandate';
-    $apiParams["sequential"]= 1;
 
-    $r = civicrm_api ("SepaMandate","create", $apiParams);
-//    die(print_r($r));
-    if ($r["is_error"]) {
-      CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
-    }
-    
-    $page = new CRM_Sepa_Page_SepaMandatePdf();
-    $page->generateHTML($r["values"][0]);
-    $page->generatePDF (true);
+    CRM_Sepa_Logic_Mandates::createMandate($apiParams);
   }
 
   
