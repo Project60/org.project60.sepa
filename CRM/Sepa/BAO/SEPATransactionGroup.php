@@ -57,7 +57,10 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         mandate.*
       FROM civicrm_contribution AS c
       JOIN civicrm_sdd_contribution_txgroup AS g ON g.contribution_id=c.id
-      JOIN civicrm_sdd_mandate AS mandate ON c.contribution_recur_id = mandate.entity_id
+      JOIN civicrm_sdd_mandate AS mandate ON mandate.id = IF(c.contribution_recur_id IS NOT NULL,
+        (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution_recur' AND entity_id = c.contribution_recur_id),
+        (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = c.id)
+      )
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
       WHERE g.txgroup_id = %1
         AND contribution_status_id != 3
