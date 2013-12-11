@@ -80,6 +80,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     $apiParams["creation_date"]= date("YmdHis");
 
     CRM_Sepa_Logic_Mandates::createMandate($apiParams);
+    return array(true); // Need to return a non-empty array to indicate success...
   }
 
   
