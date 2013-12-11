@@ -44,7 +44,25 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
     $template->assign("fileFormat",$this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
-    $query="SELECT c.id, civicrm_contact.display_name, invoice_id,currency, total_amount,receive_date,contribution_recur_id, contribution_status_id, mandate.* FROM civicrm_contribution as c JOIN civicrm_sdd_contribution_txgroup as g on g.contribution_id=c.id JOIN civicrm_sdd_mandate as mandate on c.contribution_recur_id = mandate.entity_id JOIN civicrm_contact on c.contact_id = civicrm_contact.id WHERE g.txgroup_id= %1 AND contribution_status_id != 3 AND mandate.is_enabled = true"; //and not cancelled
+    $query="
+      SELECT
+        c.id,
+        civicrm_contact.display_name,
+        invoice_id,
+        currency,
+        total_amount,
+        receive_date,
+        contribution_recur_id,
+        contribution_status_id,
+        mandate.*
+      FROM civicrm_contribution AS c
+      JOIN civicrm_sdd_contribution_txgroup AS g ON g.contribution_id=c.id
+      JOIN civicrm_sdd_mandate AS mandate ON c.contribution_recur_id = mandate.entity_id
+      JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
+      WHERE g.txgroup_id = %1
+        AND contribution_status_id != 3
+        AND mandate.is_enabled = true
+    "; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
 
     setlocale(LC_CTYPE, 'en_US.utf8');
