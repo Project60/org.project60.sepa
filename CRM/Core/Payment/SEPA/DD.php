@@ -60,6 +60,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     if (CRM_Utils_Array::value('is_recur', $params) &&
         $params['contributionRecurID']
        ) {
+      $apiParams['type'] = 'RCUR';
       $apiParams["entity_table"]="civicrm_contribution_recur";
       $apiParams["entity_id"]= $params['contributionRecurID'];
     } elseif (CRM_Utils_Array::value('selectMembership', $params))   {
@@ -68,6 +69,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       // TODO: link mandate to membership
     } else {
       // Probably a one-off contribution.
+      $apiParams['type'] = 'OOFF';
       $apiParams['entity_table'] = 'civicrm_contribution';
       // Note: for one-off contributions,
       // the contribution record is created only *after* invoking doDirectPayment() --
