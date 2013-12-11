@@ -121,8 +121,11 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
       recur.next_sched_contribution_date
     FROM civicrm_sdd_contribution_txgroup
       JOIN civicrm_contribution AS contrib ON contrib.id = contribution_id
-      JOIN civicrm_contribution_recur AS recur ON recur.id = contrib.contribution_recur_id
-      JOIN civicrm_sdd_mandate AS mandate ON mandate.entity_id = recur.id
+      LEFT JOIN civicrm_contribution_recur AS recur ON recur.id = contrib.contribution_recur_id
+      JOIN civicrm_sdd_mandate AS mandate ON mandate.id = IF(recur.id IS NOT NULL,
+        (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution_recur' AND entity_id = recur.id),
+        (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = contrib.id)
+      )
     WHERE txgroup_id=$group
       /* AND mandate.is_enabled=1 */
       AND mandate.status IN ('FRST','OOFF','RCUR')
