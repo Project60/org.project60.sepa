@@ -153,6 +153,8 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
   $contribs = civicrm_api("sepa_contribution_group","getdetail", $params);
 
   foreach ($contribs["values"] as $old) {
+    if (!$old['recur_id'])
+      throw new API_Exception("Trying to create next payment for non-recurrent contribution?");
     $date = strtotime(substr($old["receive_date"], 0, 10));
     $next_collectionDate = strtotime ("+". $old["frequency_interval"] . " ".$old["frequency_unit"],$date);
     $next_collectionDate = date('YmdHis', $next_collectionDate);

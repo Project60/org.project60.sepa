@@ -23,7 +23,9 @@
 <td>{$group.total} &euro;</td>
 <td>
 <a href="#" class="button button_close">Close</a>
+{if $group.type != 'OOFF'}
 <a href="#" class="button button_generate">Generate next batch</a>
+{/if}
 </td>
 </tr>
 {/foreach}
