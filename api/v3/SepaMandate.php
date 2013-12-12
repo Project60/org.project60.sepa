@@ -77,9 +77,6 @@ function civicrm_api3_sepa_mandate_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-function _civicrm_api3_sepa_mandate_get_spec(&$params) {
-  $params['entity_table']['api.default'] = "civicrm_contribution_recur";
-}
 /**
  * Retrieve one or more sepa_mandates
  *

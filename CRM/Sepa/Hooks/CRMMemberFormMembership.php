@@ -8,7 +8,7 @@ class CRM_Sepa_Hooks_CRMMemberFormMembership {
     echo $form->getVar( '_crid' );
     $mandate = array();
     if (false) {
-      $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
+      $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contibution_recur", "entity_id"=>$id));
     }
     
     // field to select the SDD option

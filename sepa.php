@@ -23,7 +23,8 @@ function sepa_civicrm_pageRun( &$page ) {
     array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
   if ("Payment_SEPA_DD" !=  $pp["class_name"])
     return;
-  $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$recur["id"]));
+
+  $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
   if (!array_key_exists("id",$mandate)) {
       CRM_Core_Error::fatal(ts("Can't find the sepa mandate"));
   }
@@ -142,7 +143,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     if (!array_key_exists("contribution_recur_id",$form->_values))
       return;
     $id=$form->_values['contribution_recur_id'];
-    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
     if (!array_key_exists("id",$mandate))
       return;
     //TODO, add in the form? link to something else?
@@ -150,7 +151,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
 
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );
-    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
     if (!array_key_exists("id",$mandate))
       return;
     if (!$form->getVar("_subscriptionDetails")->installments) {
