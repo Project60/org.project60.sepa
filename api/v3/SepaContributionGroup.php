@@ -119,11 +119,13 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
       recur.frequency_unit,
       recur.cycle_day,
       recur.next_sched_contribution_date
-    FROM civicrm_sdd_contribution_txgroup, civicrm_contribution AS contrib, civicrm_contribution_recur AS recur, civicrm_sdd_mandate AS mandate
-    WHERE mandate.entity_id = recur.id AND contribution_id = contrib.id AND contribution_recur_id = recur.id
+    FROM civicrm_sdd_contribution_txgroup
+      JOIN civicrm_contribution AS contrib ON contrib.id = contribution_id
+      JOIN civicrm_contribution_recur AS recur ON recur.id = contrib.contribution_recur_id
+      JOIN civicrm_sdd_mandate AS mandate ON mandate.entity_id = recur.id
+    WHERE txgroup_id=$group
       /* AND mandate.is_enabled=1 */
       AND mandate.status IN ('FRST','OOFF','RCUR')
-      AND txgroup_id=$group
   ";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
