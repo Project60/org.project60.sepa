@@ -13,25 +13,54 @@ function sepa_pageRun_contribute( &$page ) {
 
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contribute_Page_Tab") {
-    return sepa_pageRun_contribute( $page );
-  }
-  if ( get_class($page) != "CRM_Contribute_Page_ContributionRecur")
-    return;
-  $recur = $page->getTemplate()->get_template_vars("recur");
+    if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
+      // This is an installment of a recurring contribution.
+      return sepa_pageRun_contribute( $page );
+    }
+    else {
+      // This is a one-off contribution => try to show mandate data.
+      if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
+        return;
 
-  $pp = civicrm_api('PaymentProcessor', 'getsingle', 
-    array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
-  if ("Payment_SEPA_DD" !=  $pp["class_name"])
-    return;
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution', 'entity_id'=>$page->getTemplate()->get_template_vars('id')));
+      $page->assign('sepa', $mandate);
 
-  $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
-  if (!array_key_exists("id",$mandate)) {
-      CRM_Core_Error::fatal(ts("Can't find the sepa mandate"));
+      CRM_Core_Region::instance('page-body')->add(array(
+        'template' => 'Sepa/Contribute/Form/ContributionView.tpl'
+      ));
+      CRM_Core_Region::instance('page-body')->add(array(
+        'callback' => function(&$spec, &$html) {
+          /*
+           * Find the last 'crm-submit-buttons' section in the generated HTML,
+           * and move the SDD mandate section before it.
+           *
+           * This is rather hacky -- but we don't really have any better anchor to work with...
+           *
+           * (Ideally, the original template should provide a crmRegion for the main content,
+           * so we could just append the mandate stuff there without hacking HTML output.)
+           */
+          $html = preg_replace('%(.*)(\<[^>]*crm-submit-buttons.*)(\<!-- Mandate --\>.*\<!-- /Mandate --\>)%s', '$1$3$2', $html);
+        }
+      ));
+    }
   }
-  $page->assign("sepa",$mandate);
-  CRM_Core_Region::instance('page-body')->add(array(
-    'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
-  ));
+  elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
+    $recur = $page->getTemplate()->get_template_vars("recur");
+
+    $pp = civicrm_api('PaymentProcessor', 'getsingle', 
+      array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
+    if ("Payment_SEPA_DD" !=  $pp["class_name"])
+      return;
+
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
+    if (!array_key_exists("id",$mandate)) {
+        CRM_Core_Error::fatal(ts("Can't find the sepa mandate"));
+    }
+    $page->assign("sepa",$mandate);
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
+    ));
+  }
 }
 
 function _sepa_buildForm_Contribution_Main ($formName, &$form ){
