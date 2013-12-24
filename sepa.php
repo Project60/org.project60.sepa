@@ -167,15 +167,36 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
   }
 
-  if (false && "CRM_Contribute_Form_Contribution" == $formName) { //TODO remove definitely if we don't do anything with it
-    //should we be able to set the mandate info from the contribution?
-    if (!array_key_exists("contribution_recur_id",$form->_values))
-      return;
-    $id=$form->_values['contribution_recur_id'];
-    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
-    if (!array_key_exists("id",$mandate))
-      return;
-    //TODO, add in the form? link to something else?
+  if ("CRM_Contribute_Form_Contribution" == $formName
+      && isset($form->_values) // Deal with weird recursive partial invocation...
+  ) {
+    if (!array_key_exists("contribution_recur_id",$form->_values)) {
+      // This is a one-off contribution => insert mandate block.
+
+      if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id'])))
+        return;
+
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
+      $form->assign($mandate);
+
+      $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
+      $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
+      $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
+
+      CRM_Core_Region::instance('page-body')->add(array(
+        'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
+      ));
+    } else {
+      // This is an installment of a recurring contribution.
+      if (false) { //TODO remove definitely if we don't do anything with it
+        //should we be able to set the mandate info from the contribution?
+        $id=$form->_values['contribution_recur_id'];
+        $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
+        if (!array_key_exists("id",$mandate))
+          return;
+        //TODO, add in the form? link to something else?
+      }
+    }
   }
 
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
@@ -234,13 +255,20 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     }
 //CRM_Admin_Form_PaymentProcessor
   }
-  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
+  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD"
+      || "CRM_Contribute_Form_Contribution" == $formName && CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id']))) {
     $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic","sepa_active"=>"is_enabled");
     $newMandate = array();
-   $id= $form->getVar( '_crid' );
-    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur","entity_id"=>$id));
-    if (!array_key_exists("id",$mandate))
-      return;
+    if ("CRM_Contribute_Form_UpdateSubscription" == $formName) {
+      // Updating recur record of a recurring contribution.
+      $id= $form->getVar( '_crid' );
+      $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur","entity_id"=>$id));
+      if (!array_key_exists("id",$mandate))
+        return;
+    } else {
+      // Updating one-off contribution.
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
+    }
     if (!array_key_exists("is_enabled",$mandate)) {
       $mandate["is_enabled"] = false;
     }
