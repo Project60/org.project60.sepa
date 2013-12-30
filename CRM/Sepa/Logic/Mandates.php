@@ -162,6 +162,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     // for that purpose, or by examining the contrib->payment_instrument->pptype
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
+      $objectRef->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'); // For some reason (hopefully not SEPA-related), this is pre-set to 'pending' for recurring contributions, but to 'completed' for one-off contributions... We always want 'pending' for DD -- so set it explicitly.
       $objectRef->save();
       //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
     }
