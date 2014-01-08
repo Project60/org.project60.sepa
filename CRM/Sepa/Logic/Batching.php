@@ -234,7 +234,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ', TAG=' . $tag . ')');
 
     $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date,0,8);
-    $filename = str_replace($reference . ".xml",'-','_');
+    $filename = str_replace('-','_',$reference . ".xml");
 
     $session = CRM_Core_Session::singleton();
     $params = array(
