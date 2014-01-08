@@ -46,7 +46,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
-        c.id,
+        c.id AS contribution_id,
         civicrm_contact.display_name,
         invoice_id,
         currency,
@@ -91,7 +91,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       } elseif ($contrib->creditor_id == null) { // it shouldn't happen.
         $contrib->creditor_id = $creditor_id;
       } elseif ($creditor_id != $contrib->creditor_id){
-        CRM_Core_Error::fatal("mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
+        CRM_Core_Error::fatal("mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->contribution_id}");
         //to fix the mandate: update civicrm_sdd_mandate set creditor_id=1;
       }
       $this->total += $contrib->total_amount;
