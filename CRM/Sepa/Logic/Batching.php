@@ -233,8 +233,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function createSddFile($txgroup, $tag) {
     self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ', TAG=' . $tag . ')');
 
-    $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date,0,8);
-    $filename = str_replace('-','_',$reference . ".xml");
+    // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
+    $filename = $reference = time() . rand();
 
     $session = CRM_Core_Session::singleton();
     $params = array(
@@ -252,6 +252,12 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       CRM_Core_Error::fatal(ts("ERROR creating SDDFILE"));
     }
     $sddfile_id = $result['id'];
+
+    // Now that we have the auto ID, create the proper reference.
+    $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date, 0, 8) . '-' . $sddfile_id;
+    $filename = str_replace('-', '_', $reference . ".xml");
+    civicrm_api3('SEPASddFile', 'create', array('id' => $sddfile_id, 'reference' => $reference, 'filename' => $filename)); // Not very efficient, but easier than fiddling with BAO mess...
+
     $sddfile = new CRM_Sepa_BAO_SepaSddFile();
     $sddfile->get('id', $sddfile_id);
     return $sddfile;
