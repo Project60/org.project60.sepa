@@ -146,7 +146,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $collection_date = self::adjustBankDays($submission_date, $delay);
 
     $session = CRM_Core_Session::singleton();
-    $reference = "TXG-$creditor_id-$type-$collection_date";
+    $reference = time() . rand(); // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
     $params = array(
         'reference' => $reference,
         'type' => $type,
@@ -166,6 +166,11 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       return null;
     }
     $txgroup_id = $result['id'];
+
+    // Now that we have the auto ID, create the proper reference.
+    $reference = "TXG-$creditor_id-$type-$collection_date-$txgroup_id";
+    civicrm_api3('SEPATransactionGroup', 'create', array('id' => $txgroup_id, 'reference' => $reference)); // Not very efficient, but easier than fiddling with BAO mess...
+
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->get('id', $txgroup_id);
     return $txgroup;
@@ -233,8 +238,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function createSddFile($txgroup, $tag) {
     self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ', TAG=' . $tag . ')');
 
-    $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date,0,8);
-    $filename = str_replace($reference . ".xml",'-','_');
+    // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
+    $filename = $reference = time() . rand();
 
     $session = CRM_Core_Session::singleton();
     $params = array(
@@ -252,6 +257,12 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       CRM_Core_Error::fatal(ts("ERROR creating SDDFILE"));
     }
     $sddfile_id = $result['id'];
+
+    // Now that we have the auto ID, create the proper reference.
+    $reference = "SDDXML-" . (isset($tag) ? $tag . '-' : '') . substr($txgroup->latest_submission_date, 0, 8) . '-' . $sddfile_id;
+    $filename = str_replace('-', '_', $reference . ".xml");
+    civicrm_api3('SEPASddFile', 'create', array('id' => $sddfile_id, 'reference' => $reference, 'filename' => $filename)); // Not very efficient, but easier than fiddling with BAO mess...
+
     $sddfile = new CRM_Sepa_BAO_SepaSddFile();
     $sddfile->get('id', $sddfile_id);
     return $sddfile;
