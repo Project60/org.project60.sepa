@@ -13,24 +13,54 @@ function sepa_pageRun_contribute( &$page ) {
 
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contribute_Page_Tab") {
-    return sepa_pageRun_contribute( $page );
-  }
-  if ( get_class($page) != "CRM_Contribute_Page_ContributionRecur")
-    return;
-  $recur = $page->getTemplate()->get_template_vars("recur");
+    if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
+      // This is an installment of a recurring contribution.
+      return sepa_pageRun_contribute( $page );
+    }
+    else {
+      // This is a one-off contribution => try to show mandate data.
+      if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
+        return;
 
-  $pp = civicrm_api('PaymentProcessor', 'getsingle', 
-    array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
-  if ("Payment_SEPA_DD" !=  $pp["class_name"])
-    return;
-  $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$recur["id"]));
-  if (!array_key_exists("id",$mandate)) {
-      CRM_Core_Error::fatal(ts("Can't find the sepa mandate"));
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution', 'entity_id'=>$page->getTemplate()->get_template_vars('id')));
+      $page->assign('sepa', $mandate);
+
+      CRM_Core_Region::instance('page-body')->add(array(
+        'template' => 'Sepa/Contribute/Form/ContributionView.tpl'
+      ));
+      CRM_Core_Region::instance('page-body')->add(array(
+        'callback' => function(&$spec, &$html) {
+          /*
+           * Find the last 'crm-submit-buttons' section in the generated HTML,
+           * and move the SDD mandate section before it.
+           *
+           * This is rather hacky -- but we don't really have any better anchor to work with...
+           *
+           * (Ideally, the original template should provide a crmRegion for the main content,
+           * so we could just append the mandate stuff there without hacking HTML output.)
+           */
+          $html = preg_replace('%(.*)(\<[^>]*crm-submit-buttons.*)(\<!-- Mandate --\>.*\<!-- /Mandate --\>)%s', '$1$3$2', $html);
+        }
+      ));
+    }
   }
-  $page->assign("sepa",$mandate);
-  CRM_Core_Region::instance('page-body')->add(array(
-    'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
-  ));
+  elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
+    $recur = $page->getTemplate()->get_template_vars("recur");
+
+    $pp = civicrm_api('PaymentProcessor', 'getsingle', 
+      array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
+    if ("Payment_SEPA_DD" !=  $pp["class_name"])
+      return;
+
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
+    if (!array_key_exists("id",$mandate)) {
+        CRM_Core_Error::fatal(ts("Can't find the sepa mandate"));
+    }
+    $page->assign("sepa",$mandate);
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
+    ));
+  }
 }
 
 function _sepa_buildForm_Contribution_Main ($formName, &$form ){
@@ -38,11 +68,6 @@ function _sepa_buildForm_Contribution_Main ($formName, &$form ){
     ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
   if("Payment_SEPA_DD" != $pp["class_name"])
     return;
-  //$form->getElement('is_recur')->setValue(1); // recurring contrib as an option
-  if (isset($form->_elementIndex['is_recur'])) {
-    $form->removeElement('is_recur'); // force recurring contrib
-  }
-  $form->addElement('hidden','is_recur',1);
   //workaround the notice message, as ContributionBase assumes these fields exist in the confirm step
   foreach (array("account_holder","bank_identification_number","bank_name","bank_account_number") as $field){
     $form->addElement("hidden",$field);
@@ -142,20 +167,41 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
   }
 
-  if (false && "CRM_Contribute_Form_Contribution" == $formName) { //TODO remove definitely if we don't do anything with it
-    //should we be able to set the mandate info from the contribution?
-    if (!array_key_exists("contribution_recur_id",$form->_values))
-      return;
-    $id=$form->_values['contribution_recur_id'];
-    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
-    if (!array_key_exists("id",$mandate))
-      return;
-    //TODO, add in the form? link to something else?
+  if ("CRM_Contribute_Form_Contribution" == $formName
+      && isset($form->_values) // Deal with weird recursive partial invocation...
+  ) {
+    if (!array_key_exists("contribution_recur_id",$form->_values)) {
+      // This is a one-off contribution => insert mandate block.
+
+      if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id'])))
+        return;
+
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
+      $form->assign($mandate);
+
+      $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
+      $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
+      $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
+
+      CRM_Core_Region::instance('page-body')->add(array(
+        'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
+      ));
+    } else {
+      // This is an installment of a recurring contribution.
+      if (false) { //TODO remove definitely if we don't do anything with it
+        //should we be able to set the mandate info from the contribution?
+        $id=$form->_values['contribution_recur_id'];
+        $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
+        if (!array_key_exists("id",$mandate))
+          return;
+        //TODO, add in the form? link to something else?
+      }
+    }
   }
 
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );
-    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_id"=>$id));
+    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
     if (!array_key_exists("id",$mandate))
       return;
     if (!$form->getVar("_subscriptionDetails")->installments) {
@@ -209,13 +255,20 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     }
 //CRM_Admin_Form_PaymentProcessor
   }
-  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
+  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD"
+      || "CRM_Contribute_Form_Contribution" == $formName && CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id']))) {
     $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic","sepa_active"=>"is_enabled");
     $newMandate = array();
-   $id= $form->getVar( '_crid' );
-    $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur","entity_id"=>$id));
-    if (!array_key_exists("id",$mandate))
-      return;
+    if ("CRM_Contribute_Form_UpdateSubscription" == $formName) {
+      // Updating recur record of a recurring contribution.
+      $id= $form->getVar( '_crid' );
+      $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur","entity_id"=>$id));
+      if (!array_key_exists("id",$mandate))
+        return;
+    } else {
+      // Updating one-off contribution.
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
+    }
     if (!array_key_exists("is_enabled",$mandate)) {
       $mandate["is_enabled"] = false;
     }

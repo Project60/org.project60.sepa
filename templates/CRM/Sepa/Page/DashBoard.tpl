@@ -11,7 +11,7 @@
 <th></th>
 </tr>
 {foreach from=$groups item=group}
-<tr class="status_{$result.status_id}" data-id="{$group.id}">
+<tr class="status_{$result.status_id}" data-id="{$group.id}" data-type="{$group.type}">
 <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
 <td>{$group.status_id}</td>
 <td>{$group.type}</td>
@@ -23,7 +23,9 @@
 <td>{$group.total} &euro;</td>
 <td>
 <a href="#" class="button button_close">Close</a>
+{if $group.type != 'OOFF'}
 <a href="#" class="button button_generate">Generate next batch</a>
+{/if}
 </td>
 </tr>
 {/foreach}
@@ -39,8 +41,10 @@
     <th>contact</th>
     <th>contrib</th>
     <th>receive</th>
+<% if(type != 'OOFF') { %>
     <th>recur</th>
     <th>next</th>
+<% } %>
     <th>instrument</th>
   </tr>
 <% _.each(values,function(item){ %>
@@ -50,8 +54,10 @@
     <td><a href="<%= CRM.url("civicrm/contact/view",{"cid":item.contact_id}) %>"><%= item.contact_id %></a></td>
     <td><a href="<%= CRM.url("civicrm/contact/view/contribution",{"id":item.contribution_id,"cid":item.contact_id,"action":"view"}) %>"><%= item.contribution_id %></a></td>
     <td><%= item.receive_date.substring(0,10) %></td>
+<% if(type != 'OOFF') { %>
     <td><a href="<%= CRM.url("civicrm/contact/view/contributionrecur",{"id":item.recur_id,"cid":item.contact_id,"a  ction":"view"}) %>"><%= item.recur_id %></a></td>
     <td><%= item.next_sched_contribution_date.substring(0,10) %></td>
+<% } %>
     <td><%= item.payment_instrument_id %></td>
   </tr>
 <%  }); %>
@@ -83,6 +89,7 @@ console.log ("click");
      return;
     }
     CRM.api("SepaContributionGroup","getdetail",{"id":$tr.data("id")},{"success":function(data) {
+      _.extend(data,$tr.data());
       $tr.after(_.template($("#detail").html(),data));
       console.log(data);
     }});

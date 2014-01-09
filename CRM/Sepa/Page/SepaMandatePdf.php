@@ -38,23 +38,35 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $this->api = new civicrm_api3();
     $api = $this->api;
 
-    if ($mandate->entity_table != "civicrm_contribution_recur")
-      return CRM_Core_Error::fatal("We don't know how to handle mandates for ".$mandate->entity_table);
-
-    $api->ContributionRecur->getsingle(array("id"=>$mandate->entity_id));
-    $recur=$api->result;
-    $api->Contact->getsingle(array("id"=>$recur->contact_id));
-    $this->contact=$api->result;
+    switch ($mandate->entity_table) {
+      case "civicrm_contribution_recur":
+        $api->ContributionRecur->getsingle(array("id"=>$mandate->entity_id));
+        $recur=$api->result;
+        $api->Contact->getsingle(array("id"=>$recur->contact_id));
+        $this->contact=$api->result;
+        break;
+      case "civicrm_contribution":
+        $api->Contribution->getsingle(array("id"=>$mandate->entity_id));
+        $contribution=$api->result;
+        $api->Contact->getsingle(array("id"=>$contribution->contact_id));
+        $this->contact=$api->result;
+        break;
+      default:
+        return CRM_Core_Error::fatal("We don't know how to handle mandates for ".$mandate->entity_table);
+    }
 
     $msg = $this->getMessage("sepa_mandate_pdf");
     CRM_Utils_System::setTitle($msg["msg_title"]  ." ". $mandate->reference);
     $this->assign("contact",(array) $this->contact);
     $this->assign("contactId",$this->contact->contact_id);
     $this->assign("sepa",(array) $mandate);
-    $this->assign("recur",(array) $recur);
+    if (isset($recur))
+      $this->assign("recur",(array) $recur);
+    if (isset($contribution))
+      $this->assign("contribution",(array) $contribution);
 
-    $api->PaymentProcessor->getsingle((int)$recur->payment_processor_id);
-    $pp=$api->result;
+    $api->SepaCreditor->getsingle(array('id' => $mandate->creditor_id, 'api.PaymentProcessor.getsingle' => array('id' => '$value.payment_processor_id')));
+    $pp=$api->result->{'api.PaymentProcessor.getsingle'};
     $this->assign("creditor",$pp->user_name);
 
     $this->html = $this->getTemplate()->fetch("string:".$msg["msg_html"]);
