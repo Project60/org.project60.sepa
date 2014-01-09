@@ -1,3 +1,7 @@
+ALTER TABLE `civicrm_sdd_file` ADD UNIQUE KEY `UI_reference` (`reference`);
+ALTER TABLE `civicrm_sdd_file` ADD UNIQUE KEY `UI_filename` (`filename`);
+
+
 ALTER TABLE `civicrm_sdd_creditor` ADD `mandate_active` tinyint COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.';
 UPDATE `civicrm_sdd_creditor` SET `mandate_active` = 0;
 
