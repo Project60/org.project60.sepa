@@ -146,7 +146,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $collection_date = self::adjustBankDays($submission_date, $delay);
 
     $session = CRM_Core_Session::singleton();
-    $reference = "TXG-$creditor_id-$type-$collection_date";
+    $reference = time() . rand(); // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
     $params = array(
         'reference' => $reference,
         'type' => $type,
@@ -166,6 +166,11 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       return null;
     }
     $txgroup_id = $result['id'];
+
+    // Now that we have the auto ID, create the proper reference.
+    $reference = "TXG-$creditor_id-$type-$collection_date-$txgroup_id";
+    civicrm_api3('SEPATransactionGroup', 'create', array('id' => $txgroup_id, 'reference' => $reference)); // Not very efficient, but easier than fiddling with BAO mess...
+
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->get('id', $txgroup_id);
     return $txgroup;
