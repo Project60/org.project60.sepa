@@ -1,3 +1,5 @@
+ALTER TABLE `civicrm_sdd_txgroup` ADD UNIQUE KEY `UI_reference` (`reference`);
+
 ALTER TABLE `civicrm_sdd_file` ADD UNIQUE KEY `UI_reference` (`reference`);
 ALTER TABLE `civicrm_sdd_file` ADD UNIQUE KEY `UI_filename` (`filename`);
 
