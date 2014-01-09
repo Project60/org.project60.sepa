@@ -60,61 +60,63 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
 
 }
 
-/**
- * This hook makes it possible to implement PRE ooks by definine the appropriate method in a logic class
- * 
- * @param type $op
- * @param type $objectName
- * @param type $id
- * @param type $params
- */
-function sepa_civicrm_pre($op, $objectName, $id, &$params) {
-  $parts = array(
-      'hook',
-      'pre',
-      strtolower($objectName),
-      strtolower($op)
-  );
-//  CRM_Sepa_Logic_Base::debug('pre-'.$objectName.'-'.$op);
-  $methodName = implode('_', $parts);
+// HOOKS DISABLED! We will use an alternative batching method...
 
-  if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
-    CRM_Sepa_Logic_Mandates::$methodName($id, $params);
-  } else {
-  }
-  if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
-    CRM_Sepa_Logic_Batching::$methodName($id, $params);
-  }
-}
+// /**
+//  * This hook makes it possible to implement PRE ooks by definine the appropriate method in a logic class
+//  * 
+//  * @param type $op
+//  * @param type $objectName
+//  * @param type $id
+//  * @param type $params
+//  */
+// function sepa_civicrm_pre($op, $objectName, $id, &$params) {
+//   $parts = array(
+//       'hook',
+//       'pre',
+//       strtolower($objectName),
+//       strtolower($op)
+//   );
+// //  CRM_Sepa_Logic_Base::debug('pre-'.$objectName.'-'.$op);
+//   $methodName = implode('_', $parts);
 
-/**
- * This hook makes it possible to implement POST hooks by definine the appropriate method in a logic class
- * 
- * @param type $op
- * @param type $objectName
- * @param type $id
- * @param type $params
- */
-function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
-  $parts = array(
-      'hook',
-      'post',
-      strtolower($objectName),
-      strtolower($op)
-  );
-//  CRM_Sepa_Logic_Base::debug('post-'.$objectName.'-'.$op);
-  $methodName = implode('_', $parts);
-  if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
-    CRM_Sepa_Logic_Mandates::$methodName($objectId, $objectRef);
-  }
-  if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
-    CRM_Sepa_Logic_Batching::$methodName($objectId, $objectRef);
-  }
-}
+//   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
+//     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
+//     CRM_Sepa_Logic_Mandates::$methodName($id, $params);
+//   } else {
+//   }
+//   if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
+//     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
+//     CRM_Sepa_Logic_Batching::$methodName($id, $params);
+//   }
+// }
+
+// *
+//  * This hook makes it possible to implement POST hooks by definine the appropriate method in a logic class
+//  * 
+//  * @param type $op
+//  * @param type $objectName
+//  * @param type $id
+//  * @param type $params
+ 
+// function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
+//   $parts = array(
+//       'hook',
+//       'post',
+//       strtolower($objectName),
+//       strtolower($op)
+//   );
+// //  CRM_Sepa_Logic_Base::debug('post-'.$objectName.'-'.$op);
+//   $methodName = implode('_', $parts);
+//   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
+//     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
+//     CRM_Sepa_Logic_Mandates::$methodName($objectId, $objectRef);
+//   }
+//   if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
+//     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
+//     CRM_Sepa_Logic_Batching::$methodName($objectId, $objectRef);
+//   }
+// }
 
 
 // totten's addition
