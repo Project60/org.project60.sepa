@@ -121,6 +121,12 @@ CREATE TABLE `civicrm_sdd_file` (
 ,
     PRIMARY KEY ( `id` )
 
+    ,     UNIQUE INDEX `UI_reference`(
+        reference
+  )
+  ,     UNIQUE INDEX `UI_filename`(
+        filename
+  )
 
 ,          CONSTRAINT FK_civicrm_sdd_file_created_id FOREIGN KEY (`created_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
@@ -144,6 +150,9 @@ CREATE TABLE `civicrm_sdd_txgroup` (
 ,
     PRIMARY KEY ( `id` )
 
+    ,     UNIQUE INDEX `UI_reference`(
+        reference
+  )
 
 ,          CONSTRAINT FK_civicrm_sdd_txgroup_sdd_creditor_id FOREIGN KEY (`sdd_creditor_id`) REFERENCES `civicrm_sdd_creditor`(`id`) ON DELETE SET NULL,
           CONSTRAINT FK_civicrm_sdd_txgroup_sdd_file_id FOREIGN KEY (`sdd_file_id`) REFERENCES `civicrm_sdd_file`(`id`) ON DELETE SET NULL

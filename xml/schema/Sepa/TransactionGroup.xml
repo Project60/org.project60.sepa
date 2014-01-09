@@ -27,6 +27,12 @@
     <comment>End-to-end reference for this tx group.</comment>
     <add>4.3</add>
   </field>
+  <index>
+    <name>UI_reference</name>
+    <fieldName>reference</fieldName>
+    <unique>true</unique>
+    <add>4.3</add>
+  </index>
 
   <field>
     <name>type</name>
