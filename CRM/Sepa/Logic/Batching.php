@@ -254,7 +254,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $sddfile_id = $result['id'];
 
     // Now that we have the auto ID, create the proper reference.
-    $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date, 0, 8) . '-' . $sddfile_id;
+    $reference = "SDDXML-" . (isset($tag) ? $tag . '-' : '') . substr($txgroup->latest_submission_date, 0, 8) . '-' . $sddfile_id;
     $filename = str_replace('-', '_', $reference . ".xml");
     civicrm_api3('SEPASddFile', 'create', array('id' => $sddfile_id, 'reference' => $reference, 'filename' => $filename)); // Not very efficient, but easier than fiddling with BAO mess...
 
