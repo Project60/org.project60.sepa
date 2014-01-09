@@ -478,3 +478,68 @@ function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 function sepa_civicrm_managed(&$entities) {
   return _sepa_civix_civicrm_managed($entities);
 }
+
+
+
+
+// customer specific implementation
+// TODO: move to external plugin
+function sepa_civicrm_create_mandate(&$mandate_parameters) {
+
+  // load contribution
+  if ($mandate_parameters['entity_table']=='civicrm_contribution') {
+    $contribution = civicrm_api('Contribution', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
+    $turnus = '00';   // one-time
+  } else if ($mandate_parameters['entity_table']=='civicrm_contribution_recur') {
+    $contribution = civicrm_api('ContributionRecur', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
+    if ($contribution['frequency_unit']=='month') {
+      $turnus = sprintf('%02d', 12/$contribution['frequency_interval']);
+    } else if ($contribution['frequency_unit']=='year') {
+      $turnus = '01';
+    } else {
+      // error:
+      $turnus = '99';
+    }
+  } else {
+    die("unsupported mandate");
+  }
+
+  // get booking code
+  $bcodes = array(10 => 4000, 13 => 4001, 14 => 4002, 15 => 4003, 16 => 4004, 11 => 4005, 12 => 4006, 5 => 4007, 9 => 4008, 7 => 4009, 8 => 4010, 6 => 4012, 2 => 4100, 17 => 4200);
+
+  // compile parametrized reference number
+  if (isset($bcodes[$contribution['financial_type_id']])) {
+    $reference = $bcodes[$contribution['financial_type_id']];
+  } else {
+    $reference = '9999';
+  }
+  
+  $reference .= '00';         // one-off
+  $reference .= 'R';          // separator
+  $reference .= sprintf('%08d', $contribution['contact_id']);
+  $reference .= 'D';          // separator
+  $reference .= date('Ymd');
+  $reference .= 'N';          // separator
+  $reference .= '%d';         // for numbers
+  $reference .= 'K';          // campaing code
+
+  // try to find one that's not used yet...
+  for ($n=0; $n < 10; $n++) {
+    $reference_candidate = sprintf($reference, $n);
+    // check if it exists
+    $mandate = civicrm_api('SepaMandate', 'getsingle', array('version' => 3, 'reference' => $reference_candidate));
+    if ($mandate['is_error']) {
+      // does not exist! take it!
+      $mandate_parameters['reference'] = $reference_candidate;
+      return;
+    }
+  }
+
+  // if we get here, there are no more IDs
+  die('No mandates IDs left for this id/date/type.');
+}
+
+
+function sepa_civicrm_modify_txmessage(&$txmessage, $contribution, $creditor) {
+  error_log("HOOKED");
+}
