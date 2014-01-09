@@ -153,6 +153,12 @@ CREATE TABLE `civicrm_sdd_txgroup` (
     ,     UNIQUE INDEX `UI_reference`(
         reference
   )
+  ,     INDEX `creditor_id`(
+        sdd_creditor_id
+  )
+  ,     INDEX `file_id`(
+        sdd_file_id
+  )
 
 ,          CONSTRAINT FK_civicrm_sdd_txgroup_sdd_creditor_id FOREIGN KEY (`sdd_creditor_id`) REFERENCES `civicrm_sdd_creditor`(`id`) ON DELETE SET NULL,
           CONSTRAINT FK_civicrm_sdd_txgroup_sdd_file_id FOREIGN KEY (`sdd_file_id`) REFERENCES `civicrm_sdd_file`(`id`) ON DELETE SET NULL
