@@ -1,3 +1,46 @@
+<div class="crm-actions-ribbon">
+  <ul id="actions">
+    <li>
+      {if $status eq 'closed'}
+      <a title="{ts}show active groups{/ts}" class="search button" href="{$show_open_url}">
+        <span>
+          <div class="icon search-icon"></div>
+          {ts}show active groups{/ts}
+        </span>
+      </a>
+      {else}
+      <a title="{ts}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
+        <span>
+          <div class="icon search-icon"></div>
+          {ts}show closed groups{/ts}
+        </span>
+      </a>
+      {/if}
+    </li>
+    <li>
+      <a title="{ts}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
+        <span>
+          <div class="icon refresh-icon"></div>
+          {ts}update one-off{/ts}
+        </span>
+      </a>
+    </li>
+    <li>
+      <a title="{ts}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
+        <span>
+          <div class="icon refresh-icon"></div>
+          {ts}update recurring{/ts}
+        </span>
+      </a>
+    </li>
+  </ul>
+  <div class="clear"></div>
+</div>
+
+
+
+
+
 <table>
 <tr>
 <th>Reference</th>
@@ -61,10 +104,12 @@
     <td><%= item.payment_instrument_id %></td>
   </tr>
 <%  }); %>
+</script>
 </table>
 </td>
 </tr>
-</script>
+</table>
+
 <script>
 cj(function($){
   $(".button_close").click(function() {

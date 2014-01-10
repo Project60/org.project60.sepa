@@ -11,6 +11,9 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
   function run() {
     if (isset($_REQUEST['mandate_type'])) {
+      $contact_id = $_REQUEST['contact_id'];
+      $this->assign("back_url", CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=${contact_id}&selectedChild=contribute"));
+
       if ($_REQUEST['mandate_type']=='OOFF') {
         $this->createOOFFMandate();
       }
@@ -52,7 +55,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $mandate_data = array(
         'version'                   => 3,
         'debug'                     => 1,
-        'reference'                 => "TO BE SET",
+        'reference'                 => "WILL BE SET BY HOOK",
+        'contact_id'                => $_REQUEST['contact_id'],
         'entity_table'              => 'civicrm_contribution',
         'entity_id'                 => $contribution['id'],
         'creation_date'             => date('YmdHis'),

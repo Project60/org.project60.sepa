@@ -482,6 +482,23 @@ function sepa_civicrm_managed(&$entities) {
 
 
 
+function sepa_civicrm_summaryActions( &$actions, $contactID ) {
+  // add "create SEPA mandate action"
+  $actions['sepa_contribution'] = array(
+      'title'           => "SEPA Spende hinzufügen",
+      'weight'          => 5,
+      'ref'             => 'new-sepa-contribution',
+      'key'             => 'sepa_contribution',
+      'component'       => 'CiviContribute',
+      'href'            => CRM_Utils_System::url('civicrm/sepa/cmandate', "cid=$contactID"),
+      'permissions'     => array('access CiviContribute', 'edit contributions')
+    );
+}
+
+
+
+
+
 // customer specific implementation
 // TODO: move to external plugin
 function sepa_civicrm_create_mandate(&$mandate_parameters) {

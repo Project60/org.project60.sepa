@@ -70,6 +70,14 @@
 		<h2>{ts}Error!{/ts} {$error_title}</h2>
 		<p>{$error_message}</p>
 	{else}
-		<h2>{ts}Mandate successfully created.{/ts} {ts}Reference is{/ts}: {$reference}</h2>
+		<h2>{ts}Mandate successfully created.{/ts}<br/>
+		{ts}Reference is{/ts}: {$reference}</h2>
 	{/if}
+	<br/><br/>
+	<a href="{$back_url}" class="back button" title="{ts}back{/ts}">
+    	<span>
+    		<div class="icon back-icon"></div>
+    		{ts}back{/ts}
+    	</span>
+    </a>
 {/if}
