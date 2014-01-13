@@ -107,7 +107,7 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
     $file_id = (int) $params["file_id"];
     $where .= " AND sdd_file_id = $file_id ";
   }
-$sql="select txgroup.id, txgroup.reference, sdd_file_id as file_id, txgroup.type , txgroup.collection_date, txgroup.status_id , count(*) as nb_contrib, sum( contrib.total_amount) as total 
+$sql="select txgroup.id, txgroup.reference, sdd_file_id as file_id, txgroup.type , txgroup.collection_date, txgroup.latest_submission_date, txgroup.status_id , count(*) as nb_contrib, sum( contrib.total_amount) as total 
 , civicrm_sdd_file.reference as file
 from civicrm_sdd_txgroup as txgroup 
 left join civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id= txgroup_contrib.txgroup_id 

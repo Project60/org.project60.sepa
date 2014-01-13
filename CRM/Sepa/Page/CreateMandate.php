@@ -7,7 +7,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   protected $IBAN_REFERENCE_TYPE = 754;       // "IBAN"
   protected $PAYMENT_INSTRUMENT_ID = 9000;    // SEPA
   protected $CONTRIBUTION_STATUS_ID = 2;      // "pending"
-  protected $CREDITOR_ID = 3;                 // "pending"
 
   function run() {
     if (isset($_REQUEST['mandate_type'])) {
@@ -40,7 +39,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'contribution_status_id'    => $this->CONTRIBUTION_STATUS_ID,
         'receive_date'              => $_REQUEST['date'],
         'source'                    => $_REQUEST['source'],
-        'is_pay_later'              => 1,
+        //'is_pay_later'              => 1,
       );
 
     $contribution = civicrm_api('Contribution', 'create', $contribution_data);
@@ -66,7 +65,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'bic'                       => $_REQUEST['bic'],
         'status'                    => 'OOFF',
         'type'                      => 'OOFF',
-        'creditor_id'               => $this->CREDITOR_ID,
+        'creditor_id'               => $_REQUEST['creditor_id'],
         'is_enabled'                => 1,
       );
     // call the hook for mandate generation
@@ -96,10 +95,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign("financial_types", CRM_Contribute_PseudoConstant::financialType());
     $this->assign("today", date('Y-m-d'));
 
-    // add campaigns
-    $this->assign("campaigns", array(   "1" => "Telefon",
-                                        "2" => "Email"));
-
     // first, try to load contact
     $contact_id = $_REQUEST['cid'];
     $contact = civicrm_api('Contact', 'getsingle', array('version' => 3, 'id' => $contact_id));
@@ -111,6 +106,16 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     $this->assign("contact_id", $contact_id);
     $this->assign("display_name", $contact['display_name']);
+
+    // look up campaigns
+    $campaign_query = civicrm_api('Campaign', 'get', array('version'=>3, 'is_active'=>1));
+    $campaigns = array();
+    if (!$campaign_query['is_error']) {
+      foreach ($campaign_query['values'] as $campaign_id => $campaign) {
+        $campaigns[$campaign_id] = $campaign['name'];
+      }
+    }
+    $this->assign('campaigns', $campaigns);
 
     // look up account in CiviBanking (if enabled...)
     $accounts = civicrm_api('BankingAccount', 'get', array('version' => 3, 'contact_id' => $contact_id));
@@ -130,6 +135,16 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         }
       }
     }
+
+    // look up creditors
+    $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3));
+    $creditors = array();
+    if (!$creditor_query['is_error']) {
+      foreach ($creditor_query['values'] as $creditor_id => $creditor) {
+        $creditors[$creditor_id] = $creditor['name'];
+      }
+    }
+    $this->assign('creditors', $creditors);
     
     // all seems to be ok.
     $this->assign("submit_url", CRM_Utils_System::url('civicrm/sepa/cmandate'));

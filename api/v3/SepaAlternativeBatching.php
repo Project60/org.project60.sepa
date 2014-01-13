@@ -33,6 +33,87 @@
  *
  */
 
+function civicrm_api3_sepa_alternative_batching_close($params) {
+  if (!is_numeric($params['txgroup_id'])) {
+    return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
+  }
+
+  // step 1: gather data
+  $txgroup_id = (int) $params['txgroup_id'];
+  $status_closed = 1;   // TODO: load from option value
+  $status_inprogress = 5;   // TODO: load from option value
+  $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
+  if ($result['is_error']) {
+    return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
+  } 
+
+
+  // step 2: update the mandates to 'SENT'
+  if ($txgroup['type']=='OOFF') {
+    $sql = "
+    UPDATE civicrm_sdd_mandate AS mandate
+    SET status='SENT'
+    WHERE 
+      mandate.entity_id IN (SELECT contribution_id 
+                            FROM civicrm_sdd_contribution_txgroup 
+                            WHERE txgroup_id=$txgroup_id);";
+    CRM_Core_DAO::executeQuery($sql);    
+  } else {
+    return civicrm_api3_create_error("Group type '".$txgroup['type']."' not yet supported.");
+  }
+
+  // step 3: update all the contributions to status 'in progress'
+  if ($txgroup['type']=='OOFF') {
+    // CANNOT SET TO 'In Progress' via API!
+    // $contributions = CRM_Core_DAO::executeQuery("SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id;");
+    // while ($contributions->fetch()) {
+    //   $contribution_id = $contributions->contribution_id;
+    //   $result = civicrm_api('Contribution', 'create', array('id'=>$contribution_id, 'contribution_status_id'=>$status_inprogress, 'version'=>3));
+    //   if ($result['is_error']) {
+    //     error_log(print_r($result, true));
+    //     return civicrm_api3_create_error("Cannot change contribution status!");
+    //   }      
+    // }
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id=$status_inprogress WHERE id IN (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);");
+  } else {
+    return civicrm_api3_create_error("Group type '".$txgroup['type']."' not yet supported.");
+  }
+
+  // step 4: create the sepa file
+  $sepa_file = civicrm_api('SepaSddFile', 'create', array(
+        'version'                 => 3,
+        'reference'               => "SDDXML-".$txgroup['reference'],
+        'filename'                => "SDDXML-".$txgroup['reference'].'.xml',
+        'latest_submission_date'  => $txgroup['latest_submission_date'],
+        'created_date'            => date('Ymdhis'),
+        'created_id'              => 2,
+        'status_id'               => $status_closed)
+    );
+  if ($sepa_file['is_error']) {
+    return civicrm_api3_create_error("Cannot create file!");
+  }  
+
+  // step 5: close the txgroup object
+  $result = civicrm_api('SepaTransactionGroup', 'create', array(
+        'id'                      => $txgroup_id, 
+        'status_id'               => $status_closed, 
+        'sdd_file_id'             => $sepa_file['id'],
+        'version'                 => 3));
+  if ($result['is_error']) {
+    return civicrm_api3_create_error("Cannot close transaction group!");
+  } 
+
+  return civicrm_api3_create_success($result, $params);  
+}
+
+function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
+  $params['txgroup_id']['api.required'] = 1;
+}
+
+
+
+
+
 
 function civicrm_api3_sepa_alternative_batching_update($params) {
   if ($params['type']=='OOFF') {
@@ -95,7 +176,6 @@ function _sepa_alternative_batching_update_ooff($params) {
       $latest_collection_date = $collection_date;
     }
   }
-
   if (!$latest_collection_date) {
     // nothing to do...
     return array();
@@ -119,23 +199,21 @@ function _sepa_alternative_batching_update_ooff($params) {
 
   // step 4: sync calculated group structure with existing (open) groups
   foreach ($calculated_groups as $collection_date => $mandates) {
-    print_r("Looking into $collection_date<br/>");
     if (!isset($existing_groups[$collection_date])) {
-      print_r("Not found<br/>");
       // this group does not yet exist -> create
+      $creditor_id = 3;
       $group = civicrm_api('SepaTransactionGroup', 'create', array(
           'version'                 => 3, 
-          'reference'               => "Test",
+          'reference'               => "TXG-${creditor_id}-OOFF-${collection_date}",
           'type'                    => 'OOFF',
           'collection_date'         => $collection_date,
           'latest_submission_date'  => date('Y-m-d', strtotime("-$ooff_notice days", strtotime($collection_date))),
           'created_date'            => date('Y-m-d'),
           'status_id'               => 2,
-          'sdd_creditor_id'         => 3,
+          'sdd_creditor_id'         => $creditor_id,
           ));
       // TODO: error handling
     } else {
-      print_r("Found<br/>");
       $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date]));
       // TODO: error handling
       unset($existing_groups[$collection_date]);      
@@ -151,6 +229,7 @@ function _sepa_alternative_batching_update_ooff($params) {
 
     // remove all the unwanted entries from our group
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id NOT IN ($entity_ids_list);");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id!=$group_id AND contribution_id IN ($entity_ids_list);");
 
     // check which ones are already there...
     $existing = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id IN ($entity_ids_list);");
@@ -167,10 +246,9 @@ function _sepa_alternative_batching_update_ooff($params) {
     }
   }
 
-  print_r("<pre>");
-  print_r($calculated_groups);
-  print_r("</pre>");
-
+  // print_r("<pre>");
+  // print_r($calculated_groups);
+  // print_r("</pre>");
 
   // finally, remove unwanted groups alltogether...
   foreach ($existing_groups as $collection_date => $group_id) {
@@ -188,6 +266,6 @@ function _sepa_alternative_batching_get_parameter($parameter_name) {
   if ($parameter_name=='org.project60.alternative_batching.ooff.horizon_days') {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.ooff.notice') {
-    return 5;
+    return 6;
   }
 }

@@ -16,16 +16,48 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       $this->callBatcher($_REQUEST['update']);
     }
 
-    CRM_Core_Resources::singleton()
-    ->addScriptFile('civicrm', 'packages/backbone/underscore.js', 110, 'html-header', FALSE);
+    $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
+        "version"     => 3, 
+        "sequential"  => 1, 
+        //"options"     => array('sort' => 'created_date DESC'),
+        ));
+    if ($result['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
+    } else {
+      $groups = array();
+      $status_list = array(1 => 'closed', 2=>'open');
+      foreach ($result["values"] as $id => $group) {
+        // 'beautify'
+        $group['latest_submission_date'] = date('Y-m-d', strtotime($group['latest_submission_date']));
+        $group['collection_date'] = date('Y-m-d', strtotime($group['collection_date']));
+        $group['status'] = $status_list[$group['status_id']];
+        $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60*60*24);
+        if ($group['status']=='closed') {
+          $group['submit'] = 'closed';
+        } else {
+          if ($remaining_days < 3) {
+            $group['submit'] = 'urgently';
+          } else {
+            $group['submit'] = 'soon';
+          }
+        }
 
-    $r = civicrm_api("SepaTransactionGroup","getdetail",array("version"=>3,"sequential"=>1,
-    'options' => array(
-      'sort' => 'created_date DESC',
-      'limit' => 1,
-      ),
-    ));
-    $this->assign("groups",$r["values"]);
+        array_push($groups, $group);
+      }
+      $this->assign("groups", $groups);
+    }
+
+
+    // CRM_Core_Resources::singleton()
+    // ->addScriptFile('civicrm', 'packages/backbone/underscore.js', 110, 'html-header', FALSE);
+
+    // $r = civicrm_api("SepaTransactionGroup","getdetail",array("version"=>3,"sequential"=>1,
+    // 'options' => array(
+    //   'sort' => 'created_date DESC',
+    //   'limit' => 1,
+    //   ),
+    // ));
+    // $this->assign("groups",$r["values"]);
     parent::run();
   }
 

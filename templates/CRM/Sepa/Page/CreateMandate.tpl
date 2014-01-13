@@ -2,6 +2,16 @@
 <form id='new_sepa_mandate' action="{$submit_url}" method="post">
 	<input type="hidden" name="contact_id" value="{$contact_id}" />
 	<table>
+		<tr>	<!-- CREDITOR -->
+			<td>{ts}creditor{/ts}:</td>
+			<td>
+				<select disabled name="creditor_id">
+					{foreach from=$creditors item=name key=id}
+					<option value="{$id}">{$name}</option>
+					{/foreach}
+				</select>
+			</td>
+		</tr>
 		<tr>	<!-- CONTACT -->
 			<td>{ts}contact{/ts}:</td>
 			<td><input disabled name="contact" type="text" size="40" value="{$display_name}"/></td>
@@ -77,7 +87,7 @@
 	<a href="{$back_url}" class="back button" title="{ts}back{/ts}">
     	<span>
     		<div class="icon back-icon"></div>
-    		{ts}back{/ts}
+    		{ts}view{/ts}
     	</span>
     </a>
 {/if}
