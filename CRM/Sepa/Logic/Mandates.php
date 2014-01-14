@@ -188,9 +188,11 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
     }
 
-    $page = new CRM_Sepa_Page_SepaMandatePdf();
-    $page->generateHTML($r["values"][0]);
-    $page->generatePDF (true);
+    if (!isset($params['status']) || $params['status'] == 'INIT') {
+      $page = new CRM_Sepa_Page_SepaMandatePdf();
+      $page->generateHTML($r["values"][0]);
+      $page->generatePDF (true);
+    }
   }
 
   
