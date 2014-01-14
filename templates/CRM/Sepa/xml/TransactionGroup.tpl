@@ -69,9 +69,11 @@
             <IBAN>{$contribution.iban}</IBAN>
           </Id>
         </DbtrAcct>
+{if !empty($contribution.message)}
         <RmtInf>
           <Ustrd>{$contribution.message}</Ustrd>
         </RmtInf>
+{/if}
       </DrctDbtTxInf>
 {/foreach}
 
