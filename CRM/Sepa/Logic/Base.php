@@ -207,6 +207,9 @@ class CRM_Sepa_Logic_Base {
     // '&' should be replaced by '+' according to the official recommendation.
     $string = str_replace('&', '+', $string);
 
+    // Any other characters outside the valid set should be replaced by '.'.
+    $string = preg_replace('%[^[:alnum:]/?:().,\' +-]%', '.', $string);
+
     return $string;
   }
 }
