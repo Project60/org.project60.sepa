@@ -188,9 +188,6 @@ class CRM_Sepa_Logic_Base {
    * @return string The input converted to SEPA charset
    */
   public static function utf8ToSEPA($string) {
-    // '&' should be replaced by '+' according to the official recommendation.
-    $string = str_replace('&', '+', $string);
-
     // Replace any non-ASCII characters
     if (function_exists("iconv")) {
       /*
@@ -206,6 +203,9 @@ class CRM_Sepa_Logic_Base {
       setlocale(LC_CTYPE, 'en_US.utf8');
       $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
     }
+
+    // '&' should be replaced by '+' according to the official recommendation.
+    $string = str_replace('&', '+', $string);
 
     return $string;
   }
