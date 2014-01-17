@@ -168,5 +168,46 @@ class CRM_Sepa_Logic_Base {
       self::$debugLogPath = $logFilePath;
   }
 
+  /**
+   * Convert string in UTF-8 encoding to the restricted SEPA charset.
+   *
+   * Although SEPA files are technically UTF-8 XML files --
+   * which could carry any possible Unicode/UCS codepoint --
+   * the *actually* allowed characters form a very restricted set
+   * (see SEPA C2B Implementation Guidelines, chapter 1.4),
+   * which is a subset of ASCII.
+   *
+   * (Basically the least common denominator of all legacy banking systems across Europe...)
+   *
+   * This function converts characters outside this charset to allowed characters,
+   * trying to approximate the desired characters as well as possible.
+   * (It probably doesn't fully follow the official recommendations --
+   * but should be close enough...)
+   *
+   * @param string $string The input UTF-8 string to convert
+   * @return string The input converted to SEPA charset
+   */
+  public static function utf8ToSEPA($string) {
+    // '&' should be replaced by '+' according to the official recommendation.
+    $string = str_replace('&', '+', $string);
+
+    // Replace any non-ASCII characters
+    if (function_exists("iconv")) {
+      /*
+       * iconv() transliteration only works when an explicit UTF-8 locale is set.
+       * (Otherwise, we just get '?' for every non-ASCII character...)
+       *
+       * Ideally, we should use an appropriate locale for our country,
+       * to get the best possible transliterations.
+       * However, 'en_US' seems a good default,
+       * as it is most likely to be installed everywhere,
+       * and the transliterations it provides appear to be acceptable in most cases.
+       */
+      setlocale(LC_CTYPE, 'en_US.utf8');
+      $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+    }
+
+    return $string;
+  }
 }
 
