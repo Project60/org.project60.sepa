@@ -1,20 +1,35 @@
 <?php
 
 require_once 'CRM/Core/Page.php';
+require_once 'packages/php-iban-1.4.0/php-iban.php';
 
 class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
-  protected $IBAN_REFERENCE_TYPE = 754;       // "IBAN"
-  protected $PAYMENT_INSTRUMENT_ID = 9000;    // SEPA
-  protected $CONTRIBUTION_STATUS_ID = 2;      // "pending"
+  protected $IBAN_REFERENCE_TYPE = 754;       // TODO: Lookup "IBAN"
+  protected $PAYMENT_INSTRUMENT_ID = 12;      // TODO: Lookup SEPA OOFF
+  protected $CONTRIBUTION_STATUS_ID = 2;      // TODO: Lookup "pending"
 
   function run() {
+    // print_r("<pre>");
+    // print_r($_REQUEST);
+    // print_r("</pre>");
     if (isset($_REQUEST['mandate_type'])) {
       $contact_id = $_REQUEST['contact_id'];
       $this->assign("back_url", CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=${contact_id}&selectedChild=contribute"));
 
-      if ($_REQUEST['mandate_type']=='OOFF') {
-        $this->createOOFFMandate();
+      $errors = $this->validateParameters($_REQUEST['mandate_type']);
+      if (count($errors) > 0) {
+        // i.e. validation failed
+        $this->assign('validation_errors', $errors);
+        $_REQUEST['cid'] = $contact_id;
+        $this->prepareCreateForm();
+      } else {
+        // validation o.k. = > create
+        if ($_REQUEST['mandate_type']=='OOFF') {
+          $this->createMandate('OOFF');
+        } else if ($_REQUEST['mandate_type']=='RCUR') {
+          $this->createMandate('RCUR');
+        }
       }
 
     } else if (isset($_REQUEST['cid'])) {
@@ -25,26 +40,46 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   }
 
 
-  function createOOFFMandate() {
-    // TODO: Sanity check
 
+  /**
+   * Creates a SEPA mandate for the given type
+   */
+  function createMandate($type) {
     // first create a contribution
     $contribution_data = array(
         'version'                   => 3,
         'contact_id'                => $_REQUEST['contact_id'],
-        'total_amount'              => $_REQUEST['total_amount'],
         'campaign_id'               => $_REQUEST['campaign_id'],
         'financial_type_id'         => $_REQUEST['financial_type_id'],
         'payment_instrument_id'     => $this->PAYMENT_INSTRUMENT_ID,
         'contribution_status_id'    => $this->CONTRIBUTION_STATUS_ID,
         'receive_date'              => $_REQUEST['date'],
-        'source'                    => $_REQUEST['source'],
-        //'is_pay_later'              => 1,
+        'currency'                  => 'EUR',
       );
 
-    $contribution = civicrm_api('Contribution', 'create', $contribution_data);
+    if ($type=='OOFF') {
+      $initial_status = 'OOFF';
+      $entity_table = 'civicrm_contribution';
+      $contribution_data['total_amount']        = number_format($_REQUEST['total_amount'], 2, '.', '');
+      $contribution_data['source']              = $_REQUEST['source'];
+      $contribution = civicrm_api('Contribution', 'create', $contribution_data);
+    } else if ($type=='RCUR') {
+      $initial_status = 'INIT';
+      $entity_table = 'civicrm_contribution_recur';
+      $contribution_data['amount']              = number_format($_REQUEST['total_amount'], 2, '.', '');
+      $contribution_data['start_date']          = $_REQUEST['start_date'];
+      $contribution_data['end_date']            = $_REQUEST['end_date'];
+      $contribution_data['create_date']         = date('YmdHis');
+      $contribution_data['modified_date']       = date('YmdHis');
+      $contribution_data['frequency_unit']      = 'month';
+      $contribution_data['frequency_interval']  = $_REQUEST['interval'];
+      $contribution_data['cycle_day']           = $_REQUEST['cycle_day'];
+      $contribution_data['is_email_receipt']    = 0;
+      $contribution = civicrm_api('ContributionRecur', 'create', $contribution_data);
+    }
+
     if ($contribution['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't create contribution for contact #%s"), $cid), ts('Error'), 'error');
       $this->assign("error_title", ts("Couldn't create contribution"));
       $this->assign("error_message", ts($contribution['error_message']));
       return;
@@ -55,7 +90,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       // add note
       $create_note = array(
         'version'                   => 3,
-        'entity_table'              => 'civicrm_contribution',
+        'entity_table'              => $entity_table,
         'entity_id'                 => $contribution['id'],
         'note'                      => $_REQUEST['note'],
         'privacy'                   => 0,
@@ -65,7 +100,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       if ($create_note_result['is_error']) {
         // don't consider this a fatal error...
         CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s"), $contribution['id']), ts('Error'), 'alert');
-        error_log($create_note_result['error_message']);
+        error_log("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
       }
     }
 
@@ -75,15 +110,15 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'debug'                     => 1,
         'reference'                 => "WILL BE SET BY HOOK",
         'contact_id'                => $_REQUEST['contact_id'],
-        'entity_table'              => 'civicrm_contribution',
+        'entity_table'              => $entity_table,
         'entity_id'                 => $contribution['id'],
         'creation_date'             => date('YmdHis'),
         'validation_date'           => date('YmdHis'),
         'date'                      => $_REQUEST['date'],
         'iban'                      => $_REQUEST['iban'],
         'bic'                       => $_REQUEST['bic'],
-        'status'                    => 'OOFF',
-        'type'                      => 'OOFF',
+        'status'                    => $initial_status,
+        'type'                      => $type,
         'creditor_id'               => $_REQUEST['creditor_id'],
         'is_enabled'                => 1,
       );
@@ -93,8 +128,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     $mandate = civicrm_api('SepaMandate', 'create', $mandate_data);
     if ($mandate['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
-      $this->assign("error_title", ts("Couldn't create contribution"));
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't create %s mandate for contact #%s"), $type, $cid), ts('Error'), 'error');
+      $this->assign("error_title", ts("Couldn't create mandate"));
       $this->assign("error_message", ts($mandate['error_message']));
       return;
     }
@@ -103,9 +138,9 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   }
 
 
-
-
-
+  /**
+   * Will prepare the form and look up all necessary data
+   */
   function prepareCreateForm() {
     // load financial types
     $this->assign("financial_types", CRM_Contribute_PseudoConstant::financialType());
@@ -175,5 +210,81 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     
     // all seems to be ok.
     $this->assign("submit_url", CRM_Utils_System::url('civicrm/sepa/cmandate'));
+  }
+
+
+  /**
+   * Will checks all the POSTed data with respect to creating a mandate
+   *
+   * @return array('<field_id>' => '<error message>') with the fields that have not passed
+   */
+  function validateParameters() {
+    $errors = array();
+
+    // check amount
+    if (!isset($_REQUEST['total_amount'])) {
+      $errors['total_amount'] = sprintf(ts("'%s' is a required field."), ts("Amount"));
+    } else {
+      $_REQUEST['total_amount'] = str_replace(',', '.', $_REQUEST['total_amount']);
+      if (strlen($_REQUEST['total_amount']) == 0) {
+        $errors['total_amount'] = sprintf(ts("'%s' is a required field."), ts("Amount"));
+      } elseif (!is_numeric($_REQUEST['total_amount'])) {
+        $errors['total_amount'] = ts("Cannot parse amount");
+      } elseif ($_REQUEST['total_amount'] <= 0) {
+        $errors['total_amount'] = ts("Amount has to be positive");
+      }
+    }
+
+    // check BIC
+    if (!isset($_REQUEST['bic'])) {
+      $errors['bic'] = sprintf(ts("'%s' is a required field."), "BIC");
+    } else {
+      if (strlen($_REQUEST['bic']) == 0) {
+        $errors['bic'] = sprintf(ts("'%s' is a required field."), "BIC");
+      } elseif (strlen($_REQUEST['bic']) < 8) {
+        $errors['bic'] = ts("BIC too short");
+      }
+    }
+
+    // check IBAN
+    if (!isset($_REQUEST['iban'])) {
+      $errors['iban'] = sprintf(ts("'%s' is a required field."), "IBAN");
+    } else {
+      if (strlen($_REQUEST['iban']) == 0) {
+        $errors['iban'] = sprintf(ts("'%s' is a required field."), "IBAN");
+      } else {
+        if (!verify_iban($_REQUEST['iban'])) {
+          $errors['iban'] = ts("IBAN is not correct");
+        }
+      }
+    }
+
+    // check date fields
+    if ($_REQUEST['mandate_type']=='OOFF') {
+      if (!$this->_check_date('date'))
+        $errors['date'] = ts("Incorrect date format");
+    } elseif ($_REQUEST['mandate_type']=='RCUR') {
+      if (!$this->_check_date('start_date'))
+        $errors['start_date'] = ts("Incorrect date format");
+      if (isset($_REQUEST['end_date']) && strlen($_REQUEST['end_date'])) {
+        if (!$this->_check_date('end_date'))
+          $errors['end_date'] = ts("Incorrect date format");        
+      }
+    }
+
+    return $errors;
+  }
+
+  function _check_date($date_field) {
+    if (!isset($_REQUEST[$date_field])) {
+      return false;
+    } else {
+      $parsed_date = date_parse_from_format('Y-m-d', $_REQUEST[$date_field]);
+      if ($parsed_date['errors']) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   }
 }

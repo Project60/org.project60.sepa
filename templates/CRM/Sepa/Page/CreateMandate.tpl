@@ -29,7 +29,7 @@
 		</tr>
 		<tr>	<!-- AMOUNT -->
 			<td>{ts}Amount{/ts}:</td>
-			<td><input name="total_amount" type="number" size="6"/>&nbsp;EUR</td>
+			<td><input name="total_amount" type="number" size="6" value="{$total_amount}" />&nbsp;EUR</td>
 		</tr>
 		<tr>	<!-- FINANCIAL TYPE -->
 			<td>{ts}Financial Type{/ts}:</td>
@@ -53,11 +53,11 @@
 		</tr>
 		<tr>	<!-- SOURCE -->
 			<td>{ts}Source{/ts}:</td>
-			<td><input name="source" type="text" value="Telefon"/></td>
+			<td><input name="source" type="text" value="{$source}"/></td>
 		</tr>
 		<tr>	<!-- NOTE -->
 			<td id="mandate_note_label">{ts}Note{/ts}:</td>
-			<td><input name="note" type="text" size="32" value=""/></td>
+			<td><input name="note" type="text" size="32" value="{$note}"/></td>
 		</tr>
 
 		<tr><td colspan="4"><hr></td></tr>
@@ -96,7 +96,7 @@
 		<tr><td colspan="3"><div>&nbsp;</div></td></tr>
 
 		<tr>	<!-- RECURRING -->
-			<td style="vertical-align: top;" rowspan="4"><input disabled name="mandate_type" type='radio' value="RCUR">{ts}Recurring{/ts}</input></td>
+			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" type='radio' value="RCUR">{ts}Recurring{/ts}</input></td>
 			<td>{ts}Start Date{/ts}:</td>
 			<td><input name="start_date" type="date" value="{$today}" size="10" /></td>
 			<td></td>
@@ -113,7 +113,7 @@
 		</tr>
 		<tr>
 			<td>{ts}End Date{/ts}:</td>
-			<td><input name="start_date" type="date" value="{$today}" size="10" /></td>
+			<td><input name="end_date" type="date" value="" size="10" /></td>
 			<td></td>
 		</tr>
 	</table>
@@ -138,15 +138,23 @@
 {/if}
 
 
-{literal}
 <script type="text/javascript">
+{literal}
 // logic for the bank account selector
-cj("#account").change(function() {
+cj("#account").change(change_bank_account);
+change_bank_account();
+function change_bank_account() {
 	var values = cj("#account").val().split("/");
 	cj("[name='iban']").val(values[0]);
-	cj("[name='bic']").val(values[1]);
-});
-</script>
+	cj("[name='bic']").val(values[1]);	
+}
 {/literal}
+
+// Validation handling
+{foreach from=$validation_errors item=message key=field}
+cj("[name='{$field}']").parent().parent().css("background-color", "#FFBBBB");
+cj("[name='{$field}']").parent().parent().attr("title", "{$message}");
+{/foreach}
+</script>
 
 
