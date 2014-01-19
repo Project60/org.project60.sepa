@@ -46,8 +46,27 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if ($contribution['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
       $this->assign("error_title", ts("Couldn't create contribution"));
-      $this->assign("error_message", ts($contribution['error_msg']));
+      $this->assign("error_message", ts($contribution['error_message']));
       return;
+    }
+
+    // create a note, if requested
+    if ($_REQUEST['note']) {
+      // add note
+      $create_note = array(
+        'version'                   => 3,
+        'entity_table'              => 'civicrm_contribution',
+        'entity_id'                 => $contribution['id'],
+        'note'                      => $_REQUEST['note'],
+        'privacy'                   => 0,
+      );
+
+      $create_note_result = civicrm_api('Note', 'create', $create_note);
+      if ($create_note_result['is_error']) {
+        // don't consider this a fatal error...
+        CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s"), $contribution['id']), ts('Error'), 'alert');
+        error_log($create_note_result['error_message']);
+      }
     }
 
     // next, create mandate
@@ -76,10 +95,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if ($mandate['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
       $this->assign("error_title", ts("Couldn't create contribution"));
-      $this->assign("error_message", ts($mandate['error_msg']));
-      print_r("<pre>");
-      print_r($mandate);
-      print_r("</pre>");
+      $this->assign("error_message", ts($mandate['error_message']));
       return;
     }
 
@@ -117,24 +133,35 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     }
     $this->assign('campaigns', $campaigns);
 
+    // look up account in other SEPA mandates
+    $known_accounts = array();
+    $query_sql = "SELECT DISTINCT iban, bic FROM civicrm_sdd_mandate WHERE contact_id=$contact_id;";
+    $old_mandates = CRM_Core_DAO::executeQuery($query_sql);
+    while ($old_mandates->fetch()) {
+      $value = $old_mandates->iban.'/'.$old_mandates->bic;
+      array_push($known_accounts, 
+        array("name" => $old_mandates->iban, "value"=>$value));
+    }
+
+
     // look up account in CiviBanking (if enabled...)
     $accounts = civicrm_api('BankingAccount', 'get', array('version' => 3, 'contact_id' => $contact_id));
     if (!$accounts['is_error']) {
       foreach ($accounts['values'] as $account_id => $account) {
         $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $this->IBAN_REFERENCE_TYPE));
         if (!isset($account_ref['is_error'])) {
-          // account found!
-          $this->assign("iban", $account_ref['reference']);
-
           $account_data = json_decode($account['data_parsed']);
           if (isset($account_data->BIC)) {
-            $this->assign("bic", $account_data->BIC);
+            // we have IBAN and BIC -> add:
+            $value = $account_ref['reference'].'/'.$account_data->BIC;
+            array_push($known_accounts, 
+              array("name" => $account_ref['reference'], "value"=>$value));
           }
-        } else {
-          // TODO: maybe there is a regular account to convert...
         }
       }
     }
+    array_push($known_accounts, array("name" => ts("enter new account"), "value"=>"/"));
+    $this->assign("known_accounts", $known_accounts);
 
     // look up creditors
     $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3));
