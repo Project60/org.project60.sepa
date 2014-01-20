@@ -38,7 +38,7 @@ class CRM_Sepa_Logic_Base {
    */
   public static function isSDD($contrib) {
     $payment_instrument_id = $contrib["payment_instrument_id"];
-    $name = CRM_Core_OptionGroup::getValue('payment_instrument', $payment_instrument_id, 'id', 'String', 'name');
+    $name = CRM_Core_OptionGroup::getValue('payment_instrument', $payment_instrument_id, 'value', 'String', 'name');
     switch ($name) {
       case 'FRST' :
       case 'RCUR' :

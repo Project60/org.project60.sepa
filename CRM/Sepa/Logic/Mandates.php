@@ -162,9 +162,35 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     // for that purpose, or by examining the contrib->payment_instrument->pptype
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
       $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
+      $objectRef->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'); // For some reason (hopefully not SEPA-related), this is pre-set to 'pending' for recurring contributions, but to 'completed' for one-off contributions... We always want 'pending' for DD -- so set it explicitly.
       $objectRef->save();
       //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
     }
+
+    // If this is a one-off payment, doDirectPayment() has already been invoked before creating the contribution.
+    // However, we can only create the mandate once the contribution record is in place, i.e. now.
+    if (isset($GLOBALS['sepa_context']['mandateParams'])) {
+      $mandateParams = $GLOBALS['sepa_context']['mandateParams'];
+      $mandateParams["entity_id"] = $objectId;
+      self::createMandate($mandateParams);
+    }
+  }
+
+  /**
+   * Create a SEPA mandate for a new contribution
+   */
+  public static function createMandate($params) {
+    $apiParams = array('version' => 3, 'sequential' => 1);
+    $apiParams = array_merge($apiParams, $params);
+
+    $r = civicrm_api ("SepaMandate","create", $apiParams);
+    if ($r["is_error"]) {
+      CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
+    }
+
+    $page = new CRM_Sepa_Page_SepaMandatePdf();
+    $page->generateHTML($r["values"][0]);
+    $page->generatePDF (true);
   }
 
   

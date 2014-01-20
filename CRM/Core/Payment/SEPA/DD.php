@@ -51,7 +51,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     if ($this->_mode == 'test') {
       $params['trxn_id'] = "TEST:" . $params['trxn_id'];
     }
-    $apiParams = array ("version"=>3, 
+    $apiParams = array (
         "iban"=> $params["bank_iban"],
         "bic" => $params["bank_bic"],
         );
@@ -60,6 +60,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     if (CRM_Utils_Array::value('is_recur', $params) &&
         $params['contributionRecurID']
        ) {
+      $apiParams['type'] = 'RCUR';
       $apiParams["entity_table"]="civicrm_contribution_recur";
       $apiParams["entity_id"]= $params['contributionRecurID'];
     } elseif (CRM_Utils_Array::value('selectMembership', $params))   {
@@ -67,7 +68,12 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       die ("TODO manage memberships in SEPA. It's supposed to be with with a recurring membership.");
       // TODO: link mandate to membership
     } else {
-      die ("is this a single payment? We don't do that in SEPA (yet)");
+      // Probably a one-off contribution.
+      $apiParams['type'] = 'OOFF';
+      $apiParams['entity_table'] = 'civicrm_contribution';
+      // Note: for one-off contributions,
+      // the contribution record is created only *after* invoking doDirectPayment() --
+      // so we don't have an entity ID here yet...
     }
 
     $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $GLOBALS["sepa_context"]["creditor_id"], 'return' => 'mandate_active'));
@@ -78,18 +84,14 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     }
 
     $apiParams["creation_date"]= date("YmdHis");
-    //echo 'creating mandate';
-    $apiParams["sequential"]= 1;
 
-    $r = civicrm_api ("SepaMandate","create", $apiParams);
-//    die(print_r($r));
-    if ($r["is_error"]) {
-      CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
+    if (isset($apiParams['entity_id'])) {
+      CRM_Sepa_Logic_Mandates::createMandate($apiParams);
+    } else {
+      // If we don't yet have an entity to attach the mandate to, we need to postpone the mandate creation.
+      $GLOBALS['sepa_context']['mandateParams'] = $apiParams;
     }
-    
-    $page = new CRM_Sepa_Page_SepaMandatePdf();
-    $page->generateHTML($r["values"][0]);
-    $page->generatePDF (true);
+    return array(true); // Need to return a non-empty array to indicate success...
   }
 
   
