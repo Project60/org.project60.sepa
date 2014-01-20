@@ -40,12 +40,12 @@
 <table>
   <tr>
     <th>{ts}Reference{/ts}</th>
-    <th>{ts}statu{/ts}s</th>
-    <th>{ts}type{/ts}</th>
-    <th>{ts}submission{/ts}</th>
-    <th>{ts}collection{/ts}</th>
-    <th>{ts}transactions{/ts}</th>
-    <th>{ts}total{/ts}</th>
+    <th>{ts}Status{/ts}</th>
+    <th>{ts}Type{/ts}</th>
+    <th>{ts}Submission{/ts}</th>
+    <th>{ts}Collection{/ts}</th>
+    <th>{ts}Transactions{/ts}</th>
+    <th>{ts}Total{/ts}</th>
     <th></th>
   </tr>
   {foreach from=$groups item=group}

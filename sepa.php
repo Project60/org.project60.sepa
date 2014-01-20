@@ -46,10 +46,10 @@ function sepa_civicrm_pageRun( &$page ) {
   }
   elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
     $recur = $page->getTemplate()->get_template_vars("recur");
-
-    $pp = civicrm_api('PaymentProcessor', 'getsingle', 
-      array('version' => 3, 'sequential' => 1, 'id' => $recur["payment_processor_id"]));
-    if ("Payment_SEPA_DD" !=  $pp["class_name"])
+    
+    // This is a one-off contribution => try to show mandate data.
+    $payment_instrument_id = $page->getTemplate()->get_template_vars('recur')['payment_instrument_id'];
+    if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
       return;
 
     $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));

@@ -1,4 +1,6 @@
 <!-- Mandate -->
+{assign var="mid" value=$sepa.id}
+
 <div class="crm-accordion-wrapper ">
   <div class="crm-accordion-header">
     {ts}Sepa Mandate{/ts} {$sepa.id}
@@ -15,4 +17,27 @@
     </table>
   </div>
 </div>
+
+<div class="crm-submit-buttons" id="new_submit_buttons">
+    <a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon"></div>{ts}Clone{/ts}</span></a>
+
+    {if $permission eq 'edit'}{if $sepa.status eq 'OOFF'}
+    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid&cmd=delete"}" class="button"><span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
+    {/if}{/if}
+
+    {if $sepa.status eq 'OOFF'}
+    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon"></div>{ts}Stop{/ts}</span></a>
+    {/if}
+</div>
+
+{literal}
+<script type="text/javascript">
+cj(document).ready(function() {
+  cj(".crm-submit-buttons").filter(
+    function() {
+      return this.id != "new_submit_buttons";
+    }).hide();
+});
+</script>
+{/literal}
 <!-- /Mandate -->
