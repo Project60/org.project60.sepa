@@ -184,10 +184,18 @@ class CRM_Sepa_Logic_Base {
    * (It probably doesn't fully follow the official recommendations --
    * but should be close enough...)
    *
+   * Note: This function has a type check, so it's safe to call on non-string input values too.
+   * Thus it can be safely invoked on a whole array (possibly containing non-string elements)
+   * using array_map().
+   *
    * @param string $string The input UTF-8 string to convert
    * @return string The input converted to SEPA charset
    */
   public static function utf8ToSEPA($string) {
+    if (!is_string($string)) {
+      return $string;
+    }
+
     // Replace any non-ASCII characters
     if (function_exists("iconv")) {
       /*

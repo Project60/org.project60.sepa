@@ -28,7 +28,7 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     $xml = "";
     $template = CRM_Core_Smarty::singleton();
     $this->get((int)$id);
-    $template->assign("file", $this->toArray());
+    $template->assign("file", array_map('CRM_Sepa_Logic_Base::utf8ToSEPA', $this->toArray()));
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->sdd_file_id=$this->id;
     $txgroup->find();
