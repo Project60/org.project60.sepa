@@ -1,12 +1,12 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <extension key="org.project60.sepa" type="module">
   <file>sepa</file>
   <name>SEPA Direct Debit</name>
   <description>This extension provides a new payement processor SEPA Direct Debit</description>
   <license>aGPL3</license>
   <maintainer>
-    <author>xavier</author>
-    <email>xavier@tttp.eu</email>
+    <author>Software für Engagierte e.V.</author>
+    <email>info@sfe-ev.org</email>
   </maintainer>
   <releaseDate>2013-03-06</releaseDate>
   <version>0.1</version>
