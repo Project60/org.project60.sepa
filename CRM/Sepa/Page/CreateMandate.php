@@ -5,10 +5,6 @@ require_once 'packages/php-iban-1.4.0/php-iban.php';
 
 class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
-  protected $IBAN_REFERENCE_TYPE = 754;       // TODO: Lookup "IBAN"
-  protected $PAYMENT_INSTRUMENT_ID = 12;      // TODO: Lookup SEPA OOFF
-  protected $CONTRIBUTION_STATUS_ID = 2;      // TODO: Lookup "pending"
-
   function run() {
     // print_r("<pre>");
     // print_r($_REQUEST);
@@ -46,25 +42,28 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
    */
   function createMandate($type) {
     // first create a contribution
+    $payment_instrument_id = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
+    $contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+
     $contribution_data = array(
         'version'                   => 3,
         'contact_id'                => $_REQUEST['contact_id'],
         'campaign_id'               => $_REQUEST['campaign_id'],
         'financial_type_id'         => $_REQUEST['financial_type_id'],
-        'payment_instrument_id'     => $this->PAYMENT_INSTRUMENT_ID,
-        'contribution_status_id'    => $this->CONTRIBUTION_STATUS_ID,
+        'payment_instrument_id'     => $payment_instrument_id,
+        'contribution_status_id'    => $contribution_status_id,
         'receive_date'              => $_REQUEST['date'],
         'currency'                  => 'EUR',
+        'source'                    => $_REQUEST['source'],
       );
 
     if ($type=='OOFF') {
       $initial_status = 'OOFF';
       $entity_table = 'civicrm_contribution';
       $contribution_data['total_amount']        = number_format($_REQUEST['total_amount'], 2, '.', '');
-      $contribution_data['source']              = $_REQUEST['source'];
       $contribution = civicrm_api('Contribution', 'create', $contribution_data);
     } else if ($type=='RCUR') {
-      $initial_status = 'INIT';
+      $initial_status = 'FRST';
       $entity_table = 'civicrm_contribution_recur';
       $contribution_data['amount']              = number_format($_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['start_date']          = $_REQUEST['start_date'];
@@ -180,21 +179,26 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
 
     // look up account in CiviBanking (if enabled...)
-    $accounts = civicrm_api('BankingAccount', 'get', array('version' => 3, 'contact_id' => $contact_id));
-    if (!$accounts['is_error']) {
-      foreach ($accounts['values'] as $account_id => $account) {
-        $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $this->IBAN_REFERENCE_TYPE));
-        if (!isset($account_ref['is_error'])) {
-          $account_data = json_decode($account['data_parsed']);
-          if (isset($account_data->BIC)) {
-            // we have IBAN and BIC -> add:
-            $value = $account_ref['reference'].'/'.$account_data->BIC;
-            array_push($known_accounts, 
-              array("name" => $account_ref['reference'], "value"=>$value));
+    $iban_reference_type = CRM_Core_OptionGroup::getValue('civicrm_banking.reference_types', 'IBAN', 'value', 'String', 'id');
+    if ($iban_reference_type) {
+      $accounts = civicrm_api('BankingAccount', 'get', array('version' => 3, 'contact_id' => $contact_id));
+      if (!$accounts['is_error']) {
+        foreach ($accounts['values'] as $account_id => $account) {
+          $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $this->IBAN_REFERENCE_TYPE));
+          if (!isset($account_ref['is_error'])) {
+            $account_data = json_decode($account['data_parsed']);
+            if (isset($account_data->BIC)) {
+              // we have IBAN and BIC -> add:
+              $value = $account_ref['reference'].'/'.$account_data->BIC;
+              array_push($known_accounts, 
+                array("name" => $account_ref['reference'], "value"=>$value));
+            }
           }
         }
       }
     }
+
+    // add default entry
     array_push($known_accounts, array("name" => ts("enter new account"), "value"=>"/"));
     $this->assign("known_accounts", $known_accounts);
 

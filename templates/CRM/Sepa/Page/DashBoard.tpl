@@ -26,7 +26,7 @@
       </a>
     </li>
     <li>
-      <a title="{ts}update recurring{/ts}" class="refresh button disabled" href="{$batch_recur}">
+      <a title="{ts}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
         <span>
           <div class="icon refresh-icon"></div>
           {ts}update recurring{/ts}

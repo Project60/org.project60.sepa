@@ -73,6 +73,19 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
           );
       $result = civicrm_api("SepaAlternativeBatching", "update", $parameters);
 
+    } elseif ($mode=="RCUR") {
+      // perform for FRST _and_ RCUR
+      $parameters = array(
+            "version"           => 3,
+            "type"              => 'FRST',
+          );
+      $result = civicrm_api("SepaAlternativeBatching", "update", $parameters);
+      $parameters = array(
+            "version"           => 3,
+            "type"              => 'RCUR',
+          );
+      $result = civicrm_api("SepaAlternativeBatching", "update", $parameters);
+
     } else {
       CRM_Core_Session::setStatus(sprintf(ts("Unknown batcher mode '%s'. No batching triggered."), $mode), ts('Error'), 'error');
     }
