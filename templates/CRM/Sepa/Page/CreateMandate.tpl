@@ -36,7 +36,7 @@
 			<td>
 				<select name="financial_type_id">
 					{foreach from=$financial_types item=name key=id}
-					<option value="{$id}">{$name}</option>
+					<option value="{$id}" {if $id eq $financial_type_id}selected{/if}>{$name}</option>
 					{/foreach}
 				</select>
 			</td>
@@ -46,7 +46,7 @@
 			<td>
 				<select name="campaign_id">
 					{foreach from=$campaigns item=name key=id}
-					<option value="{$id}">{$name}</option>
+					<option value="{$id}" {if $id eq $campaign_id}selected{/if}>{$name}</option>
 					{/foreach}
 				</select>
 			</td>
@@ -80,40 +80,40 @@
 		</tr>
 		<tr>	<!-- BIC -->
 			<td>BIC:</td>
-			<td><input name="bic" type="text" size="13" value="{$bic}"/></td>
+			<td><input name="bic" type="text" size="14" value="{$bic}"/></td>
 		</tr>
 	</table>
 
 	<h3>{ts}Mandate Type{/ts}</h3>
 	<table class="create_mandate">
 		<tr>	<!-- ONE OFF -->
-			<td style="vertical-align: top;"><input name="mandate_type" type='radio' value="OOFF" checked>{ts}One Time{/ts}</input></td>
+			<td style="vertical-align: top;"><input name="mandate_type" type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
 			<td>{ts}Earliest execution date{/ts}:</td>
-			<td><input name="date" type="date" value="{$today}" size="10" /></td>
+			<td><input name="date" type="date" value="{$date}" size="10" /></td>
 			<td></td>
 		</tr>
 
 		<tr><td colspan="3"><div>&nbsp;</div></td></tr>
 
 		<tr>	<!-- RECURRING -->
-			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" type='radio' value="RCUR">{ts}Recurring{/ts}</input></td>
+			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts}Recurring{/ts}</input></td>
 			<td>{ts}Start Date{/ts}:</td>
-			<td><input name="start_date" type="date" value="{$today}" size="10" /></td>
+			<td><input name="start_date" type="date" value="{$start_date}" size="10" /></td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}Cycle Day{/ts}:</td>
-			<td><input name="cycle_day" type="number" value="1" size="3" /></td>
+			<td><input name="cycle_day" type="number" size="3" value="{$cycle_day}" /></td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}Interval{/ts}:</td>
-			<td><input name="interval" type="number" value="1" size="3" /></td>
+			<td><input name="interval" type="number" size="3" value="{$interval}" /></td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}End Date{/ts}:</td>
-			<td><input name="end_date" type="date" value="" size="10" /></td>
+			<td><input name="end_date" type="date" value="{$end_date}" size="10" /></td>
 			<td></td>
 		</tr>
 	</table>

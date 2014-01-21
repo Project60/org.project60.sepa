@@ -29,8 +29,16 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       }
 
     } else if (isset($_REQUEST['cid'])) {
-      $this->prepareCreateForm();
+      // create a new form
+      $this->prepareCreateForm($_REQUEST['cid']);
 
+    } else if (isset($_REQUEST['clone'])) {
+      // this is a cloned form
+      $this->prepareClonedData($_REQUEST['clone']);
+
+    } else {
+      // error -> no parameters set
+      die(ts("This page cannot be called w/o parameters."));
     }
     parent::run();
   }
@@ -140,13 +148,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   /**
    * Will prepare the form and look up all necessary data
    */
-  function prepareCreateForm() {
+  function prepareCreateForm($contact_id) {
     // load financial types
     $this->assign("financial_types", CRM_Contribute_PseudoConstant::financialType());
-    $this->assign("today", date('Y-m-d'));
+    $this->assign("date", date('Y-m-d'));
+    $this->assign("start_date", date('Y-m-d'));
 
     // first, try to load contact
-    $contact_id = $_REQUEST['cid'];
     $contact = civicrm_api('Contact', 'getsingle', array('version' => 3, 'id' => $contact_id));
     if ($contact['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
@@ -216,6 +224,57 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign("submit_url", CRM_Utils_System::url('civicrm/sepa/cmandate'));
   }
 
+
+
+  /**
+   * Will prepare the form by cloning the data from the given mandate
+   */
+  function prepareClonedData($mandate_id) {
+    $mandate = civicrm_api('SepaMandate', 'getsingle', array('id'=>$mandate_id, 'version'=>3));
+    if ($mandate['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't load mandate #%s"), $mandate_id), ts('Error'), 'error');
+      return;
+    } 
+
+    // prepare the form
+    $this->prepareCreateForm($mandate['contact_id']);
+
+    // load the attached contribution
+    if ($mandate['entity_table']=='civicrm_contribution') {
+      $contribution = civicrm_api('Contribution', 'getsingle', array('id'=>$mandate['entity_id'], 'version'=>3));
+    } else if ($mandate['entity_table']=='civicrm_contribution_recur') {
+      $contribution = civicrm_api('ContributionRecur', 'getsingle', array('id'=>$mandate['entity_id'], 'version'=>3));
+    } else {
+      CRM_Core_Session::setStatus(sprintf(ts("Mandate #%s seems to be broken!"), $mandate_id), ts('Error'), 'error');
+      $contribution = array();
+    }
+
+    if ($contribution['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't load associated (r)contribution #%s"), $contribution), ts('Error'), 'error');
+      return;
+    } 
+
+    // set all the relevant values
+    $this->assign('iban', $mandate['iban']);
+    $this->assign('bic', $mandate['bic']);
+    $this->assign('financial_type_id', $contribution['financial_type_id']);
+    $this->assign('campaign_id', $contribution['campaign_id']);
+    $this->assign('source', $contribution['source']);
+    $this->assign('mandate_type', $mandate['type']);
+
+    if (isset($contribution['total_amount'])) {
+      // this is a contribution
+      $this->assign('total_amount', $contribution['total_amount']);
+      $this->assign('date', $contribution['receive_date']);
+    } else {
+      // this has to be a recurring contribution
+      $this->assign('total_amount', $contribution['amount']);
+      $this->assign('start_date', $contribution['start_date']);
+      $this->assign('cycle_day', $contribution['cycle_day']);
+      $this->assign('interval', $contribution['frequency_interval']);
+      $this->assign('end_date', $contribution['end_date']);
+    }
+  }
 
   /**
    * Will checks all the POSTed data with respect to creating a mandate
