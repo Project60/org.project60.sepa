@@ -48,4 +48,10 @@
     <title>Close Group</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/sepa/listgroup</path>
+    <page_callback>CRM_Sepa_Page_ListGroup</page_callback>
+    <title>List Group</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

@@ -61,6 +61,7 @@
     <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
     <td>{$group.total} &euro;</td>
     <td>
+      <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts}List{/ts}</a>
       {if $group.status_id == '2'}
         <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">{ts}Close and Submit{/ts}</a>
       {else}
