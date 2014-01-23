@@ -1,0 +1,255 @@
+<?php
+
+require_once 'CRM/Core/Page.php';
+
+class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
+
+  function run() {
+
+    if (!isset($_REQUEST['mid'])) {
+      die(ts("This page needs a mandate id ('mid') parameter."));
+    } else {
+      $mandate_id = (int) $_REQUEST['mid'];
+    }
+
+    if (isset($_REQUEST['action'])) {
+      if ($_REQUEST['action']=='delete') {
+        $this->deleteMandate($mandate_id);
+
+      } else if ($_REQUEST['action']=='end') {
+        $this->endMandate($mandate_id);
+
+      } else if ($_REQUEST['action']=='cancel') {
+        $this->cancelMandate($mandate_id);
+
+      } else {
+        CRM_Core_Session::setStatus(sprintf(ts("Unkown action '%s'. Ignored."), $_REQUEST['action']), ts('Error'), 'error');
+      }
+    } 
+
+    // first, load the mandate
+    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
+    if (isset($mandate['is_error']) && $mandate['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+      die(sprintf(ts("Cannot find mandate [%s]."), $mandate_id));
+    }
+
+    // load the contribution
+    $contribution_id = $mandate['entity_id'];
+    $contribution_type = ($mandate['entity_table']=='civicrm_contribution')?'Contribution':'ContributionRecur';
+    $contribution = civicrm_api($contribution_type, "getsingle", array('id'=>$contribution_id, 'version'=>3));
+    if (isset($contribution['is_error']) && $contribution['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+    }
+
+    // load the mandate's contact
+    $contact1 = civicrm_api("Contact", "getsingle", array('id'=>$mandate['contact_id'], 'version'=>3));
+    if (isset($contact1['is_error']) && $contact1['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $contact1, $contact1['error_message']), ts('Error'), 'error');
+    }
+
+    // load the contribtion's contact
+    if ($mandate['contact_id']==$contribution['contact_id']) {
+      $contact2 = $contact1;
+    } else {
+      $contact2 = civicrm_api("Contact", "getsingle", array('id'=>$contribution['contact_id'], 'version'=>3));
+      if (isset($contact2['is_error']) && $contact2['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $contact2, $contact2['error_message']), ts('Error'), 'error');
+      }      
+    }
+
+    // load the campaign
+    if ($contribution['campaign_id']) {
+      $campaign = civicrm_api("Campaign", "getsingle", array('id'=>$contribution['campaign_id'], 'version'=>3));
+      if (isset($campaign['is_error'])) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $campaign, $campaign['error_message']), ts('Error'), 'error');
+      }      
+    }
+
+    // prepare the data
+    $financial_types = CRM_Contribute_PseudoConstant::financialType();
+    $contact1['link'] = CRM_Utils_System::url('civicrm/contact/view', "&reset=1&cid=".$contact1['id']);
+    $contact2['link'] = CRM_Utils_System::url('civicrm/contact/view', "&reset=1&cid=".$contact2['id']);
+    $contribution['financial_type'] = $financial_types[$contribution['financial_type_id']];
+    $contribution['campaign'] = $campaign['title'];
+    if (isset($contribution['amount']) && $contribution['amount']) {
+      // this is a recurring contribution
+      $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
+      $contribution['amount'] = CRM_Utils_Money::format($contribution['amount'], 'EUR');
+      $contribution['cycle'] = sprintf(ts("every %d %s"), $contribution['frequency_interval'], ts($contribution['frequency_unit'])); 
+      if ($contribution['end_date']) {
+        $contribution['default_end_date'] = date('Y-m-d', strtotime($contribution['end_date']));
+      } else {
+        $contribution['default_end_date'] = date('Y-m-d');
+      }
+    } else {
+      // this is a simple contribution
+      $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contribution', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
+      $contribution['amount'] = CRM_Utils_Money::format($contribution['total_amount'], 'EUR');
+    }
+
+    $this->assign('sepa', $mandate);
+    $this->assign('contribution', $contribution);
+    $this->assign('contact1', $contact1);
+    $this->assign('contact2', $contact2);
+    $this->assign('can_delete', CRM_Core_Permission::check('administer CiviCRM'));
+
+    parent::run();
+  }
+
+
+  function deleteMandate($mandate_id) {
+    // first, load the mandate
+    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
+    if (isset($mandate['is_error']) && $mandate['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+      return;
+    }
+    
+    if ( !($mandate['status']=="INIT" || $mandate['status']=="OOFF" || $mandate['status']=="FRST") ) {
+      CRM_Core_Session::setStatus(sprintf(ts("Mandate [%s] is already in use! It cannot be deleted."), $mandate_id), ts('Error'), 'error');
+      return;
+    }
+
+    // TODO: move the following into API or BAO
+    $rcontribution_count = 0;
+    $contributions = array();
+
+    // start by deleting the contributions
+    if ($mandate['type']=="RCUR") {
+      $cquery = civicrm_api('Contribution', "get", 
+        array('contribution_recur_id' => $mandate['entity_id'], 'version'=>3));
+      if (isset($cquery['is_error']) && $cquery['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot find contributions. Error was: '%s'"), 
+          $cquery['error_message']), ts('Error'), 'error');
+        return;
+      }
+
+      foreach ($cquery['values'] as $contribution) {
+        $delete = civicrm_api('Contribution', "delete", 
+          array('id' => $contribution['id'], 'version'=>3));
+        if (isset($delete['is_error']) && $delete['is_error']) {
+          CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'"), $contribution['id'], $delete['error_message']), ts('Error'), 'error');
+          return;
+        }
+        array_push($contributions, $contribution['id']);
+      }
+    
+      $delete = civicrm_api('ContributionRecur', "delete", 
+        array('id' => $mandate['entity_id'], 'version'=>3));
+      if (isset($delete['is_error']) && $delete['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Error deleting recurring contribution: '%s'"), 
+          $delete['error_message']), ts('Error'), 'error');
+        return;
+      }
+      $rcontribution_count = 1;
+    } else {
+      $delete = civicrm_api('Contribution', "delete", 
+        array('id' => $mandate['entity_id'], 'version'=>3));
+      if (isset($delete['is_error']) && $delete['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'"), $mandate['entity_id'], $delete['error_message']), ts('Error'), 'error');
+        return;
+      }
+        array_push($contributions, $contribution['id']);
+    }
+
+    $delete = civicrm_api('SepaMandate', "delete", array('id' => $mandate['id'], 'version'=>3));
+    if (isset($delete['is_error']) && $delete['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Error deleting mandate: '%s'"), 
+        $delete['error_message']), ts('Error'), 'error');
+      return;
+    }
+
+    // remove all contributions from the groups
+    $contribution_id_list = implode(",", $contributions);
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id IN ($contribution_id_list);");
+
+    CRM_Core_Session::setStatus(sprintf(ts("Succesfully deleted mandate [%s] and %s associated contribution(s)"), $mandate_id, (count($contributions)+$rcontribution_count)), ts('Mandate deleted'), 'info');
+  }
+
+
+  function endMandate($mandate_id) {    
+    $end_date = $_REQUEST['end_date'];
+    if ($end_date) {
+      $this->_terminateMandate($mandate_id, $end_date);
+    } else {
+      CRM_Core_Session::setStatus(sprintf(ts("You need to provide an end date.")), ts('Error'), 'error');      
+    }
+  }
+
+
+  function cancelMandate($mandate_id) {
+    $cancel_reason = $_REQUEST['cancel_reason'];
+    if ($cancel_reason) {
+      $this->_terminateMandate($mandate_id, date("Y-m-d"), $cancel_reason);
+    } else {
+      CRM_Core_Session::setStatus(sprintf(ts("You need to provide a cancel reason.")), ts('Error'), 'error');
+    }
+  }
+
+
+
+
+
+
+  function _terminateMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL) {
+     // first, load the mandate
+    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
+    if (isset($mandate['is_error'])) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+      return;
+    }
+    
+    // check the mandate type
+    if ( $mandate['type']!="RCUR" ) {
+      CRM_Core_Session::setStatus(ts("You can only modify the end date of recurring contribution mandates."), ts('Error'), 'error');
+      return;
+    }
+    
+    // load the contribution
+    $contribution_id = $mandate['entity_id'];
+    $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
+    if (isset($contribution['is_error']) && $contribution['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      return;
+    }
+
+    // check the date
+    $new_end_date = strtotime($new_end_date_str);
+    $old_end_date = strtotime($contribution['end_date']);
+
+    if ($new_end_date < strtotime("today")) {
+      CRM_Core_Session::setStatus(sprintf(ts("You cannot set an end date in the past."), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      return;      
+    }
+
+    // actually set the date
+    $query = array(
+      'version'   => 3,
+      'id'        => $contribution_id,
+      'end_date'  => date('YmdHis', $new_end_date));
+    if ($cancel_reason) {
+      $query['cancel_reason'] = $cancel_reason;
+      $query['cancel_date'] = $query['end_date'];
+      $query['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name');
+    }
+    $result = civicrm_api("ContributionRecur", "create", $query);
+    if (isset($result['is_error']) && $result['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'"), $contribution_id, $result['error_message']), ts('Error'), 'error');
+      return;
+
+    } else {
+      // success!
+      if ($cancel_reason) {
+        // ... but we also need to end the mandate
+        $result = civicrm_api("SepaMandate", "create", array('id'=>$mandate_id, 'status'=>'COMPLETE', 'version'=>3));
+        if (isset($result['is_error']) && $result['is_error']) {
+          CRM_Core_Session::setStatus(sprintf(ts("Cannot modify status of mandate [%s]. Error was: '%s'"), $mandate_id, $result['error_message']), ts('Error'), 'warn');
+        }
+      }
+
+      CRM_Core_Session::setStatus(ts("New end date set."), ts('Mandate updated.'), 'info');
+      CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed."), ts('Mandate updated.'), 'warn');
+    }
+  }
+}
