@@ -21,13 +21,7 @@
 <div class="crm-submit-buttons" id="new_submit_buttons">
     <a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon"></div>{ts}Clone{/ts}</span></a>
 
-    {if $permission eq 'edit'}{if $sepa.status eq 'OOFF'}
-    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid&cmd=delete"}" class="button"><span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
-    {/if}{/if}
-
-    {if $sepa.status eq 'OOFF'}
-    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon"></div>{ts}Stop{/ts}</span></a>
-    {/if}
+    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon"></div>{ts}Modify Mandate{/ts}</span></a>
 </div>
 
 {literal}

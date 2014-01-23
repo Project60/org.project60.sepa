@@ -38,8 +38,8 @@
   </item>
   <item>
     <path>civicrm/sepa/xmandate</path>
-    <page_callback>CRM_Sepa_Page_StopMandate</page_callback>
-    <title>Stop Mandate</title>
+    <page_callback>CRM_Sepa_Page_EditMandate</page_callback>
+    <title>Edit Mandate</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
@@ -51,7 +51,7 @@
   <item>
     <path>civicrm/sepa/listgroup</path>
     <page_callback>CRM_Sepa_Page_ListGroup</page_callback>
-    <title>List Group</title>
+    <title>SEPA transaction group contributions</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>
