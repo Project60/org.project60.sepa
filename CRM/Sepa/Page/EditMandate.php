@@ -59,11 +59,15 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
 
     // load the campaign
-    if ($contribution['campaign_id']) {
+    if (isset($contribution['campaign_id']) && $contribution['campaign_id']) {
       $campaign = civicrm_api("Campaign", "getsingle", array('id'=>$contribution['campaign_id'], 'version'=>3));
       if (isset($campaign['is_error'])) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $campaign, $campaign['error_message']), ts('Error'), 'error');
-      }      
+      } else {
+        $contribution['campaign'] = $campaign['title'];
+      }
+    } else {
+      $contribution['campaign'] = '';
     }
 
     // prepare the data
@@ -71,7 +75,6 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $contact1['link'] = CRM_Utils_System::url('civicrm/contact/view', "&reset=1&cid=".$contact1['id']);
     $contact2['link'] = CRM_Utils_System::url('civicrm/contact/view', "&reset=1&cid=".$contact2['id']);
     $contribution['financial_type'] = $financial_types[$contribution['financial_type_id']];
-    $contribution['campaign'] = $campaign['title'];
     if (isset($contribution['amount']) && $contribution['amount']) {
       // this is a recurring contribution
       $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
@@ -162,7 +165,9 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
     // remove all contributions from the groups
     $contribution_id_list = implode(",", $contributions);
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id IN ($contribution_id_list);");
+    if (strlen($contribution_id_list)>0) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id IN ($contribution_id_list);");
+    }
 
     CRM_Core_Session::setStatus(sprintf(ts("Succesfully deleted mandate [%s] and %s associated contribution(s)"), $mandate_id, (count($contributions)+$rcontribution_count)), ts('Mandate deleted'), 'info');
   }

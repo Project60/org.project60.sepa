@@ -545,7 +545,7 @@ function sepa_civicrm_create_mandate(&$mandate_parameters) {
     $reference_candidate = sprintf($reference, $n);
     // check if it exists
     $mandate = civicrm_api('SepaMandate', 'getsingle', array('version' => 3, 'reference' => $reference_candidate));
-    if ($mandate['is_error']) {
+    if (isset($mandate['is_error']) && $mandate['is_error']) {
       // does not exist! take it!
       $mandate_parameters['reference'] = $reference_candidate;
       return;

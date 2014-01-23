@@ -5,14 +5,25 @@ require_once 'CRM/Core/Page.php';
 class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
   function run() {
+    // get requested group status
+    if (isset($_REQUEST['status'])) {
+      if ($_REQUEST['status'] != 'open' && $_REQUEST['status'] != 'closed') {
+        $status = 'open';
+      } else {
+        $status = $_REQUEST['status'];
+      }
+    } else {
+      $status = 'open';
+    }
+
     // add button URLs
-    $this->assign("status", $_REQUEST['status']);
+    $this->assign("status", $status);
     $this->assign("show_closed_url", CRM_Utils_System::url('civicrm/sepa/dashbord', 'status=closed'));
     $this->assign("show_open_url", CRM_Utils_System::url('civicrm/sepa/dashbord', 'status=active'));
     $this->assign("batch_ooff", CRM_Utils_System::url('civicrm/sepa/dashbord', 'update=OOFF'));
     $this->assign("batch_recur", CRM_Utils_System::url('civicrm/sepa/dashbord', 'update=RCUR'));
 
-    if ($_REQUEST['update']) {
+    if (isset($_REQUEST['update'])) {
       $this->callBatcher($_REQUEST['update']);
     }
 

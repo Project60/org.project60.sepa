@@ -43,7 +43,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   $status_closed = 1;   // TODO: load from option value
   $status_inprogress = 5;   // TODO: load from option value
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
-  if ($result['is_error']) {
+  if (isset($result['is_error']) && $result['is_error']) {
     return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
   } 
 
@@ -144,7 +144,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
   } else {
     return civicrm_api3_create_error(sprintf("Unknown batching mode '%s'.", $params['type']));
   }
-  return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = array("total_amount"=>$total));
+  return civicrm_api3_create_success($result, $params);
 }
 
 

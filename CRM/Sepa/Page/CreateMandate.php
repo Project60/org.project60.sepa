@@ -18,7 +18,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         // i.e. validation failed
         $this->assign('validation_errors', $errors);
         $_REQUEST['cid'] = $contact_id;
-        $this->prepareCreateForm();
+        $this->prepareCreateForm($contact_id);
       } else {
         // validation o.k. = > create
         if ($_REQUEST['mandate_type']=='OOFF') {
@@ -85,7 +85,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $contribution = civicrm_api('ContributionRecur', 'create', $contribution_data);
     }
 
-    if ($contribution['is_error']) {
+    if (isset($contribution['is_error']) && $contribution['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't create contribution for contact #%s"), $cid), ts('Error'), 'error');
       $this->assign("error_title", ts("Couldn't create contribution"));
       $this->assign("error_message", ts($contribution['error_message']));
@@ -104,7 +104,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       );
 
       $create_note_result = civicrm_api('Note', 'create', $create_note);
-      if ($create_note_result['is_error']) {
+      if (isset($create_note_result['is_error']) && $create_note_result['is_error']) {
         // don't consider this a fatal error...
         CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s"), $contribution['id']), ts('Error'), 'alert');
         error_log("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
@@ -134,7 +134,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     sepa_civicrm_create_mandate($mandate_data);
 
     $mandate = civicrm_api('SepaMandate', 'create', $mandate_data);
-    if ($mandate['is_error']) {
+    if (isset($mandate['is_error']) && $mandate['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't create %s mandate for contact #%s"), $type, $cid), ts('Error'), 'error');
       $this->assign("error_title", ts("Couldn't create mandate"));
       $this->assign("error_message", ts($mandate['error_message']));
@@ -156,7 +156,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // first, try to load contact
     $contact = civicrm_api('Contact', 'getsingle', array('version' => 3, 'id' => $contact_id));
-    if ($contact['is_error']) {
+    if (isset($contact['is_error']) && $contact['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
       $this->assign("display_name", "ERROR");
       return;
@@ -168,7 +168,9 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     // look up campaigns
     $campaign_query = civicrm_api('Campaign', 'get', array('version'=>3, 'is_active'=>1));
     $campaigns = array();
-    if (!$campaign_query['is_error']) {
+    if (isset($campaign_query['is_error']) && $campaign_query['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't load campaign list."), $cid), ts('Error'), 'error');      
+    } else {
       foreach ($campaign_query['values'] as $campaign_id => $campaign) {
         $campaigns[$campaign_id] = $campaign['name'];
       }
@@ -190,10 +192,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $iban_reference_type = CRM_Core_OptionGroup::getValue('civicrm_banking.reference_types', 'IBAN', 'value', 'String', 'id');
     if ($iban_reference_type) {
       $accounts = civicrm_api('BankingAccount', 'get', array('version' => 3, 'contact_id' => $contact_id));
-      if (!$accounts['is_error']) {
+      if (isset($accounts['is_error']) && $accounts['is_error']) {
+        // this probably means, that CiviBanking is not installed...
+      } else {
         foreach ($accounts['values'] as $account_id => $account) {
           $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $this->IBAN_REFERENCE_TYPE));
-          if (!isset($account_ref['is_error'])) {
+          if (isset($account_ref['is_error']) && $account_ref['is_error']) {
+            // this would also be an error, if no reference is set...
+          } else {
             $account_data = json_decode($account['data_parsed']);
             if (isset($account_data->BIC)) {
               // we have IBAN and BIC -> add:
@@ -213,7 +219,9 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     // look up creditors
     $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3));
     $creditors = array();
-    if (!$creditor_query['is_error']) {
+    if (isset($creditor_query['is_error']) && $creditor_query['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't find any creditors."), $cid), ts('Error'), 'error');
+    } else {
       foreach ($creditor_query['values'] as $creditor_id => $creditor) {
         $creditors[$creditor_id] = $creditor['name'];
       }
@@ -231,7 +239,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
    */
   function prepareClonedData($mandate_id) {
     $mandate = civicrm_api('SepaMandate', 'getsingle', array('id'=>$mandate_id, 'version'=>3));
-    if ($mandate['is_error']) {
+    if (isset($mandate['is_error']) && $mandate['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't load mandate #%s"), $mandate_id), ts('Error'), 'error');
       return;
     } 
@@ -249,7 +257,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $contribution = array();
     }
 
-    if ($contribution['is_error']) {
+    if (isset($contribution['is_error']) && $contribution['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't load associated (r)contribution #%s"), $contribution), ts('Error'), 'error');
       return;
     } 
@@ -258,21 +266,21 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign('iban', $mandate['iban']);
     $this->assign('bic', $mandate['bic']);
     $this->assign('financial_type_id', $contribution['financial_type_id']);
-    $this->assign('campaign_id', $contribution['campaign_id']);
-    $this->assign('source', $contribution['source']);
     $this->assign('mandate_type', $mandate['type']);
+    if (isset($contribution['campaign_id'])) $this->assign('campaign_id', $contribution['campaign_id']);
+    if (isset($contribution['source'])) $this->assign('source', $contribution['source']);
 
     if (isset($contribution['total_amount'])) {
       // this is a contribution
       $this->assign('total_amount', $contribution['total_amount']);
-      $this->assign('date', $contribution['receive_date']);
+      $this->assign('date', date('Y-m-d', strtotime($contribution['receive_date'])));
     } else {
       // this has to be a recurring contribution
       $this->assign('total_amount', $contribution['amount']);
-      $this->assign('start_date', $contribution['start_date']);
+      $this->assign('start_date', date('Y-m-d', strtotime($contribution['start_date'])));
       $this->assign('cycle_day', $contribution['cycle_day']);
       $this->assign('interval', $contribution['frequency_interval']);
-      $this->assign('end_date', $contribution['end_date']);
+      $this->assign('end_date', date('Y-m-d', strtotime($contribution['end_date'])));
     }
   }
 
