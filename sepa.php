@@ -2,49 +2,46 @@
 require_once 'sepa.civix.php';
 require_once 'hooks.php';
 
-function sepa_pageRun_contribute( &$page ) {
-/*
-  $recur = $page->getTemplate()->get_template_vars("contribution_recur_id");
-  CRM_Core_Region::instance('page-body')->add(array(
-    'markup' => "Should we mention special steps to update/alter the contribution, eg if part of a batch already"
-  ));
-*/
-}
-
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contribute_Page_Tab") {
+    // single contribuion view
+
+    if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
+      return;
+
     if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
       // This is an installment of a recurring contribution.
-      return sepa_pageRun_contribute( $page );
-    }
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution_recur', 'entity_id'=>$page->getTemplate()->get_template_vars('recur_id')));
+    } 
     else {
-      // This is a one-off contribution => try to show mandate data.
-      if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
-        return;
-
+      // this is a OOFF contribtion
       $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution', 'entity_id'=>$page->getTemplate()->get_template_vars('id')));
-      $page->assign('sepa', $mandate);
-
-      CRM_Core_Region::instance('page-body')->add(array(
-        'template' => 'Sepa/Contribute/Form/ContributionView.tpl'
-      ));
-      CRM_Core_Region::instance('page-body')->add(array(
-        'callback' => function(&$spec, &$html) {
-          /*
-           * Find the last 'crm-submit-buttons' section in the generated HTML,
-           * and move the SDD mandate section before it.
-           *
-           * This is rather hacky -- but we don't really have any better anchor to work with...
-           *
-           * (Ideally, the original template should provide a crmRegion for the main content,
-           * so we could just append the mandate stuff there without hacking HTML output.)
-           */
-          $html = preg_replace('%(.*)(\<[^>]*crm-submit-buttons.*)(\<!-- Mandate --\>.*\<!-- /Mandate --\>)%s', '$1$3$2', $html);
-        }
-      ));
     }
+
+    $page->assign('sepa', $mandate);
+
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'Sepa/Contribute/Form/ContributionView.tpl'
+    ));
+    CRM_Core_Region::instance('page-body')->add(array(
+      'callback' => function(&$spec, &$html) {
+        /*
+         * Find the last 'crm-submit-buttons' section in the generated HTML,
+         * and move the SDD mandate section before it.
+         *
+         * This is rather hacky -- but we don't really have any better anchor to work with...
+         *
+         * (Ideally, the original template should provide a crmRegion for the main content,
+         * so we could just append the mandate stuff there without hacking HTML output.)
+         */
+        $html = preg_replace('%(.*)(\<[^>]*crm-submit-buttons.*)(\<!-- Mandate --\>.*\<!-- /Mandate --\>)%s', '$1$3$2', $html);
+      }
+    ));
   }
+  
   elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
+    // recurring contribuion view
+
     $recur = $page->getTemplate()->get_template_vars("recur");
     
     // This is a one-off contribution => try to show mandate data.

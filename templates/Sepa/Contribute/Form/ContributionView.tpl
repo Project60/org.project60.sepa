@@ -1,11 +1,8 @@
 <!-- Mandate -->
 {assign var="mid" value=$sepa.id}
 
-<div class="crm-accordion-wrapper ">
-  <div class="crm-accordion-header">
-    {ts}Sepa Mandate{/ts} {$sepa.id}
-  </div>
-  <div class="crm-accordion-body">
+<h3>{ts}Sepa Mandate{/ts} {$sepa.id}</h3>
+<div class="crm-container">
     <table class="crm-info-panel">
       <tr><td class="label">{ts}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
       <tr><td class="label">{ts}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>
@@ -15,7 +12,6 @@
       <tr><td class="label">{ts}Signature date{/ts}</td><td>{$sepa.date}</td></tr>
       <tr><td class="label">{ts}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
     </table>
-  </div>
 </div>
 
 <div class="crm-submit-buttons" id="new_submit_buttons">
