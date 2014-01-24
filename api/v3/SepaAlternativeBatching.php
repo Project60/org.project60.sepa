@@ -259,7 +259,7 @@ function _sepa_alternative_batching_update_rcur($params) {
             "financial_type_id"                   => $mandate['rc_financial_type_id'],
             "contribution_status_id"              => $mandate['rc_contribution_status_id'],
             "campaign_id"                         => $mandate['rc_campaign_id'],
-            "contribution_payment_instrument_id"  => $mandate['rc_payment_instrument_id'],
+            "payment_instrument_id"               => $mandate['rc_payment_instrument_id'],
           );
         $contribtion = civicrm_api('Contribution', 'create', $contribution_data);
         // TODO: Error handling
