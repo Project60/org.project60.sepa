@@ -230,6 +230,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     
     // all seems to be ok.
     $this->assign("submit_url", CRM_Utils_System::url('civicrm/sepa/cmandate'));
+
+    // copy known parameters
+    $copy_params = array('contact_id', 'creditor_id', 'total_amount', 'financial_type_id', 'campaign_id', 'source', 'note',
+      'iban', 'bic', 'date', 'mandate_type', 'start_date', 'cycle_day', 'interval', 'end_date');
+    foreach ($copy_params as $parameter) {
+      if (isset($_REQUEST[$parameter]))
+        $this->assign($parameter, $_REQUEST[$parameter]);
+    }
   }
 
 
@@ -280,7 +288,11 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $this->assign('start_date', date('Y-m-d', strtotime($contribution['start_date'])));
       $this->assign('cycle_day', $contribution['cycle_day']);
       $this->assign('interval', $contribution['frequency_interval']);
-      $this->assign('end_date', date('Y-m-d', strtotime($contribution['end_date'])));
+      if (isset($contribution['end_date']) && $contribution['end_date']) {
+        $this->assign('end_date', date('Y-m-d', strtotime($contribution['end_date'])));
+      } else {
+        $this->assign('end_date', '');
+      }
     }
   }
 
