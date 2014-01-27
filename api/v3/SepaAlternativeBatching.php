@@ -160,7 +160,6 @@ function _sepa_alternative_batching_update_rcur($params) {
   $sql_query = "
     SELECT
       mandate.id AS mandate_id,
-      mandate.date AS mandate_date,
       mandate.contact_id AS mandate_contact_id,
       mandate.entity_id AS mandate_entity_id,
       first_contribution.receive_date AS mandate_first_executed,
@@ -187,7 +186,6 @@ function _sepa_alternative_batching_update_rcur($params) {
     // TODO: sanity checks?
     $relevant_mandates[$results->mandate_id] = array(
         'mandate_id'                    => $results->mandate_id,
-        'mandate_date'                  => $results->mandate_date,
         'mandate_contact_id'            => $results->mandate_contact_id,
         'mandate_entity_id'             => $results->mandate_entity_id,
         'mandate_first_executed'        => $results->mandate_first_executed,
@@ -305,26 +303,26 @@ function _sepa_alternative_batching_update_ooff($params) {
   $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.notice');
 
   // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
-  $sql_query =
-    "SELECT ".
-    "  mandate.id AS mandate_id, ".
-    "  mandate.date AS mandate_date, ".
-    "  mandate.contact_id AS mandate_contact_id, ".
-    "  mandate.entity_id AS mandate_entity_id ".
-    "FROM civicrm_sdd_mandate AS mandate ".
-    "INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id ".
-    "WHERE mandate.date <= (NOW() + INTERVAL $horizon DAY) ".
-    "  AND mandate.type = 'OOFF' ".
-    "  AND mandate.status = 'OOFF';";
+  $sql_query = "
+    SELECT
+      mandate.id                AS mandate_id,
+      mandate.contact_id        AS mandate_contact_id,
+      mandate.entity_id         AS mandate_entity_id,
+      contribution.receive_date AS start_date
+    FROM civicrm_sdd_mandate AS mandate
+    INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id
+    WHERE contribution.receive_date <= (NOW() + INTERVAL $horizon DAY)
+      AND mandate.type = 'OOFF'
+      AND mandate.status = 'OOFF';";
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $relevant_mandates = array();
   while ($results->fetch()) {
     // TODO: sanity checks?
     $relevant_mandates[$results->mandate_id] = array(
         'mandate_id'          => $results->mandate_id,
-        'mandate_date'        => $results->mandate_date,
         'mandate_contact_id'  => $results->mandate_contact_id,
-        'mandate_entity_id'   => $results->mandate_entity_id,
+        'mandate_entity_id'   => $results->mandate_entity_id,        
+        'start_date'          => $results->start_date,
       );
   }
 
@@ -334,7 +332,7 @@ function _sepa_alternative_batching_update_ooff($params) {
   $latest_collection_date = '';
 
   foreach ($relevant_mandates as $mandate_id => $mandate) {
-    $collection_date = date('Y-m-d', strtotime($mandate['mandate_date']));
+    $collection_date = date('Y-m-d', strtotime($mandate['start_date']));
     if ($collection_date <= $earliest_collection_date) {
       $collection_date = $earliest_collection_date;
     }
@@ -445,15 +443,15 @@ function _sepa_alternative_batching_get_parameter($parameter_name) {
   if ($parameter_name=='org.project60.alternative_batching.OOFF.horizon_days') {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.OOFF.notice') {
-    return 12;
+    return 10;
   } else if ($parameter_name=='org.project60.alternative_batching.RCUR.horizon_days') {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.RCUR.notice') {
-    return 6;
+    return 8;
   } else if ($parameter_name=='org.project60.alternative_batching.FRST.horizon_days') {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.FRST.notice') {
-    return 12;
+    return 10;
   }
 }
 

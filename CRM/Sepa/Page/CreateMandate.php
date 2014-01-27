@@ -60,7 +60,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'financial_type_id'         => $_REQUEST['financial_type_id'],
         'payment_instrument_id'     => $payment_instrument_id,
         'contribution_status_id'    => $contribution_status_id,
-        'receive_date'              => $_REQUEST['date'],
         'currency'                  => 'EUR',
         'source'                    => $_REQUEST['source'],
       );
@@ -68,7 +67,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if ($type=='OOFF') {
       $initial_status = 'OOFF';
       $entity_table = 'civicrm_contribution';
-      $contribution_data['total_amount']        = number_format($_REQUEST['total_amount'], 2, '.', '');
+      $contribution_data['total_amount'] = number_format($_REQUEST['total_amount'], 2, '.', '');
+      $contribution_data['receive_date'] = $_REQUEST['date'];
       $contribution = civicrm_api('Contribution', 'create', $contribution_data);
     } else if ($type=='RCUR') {
       $initial_status = 'FRST';
@@ -121,7 +121,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'entity_id'                 => $contribution['id'],
         'creation_date'             => date('YmdHis'),
         'validation_date'           => date('YmdHis'),
-        'date'                      => $_REQUEST['date'],
+        'date'                      => date('YmdHis'),
         'iban'                      => $_REQUEST['iban'],
         'bic'                       => $_REQUEST['bic'],
         'status'                    => $initial_status,
