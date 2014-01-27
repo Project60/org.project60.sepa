@@ -462,7 +462,7 @@ function _sepa_alternative_get_next_execution_date($rcontribution, $now) {
 
   // calculate the first date
   $start_date = strtotime($rcontribution['start_date']);
-  $next_date = mktime(0, 0, 0, date('n', $start_date) + (date('j', $start_date) >= $cycle_day), $cycle_day, date('Y', $start_date));
+  $next_date = mktime(0, 0, 0, date('n', $start_date) + (date('j', $start_date) > $cycle_day), $cycle_day, date('Y', $start_date));
   $last_run = 0; 
   if (isset($rcontribution['mandate_first_executed']) && strlen($rcontribution['mandate_first_executed'])>0) {
     $last_run = strtotime($rcontribution['mandate_first_executed']);
