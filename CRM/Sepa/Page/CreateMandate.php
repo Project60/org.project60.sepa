@@ -196,7 +196,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         // this probably means, that CiviBanking is not installed...
       } else {
         foreach ($accounts['values'] as $account_id => $account) {
-          $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $this->IBAN_REFERENCE_TYPE));
+          $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $iban_reference_type));
           if (isset($account_ref['is_error']) && $account_ref['is_error']) {
             // this would also be an error, if no reference is set...
           } else {
