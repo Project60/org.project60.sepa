@@ -15,6 +15,9 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     if (isset($_REQUEST['action'])) {
       if ($_REQUEST['action']=='delete') {
         $this->deleteMandate($mandate_id);
+        $this->assign('deleted_mandate', $mandate_id);
+        parent::run();
+        return;
 
       } else if ($_REQUEST['action']=='end') {
         $this->endMandate($mandate_id);
@@ -121,7 +124,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     // start by deleting the contributions
     if ($mandate['type']=="RCUR") {
       $cquery = civicrm_api('Contribution', "get", 
-        array('contribution_recur_id' => $mandate['entity_id'], 'version'=>3));
+        array('contribution_recur_id' => $mandate['entity_id'], 'version'=>3, 'option.limit' => 999));
       if (isset($cquery['is_error']) && $cquery['is_error']) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot find contributions. Error was: '%s'"), 
           $cquery['error_message']), ts('Error'), 'error');
@@ -146,14 +149,14 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         return;
       }
       $rcontribution_count = 1;
-    } else {
+    
+    } else {    // $mandate['type']=="OOFF"
       $delete = civicrm_api('Contribution', "delete", 
         array('id' => $mandate['entity_id'], 'version'=>3));
       if (isset($delete['is_error']) && $delete['is_error']) {
         CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'"), $mandate['entity_id'], $delete['error_message']), ts('Error'), 'error');
         return;
       }
-        array_push($contributions, $contribution['id']);
     }
 
     $delete = civicrm_api('SepaMandate', "delete", array('id' => $mandate['id'], 'version'=>3));
