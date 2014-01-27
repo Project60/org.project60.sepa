@@ -91,33 +91,33 @@
 	<h3>{ts}Mandate Type{/ts}</h3>
 	<table class="create_mandate">
 		<tr>	<!-- ONE OFF -->
-			<td style="vertical-align: top;"><input name="mandate_type" type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
+			<td style="vertical-align: top;"><input name="mandate_type" id='mtype_OOFF' type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
 			<td>{ts}Earliest execution date{/ts}:</td>
-			<td><input name="date" type="date" value="{$date}" size="10" /></td>
+			<td><input name="date" type="date" value="{$date}" size="10" onChange='cj("#mtype_OOFF").prop("checked",true);' /></td>
 			<td></td>
 		</tr>
 
 		<tr><td colspan="3"><div>&nbsp;</div></td></tr>
 
 		<tr>	<!-- RECURRING -->
-			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts}Recurring{/ts}</input></td>
+			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" id='mtype_RCUR' type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts}Recurring{/ts}</input></td>
 			<td>{ts}Start Date{/ts}:</td>
-			<td><input name="start_date" type="date" value="{$start_date}" size="10" /></td>
+			<td><input name="start_date" type="date" value="{$start_date}" size="10" onChange='cj("#mtype_RCUR").prop("checked",true);'/></td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}Cycle Day{/ts}:</td>
-			<td><input name="cycle_day" type="number" size="3" value="{$cycle_day}" /></td>
+			<td><input name="cycle_day" type="number" size="3" value="{$cycle_day}" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}Interval{/ts}:</td>
-			<td><input name="interval" type="number" size="3" value="{$interval}" /></td>
+			<td><input name="interval" type="number" size="3" value="{$interval}" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}End Date{/ts}:</td>
-			<td><input name="end_date" type="date" value="{$end_date}" size="10" /></td>
+			<td><input name="end_date" type="date" value="{$end_date}" size="10" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
 			<td></td>
 		</tr>
 	</table>
