@@ -378,10 +378,20 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
   foreach ($calculated_groups as $collection_date => $mandates) {
     if (!isset($existing_groups[$collection_date])) {
       // this group does not yet exist -> create
+      // FIXME: creditor ID
       $creditor_id = 3;
+
+      // find unused reference
+      $reference = "TXG-${creditor_id}-${mode}-${collection_date}";
+      $counter = 0;
+      while (_sepa_alternative_batching_groups_reference_exists($reference)) {
+        $counter += 1;
+        $reference = "TXG-${creditor_id}-${mode}-${collection_date}_".$counter;
+      }
+
       $group = civicrm_api('SepaTransactionGroup', 'create', array(
           'version'                 => 3, 
-          'reference'               => "TXG-${creditor_id}-${mode}-${collection_date}",
+          'reference'               => $reference,
           'type'                    => $mode,
           'collection_date'         => $collection_date,
           'latest_submission_date'  => date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
@@ -484,4 +494,11 @@ function _sepa_alternative_get_next_execution_date($rcontribution, $now) {
   }
 
   return $return_date;
+}
+
+
+function _sepa_alternative_batching_groups_reference_exists($reference) {
+  $query = civicrm_api('SepaTransactionGroup', 'getsingle', array('reference'=>$reference, 'version'=>3));
+  // this should return an error, if the group exists
+  return !(isset($query['is_error']) && $query['is_error']);
 }
