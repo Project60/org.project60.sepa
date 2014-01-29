@@ -1060,3 +1060,7 @@ msgstr ""
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Mandate Options"
 msgstr ""
+
+#: sepa.php
+msgid "SEPA Mandates"
+msgstr ""

@@ -499,8 +499,8 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
    switch ($type) {
     case 'relTables':
       // Offer user to merge SEPA Mandates
-      $data['rel_table_foo'] = array(
-          'title'  => ts('SPEA Mandates'),
+      $data['rel_table_sepamandate'] = array(
+          'title'  => ts('SEPA Mandates'),
           'tables' => array('civicrm_sdd_mandate'),
           'url'    => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=$cid&selectedChild=contribute'),  // '$cid' will be automatically replaced
       );

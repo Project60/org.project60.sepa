@@ -52,7 +52,7 @@ msgstr ""
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Reference"
-msgstr "Referenz"
+msgstr "Mandatsreferenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php sepa.php
 msgid "Contact ID"
@@ -756,15 +756,15 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "One Time"
-msgstr ""
+msgstr "Einzeleinzug"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Earliest execution date"
-msgstr ""
+msgstr "Frühester Einzugstermin"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Recurring"
-msgstr ""
+msgstr "Dauereinzug"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Start Date"
@@ -781,7 +781,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "create"
-msgstr ""
+msgstr "erstellen"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Error!"
@@ -915,7 +915,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Collection Day"
-msgstr ""
+msgstr "Einzugstag"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Date"
@@ -1069,4 +1069,8 @@ msgstr ""
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Mandate Options"
 msgstr "Mandatsoptionen"
+
+#: sepa.php
+msgid "SEPA Mandates"
+msgstr "SEPA Mandate"
 
