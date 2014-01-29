@@ -21,7 +21,7 @@
 <div class="crm-submit-buttons">
     <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon"></div>{ts}Clone{/ts}</span></a-->
 
-    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon"></div>{ts}Modify Mandate{/ts}</span></a>
+    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon"></div>{ts}Mandate Options{/ts}</span></a>
 </div>
 
 <!--div class="crm-submit-buttons">

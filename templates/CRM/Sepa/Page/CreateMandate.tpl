@@ -88,8 +88,28 @@
 		</tr>
 	</table>
 
+	{if $replace}
+	<h3>{ts}Replacing Mandate{/ts}&nbsp;[{$replace}]</h3>
+	<input type="hidden" name="replace" value="{$replace}" />
+	<table class="create_mandate">
+		<tr>	<!-- REPLACE::DATE -->
+			<td>{ts}Replacement Date{/ts}:</td>
+			<td>
+				<input name="replace_date" type="date" value="{$replace_date}" size="10"/>
+			</td>
+		</tr>
+		<tr>	<!-- REPLACE::REASON -->
+			<td>{ts}Replacement Reason{/ts}:</td>
+			<td>
+				<input name="replace_reason" type="text" value="{$replace_reason}"/>
+			</td>
+		</tr>
+	</table>
+	{/if}
+
 	<h3>{ts}Mandate Type{/ts}</h3>
 	<table class="create_mandate">
+		{if not $replace}
 		<tr>	<!-- ONE OFF -->
 			<td style="vertical-align: top;"><input name="mandate_type" id='mtype_OOFF' type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
 			<td>{ts}Earliest execution date{/ts}:</td>
@@ -98,6 +118,7 @@
 		</tr>
 
 		<tr><td colspan="3"><div>&nbsp;</div></td></tr>
+		{/if}
 
 		<tr>	<!-- RECURRING -->
 			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" id='mtype_RCUR' type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts}Recurring{/ts}</input></td>

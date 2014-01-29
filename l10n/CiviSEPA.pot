@@ -74,7 +74,7 @@ msgstr ""
 
 #: CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php
 #: CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php
-#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl CRM/Sepa/BAO/SEPAMandate.php
 msgid "Error"
 msgstr ""
 
@@ -349,7 +349,7 @@ msgstr ""
 msgid "Unkown action '%s'. Ignored."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot read mandate [%s]. Error was: '%s'"
 msgstr ""
 
@@ -357,7 +357,7 @@ msgstr ""
 msgid "Cannot find mandate [%s]."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot read contribution [%s]. Error was: '%s'"
 msgstr ""
 
@@ -405,31 +405,31 @@ msgstr ""
 msgid "You need to provide a cancel reason."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "You can only modify the end date of recurring contribution mandates."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "You cannot set an end date in the past."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot modify recurring contribution [%s]. Error was: '%s'"
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot modify status of mandate [%s]. Error was: '%s'"
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "New end date set."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Mandate updated."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid ""
 "Please note, that any <i>closed</i> batches that include this mandate cannot "
 "be changed any more - all pending contributions will still be executed."
@@ -1006,4 +1006,57 @@ msgstr ""
 
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Done"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot set cancel reason for mandate [%s]. Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "Couldn't load campaign list."
+msgstr ""
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "Couldn't find any creditors."
+msgstr ""
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "replace reason"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacing Mandate"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacement Date"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacement Reason"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Terminate this mandate:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Terminate for the following reason:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Replace"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Replace the mandate beginning:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Replace for the following reason:"
+msgstr ""
+
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+msgid "Mandate Options"
 msgstr ""

@@ -39,7 +39,7 @@
   <item>
     <path>civicrm/sepa/xmandate</path>
     <page_callback>CRM_Sepa_Page_EditMandate</page_callback>
-    <title>Edit Mandate</title>
+    <title>Mandate Options</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>

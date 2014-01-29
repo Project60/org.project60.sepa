@@ -88,7 +88,7 @@ msgstr ""
 
 #: CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php
 #: CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php
-#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl CRM/Sepa/BAO/SEPAMandate.php
 msgid "Error"
 msgstr ""
 
@@ -224,7 +224,7 @@ msgstr ""
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "Mandate reference"
-msgstr ""
+msgstr "Mandatsreferenz"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "Debtor IBAN"
@@ -280,7 +280,7 @@ msgstr ""
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "This mandate reference already exists"
-msgstr ""
+msgstr "Diese Mandatsreferenz existiert bereits"
 
 #: CRM/Sepa/Logic/Batching.php
 msgid "ERROR creating SDDFILE"
@@ -304,11 +304,11 @@ msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create %s mandate for contact #%s"
-msgstr ""
+msgstr "Das Mandat %s für Kontakt #%s konnte nicht erstellt werden."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create mandate"
-msgstr ""
+msgstr "Mandat konnte nicht erstellt werden"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "enter new account"
@@ -316,11 +316,11 @@ msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't load mandate #%s"
-msgstr ""
+msgstr "Mandat [%s] konnte nicht geladen werden."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Mandate #%s seems to be broken!"
-msgstr ""
+msgstr "Mandat [%s] scheint defekt zu sein!"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't load associated (r)contribution #%s"
@@ -356,21 +356,21 @@ msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "This page needs a mandate id ('mid') parameter."
-msgstr ""
+msgstr "Diese Seite benötigt eine Mandats-ID ('mid')."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Unkown action '%s'. Ignored."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot read mandate [%s]. Error was: '%s'"
-msgstr ""
+msgstr "Das Mandat [%s] konnte nicht gelesen werden. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Cannot find mandate [%s]."
-msgstr ""
+msgstr "Mandat [%s] konnte nicht gefunden werden."
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot read contribution [%s]. Error was: '%s'"
 msgstr ""
 
@@ -384,7 +384,7 @@ msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Mandate [%s] is already in use! It cannot be deleted."
-msgstr ""
+msgstr "Mandate [%s] ist bereits in Verwendung und kann nicht mehr gelöscht werden."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Cannot find contributions. Error was: '%s'"
@@ -400,15 +400,15 @@ msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Error deleting mandate: '%s'"
-msgstr ""
+msgstr "Fehler beim Löschen des Mandats: '%s' "
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Succesfully deleted mandate [%s] and %s associated contribution(s)"
-msgstr ""
+msgstr "Mandat [%s] und %s anhängige Zuwendung(en) erfolgreich gelöscht."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Mandate deleted"
-msgstr ""
+msgstr "Mandat gelöscht"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "You need to provide an end date."
@@ -418,31 +418,31 @@ msgstr ""
 msgid "You need to provide a cancel reason."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "You can only modify the end date of recurring contribution mandates."
-msgstr ""
+msgstr "Nur bei Dauerlastschrift-Mandaten kann ein Enddatum gesetzt werden."
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "You cannot set an end date in the past."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot modify recurring contribution [%s]. Error was: '%s'"
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot modify status of mandate [%s]. Error was: '%s'"
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "New end date set."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Mandate updated."
 msgstr ""
 
-#: CRM/Sepa/Page/EditMandate.php
+#: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed."
 msgstr ""
 
@@ -947,7 +947,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Set End Date"
-msgstr ""
+msgstr "Beenden"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Change the end date to:"
@@ -957,7 +957,7 @@ msgstr ""
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Clone"
-msgstr ""
+msgstr "Kopieren"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Create a new mandate similar to this."
@@ -1016,4 +1016,57 @@ msgstr ""
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Done"
 msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot set cancel reason for mandate [%s]. Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "Couldn't load campaign list."
+msgstr ""
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "Couldn't find any creditors."
+msgstr "Keine Gläubiger eingerichtet."
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "replace reason"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacing Mandate"
+msgstr "Mandat ersetzen"
+
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacement Date"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacement Reason"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Terminate this mandate:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Terminate for the following reason:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Replace"
+msgstr "Ändern"
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Replace the mandate beginning:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Replace for the following reason:"
+msgstr ""
+
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+msgid "Mandate Options"
+msgstr "Mandatsoptionen"
 

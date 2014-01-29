@@ -36,6 +36,15 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       // this is a cloned form
       $this->prepareClonedData($_REQUEST['clone']);
 
+    } else if (isset($_REQUEST['replace'])) {
+      // this is a replace form
+      $this->prepareClonedData($_REQUEST['replace']);
+      $this->assign('replace', $_REQUEST['replace']);
+      if (isset($_REQUEST['replace_date']))
+        $this->assign('replace_date', $_REQUEST['replace_date']);
+      if (isset($_REQUEST['replace_reason']))
+        $this->assign('replace_reason', $_REQUEST['replace_reason']);
+
     } else {
       // error -> no parameters set
       die(ts("This page cannot be called w/o parameters."));
@@ -139,6 +148,11 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $this->assign("error_title", ts("Couldn't create mandate"));
       $this->assign("error_message", ts($mandate['error_message']));
       return;
+    }
+
+    // if we want to replace an old mandate:
+    if (isset($_REQUEST['replace'])) {
+      CRM_Sepa_BAO_SEPAMandate::terminateMandate($_REQUEST['replace'], $_REQUEST['replace_date'], $_REQUEST['replace_reason']);
     }
 
     $this->assign("reference", $mandate_data['reference']);
@@ -352,6 +366,16 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       if (isset($_REQUEST['end_date']) && strlen($_REQUEST['end_date'])) {
         if (!$this->_check_date('end_date'))
           $errors['end_date'] = ts("Incorrect date format");        
+      }
+    }
+
+    // check replace fields
+    if (isset($_REQUEST['replace'])) {
+      if (!$this->_check_date('replace_date'))
+        $errors['replace_date'] = ts("Incorrect date format");
+
+      if (!isset($_REQUEST['replace_reason']) || strlen($_REQUEST['replace_reason']) == 0) {
+        $errors['replace_reason'] = sprintf(ts("'%s' is a required field."), ts("replace reason"));
       }
     }
 

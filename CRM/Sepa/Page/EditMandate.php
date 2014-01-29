@@ -179,7 +179,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
   function endMandate($mandate_id) {    
     $end_date = $_REQUEST['end_date'];
     if ($end_date) {
-      $this->_terminateMandate($mandate_id, $end_date);
+      CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date);
     } else {
       CRM_Core_Session::setStatus(sprintf(ts("You need to provide an end date.")), ts('Error'), 'error');      
     }
@@ -189,75 +189,10 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
   function cancelMandate($mandate_id) {
     $cancel_reason = $_REQUEST['cancel_reason'];
     if ($cancel_reason) {
-      $this->_terminateMandate($mandate_id, date("Y-m-d"), $cancel_reason);
+      CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, date("Y-m-d"), $cancel_reason);
     } else {
       CRM_Core_Session::setStatus(sprintf(ts("You need to provide a cancel reason.")), ts('Error'), 'error');
     }
   }
 
-
-
-
-
-
-  function _terminateMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL) {
-     // first, load the mandate
-    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
-    if (isset($mandate['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
-      return;
-    }
-    
-    // check the mandate type
-    if ( $mandate['type']!="RCUR" ) {
-      CRM_Core_Session::setStatus(ts("You can only modify the end date of recurring contribution mandates."), ts('Error'), 'error');
-      return;
-    }
-    
-    // load the contribution
-    $contribution_id = $mandate['entity_id'];
-    $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
-    if (isset($contribution['is_error']) && $contribution['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
-      return;
-    }
-
-    // check the date
-    $new_end_date = strtotime($new_end_date_str);
-    $old_end_date = strtotime($contribution['end_date']);
-
-    if ($new_end_date < strtotime("today")) {
-      CRM_Core_Session::setStatus(sprintf(ts("You cannot set an end date in the past."), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
-      return;      
-    }
-
-    // actually set the date
-    $query = array(
-      'version'   => 3,
-      'id'        => $contribution_id,
-      'end_date'  => date('YmdHis', $new_end_date));
-    if ($cancel_reason) {
-      $query['cancel_reason'] = $cancel_reason;
-      $query['cancel_date'] = $query['end_date'];
-      $query['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name');
-    }
-    $result = civicrm_api("ContributionRecur", "create", $query);
-    if (isset($result['is_error']) && $result['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'"), $contribution_id, $result['error_message']), ts('Error'), 'error');
-      return;
-
-    } else {
-      // success!
-      if ($cancel_reason) {
-        // ... but we also need to end the mandate
-        $result = civicrm_api("SepaMandate", "create", array('id'=>$mandate_id, 'status'=>'COMPLETE', 'version'=>3));
-        if (isset($result['is_error']) && $result['is_error']) {
-          CRM_Core_Session::setStatus(sprintf(ts("Cannot modify status of mandate [%s]. Error was: '%s'"), $mandate_id, $result['error_message']), ts('Error'), 'warn');
-        }
-      }
-
-      CRM_Core_Session::setStatus(ts("New end date set."), ts('Mandate updated.'), 'info');
-      CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed."), ts('Mandate updated.'), 'warn');
-    }
-  }
 }

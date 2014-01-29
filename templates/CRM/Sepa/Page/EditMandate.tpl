@@ -61,7 +61,7 @@
 	<div class="crm-container">
         <table class="crm-info-panel">
         	{if $sepa.status eq 'INIT'}<tr>
-            	<td class="label"><a class="button" onclick="mandate_action_activate();">{ts}Activate{/ts}</td>
+            	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_activate();">{ts}Activate{/ts}</td>
             	<td>{ts}Activate the mandate when the written permission was received.{/ts}</td>
             </tr>{/if}
 
@@ -71,17 +71,32 @@
             </tr>{/if}{/if}
 
         	{if $sepa.status eq 'OOFF' or $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
-            	<td class="label"><a class="button" onclick="mandate_action_cancel();">{ts}Cancel{/ts}</td>
+            	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_cancel();">{ts}Cancel{/ts}</td>
             	<td>{ts}Cancel this mandate immediately for the following reason:{/ts}&nbsp;<input type="text" name="cancel_reason" size="32" /></td>
             </tr>{/if}
 
             {if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
-            	<td class="label"><a class="button" onclick="mandate_action_end();">{ts}Set End Date{/ts}</td>
-            	<td>{ts}Change the end date to:{/ts}&nbsp;<input type="text" name="end_date" size="12" value="{$contribution.default_end_date}" /></td>
+            	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_end();">{ts}Set End Date{/ts}</td>
+            	<td>
+                    {ts}Terminate this mandate:{/ts}&nbsp;<input type="text" name="end_date" size="12" value="{$contribution.default_end_date}" />
+                    <br/>
+                    {ts}Terminate for the following reason:{/ts}&nbsp;
+                    <input type="text" name="end_reason" size="32" />
+                </td>
+            </tr>{/if}{/if}
+
+            {if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
+                <td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_replace();">{ts}Replace{/ts}</td>
+                <td>
+                    {ts}Replace the mandate beginning:{/ts}&nbsp;<input type="text" name="replace_date" size="12" value="{$contribution.default_end_date}" />
+                    <br/>
+                    {ts}Replace for the following reason:{/ts}&nbsp;
+                    <input type="text" name="replace_reason" size="32" />
+                </td>
             </tr>{/if}{/if}
 
             <tr>
-            	<td class="label"><a href="{crmURL p="civicrm/sepa/cmandate" q="clone=$mandate_id"}" class="button">{ts}Clone{/ts}</td>
+            	<td class="label" style="vertical-align: middle;"><a href="{crmURL p="civicrm/sepa/cmandate" q="clone=$mandate_id"}" class="button">{ts}Clone{/ts}</td>
             	<td>{ts}Create a new mandate similar to this.{/ts}</td>
             </tr>
         </table>
@@ -91,6 +106,7 @@
 <script type="text/javascript">
 cancel_reason_message = "{ts}You need to specify a cancel reason!{/ts}";
 end_date_message = "{ts}You need to specify a date!{/ts}";
+replace_url = "{crmURL p="civicrm/sepa/cmandate" q="replace=$mandate_id"}";
 
 {literal}
 function mandate_action_delete() {
@@ -109,12 +125,33 @@ function mandate_action_cancel() {
 
 function mandate_action_end() {
 	cj("#mandate_action_value").val('end');
-	if (cj("[name='end_date']").val()) {
-		cj("#sepa_action_form").submit();
-	} else {
-		alert(end_date_message);
-	}
+    if (!cj("[name='end_reason']").val()) {
+        alert(cancel_reason_message);
+        return;
+    }
+    if (!cj("[name='end_date']").val()) {
+        alert(end_date_message);
+        return;
+    }
+	cj("#sepa_action_form").submit();
 }
+
+function mandate_action_replace() {
+    cj("#mandate_action_value").val('replace');
+    if (!cj("[name='replace_reason']").val()) {
+        alert(cancel_reason_message);
+        return;
+    }
+    if (!cj("[name='replace_date']").val()) {
+        alert(end_date_message);
+        return;
+    }
+    replace_url = cj("<div/>").html(replace_url).text();
+    replace_url += '&replace_date=' + encodeURIComponent(cj("[name='replace_date']").val());
+    replace_url += '&replace_reason=' + encodeURIComponent(cj("[name='replace_reason']").val());
+    location.href = replace_url;
+}
+
 </script>
 {/literal}
 
