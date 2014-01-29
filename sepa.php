@@ -510,3 +510,23 @@ function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 function sepa_civicrm_managed(&$entities) {
   return _sepa_civix_civicrm_managed($entities);
 }
+
+/* Support SEPA mandates in merge operations
+ */
+function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL ) {
+   switch ($type) {
+    case 'relTables':
+      // Offer user to merge SEPA Mandates
+      $data['rel_table_sepamandate'] = array(
+          'title'  => ts('SEPA Mandates'),
+          'tables' => array('civicrm_sdd_mandate'),
+          'url'    => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=$cid&selectedChild=contribute'),  // '$cid' will be automatically replaced
+      );
+    break;
+
+    case 'cidRefs':
+      // this is the only field that needs to be modified
+        $data['civicrm_sdd_mandate'] = array('contact_id');
+    break;
+  }
+}
