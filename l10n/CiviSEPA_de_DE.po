@@ -28,15 +28,15 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/Form/Report/SEPAMandate.php
 msgid "Country"
-msgstr ""
+msgstr "Land"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 msgid "Iban"
-msgstr ""
+msgstr "IBAN"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 msgid "Bic"
-msgstr ""
+msgstr "BIC"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPASddFile.php
 msgid "Tag"
@@ -52,7 +52,7 @@ msgstr ""
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Reference"
-msgstr ""
+msgstr "Referenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php sepa.php
 msgid "Contact ID"
@@ -168,11 +168,11 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "validation date"
-msgstr ""
+msgstr "Validierungsdatum"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
 msgid "Filename"
-msgstr ""
+msgstr "Dateiname"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
 msgid "Comments"
@@ -180,7 +180,7 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "Collection Date"
-msgstr ""
+msgstr "Einzugsdatum"
 
 #: CRM/Sepa/Form/Report/SEPAMandate.php
 msgid "Contact Name"
@@ -228,15 +228,15 @@ msgstr "Mandatsreferenz"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "Debtor IBAN"
-msgstr ""
+msgstr "Debitor IBAN"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "Debtor BIC"
-msgstr ""
+msgstr "Debitor BIC"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "Is this mandate active ?"
-msgstr ""
+msgstr "Ist das Mandat aktiv?"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "Currency"
@@ -248,35 +248,35 @@ msgstr ""
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "every month"
-msgstr ""
+msgstr "monatlich"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "every quarter"
-msgstr ""
+msgstr "vierteljährlich"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "every 6 months"
-msgstr ""
+msgstr "halbjährig"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "every year"
-msgstr ""
+msgstr "jährlich"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "First debit on"
-msgstr ""
+msgstr "Erster Einzug am"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "IBAN is a required field"
-msgstr ""
+msgstr "IBAN ist ein Pflichtfeld"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "BIC is a required field"
-msgstr ""
+msgstr "BIC ist ein Pflichtfeld"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "Debit amount invalid/empty"
-msgstr ""
+msgstr "Einzugsbetrag unzulässig"
 
 #: CRM/Sepa/Hooks/CRMMemberFormMembership.php
 msgid "This mandate reference already exists"
@@ -284,11 +284,11 @@ msgstr "Diese Mandatsreferenz existiert bereits"
 
 #: CRM/Sepa/Logic/Batching.php
 msgid "ERROR creating SDDFILE"
-msgstr ""
+msgstr "Fehler bei Erstellen der SDD-Datei"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "This page cannot be called w/o parameters."
-msgstr ""
+msgstr "Diese Seite kann nicht ohne Parameter aufgerufen werden."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create contribution for contact #%s"
@@ -296,11 +296,11 @@ msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create contribution"
-msgstr ""
+msgstr "Konnte die Zuwendung nicht erstellen"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create note for contribution #%s"
-msgstr ""
+msgstr "Konnte die Zuwendungsnotiz für [%s] nicht erstellen"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create %s mandate for contact #%s"
@@ -324,31 +324,31 @@ msgstr "Mandat [%s] scheint defekt zu sein!"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't load associated (r)contribution #%s"
-msgstr ""
+msgstr "Konnte die anhängigen Zuwendungen nicht lesen"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "'%s' is a required field."
-msgstr ""
+msgstr "'%s' ist ein Pflichtfeld."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Cannot parse amount"
-msgstr ""
+msgstr "Der Betrag ist unzulässig"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Amount has to be positive"
-msgstr ""
+msgstr "Der Betrag muss positiv sein."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "BIC too short"
-msgstr ""
+msgstr "Die BIC ist zu kurz"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "IBAN is not correct"
-msgstr ""
+msgstr "IBAN ist nicht korrekt."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Incorrect date format"
-msgstr ""
+msgstr "Falsches Datumsformat."
 
 #: CRM/Sepa/Page/DashBoard.php
 msgid "Unknown batcher mode '%s'. No batching triggered."
@@ -372,15 +372,15 @@ msgstr "Mandat [%s] konnte nicht gefunden werden."
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot read contribution [%s]. Error was: '%s'"
-msgstr ""
+msgstr "Konnte die Zuwendung [%s] nicht lesen. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Cannot read contact [%s]. Error was: '%s'"
-msgstr ""
+msgstr "Konnte Kontakt [%s] nicht lesen. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "every %d %s"
-msgstr ""
+msgstr "alle %d %s"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Mandate [%s] is already in use! It cannot be deleted."
@@ -388,15 +388,15 @@ msgstr "Mandate [%s] ist bereits in Verwendung und kann nicht mehr gelöscht wer
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Cannot find contributions. Error was: '%s'"
-msgstr ""
+msgstr "Konnte Zuwendungen nicht finden. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Error deleting contribution [%s]: '%s'"
-msgstr ""
+msgstr "Kann Zuwendung [%s] nicht löschen. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Error deleting recurring contribution: '%s'"
-msgstr ""
+msgstr "Konnte die Wiederkehrende Zuwendung [%s] nicht löschen."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Error deleting mandate: '%s'"
@@ -412,11 +412,11 @@ msgstr "Mandat gelöscht"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "You need to provide an end date."
-msgstr ""
+msgstr "Sie müssen ein Enddatum angeben."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "You need to provide a cancel reason."
-msgstr ""
+msgstr "Sie müssen eine Beendigungsgrund angeben."
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "You can only modify the end date of recurring contribution mandates."
@@ -424,31 +424,31 @@ msgstr "Nur bei Dauerlastschrift-Mandaten kann ein Enddatum gesetzt werden."
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "You cannot set an end date in the past."
-msgstr ""
+msgstr "Das Enddatum liegt in der Vergangenheit."
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot modify recurring contribution [%s]. Error was: '%s'"
-msgstr ""
+msgstr "Konnte die Zuwendung [%s] nicht aktualisieren. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot modify status of mandate [%s]. Error was: '%s'"
-msgstr ""
+msgstr "Konnte das Mandat [%s] nicht aktualisieren. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "New end date set."
-msgstr ""
+msgstr "Neues Enddatum übernommen."
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Mandate updated."
-msgstr ""
+msgstr "Mandat wurde aktualisiert."
 
 #: CRM/Sepa/Page/EditMandate.php CRM/Sepa/BAO/SEPAMandate.php
 msgid "Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed."
-msgstr ""
+msgstr "Bitte beachten Sie, dass alle <i>geschlossenen</i> Gruppen die dieses Mandat beinhalten nicht mehr geändert werden können - alle dort enthaltenen Zuwendungen werden weiterhin eingezogen."
 
 #: CRM/Sepa/Page/SepaFile.php
 msgid "Generate XML File"
-msgstr ""
+msgstr "Erzeuge XML-Datei"
 
 #: SEPA_File_Formats.mgd.php
 msgid "SEPA XML File Format Variants"
@@ -464,15 +464,15 @@ msgstr ""
 
 #: hooks.php
 msgid "invalid IBAN"
-msgstr ""
+msgstr "unzulässige IBAN"
 
 #: hooks.php
 msgid "invalid BIC"
-msgstr ""
+msgstr "unzulässige BIC"
 
 #: sepa.php
 msgid "Can't find the sepa mandate"
-msgstr ""
+msgstr "Kann das Mandat nicht finden"
 
 #: sepa.php
 msgid "Organisation Name"
@@ -480,7 +480,7 @@ msgstr ""
 
 #: sepa.php
 msgid "%1 is a required field."
-msgstr ""
+msgstr "%1 ist ein Pflichtfeld"
 
 #: sepa.php
 msgid "Address"
@@ -488,7 +488,7 @@ msgstr ""
 
 #: sepa.php
 msgid "Activate new mandates directly when submitted"
-msgstr ""
+msgstr "Mandat direkt aktivieren"
 
 #: sepa.php
 msgid "Mandate Prefix"
@@ -496,7 +496,7 @@ msgstr ""
 
 #: sepa.php
 msgid "%1 must be a number"
-msgstr ""
+msgstr "%1 muss eine Zahl sein"
 
 #: sepa.php
 msgid "Active mandate"
@@ -504,7 +504,7 @@ msgstr ""
 
 #: sepa.php
 msgid "SEPA Creditor"
-msgstr ""
+msgstr "SEPA Gläubiger"
 
 #: CRM/Sepa/Page/SepaMandatePdf.php
 msgid "Error sending $fileName: Contact doesn't have an email."
@@ -789,7 +789,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Mandate successfully created."
-msgstr ""
+msgstr "SEPA Mandat wurde erfolgreich erstellt."
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Reference is"
@@ -805,31 +805,31 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "show active groups"
-msgstr ""
+msgstr "Aktive Gruppen anzeigen"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "show closed groups"
-msgstr ""
+msgstr "Abgeschlossene Gruppen anzeigen"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "update one-off"
-msgstr ""
+msgstr "Einzeleinzüge Aktualisieren"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "update recurring"
-msgstr ""
+msgstr "Dauereinzüge Aktualisieren"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Submission"
-msgstr ""
+msgstr "Übermittlungsdatum"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Collection"
-msgstr ""
+msgstr "Einzugsdatum"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Transactions"
-msgstr ""
+msgstr "Zahlungen"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Total"
@@ -841,31 +841,31 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Close and Submit"
-msgstr ""
+msgstr "Schließen und Senden"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Download Again"
-msgstr ""
+msgstr "Herunterladen"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "SEPA Recurring Mandate"
-msgstr ""
+msgstr "SEPA Dauereinzugs-Mandat"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "SEPA Single Payment Mandate"
-msgstr ""
+msgstr "SEPA Einzeleinzugs-Mandat"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Not activated"
-msgstr ""
+msgstr "Nicht aktiv"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Ready"
-msgstr ""
+msgstr "Bereit"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "In Use"
-msgstr ""
+msgstr "In Verwendung"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Completed"
@@ -873,25 +873,25 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Suspended"
-msgstr ""
+msgstr "Ausgesetzt"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Creation date"
-msgstr ""
+msgstr "Erstellungsdatum"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Signature date"
-msgstr ""
+msgstr "Unterschriftsdatum"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Validation date"
-msgstr ""
+msgstr "Validierungsdatum"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Payment Details"
