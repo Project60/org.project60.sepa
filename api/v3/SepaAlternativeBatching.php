@@ -45,7 +45,8 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
   if (isset($result['is_error']) && $result['is_error']) {
     return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
-  } 
+  }
+  $collection_date = $txgroup['collection_date'];
 
 
   // step 2: update the mandates
@@ -97,8 +98,15 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
     return civicrm_api3_create_error("Group type '".$txgroup['type']."' not yet supported.");
   }
 
-  // step 3: update all the contributions to status 'in progress'
-  CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id=$status_inprogress WHERE id IN (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);");
+  // step 3: update all the contributions to status 'in progress', and set the receive_date as collection
+  CRM_Core_DAO::executeQuery("
+    UPDATE 
+      civicrm_contribution 
+    SET 
+      contribution_status_id = $status_inprogress,
+      receive_date = '$collection_date'
+    WHERE id IN 
+      (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);");
 
   // step 4: create the sepa file
   $sepa_file = civicrm_api('SepaSddFile', 'create', array(
