@@ -157,6 +157,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'"), $mandate['entity_id'], $delete['error_message']), ts('Error'), 'error');
         return;
       }
+      array_push($contributions, $mandate['entity_id']);
     }
 
     $delete = civicrm_api('SepaMandate', "delete", array('id' => $mandate['id'], 'version'=>3));
