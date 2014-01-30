@@ -164,38 +164,6 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
   }
 
-  if ("CRM_Contribute_Form_Contribution" == $formName
-      && isset($form->_values) // Deal with weird recursive partial invocation...
-  ) {
-    if (!array_key_exists("contribution_recur_id",$form->_values)) {
-      // This is a one-off contribution => insert mandate block.
-
-      if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id'])))
-        return;
-
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
-      $form->assign($mandate);
-
-      $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
-      $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
-      $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
-
-      CRM_Core_Region::instance('page-body')->add(array(
-        'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
-      ));
-    } else {
-      // This is an installment of a recurring contribution.
-      if (false) { //TODO remove definitely if we don't do anything with it
-        //should we be able to set the mandate info from the contribution?
-        $id=$form->_values['contribution_recur_id'];
-        $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
-        if (!array_key_exists("id",$mandate))
-          return;
-        //TODO, add in the form? link to something else?
-      }
-    }
-  }
-
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );
     $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
@@ -482,7 +450,7 @@ function sepa_civicrm_managed(&$entities) {
 function sepa_civicrm_summaryActions( &$actions, $contactID ) {
   // add "create SEPA mandate action"
   $actions['sepa_contribution'] = array(
-      'title'           => "SEPA Spende hinzufügen",
+      'title'           => ts("Record SEPA Contribution"),
       'weight'          => 5,
       'ref'             => 'new-sepa-contribution',
       'key'             => 'sepa_contribution',
