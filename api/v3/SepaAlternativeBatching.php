@@ -208,6 +208,7 @@ function _sepa_alternative_batching_update_rcur($params) {
   $mandates_by_nextdate = array();
   foreach ($relevant_mandates as $mandate) {
     $next_date = _sepa_alternative_get_next_execution_date($mandate, $now);
+    if ($next_date==NULL) continue;
     if ($next_date > $latest_date) continue;
 
     if (!isset($mandates_by_nextdate[$next_date]))
