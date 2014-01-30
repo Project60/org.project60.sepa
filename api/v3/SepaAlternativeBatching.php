@@ -174,6 +174,7 @@ function _sepa_alternative_batching_update_rcur($params) {
       mandate.id AS mandate_id,
       mandate.contact_id AS mandate_contact_id,
       mandate.entity_id AS mandate_entity_id,
+      mandate.source AS mandate_source,
       first_contribution.receive_date AS mandate_first_executed,
       rcontribution.cycle_day AS cycle_day,
       rcontribution.frequency_interval AS frequency_interval,
@@ -201,6 +202,7 @@ function _sepa_alternative_batching_update_rcur($params) {
         'mandate_contact_id'            => $results->mandate_contact_id,
         'mandate_entity_id'             => $results->mandate_entity_id,
         'mandate_first_executed'        => $results->mandate_first_executed,
+        'mandate_source'                => $results->mandate_source,
         'cycle_day'                     => $results->cycle_day,
         'frequency_interval'            => $results->frequency_interval,
         'frequency_unit'                => $results->frequency_unit,
@@ -255,7 +257,7 @@ function _sepa_alternative_batching_update_rcur($params) {
     foreach ($mandates as $index => $mandate) {
       $recur_id = $mandate['mandate_entity_id'];
       if (isset($existing_contributions_by_recur_id[$recur_id])) {
-        // if the contribtion already exists, store it
+        // if the contribution already exists, store it
         $contribution_id = $existing_contributions_by_recur_id[$recur_id];
         unset($existing_contributions_by_recur_id[$recur_id]);
         $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution_id;
@@ -267,22 +269,19 @@ function _sepa_alternative_batching_update_rcur($params) {
             "receive_date"                        => $collection_date,
             "contact_id"                          => $mandate['rc_contact_id'],
             "contribution_recur_id"               => $recur_id,
+            "source"                              => $mandate['mandate_source'],
             "financial_type_id"                   => $mandate['rc_financial_type_id'],
             "contribution_status_id"              => $mandate['rc_contribution_status_id'],
             "campaign_id"                         => $mandate['rc_campaign_id'],
             "payment_instrument_id"               => $mandate['rc_payment_instrument_id'],
           );
-        $contribtion = civicrm_api('Contribution', 'create', $contribution_data);
+        $contribution = civicrm_api('Contribution', 'create', $contribution_data);
         // TODO: Error handling
-        $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribtion['id'];
+        $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution['id'];
         unset($existing_contributions_by_recur_id[$recur_id]);
       }
     }
   }
-
-  // print_r("<pre>");
-  // print_r($mandates_by_nextdate);
-  // print_r("</pre>");
 
   // delete unused contributions:
   foreach ($existing_contributions_by_recur_id as $contribution_id) {
@@ -305,6 +304,10 @@ function _sepa_alternative_batching_update_rcur($params) {
     $collection_date = date('Y-m-d', strtotime($results->collection_date));
     $existing_groups[$collection_date] = $results->txgroup_id;
   }
+
+  // print_r("$mode<pre>");
+  // print_r($mandates_by_nextdate);
+  // print_r("</pre>");
 
   // step 6: sync calculated group structure with existing (open) groups
   return _sepa_alternative_batching_sync_groups($mandates_by_nextdate, $existing_groups, $mode, 'RCUR', $rcur_notice);

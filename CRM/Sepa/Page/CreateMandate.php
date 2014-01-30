@@ -70,7 +70,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'payment_instrument_id'     => $payment_instrument_id,
         'contribution_status_id'    => $contribution_status_id,
         'currency'                  => 'EUR',
-        'source'                    => $_REQUEST['source'],
       );
 
     if ($type=='OOFF') {
@@ -78,6 +77,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $entity_table = 'civicrm_contribution';
       $contribution_data['total_amount'] = number_format($_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['receive_date'] = $_REQUEST['date'];
+      $contribution_data['source'] = $_REQUEST['source'];
       $contribution = civicrm_api('Contribution', 'create', $contribution_data);
     } else if ($type=='RCUR') {
       $initial_status = 'FRST';
@@ -126,6 +126,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'debug'                     => 1,
         'reference'                 => "WILL BE SET BY HOOK",
         'contact_id'                => $_REQUEST['contact_id'],
+        'source'                    => $_REQUEST['source'],
         'entity_table'              => $entity_table,
         'entity_id'                 => $contribution['id'],
         'creation_date'             => date('YmdHis'),
