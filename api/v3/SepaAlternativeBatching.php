@@ -109,24 +109,28 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
       (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);");
 
   // step 4: create the sepa file
-  $sepa_file = civicrm_api('SepaSddFile', 'create', array(
-        'version'                 => 3,
-        'reference'               => "SDDXML-".$txgroup['reference'],
-        'filename'                => "SDDXML-".$txgroup['reference'].'.xml',
-        'latest_submission_date'  => $txgroup['latest_submission_date'],
-        'created_date'            => date('Ymdhis'),
-        'created_id'              => 2,
-        'status_id'               => $status_closed)
-    );
-  if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
-    return civicrm_api3_create_error(sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']));
-  }  
+  if (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id']) {
+    $sepa_file = civicrm_api('SepaSddFile', 'create', array(
+          'version'                 => 3,
+          'reference'               => "SDDXML-".$txgroup['reference'],
+          'filename'                => "SDDXML-".$txgroup['reference'].'.xml',
+          'latest_submission_date'  => $txgroup['latest_submission_date'],
+          'created_date'            => date('Ymdhis'),
+          'created_id'              => 2,
+          'status_id'               => $status_closed)
+      );
+    if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
+      return civicrm_api3_create_error(sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']));
+    } else {
+      $txgroup['sdd_file_id'] = $sepa_file['id'];
+    } 
+  }
 
   // step 5: close the txgroup object
   $result = civicrm_api('SepaTransactionGroup', 'create', array(
         'id'                      => $txgroup_id, 
         'status_id'               => $status_closed, 
-        'sdd_file_id'             => $sepa_file['id'],
+        'sdd_file_id'             => $txgroup['sdd_file_id'],
         'version'                 => 3));
   if (isset($result['is_error']) && $result['is_error']) {
     return civicrm_api3_create_error(sprintf(ts("Cannot close transaction group! Error was: '%s'"), $result['error_message']));
