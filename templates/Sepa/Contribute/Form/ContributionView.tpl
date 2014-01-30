@@ -23,10 +23,7 @@
 {literal}
 <script type="text/javascript">
 cj(document).ready(function() {
-  cj(".crm-submit-buttons").filter(
-    function() {
-      return this.id != "new_submit_buttons";
-    }).hide();
+  cj("div.crm-submit-buttons").last().hide();
 });
 </script>
 {/literal}
