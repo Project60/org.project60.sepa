@@ -118,8 +118,8 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
         'created_id'              => 2,
         'status_id'               => $status_closed)
     );
-  if ($sepa_file['is_error']) {
-    return civicrm_api3_create_error("Cannot create file!");
+  if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
+    return civicrm_api3_create_error(sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']));
   }  
 
   // step 5: close the txgroup object
@@ -128,8 +128,8 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
         'status_id'               => $status_closed, 
         'sdd_file_id'             => $sepa_file['id'],
         'version'                 => 3));
-  if ($result['is_error']) {
-    return civicrm_api3_create_error("Cannot close transaction group!");
+  if (isset($result['is_error']) && $result['is_error']) {
+    return civicrm_api3_create_error(sprintf(ts("Cannot close transaction group! Error was: '%s'"), $result['error_message']));
   } 
 
   return civicrm_api3_create_success($result, $params);  
