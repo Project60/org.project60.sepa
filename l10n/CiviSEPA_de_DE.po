@@ -722,9 +722,9 @@ msgstr ""
 msgid "Billing Address"
 msgstr ""
 
-#: templates/CRM/Contribute/Page/Tab.extra.tpl
+#: templates/CRM/Contribute/Page/Tab.extra.tpl sepa.php
 msgid "Record SEPA Contribution"
-msgstr ""
+msgstr "SEPA Einzug erfassen"
 
 #: templates/CRM/Sepa/Form/SepaMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
@@ -935,7 +935,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Completely delete this mandate along with the contribution. This is only possible because it has not yet been submitted to the bank."
-msgstr ""
+msgstr "Dieses Mandat unwiederbringlich löschen. Dies ist nur möglich da es noch nicht der Bank übermittelt wurde."
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel"
@@ -961,7 +961,7 @@ msgstr "Kopieren"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Create a new mandate similar to this."
-msgstr ""
+msgstr "Ein neues Mandat basierend auf diesem erstellen."
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "You need to specify a cancel reason!"
@@ -1047,11 +1047,11 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Terminate this mandate:"
-msgstr ""
+msgstr "Mandat beenden zum:"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Terminate for the following reason:"
-msgstr ""
+msgstr "Beendigungsgrund:"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Replace"
@@ -1059,11 +1059,11 @@ msgstr "Ändern"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Replace the mandate beginning:"
-msgstr ""
+msgstr "Mandat ändern zum:"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Replace for the following reason:"
-msgstr ""
+msgstr "Grund der Änderung:"
 
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
@@ -1073,4 +1073,12 @@ msgstr "Mandatsoptionen"
 #: sepa.php
 msgid "SEPA Mandates"
 msgstr "SEPA Mandate"
+
+#: api/v3/SepaAlternativeBatching.php
+msgid "Cannot create file! Error was: '%s'"
+msgstr "Die XML-Datei [%s] konnte nicht erzeugt werden. Fehler ist: '%s'"
+
+#: api/v3/SepaAlternativeBatching.php
+msgid "Cannot close transaction group! Error was: '%s'"
+msgstr "Die Gruppe [%s] konnte nicht geschlossen werden. Fehler ist: '%s'"
 

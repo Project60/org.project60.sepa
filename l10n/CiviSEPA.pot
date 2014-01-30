@@ -711,7 +711,7 @@ msgstr ""
 msgid "Billing Address"
 msgstr ""
 
-#: templates/CRM/Contribute/Page/Tab.extra.tpl
+#: templates/CRM/Contribute/Page/Tab.extra.tpl sepa.php
 msgid "Record SEPA Contribution"
 msgstr ""
 
@@ -1063,4 +1063,12 @@ msgstr ""
 
 #: sepa.php
 msgid "SEPA Mandates"
+msgstr ""
+
+#: api/v3/SepaAlternativeBatching.php
+msgid "Cannot create file! Error was: '%s'"
+msgstr ""
+
+#: api/v3/SepaAlternativeBatching.php
+msgid "Cannot close transaction group! Error was: '%s'"
 msgstr ""
