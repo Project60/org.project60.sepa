@@ -470,7 +470,12 @@ function _sepa_alternative_batching_update_ooff($params) {
 
 
 
+/**
+ * subroutine to create the group/contribution structure as calculated
+ */
 function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_groups, $mode, $type, $notice) {
+  $group_status_id_open = 2;    // TODO: look up
+
   foreach ($calculated_groups as $collection_date => $mandates) {
     if (!isset($existing_groups[$collection_date])) {
       // this group does not yet exist -> create
@@ -492,7 +497,7 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
           'collection_date'         => $collection_date,
           'latest_submission_date'  => date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
           'created_date'            => date('Y-m-d'),
-          'status_id'               => 2,
+          'status_id'               => $group_status_id_open,
           'sdd_creditor_id'         => $creditor_id,
           ));
       // TODO: error handling
@@ -533,10 +538,32 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
   // print_r($calculated_groups);
   // print_r("</pre>");
 
-  // finally, remove unwanted groups alltogether...
-  foreach ($existing_groups as $collection_date => $group_id) {
+  // CLEANUP: remove nonexisting contributions from groups
+  CRM_Core_DAO::executeQuery("
+    DELETE FROM civicrm_sdd_contribution_txgroup 
+    WHERE contribution_id NOT IN (SELECT id FROM civicrm_contribution);");
+
+  // CLEANUP: delete empty groups
+  $empty_group_query = CRM_Core_DAO::executeQuery("
+    SELECT id, sdd_file_id 
+    FROM civicrm_sdd_txgroup 
+    WHERE type = '$mode'
+      AND status_id = $group_status_id_open
+      AND id NOT IN (SELECT txgroup_id FROM civicrm_sdd_contribution_txgroup);");
+  while ($empty_group_query->fetch()) {
+    if (!in_array($empty_group_query->id, $existing_groups))
+      array_push($existing_groups, $empty_group_query->id);
+    if ($empty_group_query->sdd_file_id) {
+      error_log("org.project60.sepa: WARNING: txgroup ".$empty_group_query->id." should be deleted, but already has a file. Trouble ahead.");
+    }
+  }
+
+  // now, use the API to delete all these groups
+  foreach ($existing_groups as $group_id) {
     $result = civicrm_api('SepaTransactionGroup', 'delete', array('version' => 3, 'id' => $group_id));
-    // TODO: error handling
+    if (isset($result['is_error']) && $result['is_error']) {
+      error_log("org.project60.sepa: Cannot delete txgroup ".$group_id.". Error was ".$result['error_message']);
+    }
   }
 
   return civicrm_api3_create_success();
