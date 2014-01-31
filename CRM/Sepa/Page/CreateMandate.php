@@ -40,10 +40,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       // this is a replace form
       $this->prepareClonedData($_REQUEST['replace']);
       $this->assign('replace', $_REQUEST['replace']);
-      if (isset($_REQUEST['replace_date']))
+      if (isset($_REQUEST['replace_date'])) {
         $this->assign('replace_date', $_REQUEST['replace_date']);
-      if (isset($_REQUEST['replace_reason']))
+        $this->assign('start_date', $_REQUEST['replace_date']);
+        $this->assign('end_date', '');
+      }
+      if (isset($_REQUEST['replace_reason'])) {
         $this->assign('replace_reason', $_REQUEST['replace_reason']);
+      }
 
     } else {
       // error -> no parameters set

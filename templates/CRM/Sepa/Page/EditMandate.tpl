@@ -47,7 +47,8 @@
 	            <tr><td class="label">{ts}Last Modified{/ts}</td><td>{$contribution.modified_date}</td></tr>
 	            <tr><td class="label">{ts}Frequency{/ts}</td><td>{$contribution.cycle}</td></tr>
 	            <tr><td class="label">{ts}Collection Day{/ts}</td><td>{$contribution.cycle_day}.</td></tr>
-	            <tr><td class="label">{ts}End Date{/ts}</td><td>{$contribution.end_date}</td></tr>
+                <tr><td class="label">{ts}Start Date{/ts}</td><td>{$contribution.start_date}</td></tr>
+                <tr><td class="label">{ts}End Date{/ts}</td><td>{$contribution.end_date}</td></tr>
            	{else}
             	{* this is a simple contribution *}
                 <tr><td class="label">{ts}Date{/ts}</td><td>{$contribution.receive_date}</td></tr>

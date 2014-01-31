@@ -164,6 +164,8 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    * gracefully terminates RCUR mandates 
    */
   static function terminateMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL) {
+    $contribution_id_pending = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+
      // first, load the mandate
     $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
     if (isset($mandate['is_error'])) {
@@ -186,10 +188,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     // check the date
+    $today = strtotime("today");
     $new_end_date = strtotime($new_end_date_str);
-    $old_end_date = strtotime($contribution['end_date']);
 
-    if ($new_end_date < strtotime("today")) {
+    if ($new_end_date < $today) {
       CRM_Core_Session::setStatus(sprintf(ts("You cannot set an end date in the past."), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
       return;      
     }
@@ -203,40 +205,73 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       // FIXME: cancel_reason does not exist in contribution_recur!!
       //$query['cancel_reason'] = $cancel_reason;
       $query['cancel_date'] = $query['end_date'];
-      $query['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name');
     }
+
     $result = civicrm_api("ContributionRecur", "create", $query);
     if (isset($result['is_error']) && $result['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'"), $contribution_id, $result['error_message']), ts('Error'), 'error');
-      return;
+        return;
+    }
 
-    } else {
-      // success!
-      if ($cancel_reason) {
-        // ... but we also need to end the mandate
-        $result = civicrm_api("SepaMandate", "create", array('id'=>$mandate_id, 'status'=>'COMPLETE', 'version'=>3));
-        if (isset($result['is_error']) && $result['is_error']) {
-          CRM_Core_Session::setStatus(sprintf(ts("Cannot modify status of mandate [%s]. Error was: '%s'"), $mandate_id, $result['error_message']), ts('Error'), 'warn');
-        }
-
-        // ..and create a note, since the contribution_recur does not have cancel_reason
-        $note_result = civicrm_api("Note", "create", array(
-          'version'       => 3,
-          'entity_table'  => 'civicrm_contribution_recur',
-          'entity_id'     => $contribution_id,
-          'modified_date' => date('YmdHis'),
-          'subject'       => 'cancel_reason',
-          'note'          => $cancel_reason,
-          'privacy'       => 0));
-        if (isset($note_result['is_error']) && $note_result['is_error']) {
-          CRM_Core_Session::setStatus(sprintf(ts("Cannot set cancel reason for mandate [%s]. Error was: '%s'"), $mandate_id, $note_result['error_message']), ts('Error'), 'warn');
-        }
+    // set the cancel reason
+    if ($cancel_reason) {
+      // ..and create a note, since the contribution_recur does not have cancel_reason
+      $note_result = civicrm_api("Note", "create", array(
+        'version'       => 3,
+        'entity_table'  => 'civicrm_contribution_recur',
+        'entity_id'     => $contribution_id,
+        'modified_date' => date('YmdHis'),
+        'subject'       => 'cancel_reason',
+        'note'          => $cancel_reason,
+        'privacy'       => 0));
+      if (isset($note_result['is_error']) && $note_result['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot set cancel reason for mandate [%s]. Error was: '%s'"), $mandate_id, $note_result['error_message']), ts('Error'), 'warn');
       }
+    }
 
-      CRM_Core_Session::setStatus(ts("New end date set."), ts('Mandate updated.'), 'info');
-      CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed."), ts('Mandate updated.'), 'warn');
+    // find already created contributions that are now obsolete...
+    $obsolete_ids = array();
+    $deleted_ids = array();
+    $obsolete_query = "
+    SELECT id
+    FROM civicrm_contribution
+    WHERE receive_date > '$new_end_date_str'
+      AND contribution_recur_id = $contribution_id
+      AND contribution_status_id = $contribution_id_pending;";
+    $obsolete_ids_query = CRM_Core_DAO::executeQuery($obsolete_query);
+    while ($obsolete_ids_query->fetch()) {
+      array_push($obsolete_ids, $obsolete_ids_query->id);
+    }    
+
+    // ...and delete them:
+    foreach ($obsolete_ids as $obsolete_id) {
+      $delete_result = civicrm_api("Contribution", "delete", array('id'=>$obsolete_id, 'version'=>3));
+      if (isset($delete_result['is_error']) && $delete_result['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot delete scheduled contribution [%s]. Error was: '%s'"), $obsolete_id, $delete_result['error_message']), ts('Error'), 'warn');
+      } else {
+        array_push($deleted_ids, $obsolete_id);
+      }
+    }
+    if (count($deleted_ids)) {
+      // also, remove them from the groups
+      $deleted_ids_string = implode(',', $deleted_ids);
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id IN ($deleted_ids_string);");
+    }
+
+    // finally, let the API close the mandate if end_date is now
+    if ($new_end_date<=$today) {
+      $close_result = civicrm_api("SepaAlternativeBatching", "closeended", array('version'=>3));
+      if (isset($close_result['is_error']) && $close_result['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Closing Mandate failed. Error was: '%s'"), $close_result['error_message']), ts('Error'), 'warn');
+      }
+    }
+
+    CRM_Core_Session::setStatus(ts("New end date set."), ts('Mandate updated.'), 'info');
+    CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed."), ts('Mandate updated.'), 'warn');    
+  
+    if (count($deleted_ids)) {
+      CRM_Core_Session::setStatus(sprintf(ts("Successfully deleted %d now obsolete contributions."), count($deleted_ids)), ts('Mandate updated.'), 'info');
     }
   }
-
 }
 
