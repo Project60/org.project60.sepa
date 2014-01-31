@@ -27,12 +27,11 @@
 */
 
 /**
- * File for the CiviCRM APIv3 sepa_contribution_group functions
+ * API CALL TO CLOSE TXGROUPs
  *
  * @package CiviCRM_SEPA
  *
  */
-
 function civicrm_api3_sepa_alternative_batching_close($params) {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
@@ -144,23 +143,101 @@ function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
 }
 
 
+/**
+ * API CALL TO CLOSE MANDATES THAT ENDED
+ *
+ * @package CiviCRM_SEPA
+ *
+ */
+function civicrm_api3_sepa_alternative_batching_closeended($params) {
+  if (!isset($params['mode']) || ($params['mode']!='FRST' && $params['mode']!='RCUR')) {
+    // as a default, do both
+    $modes = "'FRST','RCUR'";
+  } else {
+    $modes = "'".$params['mode']."'";
+  }
+  $contribution_status_closed = 1;      // TODO: look that up
+
+  // first, load all of the mandates, that have run out
+  $sql_query = "
+    SELECT
+      mandate.id AS mandate_id,
+      mandate.entity_id AS mandate_entity_id,
+      rcontribution.end_date AS end_date
+    FROM civicrm_sdd_mandate AS mandate
+    INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id
+    WHERE mandate.type = 'RCUR'
+      AND mandate.status IN ($modes)
+      AND end_date < DATE(NOW());";
+  $results = CRM_Core_DAO::executeQuery($sql_query);
+  $mandates_to_end = array();
+  while ($results->fetch()) {
+    array_push($mandates_to_end, array('mandate_id'=>$results->mandate_id, 'recur_id'=>$results->mandate_entity_id));
+  }
+  
+  // then, end them one by one
+  foreach ($mandates_to_end as $mandate_to_end) {
+    $change_mandate = civicrm_api('SepaMandate', 'create', array(
+      'id'                      => $mandate_to_end['mandate_id'],
+      'status'                  => 'COMPLETE',
+      'version'                 => 3));
+    if (isset($change_mandate['is_error']) && $change_mandate['is_error']) {
+      return civicrm_api3_create_error(sprintf("Couldn't set mandate '%s' to 'complete. Error was: '%s'", $mandates_to_end['mandate_id']), $change_mandate['error_message']);
+    }
+
+    $change_rcur = civicrm_api('ContributionRecur', 'create', array(
+      'id'                      => $mandate_to_end['recur_id'],
+      'contribution_status_id'  => $contribution_status_closed,
+      'modified_date'           => date('Ymdhis'),
+      'version'                 => 3));
+    if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
+      return civicrm_api3_create_error(sprintf("Couldn't set recurring contribution '%s' to 'complete. Error was: '%s'", $mandates_to_end['recur_id']), $change_rcur['error_message']);
+    }
+  }
+
+  return civicrm_api3_create_success($mandates_to_end, $params);
+}
 
 
 
-
+/**
+ * API CALL TO UPDATE TXGROUPs ("Batching")
+ *
+ * @package CiviCRM_SEPA
+ *
+ */
 function civicrm_api3_sepa_alternative_batching_update($params) {
   if ($params['type']=='OOFF') {
     $result = _sepa_alternative_batching_update_ooff($params);
+
   } elseif ($params['type']=='RCUR' || $params['type']=='FRST') {
+    // first: make sure, that there are no outdated mandates:
+    civicrm_api3_sepa_alternative_batching_closeended(array("mode"=>$params['type']=='FRST'));
+
+    // then, run the update for recurring mandates
     $result = _sepa_alternative_batching_update_rcur($params);
+
   } else {
     return civicrm_api3_create_error(sprintf("Unknown batching mode '%s'.", $params['type']));
   }
+
   return civicrm_api3_create_success($result, $params);
 }
 
 
 
+
+
+
+
+// ############################################################################
+//                              Helper functions
+// ############################################################################
+
+
+/**
+ * runs a batching update for all RCUR mandates of the given type
+ */
 function _sepa_alternative_batching_update_rcur($params) {
   $mode = $params['type'];
   $horizon = (int) _sepa_alternative_batching_get_parameter("org.project60.alternative_batching.$mode.horizon_days");
@@ -168,7 +245,7 @@ function _sepa_alternative_batching_update_rcur($params) {
   $rcur_notice = (int) _sepa_alternative_batching_get_parameter("org.project60.alternative_batching.$mode.notice");
   $now = strtotime("+$rcur_notice days");
 
-  // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
+  // RCUR-STEP 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
   $sql_query = "
     SELECT
       mandate.id AS mandate_id,
@@ -218,7 +295,7 @@ function _sepa_alternative_batching_update_rcur($params) {
       );
   }
 
-  // step 2: calculate next execution date
+  // RCUR-STEP 2: calculate next execution date
   $mandates_by_nextdate = array();
   foreach ($relevant_mandates as $mandate) {
     $next_date = _sepa_alternative_get_next_execution_date($mandate, $now);
@@ -231,7 +308,7 @@ function _sepa_alternative_batching_update_rcur($params) {
   }
 
 
-  // step 3: find already created contributions
+  // RCUR-STEP 3: find already created contributions
   $existing_contributions_by_recur_id = array();  
   foreach ($mandates_by_nextdate as $collection_date => $mandates) {
     $rcontrib_ids = array();
@@ -252,7 +329,7 @@ function _sepa_alternative_batching_update_rcur($params) {
     }
   }
 
-  // step 4: create the missing contributions, store all in $mandate['mandate_entity_id']
+  // RCUR-STEP 4: create the missing contributions, store all in $mandate['mandate_entity_id']
   foreach ($mandates_by_nextdate as $collection_date => $mandates) {
     foreach ($mandates as $index => $mandate) {
       $recur_id = $mandate['mandate_entity_id'];
@@ -314,6 +391,9 @@ function _sepa_alternative_batching_update_rcur($params) {
 }
 
 
+/**
+ * runs a batching update for all OOFF mandates
+ */
 function _sepa_alternative_batching_update_ooff($params) {
   $horizon = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.horizon_days');
   $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.notice');
