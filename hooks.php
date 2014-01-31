@@ -60,6 +60,25 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
 
 }
 
+
+function sepa_civicrm_pre($op, $objectName, $id, &$params) {
+  // FIXME: move this into validation?
+  // disallow the deletion of a (recurring) contribution if it is attached to mandates
+  if ($op=='delete' && ($objectName=='Contribution' || $objectName=='ContributionRecur')) {
+    if ($objectName=='Contribution') {
+      $table = 'civicrm_contribution';
+    } else {
+      $table = 'civicrm_contribution_recur';
+    }
+
+    $query = "SELECT id FROM civicrm_sdd_mandate WHERE entity_id=$id AND entity_table='$table';";
+    $result = CRM_Core_DAO::executeQuery($query);
+    if ($result->fetch()) {
+      die(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"), $result->id));
+    }
+  }
+}
+
 // HOOKS DISABLED! We will use an alternative batching method...
 
 // /**
