@@ -41,7 +41,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $status_2_title[$value] = $title;
       }
     }
-   
+
     $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
         "version"     => 3, 
         "sequential"  => 1, 
@@ -63,8 +63,10 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         } else {
           if ($remaining_days < 3) {
             $group['submit'] = 'urgently';
-          } else {
+          } elseif ($remaining_days < 7) {
             $group['submit'] = 'soon';
+          } else {
+            $group['submit'] = 'later';
           }
         }
 

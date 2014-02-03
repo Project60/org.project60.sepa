@@ -64,7 +64,7 @@
     <td>{$group.total} &euro;</td>
     <td>
       <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts}Contributions{/ts}</a>
-      {if $group.status_id == '2'}
+      {if $group.status == 'open'}
         <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">{ts}Close and Submit{/ts}</a>
       {else}
         <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}.xml" class="button button_export">{ts}Download Again{/ts}</a>
