@@ -14,32 +14,23 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   static function add(&$params) {
 
-    // handle creation of a new mandate 
-
-    if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
-      CRM_Utils_SepaCustomisationHooks::create_mandate($params);
-
-      if (!array_key_exists("reference", $params)) {
-        $fallback_reference = true;
-        // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
-        $params['reference'] = time() . rand();
-      }
-      //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
-    }
-
-    // fix payment processor-created contributions before continuing
-    // if (CRM_Utils_Array::value('is_enabled', $params)) {
-    //   CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);
-    // }
-    
-    // handle 'normal' creation process inlcuding hooks
-    
+    // handle 'normal' creation process inlcuding hooks    
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
 
     // set default date to today
     if (!array_key_exists("date", $params)) {
       $params["date"] = date("YmdHis");
+    }
+
+    if (empty($params['id'])) {
+      CRM_Utils_SepaCustomisationHooks::create_mandate($params);
+
+      if (empty($params['reference'])) {
+        // If no mandate reference was supplied by the caller nor the customisation hook, create a nice default one.
+        $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix'));
+        $params['reference'] = $creditor['mandate_prefix'] . '-' . $params['type'] . '-' . date("Y") . '-' . $dao->id;
+      }
     }
 
     $dao = new CRM_Sepa_DAO_SEPAMandate();
@@ -49,13 +40,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
     $dao->save();
 
-    if (isset($fallback_reference) && $fallback_reference) {
-      // If no mandate reference was supplied by the caller nor the customisation hook, create a nice default one.
-      $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix'));
-      $dao->reference = $creditor['mandate_prefix'] . '-' . $params['type'] . '-' . date("Y") . '-' . $dao->id;
-      $dao->save();
-    }
-    
     // if the mandate is enabled, kick off the batching process
     // if (self::is_active(CRM_Utils_Array::value('status', $params))) {
     //   CRM_Sepa_Logic_Batching::batch_initial_contribution($dao->id, $dao);

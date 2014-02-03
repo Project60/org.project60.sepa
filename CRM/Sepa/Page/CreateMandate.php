@@ -144,8 +144,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'is_enabled'                => 1,
       );
     // call the hook for mandate generation
-    // TODO: Hook not working: CRM_Utils_SepaCustomisationHooks::create_mandate($mandate_data);
-    sepa_civicrm_create_mandate($mandate_data);
 
     $mandate = civicrm_api('SepaMandate', 'create', $mandate_data);
     if (isset($mandate['is_error']) && $mandate['is_error']) {
@@ -160,7 +158,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       CRM_Sepa_BAO_SEPAMandate::terminateMandate($_REQUEST['replace'], $_REQUEST['replace_date'], $_REQUEST['replace_reason']);
     }
 
-    $this->assign("reference", $mandate_data['reference']);
+    // extract the reference id from the create mandate reply
+    $this->assign("reference", $mandate['values'][$mandate['id']]['reference']);
   }
 
 

@@ -167,23 +167,3 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
       'table' => 'civicrm_sepa_contribution_txgroup',
   );
 }
-
-
-
-// example implementation for Xavier's customization hooks for WMFR
-
-/* disabled for the moment
-function sepa_civicrm_create_mandate(&$mandate_parameters) {
-  $reference = "WMFR-" . date("Y");
-  if ($mandate_parameters) {
-    $reference .="-" . $mandate_parameters["entity_id"];
-  } else {
-    $reference .= "-RAND" . sprintf("%08d", rand(0, 999999));
-  }
-  $mandate_parameters['reference'] = $reference;
-}
-
-function sepa_civicrm_mend_rcontrib($rcontribId, &$rcontrib) {
-  $rcontrib->cycle_day = 8;
-}
-*/

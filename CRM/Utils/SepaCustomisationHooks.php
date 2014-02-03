@@ -19,7 +19,7 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function create_mandate(&$mandate_parameters) {
-    return CRM_Utils_Hook::singleton()->invoke(1, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
+    return CRM_Utils_Hook::singleton()->invoke(1, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
   }
 
 
