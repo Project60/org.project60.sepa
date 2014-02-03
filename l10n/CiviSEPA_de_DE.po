@@ -776,7 +776,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Cycle Day"
-msgstr ""
+msgstr "Monatstag"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
