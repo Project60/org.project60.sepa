@@ -139,6 +139,9 @@ msgstr "Neue Mandate sofort aktivieren"
 #: CRM/Sepa/DAO/SEPAMandate.php
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Source"
 msgstr ""
 
@@ -767,6 +770,7 @@ msgid "Recurring"
 msgstr "Dauereinzug"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Start Date"
 msgstr ""
 
@@ -1019,7 +1023,7 @@ msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot set cancel reason for mandate [%s]. Error was: '%s'"
-msgstr ""
+msgstr "Beendigungsgrund für Mandat [%s] konnte nicht gesetzt werden. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't load campaign list."
@@ -1031,7 +1035,7 @@ msgstr "Keine Gläubiger eingerichtet."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "replace reason"
-msgstr ""
+msgstr "Änderungsgrund"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Replacing Mandate"
@@ -1039,11 +1043,11 @@ msgstr "Mandat ersetzen"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Replacement Date"
-msgstr ""
+msgstr "Änderungsdatum"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Replacement Reason"
-msgstr ""
+msgstr "Änderungsgrund"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Terminate this mandate:"
@@ -1076,9 +1080,29 @@ msgstr "SEPA Mandate"
 
 #: api/v3/SepaAlternativeBatching.php
 msgid "Cannot create file! Error was: '%s'"
-msgstr "Die XML-Datei [%s] konnte nicht erzeugt werden. Fehler ist: '%s'"
+msgstr "Die XML-Datei konnte nicht erzeugt werden. Fehler ist: '%s'"
 
 #: api/v3/SepaAlternativeBatching.php
 msgid "Cannot close transaction group! Error was: '%s'"
-msgstr "Die Gruppe [%s] konnte nicht geschlossen werden. Fehler ist: '%s'"
+msgstr "Die Gruppe konnte nicht geschlossen werden. Fehler ist: '%s'"
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot delete scheduled contribution [%s]. Error was: '%s'"
+msgstr "Konnte die bereits gruppierte Zuwendung [%s] nicht löschen. Fehler ist: '%s'"
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Closing Mandate failed. Error was: '%s'"
+msgstr "Mandate konnte nicht geschlossen werden. Fehler ist: '%s'"
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Successfully deleted %d now obsolete contributions."
+msgstr "%d nun überflüssig gewordene zukünftige Zuwendungen wurden gelöscht."
+
+#: hooks.php
+msgid "You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"
+msgstr "Diese Zuwendung kann nicht gelöscht werden, da sie Teil des SEPA-Mandates [%s] ist. Bitte löschen Sie das Mandat, das wird die Zuwendung entsprechend mit entfernen."
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Group Name"
+msgstr "Gruppenname"
 

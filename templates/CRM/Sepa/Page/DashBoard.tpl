@@ -39,7 +39,7 @@
 
 <table>
   <tr>
-    <th>{ts}Reference{/ts}</th>
+    <th>{ts}Group Name{/ts}</th>
     <th>{ts}Status{/ts}</th>
     <th>{ts}Type{/ts}</th>
     <th>{ts}Submission{/ts}</th>

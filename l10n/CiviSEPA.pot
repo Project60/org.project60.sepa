@@ -126,6 +126,9 @@ msgstr ""
 #: CRM/Sepa/DAO/SEPAMandate.php
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Source"
 msgstr ""
 
@@ -756,6 +759,7 @@ msgid "Recurring"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Start Date"
 msgstr ""
 
@@ -1071,4 +1075,26 @@ msgstr ""
 
 #: api/v3/SepaAlternativeBatching.php
 msgid "Cannot close transaction group! Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot delete scheduled contribution [%s]. Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Closing Mandate failed. Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Successfully deleted %d now obsolete contributions."
+msgstr ""
+
+#: hooks.php
+msgid ""
+"You cannot delete this contribution because it is connected to SEPA mandate "
+"[%s]. Delete the mandate instead!"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Group Name"
 msgstr ""
