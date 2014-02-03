@@ -117,7 +117,15 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       return;
     }
 
+    // then, delete the mandate
     // TODO: move the following into API or BAO
+    $delete = civicrm_api('SepaMandate', "delete", array('id' => $mandate['id'], 'version'=>3));
+    if (isset($delete['is_error']) && $delete['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Error deleting mandate: '%s'"), 
+        $delete['error_message']), ts('Error'), 'error');
+      return;
+    }
+
     $rcontribution_count = 0;
     $contributions = array();
 
@@ -158,13 +166,6 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         return;
       }
       array_push($contributions, $mandate['entity_id']);
-    }
-
-    $delete = civicrm_api('SepaMandate', "delete", array('id' => $mandate['id'], 'version'=>3));
-    if (isset($delete['is_error']) && $delete['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Error deleting mandate: '%s'"), 
-        $delete['error_message']), ts('Error'), 'error');
-      return;
     }
 
     // remove all contributions from the groups
