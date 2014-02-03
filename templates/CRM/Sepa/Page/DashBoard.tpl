@@ -1,22 +1,23 @@
 <div class="crm-actions-ribbon">
   <ul id="actions">
+    {if $status eq 'closed'}
     <li>
-      {if $status eq 'closed'}
       <a title="{ts}show active groups{/ts}" class="search button" href="{$show_open_url}">
         <span>
           <div class="icon search-icon"></div>
           {ts}show active groups{/ts}
         </span>
       </a>
-      {else}
+    </li>
+    {else}
+    <li>
       <a title="{ts}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
         <span>
           <div class="icon search-icon"></div>
           {ts}show closed groups{/ts}
         </span>
       </a>
-      {/if}
-    </li>
+    <li>
     <li>
       <a title="{ts}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
         <span>
@@ -33,6 +34,7 @@
         </span>
       </a>
     </li>
+    {/if}
   </ul>
   <div class="clear"></div>
 </div>

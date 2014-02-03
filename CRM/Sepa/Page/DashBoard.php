@@ -27,13 +27,20 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       $this->callBatcher($_REQUEST['update']);
     }
 
+    // look up status value
+    if ($status=='open') {
+      $status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+    } else {
+      $status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    }
+
     $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
         "version"     => 3, 
         "sequential"  => 1, 
-        //"options"     => array('sort' => 'created_date DESC'),
+        "status_id"   => $status_id,
         ));
-    if ($result['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s"), $cid), ts('Error'), 'error');
+    if (isset($result['is_error']) && $result['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't read transaction groups. Error was: '%s'"), $result['error_message']), ts('Error'), 'error');
     } else {
       $groups = array();
       $status_list = array(1 => 'closed', 2=>'open');
