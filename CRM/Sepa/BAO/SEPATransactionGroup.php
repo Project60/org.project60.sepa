@@ -81,8 +81,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       }
 
       // create an individual transaction message
-      $tx_message = "muslimehelfen e.V. bedankt sich für Deine Spende!";
-//TODO @systopia      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
+      $tx_message = "Thanks.";
+      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
       $t["message"] = $tx_message;
 
       $r[]=$t;

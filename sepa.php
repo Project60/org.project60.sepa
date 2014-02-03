@@ -543,5 +543,5 @@ function sepa_civicrm_create_mandate(&$mandate_parameters) {
 
 
 function sepa_civicrm_modify_txmessage(&$txmessage, $contribution, $creditor) {
-  error_log("HOOKED");
+  $txmessage = "muslimehelfen e.V. bedankt sich für Deine Spende";
 }
