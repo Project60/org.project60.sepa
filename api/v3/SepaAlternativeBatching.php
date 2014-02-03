@@ -168,7 +168,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
     INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id
     WHERE mandate.type = 'RCUR'
       AND mandate.status IN ($modes)
-      AND end_date < DATE(NOW());";
+      AND end_date <= DATE(NOW());";
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $mandates_to_end = array();
   while ($results->fetch()) {
