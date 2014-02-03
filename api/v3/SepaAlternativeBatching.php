@@ -39,8 +39,11 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
 
   // step 1: gather data
   $txgroup_id = (int) $params['txgroup_id'];
-  $status_closed = 1;   // TODO: load from option value
-  $status_inprogress = 5;   // TODO: load from option value
+  
+  $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');  
+  $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');  
+  $status_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Completed', 'name');  
+  $status_inprogress = (int) CRM_Core_OptionGroup::getValue('batch_status', 'In Progress', 'name');  
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
   if (isset($result['is_error']) && $result['is_error']) {
     return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
@@ -116,7 +119,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
           'latest_submission_date'  => $txgroup['latest_submission_date'],
           'created_date'            => date('Ymdhis'),
           'created_id'              => 2,
-          'status_id'               => $status_closed)
+          'status_id'               => $group_status_id_closed)
       );
     if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
       return civicrm_api3_create_error(sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']));
@@ -128,7 +131,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   // step 5: close the txgroup object
   $result = civicrm_api('SepaTransactionGroup', 'create', array(
         'id'                      => $txgroup_id, 
-        'status_id'               => $status_closed, 
+        'status_id'               => $group_status_id_closed, 
         'sdd_file_id'             => $txgroup['sdd_file_id'],
         'version'                 => 3));
   if (isset($result['is_error']) && $result['is_error']) {
@@ -156,7 +159,8 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
   } else {
     $modes = "'".$params['mode']."'";
   }
-  $contribution_status_closed = 1;      // TODO: look that up
+
+  $contribution_status_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Completed', 'name');  
 
   // first, load all of the mandates, that have run out
   $sql_query = "
@@ -244,6 +248,7 @@ function _sepa_alternative_batching_update_rcur($params) {
   $latest_date = date('Y-m-d', strtotime("+$horizon days"));
   $rcur_notice = (int) _sepa_alternative_batching_get_parameter("org.project60.alternative_batching.$mode.notice");
   $now = strtotime("+$rcur_notice days");
+  $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
   // RCUR-STEP 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
   $sql_query = "
@@ -374,7 +379,7 @@ function _sepa_alternative_batching_update_rcur($params) {
     FROM civicrm_sdd_txgroup AS txgroup
     WHERE txgroup.collection_date <= '$latest_date'
       AND txgroup.type = '$mode'
-      AND txgroup.status_id = 2;";
+      AND txgroup.status_id = $group_status_id_open;";
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $existing_groups = array();
   while ($results->fetch()) {
@@ -397,6 +402,7 @@ function _sepa_alternative_batching_update_rcur($params) {
 function _sepa_alternative_batching_update_ooff($params) {
   $horizon = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.horizon_days');
   $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.notice');
+  $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
   // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
   $sql_query = "
@@ -456,7 +462,7 @@ function _sepa_alternative_batching_update_ooff($params) {
     FROM civicrm_sdd_txgroup AS txgroup
     WHERE txgroup.collection_date <= '$latest_collection_date'
       AND txgroup.type = 'OOFF'
-      AND txgroup.status_id = 2;";
+      AND txgroup.status_id = $group_status_id_open;";
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $existing_groups = array();
   while ($results->fetch()) {
@@ -474,7 +480,7 @@ function _sepa_alternative_batching_update_ooff($params) {
  * subroutine to create the group/contribution structure as calculated
  */
 function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_groups, $mode, $type, $notice) {
-  $group_status_id_open = 2;    // TODO: look up
+  $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
   foreach ($calculated_groups as $collection_date => $mandates) {
     if (!isset($existing_groups[$collection_date])) {
@@ -502,7 +508,7 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
           ));
       // TODO: error handling
     } else {
-      $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date], 'status_id' => 2));
+      $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date], 'status_id' => $group_status_id_open));
       // TODO: error handling
       unset($existing_groups[$collection_date]);      
     }

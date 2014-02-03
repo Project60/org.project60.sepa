@@ -28,27 +28,35 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     }
 
     // look up status value
-    if ($status=='open') {
-      $status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-    } else {
-      $status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $status_list = array(
+      'open' => array(  
+            CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name'),
+            CRM_Core_OptionGroup::getValue('batch_status', 'Reopened', 'name')), 
+      'closed' => array(
+            CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'),
+            CRM_Core_OptionGroup::getValue('batch_status', 'Exported', 'name'), 
+            CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name')));
+    foreach ($status_list as $title => $values) {
+      foreach ($values as $value) {
+        $status_2_title[$value] = $title;
+      }
     }
-
+   
     $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
         "version"     => 3, 
         "sequential"  => 1, 
-        "status_id"   => $status_id,
+        "status_ids"  => implode(',', $status_list[$status]),
         ));
     if (isset($result['is_error']) && $result['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't read transaction groups. Error was: '%s'"), $result['error_message']), ts('Error'), 'error');
     } else {
       $groups = array();
-      $status_list = array(1 => 'closed', 2=>'open');
       foreach ($result["values"] as $id => $group) {
         // 'beautify'
         $group['latest_submission_date'] = date('Y-m-d', strtotime($group['latest_submission_date']));
         $group['collection_date'] = date('Y-m-d', strtotime($group['collection_date']));
-        $group['status'] = $status_list[$group['status_id']];
+        
+        $group['status'] = $status_2_title[$group['status_id']];
         $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60*60*24);
         if ($group['status']=='closed') {
           $group['submit'] = 'closed';

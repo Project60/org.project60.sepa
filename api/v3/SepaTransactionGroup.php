@@ -107,9 +107,9 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
     $file_id = (int) $params["file_id"];
     $where .= " AND sdd_file_id = $file_id ";
   }
-  if (array_key_exists("status_id",$params)) {
-    $status_id = (int) $params["status_id"];
-    $where .= " AND txgroup.status_id=$status_id ";
+  if (array_key_exists("status_ids",$params)) {
+    $status_ids = $params["status_ids"];
+    $where .= " AND txgroup.status_id IN ($status_ids) ";
   }
 
   $sql="
