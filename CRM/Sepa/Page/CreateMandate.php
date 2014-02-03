@@ -307,7 +307,10 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $this->assign('cycle_day', $contribution['cycle_day']);
       $this->assign('interval', $contribution['frequency_interval']);
       if (isset($contribution['end_date']) && $contribution['end_date']) {
-        $this->assign('end_date', date('Y-m-d', strtotime($contribution['end_date'])));
+        // only set end date, if it's in the future (to prevent accidentally creating completed mandates)
+        if (strtotime($contribution['end_date']) > strtotime("today") ) {
+          $this->assign('end_date', date('Y-m-d', strtotime($contribution['end_date'])));
+        } 
       } else {
         $this->assign('end_date', '');
       }
