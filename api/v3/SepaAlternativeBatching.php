@@ -560,6 +560,7 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
 
   // now, use the API to delete all these groups
   foreach ($existing_groups as $group_id) {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id;");
     $result = civicrm_api('SepaTransactionGroup', 'delete', array('version' => 3, 'id' => $group_id));
     if (isset($result['is_error']) && $result['is_error']) {
       error_log("org.project60.sepa: Cannot delete txgroup ".$group_id.". Error was ".$result['error_message']);
