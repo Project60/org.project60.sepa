@@ -8,8 +8,8 @@
     <author>systopia</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate>2014-02-04</releaseDate>
-  <version>0.3</version>
+  <releaseDate>2014-02-06</releaseDate>
+  <version>0.3.1</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>4.4</ver>

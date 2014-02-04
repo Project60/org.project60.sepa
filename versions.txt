@@ -1,0 +1,11 @@
+sepa_dd (org.project60.sepa) release history
+============================================
+
+Version 0.3.1
+=============
+- FIX: display/propagation of campaign
+
+
+Version 0.3
+===========
+- First alpha release
