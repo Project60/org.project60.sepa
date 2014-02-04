@@ -42,8 +42,8 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');  
   $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');  
-  $status_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Completed', 'name');  
-  $status_inprogress = (int) CRM_Core_OptionGroup::getValue('batch_status', 'In Progress', 'name');  
+  $status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');  
+  $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');  
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
   if (isset($result['is_error']) && $result['is_error']) {
     return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
@@ -160,7 +160,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
     $modes = "'".$params['mode']."'";
   }
 
-  $contribution_status_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Completed', 'name');  
+  $contribution_status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');  
 
   // first, load all of the mandates, that have run out
   $sql_query = "
