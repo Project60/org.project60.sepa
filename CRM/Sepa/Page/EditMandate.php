@@ -62,8 +62,8 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
 
     // load the campaign
-    if (isset($contribution['campaign_id']) && $contribution['campaign_id']) {
-      $campaign = civicrm_api("Campaign", "getsingle", array('id'=>$contribution['campaign_id'], 'version'=>3));
+    if (isset($contribution['contribution_campaign_id']) && $contribution['contribution_campaign_id']) {
+      $campaign = civicrm_api("Campaign", "getsingle", array('id'=>$contribution['contribution_campaign_id'], 'version'=>3));
       if (isset($campaign['is_error'])) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $campaign, $campaign['error_message']), ts('Error'), 'error');
       } else {
