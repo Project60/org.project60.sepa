@@ -61,9 +61,9 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         if ($group['status']=='closed') {
           $group['submit'] = 'closed';
         } else {
-          if ($remaining_days < 3) {
+          if ($remaining_days < 2) {
             $group['submit'] = 'urgently';
-          } elseif ($remaining_days < 7) {
+          } elseif ($remaining_days < 4) {
             $group['submit'] = 'soon';
           } else {
             $group['submit'] = 'later';
@@ -75,17 +75,6 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       $this->assign("groups", $groups);
     }
 
-
-    // CRM_Core_Resources::singleton()
-    // ->addScriptFile('civicrm', 'packages/backbone/underscore.js', 110, 'html-header', FALSE);
-
-    // $r = civicrm_api("SepaTransactionGroup","getdetail",array("version"=>3,"sequential"=>1,
-    // 'options' => array(
-    //   'sort' => 'created_date DESC',
-    //   'limit' => 1,
-    //   ),
-    // ));
-    // $this->assign("groups",$r["values"]);
     parent::run();
   }
 
