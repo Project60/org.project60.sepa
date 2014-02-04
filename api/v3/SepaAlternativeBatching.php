@@ -112,13 +112,27 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
 
   // step 4: create the sepa file
   if (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id']) {
+    // find an available txgroup reference
+    $available_name = $name = "SDDXML-".$txgroup['reference'];
+    $counter = 1;
+    $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
+    while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
+      // i.e. available_name is already taken, modify it
+      $available_name = $name.'_'.$counter;
+      $counter += 1;
+      if ($counter>1000) {
+        return civicrm_api3_create_error("Cannot create file! Unable to find an available file reference.");
+      }
+    }
+
+    // now that we found an available reference, create the file
     $sepa_file = civicrm_api('SepaSddFile', 'create', array(
           'version'                 => 3,
-          'reference'               => "SDDXML-".$txgroup['reference'],
-          'filename'                => "SDDXML-".$txgroup['reference'].'.xml',
+          'reference'               => $available_name,
+          'filename'                => $available_name.'.xml',
           'latest_submission_date'  => $txgroup['latest_submission_date'],
           'created_date'            => date('Ymdhis'),
-          'created_id'              => 2,
+          'created_id'              => CRM_Core_Session::singleton()->get('userID'),
           'status_id'               => $group_status_id_closed)
       );
     if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {

@@ -75,17 +75,6 @@
 </table>
 
 {literal}
-<script>
-cj(function($){
-  $(".button_close").click(function() {
-    var $tr=$(this).closest("tr");
-    CRM.api("SepaAlternativeBatching","close",{"txgroup_id":$tr.data("id")},{"success":function(data) {
-      location.reload();
-    }});
-  });
-});
-</script>
-
 <style>
   tr.submit_urgently {background-color:#FA583F;}
   tr.submit_soon {background-color:#FAB83F;}
