@@ -1098,3 +1098,24 @@ msgstr ""
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Group Name"
 msgstr ""
+
+#: CRM/Sepa/Page/DashBoard.php
+msgid "Couldn't read transaction groups. Error was: '%s'"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Download Link:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"<b>It is vital that you <i>immediately</i> do the following:</b>\n"
+"\t\t\t<ol>\n"
+"\t\t\t\t<li>Download the file via the above link</li>\n"
+"\t\t\t\t<li>Submit that file to your bank</li>\n"
+"\t\t\t</ol>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Group '%s' <b>is now closed</b>. It cannot be changed any more."
+msgstr ""

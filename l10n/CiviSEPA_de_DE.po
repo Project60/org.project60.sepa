@@ -741,7 +741,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "I swear I have sucessfully submitted it"
-msgstr ""
+msgstr "Ich schwöre, ich habe alle Punkte erfolgreich durchgeführt!"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Creditor"
@@ -1105,4 +1105,25 @@ msgstr "Diese Zuwendung kann nicht gelöscht werden, da sie Teil des SEPA-Mandat
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Group Name"
 msgstr "Gruppenname"
+
+#: CRM/Sepa/Page/DashBoard.php
+msgid "Couldn't read transaction groups. Error was: '%s'"
+msgstr "Die Gruppen konnten nicht geladen werden. Fehler ist: '%s'"
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Download Link:"
+msgstr "Link zum Herunterladen:"
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"<b>It is vital that you <i>immediately</i> do the following:</b>\n"
+"\t\t\t<ol>\n"
+"\t\t\t\t<li>Download the file via the above link</li>\n"
+"\t\t\t\t<li>Submit that file to your bank</li>\n"
+"\t\t\t</ol>"
+msgstr "<b>Erledige <i>SOFORT</i> folgende Punkte:</b><ol><li>Downloadlink klicken</li><li>Datei in StarMoney hochladen</li><li>An die Bank versenden</li></ol>"
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Group '%s' <b>is now closed</b>. It cannot be changed any more."
+msgstr "Die Gruppe \"%s\" <b>wurde geschlossen</b> und kann nicht mehr verändert werden."
 
