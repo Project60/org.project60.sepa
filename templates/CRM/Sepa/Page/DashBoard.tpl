@@ -58,7 +58,11 @@
     <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
     <td>{$group.status}</td>
     <td>{$group.type}</td>
+  {if $status eq 'closed'}
+    <td>{$group.file_created_date}</td>
+  {else}
     <td>{$group.latest_submission_date}</td>
+  {/if}
     <td>{$group.collection_date}</td>
     <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
     <td>{$group.total} &euro;</td>

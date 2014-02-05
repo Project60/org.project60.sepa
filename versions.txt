@@ -5,7 +5,7 @@ Version 0.3.1
 =============
 - FIX: display/propagation of campaign
 - FIX: tolerate missing 'Received' batch_status
-
+- Dashboard: closed groups sorted by XML file creation date
 
 Version 0.3
 ===========

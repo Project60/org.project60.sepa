@@ -48,9 +48,10 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     }
 
     $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
-        "version"     => 3, 
-        "sequential"  => 1, 
-        "status_ids"  => implode(',', $status_list[$status]),
+        "version"       => 3, 
+        "sequential"    => 1, 
+        "status_ids"    => implode(',', $status_list[$status]),
+        "order_by"      => (($status=='open')?'latest_submission_date':'file.created_date'),
         ));
     if (isset($result['is_error']) && $result['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't read transaction groups. Error was: '%s'"), $result['error_message']), ts('Error'), 'error');
@@ -60,7 +61,6 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         // 'beautify'
         $group['latest_submission_date'] = date('Y-m-d', strtotime($group['latest_submission_date']));
         $group['collection_date'] = date('Y-m-d', strtotime($group['collection_date']));
-        
         $group['status'] = $status_2_title[$group['status_id']];
         $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60*60*24);
         if ($group['status']=='closed') {

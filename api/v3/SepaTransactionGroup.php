@@ -99,6 +99,7 @@ function civicrm_api3_sepa_transaction_group_get($params) {
 function civicrm_api3_sepa_transaction_group_getdetail($params) {
 //  $where = "txgroup.id= txgroup_contrib.txgroup_id AND txgroup_contrib.contribution_id = contrib.id";
   $where = "1";
+  $orderby = "ORDER BY txgroup.latest_submission_date ASC";
   if (array_key_exists("id",$params)) {
     $group = (int) $params["id"];
     $where .= " AND txgroup.id = $group ";
@@ -111,6 +112,11 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
     $status_ids = $params["status_ids"];
     $where .= " AND txgroup.status_id IN ($status_ids) ";
   }
+  if (array_key_exists("order_by",$params)) {
+    if ($params["order_by"] == 'file.created_date') {
+      $orderby = "ORDER BY civicrm_sdd_file.created_date DESC";
+    }
+  }
 
   $sql="
     SELECT 
@@ -121,16 +127,17 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
       txgroup.collection_date, 
       txgroup.latest_submission_date, 
       txgroup.status_id, 
+      civicrm_sdd_file.created_date     AS file_created_date, 
       count(*)                          AS nb_contrib, 
       sum( contrib.total_amount)        AS total,
       civicrm_sdd_file.reference        AS file
     FROM civicrm_sdd_txgroup as txgroup 
-    LEFT JOIN civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id= txgroup_contrib.txgroup_id 
+    LEFT JOIN civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id = txgroup_contrib.txgroup_id 
     LEFT JOIN civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id 
     LEFT JOIN civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id 
     WHERE $where 
     GROUP BY txgroup_id 
-    ORDER BY txgroup.latest_submission_date ASC;";
+    $orderby;";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
   $total =0;
