@@ -5,7 +5,11 @@ Version 0.3.1
 =============
 - FIX: display/propagation of campaign
 - FIX: tolerate missing 'Received' batch_status
-- Dashboard: closed groups sorted by XML file creation date
+- Dashboard: closed groups now sorted by XML file creation date
+- Dashboard: adjusted timings for colour code
+- Create Mandate: use date pickers
+
+
 
 Version 0.3
 ===========

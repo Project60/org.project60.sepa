@@ -95,7 +95,7 @@
 		<tr>	<!-- REPLACE::DATE -->
 			<td>{ts}Replacement Date{/ts}:</td>
 			<td>
-				<input name="replace_date" type="date" value="{$replace_date}" size="10"/>
+				<input id="replace_date" name="replace_date" type="text" value="{$replace_date}"/>
 			</td>
 		</tr>
 		<tr>	<!-- REPLACE::REASON -->
@@ -113,7 +113,9 @@
 		<tr>	<!-- ONE OFF -->
 			<td style="vertical-align: top;"><input name="mandate_type" id='mtype_OOFF' type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
 			<td>{ts}Earliest execution date{/ts}:</td>
-			<td><input name="date" type="date" value="{$date}" size="10" onChange='cj("#mtype_OOFF").prop("checked",true);' /></td>
+			<td>
+				<input id="date" name="date" type="text" value="{$date}"/>
+			</td>
 			<td></td>
 		</tr>
 
@@ -123,7 +125,8 @@
 		<tr>	<!-- RECURRING -->
 			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" id='mtype_RCUR' type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts}Recurring{/ts}</input></td>
 			<td>{ts}Start Date{/ts}:</td>
-			<td><input name="start_date" type="date" value="{$start_date}" size="10" onChange='cj("#mtype_RCUR").prop("checked",true);'/></td>
+			<td>
+				<input id="start_date" name="start_date" type="text" value="{$start_date}"/>
 			<td></td>
 		</tr>
 		<tr>
@@ -138,7 +141,8 @@
 		</tr>
 		<tr>
 			<td>{ts}End Date{/ts}:</td>
-			<td><input name="end_date" type="date" value="{$end_date}" size="10" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
+			<td>
+				<input id="end_date" name="end_date" type="text" value="{$end_date}"/>
 			<td></td>
 		</tr>
 	</table>
@@ -180,6 +184,25 @@ function change_bank_account() {
 cj("[name='{$field}']").parent().parent().css("background-color", "#FFBBBB");
 cj("[name='{$field}']").parent().parent().attr("title", "{$message}");
 {/foreach}
+
+// Date picker
+{literal}
+var dateOptions = {
+    dateFormat: 'yy-mm-dd',
+    changeMonth: true,
+    changeYear: true,
+    minDate: 'now',
+    yearRange: '0:+5'
+  };
+cj('#date').addClass('dateplugin');
+cj('#date').datepicker(dateOptions);
+cj('#start_date').addClass('dateplugin');
+cj('#start_date').datepicker(dateOptions);
+cj('#end_date').addClass('dateplugin');
+cj('#end_date').datepicker(dateOptions);
+cj('#replace_date').addClass('dateplugin');
+cj('#replace_date').datepicker(dateOptions);
+{/literal}
 </script>
 
 
