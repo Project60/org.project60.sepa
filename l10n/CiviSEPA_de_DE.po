@@ -1127,3 +1127,11 @@ msgstr "<b>Erledige <i>SOFORT</i> folgende Punkte:</b><ol><li>Downloadlink klick
 msgid "Group '%s' <b>is now closed</b>. It cannot be changed any more."
 msgstr "Die Gruppe \"%s\" <b>wurde geschlossen</b> und kann nicht mehr verändert werden."
 
+#: templates/CRM/Contribute/Page/Tab.extra.tpl
+msgid "edit mandate"
+msgstr "Mandat Bearbeiten"
+
+#: templates/CRM/Contribute/Page/Tab.extra.tpl
+msgid "edit sepa mandate"
+msgstr "SEPA Direct-Debit Mandat bearbeiten"
+

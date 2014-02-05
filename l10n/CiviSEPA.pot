@@ -1119,3 +1119,11 @@ msgstr ""
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "Group '%s' <b>is now closed</b>. It cannot be changed any more."
 msgstr ""
+
+#: templates/CRM/Contribute/Page/Tab.extra.tpl
+msgid "edit mandate"
+msgstr ""
+
+#: templates/CRM/Contribute/Page/Tab.extra.tpl
+msgid "edit sepa mandate"
+msgstr ""
