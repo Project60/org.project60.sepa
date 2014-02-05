@@ -27,7 +27,8 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       $this->callBatcher($_REQUEST['update']);
     }
 
-    // look up status value
+    // generate status value list
+    $status_2_title = array();
     $status_list = array(
       'open' => array(  
             CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name'),
@@ -38,7 +39,11 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
             CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name')));
     foreach ($status_list as $title => $values) {
       foreach ($values as $value) {
-        $status_2_title[$value] = $title;
+        if (empty($value)) {    // delete empty values (i.e. batch_status doesn't exist)
+          unset($status_list[$title][array_search($value, $status_list[$title])]);
+        } else {
+          $status_2_title[$value] = $title;
+        }
       }
     }
 
