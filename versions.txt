@@ -3,12 +3,13 @@ sepa_dd (org.project60.sepa) release history
 
 Version 0.3.1
 =============
+- Group List: copy contributions into accounting group
 - FIX: display/propagation of campaign
 - FIX: tolerate missing 'Received' batch_status
 - Dashboard: closed groups now sorted by XML file creation date
 - Dashboard: adjusted timings for colour code
 - Create Mandate: use date pickers
-- Contributions Tab: mend actions for SEPA recurring contributions with
+- Contributions Tab: mend actions for SEPA recurring contributions
 
 
 Version 0.3

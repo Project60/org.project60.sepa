@@ -31,3 +31,19 @@
         </tr>
     </tfoot>
 </table>
+
+<a class="button" onClick="create_accounting_batch({$group_id});">{ts}Create Accounting Batch{/ts}</a>
+
+
+<script type="text/javascript">
+var view_batch_url = '{crmURL p="civicrm/batchtransaction" q="&reset=1&bid=__BATCH_ID__"}';
+{literal}
+function create_accounting_batch(group_id) {
+	CRM.api('SepaTransactionGroup', 'toaccgroup', {'q': 'civicrm/ajax/rest', 'txgroup_id': group_id},
+	  {success: function(data) {
+	  	document.location = cj(document.createElement('div')).html(view_batch_url.replace('__BATCH_ID__', data.id)).text();
+	  }
+	});
+}
+{/literal}
+</script>

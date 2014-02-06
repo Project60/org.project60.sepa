@@ -237,3 +237,110 @@ continue;
   }
 }
 
+
+
+/**
+ * This API call creates a corresponding accounting batch for the SEPA group
+ * /mh/index.php?q=civicrm/ajax/rest&entity=SepaTransactionGroup&action=toaccgroup&debug=1&sequential=1&json=1&txgroup_id=53
+ */
+function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
+  // first, load the txgroup
+  $txgroup_id = $params['txgroup_id'];  
+  $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id, 'version' => 3));
+  if (isset($txgroup['is_error']) && $txgroup['is_error']) {
+    return civicrm_api3_create_error("Cannot read transaction group ".$txgroup_id);
+  }
+
+  if (isset($txgroup['sdd_file_id'])) {
+    $sdd_file = civicrm_api('SepaSddFile', 'getsingle', array('id' => $txgroup['sdd_file_id'], 'version' => 3));
+    if (isset($sdd_file['is_error']) && $sdd_file['is_error']) {
+      return civicrm_api3_create_error("Cannot read sdd file ".$txgroup['sdd_file_id']);
+    }
+  } else {
+    $sdd_file = array(
+        'created_id' => CRM_Core_Session::singleton()->get('userID'),
+        'created_date' => date('YmdHis'));
+  }
+
+  // gather information on the group
+  $contributions_query_sql = "
+  SELECT
+    contribution.total_amount     AS amount,
+    entity_trxn.financial_trxn_id AS financial_trxn_id,
+    contribution.id               AS contribution_id
+  FROM civicrm_sdd_contribution_txgroup   AS txgroup_contrib
+  LEFT JOIN civicrm_contribution          AS contribution ON txgroup_contrib.contribution_id = contribution.id
+  LEFT JOIN civicrm_entity_financial_trxn AS entity_trxn  ON entity_trxn.entity_id = contribution.id AND entity_trxn.entity_table='civicrm_contribution'
+  WHERE txgroup_contrib.txgroup_id = $txgroup_id;";
+
+  $contributions_query = CRM_Core_DAO::executeQuery($contributions_query_sql);
+  $transactions = array();
+  $contributions_missing_transaction = array();
+  $total = 0.0;
+  while ($contributions_query->fetch()) {
+    if ($contributions_query->financial_trxn_id) {
+      array_push($transactions, $contributions_query->financial_trxn_id);
+      $total += $contributions_query->amount;      
+    } else {
+      array_push($contributions_missing_transaction, $contributions_query->contribution_id);
+    }
+  }
+
+  // find a name
+  $name = $wanted_name = 'SEPA '.$txgroup['reference'];
+  $counter = 0;
+  while (CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_batch WHERE title='$name';")->fetch()) {
+    $counter++;
+    $name = $wanted_name.'_'.$counter;
+  }
+
+  // get type id
+  $type_id = (int) CRM_Core_OptionGroup::getValue('batch_type', 'SEPA DD Transaction Batch', 'name');
+  if (!$type_id) {
+    // create SEPA type entry if not exists
+    $value_spec = array('name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch'));
+    $group_spec = array('name' => 'batch_type');
+    $action = CRM_Core_Action::ADD;
+    $type_id = CRM_Core_OptionValue::addOptionValue($value_spec, $group_spec, $action)->value;
+  }
+
+  // then, finally, create the accounting group
+  $description = sprintf(ts('This group corresponds to <a href="%s">SEPA transaction group [%s]</a>'),
+      CRM_Utils_System::url('civicrm/sepa/listgroup', "group_id=$txgroup_id"), $txgroup_id); 
+
+  $batch = array( 'title'                 => $name,
+                  'description'           => $description,
+                  'created_id'            => $sdd_file['created_id'],
+                  'created_date'          => $txgroup['created_date'],
+                  'modified_id'           => CRM_Core_Session::singleton()->get('userID'),
+                  'modified_date'         => date('YmdHis'),
+                  'status_id'             => $txgroup['status_id'],
+                  'type_id'               => $type_id,
+                  'mode_id'               => (int) CRM_Core_OptionGroup::getValue('batch_mode', 'Automatic Batch', 'name'),
+                  'total'                 => $total,
+                  'item_count'            => count($transactions),
+                  'payment_instrument_id' => (int) CRM_Core_OptionGroup::getValue('payment_instrument', $txgroup['type'], 'name'),
+                  'exported_date'         => $sdd_file['created_date'],
+                  'version'               => 3);
+  $batch_create = civicrm_api('Batch', 'create', $batch);
+  if (isset($batch_create['is_error']) && $batch_create['is_error']) {
+    return civicrm_api3_create_error("Cannot create batch for SEPA transaction group ".$txgroup_id);
+  } else {
+    $batch_id = $batch_create['id'];
+    if (count($contributions_missing_transaction)) {
+      $batch_create['contributions_missing_transaction'] = $contributions_missing_transaction;
+    }
+  }
+
+  // add all the financial transactions to the group
+  foreach ($transactions as $trxn_id) {
+    CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_entity_batch ( entity_table, entity_id, batch_id ) VALUES ('civicrm_financial_trxn', $trxn_id, $batch_id);");
+  }
+
+  return civicrm_api3_create_success($batch_create, $params);
+}
+
+function _civicrm_api3_sepa_transaction_group_toaccgroup_spec(&$params) {
+  $params['txgroup_id']['api.required'] = 1;
+}
+

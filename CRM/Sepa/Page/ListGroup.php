@@ -68,6 +68,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
     }
 
     $this->assign("reference", $reference);
+    $this->assign("group_id", $group_id);
     $this->assign("total_count", $total_count);
     $this->assign("total_amount", $total_amount);
     $this->assign("total_amount_str", CRM_Utils_Money::format($total_amount, 'EUR'));
