@@ -68,7 +68,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         } else {
           if ($remaining_days <= 1) {
             $group['submit'] = 'urgently';
-          } elseif ($remaining_days <= 2) {
+          } elseif ($remaining_days <= 6) {
             $group['submit'] = 'soon';
           } else {
             $group['submit'] = 'later';
