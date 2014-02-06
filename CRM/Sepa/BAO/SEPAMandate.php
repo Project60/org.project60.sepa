@@ -30,7 +30,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
       //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
     }
-
    if (CRM_Utils_Array::value('is_enabled', $params)) {
       CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);     
    }

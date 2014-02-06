@@ -190,7 +190,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
       //$newMandate["entity_id"]=$mandate["entity_id"];
       //$newMandate["entity_table"]=$mandate["entity_table"];
       $newMandate["version"] = 3;
-      $mandate = civicrm_api("SepaMandate","create",$newMandate);
+      $mandate = civicrm_api3("SepaMandate","create",$newMandate);
       if ($mandate["is_error"]) {
         CRM_Core_Error::fatal($mandate["error_message"]);
       }

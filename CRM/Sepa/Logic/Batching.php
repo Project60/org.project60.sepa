@@ -34,17 +34,18 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $payment_instrument_id = $contrib->payment_instrument_id;
     $params = array(
         'payment_instrument_id' => $payment_instrument_id,
+        'sequential' => 1,
         'version' => 3,
     );
-    $result = civicrm_api('SepaCreditor', 'getsingle', $params);
-    if ($result['is_error']) {
+    $result = civicrm_api3('SepaCreditor', 'get', $params);
+    if ($result['count'] == 0) {
       $result = civicrm_api('SepaCreditor', 'create', array("version"=>3,"identifier"=>"FIXME","name"=>"Workaround","payment_instrument_id" => $payment_instrument_id,));
       if ($result['is_error']) {
         CRM_Core_Error::fatal($result['error_message']);
         return null;
       }
     }
-    $creditor_id = $result['id'];
+    $creditor_id = $result["values"][0]['creditor_id'];
 
     CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib,$creditor_id);
 }
@@ -62,6 +63,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $maxpush = 0;
     $earliest_date = self::adjustBankDays($receive_date, - $maxpull);
     $latest_date = self::adjustBankDays($receive_date, $maxpush);
+
 
     // we have a query : look for an open batch in this date range and of the 
     // appropriate type and creditor

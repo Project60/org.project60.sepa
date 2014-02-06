@@ -116,6 +116,22 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
       'class' => 'CRM_Sepa_DAO_SEPACreditor',
       'table' => 'civicrm_sepa_creditor',
   );
+  $entityTypes[] = array(
+      'name' => 'SepaTransactionGroup',
+      'class' => 'CRM_Sepa_BAO_SEPATransactionGroup',
+      'table' => 'civicrm_sepa_txgroup',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaSddFile',
+      'class' => 'CRM_Sepa_DAO_SEPASddFile',
+      'table' => 'civicrm_sepa_file',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaContributionGroup',
+      'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
+      'table' => 'civicrm_sepa_contribution_txgroup',
+  );
+
 }
 
 

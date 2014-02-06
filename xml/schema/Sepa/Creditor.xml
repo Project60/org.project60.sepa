@@ -109,7 +109,7 @@
     <comment>FK to Payment Instrument</comment>
     <pseudoconstant>
       <name>paymentInstrument</name>
-      <optionGroupName>paymentInstrument</optionGroupName>
+      <optionGroupName>payment_instrument</optionGroupName>
       <class>CRM_Contribute_PseudoConstant</class>
     </pseudoconstant>
     <add>1.3</add>

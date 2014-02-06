@@ -256,7 +256,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'title' => ts('Payment Instrument') ,
           'pseudoconstant' => array(
             'name' => 'paymentInstrument',
-            'optionGroupName' => 'paymentInstrument',
+            'optionGroupName' => 'payment_instrument',
             'class' => 'CRM_Contribute_PseudoConstant',
           )
         ) ,
