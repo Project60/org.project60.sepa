@@ -597,7 +597,7 @@ function _sepa_alternative_batching_get_parameter($parameter_name) {
   if ($parameter_name=='org.project60.alternative_batching.OOFF.horizon_days') {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.OOFF.notice') {
-    return 10;
+    return 8;
   } else if ($parameter_name=='org.project60.alternative_batching.RCUR.horizon_days') {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.RCUR.notice') {
@@ -605,7 +605,7 @@ function _sepa_alternative_batching_get_parameter($parameter_name) {
   } else if ($parameter_name=='org.project60.alternative_batching.FRST.horizon_days') {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.FRST.notice') {
-    return 10;
+    return 8;
   }
 }
 
