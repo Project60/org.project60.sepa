@@ -789,7 +789,7 @@ msgstr "erstellen"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Error!"
-msgstr ""
+msgstr "Fehler!"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Mandate successfully created."
@@ -969,11 +969,11 @@ msgstr "Ein neues Mandat basierend auf diesem erstellen."
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "You need to specify a cancel reason!"
-msgstr ""
+msgstr "Bitte Grund eingeben!"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "You need to specify a date!"
-msgstr ""
+msgstr "Bitte Datum eingeben!"
 
 #: templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "Contributions for transaction group"
@@ -1134,4 +1134,16 @@ msgstr "Mandat Bearbeiten"
 #: templates/CRM/Contribute/Page/Tab.extra.tpl
 msgid "edit sepa mandate"
 msgstr "SEPA Direct-Debit Mandat bearbeiten"
+
+#: api/v3/SepaTransactionGroup.php
+msgid "SEPA DD Transaction Batch"
+msgstr "SEPA DD Einzugsgruppe"
+
+#: api/v3/SepaTransactionGroup.php
+msgid "This group corresponds to <a href=\"%s\">SEPA transaction group [%s]</a>"
+msgstr "Dieser Rechnungslauf repräsentiert <a href=\"%s\">SEPA Einzugsgruppe [%s]</a>"
+
+#: templates/CRM/Sepa/Page/ListGroup.tpl
+msgid "Create Accounting Batch"
+msgstr "In Rechnungslauf kopieren"
 

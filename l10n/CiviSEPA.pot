@@ -1127,3 +1127,16 @@ msgstr ""
 #: templates/CRM/Contribute/Page/Tab.extra.tpl
 msgid "edit sepa mandate"
 msgstr ""
+
+#: api/v3/SepaTransactionGroup.php
+msgid "SEPA DD Transaction Batch"
+msgstr ""
+
+#: api/v3/SepaTransactionGroup.php
+msgid ""
+"This group corresponds to <a href=\"%s\">SEPA transaction group [%s]</a>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/ListGroup.tpl
+msgid "Create Accounting Batch"
+msgstr ""
