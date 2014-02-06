@@ -6,6 +6,7 @@ Version 0.3.1
 - Group List: copy contributions into accounting group
 - FIX: display/propagation of campaign
 - FIX: tolerate missing 'Received' batch_status
+- FIX: ignore time of day when checking notice deadlines
 - Dashboard: closed groups now sorted by XML file creation date
 - Dashboard: adjusted timings for colour code
 - Create Mandate: use date pickers

@@ -610,6 +610,7 @@ function _sepa_alternative_batching_get_parameter($parameter_name) {
 }
 
 function _sepa_alternative_get_next_execution_date($rcontribution, $now) {
+  $now =  strtotime(date('Y-m-d', $now));     // ignore time of day
   $cycle_day = $rcontribution['cycle_day'];
   $interval = $rcontribution['frequency_interval'];
   $unit = $rcontribution['frequency_unit'];
