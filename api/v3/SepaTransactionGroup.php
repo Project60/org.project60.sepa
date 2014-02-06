@@ -166,17 +166,17 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
     $new["contribution_recur_id"] = $new["recur_id"];     
     unset($new["recur_id"]);
 
-    /*
-       CRM_Core_DAO::executeQuery("
+/*   
+    CRM_Core_DAO::executeQuery("
        UPDATE civicrm_contribution_recur 
-       SET next_sched_contribution = %1 
+       SET next_sched_contribution_date = %1 
        WHERE id = %2
        ", array(
        1 => array($next_collectionDate, 'String'),
        2 => array($new["contribution_recur_id"], 'Integer')
        )
-       );
-     */
+    );
+*/    
     $new["version"] =3;       
     $new["sequential"] =1;       
 
@@ -198,7 +198,7 @@ continue;
       $contrib->get('id', $result["id"]);//it sucks to have to fetch again, just to get the BAO
 //      $mandate->get('id', $old["mandate_id"]);
 //      $values[] = $result["values"];
-      $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib, $old["creditor_id"],$old["payment_instrument_id"]);
+      $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib, $old["creditor_id"],$old["payment_instrument_id"],"RCUR");
       $values = $group->toArray();
     }
   }
