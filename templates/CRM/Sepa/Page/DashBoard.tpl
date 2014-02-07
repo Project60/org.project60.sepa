@@ -29,6 +29,7 @@
 </td>
 </tr>
 {/foreach}
+</table>
 {literal}
 <script type="text/template" id="detail">
 <tr class="detail">
