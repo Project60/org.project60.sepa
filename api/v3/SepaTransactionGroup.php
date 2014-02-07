@@ -107,13 +107,25 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
     $file_id = (int) $params["file_id"];
     $where .= " AND sdd_file_id = $file_id ";
   }
-$sql="select txgroup.id, txgroup.reference, sdd_file_id as file_id, txgroup.type , txgroup.collection_date, txgroup.status_id , count(*) as nb_contrib, sum( contrib.total_amount) as total 
-, civicrm_sdd_file.reference as file
-from civicrm_sdd_txgroup as txgroup 
-left join civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id= txgroup_contrib.txgroup_id 
-left join civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id 
-left join civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id 
-where $where group by txgroup_id ORDER BY id DESC";
+  $sql = "
+    SELECT
+      txgroup.id,
+      txgroup.reference,
+      sdd_file_id AS file_id,
+      txgroup.type,
+      txgroup.collection_date,
+      txgroup.status_id,
+      count(*) AS nb_contrib,
+      SUM(contrib.total_amount) AS total,
+      civicrm_sdd_file.reference AS file
+    FROM civicrm_sdd_txgroup AS txgroup
+    LEFT JOIN civicrm_sdd_contribution_txgroup AS txgroup_contrib ON txgroup.id = txgroup_contrib.txgroup_id
+    LEFT JOIN civicrm_contribution AS contrib ON txgroup_contrib.contribution_id = contrib.id
+    LEFT JOIN civicrm_sdd_file ON sdd_file_id = civicrm_sdd_file.id
+    WHERE $where
+    GROUP BY txgroup_id
+    ORDER BY id DESC
+  ";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
   $total =0;
