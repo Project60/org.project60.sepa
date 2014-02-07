@@ -116,15 +116,12 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
       txgroup.collection_date,
       txgroup.status_id,
       txgroup.sdd_creditor_id,
-      count(*) AS nb_contrib,
-      SUM(contrib.total_amount) AS total,
+      (SELECT count(*) FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=txgroup.id) AS nb_contrib,
+      (SELECT IFNULL(SUM(total_amount), 0) FROM civicrm_contribution WHERE id IN (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=txgroup.id)) AS total,
       civicrm_sdd_file.reference AS file
     FROM civicrm_sdd_txgroup AS txgroup
-    LEFT JOIN civicrm_sdd_contribution_txgroup AS txgroup_contrib ON txgroup.id = txgroup_contrib.txgroup_id
-    LEFT JOIN civicrm_contribution AS contrib ON txgroup_contrib.contribution_id = contrib.id
     LEFT JOIN civicrm_sdd_file ON sdd_file_id = civicrm_sdd_file.id
     WHERE $where
-    GROUP BY txgroup_id
     ORDER BY id DESC
   ";
   $dao = CRM_Core_DAO::executeQuery($sql);
