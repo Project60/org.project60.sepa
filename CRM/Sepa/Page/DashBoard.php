@@ -14,7 +14,13 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       'limit' => 1,
       ),
     ));
-    $this->assign("groups",$r["values"]);
+
+    $groups = array();
+    foreach ($r['values'] as $group) {
+      $groups[$group['sdd_creditor_id']][] = $group;
+    }
+    $this->assign("groups",$groups);
+
     parent::run();
   }
 

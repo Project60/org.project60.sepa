@@ -1,3 +1,8 @@
+{foreach from=$groups key=creditor_id item=creditor}
+<div class='crm-accordion-wrapper'>
+  <div class='crm-accordion-header'>{ts}Creditor{/ts} {$creditor_id}</div>
+  <div class="crm-accordion-body">
+
 <table>
 <tr>
 <th>Reference</th>
@@ -10,7 +15,7 @@
 <th>total</th>
 <th></th>
 </tr>
-{foreach from=$groups item=group}
+{foreach from=$creditor item=group}
 <tr class="status_{$result.status_id}" data-id="{$group.id}" data-type="{$group.type}">
 <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
 <td>{$group.status_id}</td>
@@ -30,6 +35,19 @@
 </tr>
 {/foreach}
 </table>
+
+  </div> <!-- crm-accordion-body -->
+</div> <!--crm-accordion-wrapper -->
+{/foreach}
+
+<script type="text/javascript">
+  {literal}
+    cj(function() {
+      cj().crmAccordions();
+    });
+  {/literal}
+</script>
+
 {literal}
 <script type="text/template" id="detail">
 <tr class="detail">
