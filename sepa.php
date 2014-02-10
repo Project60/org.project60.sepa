@@ -516,7 +516,7 @@ function sepa_civicrm_create_mandate(&$mandate_parameters) {
     $reference = '9999';
   }
   
-  $reference .= '00';         // one-off
+  $reference .= $turnus;
   $reference .= 'R';          // separator
   $reference .= sprintf('%08d', $contribution['contact_id']);
   $reference .= 'D';          // separator
