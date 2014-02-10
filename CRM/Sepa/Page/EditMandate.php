@@ -186,7 +186,11 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
   function endMandate($mandate_id) {    
     $end_date = $_REQUEST['end_date'];
     if ($end_date) {
-      CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date);
+      if (isset($_REQUEST['end_reason'])) {
+        CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date, $_REQUEST['end_reason']);
+      } else {
+        CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date);
+      }
     } else {
       CRM_Core_Session::setStatus(sprintf(ts("You need to provide an end date.")), ts('Error'), 'error');      
     }

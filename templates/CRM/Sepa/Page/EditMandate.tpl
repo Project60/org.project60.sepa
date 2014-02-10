@@ -53,6 +53,12 @@
             	{* this is a simple contribution *}
                 <tr><td class="label">{ts}Date{/ts}</td><td>{$contribution.receive_date}</td></tr>
 	       	{/if}
+
+            {* add note field *}
+            {crmAPI var='result' entity='Note' action='get' q='civicrm/ajax/rest' subject='cancel_reason' entity_id=$contribution.id entity_table='civicrm_contribution_recur'}
+            {foreach from=$result.values item=Note}
+            <tr><td class="label">{ts}Cancel Reason{/ts}</td><td>{$Note.note}</td></tr>
+            {/foreach}
         </table>
     </div>
 </div>
