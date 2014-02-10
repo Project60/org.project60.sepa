@@ -488,6 +488,9 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
 // TODO: move to external plugin
 function sepa_civicrm_create_mandate(&$mandate_parameters) {
 
+  if (isset($mandate_parameters['reference']) && !empty($mandate_parameters['reference']))
+    return;   // user defined mandate
+
   // load contribution
   if ($mandate_parameters['entity_table']=='civicrm_contribution') {
     $contribution = civicrm_api('Contribution', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
