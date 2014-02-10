@@ -509,24 +509,30 @@ function sepa_civicrm_create_mandate(&$mandate_parameters) {
     die("unsupported mandate");
   }
 
-  // get booking code
-  $bcodes = array(10 => 4000, 13 => 4001, 14 => 4002, 15 => 4003, 16 => 4004, 11 => 4005, 12 => 4006, 5 => 4007, 9 => 4008, 7 => 4009, 8 => 4010, 6 => 4012, 2 => 4100, 17 => 4200);
 
-  // compile parametrized reference number
-  if (isset($bcodes[$contribution['financial_type_id']])) {
-    $reference = $bcodes[$contribution['financial_type_id']];
+  // get financial type
+  $financial_types = CRM_Contribute_PseudoConstant::financialType();
+  $financial_type = $financial_types[$contribution['financial_type_id']];
+  if ($financial_type == 'Abo') {
+    $code = 'A';
+  } elseif ($financial_type == 'Mitgliedsbeitrag') {
+    $code = 'M';
+  } elseif ($financial_type == 'Anlassspende') {
+    $code = 'S';
+  } elseif ($financial_type == 'allgemeine Spende') {
+    $code = 'F';
   } else {
-    $reference = '9999';
+    $code = 'X';
   }
   
-  $reference .= '00';         // one-off
+  $reference  = $code;
+  $reference .= $turnus;
   $reference .= 'R';          // separator
   $reference .= sprintf('%08d', $contribution['contact_id']);
   $reference .= 'D';          // separator
   $reference .= date('Ymd');
   $reference .= 'N';          // separator
   $reference .= '%d';         // for numbers
-  $reference .= 'K';          // campaing code
 
   // try to find one that's not used yet...
   for ($n=0; $n < 10; $n++) {
