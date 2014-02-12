@@ -128,7 +128,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $mandate_data = array(
         'version'                   => 3,
         'debug'                     => 1,
-        'reference'                 => "WILL BE SET BY HOOK",
         'contact_id'                => $_REQUEST['contact_id'],
         'source'                    => $_REQUEST['source'],
         'entity_table'              => $entity_table,
