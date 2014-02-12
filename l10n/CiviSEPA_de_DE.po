@@ -1147,3 +1147,11 @@ msgstr "Dieser Rechnungslauf repräsentiert <a href=\"%s\">SEPA Einzugsgruppe [%
 msgid "Create Accounting Batch"
 msgstr "In Rechnungslauf kopieren"
 
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "No Campaign"
+msgstr "Keine Kampagne"
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Cancel Reason"
+msgstr "Änderungsgrund"
+

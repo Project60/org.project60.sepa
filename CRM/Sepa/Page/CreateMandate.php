@@ -185,11 +185,12 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     // look up campaigns
     $campaign_query = civicrm_api('Campaign', 'get', array('version'=>3, 'is_active'=>1, 'option.limit' => 999));
     $campaigns = array();
+    $campaigns[''] = ts("No Campaign");
     if (isset($campaign_query['is_error']) && $campaign_query['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't load campaign list."), $cid), ts('Error'), 'error');      
     } else {
       foreach ($campaign_query['values'] as $campaign_id => $campaign) {
-        $campaigns[$campaign_id] = $campaign['name'];
+        $campaigns[$campaign_id] = $campaign['title'];
       }
     }
     $this->assign('campaigns', $campaigns);
