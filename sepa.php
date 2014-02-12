@@ -45,7 +45,8 @@ function sepa_civicrm_pageRun( &$page ) {
     $recur = $page->getTemplate()->get_template_vars("recur");
     
     // This is a one-off contribution => try to show mandate data.
-    $payment_instrument_id = $page->getTemplate()->get_template_vars('recur')['payment_instrument_id'];
+    $template_vars = $page->getTemplate()->get_template_vars('recur');
+    $payment_instrument_id = $template_vars['payment_instrument_id'];
     if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
       return;
 
