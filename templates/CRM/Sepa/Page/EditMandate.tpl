@@ -86,7 +86,7 @@
             {if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
             	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_end();">{ts}Set End Date{/ts}</td>
             	<td>
-                    {ts}Terminate this mandate:{/ts}&nbsp;<input type="text" name="end_date" size="12" value="{$contribution.default_end_date}" />
+                    {ts}Terminate this mandate:{/ts}&nbsp;<input type="text" name="end_date" id="end_date" size="12" value="{$contribution.default_end_date}" />
                     <br/>
                     {ts}Terminate for the following reason:{/ts}&nbsp;
                     <input type="text" name="end_reason" size="32" />
@@ -96,7 +96,7 @@
             {if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
                 <td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_replace();">{ts}Replace{/ts}</td>
                 <td>
-                    {ts}Replace the mandate beginning:{/ts}&nbsp;<input type="text" name="replace_date" size="12" value="{$contribution.default_end_date}" />
+                    {ts}Replace the mandate beginning:{/ts}&nbsp;<input type="text" name="replace_date" id="replace_date" size="12" value="{$contribution.default_end_date}" />
                     <br/>
                     {ts}Replace for the following reason:{/ts}&nbsp;
                     <input type="text" name="replace_reason" size="32" />
@@ -160,6 +160,18 @@ function mandate_action_replace() {
     location.href = replace_url;
 }
 
+// Date picker
+var dateOptions = {
+    dateFormat: 'yy-mm-dd',
+    changeMonth: true,
+    changeYear: true,
+    minDate: 'now',
+    yearRange: '0:+50'
+  };
+cj('#replace_date').addClass('dateplugin');
+cj('#replace_date').datepicker(dateOptions);
+cj('#end_date').addClass('dateplugin');
+cj('#end_date').datepicker(dateOptions);
 </script>
 {/literal}
 
