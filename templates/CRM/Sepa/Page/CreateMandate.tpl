@@ -126,7 +126,7 @@
 			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" id='mtype_RCUR' type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts}Recurring{/ts}</input></td>
 			<td>{ts}Start Date{/ts}:</td>
 			<td>
-				<input id="start_date" name="start_date" type="text" value="{$start_date}"/>
+				<input id="start_date" name="start_date" type="text" value="{$start_date}" onChange='cj("#mtype_RCUR").prop("checked",true);' />
 			<td></td>
 		</tr>
 		<tr>
@@ -142,7 +142,7 @@
 		<tr>
 			<td>{ts}End Date{/ts}:</td>
 			<td>
-				<input id="end_date" name="end_date" type="text" value="{$end_date}"/>
+				<input id="end_date" name="end_date" type="text" value="{$end_date}" onChange='cj("#mtype_RCUR").prop("checked",true);' />
 			<td></td>
 		</tr>
 	</table>
