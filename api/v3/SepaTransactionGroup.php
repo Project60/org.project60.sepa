@@ -298,7 +298,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   $type_id = (int) CRM_Core_OptionGroup::getValue('batch_type', 'SEPA DD Transaction Batch', 'name');
   if (!$type_id) {
     // create SEPA type entry if not exists
-    $value_spec = array('name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch'));
+    $value_spec = array('name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch'), 'is_active' => 1);
     $group_spec = array('name' => 'batch_type');
     $action = CRM_Core_Action::ADD;
     $type_id = CRM_Core_OptionValue::addOptionValue($value_spec, $group_spec, $action)->value;
