@@ -7,10 +7,16 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
   function run() {
     if (isset($_REQUEST['group_id'])) {
       // get some values
+      $group_id = (int) $_REQUEST['group_id'];
       $financial_types = CRM_Contribute_PseudoConstant::financialType();
 
+      // load the group
+      $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$group_id, 'version'=>3));
+      if (isset($txgroup['is_error']) && $txgroup['is_error']) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read SEPA transaction group [%s]. Error was: '%s'"), $group_id, $txgroup['error_message']), ts("Error"), "error");
+      }
+
       // load the group's contributions
-      $group_id = (int) $_REQUEST['group_id'];
       $sql = "
       SELECT
         civicrm_sdd_txgroup.reference           AS reference,
@@ -67,6 +73,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
       }
     }
 
+    $this->assign("txgroup", $txgroup);
     $this->assign("reference", $reference);
     $this->assign("group_id", $group_id);
     $this->assign("total_count", $total_count);

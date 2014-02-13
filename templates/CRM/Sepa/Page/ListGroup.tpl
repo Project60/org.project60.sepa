@@ -32,8 +32,10 @@
     </tfoot>
 </table>
 
+{if $txgroup.status_id eq 2}
+{* only show button if group is closed *}
 <a class="button" onClick="create_accounting_batch({$group_id});">{ts}Create Accounting Batch{/ts}</a>
-
+{/if}
 
 <script type="text/javascript">
 var view_batch_url = '{crmURL p="civicrm/batchtransaction" q="&reset=1&bid=__BATCH_ID__"}';
