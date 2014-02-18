@@ -49,14 +49,10 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $rc->get('id', $bao->entity_id);
 
       // set start date if not set
-      if (strlen($rc->start_date)>0) {
-        $rc->start_date = date('Y-m', strtotime("now"))."-".$rc->cycle_day;
+      if (!isset($rc->start_date)) {
+        $rc->start_date = date('Ymd');
+      } else {
         $rc->start_date = date("Ymd",strtotime($rc->start_date));             // copied that from X+, must be sth about the format...
-      }
-
-      // adjust start date, if in the past or less than five days in the future
-      if (strtotime($rc->start_date) < strtotime("now + 5 days")) {
-        $rc->start_date = date("Ymd", strtotime('+1 month', strtotime($rc->start_date)));
       }
 
       $rc->create_date = date("YmdHis",strtotime($rc->create_date));

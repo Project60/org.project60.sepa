@@ -3,6 +3,12 @@
   <div class='crm-accordion-header'>{ts}Creditor{/ts} {$creditor_id}</div>
   <div class="crm-accordion-body">
 
+    <div class="action-link">
+      <div class="crm-submit-buttons">
+        <a class="button" href="{crmURL p='civicrm/sepa/batchforsubmit' q="creditor_id=$creditor_id"}"><span>{ts}Prepare Submit{/ts}</span></a>
+      </div>
+    </div>
+
 <table>
 <tr>
 <th>Reference</th>
@@ -30,6 +36,11 @@
 <a href="#" class="button button_close">Close</a>
 {if $group.type != 'OOFF'}
 <a href="#" class="button button_generate">Generate next batch</a>
+{/if}
+{if $group.status_id == 2}
+  {assign var='group_id' value=$group.id}
+  <a class="button" href="{crmURL p='civicrm/sepa/cancelsubmitgroup' q="txgroup_id=$group_id"}">{ts}Cancel Group{/ts}</a>
+  <a class="button" href="{crmURL p='civicrm/sepa/cancelsubmitfile' q="file_id=$file_id"}">{ts}Cancel File{/ts}</a>
 {/if}
 </td>
 </tr>

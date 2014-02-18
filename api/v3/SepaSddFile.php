@@ -105,3 +105,28 @@ function civicrm_api3_sepa_sdd_file_generatexml($params) {
   $file = new CRM_Sepa_BAO_SEPASddFile();
   $file->generateXML($params["id"]);
 }
+
+/**
+ */
+function _civicrm_api3_sepa_sdd_file_batchforsubmit_spec(&$params) {
+  $params['submit_date']['api.default'] = date('Y-m-d', strtotime('today'));
+  $params['creditor_id']['api.required'] = 1;
+}
+
+/**
+ */
+function civicrm_api3_sepa_sdd_file_batchforsubmit($params) {
+  CRM_Sepa_Logic_Batching::batchForSubmit($params['submit_date'], $params['creditor_id']);
+}
+
+/**
+ */
+function _civicrm_api3_sepa_sdd_file_cancelsubmit_spec(&$params) {
+  $params['id']['api.required'] = 1;
+}
+
+/**
+ */
+function civicrm_api3_sepa_sdd_file_cancelsubmit($params) {
+  CRM_Sepa_Logic_Batching::cancelSubmit(array('sdd_file_id' => $params['id']));
+}
