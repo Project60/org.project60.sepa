@@ -33,7 +33,6 @@
 <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
 <td>{$group.total} &euro;</td>
 <td>
-<a href="#" class="button button_close">Close</a>
 {if $group.type != 'OOFF'}
 <a href="#" class="button button_generate">Generate next batch</a>
 {/if}
@@ -97,12 +96,6 @@
 </script>
 <script>
 cj(function($){
-  $(".button_close").click(function() {
-    var $tr=$(this).closest("tr");
-    CRM.api("SepaTransactionGroup","close",{"id":$tr.data("id")},{"success":function(data) {
-      console.log(data);
-    }});
-  });
   $(".button_generate").click(function() {
 console.log ("click");
     var $tr=$(this).closest("tr");
