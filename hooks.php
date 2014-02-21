@@ -7,6 +7,7 @@ This hook has two aims:
 */
 
 function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$errors ){
+  /* DISABLED
   $tag = str_replace('_', '', $formName);
   if (stream_resolve_include_path('CRM/Sepa/Hooks/'.$tag.'.php')) {
     $className = 'CRM_Sepa_Hooks_' . $tag;
@@ -16,7 +17,7 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
         $className::validateForm($form);
       }
     }
-  }
+  } */
   
   if ("CRM_Contribute_Form_Contribution_Main"  == $formName) { 
     require_once("packages/php-iban-1.4.0/php-iban.php");

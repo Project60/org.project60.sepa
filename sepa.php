@@ -81,6 +81,7 @@ EOD;
 }
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
+  /* DISABLED
   $tag = str_replace('_', '', $formName);
   if (stream_resolve_include_path('CRM/Sepa/Hooks/'.$tag.'.php')) {
     $className = 'CRM_Sepa_Hooks_' . $tag;
@@ -90,7 +91,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         $className::buildForm($form);
       }
     }
-  }
+  } */
 
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
     $pp=civicrm_api("PaymentProcessorType","getsingle",array("id"=>$form->_ppType, "version"=>3));
