@@ -1,12 +1,16 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
-
-Version 0.3.2
-=============
+Version 0.4
+===========
 - TODO: Fix contributions status
 - TODO: put parameters into settings
 - TODO: allow for multiple mandates
+
+
+Version 0.3.2
+=============
+- Disable form hooks
 
 
 Version 0.3.1
