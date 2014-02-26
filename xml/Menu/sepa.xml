@@ -48,4 +48,10 @@
     <title>Unbatch Transactions from all Groups in File</title>
     <access_arguments>access CiviContribute</access_arguments>
   </item>
+  <item>
+    <path>civicrm/sepa/createnext</path>
+    <page_callback>CRM_Sepa_Page_CreateNext</page_callback>
+    <title>Create upcoming Recurring Contribution installments</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
 </menu>

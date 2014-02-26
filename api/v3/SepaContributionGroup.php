@@ -141,3 +141,80 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
 }
 
 
+function countPeriods($fromDate, $toDate, $frequencyUnit, $frequencyInterval) {
+  date_default_timezone_set('UTC');
+  $diff = date_diff($fromDate, $toDate);
+  switch ($frequencyUnit) {
+    case 'year': $units = $diff->y; break;
+    case 'month': $units = 12 * $diff->y + $diff->m; break;
+    case 'week': $units = floor($diff->days / 7); break;
+    case 'day': $units = $diff->days; break;
+    default: throw new Exception("Unknown frequency unit: $frequencyUnit");
+  }
+  $signedUnits = $units * ($diff->inverse ? -1 : 1);
+  return floor($signedUnits / $frequencyInterval);
+}
+
+/**
+ */
+function civicrm_api3_sepa_contribution_group_createnext($params) {
+  $instruments = array();
+  foreach (array('FRST', 'RCUR') as $type) {
+    $instruments[] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
+  }
+
+  $result = civicrm_api3('ContributionRecur', 'get', array_merge($params, array(
+    'options' => array('limit' => 1234567890),
+    'payment_instrument_id' => array('IN' => $instruments),
+    #'contribution_status_id'
+    'api.Contribution.getsingle' => array(
+      'options' => array(
+        'sort' => 'receive_date DESC',
+        'limit' => 1,
+      ),
+    ),
+    'api.SepaCreditor.getvalue' => array(
+      'payment_processor_id' => '$value.payment_processor_id',
+      'return' => 'id',
+    ),
+  )));
+
+  foreach ($result['values'] as $recur) {
+    $lastContrib = $recur['api.Contribution.getsingle'];
+    $creditorId = $recur['api.SepaCreditor.getvalue'];
+
+    $recurStart = date_create_from_format("!Y-m-d+", $recur['start_date']);
+    $frequencyUnit = $recur['frequency_unit'];
+    $frequencyInterval = $recur['frequency_interval'];
+
+    $lastPeriod = countPeriods($recurStart, date_create($lastContrib['receive_date']), $frequencyUnit, $frequencyInterval);
+    $currentPeriod = countPeriods($recurStart, date_create('yesterday'), $frequencyUnit, $frequencyInterval);
+
+    for ($period = $lastPeriod + 1; $period <= $currentPeriod + 1; ++$period) {
+      $dueDate = date_add(clone $recurStart, DateInterval::createFromDateString($period * $frequencyInterval . $frequencyUnit));
+
+      $result = civicrm_api3('Contribution', 'create', array(
+        'contact_id' => $recur['contact_id'],
+        'financial_type_id' => $recur['financial_type_id'],
+        'contribution_page_id' => $lastContrib['contribution_page_id'],
+        'payment_instrument_id' => CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name'),
+        'receive_date' => date_format($dueDate, 'Y-m-d'),
+        'total_amount' => $recur['amount'],
+        'currency' => $recur['currency'],
+        'source' => $lastContrib['source'],
+        'amount_level' => $lastContrib['amount_level'],
+        'contribution_recur_id' => $recur['id'],
+        'honor_contact_id' => $lastContrib['honor_contact_id'],
+        'is_test' => $recur['is_test'],
+        'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+        'honor_type_id' => $lastContrib['honor_type_id'],
+        'address_id' => $lastContrib['address_id'],
+        'campaign_id' => $recur['campaign_id'],
+      ));
+
+      $contrib = new CRM_Contribute_BAO_Contribution();
+      $contrib->get('id', $result['id']);
+      CRM_Sepa_Logic_Batching::batchContributionByCreditor($contrib, $creditorId, $paymentInstrumentId);
+    } /* for($period) */
+  } /* foreach($recur) */
+}
