@@ -2,8 +2,8 @@
 
 class CRM_Sepa_Logic_Base {
 
-  public static $debugByStatus = 1;
-  public static $debugByEcho = 1;
+  public static $debugByStatus = 0;
+  public static $debugByEcho = 0;
   public static $debugByLog = 1;
   public static $debugLogPath = '';
 
