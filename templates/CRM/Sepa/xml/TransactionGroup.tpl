@@ -24,7 +24,13 @@
       </CdtrAcct>
       <CdtrAgt>
         <FinInstnId>
+{if !empty($creditor.bic)}
           <BIC>{$creditor.bic}</BIC>
+{else}
+          <Othr>
+            <Id>NOTPROVIDED</Id>
+          </Othr>
+{/if}
         </FinInstnId>
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
@@ -58,7 +64,13 @@
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
+{if !empty($contribution.bic)}
             <BIC>{$contribution.bic}</BIC>
+{else}
+            <Othr>
+              <Id>NOTPROVIDED</Id>
+            </Othr>
+{/if}
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
