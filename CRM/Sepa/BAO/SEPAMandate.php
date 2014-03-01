@@ -45,7 +45,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
     if (self::is_active(CRM_Utils_Array::value('status', $params))) {
-      $dao->validation_date = date("YmdHis");
+      if (empty($params['validation_date'])) {
+        $dao->validation_date = date("YmdHis");
+      }
     }
     $dao->save();
 
