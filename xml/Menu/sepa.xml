@@ -54,4 +54,9 @@
     <title>Create upcoming Recurring Contribution installments</title>
     <access_arguments>access CiviContribute</access_arguments>
   </item>
+  <item>
+    <path>civicrm/sepa/importtest</path>
+    <page_callback>CRM_Sepa_Page_ImportTest</page_callback>
+    <title>Test SEPA Import API</title>
+  </item>
 </menu>
