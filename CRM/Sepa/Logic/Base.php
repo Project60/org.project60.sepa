@@ -220,5 +220,27 @@ class CRM_Sepa_Logic_Base {
 
     return $string;
   }
+
+  public static function countPeriods($fromDate, $toDate, $frequencyUnit, $frequencyInterval) {
+    $origTimezone = date_default_timezone_get();
+    date_default_timezone_set('UTC');
+    $diff = date_diff($fromDate, $toDate);
+    date_default_timezone_set($origTimezone);
+
+    switch ($frequencyUnit) {
+      case 'year': $units = $diff->y; break;
+      case 'month': $units = 12 * $diff->y + $diff->m; break;
+      case 'week': $units = floor($diff->days / 7); break;
+      case 'day': $units = $diff->days; break;
+      default: throw new Exception("Unknown frequency unit: $frequencyUnit");
+    }
+    $signedUnits = $units * ($diff->inverse ? -1 : 1);
+#echo('<pre>'.print_r($fromDate, true).print_r($toDate, true).print_r($diff, true).print_r($signedUnits, true).'</pre>'); #DEBUG
+    return floor($signedUnits / $frequencyInterval);
+  }
+
+  public static function addPeriods($startDate, $periods, $frequencyUnit, $frequencyInterval) {
+    return date_add(clone $startDate, DateInterval::createFromDateString($periods * $frequencyInterval . $frequencyUnit));
+  }
 }
 

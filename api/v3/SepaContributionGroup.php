@@ -141,20 +141,6 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
 }
 
 
-function countPeriods($fromDate, $toDate, $frequencyUnit, $frequencyInterval) {
-  date_default_timezone_set('UTC');
-  $diff = date_diff($fromDate, $toDate);
-  switch ($frequencyUnit) {
-    case 'year': $units = $diff->y; break;
-    case 'month': $units = 12 * $diff->y + $diff->m; break;
-    case 'week': $units = floor($diff->days / 7); break;
-    case 'day': $units = $diff->days; break;
-    default: throw new Exception("Unknown frequency unit: $frequencyUnit");
-  }
-  $signedUnits = $units * ($diff->inverse ? -1 : 1);
-  return floor($signedUnits / $frequencyInterval);
-}
-
 /**
  */
 function civicrm_api3_sepa_contribution_group_createnext($params) {
@@ -187,11 +173,11 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
     $frequencyUnit = $recur['frequency_unit'];
     $frequencyInterval = $recur['frequency_interval'];
 
-    $lastPeriod = countPeriods($recurStart, date_create($lastContrib['receive_date']), $frequencyUnit, $frequencyInterval);
-    $currentPeriod = countPeriods($recurStart, date_create('yesterday'), $frequencyUnit, $frequencyInterval);
+    $lastPeriod = CRM_Sepa_Logic_Base::countPeriods($recurStart, date_create($lastContrib['receive_date']), $frequencyUnit, $frequencyInterval);
+    $currentPeriod = CRM_Sepa_Logic_Base::countPeriods($recurStart, date_create('yesterday'), $frequencyUnit, $frequencyInterval);
 
     for ($period = $lastPeriod + 1; $period <= $currentPeriod + 1; ++$period) {
-      $dueDate = date_add(clone $recurStart, DateInterval::createFromDateString($period * $frequencyInterval . $frequencyUnit));
+      $dueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $period, $frequencyUnit, $frequencyInterval);
 
       $result = civicrm_api3('Contribution', 'create', array(
         'contact_id' => $recur['contact_id'],
