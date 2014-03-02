@@ -25,11 +25,13 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
          $errors['bank_iban'] = ts( 'invalid IBAN' );
          return;
       }
-      // we use the same function that cleans iban to clean bic
-      $fields["bank_bic"] = iban_to_machine_format($fields["bank_bic"]);
-      if (!preg_match("/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i", $fields["bank_bic"])) {
-         $errors['bank_bic'] = ts( 'invalid BIC' );
-      } 
+      if (!empty($fields['bank_bic'])) {
+        // we use the same function that cleans iban to clean bic
+        $fields["bank_bic"] = iban_to_machine_format($fields["bank_bic"]);
+        if (!preg_match("/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i", $fields["bank_bic"])) {
+           $errors['bank_bic'] = ts( 'invalid BIC' );
+        } 
+      }
     }
   }
 

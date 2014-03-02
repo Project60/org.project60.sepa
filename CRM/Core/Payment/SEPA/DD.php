@@ -138,7 +138,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'title' => ts('BIC'),
         'cc_field' => TRUE,
         'attributes' => array('size' => 11, 'maxlength' => 11, /* 'autocomplete' => 'off' */ ),
-        'is_required' => TRUE,
+        'is_required' => FALSE,
         );
 
     foreach ($form->_paymentFields as $name => $field) {
