@@ -127,7 +127,6 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
         (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = contrib.id)
       )
     WHERE txgroup_id=$group
-      /* AND mandate.is_enabled=1 */
       AND mandate.status IN ('FRST','OOFF','RCUR')
   ";
   $dao = CRM_Core_DAO::executeQuery($sql);

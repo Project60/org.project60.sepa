@@ -28,7 +28,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     // fix payment processor-created contributions before continuing
-    if (CRM_Utils_Array::value('is_enabled', $params)) {
+    if (!empty($params['id']) && self::is_active(CRM_Utils_Array::value('status', $params))) {
       CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);
     }
     

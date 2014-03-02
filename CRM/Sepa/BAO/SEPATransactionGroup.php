@@ -65,7 +65,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
       WHERE g.txgroup_id = %1
         AND contribution_status_id != 3
-        AND mandate.is_enabled = true
+        AND mandate.status IN ('FRST','OOFF','RCUR')
     "; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
 

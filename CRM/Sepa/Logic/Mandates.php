@@ -58,15 +58,15 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $rc->create_date = date("YmdHis",strtotime($rc->create_date));
       $rc->modified_date = date("YmdHis",strtotime("now"));
 
-      if (!$bao->is_enabled && $api_mandate["is_enabled"]) {
-        $rc->contribution_status_id=1; //TODO match the status to the mandate is_enabled
+      if (!CRM_Sepa_BAO_SEPAMandate::is_active($bao->status) && CRM_Sepa_BAO_SEPAMandate::is_active($api_mandate["status"])) {
+        $rc->contribution_status_id=1; //TODO match the status to the mandate is_active
         // figure out whether there is a contribution for this mandate
         $contrib = $bao->findContribution();
         $contrib->receive_date = $rc->start_date;
         $contrib->save();
-      } elseif (!$bao->is_enabled && !$api_mandate["is_enabled"]) {
+      } elseif (!CRM_Sepa_BAO_SEPAMandate::is_active($bao->status) && !CRM_Sepa_BAO_SEPAMandate::is_active($api_mandate["status"])) {
         // TODO should we disable the next contribution or only the recurring contrib? 
-        $rc->contribution_status_id=3; //TODO match the status to the mandate is_enabled
+        $rc->contribution_status_id=3; //TODO match the status to the mandate is_active
       }
       $rc->save();
     }

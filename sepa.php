@@ -23,6 +23,7 @@ function sepa_civicrm_pageRun( &$page ) {
         return;
 
       $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution', 'entity_id'=>$page->getTemplate()->get_template_vars('id')));
+      $mandate['is_enabled'] = CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']);
       $page->assign('sepa', $mandate);
 
       CRM_Core_Region::instance('page-body')->add(array(
@@ -56,6 +57,7 @@ function sepa_civicrm_pageRun( &$page ) {
     if (!array_key_exists("id",$mandate)) {
         CRM_Core_Error::fatal(ts("Can't find the sepa mandate"));
     }
+    $mandate['is_enabled'] = CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']);
     $page->assign("sepa",$mandate);
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
@@ -179,7 +181,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
       $form->assign($mandate);
 
-      $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
+      $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue(CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']));
       $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
       $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
 
@@ -210,7 +212,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     $form->getElement('is_notify')->setValue(0); // the notification isn't clear, disable it
     $form->assign($mandate);
     //TODO, add in the form, as a region?
-    $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue($mandate["is_enabled"]);
+    $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue(CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']));
     $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
     $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
     CRM_Core_Region::instance('page-body')->add(array(
@@ -257,7 +259,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
   }
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD"
       || "CRM_Contribute_Form_Contribution" == $formName && CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id']))) {
-    $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic","sepa_active"=>"is_enabled");
+    $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic");
     $newMandate = array();
     if ("CRM_Contribute_Form_UpdateSubscription" == $formName) {
       // Updating recur record of a recurring contribution.
@@ -269,17 +271,36 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
       // Updating one-off contribution.
       $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
     }
-    if (!array_key_exists("is_enabled",$mandate)) {
-      $mandate["is_enabled"] = false;
-    }
-    if (!array_key_exists("sepa_active",$form->_submitValues)) {
-      $form->_submitValues["sepa_active"] = false;
-    }
     foreach ($fieldMapping as $field => $api) {
       if($mandate[$api] !=$form->_submitValues[$field]) {
         $newMandate[$api] = $form->_submitValues[$field];
       }
     }
+
+    $oldActive = CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']);
+    $newActive = isset($form->_submitValues['sepa_active']) && $form->_submitValues['sepa_active'];
+    if ($newActive != $oldActive) {
+      if ($oldActive) {
+        /*
+         * Deactivating previously active mandate.
+         *
+         * If this is a recurring mandate that has already been used, we put it 'ONHOLD',
+         * to distinguish it from mandates that have never been used.
+         *
+         * One-off mandates always go back to 'INIT',
+         * as manual deactivation only makes sense here if they haven't been used yet.
+         */
+        $newMandate['status'] = ($mandate['status'] == 'RCUR') ? 'ONHOLD' : 'INIT';
+      } else {
+        /* Activating previously inactive mandate. */
+        if ($mandate['type'] == 'RCUR') {
+          $newMandate['status'] = ($mandate['status'] == 'ONHOLD') ? 'RCUR' : 'FRST';
+        } else {
+          $newMandate['status'] = 'OOFF';
+        }
+      }
+    }
+
     if ($newMandate) {
       $newMandate["id"]=$mandate["id"];
       //not strictly needed, uncomment if proven handy in the underlying api/bao

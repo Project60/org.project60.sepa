@@ -59,7 +59,6 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
   $params['entity_table']['api.required'] = 1;
   $params['type']['api.required'] = 1;
-  $params['is_enabled']['api.default'] = false;
   $params['status']['api.default'] = "INIT";
 
 }
