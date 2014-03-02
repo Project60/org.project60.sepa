@@ -9,7 +9,11 @@
           <Cd>SEPA</Cd>
         </SvcLvl>
         <LclInstrm>
+{if ($group.is_cor1)}
+          <Cd>COR1</Cd>
+{else}
           <Cd>CORE</Cd>
+{/if}
         </LclInstrm>
         <SeqTp>{$group.type}</SeqTp>
       </PmtTpInf>

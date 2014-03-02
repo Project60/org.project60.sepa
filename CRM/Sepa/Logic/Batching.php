@@ -94,7 +94,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       if ($bestCollectionDate > $dateRangeEnd) {
         continue;
       }
-      $advanceDays = ($group['type'] == 'RCUR') ? 2 : 5;
+      $group['is_cor1'] = true; /* DiCo hack */
+      $advanceDays = $group['is_cor1'] ? 1 : ($group['type'] == 'RCUR' ? 2 : 5);
       $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
       $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
 

@@ -37,6 +37,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $this->nbtransactions=0;
 
     $group = civicrm_api ("SepaTransactionGroup","getsingle",array("sequential"=>1,"version"=>3,"id"=>$this->id));
+    $group['is_cor1'] = true; /* DiCo hack */
     $creditor_id = $group["sdd_creditor_id"];
     $template->assign("group", array_map('CRM_Sepa_Logic_Base::utf8ToSEPA', $group));
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
