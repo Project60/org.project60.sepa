@@ -1,3 +1,6 @@
+ALTER TABLE `civicrm_sdd_mandate` DROP `is_enabled`;
+
+
 ALTER TABLE `civicrm_sdd_txgroup` ADD INDEX `creditor_id` (`sdd_creditor_id`);
 ALTER TABLE `civicrm_sdd_txgroup` ADD INDEX `file_id` (`sdd_file_id`);
 
