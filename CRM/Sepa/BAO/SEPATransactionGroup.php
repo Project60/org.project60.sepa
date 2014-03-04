@@ -78,6 +78,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 //TODO @systopia      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
       $t["message"] = $tx_message;
 
+      $t['trxn_id'] = "{$creditor['mandate_prefix']}-{$t['contribution_id']}";
+
       $r[] = array_map('CRM_Sepa_Logic_Base::utf8ToSEPA', $t);
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
