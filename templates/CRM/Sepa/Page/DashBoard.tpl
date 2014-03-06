@@ -35,7 +35,7 @@
 <td>{$group.created_date}</td>
 <td>{$group.collection_date}</td>
 {assign var='file_id' value=$group.file_id}
-<td class="file_{$group.file_id}"><a href='{crmURL p="civicrm/sepa/xml" q="id=$file_id"}'>{$group.file}</a></td>
+<td class="file_{$group.file_id}">{$group.file_href}</td>
 <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
 <td>{$group.total} &euro;</td>
 <td>

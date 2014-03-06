@@ -17,6 +17,12 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
     $groups = array();
     foreach ($r['values'] as $group) {
+      $files = CRM_Core_BAO_File::getEntityFile('civicrm_sdd_file', $group['file_id']);
+      if (!empty($files)) {
+        list($file) = array_slice($files, 0, 1);
+        $group['file_href'] = $file['href'];
+      }
+
       $groups[$group['sdd_creditor_id']][] = $group;
     }
     $this->assign("groups",$groups);

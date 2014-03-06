@@ -131,6 +131,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
           ));
         }
       }
+
+      civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
     }
   }
 
