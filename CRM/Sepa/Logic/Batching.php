@@ -145,6 +145,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'options' => array('limit' => 1234567890),
         'id' => '$value.id',
       ),
+      'api.SepaTransactionGroup.create' => array(
+        /* 'id' inherited */
+        'status_id' => 666,
+      ),
     )));
     if (!$result['count']) {
       throw new API_Exception("No matching Transaction Group found.");
