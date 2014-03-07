@@ -174,7 +174,7 @@ CREATE TABLE `civicrm_sdd_contribution_txgroup` (
 ,
     PRIMARY KEY ( `id` )
 
-    ,     UNIQUE INDEX `contriblookup`(
+    ,     INDEX `contriblookup`(
         contribution_id
   )
   ,     INDEX `txglookup`(

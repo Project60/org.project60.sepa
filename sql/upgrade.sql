@@ -1,3 +1,6 @@
+ALTER TABLE `civicrm_sdd_contribution_txgroup` DROP INDEX `contriblookup`, ADD INDEX `contriblookup`(`contribution_id`); -- Drop UNIQUE.
+
+
 ALTER TABLE `civicrm_sdd_mandate` DROP `is_enabled`;
 
 
