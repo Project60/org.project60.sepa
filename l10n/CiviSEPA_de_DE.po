@@ -89,6 +89,7 @@ msgstr ""
 #: CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php
 #: CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl CRM/Sepa/BAO/SEPAMandate.php
+#: CRM/Sepa/Page/ListGroup.php
 msgid "Error"
 msgstr ""
 
@@ -1154,4 +1155,16 @@ msgstr "Keine Kampagne"
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel Reason"
 msgstr "Änderungsgrund"
+
+#: CRM/Sepa/Page/ListGroup.php
+msgid "Cannot read SEPA transaction group [%s]. Error was: '%s'"
+msgstr "Die SEPA Gruppe [%s] konnte nicht geladen werden. Fehler ist: '%s'"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Mark Received"
+msgstr "Zahlung Erhalten"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Do you really want to mark this groups as 'payment received'?"
+msgstr "Möchten Sie diese Gruppe wirklich als \"Zahlung erhalten\" markieren?"
 

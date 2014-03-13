@@ -30,8 +30,8 @@ class CRM_Utils_SepaCustomisationHooks {
    *  debtor, even an individualised one (like "Thank you, Hans!")
    *
    * @param string $txmessage    the message that will go with the transaction. Modify or extend
-   * @param array  $contribution the contribution that is being debited
-   * @param array  $creditor the the creditor involved
+   * @param array  $cinfo        some information on the mandate/contribution 
+   * @param array  $creditor     the creditor involved
    *
    * @access public
    */

@@ -75,6 +75,7 @@ msgstr ""
 #: CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php
 #: CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl CRM/Sepa/BAO/SEPAMandate.php
+#: CRM/Sepa/Page/ListGroup.php
 msgid "Error"
 msgstr ""
 
@@ -1147,4 +1148,16 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel Reason"
+msgstr ""
+
+#: CRM/Sepa/Page/ListGroup.php
+msgid "Cannot read SEPA transaction group [%s]. Error was: '%s'"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Mark Received"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Do you really want to mark this groups as 'payment received'?"
 msgstr ""

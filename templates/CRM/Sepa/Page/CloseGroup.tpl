@@ -16,5 +16,5 @@
 		</p>
 		</font>
 	</div>
-	<p><a href="{crmURL p="civicrm/sepa"}" class="button button_export">{ts}I swear I have sucessfully submitted it{/ts}</a></p>
+	<p><a href="{crmURL p="civicrm/sepa/dashboard" q="status=closed"}" class="button button_export">{ts}I swear I have sucessfully submitted it{/ts}</a></p>
 </div>

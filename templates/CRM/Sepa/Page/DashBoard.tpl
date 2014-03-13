@@ -56,7 +56,7 @@
   <tr bgcolor="#FF0000" class="status_{$group.status_id} submit_{$group.submit}" data-id="{$group.id}" data-type="{$group.type}">
 
     <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
-    <td>{$group.status}</td>
+    <td>{$group.status_label}</td>
     <td>{$group.type}</td>
   {if $status eq 'closed'}
     <td>{$group.file_created_date}</td>
@@ -72,6 +72,9 @@
         <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">{ts}Close and Submit{/ts}</a>
       {else}
         <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}.xml" class="button button_export">{ts}Download Again{/ts}</a>
+        {if $closed_status_id eq $group.status_id}
+        <a onClick="mark_received({$group_id});" class="button button_export">{ts}Mark Received{/ts}</a>
+        {/if}
       {/if}
     </td>
   </tr>
@@ -84,5 +87,22 @@
   tr.submit_soon {background-color:#FAB83F;}
   tr.submit_closed {background-color:#f0f8ff;}
 </style>
+{/literal}
+
+<script type="text/javascript">
+var received_confirmation_message = "{ts}Do you really want to mark this groups as 'payment received'?{/ts}";
+
+{literal}
+function mark_received(group_id) {
+  if (confirm(received_confirmation_message)) {
+    CRM.api('SepaAlternativeBatching', 'received', {'q': 'civicrm/ajax/rest', 'txgroup_id': group_id},
+      {success: function(data) {
+        // reload page
+        location.reload();     
+      }}
+    );    
+  }
+}
+</script>
 {/literal}
 

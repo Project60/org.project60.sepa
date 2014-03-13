@@ -46,7 +46,17 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         }
       }
     }
+    // generate group value list
+    $status2label = array();
+    $status_values = array();
+    $status_group_selector = array('name'=>'batch_status');
+    CRM_Core_OptionValue::getValues($status_group_selector, $status_values);
+    foreach ($status_values as $status_value) {
+      $status2label[$status_value['value']] = $status_value['label'];
+    }
+    $this->assign('closed_status_id', CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'));
 
+    // now read the details
     $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
         "version"       => 3, 
         "sequential"    => 1, 
@@ -62,6 +72,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $group['latest_submission_date'] = date('Y-m-d', strtotime($group['latest_submission_date']));
         $group['collection_date'] = date('Y-m-d', strtotime($group['collection_date']));
         $group['status'] = $status_2_title[$group['status_id']];
+        $group['status_label'] = $status2label[$group['status_id']];
         $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60*60*24);
         if ($group['status']=='closed') {
           $group['submit'] = 'closed';
