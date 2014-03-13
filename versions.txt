@@ -11,6 +11,7 @@ Version 0.4
 Version 0.3.2
 =============
 - Disable form hooks
+- added 'mark received' button to groups
 
 
 Version 0.3.1

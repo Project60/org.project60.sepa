@@ -1166,5 +1166,5 @@ msgstr "Zahlung Erhalten"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Do you really want to mark this groups as 'payment received'?"
-msgstr "Möchten Sie diese Gruppe wirklich als \"Zahlung erhalten\" markieren?"
+msgstr "Haben Sie die Zahlung für diese Gruppe wirklich bereits erhalten?"
 
