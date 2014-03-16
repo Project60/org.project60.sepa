@@ -96,6 +96,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       }
       $group['is_cor1'] = true; /* DiCo hack */
       $advanceDays = $group['is_cor1'] ? 1 : ($group['type'] == 'RCUR' ? 2 : 5);
+      $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
       $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
       $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
 
