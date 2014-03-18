@@ -16,6 +16,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // handle creation of a new mandate 
 
+    $fallback_reference = false;
     if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
       CRM_Utils_SepaCustomisationHooks::create_mandate($params);
 
