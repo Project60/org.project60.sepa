@@ -74,7 +74,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
 
       // create an individual transaction message
-      $tx_message = "";
+      $tx_message = "Digitalcourage sagt Danke";
 //TODO @systopia      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
       $t["message"] = $tx_message;
 
