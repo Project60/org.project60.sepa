@@ -211,7 +211,22 @@ class CRM_Sepa_Logic_Base {
   }
 
   public static function addPeriods($startDate, $periods, $frequencyUnit, $frequencyInterval) {
-    return date_add(clone $startDate, DateInterval::createFromDateString($periods * $frequencyInterval . $frequencyUnit));
+    $dueDate = date_add(clone $startDate, DateInterval::createFromDateString($periods * $frequencyInterval . $frequencyUnit));
+
+    if (in_array($frequencyUnit, array('month', 'year')) && $dueDate->format('d') != $startDate->format('d')) { /* Month wrapped. */
+      $wrapDays = $dueDate->format('d');
+      $monthWrapPolicy = 'pre'; /* DiCo hack */
+      switch ($monthWrapPolicy) {
+        case 'pre':
+          $dueDate->modify("-$wrapDays days");
+          break;
+        case 'post':
+          $dueDate->modify("-$wrapDays days +1 day");
+          break;
+      }
+    }
+
+    return $dueDate;
   }
 
   public static function getSequenceNumberField() {
