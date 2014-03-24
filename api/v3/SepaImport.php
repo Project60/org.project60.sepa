@@ -116,16 +116,22 @@ function _civicrm_api3_sepa_import_create_spec(&$params) {
 /**
  */
 function civicrm_api3_sepa_import_create($params) {
+  $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
+
   $startDate = date_create(substr($params['start_date'], 0, 10));
   $createDate = date_create(substr($params['create_date'], 0, 10));
-  if ($createDate > $startDate) {
-    $frequencyUnit = $params['frequency_unit'];
-    $frequencyInterval = $params['frequency_interval'];
-    $startPeriod = CRM_Sepa_Logic_Base::countPeriods($startDate, date_sub(clone $createDate, new DateInterval('P1D')), $frequencyUnit, $frequencyInterval) + 1;
-#echo('<pre>'.print_r($startDate, true).print_r($createDate, true).print_r($startPeriod, true).'</pre>'); #DEBUG
-    $firstPaymentDate = CRM_Sepa_Logic_Base::addPeriods($startDate, $startPeriod, $frequencyUnit, $frequencyInterval);
-  } else {
-    $firstPaymentDate = $startDate;
+  $frequencyUnit = $params['frequency_unit'];
+  $frequencyInterval = $params['frequency_interval'];
+
+  #if ($createDate > $startDate) {
+  #  $firstPaymentPeriod = CRM_Sepa_Logic_Base::countPeriods($startDate, date_sub(clone $createDate, new DateInterval('P1D')), $frequencyUnit, $frequencyInterval) + 1;
+  #} else {
+  #  $firstPaymentPeriod = 0;
+  #}
+
+  for ($firstPaymentPeriod = 0, $firstPaymentDate = $startDate; $firstPaymentDate < $createDate; ) {
+    ++$firstPaymentPeriod;
+    $firstPaymentDate = CRM_Sepa_Logic_Base::addPeriods($startDate, $firstPaymentPeriod, $frequencyUnit, $frequencyInterval);
   }
 
   $params = array_merge($params, array(
@@ -136,6 +142,7 @@ function civicrm_api3_sepa_import_create($params) {
     'total_amount' => $params['amount'],
     'type' => 'RCUR',
     'creation_date' => $params['create_date'],
+    $sequenceNumberField => $firstPaymentPeriod + 1,
   ));
 
   if (isset($params['status']) && $params['status'] != 'INIT') {

@@ -161,6 +161,14 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $objectRef->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'); // For some reason (hopefully not SEPA-related), this is pre-set to 'pending' for recurring contributions, but to 'completed' for one-off contributions... We always want 'pending' for DD -- so set it explicitly.
       $objectRef->save();
       //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
+
+      /* Set `sequence_number` if necessary. Note: using API here, as the BAO (which is passed in the hook) doesn't seem to handle custom fields. */
+      $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
+      $result = civicrm_api3('Contribution', 'getsingle', array('id' => $objectId, 'return' => $sequenceNumberField));
+      if (!isset($return[$sequenceNumberField])) {
+        /* If no Sequence Number is passed in explicitly, this must be the auto-created first contribution in the sequence. */
+        civicrm_api3('Contribution', 'create', array('id' => $objectId, $sequenceNumberField => 1));
+      }
     }
 
     // If this is a one-off payment, doDirectPayment() has already been invoked before creating the contribution.

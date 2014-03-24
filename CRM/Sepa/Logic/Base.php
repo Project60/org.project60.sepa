@@ -213,5 +213,9 @@ class CRM_Sepa_Logic_Base {
   public static function addPeriods($startDate, $periods, $frequencyUnit, $frequencyInterval) {
     return date_add(clone $startDate, DateInterval::createFromDateString($periods * $frequencyInterval . $frequencyUnit));
   }
+
+  public static function getSequenceNumberField() {
+    return 'custom_' . civicrm_api3('CustomField', 'getvalue', array('name' => 'sdd_contribution_sequence_number', 'return' => 'id'));
+  }
 }
 

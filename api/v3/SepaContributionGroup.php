@@ -143,6 +143,10 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
 /**
  */
 function civicrm_api3_sepa_contribution_group_createnext($params) {
+  $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
+
+  $today = date_create('00:00');
+
   $instruments = array();
   foreach (array('FRST', 'RCUR') as $type) {
     $instruments[] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
@@ -154,7 +158,7 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
     #'contribution_status_id'
     'api.Contribution.getsingle' => array(
       'options' => array(
-        'sort' => 'receive_date DESC',
+        'sort' => "$sequenceNumberField DESC",
         'limit' => 1,
       ),
     ),
@@ -172,10 +176,10 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
     $frequencyUnit = $recur['frequency_unit'];
     $frequencyInterval = $recur['frequency_interval'];
 
-    $lastPeriod = CRM_Sepa_Logic_Base::countPeriods($recurStart, date_create($lastContrib['receive_date']), $frequencyUnit, $frequencyInterval);
-    $currentPeriod = CRM_Sepa_Logic_Base::countPeriods($recurStart, date_create('yesterday'), $frequencyUnit, $frequencyInterval);
+    $lastPeriod = $lastContrib[$sequenceNumberField] - 1;
+    $lastDueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $lastPeriod, $frequencyUnit, $frequencyInterval);
 
-    for ($period = $lastPeriod + 1; $period <= $currentPeriod + 1; ++$period) {
+    for ($period = $lastPeriod + 1; $lastDueDate < $today; ++$period, $lastDueDate = $dueDate) {
       $dueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $period, $frequencyUnit, $frequencyInterval);
 
       $result = civicrm_api3('Contribution', 'create', array(
@@ -195,6 +199,7 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
         'honor_type_id' => $lastContrib['honor_type_id'],
         'address_id' => $lastContrib['address_id'],
         'campaign_id' => $recur['campaign_id'],
+        $sequenceNumberField => $period + 1,
       ));
 
       $contrib = new CRM_Contribute_BAO_Contribution();
