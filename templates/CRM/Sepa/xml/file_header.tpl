@@ -7,6 +7,7 @@
   <CstmrDrctDbtInitn>
     <GrpHdr>
       <MsgId>{$file.reference}</MsgId>
+{* for some reason, the seconds (%s) in the following line will not be converted correctly, hence 42 *}
       <CreDtTm>{$file.created_date|crmDate:"%Y-%m-%dT%H:%i:42"}</CreDtTm>
       <NbOfTxs>{$nbtransactions}</NbOfTxs>
       <CtrlSum>{$total}</CtrlSum>
