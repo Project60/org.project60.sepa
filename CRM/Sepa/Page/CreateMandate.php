@@ -229,6 +229,16 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         }
       }
     }
+    
+    // remove duplicate entries
+    $known_account_names = array();
+    foreach ($known_accounts as $index => $entry) {
+      if (isset($known_account_names[$entry['name']])) {
+        unset($known_accounts[$index]);
+      } else {
+        $known_account_names[$entry['name']] = $index;
+      }
+    }
 
     // add default entry
     array_push($known_accounts, array("name" => ts("enter new account"), "value"=>"/"));
