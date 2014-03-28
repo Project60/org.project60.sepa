@@ -74,11 +74,15 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     while ($contrib->fetch()) {
       $t=$contrib->toArray();
       $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
-      $t["display_name"]=str_replace('&','+',$t["display_name"]);// french banks don't like & nor &amp;
+      
+      // try to convert the name into a more acceptable format
       if (function_exists("iconv")){
         $t["display_name"]=iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
         //french banks like utf8 as long as it's ascii7 only
       }
+
+      // ...but to be sure, replace any remainig illegit characters with '?'
+      $t["display_name"] = preg_replace("/[^ 0-9a-zA-Z':?,\-(+.)\/\"]/", '?', $t["display_name"]);
 
       // create an individual transaction message
       $tx_message = "Thanks.";
