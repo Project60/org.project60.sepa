@@ -344,10 +344,11 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (!isset($_REQUEST['bic'])) {
       $errors['bic'] = sprintf(ts("'%s' is a required field."), "BIC");
     } else {
+      $_REQUEST['bic'] = strtoupper($_REQUEST['bic']);
       if (strlen($_REQUEST['bic']) == 0) {
         $errors['bic'] = sprintf(ts("'%s' is a required field."), "BIC");
-      } elseif (strlen($_REQUEST['bic']) < 8) {
-        $errors['bic'] = ts("BIC too short");
+      } elseif (!preg_match("/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/", $_REQUEST['bic'])) {
+        $errors['bic'] = ts("BIC is not correct");
       }
     }
 

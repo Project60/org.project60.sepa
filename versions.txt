@@ -1,11 +1,19 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
-Version 0.4
-===========
+Version 0.4 (planned)
+=====================
 - TODO: Fix contributions status
 - TODO: put parameters into settings
 - TODO: allow for multiple mandates
+
+
+
+
+
+Version 0.3.3
+=============
+- create SEPA form: improved BIC validation
 
 
 Version 0.3.2
