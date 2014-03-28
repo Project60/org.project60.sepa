@@ -15,6 +15,7 @@ Version 0.3.3
 =============
 - FIX: (further) restrict characters on Nm field in PAIN XML
 - create SEPA form: improved BIC validation
+- create SEPA form: only show mandates from the last 60 days
 
 
 Version 0.3.2
