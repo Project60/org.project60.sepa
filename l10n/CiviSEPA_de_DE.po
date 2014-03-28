@@ -1168,3 +1168,15 @@ msgstr "Zahlung Erhalten"
 msgid "Do you really want to mark this groups as 'payment received'?"
 msgstr "Haben Sie die Zahlung für diese Gruppe wirklich bereits erhalten?"
 
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "PDF Prenotfication"
+msgstr "PDF Prenotifikation"
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Will generate a Prenotification PDF with this mandate's data."
+msgstr "Erstellt eine PDF Prenotifikation mit den Mandatsdaten."
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "BIC is not correct"
+msgstr "BIC ist nicht korrekt."
+

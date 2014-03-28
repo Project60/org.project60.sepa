@@ -1161,3 +1161,15 @@ msgstr ""
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Do you really want to mark this groups as 'payment received'?"
 msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "PDF Prenotfication"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Will generate a Prenotification PDF with this mandate's data."
+msgstr ""
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "BIC is not correct"
+msgstr ""
