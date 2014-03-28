@@ -14,6 +14,7 @@ Version 0.4 (planned)
 Version 0.3.3
 =============
 - FIX: (further) restrict characters on Nm field in PAIN XML
+- FIX: use 24h time format in batching
 - create SEPA form: improved BIC validation
 - create SEPA form: only show mandates from the last 60 days
 

@@ -131,7 +131,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
           'reference'               => $available_name,
           'filename'                => $available_name.'.xml',
           'latest_submission_date'  => $txgroup['latest_submission_date'],
-          'created_date'            => date('Ymdhis'),
+          'created_date'            => date('YmdHis'),
           'created_id'              => CRM_Core_Session::singleton()->get('userID'),
           'status_id'               => $group_status_id_closed)
       );
@@ -323,7 +323,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
     $change_rcur = civicrm_api('ContributionRecur', 'create', array(
       'id'                      => $mandate_to_end['recur_id'],
       'contribution_status_id'  => $contribution_status_closed,
-      'modified_date'           => date('Ymdhis'),
+      'modified_date'           => date('YmdHis'),
       'version'                 => 3));
     if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
       return civicrm_api3_create_error(sprintf("Couldn't set recurring contribution '%s' to 'complete. Error was: '%s'", $mandates_to_end['recur_id']), $change_rcur['error_message']);

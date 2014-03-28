@@ -155,8 +155,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'payment_instrument_id' => $payment_instrument_id,
         'collection_date' => $collection_date,
         'latest_submission_date' => $submission_date,
-        'created_date' => date('Ymdhis'),
-        'modified_date' => date('Ymdhis'),
+        'created_date' => date('YmdHis'),
+        'modified_date' => date('YmdHis'),
         'created_id' => $session->get('userID'),
         'modified_id' => $session->get('userID'),
     );
@@ -248,7 +248,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value'),
         'latest_submission_date' => $txgroup->latest_submission_date,
         'tag' => $tag,
-        'created_date' => date('Ymdhis'),
+        'created_date' => date('YmdHis'),
         'created_id' => $session->get('userID'),
         'version' => 3,
     );
