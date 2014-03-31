@@ -66,8 +66,10 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $this->assign("contribution",(array) $contribution);
 
     $api->SepaCreditor->getsingle(array('id' => $mandate->creditor_id, 'api.PaymentProcessor.getsingle' => array('id' => '$value.payment_processor_id')));
-    $pp=$api->result->{'api.PaymentProcessor.getsingle'};
-    $this->assign("creditor",$pp->user_name);
+    if (isset($api->result->{'api.PaymentProcessor.getsingle'})) {
+      $pp = $api->result->{'api.PaymentProcessor.getsingle'};
+      $this->assign("creditor",$pp->user_name);      
+    }
 
     $this->html = $this->getTemplate()->fetch("string:".$msg["msg_html"]);
   }
