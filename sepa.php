@@ -223,8 +223,8 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     }
 //CRM_Admin_Form_PaymentProcessor
   }
-  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD"
-      || "CRM_Contribute_Form_Contribution" == $formName && CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id']))) {
+  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
+    // DISABLED: || "CRM_Contribute_Form_Contribution" == $formName && CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id']))) {
     $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic","sepa_active"=>"is_enabled");
     $newMandate = array();
     if ("CRM_Contribute_Form_UpdateSubscription" == $formName) {
