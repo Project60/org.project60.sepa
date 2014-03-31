@@ -136,7 +136,7 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
     LEFT JOIN civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id 
     LEFT JOIN civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id 
     WHERE $where 
-    GROUP BY txgroup_id 
+    GROUP BY txgroup.id 
     $orderby;";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
