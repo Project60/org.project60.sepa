@@ -8,7 +8,9 @@ Version 0.4 (planned)
 - TODO: allow for multiple mandates
 
 
-
+Version 0.3.4
+=============
+- alternative batching: included collection date deferral (e.g. for banking holidays or week ends)
 
 
 Version 0.3.3

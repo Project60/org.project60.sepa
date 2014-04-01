@@ -373,7 +373,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
 /**
  * runs a batching update for all RCUR mandates of the given type
  */
-function _sepa_alternative_batching_update_rcur($params) {
+function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
   $mode = $params['type'];
   $horizon = (int) _sepa_alternative_batching_get_parameter("org.project60.alternative_batching.$mode.horizon_days");
   $latest_date = date('Y-m-d', strtotime("+$horizon days"));
@@ -530,7 +530,7 @@ function _sepa_alternative_batching_update_rcur($params) {
 /**
  * runs a batching update for all OOFF mandates
  */
-function _sepa_alternative_batching_update_ooff($params) {
+function _sepa_alternative_batching_update_ooff($params, $creditor_id=3) {
   $horizon = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.horizon_days');
   $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.notice');
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
@@ -614,6 +614,7 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
   foreach ($calculated_groups as $collection_date => $mandates) {
+    CRM_Utils_SepaCustomisationHooks::defer_collection_date($collection_date, $creditor_id);
     if (!isset($existing_groups[$collection_date])) {
       // this group does not yet exist -> create
       // FIXME: creditor ID

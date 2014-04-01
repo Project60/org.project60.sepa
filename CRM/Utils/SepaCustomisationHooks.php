@@ -52,4 +52,19 @@ class CRM_Utils_SepaCustomisationHooks {
   static function mend_rcontrib($rcontribId, &$rcontrib) {
     return CRM_Utils_Hook::singleton()->invoke(2, $rcontribId, $rcontrib, self::$null, self::$null, self::$null, 'civicrm_mend_rcontrib');
   }
+
+  /**
+   * This hook is called by the alternativeBatching:
+   *  to avoid using a collection date that is not accepted by the bank, e.g. holidays,
+   *  this hook lets you alter the calculated collection date string (format: "YYYY-MM-DD").
+   *  You should _only_ defer the date by a few days!
+   *
+   * @param string $collection_date  the calculated collection date (format: "YYYY-MM-DD").
+   * @param array  $creditor_id      the creditor involved
+   *
+   * @access public
+   */
+  static function defer_collection_date(&$collection_date, $creditor_id) {
+    return CRM_Utils_Hook::singleton()->invoke(2, $collection_date, $creditor_id, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
+  }
 }
