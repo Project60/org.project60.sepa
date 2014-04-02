@@ -8,13 +8,13 @@
     <author>systopia</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate>2014-02-21</releaseDate>
+  <releaseDate>2014-04-01</releaseDate>
   <version>0.3.3</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>4.4.4</ver>
   </compatibility>
-  <comments>This module is fork of Project60's sepa_dd extension (https://github.com/Project60/sepa_dd). Original maintainer is: xavier@tttp.eu</comments>
+  <comments>This module is fork of Project60's sepa_dd extension (https://github.com/Project60/sepa_dd). Current maintainer: endres@systopia.de. Original maintainer is: xavier@tttp.eu</comments>
   <civix>
     <namespace>CRM/Sepa</namespace>
   </civix>
