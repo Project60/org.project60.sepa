@@ -9,7 +9,11 @@
           <Cd>SEPA</Cd>
         </SvcLvl>
         <LclInstrm>
+{if $fileFormat == 'pain.008.003.02 COR1'}
+          <Cd>COR1</Cd>
+{else}
           <Cd>CORE</Cd>
+{/if}
         </LclInstrm>
         <SeqTp>{$group.type}</SeqTp>
       </PmtTpInf>
@@ -29,7 +33,8 @@
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
       <CdtrSchmeId>
-{if $fileFormat != 'pain.008.003.02'}{* Element doesn't exist in German non-standard. *}
+{if $fileFormat != 'pain.008.003.02' and $fileFormat != 'pain.008.003.02 COR1'}
+{* Element doesn't exist in German non-standard. *}
         <Nm>{$creditor.name}</Nm>
 {/if}
         <Id>

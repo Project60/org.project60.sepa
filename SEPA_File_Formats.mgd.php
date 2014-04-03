@@ -19,7 +19,12 @@ return array (
         ),
         array(
           'name' => 'pain.008.003.02',
-          'label' => ts('pain.008.003.02 (German Sonderwurst)'),
+          'label' => ts('pain.008.003.02 container core direct debit (CDC EBICS-2.7)'),
+          'is_reserved' => 1,
+        ),
+        array(
+          'name' => 'pain.008.003.02 COR1',
+          'label' => ts('pain.008.003.02 COR1 direct debit (CD1 EBICS-2.7)'),
           'is_reserved' => 1,
         ),
       ),
