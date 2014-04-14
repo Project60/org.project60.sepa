@@ -523,7 +523,7 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
   // print_r("</pre>");
 
   // step 6: sync calculated group structure with existing (open) groups
-  return _sepa_alternative_batching_sync_groups($mandates_by_nextdate, $existing_groups, $mode, 'RCUR', $rcur_notice);
+  return _sepa_alternative_batching_sync_groups($mandates_by_nextdate, $existing_groups, $mode, 'RCUR', $rcur_notice, $creditor_id);
 }
 
 
@@ -534,7 +534,7 @@ function _sepa_alternative_batching_update_ooff($params, $creditor_id=3) {
   $horizon = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.horizon_days');
   $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.notice');
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
-
+  
   // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
   $sql_query = "
     SELECT
@@ -602,7 +602,7 @@ function _sepa_alternative_batching_update_ooff($params, $creditor_id=3) {
   }
 
   // step 4: sync calculated group structure with existing (open) groups
-  return _sepa_alternative_batching_sync_groups($calculated_groups, $existing_groups, 'OOFF', 'OOFF', $ooff_notice);
+  return _sepa_alternative_batching_sync_groups($calculated_groups, $existing_groups, 'OOFF', 'OOFF', $ooff_notice, $creditor_id);
 }
 
 
@@ -610,7 +610,7 @@ function _sepa_alternative_batching_update_ooff($params, $creditor_id=3) {
 /**
  * subroutine to create the group/contribution structure as calculated
  */
-function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_groups, $mode, $type, $notice) {
+function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_groups, $mode, $type, $notice, $creditor_id) {
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
   foreach ($calculated_groups as $collection_date => $mandates) {
