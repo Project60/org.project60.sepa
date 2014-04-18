@@ -37,6 +37,13 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
     return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
   }
 
+  // step 0: check lock
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.update.lock_timeout');
+  $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
+  if (!$lock->isAcquired()) {
+    return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
+  }
+
   // step 1: gather data
   $txgroup_id = (int) $params['txgroup_id'];
   
@@ -46,6 +53,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');  
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
   if (isset($result['is_error']) && $result['is_error']) {
+    $lock->release();
     return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
   }
   $collection_date = $txgroup['collection_date'];
@@ -97,6 +105,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
     // AFAIK nothing to do with RCURs...
 
   } else {
+    $lock->release();
     return civicrm_api3_create_error("Group type '".$txgroup['type']."' not yet supported.");
   }
 
@@ -121,6 +130,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
       $available_name = $name.'_'.$counter;
       $counter += 1;
       if ($counter>1000) {
+        $lock->release();
         return civicrm_api3_create_error("Cannot create file! Unable to find an available file reference.");
       }
     }
@@ -136,6 +146,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
           'status_id'               => $group_status_id_closed)
       );
     if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
+      $lock->release();
       return civicrm_api3_create_error(sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']));
     } else {
       $txgroup['sdd_file_id'] = $sepa_file['id'];
@@ -149,9 +160,11 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
         'sdd_file_id'             => $txgroup['sdd_file_id'],
         'version'                 => 3));
   if (isset($result['is_error']) && $result['is_error']) {
+    $lock->release();
     return civicrm_api3_create_error(sprintf(ts("Cannot close transaction group! Error was: '%s'"), $result['error_message']));
   } 
 
+  $lock->release();
   return civicrm_api3_create_success($result, $params);  
 }
 
@@ -173,6 +186,13 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
     return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
   }
 
+  // step 0: check lock
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.update.lock_timeout');
+  $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
+  if (!$lock->isAcquired()) {
+    return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
+  }
+
   // step 1: gather data
   $txgroup_id = (int) $params['txgroup_id'];
   
@@ -188,11 +208,13 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
   // step 0: load the group object  
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
   if (!empty($txgroup['is_error'])) {
+    $lock->release();
     return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
   }
   
   // check status
   if ($txgroup['status_id'] != $group_status_id_closed) {
+    $lock->release();
     return civicrm_api3_create_error("Transaction group ".$txgroup_id." is not 'closed'.");
   }
 
@@ -259,14 +281,17 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
   // step 3: update group status
   $result = civicrm_api('SepaTransactionGroup', 'create', array('id'=>$txgroup_id, 'status_id'=>$group_status_id_received, 'version'=>3));
   if (!empty($result['is_error'])) {
+    $lock->release();
     return civicrm_api3_create_error("Cannot update transaction group status for ID ".$txgroup_id);
   }
 
   // check if there was problems
   if ($error_count) {
+    $lock->release();
     return civicrm_api3_create_error("$error_count contributions could not be updated to status 'completed'.");
   }
 
+  $lock->release();
   return civicrm_api3_create_success($result, $params);  
 }
 
@@ -289,6 +314,13 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
     $modes = "'FRST','RCUR'";
   } else {
     $modes = "'".$params['mode']."'";
+  }
+
+  // check lock
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.update.lock_timeout');
+  $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
+  if (!$lock->isAcquired()) {
+    return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
   }
 
   $contribution_status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');  
@@ -317,6 +349,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
       'status'                  => 'COMPLETE',
       'version'                 => 3));
     if (isset($change_mandate['is_error']) && $change_mandate['is_error']) {
+      $lock->release();
       return civicrm_api3_create_error(sprintf("Couldn't set mandate '%s' to 'complete. Error was: '%s'", $mandates_to_end['mandate_id']), $change_mandate['error_message']);
     }
 
@@ -326,10 +359,12 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
       'modified_date'           => date('YmdHis'),
       'version'                 => 3));
     if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
+      $lock->release();
       return civicrm_api3_create_error(sprintf("Couldn't set recurring contribution '%s' to 'complete. Error was: '%s'", $mandates_to_end['recur_id']), $change_rcur['error_message']);
     }
   }
 
+  $lock->release();
   return civicrm_api3_create_success($mandates_to_end, $params);
 }
 
@@ -342,6 +377,12 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
  *
  */
 function civicrm_api3_sepa_alternative_batching_update($params) {
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.update.lock_timeout');
+  $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
+  if (!$lock->isAcquired()) {
+    return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
+  }
+
   if ($params['type']=='OOFF') {
     $result = _sepa_alternative_batching_update_ooff($params);
 
@@ -356,6 +397,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
     return civicrm_api3_create_error(sprintf("Unknown batching mode '%s'.", $params['type']));
   }
 
+  $lock->release();
   return civicrm_api3_create_success($result, $params);
 }
 
@@ -724,6 +766,10 @@ function _sepa_alternative_batching_get_parameter($parameter_name) {
     return 30;
   } else if ($parameter_name=='org.project60.alternative_batching.FRST.notice') {
     return 8;
+  } else if ($parameter_name=='org.project60.alternative_batching.update.lock_timeout') {
+    return 170;
+  } else {
+    error_log("org.project60.sepa: get_parameter for unknown key: $parameter_name");
   }
 }
 
