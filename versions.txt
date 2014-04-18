@@ -10,6 +10,7 @@ Version 0.4 (planned)
 
 Version 0.3.4
 =============
+- FIX: copy into accounting batch for contributions with multiple financial transactions
 - alternative batching: included collection date deferral (e.g. for banking holidays or week ends)
 
 

@@ -271,7 +271,8 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   FROM civicrm_sdd_contribution_txgroup   AS txgroup_contrib
   LEFT JOIN civicrm_contribution          AS contribution ON txgroup_contrib.contribution_id = contribution.id
   LEFT JOIN civicrm_entity_financial_trxn AS entity_trxn  ON entity_trxn.entity_id = contribution.id AND entity_trxn.entity_table='civicrm_contribution'
-  WHERE txgroup_contrib.txgroup_id = $txgroup_id;";
+  WHERE txgroup_contrib.txgroup_id = $txgroup_id
+  GROUP BY contribution.id;";
 
   $contributions_query = CRM_Core_DAO::executeQuery($contributions_query_sql);
   $transactions = array();
