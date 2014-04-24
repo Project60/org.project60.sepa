@@ -82,14 +82,19 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     $result = civicrm_api3('SepaTransactionGroup', 'get', array(
       'options' => array('limit' => 1234567890),
-      'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name'),
+      'sdd_file_id' => array('IS NULL' => 1), /* Only include pending groups. This doesn't actually work in existing CiviCRM versions... But hopefully it will work in the future, and it should provide a nice performance boost when it does. */
       'sdd_creditor_id' => $creditorId,
       'filter.collection_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter the ones obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
-      'return' => array('id', 'type', 'collection_date'),
+      'return' => array('id', 'type', 'collection_date', 'sdd_file_id'),
     ));
 
     $pendingGroups = array();
     foreach ($result['values'] as $group) {
+      /* Only include pending groups. Need the explicit check as long as the API filter doesn't work... */
+      if (isset($group['sdd_file_id'])) {
+        continue;
+      }
+
       $bestCollectionDate = self::adjustBankDays($group['collection_date'], 0);
       /* Re-check, as date might exceed range after adjustment. */
       if ($bestCollectionDate > $dateRangeEnd) {
@@ -182,13 +187,12 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    */
   public static function findTxGroup($creditor_id, $type, $earliest_date, $latest_date) {
     CRM_Sepa_Logic_Base::debug("Locating suitable TXG with CRED=$creditor_id, TYPE=$type and COLLDATE IN " . substr($earliest_date,0,10) . ' / ' . substr($latest_date,0,10));
-    $openStatus = CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value');
     $query = "SELECT 
                 id 
               FROM
                 civicrm_sdd_txgroup
               WHERE         
-                status_id = " . $openStatus . "
+                sdd_file_id IS NULL /* Pending group. (Not batched yet.) */
                 AND
                 type = '" . $type . "'
                 AND
