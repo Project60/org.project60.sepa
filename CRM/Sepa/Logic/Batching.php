@@ -84,16 +84,18 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       'options' => array('limit' => 1234567890),
       'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name'),
       'sdd_creditor_id' => $creditorId,
-      #'filter.collection_date_high' => $dateRangeEnd,
+      'filter.collection_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter the ones obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
       'return' => array('id', 'type', 'collection_date'),
     ));
 
     $pendingGroups = array();
     foreach ($result['values'] as $group) {
       $bestCollectionDate = self::adjustBankDays($group['collection_date'], 0);
+      /* Re-check, as date might exceed range after adjustment. */
       if ($bestCollectionDate > $dateRangeEnd) {
         continue;
       }
+
       $group['is_cor1'] = true; /* DiCo hack */
       $advanceDays = $group['is_cor1'] ? 1 : ($group['type'] == 'RCUR' ? 2 : 5);
       $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
