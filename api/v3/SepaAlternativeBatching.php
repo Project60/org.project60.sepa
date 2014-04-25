@@ -102,7 +102,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
     CRM_Core_DAO::executeQuery($sql);
 
   } else if ($txgroup['type']=='RCUR') {
-    // AFAIK nothing to do with RCURs...
+    // AFAIK there's nothing to do with RCURs...
 
   } else {
     $lock->release();
@@ -423,7 +423,7 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
   $now = strtotime("+$rcur_notice days");
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
-  // RCUR-STEP 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
+  // RCUR-STEP 1: find all active/pending RCUR mandates within the horizon that are NOT in a closed batch
   $sql_query = "
     SELECT
       mandate.id AS mandate_id,
@@ -531,7 +531,10 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
             "payment_instrument_id"               => $mandate['rc_payment_instrument_id'],
           );
         $contribution = civicrm_api('Contribution', 'create', $contribution_data);
-        // TODO: Error handling
+        if (!empty($contribution['is_error'])) {
+          // TODO: Error handling
+          error_log("org.project60.sepa: alternative_batching:updateRCUR/createContrib ".$contribution['error_message']);
+        }
         $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution['id'];
         unset($existing_contributions_by_recur_id[$recur_id]);
       }
@@ -559,10 +562,6 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
     $collection_date = date('Y-m-d', strtotime($results->collection_date));
     $existing_groups[$collection_date] = $results->txgroup_id;
   }
-
-  // print_r("$mode<pre>");
-  // print_r($mandates_by_nextdate);
-  // print_r("</pre>");
 
   // step 6: sync calculated group structure with existing (open) groups
   return _sepa_alternative_batching_sync_groups($mandates_by_nextdate, $existing_groups, $mode, 'RCUR', $rcur_notice, $creditor_id);
@@ -680,10 +679,16 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
           'status_id'               => $group_status_id_open,
           'sdd_creditor_id'         => $creditor_id,
           ));
-      // TODO: error handling
+      if (!empty($group['is_error'])) {
+        // TODO: Error handling
+        error_log("org.project60.sepa: alternative_batching:syncGroups/createGroup ".$group['error_message']);
+      }
     } else {
       $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date], 'status_id' => $group_status_id_open));
-      // TODO: error handling
+      if (!empty($group['is_error'])) {
+        // TODO: Error handling
+        error_log("org.project60.sepa: alternative_batching:syncGroups/getGroup ".$group['error_message']);
+      }
       unset($existing_groups[$collection_date]);      
     }
 
@@ -691,15 +696,39 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
     $group_id = $group['id'];
     $entity_ids = array();
     foreach ($mandates as $mandate) {
-      array_push($entity_ids, $mandate['mandate_entity_id']);
+      // remark: "mandate_entity_id" in this case means the contribution ID
+      if (empty($mandate['mandate_entity_id'])) {
+        // this shouldn't happen
+        error_log("org.project60.sepa: alternative_batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
+      } else {
+        array_push($entity_ids, $mandate['mandate_entity_id']);
+      }
     }
+    if (count($entity_ids)<=0) continue;
+
+    // now, filter out the entity_ids that are are already in a non-open group
+    //   (DO NOT CHANGE CLOSED GROUPS!)
     $entity_ids_list = implode(',', $entity_ids);
+    $already_sent_contributions = CRM_Core_DAO::executeQuery("
+      SELECT contribution_id 
+      FROM civicrm_sdd_contribution_txgroup 
+      LEFT JOIN civicrm_sdd_txgroup ON civicrm_sdd_contribution_txgroup.txgroup_id = civicrm_sdd_txgroup.id
+      WHERE contribution_id IN ($entity_ids_list)
+       AND  civicrm_sdd_txgroup.status_id <> $group_status_id_open;");
+    while ($already_sent_contributions->fetch()) {
+      $index = array_search($already_sent_contributions->contribution_id, $entity_ids);
+      if ($index !== false) unset($entity_ids[$index]);
+    }
+    if (count($entity_ids)<=0) continue;
 
     // remove all the unwanted entries from our group
+    $entity_ids_list = implode(',', $entity_ids);
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id NOT IN ($entity_ids_list);");
+
+    // remove all our entries from other groups, if necessary
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id!=$group_id AND contribution_id IN ($entity_ids_list);");
 
-    // check which ones are already there...
+    // now check which ones are already in our group...
     $existing = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id IN ($entity_ids_list);");
     while ($existing->fetch()) {
       // remove from entity ids, if in there:
