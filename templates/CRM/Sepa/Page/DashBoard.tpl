@@ -11,7 +11,7 @@
 
     <div class="action-link">
       <div class="crm-submit-buttons">
-        <a class="button" href="{crmURL p='civicrm/sepa/batchforsubmit' q="creditor_id=$creditor_id"}"><span>{ts}Prepare Submit{/ts}</span></a>
+        <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=batch_for_submit&creditor_id=$creditor_id"}"><span>{ts}Prepare Submit{/ts}</span></a>
       </div>
     </div>
 
@@ -41,8 +41,8 @@
 <td>
 {if !empty($group.file_id) && $group.status == 'Pending'}
   {assign var='group_id' value=$group.id}
-  <a class="button" href="{crmURL p='civicrm/sepa/cancelsubmitgroup' q="txgroup_id=$group_id"}">{ts}Cancel Group{/ts}</a>
-  <a class="button" href="{crmURL p='civicrm/sepa/cancelsubmitfile' q="file_id=$file_id"}">{ts}Cancel File{/ts}</a>
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=cancel_submit_group&txgroup_id=$group_id"}">{ts}Cancel Group{/ts}</a>
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=cancel_submit_file&file_id=$file_id"}">{ts}Cancel File{/ts}</a>
 {/if}
 </td>
 </tr>

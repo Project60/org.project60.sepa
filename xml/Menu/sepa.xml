@@ -31,21 +31,9 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-    <path>civicrm/sepa/batchforsubmit</path>
-    <page_callback>CRM_Sepa_Page_BatchForSubmit</page_callback>
-    <title>Batch pending SDD Transactions</title>
-    <access_arguments>access CiviContribute</access_arguments>
-  </item>
-  <item>
-    <path>civicrm/sepa/cancelsubmitgroup</path>
-    <page_callback>CRM_Sepa_Page_CancelSubmitGroup</page_callback>
-    <title>Unbatch Transactions from Group</title>
-    <access_arguments>access CiviContribute</access_arguments>
-  </item>
-  <item>
-    <path>civicrm/sepa/cancelsubmitfile</path>
-    <page_callback>CRM_Sepa_Page_CancelSubmitFile</page_callback>
-    <title>Unbatch Transactions from all Groups in File</title>
+    <path>civicrm/sepa/batchingaction</path>
+    <page_callback>CRM_Sepa_Page_BatchingAction</page_callback>
+    <title>SEPA Batching Action</title>
     <access_arguments>access CiviContribute</access_arguments>
   </item>
   <item>
