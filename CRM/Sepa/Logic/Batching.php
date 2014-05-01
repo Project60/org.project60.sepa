@@ -155,7 +155,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       ),
       'api.SepaTransactionGroup.create' => array(
         /* 'id' inherited */
-        'status_id' => 666,
+        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
       ),
     )));
     if (!$result['count']) {
@@ -218,15 +218,13 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $collection_date = substr($receive_date, 0, 10);
     CRM_Sepa_Logic_Base::debug("Creating new TXG( CRED=$creditor_id, TYPE=$type, COLLDATE=" . $collection_date . ')');
 
-    $status = isset($sddFileId) ? 'Closed' : 'Open';
-
     $session = CRM_Core_Session::singleton();
     $reference = time() . rand(); // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
     $params = array(
         'reference' => $reference,
         'type' => $type,
         'sdd_creditor_id' => $creditor_id,
-        'status_id' => CRM_Core_OptionGroup::getValue('batch_status', $status, 'name', 'String', 'value'),
+        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
         'payment_instrument_id' => $payment_instrument_id,
         'collection_date' => $collection_date,
         'created_date' => date('Ymdhis'),
@@ -243,7 +241,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $txgroup_id = $result['id'];
 
     // Now that we have the auto ID, create the proper reference.
-    $prefix = ($status == 'Open') ? 'PENDING' : 'TXG';
+    $prefix = !isset($sddFileId) ? 'PENDING' : 'TXG';
     $creditorPrefix = civicrm_api3('SepaCreditor', 'getvalue', array('id' => $creditor_id, 'return' => 'mandate_prefix'));
     $reference = "$prefix-$creditorPrefix-$creditor_id-$type-$collection_date-$txgroup_id";
     civicrm_api3('SEPATransactionGroup', 'create', array('id' => $txgroup_id, 'reference' => $reference)); // Not very efficient, but easier than fiddling with BAO mess...
@@ -283,7 +281,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
   public static function findSddFile($txgroup, $tag) {
     self::debug('Locating suitable SDDFILE with LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ' and TAG = ' . $tag);
-    $openStatus = CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value');
+    $openStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
     $query = "SELECT 
                 id 
               FROM
@@ -318,7 +316,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $params = array(
         'reference' => $reference,
         'filename' => $filename,
-        'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name', 'String', 'value'),
+        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
         'latest_submission_date' => $txgroup->latest_submission_date,
         'tag' => $tag,
         'created_date' => date('Ymdhis'),

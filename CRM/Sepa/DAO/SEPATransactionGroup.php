@@ -125,7 +125,7 @@ class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Core_DAO
    */
   public $created_date;
   /**
-   * fk sepa group Status options in civicrm_option_values
+   * fk Contribution Status options in civicrm_option_values
    *
    * @var int unsigned
    */

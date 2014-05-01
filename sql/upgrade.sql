@@ -1,3 +1,11 @@
+UPDATE `civicrm_sdd_txgroup` SET `status_id` = CASE `status_id`
+  WHEN 1 THEN 2 -- 'Open' (batch_status) => 'Pending' (contribution_status)
+  WHEN 2 THEN 2 -- 'Closed' (batch_status) => 'Pending' (contribution_status)
+  WHEN 666 THEN 3 -- 'Cancelled'
+END;
+UPDATE `civicrm_sdd_file` SET `status_id` = 2 WHERE `status_id` = 1; -- 'Open' (batch_status) => 'Pending' (contribution_status)
+
+
 ALTER TABLE `civicrm_sdd_contribution_txgroup` DROP INDEX `contriblookup`, ADD INDEX `contriblookup`(`contribution_id`); -- Drop UNIQUE.
 
 

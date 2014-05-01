@@ -125,7 +125,7 @@ class CRM_Sepa_DAO_SEPASddFile extends CRM_Core_DAO
    */
   public $created_id;
   /**
-   * fk to Batch Status options in civicrm_option_values
+   * fk to Contribution Status options in civicrm_option_values
    *
    * @var int unsigned
    */

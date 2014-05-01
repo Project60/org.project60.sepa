@@ -64,7 +64,7 @@
     <name>status_id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>fk sepa group Status options in civicrm_option_values</comment>
+    <comment>fk Contribution Status options in civicrm_option_values</comment>
     <add>4.3</add>
   </field>
   <field>

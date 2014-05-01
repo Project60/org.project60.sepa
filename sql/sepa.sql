@@ -114,7 +114,7 @@ CREATE TABLE `civicrm_sdd_file` (
      `latest_submission_date` datetime    COMMENT 'Latest submission date',
      `created_date` datetime    COMMENT 'When was this item created',
      `created_id` int unsigned    COMMENT 'FK to Contact ID of creator',
-     `status_id` int unsigned NOT NULL   COMMENT 'fk to Batch Status options in civicrm_option_values',
+     `status_id` int unsigned NOT NULL   COMMENT 'fk to Contribution Status options in civicrm_option_values',
      `comments` text    COMMENT 'Comments about processing of this file',
      `tag` varchar(64) NULL   COMMENT 'Tag used to group multiple creditors in this XML file.'
 ,
@@ -143,7 +143,7 @@ CREATE TABLE `civicrm_sdd_txgroup` (
      `collection_date` datetime    COMMENT 'Target collection date',
      `latest_submission_date` datetime    COMMENT 'Latest submission date',
      `created_date` datetime    COMMENT 'When was this item created',
-     `status_id` int unsigned NOT NULL   COMMENT 'fk to Batch Status options in civicrm_option_values',
+     `status_id` int unsigned NOT NULL   COMMENT 'fk to Contribution Status options in civicrm_option_values',
      `sdd_creditor_id` int unsigned    COMMENT 'fk to SDD Creditor Id',
      `sdd_file_id` int unsigned    COMMENT 'fk to SDD File Id'
 ,
