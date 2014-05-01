@@ -23,6 +23,8 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $group['file_href'] = $file['href'];
       }
 
+      $group['status_label'] = CRM_Core_OptionGroup::getLabel('contribution_status', $group['status_id']);
+
       $groups[$group['sdd_creditor_id']][] = $group;
     }
     $this->assign("groups",$groups);
