@@ -24,6 +24,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       }
 
       $group['status_label'] = CRM_Core_OptionGroup::getLabel('contribution_status', $group['status_id']);
+      $group['status'] = CRM_Core_OptionGroup::getValue('contribution_status', $group['status_id'], 'value', 'String', 'name');
 
       $groups[$group['sdd_creditor_id']][] = $group;
     }

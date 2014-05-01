@@ -39,7 +39,7 @@
 <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
 <td>{$group.total} &euro;</td>
 <td>
-{if !empty($group.file_id) && $group.status_id == 2}
+{if !empty($group.file_id) && $group.status == 'Pending'}
   {assign var='group_id' value=$group.id}
   <a class="button" href="{crmURL p='civicrm/sepa/cancelsubmitgroup' q="txgroup_id=$group_id"}">{ts}Cancel Group{/ts}</a>
   <a class="button" href="{crmURL p='civicrm/sepa/cancelsubmitfile' q="file_id=$file_id"}">{ts}Cancel File{/ts}</a>
