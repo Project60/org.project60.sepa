@@ -1,11 +1,10 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
-Version 0.4 (planned)
-=====================
-- TODO: Fix contributions status
-- TODO: put parameters into settings
-- TODO: allow for multiple mandates
+
+Version 0.4
+===========
+- is essentially Version 0.3.4 with updated documentation
 
 
 Version 0.3.4
