@@ -1,5 +1,11 @@
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS civicrm_sdd_mandate;
 DROP TABLE IF EXISTS civicrm_sdd_creditor;
+DROP TABLE IF EXISTS civicrm_sdd_file;
+DROP TABLE IF EXISTS civicrm_sdd_txgroup;
+DROP TABLE IF EXISTS civicrm_sdd_contribution_txgroup;
+SET FOREIGN_KEY_CHECKS = 1;
+
 
 -- /*******************************************************
 -- *
