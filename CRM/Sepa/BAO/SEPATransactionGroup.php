@@ -79,7 +79,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t["message"] = $tx_message;
 
       $t['trxn_id'] = "{$creditor['mandate_prefix']}-{$t['contribution_id']}";
-      civicrm_api3('Contribution', 'create', array('id' => $contrib->contribution_id, 'trxn_id' => $t['trxn_id']));
+      civicrm_api3('Contribution', 'create', array(
+        'id' => $contrib->contribution_id,
+        'trxn_id' => $t['trxn_id'],
+        'contribution_status_id' => $t['contribution_status_id'], /* Need to resubmit the value explicitly, as otherwise it changes to 'completed' instead of keeping the original value... */
+      ));
 
       $r[] = array_map('CRM_Sepa_Logic_Base::utf8ToSEPA', $t);
       if ($creditor_id == null) {
