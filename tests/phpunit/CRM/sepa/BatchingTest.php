@@ -294,7 +294,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
   }
 
   public function testReceivedGroup() {
-     $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`) VALUES (NULL, '67', 'Received', '6', 'Received', NULL, '0', NULL, '5', NULL, '0', '0', '1', NULL, NULL, NULL);");
+    $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`) VALUES (NULL, '67', 'Received', '6', 'Received', NULL, '0', NULL, '5', NULL, '0', '0', '1', NULL, NULL, NULL);");
     // create a contact
     $contactId = $this->individualCreate();
     // create a recurring contribution
@@ -380,6 +380,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "status_id" => (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name')
     );
     $this->assertDBCompareValues("CRM_Sepa_DAO_SEPATransactionGroup", array("id" => 1), $searchParams);
+    // TODO: Second Contribution
   }
 
   public function testReceivedWithEmptyParameters() {
@@ -446,7 +447,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBCompareValues("CRM_Contribute_DAO_ContributionRecur", array("id" => 1), $searchParams);
   }
 
-  public function testMultipleCreditors() {
+  public function _testMultipleCreditors() {
     // create a contact
     $secondCreditorId = $this->individualCreate();
     // create a creditor
@@ -526,9 +527,87 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
 
     // test whether exactly one txgroup has been created
+    $this->assertDBQuery(2, 'select count(*) from civicrm_sdd_txgroup;', array());
+  }
 
-    // TODO: CiviSEPA currently does not support multiple creditors
-    // so we can assume that only one txgroup will be created.
-    $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
+  public function testReceivedBeforeClosed() {
+    $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`) VALUES (NULL, '67', 'Received', '6', 'Received', NULL, '0', NULL, '5', NULL, '0', '0', '1', NULL, NULL, NULL);");
+    // create a contact
+    $contactId = $this->individualCreate();
+    // create a recurring contribution
+    $txmd5 = md5(date("YmdHis") . "noduplicate1");
+    $txref = "SDD-TEST-RCUR-" . $txmd5;
+    $cparams = array(
+      'contact_id' => $contactId,
+      'frequency_interval' => '1',
+      'frequency_unit' => 'month',
+      'amount' => 1337.42,
+      'contribution_status_id' => 1,
+      'start_date' => date("Ymd", strtotime("+14 days")),
+      'currency' => "EUR",
+      'financial_type_id' => 1
+    );
+
+    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
+    $contrib = $contrib["values"][ $contrib["id"] ];
+
+    // create a mandate
+    $apiParams = array(
+      "type" => "RCUR",
+      "reference" => $txmd5,
+      "status" => "FRST",
+      "source" => "TestSource",
+      "date" => date("Y-m-d H:i:s"),
+      "creditor_id" => "3",
+      "contact_id" => $contactId,
+      "iban" => "0000000000000000010001",
+      "bic"  => "COLSDE22XXX",
+      "creation_date" => date("Y-m-d H:i:s"),
+      "entity_table" => "civicrm_contribution_recur",
+      "entity_id" => $contrib["id"],
+      );
+
+    $this->callAPISuccess("SepaMandate", "create", $apiParams);
+
+    // create another contact
+    $contactId = $this->individualCreate();
+    // create another recurring contribution
+    $txmd5 = md5(date("YmdHis") . "noduplicate2");
+    $txref = "SDD-TEST-RCUR-" . $txmd5;
+    $cparams = array(
+      'contact_id' => $contactId,
+      'frequency_interval' => '1',
+      'frequency_unit' => 'month',
+      'amount' => 543.21,
+      'contribution_status_id' => 1,
+      'start_date' => date("Ymd", strtotime("+14 days")),
+      'currency' => "EUR",
+      'financial_type_id' => 1
+    );
+
+    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
+    $contrib = $contrib["values"][ $contrib["id"] ];
+
+    // create another mandate
+    $apiParams = array(
+      "type" => "RCUR",
+      "reference" => $txmd5,
+      "status" => "FRST",
+      "source" => "TestSource",
+      "date" => date("Y-m-d H:i:s"),
+      "creditor_id" => "3",
+      "contact_id" => $contactId,
+      "iban" => "0000000000000000000110",
+      "bic"  => "COLSDE22XXX",
+      "creation_date" => date("Y-m-d H:i:s"),
+      "entity_table" => "civicrm_contribution_recur",
+      "entity_id" => $contrib["id"],
+      );
+
+    $this->callAPISuccess("SepaMandate", "create", $apiParams);
+    // update txgroup
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
+    // mark the group as received
+    $this->callAPIFailure("SepaAlternativeBatching", "received", array("txgroup_id"=>1));
   }
 }
