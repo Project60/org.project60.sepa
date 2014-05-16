@@ -332,7 +332,7 @@ function sepa_civicrm_install_options($data) {
               'option_group_id' => $group_id,
               'name' => $valueName,
               'label' => $value['label'],
-              'weight' => $weight,
+              'weight' => isset($value['weight']) ? $value['weight'] : $weight,
               'is_default' => $value['is_default'],
               'is_active' => 1,
           );
@@ -399,7 +399,41 @@ function sepa_civicrm_options() {
               ),
           ),
       ),
-  );
+
+      'sepa_file_format' => array(
+          'title' => 'SEPA XML File Format Variants',
+          'description' => '',
+          'is_reserved' => 1,
+          'is_active' => 1,
+          'values' => array(
+            'pain.008.001.02' => array(
+              'label' => ts('pain.008.001.02 (ISO 20022/official SEPA guidelines)'),
+              'is_default' => 1,
+              'is_reserved' => 1,
+            ),
+            'pain.008.003.02' => array(
+              'label' => ts('pain.008.003.02 container core direct debit (CDC EBICS-2.7)'),
+              'is_default' => 0,
+              'is_reserved' => 1,
+            ),
+            'pain.008.003.02 COR1' => array(
+              'label' => ts('pain.008.003.02 COR1 direct debit (CD1 EBICS-2.7)'),
+              'is_default' => 0,
+              'is_reserved' => 1,
+            ),
+          ),
+        ),
+
+      'batch_status' => array(
+        'values' => array(
+        'Received' => array(
+            'label' => 'Received',
+            'is_default' => 0,
+            'weight' => 6,
+          ),
+         ),
+        ),
+    );
 }
 
 /**
