@@ -234,3 +234,16 @@ function _civicrm_api3_sepa_transaction_group_cancelsubmit_spec($params) {
 function civicrm_api3_sepa_transaction_group_cancelsubmit($params) {
   CRM_Sepa_Logic_Batching::cancelSubmit(array('id' => $params['id']));
 }
+
+/**
+ */
+function _civicrm_api3_sepa_transaction_group_updatestatus_spec($params) {
+  $params['id']['api.required'] = 1;
+  $params['status_id']['api.required'] = 1;
+}
+
+/**
+ */
+function civicrm_api3_sepa_transaction_group_updatestatus($params) {
+  CRM_Sepa_Logic_Batching::updateStatus(array('id' => $params['id']), $params['status_id']);
+}

@@ -149,5 +149,26 @@ function _civicrm_api3_sepa_sdd_file_cancelsubmit_spec(&$params) {
 /**
  */
 function civicrm_api3_sepa_sdd_file_cancelsubmit($params) {
-  CRM_Sepa_Logic_Batching::cancelSubmit(array('sdd_file_id' => $params['id']));
+  $groupParams = array('sdd_file_id' => $params['id']);
+  if (array_key_exists('from_status_id', $params)) {
+    $groupParams['status_id'] = $params['from_status_id'];
+  }
+  CRM_Sepa_Logic_Batching::cancelSubmit($groupParams);
+}
+
+/**
+ */
+function _civicrm_api3_sepa_sdd_file_updatestatus_spec(&$params) {
+  $params['id']['api.required'] = 1;
+  $params['to_status_id']['api.required'] = 1;
+}
+
+/**
+ */
+function civicrm_api3_sepa_sdd_file_updatestatus($params) {
+  $groupParams = array('sdd_file_id' => $params['id']);
+  if (array_key_exists('from_status_id', $params)) {
+    $groupParams['status_id'] = $params['from_status_id'];
+  }
+  CRM_Sepa_Logic_Batching::updateStatus($groupParams, $params['to_status_id']);
 }
