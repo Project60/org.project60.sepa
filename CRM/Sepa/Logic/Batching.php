@@ -147,16 +147,12 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   /**
    */
   public static function updateStatus($txgroupParams, $statusId) {
-    $statusApiWorkaround = $rebatch = $setReceiveDate = false;
+    $rebatch = $setReceiveDate = false;
     $contributionStatusId = $groupStatusId = $statusId;
     switch (CRM_Core_OptionGroup::getValue('contribution_status', $statusId, 'value', 'String', 'name')) {
-      case 'In Progress':
-        $statusApiWorkaround = true; /* API can't handle transition to 'In Progress' => we have to do it at BAO level :-( */
-        break;
       case 'Cancelled':
         $rebatch = true;
         $contributionStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-        $statusApiWorkaround = true;
         break;
       case 'Completed':
         $setReceiveDate = true;
@@ -173,38 +169,24 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'options' => array('limit' => 1234567890),
         'txgroup_id' => '$value.id',
         #'return' => array('contribution_id'), # Doesn't really skip anything from the result...
-        'api.SepaTransactionGroup.getsingle' => array(
-          'id' => '$value.txgroup_id',
-          'return' => array('collection_date'),
-        ),
-        'api.Contribution.create' => $statusApiWorkaround ? false : array(
-          'id' => '$value.contribution_id',
-          'contribution_status_id' => $contributionStatusId,
-          'receive_date' => $setReceiveDate ? '$value.api.SepaTransactionGroup.getsingle.collection_date' : false,
-        ),
       ),
     )));
     if (!$result['count']) {
       throw new API_Exception("No matching Transaction Group found.");
     }
 
-    if ($statusApiWorkaround || $rebatch ) {
-      foreach ($result['values'] as $group) {
-        foreach ($group['api.SepaContributionGroup.get']['values'] as $groupMember) {
-          $contribution = new CRM_Contribute_BAO_Contribution();
-          $contribution->get($groupMember['contribution_id']);
+    foreach ($result['values'] as $group) {
+      foreach ($group['api.SepaContributionGroup.get']['values'] as $groupMember) {
+        $contribution = new CRM_Contribute_BAO_Contribution();
+        $contribution->get($groupMember['contribution_id']);
 
-          if ($rebatch) {
-            self::batchContributionByCreditor($contribution, $group['sdd_creditor_id'], $contribution->payment_instrument_id);
-          }
-
-          if ($statusApiWorkaround) {
-            $contribution->contribution_status_id = $contributionStatusId;
-            #$contribution->receive_date = date('YmdHis', strtotime($setReceiveDate ? $groupMember['api.SepaTransactionGroup.getsingle']['collection_date'] : $contribution->receive_date));
-            $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
-            $contribution->save();
-          }
+        if ($rebatch) {
+          self::batchContributionByCreditor($contribution, $group['sdd_creditor_id'], $contribution->payment_instrument_id);
         }
+
+        $contribution->contribution_status_id = $contributionStatusId;
+        $contribution->receive_date = date('YmdHis', strtotime($setReceiveDate ? $group['collection_date'] : $contribution->receive_date));
+        $contribution->save();
       }
     }
   }
