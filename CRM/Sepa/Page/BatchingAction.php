@@ -17,8 +17,9 @@ class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
         $fileId = CRM_Utils_Request::retrieve('file_id', 'Positive', $_ = null, true);
         CRM_Utils_System::setTitle("Unbatch Transactions from all Groups in File $fileId");
 
-        civicrm_api3('SepaSddFile', 'cancelsubmit', array(
+        civicrm_api3('SepaSddFile', 'updatestatus', array(
           'id' => $fileId,
+          'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
         ));
         break;
       case 'confirm_submit_file':
@@ -35,9 +36,10 @@ class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
         $fileId = CRM_Utils_Request::retrieve('file_id', 'Positive', $_ = null, true);
         CRM_Utils_System::setTitle("Unbatch Transactions from all 'In Progress' Groups in File $fileId");
 
-        civicrm_api3('SepaSddFile', 'cancelsubmit', array(
+        civicrm_api3('SepaSddFile', 'updatestatus', array(
           'id' => $fileId,
           'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
+          'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
         ));
         break;
       case 'complete_file':
@@ -55,7 +57,10 @@ class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
         $txgroupId = CRM_Utils_Request::retrieve('txgroup_id', 'Positive', $_ = null, true);
         CRM_Utils_System::setTitle("Unbatch Transactions from Group $txgroupId");
 
-        civicrm_api3('SepaTransactionGroup', 'cancelsubmit', array('id' => $txgroupId));
+        civicrm_api3('SepaTransactionGroup', 'updatestatus', array(
+          'id' => $txgroupId,
+          'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
+        ));
         break;
       case 'complete_group':
         $txgroupId = CRM_Utils_Request::retrieve('txgroup_id', 'Positive', $_ = null, true);
