@@ -149,9 +149,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function cancelSubmit($params) {
     $result = civicrm_api3('SepaTransactionGroup', 'get', array_merge($params, array(
       'options' => array('limit' => 1234567890),
-      'api.SepaContributionGroup.getdetail' => array(
+      'api.SepaContributionGroup.get' => array(
         'options' => array('limit' => 1234567890),
-        'id' => '$value.id',
+        'txgroup_id' => '$value.id',
       ),
       'api.SepaTransactionGroup.create' => array(
         /* 'id' inherited */
@@ -163,14 +163,11 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     }
 
     foreach ($result['values'] as $group) {
-      foreach ($group['api.SepaContributionGroup.getdetail']['values'] as $contributionGroup) {
+      foreach ($group['api.SepaContributionGroup.get']['values'] as $contributionGroup) {
         $contribution = new CRM_Contribute_BAO_Contribution();
         $contribution->get('id', $contributionGroup['contribution_id']);
 
-        $mandate = new CRM_Sepa_BAO_SEPAMandate();
-        $mandate->get('id', $contributionGroup['mandate_id']);
-
-        self::batchContribution($contribution, $mandate);
+        self::batchContributionByCreditor($contribution, $group['sdd_creditor_id'], $contribution->payment_instrument_id);
 
         $contribution->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
         $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
