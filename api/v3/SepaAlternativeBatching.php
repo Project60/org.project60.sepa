@@ -572,6 +572,7 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
     FROM civicrm_sdd_txgroup AS txgroup
     WHERE txgroup.collection_date <= '$latest_date'
       AND txgroup.type = '$mode'
+      AND txgroup.sdd_creditor_id = $creditor_id
       AND txgroup.status_id = $group_status_id_open;";
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $existing_groups = array();
@@ -651,6 +652,7 @@ function _sepa_alternative_batching_update_ooff($params, $creditor_id) {
       txgroup.id AS txgroup_id
     FROM civicrm_sdd_txgroup AS txgroup
     WHERE txgroup.collection_date <= '$latest_collection_date'
+      AND txgroup.sdd_creditor_id = $creditor_id
       AND txgroup.type = 'OOFF'
       AND txgroup.status_id = $group_status_id_open;";
   $results = CRM_Core_DAO::executeQuery($sql_query);
