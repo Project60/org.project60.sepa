@@ -146,7 +146,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
   /**
    */
-  public static function updateStatus($txgroupParams, $statusId) {
+  public static function updateStatus($txgroupParams, $statusId, $fromStatusId) {
     $rebatch = $setReceiveDate = false;
     $contributionStatusId = $groupStatusId = $statusId;
     switch (CRM_Core_OptionGroup::getValue('contribution_status', $statusId, 'value', 'String', 'name')) {
@@ -161,6 +161,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     $result = civicrm_api3('SepaTransactionGroup', 'get', array_merge($txgroupParams, array(
       'options' => array('limit' => 1234567890),
+      'status_id' => $fromStatusId,
+      'return' => array('sdd_creditor_id', 'collection_date'),
       'api.SepaTransactionGroup.create' => array(
         /* 'id' inherited */
         'status_id' => $groupStatusId,
@@ -168,7 +170,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       'api.SepaContributionGroup.get' => array(
         'options' => array('limit' => 1234567890),
         'txgroup_id' => '$value.id',
-        #'return' => array('contribution_id'), # Doesn't really skip anything from the result...
+        'api.Contribution.getsingle' => array(
+          'id' => '$value.contribution_id',
+          'return' => array('contribution_status_id'),
+        ),
       ),
     )));
     if (!$result['count']) {
@@ -177,6 +182,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     foreach ($result['values'] as $group) {
       foreach ($group['api.SepaContributionGroup.get']['values'] as $groupMember) {
+        if ($groupMember['api.Contribution.getsingle']['contribution_status_id'] != $fromStatusId) {
+          continue;
+        }
+
         $contribution = new CRM_Contribute_BAO_Contribution();
         $contribution->get($groupMember['contribution_id']);
 

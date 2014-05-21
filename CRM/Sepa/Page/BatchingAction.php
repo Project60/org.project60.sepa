@@ -15,19 +15,21 @@ class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
 
       case 'cancel_submit_file':
         $fileId = CRM_Utils_Request::retrieve('file_id', 'Positive', $_ = null, true);
-        CRM_Utils_System::setTitle("Unbatch Transactions from all Groups in File $fileId");
+        CRM_Utils_System::setTitle("Unbatch Transactions from all 'Pending' Groups in File $fileId");
 
         civicrm_api3('SepaSddFile', 'updatestatus', array(
           'id' => $fileId,
+          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
           'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
         ));
         break;
       case 'confirm_submit_file':
         $fileId = CRM_Utils_Request::retrieve('file_id', 'Positive', $_ = null, true);
-        CRM_Utils_System::setTitle("Set Status of all Groups in File $fileId to 'In Progress'");
+        CRM_Utils_System::setTitle("Set Status of all 'Pending' Groups in File $fileId to 'In Progress'");
 
         civicrm_api3('SepaSddFile', 'updatestatus', array(
           'id' => $fileId,
+          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
           'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
         ));
         break;
@@ -59,7 +61,8 @@ class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
 
         civicrm_api3('SepaTransactionGroup', 'updatestatus', array(
           'id' => $txgroupId,
-          'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
+          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
+          'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
         ));
         break;
       case 'complete_group':
@@ -68,7 +71,8 @@ class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
 
         civicrm_api3('SepaTransactionGroup', 'updatestatus', array(
           'id' => $txgroupId,
-          'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name'),
+          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
+          'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name'),
         ));
         break;
 
