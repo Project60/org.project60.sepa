@@ -383,22 +383,46 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
     return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
   }
 
+  // get creditor list
+  $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
+  if (!empty($creditor_query['is_error'])) {
+    return civicrm_api3_create_error("Cannot get creditor list: ".$creditor_query['error_message']);
+  } else {
+    $creditors = array();
+    foreach ($creditor_query['values'] as $creditor) {
+      if ($creditor['mandate_active']) {
+        $creditors[] = $creditor['id'];
+      }
+    }
+  }
+
   if ($params['type']=='OOFF') {
-    $result = _sepa_alternative_batching_update_ooff($params);
+    foreach ($creditors as $creditor_id) {
+      $result = _sepa_alternative_batching_update_ooff($params, $creditor_id);
+      if (!empty($result['is_error'])) {
+        return civicrm_api3_create_error("Error while batching for creditor [$creditor_id]: ".$result['error_message']);
+      }
+    }
 
   } elseif ($params['type']=='RCUR' || $params['type']=='FRST') {
     // first: make sure, that there are no outdated mandates:
     civicrm_api3_sepa_alternative_batching_closeended(array("mode"=>$params['type']=='FRST'));
 
     // then, run the update for recurring mandates
-    $result = _sepa_alternative_batching_update_rcur($params);
+    foreach ($creditors as $creditor_id) {
+      $result = _sepa_alternative_batching_update_rcur($params, $creditor_id);
+      if (!empty($result['is_error'])) {
+        return civicrm_api3_create_error("Error while batching for creditor [$creditor_id]: ".$result['error_message']);
+      }
+    }
+
 
   } else {
     return civicrm_api3_create_error(sprintf("Unknown batching mode '%s'.", $params['type']));
   }
 
   $lock->release();
-  return civicrm_api3_create_success($result, $params);
+  return civicrm_api3_create_success();
 }
 
 
@@ -415,7 +439,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
 /**
  * runs a batching update for all RCUR mandates of the given type
  */
-function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
+function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
   $mode = $params['type'];
   $horizon = (int) _sepa_alternative_batching_get_parameter("org.project60.alternative_batching.$mode.horizon_days");
   $latest_date = date('Y-m-d', strtotime("+$horizon days"));
@@ -447,7 +471,8 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
     INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id
     LEFT  JOIN civicrm_contribution       AS first_contribution  ON mandate.first_contribution_id = first_contribution.id
     WHERE mandate.type = 'RCUR'
-      AND mandate.status = '$mode';";
+      AND mandate.status = '$mode'
+      AND mandate.creditor_id = $creditor_id;";
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $relevant_mandates = array();
   while ($results->fetch()) {
@@ -571,7 +596,7 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id=3) {
 /**
  * runs a batching update for all OOFF mandates
  */
-function _sepa_alternative_batching_update_ooff($params, $creditor_id=3) {
+function _sepa_alternative_batching_update_ooff($params, $creditor_id) {
   $horizon = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.horizon_days');
   $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.alternative_batching.OOFF.notice');
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
@@ -587,7 +612,8 @@ function _sepa_alternative_batching_update_ooff($params, $creditor_id=3) {
     INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id
     WHERE contribution.receive_date <= (NOW() + INTERVAL $horizon DAY)
       AND mandate.type = 'OOFF'
-      AND mandate.status = 'OOFF';";
+      AND mandate.status = 'OOFF'
+      AND mandate.creditor_id = $creditor_id;";
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $relevant_mandates = array();
   while ($results->fetch()) {
@@ -658,9 +684,7 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
     CRM_Utils_SepaCustomisationHooks::defer_collection_date($collection_date, $creditor_id);
     if (!isset($existing_groups[$collection_date])) {
       // this group does not yet exist -> create
-      // FIXME: creditor ID
-      $creditor_id = 3;
-
+      
       // find unused reference
       $reference = "TXG-${creditor_id}-${mode}-${collection_date}";
       $counter = 0;
