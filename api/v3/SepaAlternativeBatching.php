@@ -502,7 +502,6 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
     array_push($mandates_by_nextdate[$next_date], $mandate);
   }
 
-
   // RCUR-STEP 3: find already created contributions
   $existing_contributions_by_recur_id = array();  
   foreach ($mandates_by_nextdate as $collection_date => $mandates) {

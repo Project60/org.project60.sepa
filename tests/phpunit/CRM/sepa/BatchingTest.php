@@ -50,6 +50,30 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->unsetExtensionSystem();
   }
 
+  function createContactAndRecurContrib() {
+    // create a contact
+    $contactId = $this->individualCreate();
+    // create a recurring contribution
+    $cparams = array(
+      'contact_id' => $contactId,
+      'frequency_interval' => '1',
+      'frequency_unit' => 'month',
+      'amount' => 1337.42,
+      'contribution_status_id' => 1,
+      'start_date' => date("Ymd"),
+      'currency' => "EUR",
+      'financial_type_id' => 1,
+      'cycle_day' => date("d", strtotime("+14 days")),
+    );
+
+    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
+    $contrib = $contrib["values"][ $contrib["id"] ];
+
+    $result = array("contactId" => $contactId,
+                    "contribution" => $contrib);
+    return $result;
+  }
+
   public function testBatchingUpdateOOFF() {
     // create a contact
     $contactId = $this->individualCreate();
@@ -144,26 +168,10 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
   }
 
   public function testBatchingUpdateRCUR() {
-    // create a contact
-    $contactId = $this->individualCreate();
-    // create a recurring contribution
-    $txmd5 = md5(date("YmdHis") . "noduplicate1");
-    $txref = "SDD-TEST-RCUR-" . $txmd5;
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 1337.42,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd", strtotime("+14 days")),
-      'currency' => "EUR",
-      'financial_type_id' => 1
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
+    $result = $this->createContactAndRecurContrib();
 
     // create a mandate
+    $txmd5 = md5(date("YmdHis")."noduplicate1");
     $apiParams = array(
       "type" => "RCUR",
       "reference" => $txmd5,
@@ -171,36 +179,18 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "source" => "TestSource",
       "date" => date("Y-m-d H:i:s"),
       "creditor_id" => "3",
-      "contact_id" => $contactId,
+      "contact_id" => $result["contactId"],
       "iban" => "0000000000000000010001",
       "bic"  => "COLSDE22XXX",
       "creation_date" => date("Y-m-d H:i:s"),
       "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $contrib["id"],
+      "entity_id" => $result["contribution"]["id"],
       );
 
     $this->callAPISuccess("SepaMandate", "create", $apiParams);
 
-    // create another contact
-    $contactId = $this->individualCreate();
-    // create another recurring contribution
-    $txmd5 = md5(date("YmdHis") . "noduplicate2");
-    $txref = "SDD-TEST-RCUR-" . $txmd5;
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 543.21,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd", strtotime("+14 days")),
-      'currency' => "EUR",
-      'financial_type_id' => 1
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
-
     // create another mandate
+    $txmd5 = md5(date("YmdHis")."noduplicate2");
     $apiParams = array(
       "type" => "RCUR",
       "reference" => $txmd5,
@@ -208,12 +198,12 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "source" => "TestSource",
       "date" => date("Y-m-d H:i:s"),
       "creditor_id" => "3",
-      "contact_id" => $contactId,
+      "contact_id" => $result["contactId"],
       "iban" => "0000000000000000000110",
       "bic"  => "COLSDE22XXX",
       "creation_date" => date("Y-m-d H:i:s"),
       "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $contrib["id"],
+      "entity_id" => $result["contribution"]["id"],
       );
 
     $this->callAPISuccess("SepaMandate", "create", $apiParams);
@@ -222,7 +212,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     // test whether exactly one txgroup has been created
     $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
     // check txgroup attributes
-    $collectionDate = date('Y-m-d', strtotime('first day of next month'));
+    $collectionDate = date('Y-m-d', strtotime('+14 days'));
     $searchParams = array(
       "id" => 1,
       "reference" => sprintf("TXG-3-FRST-%s", $collectionDate),
@@ -467,25 +457,10 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     // create a creditor
     $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES ('4', '%1', 'TESTCREDITORID', 'TESTCREDITOR', '108 Wayne Street', '1082', '0000000000000000000000', 'COLSDE44XXX', 'TEST', '0', 'MAIN', NULL, '1', '1');", array(1 => array($secondCreditorId, "Int")));
   
-    // create a contact
-    $contactId = $this->individualCreate();
-    // create a recurring contribution
-    $txmd5 = md5(date("YmdHis") . "noduplicate1");
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 1337.42,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd", strtotime("+14 days")),
-      'currency' => "EUR",
-      'financial_type_id' => 1
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
+    $result = $this->createContactAndRecurContrib();
 
     // create a mandate
+    $txmd5 = md5(date("YmdHis") . "noduplicate1");
     $apiParams = array(
       "type" => "RCUR",
       "reference" => $txmd5,
@@ -493,35 +468,20 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "source" => "TestSource",
       "date" => date("Y-m-d H:i:s"),
       "creditor_id" => "4",
-      "contact_id" => $contactId,
+      "contact_id" => $result["contactId"],
       "iban" => "0000000000000000010001",
       "bic"  => "COLSDE22XXX",
       "creation_date" => date("Y-m-d H:i:s"),
       "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $contrib["id"],
+      "entity_id" => $result["contribution"]["id"],
       );
 
     $this->callAPISuccess("SepaMandate", "create", $apiParams);
 
-    // create another contact
-    $contactId = $this->individualCreate();
-    // create another recurring contribution
-    $txmd5 = md5(date("YmdHis") . "noduplicate2");
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 543.21,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd", strtotime("+14 days")),
-      'currency' => "EUR",
-      'financial_type_id' => 1
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
+    $result = $this->createContactAndRecurContrib();
 
     // create another mandate
+    $txmd5 = md5(date("YmdHis") . "noduplicate2");
     $apiParams = array(
       "type" => "RCUR",
       "reference" => $txmd5,
@@ -529,12 +489,12 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "source" => "TestSource",
       "date" => date("Y-m-d H:i:s"),
       "creditor_id" => "3",
-      "contact_id" => $contactId,
+      "contact_id" => $result["contribution"]["id"],
       "iban" => "0000000000000000000110",
       "bic"  => "COLSDE22XXX",
       "creation_date" => date("Y-m-d H:i:s"),
       "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $contrib["id"],
+      "entity_id" => $result["contribution"]["id"],
       );
 
     $this->callAPISuccess("SepaMandate", "create", $apiParams);
@@ -546,26 +506,10 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
 
   public function testReceivedBeforeClosed() {
     //$this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`) VALUES (NULL, '67', 'Received', '6', 'Received', NULL, '0', NULL, '5', NULL, '0', '0', '1', NULL, NULL, NULL);");
-    // create a contact
-    $contactId = $this->individualCreate();
-    // create a recurring contribution
-    $txmd5 = md5(date("YmdHis") . "noduplicate1");
-    $txref = "SDD-TEST-RCUR-" . $txmd5;
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 1337.42,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd", strtotime("+14 days")),
-      'currency' => "EUR",
-      'financial_type_id' => 1
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
+    $result = $this->createContactAndRecurContrib();
 
     // create a mandate
+    $txmd5 = md5(date("YmdHis") . "noduplicate1");
     $apiParams = array(
       "type" => "RCUR",
       "reference" => $txmd5,
@@ -573,36 +517,21 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "source" => "TestSource",
       "date" => date("Y-m-d H:i:s"),
       "creditor_id" => "3",
-      "contact_id" => $contactId,
+      "contact_id" => $result["contactId"],
       "iban" => "0000000000000000010001",
       "bic"  => "COLSDE22XXX",
       "creation_date" => date("Y-m-d H:i:s"),
       "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $contrib["id"],
+      "entity_id" => $result["contribution"]["id"],
       );
 
     $this->callAPISuccess("SepaMandate", "create", $apiParams);
 
     // create another contact
-    $contactId = $this->individualCreate();
-    // create another recurring contribution
-    $txmd5 = md5(date("YmdHis") . "noduplicate2");
-    $txref = "SDD-TEST-RCUR-" . $txmd5;
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 543.21,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd", strtotime("+14 days")),
-      'currency' => "EUR",
-      'financial_type_id' => 1
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
+    $result = $this->createContactAndRecurContrib();
 
     // create another mandate
+    $txmd5 = md5(date("YmdHis") . "noduplicate2");
     $apiParams = array(
       "type" => "RCUR",
       "reference" => $txmd5,
@@ -610,12 +539,12 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "source" => "TestSource",
       "date" => date("Y-m-d H:i:s"),
       "creditor_id" => "3",
-      "contact_id" => $contactId,
-      "iban" => "0000000000000000000110",
+      "contact_id" => $result["contactId"],
+      "iban" => "0000000000000000010001",
       "bic"  => "COLSDE22XXX",
       "creation_date" => date("Y-m-d H:i:s"),
       "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $contrib["id"],
+      "entity_id" => $result["contribution"]["id"],
       );
 
     $this->callAPISuccess("SepaMandate", "create", $apiParams);
