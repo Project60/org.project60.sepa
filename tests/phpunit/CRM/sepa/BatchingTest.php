@@ -1,8 +1,9 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
-| Author: X+                                             |
+| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Author: N. Bochan (bochan -at- systopia.de)            |
+| http://www.systopia.de/                                |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
 | Affero GPL license. You can redistribute it and/or     |
