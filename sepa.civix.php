@@ -66,19 +66,6 @@ function _sepa_civix_civicrm_enable() {
       return $upgrader->onEnable();
     }
   }
-  $config_fields = array('alternative_batching_ooff_horizon_days' => 30,
-                         'alternative_batching_ooff_notice_days' => 8,
-                         'alternative_batching_rcur_horizon_days' => 30,
-                         'alternative_batching_rcur_notice_days' => 8,
-                         'alternative_batching_frst_horizon_days' => 30,
-                         'alternative_batching_frst_notice_days' => 8,
-                         'alternative_batching_update_lock_timeout' => 170
-                        );
-  foreach ($config_fields as $key => $value) {
-    if (!CRM_Core_BAO_Setting::getItem('org.project60', $key)) {
-        CRM_Core_BAO_Setting::setItem($value, 'org.project60', $key);
-    }
-  }
 }
 
 /**

@@ -18,7 +18,7 @@
  * SEPA_DD payment processor
  *
  * @package CiviCRM_SEPA
- * @todo: deprecated, fix
+ * @deprecated
  */
 
 class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {

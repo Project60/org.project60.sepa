@@ -14,6 +14,7 @@
 
 require_once 'sepa.civix.php';
 require_once 'hooks.php';
+require_once 'sepa_pp.php';
 
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contribute_Page_Tab") {
@@ -461,6 +462,24 @@ function sepa_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function sepa_civicrm_enable() {
+  // set default values, if not exist
+  $config_fields = array('alternative_batching_ooff_horizon_days' => 30,
+                         'alternative_batching_ooff_notice_days' => 8,
+                         'alternative_batching_rcur_horizon_days' => 30,
+                         'alternative_batching_rcur_notice_days' => 8,
+                         'alternative_batching_frst_horizon_days' => 30,
+                         'alternative_batching_frst_notice_days' => 8,
+                         'alternative_batching_update_lock_timeout' => 170
+                        );
+  foreach ($config_fields as $key => $value) {
+    if (NULL==CRM_Core_BAO_Setting::getItem('org.project60', $key)) {
+        CRM_Core_BAO_Setting::setItem($value, 'org.project60', $key);
+    }
+  }
+
+  // install/activate SEPA payment processor
+  sepa_pp_install();
+  
   return _sepa_civix_civicrm_enable();
 }
 
@@ -468,6 +487,7 @@ function sepa_civicrm_enable() {
  * Implementation of hook_civicrm_disable
  */
 function sepa_civicrm_disable() {
+  sepa_pp_disable();
   return _sepa_civix_civicrm_disable();
 }
 
