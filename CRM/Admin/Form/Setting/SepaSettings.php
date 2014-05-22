@@ -19,14 +19,27 @@ require_once 'CRM/Core/BAO/CustomField.php';
  
 class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 {
+    private $config_fields = array(
+                         array('alternative_batching_ooff_horizon_days', 'OOFF horizon'),
+                         array('alternative_batching_ooff_notice_days', 'OOFF notice days'),
+                         array('alternative_batching_rcur_horizon_days', 'RCUR horizon'),
+                         array('alternative_batching_rcur_notice_days', 'RCUR notice days'),
+                         array('alternative_batching_frst_horizon_days', 'FRST horizon'),
+                         array('alternative_batching_frst_notice_days', 'FRST notice days'),
+                         array('alternative_batching_update_lock_timeout', 'update lock timeout'),
+                        );
+
+    function setDefaultValues() {
+        $fields = array();
+        // get all default values (they are set once when the extension is being enabled)
+        foreach ($this->config_fields as $key => $value) {
+            $fields[$value[0]] = CRM_Core_BAO_Setting::getItem('org.project60', $value[0]);
+        }
+        return $fields; 
+    }
 
     public function buildQuickForm( ) {
         CRM_Utils_System::setTitle(ts('Sepa Direct Debit - Settings'));
- 
- 		$config = CRM_Core_Config::singleton();	
- 		print_r($config->sepasettings_ooff_horizon_days);
- 		$ret = CRM_Core_BAO_Setting::getItem('sepasettings', "sepasettings_ooff_horizon_days");
- 		print_r($ret);
 
         $customFields = CRM_Core_BAO_CustomField::getFields();
         $cf = array();
@@ -34,72 +47,36 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
             $cf[$k] = $v['label'];
         }
 
- 		    // OOFF
-        $this->addElement('text',
-		                        'sepasettings_ooff_horizon_days',
-		                        ts('OOFF horizon days')
-		                        );
-        $this->addElement('text',
-                          'sepasettings_ooff_notice_days',
-                          ts('OOFF notice days')
-                          );
-     		// RCUR
-     		$this->addElement('text',
-                          'sepasettings_rcur_horizon_days',
-                          ts('RCUR horizon days')
-                          );
- 
-        $this->addElement('text',
-                          'sepasettings_rcur_notice_days',
-                          ts('RCUR notice days')
-                          );
-
-        // FRST
- 		    $this->addElement('text',
-                          'sepasettings_frst_horizon_days',
-                          ts('FRST horizon days')
-                          );
- 
-        $this->addElement('text',
-                          'sepasettings_frst_notice_days',
-                          ts('FRST notice days')
-                          );
-
-        // System
-        $this->addElement('text',
-                          'sepasettings_update_lock_timeout',
-                          ts('Update lock timeout')
-                          );
-
-        // Rules
-        $this->addRule('sepasettings_ooff_horizon_days', 
-                       ts('Please enter the horizon as number of days (integers only).'),
+        // add all form elements and validation rules
+ 		    foreach ($this->config_fields as $key => $value) {
+            // add element
+            $this->addElement('text', $value[0], ts($value[1]));
+            // add rule
+            $this->addRule($value[0], 
+                       ts("Please enter the $value[1] as number (integers only)."),
                       'positiveInteger');
-
-        $this->addRule('sepasettings_ooff_notice_days', 
-                       ts('Please enter the notice days as number of days (integers only).'),
-                      'positiveInteger');
-
-        $this->addRule('sepasettings_rcur_horizon_days', 
-                       ts('Please enter the horizon as number of days (integers only).'),
-                      'positiveInteger');
-
-        $this->addRule('sepasettings_rcur_notice_days', 
-                       ts('Please enter the notice days as number of days (integers only).'),
-                      'positiveInteger');
-
-        $this->addRule('sepasettings_frst_horizon_days', 
-                       ts('Please enter the horizon as number of days (integers only).'),
-                      'positiveInteger');
-
-        $this->addRule('sepasettings_frst_notice_days', 
-                       ts('Please enter the notice days as number of days (integers only).'),
-                      'positiveInteger');
-
-        $this->addRule('sepasettings_update_lock_timeout', 
-                       ts('Please enter the lock timeout as number of days (integers only).'),
-                      'positiveInteger');
+            $this->addRule($value[0], 
+                       ts("Please enter the $value[1] as number (integers only)."),
+                      'required');
+        }
 
         parent::buildQuickForm();
+    }
+
+    function postProcess() {
+        $values = $this->controller->exportValues($this->_name);
+
+        // save field values
+        foreach ($this->config_fields as $key => $value) {
+            if(array_key_exists($value[0], $values)) {
+                CRM_Core_BAO_Setting::setItem($values[$value[0]], 'org.project60', $value[0]);
+            }  
+        }
+        
+        $session = CRM_Core_Session::singleton();
+        $session->setStatus(ts("Settings successfully saved"));
+
+        CRM_Core_DAO::triggerRebuild();
+        $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/setting/sepa'));
     }
 }
