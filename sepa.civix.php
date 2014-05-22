@@ -66,18 +66,6 @@ function _sepa_civix_civicrm_enable() {
       return $upgrader->onEnable();
     }
   }
-}
-
-/**
- * (Delegated) Implementation of hook_civicrm_disable
- */
-function _sepa_civix_civicrm_disable() {
-  _sepa_civix_civicrm_config();
-  if ($upgrader = _sepa_civix_upgrader()) {
-    if (is_callable(array($upgrader, 'onDisable'))) {
-      return $upgrader->onDisable();
-    }
-  }
   $config_fields = array('alternative_batching_ooff_horizon_days' => 30,
                          'alternative_batching_ooff_notice_days' => 8,
                          'alternative_batching_rcur_horizon_days' => 30,
@@ -89,6 +77,18 @@ function _sepa_civix_civicrm_disable() {
   foreach ($config_fields as $key => $value) {
     if (!CRM_Core_BAO_Setting::getItem('org.project60', $key)) {
         CRM_Core_BAO_Setting::setItem($value, 'org.project60', $key);
+    }
+  }
+}
+
+/**
+ * (Delegated) Implementation of hook_civicrm_disable
+ */
+function _sepa_civix_civicrm_disable() {
+  _sepa_civix_civicrm_config();
+  if ($upgrader = _sepa_civix_upgrader()) {
+    if (is_callable(array($upgrader, 'onDisable'))) {
+      return $upgrader->onDisable();
     }
   }
 }
