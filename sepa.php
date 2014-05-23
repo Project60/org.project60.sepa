@@ -463,13 +463,13 @@ function sepa_civicrm_uninstall() {
  */
 function sepa_civicrm_enable() {
   // set default values, if not exist
-  $config_fields = array('alternative_batching_ooff_horizon_days' => 30,
-                         'alternative_batching_ooff_notice_days' => 8,
-                         'alternative_batching_rcur_horizon_days' => 30,
-                         'alternative_batching_rcur_notice_days' => 8,
-                         'alternative_batching_frst_horizon_days' => 30,
-                         'alternative_batching_frst_notice_days' => 8,
-                         'alternative_batching_update_lock_timeout' => 170
+  $config_fields = array('batching.alt.OOFF.horizon' => 30,
+                         'batching.alt.OOFF.notice' => 8,
+                         'batching.alt.RCUR.horizon' => 30,
+                         'batching.alt.RCUR.notice' => 8,
+                         'batching.alt.FRST.horizon' => 30,
+                         'batching.alt.FRST.horizon' => 8,
+                         'batching.alt.update.lock.timeout' => 170
                         );
   foreach ($config_fields as $key => $value) {
     if (NULL==CRM_Core_BAO_Setting::getItem('org.project60', $key)) {

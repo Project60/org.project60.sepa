@@ -20,20 +20,29 @@ require_once 'CRM/Core/BAO/CustomField.php';
 class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 {
     private $config_fields = array(
-                         array('alternative_batching_ooff_horizon_days', 'OOFF horizon'),
-                         array('alternative_batching_ooff_notice_days', 'OOFF notice days'),
-                         array('alternative_batching_rcur_horizon_days', 'RCUR horizon'),
-                         array('alternative_batching_rcur_notice_days', 'RCUR notice days'),
-                         array('alternative_batching_frst_horizon_days', 'FRST horizon'),
-                         array('alternative_batching_frst_notice_days', 'FRST notice days'),
-                         array('alternative_batching_update_lock_timeout', 'update lock timeout'),
+                         array('batching.alt.OOFF.horizon', 'OOFF horizon'),
+                         array('batching.alt.OOFF.notice', 'OOFF notice days'),
+                         array('batching.alt.RCUR.horizon', 'RCUR horizon'),
+                         array('batching.alt.RCUR.notice', 'RCUR notice days'),
+                         array('batching.alt.FRST.horizon', 'FRST horizon'),
+                         array('batching.alt.FRST.notice', 'FRST notice days'),
+                         array('batching.alt.update.lock.timeout', 'update lock timeout'),
                         );
+
+    function domainToString($raw) {
+      return str_replace('.', '_', $raw);
+    }
+
+    function stringToDomain($raw) {
+      return str_replace('.', '_', $raw);
+    }
+
 
     function setDefaultValues() {
         $fields = array();
         // get all default values (they are set once when the extension is being enabled)
         foreach ($this->config_fields as $key => $value) {
-            $fields[$value[0]] = CRM_Core_BAO_Setting::getItem('org.project60', $value[0]);
+            $fields[$this->domainToString($value[0])] = CRM_Core_BAO_Setting::getItem('org.project60', $value[0]);
         }
         return $fields; 
     }
@@ -50,12 +59,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add all form elements and validation rules
  		    foreach ($this->config_fields as $key => $value) {
             // add element
-            $this->addElement('text', $value[0], ts($value[1]));
+            error_log($this->domainToString($value[0]));
+            $this->addElement('text', $this->domainToString($value[0]), ts($value[1]));
             // add rule
-            $this->addRule($value[0], 
+            $this->addRule($this->domainToString($value[0]), 
                        ts("Please enter the $value[1] as number (integers only)."),
                       'positiveInteger');
-            $this->addRule($value[0], 
+            $this->addRule($this->domainToString($value[0]), 
                        ts("Please enter the $value[1] as number (integers only)."),
                       'required');
         }
@@ -68,8 +78,8 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         // save field values
         foreach ($this->config_fields as $key => $value) {
-            if(array_key_exists($value[0], $values)) {
-                CRM_Core_BAO_Setting::setItem($values[$value[0]], 'org.project60', $value[0]);
+            if(array_key_exists($this->domainToString($value[0]), $values)) {
+                CRM_Core_BAO_Setting::setItem($values[$this->domainToString($value[0])], 'org.project60', $value[0]);
             }  
         }
         
