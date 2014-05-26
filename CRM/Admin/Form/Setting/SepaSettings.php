@@ -26,7 +26,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.alt.RCUR.notice', 'RCUR notice days'),
                          array('batching.alt.FRST.horizon', 'FRST horizon'),
                          array('batching.alt.FRST.notice', 'FRST notice days'),
-                         array('batching.alt.update.lock.timeout', 'update lock timeout'),
+                         array('batching.alt.update.lock.timeout', 'Update lock timeout'),
                         );
 
     function domainToString($raw) {
@@ -58,10 +58,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         // add all form elements and validation rules
  		    foreach ($this->config_fields as $key => $value) {
-            // add element
-            error_log($this->domainToString($value[0]));
             $this->addElement('text', $this->domainToString($value[0]), ts($value[1]));
-            // add rule
             $this->addRule($this->domainToString($value[0]), 
                        ts("Please enter the $value[1] as number (integers only)."),
                       'positiveInteger');
@@ -70,6 +67,18 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                       'required');
         }
 
+        // get creditor list
+        $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
+        if (!empty($creditor_query['is_error'])) {
+          return civicrm_api3_create_error("Cannot get creditor list: " . $creditor_query['error_message']);
+        } else {
+          $creditors = array();
+          foreach ($creditor_query['values'] as $creditor) {
+              $creditors[] = $creditor;
+          }
+        }
+
+        $this->assign('creditors', $creditors);
         parent::buildQuickForm();
     }
 
