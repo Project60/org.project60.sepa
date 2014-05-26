@@ -67,6 +67,14 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                       'required');
         }
 
+        // add creditor form elements
+        $this->addElement('text', 'addcreditor_name', ts("Name"));
+        $this->addElement('text', 'addcreditor_id', ts("ID"));
+        $this->addElement('text', 'addcreditor_address', ts("Address"));
+        $this->addElement('text', 'addcreditor_bic', ts("BIC"));
+        $this->addElement('text', 'addcreditor_iban', ts("IBAN"));
+        
+
         // get creditor list
         $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
         if (!empty($creditor_query['is_error'])) {
