@@ -29,12 +29,22 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.alt.update.lock.timeout', 'Update lock timeout'),
                         );
 
+    private $custom_fields = array(
+                         array('custom_OOFF_horizon', 'OOFF horizon'),
+                         array('custom_OOFF_notice', 'OOFF notice days'),
+                         array('custom_RCUR_horizon', 'RCUR horizon'),
+                         array('custom_RCUR_notice', 'RCUR notice days'),
+                         array('custom_FRST_horizon', 'FRST horizon'),
+                         array('custom_FRST_notice', 'FRST notice days'),
+                         array('custom_update_lock_timeout', 'Update lock timeout'),
+                        );
+
     function domainToString($raw) {
       return str_replace('.', '_', $raw);
     }
 
     function stringToDomain($raw) {
-      return str_replace('.', '_', $raw);
+      return str_replace('_', '.', $raw);
     }
 
 
@@ -68,12 +78,25 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         }
 
         // add creditor form elements
+        $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor CiviCRM ID"));
         $this->addElement('text', 'addcreditor_name', ts("Name"));
-        $this->addElement('text', 'addcreditor_id', ts("ID"));
+        $this->addElement('text', 'addcreditor_id', ts("Identifier"));
         $this->addElement('text', 'addcreditor_address', ts("Address"));
+        $this->addElement('text', 'addcreditor_country_id', ts("Country ID"));
         $this->addElement('text', 'addcreditor_bic', ts("BIC"));
         $this->addElement('text', 'addcreditor_iban', ts("IBAN"));
-        
+        $this->addElement('select', 'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
+        $this->addElement('hidden', 'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
+
+        // add all form elements and validation rules
+        $index = 0;
+        foreach ($this->custom_fields as $key => $value) {
+            $this->addElement('text', $this->domainToString($value[0]), ts($value[1]), array('placeholder' => CRM_Core_BAO_Setting::getItem('org.project60', $this->config_fields[$index][0])));
+            $this->addRule($this->domainToString($value[0]), 
+                       ts("Please enter the $value[1] as number (integers only)."),
+                      'positiveInteger');
+            $index++;
+        }
 
         // get creditor list
         $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
@@ -85,7 +108,6 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
               $creditors[] = $creditor;
           }
         }
-
         $this->assign('creditors', $creditors);
         parent::buildQuickForm();
     }
