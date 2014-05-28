@@ -257,8 +257,10 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     }
 //CRM_Admin_Form_PaymentProcessor
   }
-  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD"
-      || "CRM_Contribute_Form_Contribution" == $formName && CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id']))) {
+  if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD" /* SEPA recurring record. */
+      || "CRM_Contribute_Form_Contribution" == $formName && !isset($form->_values['contribution_recur_id']) && CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id'])) /* SEPA OOFF contribution record. */
+  ) {
+    /* Update mandate data. */
     $fieldMapping = array ("bank_iban"=>"iban",'bank_bic'=>"bic");
     $newMandate = array();
     if ("CRM_Contribute_Form_UpdateSubscription" == $formName) {
