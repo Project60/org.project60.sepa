@@ -44,7 +44,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $type = CRM_Core_OptionGroup::getValue('payment_instrument', $contrib->payment_instrument_id, 'value', 'String', 'name');
     self::debug(' Contribution is of type '. $type);
 
-    $receive_date = substr($contrib->receive_date, 0, 10);
+    $receive_date = date('Y-m-d', strtotime($contrib->receive_date));
     $txGroup = self::findTxGroup($creditor_id, $type, $receive_date, $receive_date);
 
     // if not found, create a nex batch 
