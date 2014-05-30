@@ -107,6 +107,11 @@ function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
 function sepa_civicrm_entityTypes(&$entityTypes) {
   // add my DAO's
   $entityTypes[] = array(
+      'name' => 'MessageTemplates',
+      'class' => 'CRM_Core_DAO_MessageTemplate',
+      'table' => 'civicrm_message_template',
+  );
+  $entityTypes[] = array(
       'name' => 'SepaMandate',
       'class' => 'CRM_Sepa_DAO_SEPAMandate',
       'table' => 'civicrm_sepa_mandate',
