@@ -265,7 +265,7 @@
     console.log(inputCreditorInfo);
     var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
     
-    var creditorId = cj('#edit_creditor_id').val()
+    var creditorId = cj('#edit_creditor_id').val();
 
     var map = new Array();
     map["edit_creditor_id"]         = "id";
@@ -288,7 +288,12 @@
       }
     }
 
-    CRM.api('SepaCreditor', 'create', cj.extend({'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': creditorId}, updatedCreditorInfo),
+    var stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1};
+    if (creditorId != "none") {
+      stdObj.id = creditorId;
+    };
+
+    CRM.api('SepaCreditor', 'create', cj.extend(stdObj, updatedCreditorInfo),
             {success: function(data) {
                CRM.alert("{/literal}{ts}Creditor updated/created{/ts}", "{ts}Success{/ts}{literal}", "success");
                location.reload();
@@ -301,6 +306,7 @@
     cj('#custombatching :input').val("");
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
+    cj('#addcreditor').hide(500);
   }
 </script>
 {/literal}
