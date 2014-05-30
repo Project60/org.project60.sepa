@@ -83,6 +83,11 @@
                 {$form.addcreditor_pain_version.html}
               </td>
             </tr>
+            <tr>
+              <td>
+                {$form.edit_creditor_id.html}
+              </td>
+            </tr>
        </table>
      <h3>Custom Batching Settings</h3>
      <table id="custombatching" class="form-layout">
@@ -122,14 +127,9 @@
                 {$form.custom_FRST_notice.html}
               </td>
             </tr>
-            <tr class="crm-custom-form-block-edit-creditor-id">
-              <td>
-                {$form.edit_creditor_id.html}
-              </td>
-            </tr>
        </table>
        <div>
-          <a class="save button" title="Save" onclick="">
+          <a class="save button" title="Save" onclick="updateCreditor()">
             <span>{ts}Save{/ts}</span>
           </a>
           <a class="cancel button" title="Cancel" onclick="resetValues()">
@@ -252,50 +252,49 @@
                     ];
           for (var i = 0; i < cbat.length; i++) {
             var test = cbat[i][0];
-            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'org.project60', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i)});
-          };
-        };
+            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'org.project60', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i), error: null});
+          }
+        }
       }
     }
     );
   }
 
-  function updateCreditor(values) {
+  function updateCreditor() {
     var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
+    console.log(inputCreditorInfo);
     var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
-    var updateFields = inputCreditorInfo.concat(inputCustomBatching);
+    
+    var creditorId = cj('#edit_creditor_id').val()
 
-    var creditorId = cj('#edit_creditor_id').val();
-    console.log(creditorId);
-    var map = [
-                "edit_creditor_id"        => "id",
-                "addcreditor_creditor_id" => "creditor_id",
-                "addcreditor_name"        => "name",
-                "addcreditor_address"     => "address",
-                "addcreditor_country_id"  => "country_id",
-                "addcreditor_id"          => "identifier",
-                "addcreditor_iban"        => "iban",
-                "addcreditor_bic"         => "bic",
-                "addcreditor_pain_version"=> "sepa_file_format_id"
-              ];
+    var map = new Array();
+    map["edit_creditor_id"]         = "id";
+    map["addcreditor_creditor_id"]  = "creditor_id";
+    map["addcreditor_name"]         = "name";
+    map["addcreditor_address"]      = "address";
+    map["addcreditor_country_id"]   = "country_id";
+    map["addcreditor_id"]           = "identifier";
+    map["addcreditor_iban"]         = "iban";
+    map["addcreditor_bic"]          = "bic";
+    map["addcreditor_pain_version"] = "sepa_file_format_id";
 
-    var cbat = [
-                      ["batching.alt." + data['id'] + ".OOFF.horizon", "custom_OOFF_horizon"],
-                      ["batching.alt." + data['id'] + ".OOFF.notice", "custom_OOFF_notice"],
-                      ["batching.alt." + data['id'] + ".RCUR.horizon", "custom_RCUR_horizon"],
-                      ["batching.alt." + data['id'] + ".RCUR.notice", "custom_RCUR_notice"],
-                      ["batching.alt." + data['id'] + ".FRST.horizon", "custom_FRST_horizon"],
-                      ["batching.alt." + data['id'] + ".FRST.notice", "custom_FRST_notice"]
-                      //["batching.alt." + data['id'] + ".update.lock.timeout", "custom_lock_timeout"]
-                    ];
-
-    for (var i = 0; i < updateFields.length; i++) {
-      var name = map[(updateFields[i]["name"])];
-      var value = updateFields[i]["value"];
+    // update creditor information
+    var updatedCreditorInfo = new Array();
+    for (var i = 0; i < inputCreditorInfo.length; i++) {
+      var name = map[(inputCreditorInfo[i]["name"])] || inputCreditorInfo[i]["name"];
+      var value = inputCreditorInfo[i]["value"];
       if (value != "") {
-        // TODO
-      };
-    };
+        updatedCreditorInfo[name] = value;
+      }
+    }
+
+    CRM.api('SepaCreditor', 'create', cj.extend({'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': creditorId}, updatedCreditorInfo),
+            {success: function(data) {
+               CRM.alert("{/literal}{ts}Creditor updated/created{/ts}", "{ts}Success{/ts}{literal}", "success");
+               location.reload();
+              }
+            }
+    );
   }
 
   function resetValues() {
