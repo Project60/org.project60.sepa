@@ -30,7 +30,7 @@
       {/if}
       <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500);">
         <span><div class="icon add-icon"></div>{ts}Add{/ts}</span>
-      </a>
+      </a><br/>
       <div id="addcreditor" style="display:none;">
      <h2>Add/Edit Creditor</h2>
      <h3>Creditor Information</h3>
@@ -134,7 +134,7 @@
           </a>
           <a class="cancel button" title="Cancel" onclick="resetValues()">
             <span>{ts}Cancel{/ts}</span>
-          </a>
+          </a><br/>
        </div>
    </div>
    </div>
@@ -214,6 +214,18 @@
     );
   }
 
+
+  /*
+    This function is needed due to the asynchronous call of success() in CRM.api().
+  */
+  function createCallback(data, map, i) {
+    return function (data) {
+      if (data['is_error'] == 0) {
+        cj("#"+map[i][1]).val(data['result']);   
+      }
+    }
+  }
+
   function fetchCreditor(id) {
     CRM.api('SepaCreditor', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
     {success: function(data) {
@@ -228,10 +240,62 @@
           cj('#addcreditor_bic').val(data['bic']);
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
           cj('#addcreditor').show(500);
+
+          var cbat = [
+                      ["batching.alt." + data['id'] + ".OOFF.horizon", "custom_OOFF_horizon"],
+                      ["batching.alt." + data['id'] + ".OOFF.notice", "custom_OOFF_notice"],
+                      ["batching.alt." + data['id'] + ".RCUR.horizon", "custom_RCUR_horizon"],
+                      ["batching.alt." + data['id'] + ".RCUR.notice", "custom_RCUR_notice"],
+                      ["batching.alt." + data['id'] + ".FRST.horizon", "custom_FRST_horizon"],
+                      ["batching.alt." + data['id'] + ".FRST.notice", "custom_FRST_notice"]
+                      //["batching.alt." + data['id'] + ".update.lock.timeout", "custom_lock_timeout"]
+                    ];
+          for (var i = 0; i < cbat.length; i++) {
+            var test = cbat[i][0];
+            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'org.project60', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i)});
+          };
         };
       }
     }
     );
+  }
+
+  function updateCreditor(values) {
+    var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
+    var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
+    var updateFields = inputCreditorInfo.concat(inputCustomBatching);
+
+    var creditorId = cj('#edit_creditor_id').val();
+    console.log(creditorId);
+    var map = [
+                "edit_creditor_id"        => "id",
+                "addcreditor_creditor_id" => "creditor_id",
+                "addcreditor_name"        => "name",
+                "addcreditor_address"     => "address",
+                "addcreditor_country_id"  => "country_id",
+                "addcreditor_id"          => "identifier",
+                "addcreditor_iban"        => "iban",
+                "addcreditor_bic"         => "bic",
+                "addcreditor_pain_version"=> "sepa_file_format_id"
+              ];
+
+    var cbat = [
+                      ["batching.alt." + data['id'] + ".OOFF.horizon", "custom_OOFF_horizon"],
+                      ["batching.alt." + data['id'] + ".OOFF.notice", "custom_OOFF_notice"],
+                      ["batching.alt." + data['id'] + ".RCUR.horizon", "custom_RCUR_horizon"],
+                      ["batching.alt." + data['id'] + ".RCUR.notice", "custom_RCUR_notice"],
+                      ["batching.alt." + data['id'] + ".FRST.horizon", "custom_FRST_horizon"],
+                      ["batching.alt." + data['id'] + ".FRST.notice", "custom_FRST_notice"]
+                      //["batching.alt." + data['id'] + ".update.lock.timeout", "custom_lock_timeout"]
+                    ];
+
+    for (var i = 0; i < updateFields.length; i++) {
+      var name = map[(updateFields[i]["name"])];
+      var value = updateFields[i]["value"];
+      if (value != "") {
+        // TODO
+      };
+    };
   }
 
   function resetValues() {

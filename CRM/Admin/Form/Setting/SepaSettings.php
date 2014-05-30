@@ -77,12 +77,16 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                       'required');
         }
 
+        $country_ids = array();
+        $country_ids[''] = ts('- select -');
+        $country_ids['1082'] = ts('Germany');
+
         // add creditor form elements
         $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor CiviCRM ID"));
         $this->addElement('text', 'addcreditor_name', ts("Name"));
         $this->addElement('text', 'addcreditor_id', ts("Identifier"));
         $this->addElement('text', 'addcreditor_address', ts("Address"));
-        $this->addElement('text', 'addcreditor_country_id', ts("Country ID"));
+        $this->addElement('select', 'addcreditor_country_id', ts("Country"), $country_ids);
         $this->addElement('text', 'addcreditor_bic', ts("BIC"));
         $this->addElement('text', 'addcreditor_iban', ts("IBAN"));
         $this->addElement('select', 'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
