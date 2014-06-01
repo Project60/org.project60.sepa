@@ -30,7 +30,7 @@
       {/if}
       <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500);">
         <span><div class="icon add-icon"></div>{ts}Add{/ts}</span>
-      </a>
+      </a><br/>
       <div id="addcreditor" style="display:none;">
      <h2>Add/Edit Creditor</h2>
      <h3>Creditor Information</h3>
@@ -83,6 +83,11 @@
                 {$form.addcreditor_pain_version.html}
               </td>
             </tr>
+            <tr>
+              <td>
+                {$form.edit_creditor_id.html}
+              </td>
+            </tr>
        </table>
      <h3>Custom Batching Settings</h3>
      <table id="custombatching" class="form-layout">
@@ -122,19 +127,14 @@
                 {$form.custom_FRST_notice.html}
               </td>
             </tr>
-            <tr class="crm-custom-form-block-edit-creditor-id">
-              <td>
-                {$form.edit_creditor_id.html}
-              </td>
-            </tr>
        </table>
        <div>
-          <a class="save button" title="Save" onclick="">
+          <a class="save button" title="Save" onclick="updateCreditor()">
             <span>{ts}Save{/ts}</span>
           </a>
           <a class="cancel button" title="Cancel" onclick="resetValues()">
             <span>{ts}Cancel{/ts}</span>
-          </a>
+          </a><br/>
        </div>
    </div>
    </div>
@@ -214,6 +214,18 @@
     );
   }
 
+
+  /*
+    This function is needed due to the asynchronous call of success() in CRM.api().
+  */
+  function createCallback(data, map, i) {
+    return function (data) {
+      if (data['is_error'] == 0) {
+        cj("#"+map[i][1]).val(data['result']);   
+      }
+    }
+  }
+
   function fetchCreditor(id) {
     CRM.api('SepaCreditor', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
     {success: function(data) {
@@ -228,9 +240,65 @@
           cj('#addcreditor_bic').val(data['bic']);
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
           cj('#addcreditor').show(500);
-        };
+
+          var cbat = [
+                      ["batching.alt." + data['id'] + ".OOFF.horizon", "custom_OOFF_horizon"],
+                      ["batching.alt." + data['id'] + ".OOFF.notice", "custom_OOFF_notice"],
+                      ["batching.alt." + data['id'] + ".RCUR.horizon", "custom_RCUR_horizon"],
+                      ["batching.alt." + data['id'] + ".RCUR.notice", "custom_RCUR_notice"],
+                      ["batching.alt." + data['id'] + ".FRST.horizon", "custom_FRST_horizon"],
+                      ["batching.alt." + data['id'] + ".FRST.notice", "custom_FRST_notice"]
+                      //["batching.alt." + data['id'] + ".update.lock.timeout", "custom_lock_timeout"]
+                    ];
+          for (var i = 0; i < cbat.length; i++) {
+            var test = cbat[i][0];
+            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'org.project60', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i), error: null});
+          }
+        }
       }
     }
+    );
+  }
+
+  function updateCreditor() {
+    var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
+    console.log(inputCreditorInfo);
+    var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
+    
+    var creditorId = cj('#edit_creditor_id').val();
+
+    var map = new Array();
+    map["edit_creditor_id"]         = "id";
+    map["addcreditor_creditor_id"]  = "creditor_id";
+    map["addcreditor_name"]         = "name";
+    map["addcreditor_address"]      = "address";
+    map["addcreditor_country_id"]   = "country_id";
+    map["addcreditor_id"]           = "identifier";
+    map["addcreditor_iban"]         = "iban";
+    map["addcreditor_bic"]          = "bic";
+    map["addcreditor_pain_version"] = "sepa_file_format_id";
+
+    // update creditor information
+    var updatedCreditorInfo = new Array();
+    for (var i = 0; i < inputCreditorInfo.length; i++) {
+      var name = map[(inputCreditorInfo[i]["name"])] || inputCreditorInfo[i]["name"];
+      var value = inputCreditorInfo[i]["value"];
+      if (value != "") {
+        updatedCreditorInfo[name] = value;
+      }
+    }
+
+    var stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1};
+    if (creditorId != "none") {
+      stdObj.id = creditorId;
+    };
+
+    CRM.api('SepaCreditor', 'create', cj.extend(stdObj, updatedCreditorInfo),
+            {success: function(data) {
+               CRM.alert("{/literal}{ts}Creditor updated/created{/ts}", "{ts}Success{/ts}{literal}", "success");
+               location.reload();
+              }
+            }
     );
   }
 
@@ -238,6 +306,7 @@
     cj('#custombatching :input').val("");
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
+    cj('#addcreditor').hide(500);
   }
 </script>
 {/literal}
