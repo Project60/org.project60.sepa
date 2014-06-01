@@ -454,6 +454,15 @@ function sepa_civicrm_options() {
               ),
           ),
       ),
+
+      'contribution_status' => array(
+        'values' => array(
+          'Batched' => array(
+            'label' => ts('Pending/Batched'),
+            'is_default' => 0,
+          ),
+        ),
+      ),
   );
 }
 

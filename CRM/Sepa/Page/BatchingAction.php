@@ -15,21 +15,21 @@ class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
 
       case 'cancel_submit_file':
         $fileId = CRM_Utils_Request::retrieve('file_id', 'Positive', $_ = null, true);
-        CRM_Utils_System::setTitle("Unbatch Transactions from all 'Pending' Groups in File $fileId");
+        CRM_Utils_System::setTitle("Unbatch Transactions from all 'Pending/Batched' Groups in File $fileId");
 
         civicrm_api3('SepaSddFile', 'updatestatus', array(
           'id' => $fileId,
-          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'),
           'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name'),
         ));
         break;
       case 'confirm_submit_file':
         $fileId = CRM_Utils_Request::retrieve('file_id', 'Positive', $_ = null, true);
-        CRM_Utils_System::setTitle("Set Status of all 'Pending' Groups in File $fileId to 'In Progress'");
+        CRM_Utils_System::setTitle("Set Status of all 'Pending/Batched' Groups in File $fileId to 'In Progress'");
 
         civicrm_api3('SepaSddFile', 'updatestatus', array(
           'id' => $fileId,
-          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+          'from_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'),
           'to_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
         ));
         break;

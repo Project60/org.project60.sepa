@@ -82,19 +82,14 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     $result = civicrm_api3('SepaTransactionGroup', 'get', array(
       'options' => array('limit' => 1234567890),
-      'sdd_file_id' => array('IS NULL' => 1), /* Only include pending groups. This doesn't actually work in existing CiviCRM versions... But hopefully it will work in the future, and it should provide a nice performance boost when it does. */
+      'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
       'sdd_creditor_id' => $creditorId,
       'filter.collection_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter the ones obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
-      'return' => array('id', 'type', 'collection_date', 'sdd_file_id'),
+      'return' => array('id', 'type', 'collection_date'),
     ));
 
     $pendingGroups = array();
     foreach ($result['values'] as $group) {
-      /* Only include pending groups. Need the explicit check as long as the API filter doesn't work... */
-      if (isset($group['sdd_file_id'])) {
-        continue;
-      }
-
       $bestCollectionDate = self::adjustBankDays($group['collection_date'], 0);
       /* Re-check, as date might exceed range after adjustment. */
       if ($bestCollectionDate > $dateRangeEnd) {
@@ -137,6 +132,17 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               'id' => '$value.id',
             ),
           ));
+
+          foreach ($result['values'] as $group) {
+            foreach ($group['api.SepaContributionGroup.get']['values'] as $groupMember) {
+              $contribution = new CRM_Contribute_BAO_Contribution();
+              $contribution->get($groupMember['contribution_id']);
+
+              $contribution->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name');
+              $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
+              $contribution->save();
+            }
+          }
         }
       }
 
@@ -212,12 +218,13 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    */
   public static function findTxGroup($creditor_id, $type, $earliest_date, $latest_date) {
     CRM_Sepa_Logic_Base::debug("Locating suitable TXG with CRED=$creditor_id, TYPE=$type and COLLDATE IN " . substr($earliest_date,0,10) . ' / ' . substr($latest_date,0,10));
+    $openStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name', 'String', 'value');
     $query = "SELECT 
                 id 
               FROM
                 civicrm_sdd_txgroup
               WHERE         
-                sdd_file_id IS NULL /* Pending group. (Not batched yet.) */
+                status_id = " . $openStatus . "
                 AND
                 type = '" . $type . "'
                 AND
@@ -243,13 +250,15 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $collection_date = substr($receive_date, 0, 10);
     CRM_Sepa_Logic_Base::debug("Creating new TXG( CRED=$creditor_id, TYPE=$type, COLLDATE=" . $collection_date . ')');
 
+    $status = isset($sddFileId) ? 'Batched' : 'Pending';
+
     $session = CRM_Core_Session::singleton();
     $reference = time() . rand(); // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
     $params = array(
         'reference' => $reference,
         'type' => $type,
         'sdd_creditor_id' => $creditor_id,
-        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', $status, 'name'),
         'payment_instrument_id' => $payment_instrument_id,
         'collection_date' => $collection_date,
         'created_date' => date('Ymdhis'),
@@ -266,7 +275,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $txgroup_id = $result['id'];
 
     // Now that we have the auto ID, create the proper reference.
-    $prefix = !isset($sddFileId) ? 'PENDING' : 'TXG';
+    $prefix = ($status == 'Pending') ? 'PENDING' : 'TXG';
     $creditorPrefix = civicrm_api3('SepaCreditor', 'getvalue', array('id' => $creditor_id, 'return' => 'mandate_prefix'));
     $reference = "$prefix-$creditorPrefix-$creditor_id-$type-$collection_date-$txgroup_id";
     civicrm_api3('SEPATransactionGroup', 'create', array('id' => $txgroup_id, 'reference' => $reference)); // Not very efficient, but easier than fiddling with BAO mess...

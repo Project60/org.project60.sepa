@@ -39,17 +39,15 @@
 <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
 <td>{$group.total} &euro;</td>
 <td>
-{if !empty($group.file_id)}
-  {if $group.status == 'Pending'}
-    <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=cancel_submit_file&file_id=$file_id"}">{ts}Cancel File{/ts}</a>
-    <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=confirm_submit_file&file_id=$file_id"}">{ts}File Submitted{/ts}</a>
-  {elseif $group.status == 'In Progress'}
-    {assign var='group_id' value=$group.id}
-    <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=abort_group&txgroup_id=$group_id"}">{ts}Group Aborted{/ts}</a>
-    <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=complete_group&txgroup_id=$group_id"}">{ts}Group Completed{/ts}</a>
-    <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=abort_file&file_id=$file_id"}">{ts}File Aborted{/ts}</a>
-    <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=complete_file&file_id=$file_id"}">{ts}File Completed{/ts}</a>
-  {/if}
+{if $group.status == 'Batched'}
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=cancel_submit_file&file_id=$file_id"}">{ts}Cancel File{/ts}</a>
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=confirm_submit_file&file_id=$file_id"}">{ts}File Submitted{/ts}</a>
+{elseif $group.status == 'In Progress'}
+  {assign var='group_id' value=$group.id}
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=abort_group&txgroup_id=$group_id"}">{ts}Group Aborted{/ts}</a>
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=complete_group&txgroup_id=$group_id"}">{ts}Group Completed{/ts}</a>
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=abort_file&file_id=$file_id"}">{ts}File Aborted{/ts}</a>
+  <a class="button" href="{crmURL p='civicrm/sepa/batchingaction' q="_action=complete_file&file_id=$file_id"}">{ts}File Completed{/ts}</a>
 {/if}
 </td>
 </tr>
