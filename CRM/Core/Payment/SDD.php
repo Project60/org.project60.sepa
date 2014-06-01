@@ -65,21 +65,45 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $form->add( 'text', 
                 'bank_iban', 
                 ts('IBAN'), 
-                array('size' => 34, 'maxlength' => 34, /* 'autocomplete' => 'off' */ ), 
+                array('size' => 34, 'maxlength' => 34,), 
                 TRUE);
     //error_log(print_r($form->_paymentFields, true));
 
     $form->add( 'text', 
                 'bank_bic', 
                 ts('BIC'), 
-                array('size' => 11, 'maxlength' => 11, /* 'autocomplete' => 'off' */ ), 
+                array('size' => 11, 'maxlength' => 11), 
+                TRUE);
+
+    $form->add( 'text', 
+                'cycle_day', 
+                ts('day of month'), 
+                array('size' => 2, 'value' => 1), 
+                TRUE);
+
+    $form->add( 'text', 
+                'frequency', 
+                ts('frequency'), 
+                array('size' => 2, 'value' => 2), 
+                TRUE);
+    
+    $form->add( 'select', 
+                'frequency_unit', 
+                ts('frequency unit'), 
+                array('size' => 2, 'value' => 'ooff'), 
+                TRUE);
+
+    $form->add( 'date', 
+                'start_date', 
+                ts('start date'), 
+                array('hidden' => '1', 'value' => 'today'), 
                 TRUE);
 
     // TODO: add (hidden) cycle_day, frequency and start_date
 
     //CRM_Core_Region::instance('billing-block')->update('default', array('disabled' => TRUE));
 
-    // TODO: create new template
+    // TODO: create new template with jQuery magic
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Sepa/Mandate.tpl', 'weight' => -1));
   }
@@ -172,6 +196,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   // [contributionType_accounting_code] => 4300
   // [contributionPageID] => 2
 function doDirectPayment(&$params) {
+    // TODO: FIX recurring contribution
+
     error_log(print_r($params, true));
 
     // create the mandate

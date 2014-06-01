@@ -19,14 +19,29 @@
 </legend>
 
 <div class="crm-section {$form.bank_iban.name}-section">
-<div class="label">{$form.bank_iban.label}</div>
-<div class="content">{$form.bank_iban.html}</div>
-<div class="clear"></div>
+	<div class="label">{$form.bank_iban.label}</div>
+	<div class="content">{$form.bank_iban.html}</div>
+	<div class="clear"></div>
 </div>
 <div class="crm-section {$form.bank_bic.name}-section">
-<div class="label">{$form.bank_bic.label}</div>
-<div class="content">{$form.bank_bic.html}</div>
-<div class="clear"></div>
+	<div class="label">{$form.bank_bic.label}</div>
+	<div class="content">{$form.bank_bic.html}</div>
+	<div class="clear"></div>
+</div>
+<div class="crm-section {$form.cycle_day.name}-section">
+	<div class="label">{$form.cycle_day.label}</div>
+	<div class="content">{$form.cycle_day.html}</div>
+	<div class="clear"></div>
+</div>
+<div class="crm-section {$form.frequency.name}-section">
+	<div class="label">{$form.frequency.label}</div>
+	<div class="content">{$form.frequency.html}</div>
+	<div class="clear"></div>
+</div>
+<div class="crm-section {$form.start_date.name}-section">
+	<div class="label">{$form.start_date.label}</div>
+	<div class="content">{$form.start_date.html}</div>
+	<div class="clear"></div>
 </div>
 
 
