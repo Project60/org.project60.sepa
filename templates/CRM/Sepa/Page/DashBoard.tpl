@@ -28,7 +28,7 @@
 <th></th>
 </tr>
 {foreach from=$creditor item=group}
-<tr class="status_{$result.status_id}" data-id="{$group.id}" data-type="{$group.type}">
+<tr class="status_{$group.status}" data-id="{$group.id}" data-type="{$group.type}">
 <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
 <td>{$group.status_label}</td>
 <td>{$group.type}</td>
