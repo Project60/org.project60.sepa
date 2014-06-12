@@ -207,6 +207,7 @@
                 }
               }
             );
+            resetValues();
         },
         {
           message: {/literal}"{ts}Are you sure you want to delete this creditor?{/ts}"{literal}
@@ -214,10 +215,8 @@
     );
   }
 
-
-  /*
-    This function is needed due to the asynchronous call of success() in CRM.api().
-  */
+  
+  // This function is needed due to the asynchronous call of success() in CRM.api().
   function createCallback(data, map, i) {
     return function (data) {
       if (data['is_error'] == 0) {
@@ -251,7 +250,6 @@
                       //["batching.alt." + data['id'] + ".update.lock.timeout", "custom_lock_timeout"]
                     ];
           for (var i = 0; i < cbat.length; i++) {
-            var test = cbat[i][0];
             CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'org.project60', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i), error: null});
           }
         }
@@ -262,9 +260,7 @@
 
   function updateCreditor() {
     var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
-    console.log(inputCreditorInfo);
     var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
-    
     var creditorId = cj('#edit_creditor_id').val();
 
     var map = new Array();
@@ -295,11 +291,28 @@
 
     CRM.api('SepaCreditor', 'create', cj.extend(stdObj, updatedCreditorInfo),
             {success: function(data) {
-               CRM.alert("{/literal}{ts}Creditor updated/created{/ts}", "{ts}Success{/ts}{literal}", "success");
-               location.reload();
-              }
+               }
             }
     );
+
+    // update creditor batching settings
+    var cbat = [
+                  ["batching.alt." + creditorId + ".OOFF.horizon", "custom_OOFF_horizon"],
+                  ["batching.alt." + creditorId + ".OOFF.notice", "custom_OOFF_notice"],
+                  ["batching.alt." + creditorId + ".RCUR.horizon", "custom_RCUR_horizon"],
+                  ["batching.alt." + creditorId + ".RCUR.notice", "custom_RCUR_notice"],
+                  ["batching.alt." + creditorId + ".FRST.horizon", "custom_FRST_horizon"],
+                  ["batching.alt." + creditorId + ".FRST.notice", "custom_FRST_notice"]
+                ];
+
+    for (var i = 0; i < cbat.length; i++) {
+      var name = cbat[i][0];
+      var value = inputCustomBatching[i].value;
+      if (value != "") {
+        CRM.api('Setting', 'create', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'name': name, 'value': value}, {success: function(data) {
+        }});
+      }
+    }
   }
 
   function resetValues() {
