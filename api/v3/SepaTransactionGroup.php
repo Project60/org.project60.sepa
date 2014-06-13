@@ -225,7 +225,7 @@ continue;
 
 /**
  */
-function _civicrm_api3_sepa_transaction_group_updatestatus_spec($params) {
+function _civicrm_api3_sepa_transaction_group_updatestatus_spec(&$params) {
   $params['id']['api.required'] = 1;
   $params['to_status_id']['api.required'] = 1;
   $params['from_status_id']['api.required'] = 1;
