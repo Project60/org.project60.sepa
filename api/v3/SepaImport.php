@@ -147,7 +147,13 @@ function civicrm_api3_sepa_import_create($params) {
   $startDate = date_create_from_format("!Ymd+", $params['start_date']);
   $createDate = date_create_from_format("!Ymd+", $params['create_date']);
   $frequencyUnit = $params['frequency_unit'];
+  if (!in_array($frequencyUnit, array('month', 'year', 'week', 'day'))) {
+    throw new API_Exception("Invalid value '$frequencyUnit' for parameter 'frequency_unit'");
+  }
   $frequencyInterval = $params['frequency_interval'];
+  if (!CRM_Utils_Rule::positiveInteger($frequencyInterval)) {
+    throw new API_Exception("Invalid value '$frequencyInterval' for parameter 'frequency_interval'");
+  }
 
   #if ($createDate > $startDate) {
   #  $firstPaymentPeriod = CRM_Sepa_Logic_Base::countPeriods($startDate, date_sub(clone $createDate, new DateInterval('P1D')), $frequencyUnit, $frequencyInterval) + 1;
