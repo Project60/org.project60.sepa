@@ -102,6 +102,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
       $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
 
+      $pendingGroups = array_replace_recursive($pendingGroups, array($group['type'] => array($collectionDate => array()))); /* Create any missing array levels, to avoid PHP notice. */
       $pendingGroups[$group['type']][$collectionDate][] = $group['id'];
     }
 
