@@ -113,7 +113,6 @@ cj(function($){
     CRM.api("SepaContributionGroup","getdetail",{"id":$tr.data("id")},{"success":function(data) {
       _.extend(data,$tr.data());
       $tr.after(_.template($("#detail").html(),data));
-      console.log(data);
     }});
   });
 });
