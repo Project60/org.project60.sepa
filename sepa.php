@@ -551,3 +551,10 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
   }
 }
 
+/**
+* Implementation of hook_civicrm_config
+*/
+function sepa_civicrm_alterSettingsFolders(&$metaDataFolders = NULL){
+  _sepa_civix_civicrm_alterSettingsFolders($metaDataFolders);
+}
+

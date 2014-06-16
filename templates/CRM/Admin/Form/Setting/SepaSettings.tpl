@@ -241,16 +241,10 @@
           cj('#addcreditor').show(500);
 
           var cbat = [
-                      ["batching.alt." + data['id'] + ".OOFF.horizon", "custom_OOFF_horizon"],
-                      ["batching.alt." + data['id'] + ".OOFF.notice", "custom_OOFF_notice"],
-                      ["batching.alt." + data['id'] + ".RCUR.horizon", "custom_RCUR_horizon"],
-                      ["batching.alt." + data['id'] + ".RCUR.notice", "custom_RCUR_notice"],
-                      ["batching.alt." + data['id'] + ".FRST.horizon", "custom_FRST_horizon"],
-                      ["batching.alt." + data['id'] + ".FRST.notice", "custom_FRST_notice"]
-                      //["batching.alt." + data['id'] + ".update.lock.timeout", "custom_lock_timeout"]
+                      ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon"],
                     ];
           for (var i = 0; i < cbat.length; i++) {
-            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'org.project60', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i), error: null});
+            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'SEPA Direct Debit Preferences', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i)});
           }
         }
       }
@@ -297,19 +291,17 @@
 
     // update creditor batching settings
     var cbat = [
-                  ["batching.alt." + creditorId + ".OOFF.horizon", "custom_OOFF_horizon"],
-                  ["batching.alt." + creditorId + ".OOFF.notice", "custom_OOFF_notice"],
-                  ["batching.alt." + creditorId + ".RCUR.horizon", "custom_RCUR_horizon"],
-                  ["batching.alt." + creditorId + ".RCUR.notice", "custom_RCUR_notice"],
-                  ["batching.alt." + creditorId + ".FRST.horizon", "custom_FRST_horizon"],
-                  ["batching.alt." + creditorId + ".FRST.notice", "custom_FRST_notice"]
+                  ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon"],
                 ];
 
     for (var i = 0; i < cbat.length; i++) {
       var name = cbat[i][0];
       var value = inputCustomBatching[i].value;
+      var param = {};
+      param[name] = value;
+      console.log(param);
       if (value != "") {
-        CRM.api('Setting', 'create', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'name': name, 'value': value}, {success: function(data) {
+        CRM.api('Setting', 'create', param, {success: function(data) {
         }});
       }
     }
