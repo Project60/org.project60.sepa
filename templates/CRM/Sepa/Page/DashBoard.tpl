@@ -28,15 +28,15 @@
 <th></th>
 </tr>
 {foreach from=$creditor item=group}
-<tr class="status_{$group.status}" data-id="{$group.id}" data-type="{$group.type}">
-<td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
+<tr class="contribution_group status_{$group.status}" data-id="{$group.id}" data-type="{$group.type}">
+<td title="id {$group.id}">{$group.reference}</td>
 <td>{$group.status_label}</td>
 <td>{$group.type}</td>
 <td>{$group.created_date}</td>
 <td>{$group.collection_date}</td>
 {assign var='file_id' value=$group.file_id}
 <td class="file_{$group.file_id}">{$group.file_href}</td>
-<td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
+<td>{$group.nb_contrib}</td>
 <td>{$group.total} &euro;</td>
 <td>
 {if $group.status == 'Batched'}
@@ -104,8 +104,8 @@
 </script>
 <script>
 cj(function($){
-  $(".nb_contrib").click(function(){
-    var $tr=$(this).closest("tr");
+  $(".contribution_group").click(function(){
+    var $tr=$(this);
     if ($tr.next().hasClass("detail")) {
      $tr.next().remove();
      return;
@@ -118,8 +118,8 @@ cj(function($){
 });
 </script>
 <style>
-  .nb_contrib {cursor:pointer}
-  .nb_contrib:hover {text-decoration:underline;}
+  .contribution_group {cursor:pointer}
+  .contribution_group:hover {text-decoration:underline;}
 </style>
 {/literal}
 
