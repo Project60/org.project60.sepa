@@ -196,6 +196,10 @@
 {literal}
 <script type="text/javascript">
   cj('#edit_creditor_id').val("none");
+  
+  var cbat = [
+              ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon", null],
+            ];
 
   function deletecreditor(id) {
 
@@ -220,7 +224,15 @@
   function createCallback(data, map, i) {
     return function (data) {
       if (data['is_error'] == 0) {
-        cj("#"+map[i][1]).val(data['result']);   
+        var result = "";
+        var creditorId = cj('#edit_creditor_id').val();
+        result = cj.parseJSON(data['result']);
+        if (result[creditorId] != undefined) {
+          cbat[i][2] = result;
+          cj("#"+map[i][1]).val(result[creditorId]); 
+        }else{
+          cj("#"+map[i][1]).val("");
+        }
       }
     }
   }
@@ -240,9 +252,6 @@
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
           cj('#addcreditor').show(500);
 
-          var cbat = [
-                      ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon"],
-                    ];
           for (var i = 0; i < cbat.length; i++) {
             CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'SEPA Direct Debit Preferences', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i)});
           }
@@ -290,17 +299,21 @@
     );
 
     // update creditor batching settings
-    var cbat = [
-                  ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon"],
-                ];
-
     for (var i = 0; i < cbat.length; i++) {
       var name = cbat[i][0];
       var value = inputCustomBatching[i].value;
       var param = {};
-      param[name] = value;
-      console.log(param);
+
+      if (cbat[i][2]) {
+        param[name] = cbat[i][2];
+        param[name][creditorId] = value;
+        param[name] = JSON.stringify(param[name]);
+      }else{
+        param[name] = value;
+      }
+      
       if (value != "") {
+        console.log(param);
         CRM.api('Setting', 'create', param, {success: function(data) {
         }});
       }
