@@ -162,13 +162,22 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $objectRef->save();
       //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
 
-      /* Set `sequence_number` if necessary. Note: using API here, as the BAO (which is passed in the hook) doesn't seem to handle custom fields. */
+      /*
+       * Set `sequence_number` default value.
+       *
+       * Using API here, as the BAO (which is passed in the hook) doesn't seem to handle custom fields.
+       *
+       * The 'get' -> 'create' dance is necessary to prevent overwriting the status with the default 'Completed' value...
+       */
       $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
-      $result = civicrm_api3('Contribution', 'getsingle', array('id' => $objectId, 'return' => array($sequenceNumberField, 'contribution_status_id'));
-      if (!isset($return[$sequenceNumberField])) {
-        /* If no Sequence Number is passed in explicitly, this must be the auto-created first contribution in the sequence. */
-        civicrm_api3('Contribution', 'create', array('id' => $objectId, $sequenceNumberField => 1, 'contribution_status_id' => $result['contribution_status_id']));
-      }
+      civicrm_api3('Contribution', 'getsingle', array(
+        'id' => $objectId,
+        'return' => 'contribution_status_id',
+        'api.Contribution.create' => array(
+          $sequenceNumberField => 1,
+          'contribution_status_id' => '$value.contribution_status_id',
+        ),
+      ));
     }
 
     // If this is a one-off payment, doDirectPayment() has already been invoked before creating the contribution.
