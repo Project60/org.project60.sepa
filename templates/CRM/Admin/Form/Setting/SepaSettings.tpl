@@ -15,7 +15,10 @@
             <td>{$creditor.iban}</td>
             <td>{$creditor.bic}</td>
             <td>
-              <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id});">
+              <a class="add button" title="Copy" onclick="fetchCreditor({$creditor.id}, true);">
+                <span><div class="icon add-icon"></div>{ts}Copy{/ts}</span>
+              </a>
+              <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id}, false);">
                 <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
               </a>
               <a class="delete button" title="Delete" onclick="deletecreditor({$creditor.id});">
@@ -226,11 +229,10 @@
 
   
   // This function is needed due to the asynchronous call of success() in CRM.api().
-  function createCallback(data, map, i) {
+  function createCallback(data, map, i, creditorId) {
     return function (data) {
       if (data['is_error'] == 0) {
         var result = "";
-        var creditorId = cj('#edit_creditor_id').val();
         
         if (data['result'] != "undefined") {
           result = cj.parseJSON(data['result']);
@@ -246,11 +248,13 @@
     }
   }
 
-  function fetchCreditor(id) {
+  function fetchCreditor(id, isCopy) {
     CRM.api('SepaCreditor', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
     {success: function(data) {
         if (data['is_error'] == 0) {
-          cj('#edit_creditor_id').val(data['id']);
+          if (!isCopy) {
+            cj('#edit_creditor_id').val(data['id']);
+          }
           cj('#addcreditor_creditor_id').val(data['creditor_id']);
           cj('#addcreditor_name').val(data['name']);
           cj('#addcreditor_address').val(data['address']);
@@ -262,7 +266,7 @@
           cj('#addcreditor').show(500);
 
           for (var i = 0; i < customBatchingParams.length; i++) {
-            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'SEPA Direct Debit Preferences', 'name': customBatchingParams[i][0]}, {success: createCallback(data, customBatchingParams, i)});
+            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'SEPA Direct Debit Preferences', 'name': customBatchingParams[i][0]}, {success: createCallback(data, customBatchingParams, i, id)});
           }
         }
       }
