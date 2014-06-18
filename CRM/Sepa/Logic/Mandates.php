@@ -164,10 +164,10 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
 
       /* Set `sequence_number` if necessary. Note: using API here, as the BAO (which is passed in the hook) doesn't seem to handle custom fields. */
       $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
-      $result = civicrm_api3('Contribution', 'getsingle', array('id' => $objectId, 'return' => $sequenceNumberField));
+      $result = civicrm_api3('Contribution', 'getsingle', array('id' => $objectId, 'return' => array($sequenceNumberField, 'contribution_status_id'));
       if (!isset($return[$sequenceNumberField])) {
         /* If no Sequence Number is passed in explicitly, this must be the auto-created first contribution in the sequence. */
-        civicrm_api3('Contribution', 'create', array('id' => $objectId, $sequenceNumberField => 1));
+        civicrm_api3('Contribution', 'create', array('id' => $objectId, $sequenceNumberField => 1, 'contribution_status_id' => $result['contribution_status_id']));
       }
     }
 
