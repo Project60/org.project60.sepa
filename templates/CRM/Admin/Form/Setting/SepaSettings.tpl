@@ -300,33 +300,41 @@
 
     CRM.api('SepaCreditor', 'create', cj.extend(stdObj, updatedCreditorInfo),
             {success: function(data) {
+                if (data['is_error'] == 0) {
+                  // check whether we updated an existing creditor 
+                  // or created a new one
+                  var creditorId = cj('#edit_creditor_id').val();
+                  if (creditorId == "none") {
+                    creditorId = data['values'][0]['id'];
+                  }
+
+                  // update creditor batching settings
+                  for (var i = 0; i < cbat.length; i++) {
+                    var name = cbat[i][0];
+                    var value = inputCustomBatching[i].value;
+                    var param = {};
+
+                    if (cbat[i][2] !== null) {
+                      param[name] = cbat[i][2];
+                    }else{
+                      param[name] = {};
+                    }
+
+                    if (value != "") {
+                      param[name][creditorId] = value; 
+                    }else{
+                      delete param[name][creditorId];
+                    }
+
+                    param[name] = JSON.stringify(param[name]);;
+
+                    CRM.api('Setting', 'create', param, {success: function(data) {
+                      }});
+                  }
+                }
                }
             }
     );
-
-    // update creditor batching settings
-    for (var i = 0; i < cbat.length; i++) {
-      var name = cbat[i][0];
-      var value = inputCustomBatching[i].value;
-      var param = {};
-
-      if (cbat[i][2] !== null) {
-        param[name] = cbat[i][2];
-      }else{
-        param[name] = {};
-      }
-
-      if (value != "") {
-        param[name][creditorId] = value; 
-      }else{
-        delete param[name][creditorId];
-      }
-      
-      param[name] = JSON.stringify(param[name]);;
-
-      CRM.api('Setting', 'create', param, {success: function(data) {
-        }});
-    }
   }
 
   function resetValues() {
