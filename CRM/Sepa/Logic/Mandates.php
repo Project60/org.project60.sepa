@@ -161,10 +161,6 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     // check whether this is a SDD contribution. This could be done using a financial_type_id created specially 
     // for that purpose, or by examining the contrib->payment_instrument->pptype
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
-      $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      $objectRef->save();
-      //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
-
       /*
        * Set `sequence_number` default value.
        *
