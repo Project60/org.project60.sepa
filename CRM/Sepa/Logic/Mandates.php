@@ -158,9 +158,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     }
 
   public static function hook_post_contribution_create($objectId, $objectRef) {
-    // check whether this is a SDD contribution. This could be done using a financial_type_id created specially 
-    // for that purpose, or by examining the contrib->payment_instrument->pptype
-    if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
+    if (CRM_Sepa_Logic_Base::isSDD((array)$objectRef)) {
       /*
        * Set `sequence_number` default value.
        *
