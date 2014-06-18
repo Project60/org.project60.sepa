@@ -197,10 +197,13 @@
 <script type="text/javascript">
   cj('#edit_creditor_id').val("none");
   
-  var cbat = [
+  var customBatchingParams = [
               ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon", null],
               ["batching_alt_OOFF_notice_override",  "custom_OOFF_notice", null],
-              ["batching_alt_RCUR_horizon_override", "custom_RCUR_horizon", null]
+              ["batching_alt_RCUR_horizon_override", "custom_RCUR_horizon", null],
+              ["batching_alt_RCUR_notice_override", "custom_RCUR_notice", null],
+              ["batching_alt_FRST_horizon_override", "custom_FRST_horizon", null],
+              ["batching_alt_FRST_notice_override", "custom_FRST_notice", null]
              ];
 
   function deletecreditor(id) {
@@ -231,7 +234,7 @@
         
         if (data['result'] != "undefined") {
           result = cj.parseJSON(data['result']);
-          cbat[i][2] = result;  
+          customBatchingParams[i][2] = result;  
         }
 
         if (result[creditorId] != undefined) {
@@ -258,8 +261,8 @@
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
           cj('#addcreditor').show(500);
 
-          for (var i = 0; i < cbat.length; i++) {
-            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'SEPA Direct Debit Preferences', 'name': cbat[i][0]}, {success: createCallback(data, cbat, i)});
+          for (var i = 0; i < customBatchingParams.length; i++) {
+            CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'SEPA Direct Debit Preferences', 'name': customBatchingParams[i][0]}, {success: createCallback(data, customBatchingParams, i)});
           }
         }
       }
@@ -309,13 +312,14 @@
                   }
 
                   // update creditor batching settings
-                  for (var i = 0; i < cbat.length; i++) {
-                    var name = cbat[i][0];
+                  for (var i = 0; i < customBatchingParams.length; i++) {
+                    var name = customBatchingParams[i][0];
                     var value = inputCustomBatching[i].value;
                     var param = {};
 
-                    if (cbat[i][2] !== null) {
-                      param[name] = cbat[i][2];
+                    // modify the object from the database if it exists
+                    if (customBatchingParams[i][2] !== null) {
+                      param[name] = customBatchingParams[i][2];
                     }else{
                       param[name] = {};
                     }
@@ -329,6 +333,9 @@
                     param[name] = JSON.stringify(param[name]);;
 
                     CRM.api('Setting', 'create', param, {success: function(data) {
+                         CRM.alert("{/literal}{ts}Creditor updated{/ts}", "{ts}Success{/ts}{literal}", "success");
+                         resetValues();
+                         location.reload();
                       }});
                   }
                 }
