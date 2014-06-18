@@ -199,7 +199,9 @@
   
   var cbat = [
               ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon", null],
-            ];
+              ["batching_alt_OOFF_notice_override",  "custom_OOFF_notice", null],
+              ["batching_alt_RCUR_horizon_override", "custom_RCUR_horizon", null]
+             ];
 
   function deletecreditor(id) {
 
@@ -226,9 +228,13 @@
       if (data['is_error'] == 0) {
         var result = "";
         var creditorId = cj('#edit_creditor_id').val();
-        result = cj.parseJSON(data['result']);
+        
+        if (data['result'] != "undefined") {
+          result = cj.parseJSON(data['result']);
+          cbat[i][2] = result;  
+        }
+
         if (result[creditorId] != undefined) {
-          cbat[i][2] = result;
           cj("#"+map[i][1]).val(result[creditorId]); 
         }else{
           cj("#"+map[i][1]).val("");
@@ -304,19 +310,22 @@
       var value = inputCustomBatching[i].value;
       var param = {};
 
-      if (cbat[i][2]) {
+      if (cbat[i][2] !== null) {
         param[name] = cbat[i][2];
-        param[name][creditorId] = value;
-        param[name] = JSON.stringify(param[name]);
       }else{
-        param[name] = value;
+        param[name] = {};
+      }
+
+      if (value != "") {
+        param[name][creditorId] = value; 
+      }else{
+        delete param[name][creditorId];
       }
       
-      if (value != "") {
-        console.log(param);
-        CRM.api('Setting', 'create', param, {success: function(data) {
+      param[name] = JSON.stringify(param[name]);;
+
+      CRM.api('Setting', 'create', param, {success: function(data) {
         }});
-      }
     }
   }
 
