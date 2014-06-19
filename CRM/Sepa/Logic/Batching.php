@@ -154,7 +154,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   /**
    */
   public static function updateStatus($txgroupParams, $statusId, $fromStatusId) {
-    $rebatch = $setReceiveDate = false;
+    $rebatch = $useApi = false;
     $contributionStatusId = $groupStatusId = $statusId;
     switch (CRM_Core_OptionGroup::getValue('contribution_status', $statusId, 'value', 'String', 'name')) {
       case 'Cancelled':
@@ -162,7 +162,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         $contributionStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
         break;
       case 'Completed':
-        $setReceiveDate = true;
+        $useApi = true;
         break;
     }
 
@@ -193,16 +193,24 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
           continue;
         }
 
-        $contribution = new CRM_Contribute_BAO_Contribution();
-        $contribution->get($groupMember['contribution_id']);
+        if ($useApi) {
+          civicrm_api3('Contribution', 'create', array(
+            'id' => $groupMember['contribution_id'],
+            'contribution_status_id' => $contributionStatusId,
+            'receive_date' => $group['collection_date'],
+          ));
+        } else {
+          $contribution = new CRM_Contribute_BAO_Contribution();
+          $contribution->get($groupMember['contribution_id']);
 
-        if ($rebatch) {
-          self::batchContributionByCreditor($contribution, $group['sdd_creditor_id'], $contribution->payment_instrument_id);
+          if ($rebatch) {
+            self::batchContributionByCreditor($contribution, $group['sdd_creditor_id'], $contribution->payment_instrument_id);
+          }
+
+          $contribution->contribution_status_id = $contributionStatusId;
+          $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
+          $contribution->save();
         }
-
-        $contribution->contribution_status_id = $contributionStatusId;
-        $contribution->receive_date = date('YmdHis', strtotime($setReceiveDate ? $group['collection_date'] : $contribution->receive_date));
-        $contribution->save();
       }
     }
   }
