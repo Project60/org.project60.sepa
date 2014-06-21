@@ -14,13 +14,18 @@
  * as well as `creditor_id` for the Mandate --
  * though sticking to this set is not an actual requirement of this API.
  *
- * Default filters by Contribution status and Mandate status are always applied,
- * to ensure that indeed only pending active contributions are considered.
+ * Default filters by Contribution status, Mandate status, and Contact `is_deleted` status
+ * are always applied, to ensure that indeed only pending active contributions are considered.
  *
  * For the benefit of the AJAX-based group detail listing on the Dashboard,
  * this call can optionally also fetch the corresponding `contribution_recur` record,
  * if a 'recur' parameter sub-array is supplied.
  * The result will be joined into the main result as well.
+ *
+ * (As we need to fetch the Contact objects for checking the `is_deleted` status,
+ * it's also possible to pass explicit Contact parameters and request return values
+ * in a 'contact' sub-array, just as for Mandates and 'recur' records --
+ * though this is not presently needed for any of the existing use cases...)
  *
  * Beware of chaining further API calls onto this one: the results might be unexpected,
  * because filtering by related Objects fields is applied only after the main API invocation.
@@ -34,6 +39,7 @@
  */
 function civicrm_api3_sepa_contribution_pending_get($params) {
   $mandateParams = CRM_Utils_Array::value('mandate', $params, array());
+  $contactParams = CRM_Utils_Array::value('contact', $params, array());
   $recurParams = CRM_Utils_Array::value('recur', $params); /* No default here, as this one is optional, and will be fetched only if the 'recur' sub-array is supplied. */
 
   #$instruments = array();
@@ -50,24 +56,34 @@ function civicrm_api3_sepa_contribution_pending_get($params) {
   #  'option.limit' => 1234567890,
   #  'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
   #  #'payment_instrument_id' => array('IN' => $instruments), # 'IN' doesn't work with Contribution API...
-  #  'return' => array('contribution_recur_id',
+  #  'return' => array('contribution_recur_id', 'contact_id'),
   #  'api.SepaContributionMandate.getsingle' => array_merge_recursive(array(
   #    'contribution_id' => '$value.id',
   #    'contribution_recur_id' => '$value.contribution_recur_id',
   #    'status' => array('IN' => array('FRST', 'RCUR', 'OOFF')),
   #  ), $mandateParams),
+  #  'api.Contact.getsingle' => array(
+  #    'id' => '$value.contact_id',
+  #    'is_deleted' => 0,
+  #    'format.only_id' => 1,
+  #  ),
   #), $params));
 
   #$apiParams = (array_replace_recursive(array(
   #  'options' => array('limit' => 1234567890),
   #  'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
   #  'contribution_payment_instrument_id' => array('IN' => $instruments),
-  #  'return' => array('_recur' => 'contribution_recur_id'),
+  #  'return' => array('_recur' => 'contribution_recur_id', '_contact' => 'contact_id'),
   #  'api.SepaContributionMandate.getsingle' => array_merge_recursive(array(
   #    'contribution_id' => '$value.id',
   #    'contribution_recur_id' => '$value.contribution_recur_id',
   #    'status' => array('IN' => array('FRST', 'RCUR', 'OOFF')),
   #  ), $mandateParams),
+  #  'api.Contact.getsingle' => array(
+  #    'id' => '$value.contact_id',
+  #    'is_deleted' => 0,
+  #    'format.only_id' => 1,
+  #  ),
   #), $params));
   #$mainResult = civicrm_api3('SepaContribution', 'get', $apiParams);
 
@@ -82,7 +98,7 @@ function civicrm_api3_sepa_contribution_pending_get($params) {
     'options' => array('limit' => 1234567890),
     'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
     'contribution_payment_instrument_id' => array('IN' => $instruments),
-    'return' => array('_recur' => 'contribution_recur_id'), /* Using explicit keys to make them distinct from any passed from the caller, so array_replace() concatenates the values rather than overwriting. */
+    'return' => array('_recur' => 'contribution_recur_id', '_contact' => 'contact_id'), /* Using explicit keys to make them distinct from any passed from the caller, so array_replace() concatenates the values rather than overwriting. */
   ), $params));
   $contributions = &$mainResult['values'];
 
@@ -92,8 +108,9 @@ function civicrm_api3_sepa_contribution_pending_get($params) {
    * but these do not affect the result;
    * and the number should normally be so low
    * that it's probably not helpful to filter them for performance. */
-  $rcurIds = $ooffIds = array(0); /* '0' is a dummy ID that never matches anything, but prevents errors when the list is empty otherwise. */
+  $contactIds = $rcurIds = $ooffIds = array(0); /* '0' is a dummy ID that never matches anything, but prevents errors when the list is empty otherwise. */
   foreach ($contributions as $id => $contribution) {
+    $contactIds[] = $contribution['contact_id'];
     if (isset($contribution['contribution_recur_id'])) {
       $rcurIds[] = $contribution['contribution_recur_id'];
     } else {
@@ -119,6 +136,14 @@ function civicrm_api3_sepa_contribution_pending_get($params) {
     );
   }
 
+  $result = civicrm_api3('Contact', 'get', array_replace_recursive(array(
+    'options' => array('limit' => 1234567890),
+    'id' => array('IN' => $contactIds),
+    'is_deleted' => 0,
+    'return' => array(''), /* Don't really need anything... Just the ID that is passed as the key anyways. */
+  ), $contactParams));
+  $contacts = $result['values'];
+
   if (isset($recurParams)) {
     $result = civicrm_api3('ContributionRecur', 'get', array_replace_recursive(array(
       'options' => array('limit' => 1234567890),
@@ -131,6 +156,11 @@ function civicrm_api3_sepa_contribution_pending_get($params) {
   foreach ($contributions as $contributionId => &$contribution) {
     $contribution['contribution_id'] = $contribution['id'];
 
+    #if (civicrm_error($contribution['api.Contact.getsingle'])) {
+    #  unset($result['values'][$id]);
+    #  continue;
+    #}
+
     #$mandate = $contribution['api.SepaContributionMandate.getsingle'];
     #if (isset($mandate['id'])) {
     #  $contribution = array_merge($mandate, $contribution, array('mandate_id' => $mandate['id']));
@@ -138,6 +168,15 @@ function civicrm_api3_sepa_contribution_pending_get($params) {
     #  unset($result['values'][$id]);
     #  continue;
     #}
+
+    /* If we have a matching Contact, merge its data; otherwise, drop the Contribution. */
+    $contact = CRM_Utils_Array::value($contribution['contact_id'], $contacts);
+    if ($contact) {
+      $contribution = array_merge($contact, $contribution);
+    } else {
+      unset($contributions[$contributionId]);
+      continue;
+    }
 
     /* If we have a matching Mandate, merge its data; otherwise, drop the Contribution. */
     $recurId = CRM_Utils_Array::value('contribution_recur_id', $contribution);
