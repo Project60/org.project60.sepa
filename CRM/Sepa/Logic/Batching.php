@@ -81,6 +81,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     #foreach ($result['api.SepaTransactionGroup.get']['values'] as $group) {
 
     $result = civicrm_api3('SepaContributionPending', 'get', array(
+      'options' => array('sort' => 'payment_instrument_id, receive_date'), /* Make sure Groups are batched in a clear order. */
       'filter.receive_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter the ones obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
       'return' => array('payment_instrument_id', 'receive_date'),
       'mandate' => array(
