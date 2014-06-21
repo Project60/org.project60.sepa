@@ -89,34 +89,46 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       )
     ));
 
+    /* First, group by type (`payment_instrument_id`) and original `receive_date`. */
     $pendingGroups = array();
     foreach ($result['values'] as $contributionId => $contribution) {
-      $bestCollectionDate = self::adjustBankDays($contribution['receive_date'], 0);
-      /* Re-check, as date might exceed range after adjustment. */
-      if ($bestCollectionDate > $dateRangeEnd) {
-        continue;
-      }
-
+      $receiveDate = date('Y-m-d', strtotime($contribution['receive_date']));
       $instrument = $contribution['payment_instrument_id'];
-      $type = CRM_Core_OptionGroup::getValue('payment_instrument', $instrument, 'value', 'String', 'name');
 
-      $isCor1 = true; /* DiCo hack */
-      $advanceDays = $isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5);
-      $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
-      $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
-      $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
-
-      $pendingGroups = array_replace_recursive($pendingGroups, array($type => array($collectionDate => array()))); /* Create any missing array levels, to avoid PHP notice. */
-      $pendingGroups[$type][$collectionDate][] = $contributionId;
+      $pendingGroups = array_replace_recursive($pendingGroups, array($instrument => array($receiveDate => array()))); /* Create any missing array levels, to avoid PHP notice. */
+      $pendingGroups[$instrument][$receiveDate][] = $contributionId;
     }
 
-    if (!empty($pendingGroups)) {
+    /* Now adjust each temporary group to earliest possible Collection Date, and merge groups accordingly. */
+    $groups = array();
+    foreach ($pendingGroups as $instrument => $dates) {
+      foreach ($dates as $receiveDate => $ids) {
+        $bestCollectionDate = self::adjustBankDays($receiveDate, 0);
+        /* Re-check, as date might exceed range after adjustment. */
+        if ($bestCollectionDate > $dateRangeEnd) {
+          continue;
+        }
+
+        $type = CRM_Core_OptionGroup::getValue('payment_instrument', $instrument, 'value', 'String', 'name');
+
+        $isCor1 = true; /* DiCo hack */
+        $advanceDays = $isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5);
+        $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
+        $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
+        $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
+
+        $groups = array_merge_recursive($groups, array($type => array($collectionDate => $ids)));
+      }
+    }
+
+    /* Finally, create the File and Groups in DB. */
+    if (!empty($groups)) {
       $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditorId));
       $tag = (isset($creditor['tag'])) ? $creditor['tag'] : $creditor['mandate_prefix'];
 
       $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
 
-      foreach ($pendingGroups as $type => $dates) {
+      foreach ($groups as $type => $dates) {
         foreach ($dates as $collectionDate => $ids) {
           $paymentInstrumentId = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
           $txGroup = self::createTxGroup($creditorId, $type, $collectionDate, $paymentInstrumentId, $sddFile->id);
