@@ -80,30 +80,33 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     #$pendingGroups = array();
     #foreach ($result['api.SepaTransactionGroup.get']['values'] as $group) {
 
-    $result = civicrm_api3('SepaTransactionGroup', 'get', array(
-      'options' => array('limit' => 1234567890),
-      'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
-      'sdd_creditor_id' => $creditorId,
-      'filter.collection_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter the ones obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
-      'return' => array('id', 'type', 'collection_date'),
+    $result = civicrm_api3('SepaContributionPending', 'get', array(
+      'filter.receive_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter the ones obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
+      'return' => array('payment_instrument_id', 'receive_date'),
+      'mandate' => array(
+        'creditor_id' => $creditorId,
+      )
     ));
 
     $pendingGroups = array();
-    foreach ($result['values'] as $group) {
-      $bestCollectionDate = self::adjustBankDays($group['collection_date'], 0);
+    foreach ($result['values'] as $contributionId => $contribution) {
+      $bestCollectionDate = self::adjustBankDays($contribution['receive_date'], 0);
       /* Re-check, as date might exceed range after adjustment. */
       if ($bestCollectionDate > $dateRangeEnd) {
         continue;
       }
 
-      $group['is_cor1'] = true; /* DiCo hack */
-      $advanceDays = $group['is_cor1'] ? 1 : ($group['type'] == 'RCUR' ? 2 : 5);
+      $instrument = $contribution['payment_instrument_id'];
+      $type = CRM_Core_OptionGroup::getValue('payment_instrument', $instrument, 'value', 'String', 'name');
+
+      $isCor1 = true; /* DiCo hack */
+      $advanceDays = $isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5);
       $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
       $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
       $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
 
-      $pendingGroups = array_replace_recursive($pendingGroups, array($group['type'] => array($collectionDate => array()))); /* Create any missing array levels, to avoid PHP notice. */
-      $pendingGroups[$group['type']][$collectionDate][] = $group['id'];
+      $pendingGroups = array_replace_recursive($pendingGroups, array($type => array($collectionDate => array()))); /* Create any missing array levels, to avoid PHP notice. */
+      $pendingGroups[$type][$collectionDate][] = $contributionId;
     }
 
     if (!empty($pendingGroups)) {
@@ -117,32 +120,18 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
           $paymentInstrumentId = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
           $txGroup = self::createTxGroup($creditorId, $type, $collectionDate, $paymentInstrumentId, $sddFile->id);
 
-          $result = civicrm_api3('SepaTransactionGroup', 'get', array(
-            'options' => array('limit' => 1234567890),
-            'id' => array('IN' => $ids),
-            'api.SepaContributionGroup.get' => array(
-              'options' => array('limit' => 1234567890),
-              'txgroup_id' => '$value.id',
-              'api.SepaContributionGroup.create' => array(
-                'id' => '$value.id', /* Make this explicit, as otherwise it's very confusing why this call updates the existing record rather than adding a new one... */
-                'txgroup_id' => $txGroup->id,
-                'contribution_id' => '$value.contribution_id',
-              ),
-            ),
-            'api.SepaTransactionGroup.delete' => array(
-              'id' => '$value.id',
-            ),
-          ));
+          foreach ($ids as $contributionId) {
+            $result = civicrm_api3('SepaContributionGroup', 'create', array(
+              'txgroup_id' => $txGroup->id,
+              'contribution_id' => $contributionId,
+            ));
 
-          foreach ($result['values'] as $group) {
-            foreach ($group['api.SepaContributionGroup.get']['values'] as $groupMember) {
-              $contribution = new CRM_Contribute_BAO_Contribution();
-              $contribution->get($groupMember['contribution_id']);
+            $contribution = new CRM_Contribute_BAO_Contribution();
+            $contribution->get($contributionId);
 
-              $contribution->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name');
-              $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
-              $contribution->save();
-            }
+            $contribution->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name');
+            $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
+            $contribution->save();
           }
         }
       }
@@ -154,11 +143,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   /**
    */
   public static function updateStatus($txgroupParams, $statusId, $fromStatusId) {
-    $rebatch = $useApi = false;
+    $useApi = false;
     $contributionStatusId = $groupStatusId = $statusId;
     switch (CRM_Core_OptionGroup::getValue('contribution_status', $statusId, 'value', 'String', 'name')) {
       case 'Cancelled':
-        $rebatch = true;
         $contributionStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
         break;
       case 'Completed':
@@ -202,10 +190,6 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         } else {
           $contribution = new CRM_Contribute_BAO_Contribution();
           $contribution->get($groupMember['contribution_id']);
-
-          if ($rebatch) {
-            self::batchContributionByCreditor($contribution, $group['sdd_creditor_id'], $contribution->payment_instrument_id);
-          }
 
           $contribution->contribution_status_id = $contributionStatusId;
           $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));

@@ -59,10 +59,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $dao->save();
     }
     
-    // if the mandate is enabled, kick off the batching process
-    if (self::is_active(CRM_Utils_Array::value('status', $params))) {
-      CRM_Sepa_Logic_Batching::batch_initial_contribution($dao->id, $dao);
-    }
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }

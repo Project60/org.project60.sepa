@@ -162,15 +162,10 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
         'limit' => 1,
       ),
     ),
-    'api.SepaCreditor.getvalue' => array(
-      'payment_processor_id' => '$value.payment_processor_id',
-      'return' => 'id',
-    ),
   )));
 
   foreach ($result['values'] as $recur) {
     $lastContrib = $recur['api.Contribution.getsingle'];
-    $creditorId = $recur['api.SepaCreditor.getvalue'];
 
     $recurStart = date_create_from_format("!Y-m-d+", $recur['start_date']);
     $frequencyUnit = $recur['frequency_unit'];
@@ -201,10 +196,6 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
         'campaign_id' => $recur['campaign_id'],
         $sequenceNumberField => $period + 1,
       ));
-
-      $contrib = new CRM_Contribute_BAO_Contribution();
-      $contrib->get('id', $result['id']);
-      CRM_Sepa_Logic_Batching::batchContributionByCreditor($contrib, $creditorId, $paymentInstrumentId);
     } /* for($period) */
   } /* foreach($recur) */
 }
