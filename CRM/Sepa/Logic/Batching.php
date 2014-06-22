@@ -57,6 +57,25 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     return $txGroup;
   }
 
+  /*
+   * Change Contribution status, using BAO.
+   *
+   * This is needed because the Contribution API only accepts a very limited set of status transitions;
+   * while the BAO allows us changing from any status to any other one.
+   *
+   * @param int $statusId The 'value' of the desired `contribution_status` option value
+   * @param int $contributionId ID of the Contribution to update
+   * @return void
+   */
+  static function setContributionStatus($contributionId, $statusId) {
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->get($contributionId);
+
+    $contribution->contribution_status_id = $statusId;
+    $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date)); /* BAO fails to accept own date format... */
+    $contribution->save();
+  }
+
   /**
    */
   public static function batchForSubmit($submitDate, $creditorId) {
@@ -139,12 +158,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               'contribution_id' => $contributionId,
             ));
 
-            $contribution = new CRM_Contribute_BAO_Contribution();
-            $contribution->get($contributionId);
-
-            $contribution->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name');
-            $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
-            $contribution->save();
+            self::setContributionStatus($contributionId, CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'));
           }
         }
       }
@@ -201,12 +215,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
             'receive_date' => $group['collection_date'],
           ));
         } else {
-          $contribution = new CRM_Contribute_BAO_Contribution();
-          $contribution->get($groupMember['contribution_id']);
-
-          $contribution->contribution_status_id = $contributionStatusId;
-          $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date));
-          $contribution->save();
+          self::setContributionStatus($groupMember['contribution_id'], $contributionStatusId);
         }
       }
     }
