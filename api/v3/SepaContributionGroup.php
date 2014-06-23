@@ -161,6 +161,11 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
         'limit' => 1,
       ),
     ),
+    'api.SepaMandate.getsingle' => array(
+      'entity_table' => 'civicrm_contribution_recur',
+      'entity_id' => '$value.id',
+      'return' => 'status',
+    ),
     'api.Contact.getcount' => array(
       'id' => '$value.contact_id',
       'is_deleted' => 0,
@@ -169,7 +174,12 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
 
   foreach ($result['values'] as $recur) {
     $lastContrib = $recur['api.Contribution.getsingle'];
+    $mandate = $recur['api.SepaMandate.getsingle'];
     $contactCount = $recur['api.Contact.getcount'];
+
+    if (!CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status'])) {
+      continue;
+    }
 
     if (!$contactCount) { /* Deleted Contact (or otherwise orphaned Recur record). */
       continue;
