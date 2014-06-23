@@ -161,10 +161,19 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
         'limit' => 1,
       ),
     ),
+    'api.Contact.getcount' => array(
+      'id' => '$value.contact_id',
+      'is_deleted' => 0,
+    ),
   )));
 
   foreach ($result['values'] as $recur) {
     $lastContrib = $recur['api.Contribution.getsingle'];
+    $contactCount = $recur['api.Contact.getcount'];
+
+    if (!$contactCount) { /* Deleted Contact (or otherwise orphaned Recur record). */
+      continue;
+    }
 
     $recurStart = date_create_from_format("!Y-m-d+", $recur['start_date']);
     $frequencyUnit = $recur['frequency_unit'];
