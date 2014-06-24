@@ -154,7 +154,10 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
   $result = civicrm_api3('ContributionRecur', 'get', array_merge($params, array(
     'options' => array('limit' => 1234567890),
     'payment_instrument_id' => array('IN' => $instruments),
-    #'contribution_status_id'
+    'contribution_status_id' => array('IN' => array(
+      CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+      CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
+    )),
     'api.Contribution.getsingle' => array(
       'options' => array(
         'sort' => "$sequenceNumberField DESC",
