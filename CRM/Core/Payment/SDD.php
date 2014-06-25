@@ -67,7 +67,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 ts('IBAN'), 
                 array('size' => 34, 'maxlength' => 34,), 
                 TRUE);
-    //error_log(print_r($form->_paymentFields, true));
 
     $form->add( 'text', 
                 'bank_bic', 
@@ -81,31 +80,19 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 array('size' => 2, 'value' => 1), 
                 TRUE);
 
-    $form->add( 'text', 
+    $form->add( 'select', 
                 'frequency', 
                 ts('frequency'), 
-                array('size' => 2, 'value' => 2), 
+                array(1=>1, 2=>2, 3=>3, 4=>4, 6=>6), 
                 TRUE);
     
-    $form->add( 'select', 
-                'frequency_unit', 
-                ts('frequency unit'), 
-                array('size' => 2, 'value' => 'ooff'), 
-                TRUE);
-
-    $form->add( 'date', 
-                'start_date', 
+    $form->addDate('start_date', 
                 ts('start date'), 
-                array('hidden' => '1', 'value' => 'today'), 
-                TRUE);
+                TRUE, 
+                array('formatType' => 'today'));
 
-    // TODO: add (hidden) cycle_day, frequency and start_date
-
-    //CRM_Core_Region::instance('billing-block')->update('default', array('disabled' => TRUE));
-
-    // TODO: create new template with jQuery magic
     CRM_Core_Region::instance('billing-block')->add(
-      array('template' => 'CRM/Sepa/Mandate.tpl', 'weight' => -1));
+      array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
   }
 
 
@@ -195,7 +182,59 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   // [contributionType_name] => Abo
   // [contributionType_accounting_code] => 4300
   // [contributionPageID] => 2
+  // OR:
+  // [qfKey] => f573725f392e40bd836b99695dc6249e_7372
+  // [entryURL] => http://localhost:8888/migration/civicrm/contribute/transact?reset=1&amp;id=2
+  // [hidden_processor] => 1
+  // [bank_iban] => DE55430609676030448700
+  // [bank_bic] => AABAFI22
+  // [cycle_day] => 15
+  // [frequency] => 2
+  // [start_date] => 07/12/2014
+  // [email-5] => schuttenberg@systopia.de
+  // [payment_processor] => 9
+  // [priceSetId] => 4
+  // [price_5] => 30
+  // [is_recur] => 1
+  // [frequency_interval] => 1
+  // [frequency_unit] => year
+  // [selectProduct] => 
+  // [MAX_FILE_SIZE] => 33554432
+  // [ip_address] => 127.0.0.1
+  // [amount] => 30
+  // [currencyID] => EUR
+  // [payment_action] => Sale
+  // [is_pay_later] => 0
+  // [invoiceID] => 8c2b6dca504d698d119c95973833bbb7
+  // [is_quick_config] => 1
+  // [description] => Online-Zuwendung: Test2
+  // [accountingCode] => 
+  // [payment_processor_id] => 9
+  // [email] => schuttenberg@systopia.de
+  // [contributionType_name] => Abo
+  // [contributionType_accounting_code] => 4300
+  // [contributionPageID] => 2
+  // [contactID] => 2
+  // [contributionID] => 10707
+  // [contributionTypeID] => 4
+  // [contributionRecurID] => 278
+
 function doDirectPayment(&$params) {
+  $test_mode = ($this->_mode == 'test');
+  $rcur_mode = !empty($params['is_recur']);
+
+  // TODO: RCUR
+  // fix recurring contribtuion
+  // delete contribution
+  // create mandate (what if test mode?)
+
+  // TODO: OOFF
+  // fix contribtuion
+  // create mandate (what if test mode?)
+
+
+
+
     // TODO: FIX recurring contribution
 
     error_log(print_r($params, true));
