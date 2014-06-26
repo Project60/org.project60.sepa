@@ -26,7 +26,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.alt.RCUR.notice', 'RCUR notice days'),
                          array('batching.alt.FRST.horizon', 'FRST horizon'),
                          array('batching.alt.FRST.notice', 'FRST notice days'),
-                         array('batching.alt.update.lock.timeout', 'Update lock timeout'),
+                         array('batching.alt.UPDATE.lock.timeout', 'Update lock timeout'),
                         );
 
     private $custom_fields = array(
@@ -52,7 +52,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $fields = array();
         // get all default values (they are set once when the extension is being enabled)
         foreach ($this->config_fields as $key => $value) {
-            $fields[$this->domainToString($value[0])] = CRM_Core_BAO_Setting::getItem('org.project60', $value[0]);
+            $fields[$this->domainToString($value[0])] = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($value[0]));
         }
         return $fields; 
     }
@@ -95,7 +95,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add all form elements and validation rules
         $index = 0;
         foreach ($this->custom_fields as $key => $value) {
-            $this->addElement('text', $this->domainToString($value[0]), ts($value[1]), array('placeholder' => CRM_Core_BAO_Setting::getItem('org.project60', $this->config_fields[$index][0])));
+            $this->addElement('text', $this->domainToString($value[0]), ts($value[1]), array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]))));
             $this->addRule($this->domainToString($value[0]), 
                        ts("Please enter the $value[1] as number (integers only)."),
                       'positiveInteger');
@@ -122,7 +122,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // save field values
         foreach ($this->config_fields as $key => $value) {
             if(array_key_exists($this->domainToString($value[0]), $values)) {
-                CRM_Core_BAO_Setting::setItem($values[$this->domainToString($value[0])], 'org.project60', $value[0]);
+                CRM_Core_BAO_Setting::setItem($values[$this->domainToString($value[0])], 'SEPA Direct Debit Preferences', $this->domainToString($value[0]));
             }  
         }
         
