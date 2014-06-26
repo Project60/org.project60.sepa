@@ -48,7 +48,7 @@
 		</tr>
 		<tr>	<!-- AMOUNT -->
 			<td>{ts}Amount{/ts}:</td>
-			<td><input name="total_amount" type="number" size="6" value="{$total_amount}" />&nbsp;EUR</td>
+			<td><input name="total_amount" type="number" size="6" step="0.01" value="{$total_amount}" />&nbsp;EUR</td>
 		</tr>
 		<tr>	<!-- FINANCIAL TYPE -->
 			<td>{ts}Financial Type{/ts}:</td>
