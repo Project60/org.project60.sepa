@@ -30,7 +30,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   }
 
   // step 0: check lock
-  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.update.lock.timeout');
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.UPDATE.lock.timeout', NULL);
   $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
@@ -179,7 +179,7 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
   }
 
   // step 0: check lock
-  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.update.lock.timeout');
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.UPDATE.lock.timeout', NULL);
   $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
@@ -309,7 +309,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
   }
 
   // check lock
-  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.update.lock.timeout');
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.UPDATE.lock.timeout', NULL);
   $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
@@ -369,7 +369,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
  *
  */
 function civicrm_api3_sepa_alternative_batching_update($params) {
-  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.update.lock.timeout');
+  $timeout = _sepa_alternative_batching_get_parameter('org.project60.batching.alt.UPDATE.lock.timeout', NULL);
   $lock = new CRM_Core_Lock('org.project60.sepa.alternative_batching.update', $timeout);
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error("alternative_batching is busy. Please wait, process should complete within {$timeout}s.");
@@ -377,6 +377,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
 
   // get creditor list
   $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
+
   if (!empty($creditor_query['is_error'])) {
     return civicrm_api3_create_error("Cannot get creditor list: ".$creditor_query['error_message']);
   } else {
@@ -433,9 +434,9 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
  */
 function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
   $mode = $params['type'];
-  $horizon = (int) _sepa_alternative_batching_get_parameter("org.project60.alternative_batching.$mode.horizon_days");
+  $horizon = (int) _sepa_alternative_batching_get_parameter("org.project60.batching.alt.$mode.horizon", $creditor_id);
   $latest_date = date('Y-m-d', strtotime("+$horizon days"));
-  $rcur_notice = (int) _sepa_alternative_batching_get_parameter("org.project60.alternative_batching.$mode.notice");
+  $rcur_notice = (int) _sepa_alternative_batching_get_parameter("org.project60.batching.alt.$mode.notice", $creditor_id);
   $now = strtotime("+$rcur_notice days");
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
@@ -589,8 +590,8 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
  * runs a batching update for all OOFF mandates
  */
 function _sepa_alternative_batching_update_ooff($params, $creditor_id) {
-  $horizon = (int) _sepa_alternative_batching_get_parameter('org.project60.batching.alt.OOFF.horizon');
-  $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.batching.alt.OOFF.notice');
+  $horizon = (int) _sepa_alternative_batching_get_parameter('org.project60.batching.alt.OOFF.horizon', $creditor_id);
+  $ooff_notice = (int) _sepa_alternative_batching_get_parameter('org.project60.batching.alt.OOFF.notice', $creditor_id);
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
   
   // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
@@ -798,13 +799,23 @@ function _sepa_alternative_batching_sync_groups($calculated_groups, $existing_gr
 
 
 
-function _sepa_alternative_batching_get_parameter($parameter_name) {
-  $result = CRM_Core_BAO_Setting::getItem('org.project60', substr($parameter_name, 14));
-  if ($result == NULL) {
-      error_log("org.project60.sepa: get_parameter for unknown key: org.project60.sepa.$parameter_name");
+function _sepa_alternative_batching_get_parameter($parameter_name, $creditor_id) {
+  $creditor_id = is_null($creditor_id) ? NULL : $creditor_id;
+  $param_name = str_replace('.', '_', substr($parameter_name, 14));
+  $override = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name . "_override");
+  $stdvalue = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name);
+  if (($override == NULL && $stdvalue == NULL) || $stdvalue == NULL) {
+      error_log("org.project60.sepa: get_parameter for unknown key: $parameter_name");
       return NULL;
+  }else if ($override == NULL) {
+    return $stdvalue;
+  }else{
+    $override = json_decode($override);
+    if (isset($override->{$creditor_id})) {
+      return $override->{$creditor_id};
+    }
+    return $stdvalue;
   }
-  return $result;
 }
 
 function _sepa_alternative_get_next_execution_date($rcontribution, $now) {
