@@ -462,21 +462,6 @@ function sepa_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function sepa_civicrm_enable() {
-  // set default values, if not exist
-  $config_fields = array('batching.alt.OOFF.horizon' => 30,
-                         'batching.alt.OOFF.notice' => 8,
-                         'batching.alt.RCUR.horizon' => 30,
-                         'batching.alt.RCUR.notice' => 8,
-                         'batching.alt.FRST.horizon' => 30,
-                         'batching.alt.FRST.horizon' => 8,
-                         'batching.alt.update.lock.timeout' => 170
-                        );
-  foreach ($config_fields as $key => $value) {
-    if (NULL==CRM_Core_BAO_Setting::getItem('org.project60', $key)) {
-        CRM_Core_BAO_Setting::setItem($value, 'org.project60', $key);
-    }
-  }
-
   // install/activate SEPA payment processor
   sepa_pp_install();
   
