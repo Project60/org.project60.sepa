@@ -71,7 +71,7 @@ function _is_recur_visualize() {
 	var is_recur = cj("#is_recur").attr('checked')=='checked';
 	cj("#frequency").attr('disabled', !is_recur);
 	cj("#frequency_unit").attr('disabled', !is_recur);
-	cj("#cycle_day").attr('disabled', !is_recur);
+	cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
 }
 cj("#is_recur").change(_is_recur_visualize);
 _is_recur_visualize();

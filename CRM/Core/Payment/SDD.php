@@ -78,13 +78,13 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 'cycle_day', 
                 ts('day of month'), 
                 array('size' => 2, 'value' => 1), 
-                TRUE);
+                FALSE);
 
     $form->add( 'select', 
                 'frequency', 
-                ts('frequency'), 
+                ts('frequency'),
                 array(1=>1, 2=>2, 3=>3, 4=>4, 6=>6), 
-                TRUE);
+                FALSE);
     
     $form->addDate('start_date', 
                 ts('start date'), 
@@ -109,8 +109,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     return NULL;
   }
 
-
-
   /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
@@ -119,174 +117,129 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    *
    * @return array the result in an nice formatted array (or an error object)
    */
-  // EXAMPLE ARRAY
-  // [qfKey] => f85d583b0d6c76b40af41946f022c487_9963
-  // [entryURL] => http://localhost:8888/migration/civicrm/contribute/transact?reset=1&amp;id=2&amp;action=preview
-  // [hidden_processor] => 1
-  // [bank_iban] => DEXXXXXXXXX0
-  // [bank_bic] => AABAFI22
-  // [email-5] => schuttenberg@systopia.de
-  // [payment_processor] => 10
-  // [priceSetId] => 4
-  // [price_5] => 50
-  // [is_recur] => 1
-  // [frequency_interval] => 1
-  // [frequency_unit] => month
-  // [selectProduct] => 
-  // [MAX_FILE_SIZE] => 33554432
-  // [ip_address] => 127.0.0.1
-  // [amount] => 50
-  // [currencyID] => EUR
-  // [payment_action] => Sale
-  // [is_pay_later] => 0
-  // [invoiceID] => 5ab7e63d0e975ea9d25df745612698f5
-  // [is_quick_config] => 1
-  // [description] => Online-Zuwendung: Test2
-  // [accountingCode] => 
-  // [payment_processor_id] => 10
-  // [email] => srb@systopia.de
-  // [contributionType_name] => Abo
-  // [contributionType_accounting_code] => 4300
-  // [contributionPageID] => 2
-  // [contactID] => 2
-  // [contributionID] => 10705
-  // [contributionTypeID] => 4
-  // [contributionRecurID] => 277
-  //
-  //
-  // OR:
-  // [qfKey] => f85d583b0d6c76b40af41946f022c487_6725
-  // [entryURL] => http://localhost:8888/migration/civicrm/contribute/transact?reset=1&amp;id=2&amp;action=preview
-  // [hidden_processor] => 1
-  // [bank_iban] => Dxxx00
-  // [bank_bic] => Axxx2
-  // [email-5] => schuttenberg@systopia.de
-  // [payment_processor] => 10
-  // [priceSetId] => 4
-  // [price_5] => 50
-  // [frequency_interval] => 1
-  // [frequency_unit] => month
-  // [selectProduct] => 
-  // [MAX_FILE_SIZE] => 33554432
-  // [ip_address] => 127.0.0.1
-  // [amount] => 50
-  // [currencyID] => EUR
-  // [payment_action] => Sale
-  // [is_pay_later] => 0
-  // [invoiceID] => 90ba21ded5ea70bb3cc8d68a25655d89
-  // [is_quick_config] => 1
-  // [description] => Online-Zuwendung: Test2
-  // [accountingCode] => 
-  // [payment_processor_id] => 10
-  // [email] => schuttenberg@systopia.de
-  // [contributionType_name] => Abo
-  // [contributionType_accounting_code] => 4300
-  // [contributionPageID] => 2
-  // OR:
-  // [qfKey] => f573725f392e40bd836b99695dc6249e_7372
-  // [entryURL] => http://localhost:8888/migration/civicrm/contribute/transact?reset=1&amp;id=2
-  // [hidden_processor] => 1
-  // [bank_iban] => DE55430609676030448700
-  // [bank_bic] => AABAFI22
-  // [cycle_day] => 15
-  // [frequency] => 2
-  // [start_date] => 07/12/2014
-  // [email-5] => schuttenberg@systopia.de
-  // [payment_processor] => 9
-  // [priceSetId] => 4
-  // [price_5] => 30
-  // [is_recur] => 1
-  // [frequency_interval] => 1
-  // [frequency_unit] => year
-  // [selectProduct] => 
-  // [MAX_FILE_SIZE] => 33554432
-  // [ip_address] => 127.0.0.1
-  // [amount] => 30
-  // [currencyID] => EUR
-  // [payment_action] => Sale
-  // [is_pay_later] => 0
-  // [invoiceID] => 8c2b6dca504d698d119c95973833bbb7
-  // [is_quick_config] => 1
-  // [description] => Online-Zuwendung: Test2
-  // [accountingCode] => 
-  // [payment_processor_id] => 9
-  // [email] => schuttenberg@systopia.de
-  // [contributionType_name] => Abo
-  // [contributionType_accounting_code] => 4300
-  // [contributionPageID] => 2
-  // [contactID] => 2
-  // [contributionID] => 10707
-  // [contributionTypeID] => 4
-  // [contributionRecurID] => 278
+  function doDirectPayment(&$params) {
+    $test_mode = ($this->_mode == 'test');
+    
+    // TODO: $this->_paymentProcessor['creditor_id'];
+    
+    // copy frequency_interval unit
+    $params['frequency_interval'] = $params['frequency'];
+    
 
-function doDirectPayment(&$params) {
-  $test_mode = ($this->_mode == 'test');
-  $rcur_mode = !empty($params['is_recur']);
-
-  // TODO: RCUR
-  // fix recurring contribtuion
-  // delete contribution
-  // create mandate (what if test mode?)
-
-  // TODO: OOFF
-  // fix contribtuion
-  // create mandate (what if test mode?)
-
-
-
-
-    // TODO: FIX recurring contribution
-
-    error_log(print_r($params, true));
-
-    // create the mandate
-    if ($this->_mode == 'test') {
-      $params['trxn_id'] = "TEST:" . $params['trxn_id'];
+    // see if the contribution type is there
+    if (empty($params['contributionTypeID'])) {
+      // if the type is not passed, look it up:
+      $look_up = array('name'=>$params['contributionType_name']);
+      $default = null;
+      $financial_type = CRM_Financial_BAO_FinancialType::retrieve($search, $default);
+      $params['contributionTypeID'] = $financial_type->id;
     }
-    $apiParams = array (
-        "iban"=> $params["bank_iban"],
-        "bic" => $params["bank_bic"],
-        );
-    $apiParams ["creditor_id"] = $GLOBALS["sepa_context"]["creditor_id"];
-    // set the contract entity for this mandate
-    if (CRM_Utils_Array::value('is_recur', $params) &&
-        $params['contributionRecurID']
-       ) {
-      $apiParams['type'] = 'RCUR';
-      $apiParams["entity_table"]="civicrm_contribution_recur";
-      $apiParams["entity_id"]= $params['contributionRecurID'];
-    } elseif (CRM_Utils_Array::value('selectMembership', $params))   {
-      print_r($params);
-      die ("TODO manage memberships in SEPA. It's supposed to be with with a recurring membership.");
-      // TODO: link mandate to membership
+
+    // look up contact
+    $contacts = civicrm_api3('Contact', 'get', array(
+      'email' => $params['email'],
+      ));
+    error_log(print_r($contacts, 1));
+
+    if (empty($contacts['values'])) {
+      // if not exists, create contact
+      $contact = civicrm_api3('Contact', 'create', array(
+        'email' => $params['email'],
+        'contact_type' => 'Individual',
+        ));
     } else {
-      // Probably a one-off contribution.
-      $apiParams['type'] = 'OOFF';
-      $apiParams['entity_table'] = 'civicrm_contribution';
-      // Note: for one-off contributions,
-      // the contribution record is created only *after* invoking doDirectPayment() --
-      // so we don't have an entity ID here yet...
+      // TODO: which contact to take? We just take the first...
+      $contact = reset($contacts['values']);
     }
+    $params['contact_id'] = $contact['id'];
 
-    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $GLOBALS["sepa_context"]["creditor_id"], 'return' => 'mandate_active'));
-    if ($creditor['mandate_active']) {
-      $apiParams['status'] = CRM_Utils_Array::value('is_recur', $params) ? 'FRST' : 'OOFF';
+    if (empty($params['is_recur'])) {
+      return $this->_createOOFFmandate($params);
     } else {
-      $apiParams['status'] = 'INIT';
+      return $this->_createRCURmandate($params);
     }
-
-    $apiParams["creation_date"]= date("YmdHis");
-
-    if (isset($apiParams['entity_id'])) {
-      CRM_Sepa_Logic_Mandates::createMandate($apiParams);
-    } else {
-      // If we don't yet have an entity to attach the mandate to, we need to postpone the mandate creation.
-      $GLOBALS['sepa_context']['mandateParams'] = $apiParams;
-    }
-    return array(true); // Need to return a non-empty array to indicate success...
   }
 
-  
+
+  function _createOOFFmandate(&$params) {
+    // fix contribution
+    $contribution = civicrm_api3('Contribution', 'create', array(
+        'id' => $params['contributionID'],
+        'total_amount' => $params['amount'],
+        'contact_id' => $params['contact_id'],
+        'financial_type_id' => $params['contributionTypeID'],
+        'payment_instrument_id' => CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name'),
+        'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+        'currency' => 'EUR',
+        'receive_date' => date('YmdHis', strtotime($params['start_date'])),
+        //'is_test' => ($this->_mode == 'test')?1:0,
+    ));
+
+    // create matching mandate
+    civicrm_api3('SepaMandate', 'create', array(
+        'contact_id'                => $params['contact_id'],
+        //'source'                    => $_REQUEST['source'],
+        'entity_table'              => 'civicrm_contribution',
+        'entity_id'                 => $contribution['id'],
+        'creation_date'             => date('YmdHis'),
+        'validation_date'           => date('YmdHis'),
+        'date'                      => date('YmdHis'),
+        'iban'                      => $params['bank_iban'],
+        'bic'                       => $params['bank_bic'],
+        'status'                    => 'OOFF',
+        'type'                      => 'OOFF',
+        'creditor_id'               => 3,  // TODO: config
+        'is_enabled'                => 1,
+      ));
+
+    return array(true);
+  }
+
+
+  function _createRCURmandate(&$params) {
+    error_log(print_r($params, 1));
+
+    // delete contribution, if any
+    if (!empty($params['contributionID'])) {
+      civicrm_api3('Contribution', 'delete', array('id'=>$params['contributionID']));
+    }
+
+    // fix recurring contribution
+    $contribution = civicrm_api3('ContributionRecur', 'create', array(
+        'id' => $params['contributionRecurID'],
+        'amount' => $params['amount'],
+        'contact_id' => $params['contact_id'],
+        'financial_type_id' => $params['contributionTypeID'],
+        'payment_instrument_id' => CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name'),
+        'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+        'currency' => 'EUR',
+        'start_date' => date('YmdHis', strtotime($params['start_date'])),
+        'create_date' => date('YmdHis'),
+        'modified_date' => date('YmdHis'),
+        'frequency_unit' => $params['frequency_unit'],
+        'frequency_interval' => $params['frequency'],
+        'cycle_day' => $params['cycle_day'],
+        'is_email_receipt' => 0,
+    ));
+
+    // create matching mandate
+    civicrm_api3('SepaMandate', 'create', array(
+        'contact_id'                => $params['contact_id'],
+        'entity_table'              => 'civicrm_contribution_recur',
+        'entity_id'                 => $params['contributionRecurID'],
+        'creation_date'             => date('YmdHis'),
+        'validation_date'           => date('YmdHis'),
+        'date'                      => date('YmdHis'),
+        'iban'                      => $params['bank_iban'],
+        'bic'                       => $params['bank_bic'],
+        'status'                    => 'FRST',
+        'type'                      => 'RCUR',
+        'creditor_id'               => 3,  // TODO: config
+        'is_enabled'                => 1,
+      ));
+
+    return array(true);
+  }
 
 
   function &error($errorCode = NULL, $errorMessage = NULL) {
