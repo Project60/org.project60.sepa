@@ -48,11 +48,14 @@
 {$form.frequency.html}
 <span id="currency_indicator"><b>EUR</b></span>
 
-
 <!-- JS Magic -->
 <script type="text/javascript">
+// translated captions
 var label_months = "{ts}month(s){/ts}";
 var label_years = "{ts}year(s){/ts}";
+
+// set default time
+cj("#start_date").val("{$today}");
 
 {literal}
 // move the frequency counter up
@@ -65,6 +68,7 @@ cj("#frequency_unit > option[value='year']").text(label_years);
 
 // set currency to EUR
 cj(".other_amount-content > input").parent().append(cj("#currency_indicator"));
+
 
 // disable the recur_selector fields if disabled
 function _is_recur_visualize() {

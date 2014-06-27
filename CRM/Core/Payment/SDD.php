@@ -89,7 +89,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $form->addDate('start_date', 
                 ts('start date'), 
                 TRUE, 
-                array('formatType' => 'today'));
+                array());
+
+    // FIXME: adjust to notice?
+    $form->assign('today', date('m/d/Y'));
 
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
@@ -124,7 +127,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     
     // copy frequency_interval unit
     $params['frequency_interval'] = $params['frequency'];
-    
+
 
     // see if the contribution type is there
     if (empty($params['contributionTypeID'])) {
