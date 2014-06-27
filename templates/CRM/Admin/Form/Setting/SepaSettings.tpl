@@ -185,9 +185,9 @@
        <h2>System Settings</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
-              <td class="label">{$form.batching_alt_update_lock_timeout.label}</td>
+              <td class="label">{$form.batching_alt_UPDATE_lock_timeout.label}</td>
               <td>
-                {$form.batching_alt_update_lock_timeout.html}
+                {$form.batching_alt_UPDATE_lock_timeout.html}
               </td>
             </tr>
        </table>

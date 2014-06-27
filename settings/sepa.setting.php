@@ -160,5 +160,17 @@ return array(
     'is_contact' => 0,
     'description' => 'FRST notice',
     'help_text' => 'FRST notice',
+  ),
+  'batching_alt_UPDATE_lock_timeout' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'batching_alt_UPDATE_lock_timeout',
+    'type' => 'String',
+    'default' => "180",
+    'add' => '4.3',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'UPDATE lock timeout',
+    'help_text' => 'UPDATE lock timeout',
   )
  );
