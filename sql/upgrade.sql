@@ -1,3 +1,7 @@
+DELETE FROM `civicrm_sdd_contribution_txgroup` USING `civicrm_sdd_txgroup` LEFT JOIN `civicrm_sdd_contribution_txgroup` ON `civicrm_sdd_contribution_txgroup`.`txgroup_id` = `civicrm_sdd_txgroup`.`id` WHERE `civicrm_sdd_txgroup`.`sdd_file_id` IS NULL;
+DELETE FROM `civicrm_sdd_txgroup` WHERE `civicrm_sdd_txgroup`.`sdd_file_id` IS NULL;
+
+
 -- Before executing following queries, manually add option 'Batched' to 'contribution_status' option group!
 -- (Under civicrm/admin/options )
 -- Parameters:

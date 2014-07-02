@@ -127,7 +127,6 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
         (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = contrib.id)
       )
     WHERE txgroup_id=$group
-      AND mandate.status IN ('FRST','OOFF','RCUR')
   ";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
@@ -155,22 +154,39 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
   $result = civicrm_api3('ContributionRecur', 'get', array_merge($params, array(
     'options' => array('limit' => 1234567890),
     'payment_instrument_id' => array('IN' => $instruments),
-    #'contribution_status_id'
+    'contribution_status_id' => array('IN' => array(
+      CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+      CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
+    )),
     'api.Contribution.getsingle' => array(
       'options' => array(
         'sort' => "$sequenceNumberField DESC",
         'limit' => 1,
       ),
     ),
-    'api.SepaCreditor.getvalue' => array(
-      'payment_processor_id' => '$value.payment_processor_id',
-      'return' => 'id',
+    'api.SepaMandate.getsingle' => array(
+      'entity_table' => 'civicrm_contribution_recur',
+      'entity_id' => '$value.id',
+      'return' => 'status',
+    ),
+    'api.Contact.getcount' => array(
+      'id' => '$value.contact_id',
+      'is_deleted' => 0,
     ),
   )));
 
   foreach ($result['values'] as $recur) {
     $lastContrib = $recur['api.Contribution.getsingle'];
-    $creditorId = $recur['api.SepaCreditor.getvalue'];
+    $mandate = $recur['api.SepaMandate.getsingle'];
+    $contactCount = $recur['api.Contact.getcount'];
+
+    if (!CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status'])) {
+      continue;
+    }
+
+    if (!$contactCount) { /* Deleted Contact (or otherwise orphaned Recur record). */
+      continue;
+    }
 
     $recurStart = date_create_from_format("!Y-m-d+", $recur['start_date']);
     $frequencyUnit = $recur['frequency_unit'];
@@ -201,10 +217,6 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
         'campaign_id' => $recur['campaign_id'],
         $sequenceNumberField => $period + 1,
       ));
-
-      $contrib = new CRM_Contribute_BAO_Contribution();
-      $contrib->get('id', $result['id']);
-      CRM_Sepa_Logic_Batching::batchContributionByCreditor($contrib, $creditorId, $paymentInstrumentId);
     } /* for($period) */
   } /* foreach($recur) */
 }

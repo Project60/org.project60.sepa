@@ -85,10 +85,6 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
     CRM_Sepa_Logic_Mandates::$methodName($id, $params);
   } else {
   }
-  if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
-    CRM_Sepa_Logic_Batching::$methodName($id, $params);
-  }
 }
 
 /**
@@ -111,10 +107,6 @@ function sepa_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
   if (method_exists('CRM_Sepa_Logic_Mandates', $methodName)) {
     CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Mandate Logic'), $methodName, 'alert');
     CRM_Sepa_Logic_Mandates::$methodName($objectId, $objectRef);
-  }
-  if (method_exists('CRM_Sepa_Logic_Batching', $methodName)) {
-    CRM_Sepa_Logic_Base::debug(ts('Calling SEPA Batching Logic'), $methodName, 'alert');
-    CRM_Sepa_Logic_Batching::$methodName($objectId, $objectRef);
   }
 }
 
