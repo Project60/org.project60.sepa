@@ -307,7 +307,7 @@ function sepa_civicrm_install() {
   $sql = file_get_contents(dirname( __FILE__ ) .'/sql/sepa.sql', true);
   CRM_Utils_File::sourceSQLFile($config->dsn, $sql, NULL, true);
 
-    //add the required option groups
+  //add the required option groups
   sepa_civicrm_install_options(sepa_civicrm_options());
 
   return _sepa_civix_civicrm_install();
@@ -464,6 +464,43 @@ function sepa_civicrm_uninstall() {
 function sepa_civicrm_enable() {
   // install/activate SEPA payment processor
   sepa_pp_install();
+
+  //create a dummy creditor if none exists
+  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
+  
+  if ($creditorCount < 1) {
+    $query = "INSERT INTO `civicrm_sdd_creditor` (
+                          `id`,
+                          `creditor_id`,
+                          `identifier`, 
+                          `name`, 
+                          `address`, 
+                          `country_id`, 
+                          `iban`, 
+                          `bic`, 
+                          `mandate_prefix`, 
+                          `payment_processor_id`, 
+                          `category`, 
+                          `tag`, 
+                          `mandate_active`, 
+                          `sepa_file_format_id`) 
+              VALUES (
+                          NULL, 
+                          '1', 
+                          'DUMMYCREDITOR', 
+                          'DUMMY CREDITOR', 
+                          '221B Baker Street', 
+                          '1082', 
+                          'DE12500105170648489890', 
+                          'INGDDEFFXXX', 
+                          'DMMY', 
+                          NULL, 
+                          NULL, 
+                          NULL, 
+                          '1', 
+                          '2');";
+    $res = CRM_Core_DAO::executeQuery($query);
+  }
   
   return _sepa_civix_civicrm_enable();
 }
