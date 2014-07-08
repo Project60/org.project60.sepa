@@ -45,7 +45,6 @@
 <!-- TWEAK THE FORM: -->
 
 <!-- Additional Elements -->
-{$form.frequency.html}
 <span id="currency_indicator"><b>EUR</b></span>
 
 <!-- JS Magic -->
@@ -58,9 +57,10 @@ var label_years = "{ts}year(s){/ts}";
 cj("#start_date").val("{$today}");
 
 {literal}
-// move the frequency counter up
-cj("#frequency_unit").parent().append(cj("#frequency"));
-cj("#frequency").parent().append(cj("#frequency_unit"));
+// fix up the frequency interval field
+cj("#frequency_interval").attr('size', 1);
+cj("#frequency_interval").attr('maxlength', 2);
+cj("#frequency_interval").attr('class', null);
 
 // adjust frequency unit counter labels
 cj("#frequency_unit > option[value='month']").text(label_months);
@@ -73,7 +73,7 @@ cj(".other_amount-content > input").parent().append(cj("#currency_indicator"));
 // disable the recur_selector fields if disabled
 function _is_recur_visualize() {
 	var is_recur = cj("#is_recur").attr('checked')=='checked';
-	cj("#frequency").attr('disabled', !is_recur);
+	cj("#frequency_interval").attr('disabled', !is_recur);
 	cj("#frequency_unit").attr('disabled', !is_recur);
 	cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
 }

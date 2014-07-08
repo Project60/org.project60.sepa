@@ -15,11 +15,63 @@
 +--------------------------------------------------------*/
 
 /**
- * Provides the SYSTOPIA SEPA payment processor
+ * Provides the SEPA payment processor
  *
  * @package CiviCRM_SEPA
  *
  */
+
+/**
+ * buildForm Hook for payment processor
+ */
+function sepa_pp_buildForm ( $formName, &$form ) {
+	if ($formName == "CRM_Admin_Form_PaymentProcessor") {
+		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
+		if ($pp['class_name'] = "Payment_SDD") {
+			// that's ours!
+			$creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3));
+			$form->assign('creditors', $creditors['values']);
+			$form->assign('cycle_day', 1);
+
+			// build cycle day options
+			$cycle_day_options = range(0,28);
+			$cycle_day_options[0] = ts('Any');
+			unset($cycle_day_options[0]); // 'any' disabled for now
+
+			// add new elements
+			$form->add('select', 'cycle_day', ts('Cycle Day'), $cycle_day_options);
+			$form->add('select', 'test_cycle_day', ts('Cycle Day'), $cycle_day_options);
+			CRM_Core_Region::instance('page-body')->add(array(
+				'template' => 'CRM/Admin/Form/PaymentProcessor/SDD.tpl'
+			));
+		}
+
+	} elseif ($formName == "CRM_Contribute_Form_Contribution_Confirm") {
+
+
+	} elseif ($formName == "CRM_Contribute_Form_Contribution_ThankYou") {
+		$form->assign("mandate_reference",	$form->_params["mandate_reference"]);
+		$form->assign("bank_iban",			$form->_params["bank_iban"]);
+		$form->assign("bank_bic",			$form->_params["bank_bic"]);
+		CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
+		  'template' => 'CRM/Contribute/Form/ContributionThankYou.tpl'));
+	}
+}
+
+/**
+ * postProcess Hook for payment processor
+ */
+function sepa_pp_postProcess( $formName, &$form ) {
+	if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
+		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
+		if ($pp['class_name'] = "Payment_SDD") {
+			$paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', 
+				array('name' => $form->_submitValues['name'], 'is_test' => 0));
+		}
+	}
+}
+
+
 
 /**
  * Will install the SEPA payment processor
