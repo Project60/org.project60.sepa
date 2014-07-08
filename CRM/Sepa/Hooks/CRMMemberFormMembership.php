@@ -15,10 +15,10 @@
 
 
 /**
- * File for the CiviCRM sepa memebership hook
+ * File is part of the original, hook-based batching
  *
+ * @deprecated in the current version
  * @package CiviCRM_SEPA
- *
  */
 
 class CRM_Sepa_Hooks_CRMMemberFormMembership {
