@@ -268,7 +268,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'mandate_prefix' => array(
           'name' => 'mandate_prefix',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Mandate numering prefix') ,
+          'title' => ts('Mandate numbering prefix') ,
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
         ) ,

@@ -2,6 +2,9 @@
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
 msgid "IBAN"
 msgstr ""
 
@@ -9,10 +12,14 @@ msgstr ""
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
 msgid "BIC"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/Form/Report/SEPAMandate.php
+#: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Country"
 msgstr ""
 
@@ -87,7 +94,7 @@ msgstr ""
 msgid "Calling SEPA Hook "
 msgstr ""
 
-#: CRM/Core/Payment/SEPA/DD.php
+#: CRM/Core/Payment/SEPA/DD.php CRM/Core/Payment/SDD.php sepa_pp_sdd.php
 msgid "SEPA Direct Debit"
 msgstr ""
 
@@ -447,7 +454,7 @@ msgstr ""
 msgid "SEPA XML File Format Variants"
 msgstr ""
 
-#: SEPA_File_Formats.mgd.php
+#: SEPA_File_Formats.mgd.php sepa.php
 msgid "pain.008.001.02 (ISO 20022/official SEPA guidelines)"
 msgstr ""
 
@@ -475,7 +482,7 @@ msgstr ""
 msgid "%1 is a required field."
 msgstr ""
 
-#: sepa.php
+#: sepa.php CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Address"
 msgstr ""
 
@@ -521,11 +528,13 @@ msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Edit"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Delete"
 msgstr ""
 
@@ -725,7 +734,7 @@ msgstr ""
 msgid "Sepa Mandate"
 msgstr ""
 
-#: templates/CRM/Sepa/Mandate.tpl
+#: templates/CRM/Sepa/Mandate.tpl templates/CRM/Core/Payment/SEPA/SDD.tpl
 msgid "Direct Debit Information"
 msgstr ""
 
@@ -734,6 +743,7 @@ msgid "I swear I have sucessfully submitted it"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
 msgid "Creditor"
 msgstr ""
 
@@ -764,7 +774,8 @@ msgstr ""
 msgid "Start Date"
 msgstr ""
 
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl sepa_pp_sdd.php
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
 msgid "Cycle Day"
 msgstr ""
 
@@ -934,6 +945,7 @@ msgid ""
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Cancel"
 msgstr ""
 
@@ -1172,4 +1184,142 @@ msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "BIC is not correct"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Sepa Direct Debit - Settings"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "- select -"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Germany"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Creditor CiviCRM ID"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Name"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Identifier"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "PAIN Version"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Settings successfully saved"
+msgstr ""
+
+#: CRM/Core/Payment/SDD.php
+msgid "day of month"
+msgstr ""
+
+#: CRM/Core/Payment/SDD.php
+msgid "start date"
+msgstr ""
+
+#: sepa.php
+msgid "pain.008.003.02 container core direct debit (CDC EBICS-2.7)"
+msgstr ""
+
+#: sepa.php
+msgid "pain.008.003.02 COR1 direct debit (CD1 EBICS-2.7)"
+msgstr ""
+
+#: sepa_pp_sdd.php
+msgid "Any"
+msgstr ""
+
+#: sepa_pp_sdd.php
+msgid "Payment processor for the 'Single European Payement Area' (SEPA)."
+msgstr ""
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid "Select the creditor, that should be used for this payment processor."
+msgstr ""
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid ""
+"The creditor object not only determines the creditor ID, but also the "
+"account and the SEPA file format to be used."
+msgstr ""
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid ""
+"Set the day of the month, on which recurring payments will be collected."
+msgstr ""
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid "You can only select days that are present in <i>every</i> month."
+msgstr ""
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
+msgid "Help"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Actions"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Copy"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "No creditors found"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Add"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Save"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor deleted"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Success"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Are you sure you want to delete this creditor?"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor updated"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+msgid "Direct Debit Payment"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+msgid "Mandate Reference"
+msgstr ""
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "month(s)"
+msgstr ""
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "year(s)"
+msgstr ""
+
+msgid "This recurring contribution will be automatically processed every %1 %2(s)."
+msgstr ""
+
+msgid "Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt."
 msgstr ""

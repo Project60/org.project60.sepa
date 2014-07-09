@@ -16,17 +16,24 @@ msgstr ""
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
 msgid "IBAN"
-msgstr ""
+msgstr "IBAN"
 
 #: CRM/Core/Payment/SEPA/DD.php sepa.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
 msgid "BIC"
-msgstr ""
+msgstr "BIC"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/Form/Report/SEPAMandate.php
+#: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Country"
 msgstr "Land"
 
@@ -40,11 +47,11 @@ msgstr "BIC"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPASddFile.php
 msgid "Tag"
-msgstr ""
+msgstr "Tag"
 
 #: CRM/Sepa/DAO/SEPACreditor.php sepa.php
 msgid "SEPA File Format"
-msgstr ""
+msgstr "SEPA Dateiformat (PAIN)"
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php
 #: CRM/Sepa/DAO/SEPATransactionGroup.php templates/CRM/Sepa/Page/DashBoard.tpl
@@ -99,11 +106,11 @@ msgstr "Konnte Kontakt %s nicht finden"
 
 #: hooks.php sepa.php
 msgid "Calling SEPA Hook "
-msgstr ""
+msgstr "Aufrufen des SEPA-Hooks"
 
-#: CRM/Core/Payment/SEPA/DD.php
+#: CRM/Core/Payment/SEPA/DD.php CRM/Core/Payment/SDD.php sepa_pp_sdd.php
 msgid "SEPA Direct Debit"
-msgstr ""
+msgstr "SEPA Einzug"
 
 #: CRM/Core/Payment/SEPA/DD.php
 msgid "Creditor ID is not set in the Administer CiviCRM &raquo; Payment Processor."
@@ -458,7 +465,7 @@ msgstr "Erzeuge XML-Datei"
 msgid "SEPA XML File Format Variants"
 msgstr ""
 
-#: SEPA_File_Formats.mgd.php
+#: SEPA_File_Formats.mgd.php sepa.php
 msgid "pain.008.001.02 (ISO 20022/official SEPA guidelines)"
 msgstr ""
 
@@ -486,7 +493,7 @@ msgstr ""
 msgid "%1 is a required field."
 msgstr "%1 ist ein Pflichtfeld"
 
-#: sepa.php
+#: sepa.php CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Address"
 msgstr ""
 
@@ -532,11 +539,13 @@ msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Edit"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Delete"
 msgstr ""
 
@@ -736,7 +745,7 @@ msgstr "SEPA Einzug erfassen"
 msgid "Sepa Mandate"
 msgstr ""
 
-#: templates/CRM/Sepa/Mandate.tpl
+#: templates/CRM/Sepa/Mandate.tpl templates/CRM/Core/Payment/SEPA/SDD.tpl
 msgid "Direct Debit Information"
 msgstr ""
 
@@ -745,6 +754,7 @@ msgid "I swear I have sucessfully submitted it"
 msgstr "Ich schwöre, ich habe alle Punkte erfolgreich durchgeführt!"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
 msgid "Creditor"
 msgstr ""
 
@@ -775,7 +785,8 @@ msgstr "Dauereinzug"
 msgid "Start Date"
 msgstr ""
 
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl sepa_pp_sdd.php
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
 msgid "Cycle Day"
 msgstr "Monatstag"
 
@@ -943,6 +954,7 @@ msgid "Completely delete this mandate along with the contribution. This is only 
 msgstr "Dieses Mandat unwiederbringlich löschen. Dies ist nur möglich da es noch nicht der Bank übermittelt wurde."
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Cancel"
 msgstr ""
 
@@ -1179,4 +1191,140 @@ msgstr "Erstellt eine PDF Prenotifikation mit den Mandatsdaten."
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "BIC is not correct"
 msgstr "BIC ist nicht korrekt."
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Sepa Direct Debit - Settings"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "- select -"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Germany"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Creditor CiviCRM ID"
+msgstr "Gläubiger CiviCRM-ID"
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Name"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Identifier"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "PAIN Version"
+msgstr "PAIN Dateiformat"
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Settings successfully saved"
+msgstr "Einstellungen gespeichert"
+
+#: CRM/Core/Payment/SDD.php
+msgid "day of month"
+msgstr "Tag des Monats"
+
+#: CRM/Core/Payment/SDD.php
+msgid "start date"
+msgstr "Stardatum"
+
+#: sepa.php
+msgid "pain.008.003.02 container core direct debit (CDC EBICS-2.7)"
+msgstr ""
+
+#: sepa.php
+msgid "pain.008.003.02 COR1 direct debit (CD1 EBICS-2.7)"
+msgstr ""
+
+#: sepa_pp_sdd.php
+msgid "Any"
+msgstr ""
+
+#: sepa_pp_sdd.php
+msgid "Payment processor for the 'Single European Payement Area' (SEPA)."
+msgstr "Zahlungsprozessor für SEPA (\"Single European Payement Area\")."
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid "Select the creditor, that should be used for this payment processor."
+msgstr "Wählen Sie den Gläubiger, der für diesen Zahlungsprozessor verwendet werden soll."
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid "The creditor object not only determines the creditor ID, but also the account and the SEPA file format to be used."
+msgstr "Der eingestellte Gläubiger bestimmt nicht nur die verwendete Gläubiger-ID, sondern auch das Eingangskonto und das eingesetzte SEPA Dateiformat."
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid "Set the day of the month, on which recurring payments will be collected."
+msgstr "Wählen Sie den Tag des Monats, an dem die wiederkehrenden Zahlungen eingezogen werden sollen."
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
+msgid "You can only select days that are present in <i>every</i> month."
+msgstr "Sie können nur Tage auswählen, die in <i>jedem</i> Monat vorkommen."
+
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
+msgid "Help"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Actions"
+msgstr "Aktionen"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Copy"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "No creditors found"
+msgstr "Keine Gläubiger gefunden."
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Add"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Save"
+msgstr "Speichern"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor deleted"
+msgstr "Gläubiger gelöscht"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Success"
+msgstr "Erfolg"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Are you sure you want to delete this creditor?"
+msgstr "Sind Sie sicher, dass Sie diesen Gläubiger löschen möchten?"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor updated"
+msgstr "Gläubiger aktualisiert"
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+msgid "Direct Debit Payment"
+msgstr "SEPA Zahlungsinformationen"
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+#, fuzzy
+msgid "Mandate Reference"
+msgstr "Mandatsreferenz"
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "month(s)"
+msgstr "Monat(e)"
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "year(s)"
+msgstr "Jahr(e)"
+
+msgid "This recurring contribution will be automatically processed every %1 %2(s)."
+msgstr "Diese wiederkehrende Zahlung wird nun automatisch alle %1 %2(e) eingezogen."
+
+msgid "Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt."
+msgstr "Ihre erste Zahlung wird eingezogen, sobald Sie die hier aufgeführten Daten bestätigt haben."
 
