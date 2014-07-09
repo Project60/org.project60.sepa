@@ -129,7 +129,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       // if the type is not passed, look it up:
       $look_up = array('name'=>$params['contributionType_name']);
       $default = null;
-      $financial_type = CRM_Financial_BAO_FinancialType::retrieve($search, $default);
+      $financial_type = CRM_Financial_BAO_FinancialType::retrieve($look_up, $default);
       $params['contributionTypeID'] = $financial_type->id;
     }
 
