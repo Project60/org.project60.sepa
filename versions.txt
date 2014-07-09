@@ -1,49 +1,6 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
-Version 0.5
-=====================
-- allow for multiple mandates
-- TODO: put parameters into settings
-- TODO: published unit tests
-
-
-Version 0.3.4 / 0.4
-===================
-- FIX (important) RCUR batching broken in certain conditions
-- FIX: copy into accounting batch for contributions with multiple financial transactions
-- alternative batching: use locks so batching processes cannot interfer with each other
-- alternative batching: included collection date deferral (e.g. for banking holidays or week ends)
-
-
-Version 0.3.3
-=============
-- FIX: (further) restrict characters on Nm field in PAIN XML
-- FIX: create SEPA form: removed duplicate entries
-- FIX: use 24h time format in batching
-- create SEPA form: improved BIC validation
-- create SEPA form: only show mandates from the last 60 days
-
-
-Version 0.3.2
-=============
-- Disable form hooks
-- added 'mark received' button to groups
-
-
-Version 0.3.1
-=============
-- Group List: copy contributions into accounting group
-- FIX: display/propagation of campaign
-- FIX: tolerate missing 'Received' batch_status
-- FIX: ignore time of day when checking notice deadlines
-- FIX: dealing with no compaign and show campaign titles
-- Dashboard: closed groups now sorted by XML file creation date
-- Dashboard: adjusted timings for colour code
-- Create Mandate/Mandate Options: use date pickers
-- Contributions Tab: mend actions for SEPA recurring contributions
-
-
-Version 0.3
+Version 1.0
 ===========
-- First alpha release
+- merged SYSTOPIA Version 0.5 (https://github.com/systopia/sepa_dd/tree/master)

@@ -2,19 +2,19 @@
 <extension key="org.project60.sepa" type="module">
   <file>sepa</file>
   <name>SEPA Direct Debit</name>
-  <description>This extension provides SEPA Direct Debit processing, with an alternative matching algorithm.</description>
+  <description>This extension provides SEPA Direct Debit processing.</description>
   <license>aGPL3</license>
   <maintainer>
-    <author>systopia</author>
+    <author>Project60</author>
     <email>endres@systopia.de</email>
   </maintainer>
   <releaseDate></releaseDate>
-  <version>0.5</version>
+  <version>1.0</version>
   <develStage>under development</develStage>
   <compatibility>
-    <ver>4.4.4</ver>
+    <ver>4.4.6</ver>
   </compatibility>
-  <comments>This module is fork of Project60's sepa_dd extension (https://github.com/Project60/sepa_dd). Current maintainer: endres@systopia.de. Original maintainer is: xavier@tttp.eu</comments>
+  <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches.</comments>
   <civix>
     <namespace>CRM/Sepa</namespace>
   </civix>
