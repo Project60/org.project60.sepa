@@ -119,7 +119,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
     $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
     while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
       // i.e. available_name is already taken, modify it
-      $available_name = $name.'_'.$counter;
+      $available_name = $name.'--'.$counter;
       $counter += 1;
       if ($counter>1000) {
         $lock->release();
