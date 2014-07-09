@@ -60,6 +60,10 @@ var earliest_rcur_date = "{$earliest_rcur_date}";
 cj("#frequency_interval").attr('size', 1);
 cj("#frequency_interval").attr('maxlength', 2);
 cj("#frequency_interval").attr('class', null);
+if (!cj("#frequency_interval").val()) {
+	// set default value of '1'
+	cj("#frequency_interval").val('1');
+}
 
 // adjust frequency unit counter labels
 cj("#frequency_unit > option[value='month']").text(label_months);
