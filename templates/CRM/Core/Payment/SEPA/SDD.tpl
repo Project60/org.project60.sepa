@@ -52,9 +52,8 @@
 // translated captions
 var label_months = "{ts}month(s){/ts}";
 var label_years = "{ts}year(s){/ts}";
-
-// set default time
-cj("#start_date").val("{$today}");
+var earliest_ooff_date = "{$earliest_ooff_date}";
+var earliest_rcur_date = "{$earliest_rcur_date}";
 
 {literal}
 // fix up the frequency interval field
@@ -69,13 +68,17 @@ cj("#frequency_unit > option[value='year']").text(label_years);
 // set currency to EUR
 cj(".other_amount-content > input").parent().append(cj("#currency_indicator"));
 
-
 // disable the recur_selector fields if disabled
 function _is_recur_visualize() {
 	var is_recur = cj("#is_recur").attr('checked')=='checked';
 	cj("#frequency_interval").attr('disabled', !is_recur);
 	cj("#frequency_unit").attr('disabled', !is_recur);
 	cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
+	if (is_recur) {
+		cj("#start_date_display").datepicker("option", 'minDate', earliest_rcur_date);
+	} else {
+		cj("#start_date_display").datepicker("option", 'minDate', earliest_ooff_date);
+	}
 }
 cj("#is_recur").change(_is_recur_visualize);
 _is_recur_visualize();

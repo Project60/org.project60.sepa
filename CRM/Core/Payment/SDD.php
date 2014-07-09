@@ -85,8 +85,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 TRUE, 
                 array());
 
-    $form->assign('today', date('m/d/Y'));
-    $form->assign('RCUR_notice_days', '8'); // FIXME: read notice period
+    $rcur_notice_days = 8; // FIXME: read notice period from settings
+    $ooff_notice_days = 5; // FIXME: read notice period from settings
+    $form->assign('earliest_rcur_date', date('m/d/Y', strtotime("now + $rcur_notice_days days")));
+    $form->assign('earliest_ooff_date', date('m/d/Y', strtotime("now + $ooff_notice_days days")));
 
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
