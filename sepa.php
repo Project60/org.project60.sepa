@@ -13,7 +13,6 @@
 +--------------------------------------------------------*/
 
 require_once 'sepa.civix.php';
-require_once 'hooks.php';
 require_once 'sepa_pp_sdd.php';
 
 
@@ -317,8 +316,6 @@ function sepa_civicrm_managed(&$entities) {
 }
 
 
-
-
 function sepa_civicrm_summaryActions( &$actions, $contactID ) {
   // add "create SEPA mandate action"
   $actions['sepa_contribution'] = array(
@@ -333,7 +330,8 @@ function sepa_civicrm_summaryActions( &$actions, $contactID ) {
 }
 
 
-/* Support SEPA mandates in merge operations
+/**
+ *  Support SEPA mandates in merge operations
  */
 function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL ) {
    switch ($type) {
@@ -351,6 +349,58 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
         $data['civicrm_sdd_mandate'] = array('contact_id');
     break;
   }
+}
+
+/** 
+ * PREVENT the user to delete a (recurring) contribution when there's a mandate attached.
+ */
+function sepa_civicrm_pre($op, $objectName, $id, &$params) {
+  // FIXME: move this into validation?
+  // disallow the deletion of a (recurring) contribution if it is attached to mandates
+  if ($op=='delete' && ($objectName=='Contribution' || $objectName=='ContributionRecur')) {
+    if ($objectName=='Contribution') {
+      $table = 'civicrm_contribution';
+    } else {
+      $table = 'civicrm_contribution_recur';
+    }
+
+    $query = "SELECT id FROM civicrm_sdd_mandate WHERE entity_id=$id AND entity_table='$table';";
+    $result = CRM_Core_DAO::executeQuery($query);
+    if ($result->fetch()) {
+      die(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"), $result->id));
+    }
+  }
+}
+
+
+// totten's addition
+function sepa_civicrm_entityTypes(&$entityTypes) {
+  // add my DAO's
+  $entityTypes[] = array(
+      'name' => 'SepaMandate',
+      'class' => 'CRM_Sepa_DAO_SEPAMandate',
+      'table' => 'civicrm_sepa_mandate',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaCreditor',
+      'class' => 'CRM_Sepa_DAO_SEPACreditor',
+      'table' => 'civicrm_sepa_creditor',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaTransactionGroup',
+      'class' => 'CRM_Sepa_BAO_SEPATransactionGroup',
+      'table' => 'civicrm_sepa_txgroup',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaSddFile',
+      'class' => 'CRM_Sepa_DAO_SEPASddFile',
+      'table' => 'civicrm_sepa_file',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaContributionGroup',
+      'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
+      'table' => 'civicrm_sepa_contribution_txgroup',
+  );
 }
 
 /**
