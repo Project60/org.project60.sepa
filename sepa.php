@@ -162,6 +162,7 @@ function sepa_civicrm_options() {
   if (!isset($result['id']))
     die ($result["error_message"]);
   $gid= $result['id'];
+
   //find the value to give to the payment instruments
   $query = "SELECT max( `weight` ) as weight FROM `civicrm_option_value` where option_group_id=" . $gid;
   $dao = new CRM_Core_DAO();
@@ -219,16 +220,19 @@ function sepa_civicrm_options() {
               'label' => ts('pain.008.001.02 (ISO 20022/official SEPA guidelines)'),
               'is_default' => 1,
               'is_reserved' => 1,
+              'value' => 1,
             ),
             'pain.008.003.02' => array(
               'label' => ts('pain.008.003.02 container core direct debit (CDC EBICS-2.7)'),
               'is_default' => 0,
               'is_reserved' => 1,
+              'value' => 2,
             ),
             'pain.008.003.02 COR1' => array(
               'label' => ts('pain.008.003.02 COR1 direct debit (CD1 EBICS-2.7)'),
               'is_default' => 0,
               'is_reserved' => 1,
+              'value' => 3,
             ),
           ),
         ),
@@ -260,41 +264,22 @@ function sepa_civicrm_enable() {
   // install/activate SEPA payment processor
   sepa_pp_install();
 
-  //create a dummy creditor if none exists
+  // create a dummy creditor if no creditor exists
+  // remark: we're within the enable hook, so we cannot use the 
   $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
-  
-  if ($creditorCount < 1) {
-    $query = "INSERT INTO `civicrm_sdd_creditor` (
-                          `id`,
-                          `creditor_id`,
-                          `identifier`, 
-                          `name`, 
-                          `address`, 
-                          `country_id`, 
-                          `iban`, 
-                          `bic`, 
-                          `mandate_prefix`, 
-                          `payment_processor_id`, 
-                          `category`, 
-                          `tag`, 
-                          `mandate_active`, 
-                          `sepa_file_format_id`) 
-              VALUES (
-                          NULL, 
-                          '1', 
-                          'DUMMYCREDITOR', 
-                          'DUMMY CREDITOR', 
-                          '221B Baker Street', 
-                          '1082', 
-                          'DE12500105170648489890', 
-                          'INGDDEFFXXX', 
-                          'DMMY', 
-                          NULL, 
-                          NULL, 
-                          NULL, 
-                          '1', 
-                          '2');";
-    $res = CRM_Core_DAO::executeQuery($query);
+  if (empty($creditorCount)) {
+    $dummy_creditor = array(
+      'creditor_id'         => 1,
+      'identifier'          => 'DUMMYCREDITOR',
+      'name'                => 'DUMMY CREDITOR',
+      'address'             => '221B Baker Street\nLondon',
+      'country_id'          => '1226',
+      'iban'                => 'DE12500105170648489890',
+      'bic'                 => 'TESTTEST',
+      'mandate_active'      => 1,
+      'sepa_file_format_id' => 1,
+      );
+    CRM_Sepa_BAO_SEPACreditor::add($dummy_creditor);
   }
   
   return _sepa_civix_civicrm_enable();
