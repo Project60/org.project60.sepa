@@ -47,6 +47,11 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
   function doDirectPayment(&$params) {
     $params['trxn_id'] = "TODO GENERATE MANDATE ID";
 
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array(
+      'payment_processor_id' => $params['payment_processor_id'],
+      'return' => array('id', 'mandate_active'),
+    ));
+
     // create the mandate
     if ($this->_mode == 'test') {
       $params['trxn_id'] = "TEST:" . $params['trxn_id'];
@@ -55,7 +60,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         "iban"=> $params["bank_iban"],
         "bic" => $params["bank_bic"],
         );
-    $apiParams ["creditor_id"] = $GLOBALS["sepa_context"]["creditor_id"];
+    $apiParams['creditor_id'] = $creditor['id'];
     // set the contract entity for this mandate
     if (CRM_Utils_Array::value('is_recur', $params) &&
         $params['contributionRecurID']
@@ -76,7 +81,6 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       // so we don't have an entity ID here yet...
     }
 
-    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $GLOBALS["sepa_context"]["creditor_id"], 'return' => 'mandate_active'));
     if ($creditor['mandate_active']) {
       $apiParams['status'] = CRM_Utils_Array::value('is_recur', $params) ? 'FRST' : 'OOFF';
     } else {

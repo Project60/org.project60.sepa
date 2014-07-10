@@ -45,15 +45,6 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
       return;
     $GLOBALS["sepa_context"]["processor_id"] = $pp['id'];
 
-    // get the creditor info as well
-    $cred = civicrm_api("SepaCreditor","get"
-      ,array("version"=>3,"sequential"=>1,"payment_processor_id"=>$pp['id']));
-    if ($cred["count"] == 0) {
-       CRM_Core_Error::fatal('creditor not set for the payment processor '. $pp["id"]);   
-    }
-    $cred = $cred["values"][0];
-    $GLOBALS["sepa_context"]["creditor_id"] = $cred['id'];
-
     $type = $fields['is_recur'] ? 'FRST' : 'OOFF';
     $GLOBALS["sepa_context"]["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
