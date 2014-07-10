@@ -54,12 +54,6 @@
      <h3>Creditor Information</h3>
      <table id="creditorinfo" class="form-layout">
             <tr>
-              <td class="label">{$form.addcreditor_creditor_id.label}</td>
-              <td>
-                {$form.addcreditor_creditor_id.html}
-              </td>
-            </tr>
-            <tr>
               <td class="label">{$form.addcreditor_name.label}</td>
               <td>
                 {$form.addcreditor_name.html}
@@ -270,7 +264,6 @@
           if (!isCopy) {
             cj('#edit_creditor_id').val(data['id']);
           }
-          cj('#addcreditor_creditor_id').val(data['creditor_id']);
           cj('#addcreditor_name').val(data['name']);
           cj('#addcreditor_address').val(data['address']);
           cj('#addcreditor_country_id').val(data['country_id']);
@@ -296,7 +289,6 @@
 
     var map = new Array();
     map["edit_creditor_id"]         = "id";
-    map["addcreditor_creditor_id"]  = "creditor_id";
     map["addcreditor_name"]         = "name";
     map["addcreditor_address"]      = "address";
     map["addcreditor_country_id"]   = "country_id";
@@ -349,7 +341,7 @@
                       delete param[name][creditorId];
                     }
 
-                    param[name] = JSON.stringify(param[name]);;
+                    param[name] = JSON.stringify(param[name]);
 
                     CRM.api('Setting', 'create', param, {success: function(data) {
                          CRM.alert("{/literal}{ts}Creditor updated{/ts}", "{ts}Success{/ts}{literal}", "success");
