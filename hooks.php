@@ -43,7 +43,6 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
       ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
     if("Payment_SEPA_DD" != $pp["class_name"])
       return;
-    $GLOBALS["sepa_context"]["processor_id"] = $pp['id'];
 
     $type = $fields['is_recur'] ? 'FRST' : 'OOFF';
     $GLOBALS["sepa_context"]["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
