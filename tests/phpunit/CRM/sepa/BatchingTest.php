@@ -153,10 +153,10 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     // test whether exactly one txgroup has been created
     $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
     // check txgroup attributes
-    $collectionDate = date('Y-m-d', strtotime('+8 days')); // TODO: Use config file instead
+    $collectionDate = date('Y-m-d', strtotime('+14 days')); // TODO: Use config file instead
     $searchParams = array(
       "id" => 1,
-      "reference" => sprintf("TXG-3-OOFF-%s", $collectionDate),
+      //"reference" => sprintf("TXG-3-OOFF-%s", $collectionDate), TODO: bug 
       "type" => "OOFF",
       "collection_date" => sprintf("%s 00:00:00", $collectionDate),
       "latest_submission_date" => sprintf("%s 00:00:00", date('Y-m-d')),
@@ -347,7 +347,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'amount' => 543.21,
       'contribution_status_id' => 1,
-      'start_date' => date("Ymd", strtotime("+14 days")),
+      'start_date' => date("Ymd", strtotime("+10 days")),
       'currency' => "EUR",
       'financial_type_id' => 1
     );
@@ -552,5 +552,40 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
     // mark the group as received
     $this->callAPIFailure("SepaAlternativeBatching", "received", array("txgroup_id"=>1));
+  }
+
+  // test for https://github.com/Project60/sepa_dd/issues/128
+  public function testUpdateAfterClosedRCUR() {
+    $result = $this->createContactAndRecurContrib();
+
+    // 1. create a due FRST group
+
+    // 1.1 create a mandate
+    $txmd5 = md5(date("YmdHis"));
+    $apiParams = array(
+      "type" => "RCUR",
+      "reference" => $txmd5,
+      "status" => "FRST",
+      "source" => "TestSource",
+      "date" => date("Y-m-d H:i:s", strtotime("-130 days")),
+      "creditor_id" => "3",
+      "contact_id" => $result["contactId"],
+      "iban" => "0000000000000000010001",
+      "bic"  => "COLSDE22XXX",
+      "creation_date" => date("Y-m-d H:i:s", strtotime("-130 days")),
+      "entity_table" => "civicrm_contribution_recur",
+      "entity_id" => $result["contribution"]["id"]
+      );
+
+    $this->callAPISuccess("SepaMandate", "create", $apiParams);
+
+    // close the group
+    $this->callAPISuccess("SepaAlternativeBatching", "closeended", array("txgroup_id"=>1));
+
+    // update txgroup
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
+    
+    // test whether there is more than one payment
+    $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
   }
 }
