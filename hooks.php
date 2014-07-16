@@ -18,7 +18,10 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     }
   }
   
-  if ("CRM_Contribute_Form_Contribution_Main"  == $formName) { 
+  if ("CRM_Contribute_Form_Contribution_Main"  == $formName || /* Online Contribution Page. */
+      "CRM_Contribute_Form_Contribution" == $formName || /* Back-office Contribution form (new or edit). */
+      "CRM_Contribute_Form_UpdateSubscription" == $formName /* Contribution Recur record edit. */
+  ) {
     require_once("packages/php-iban-1.4.0/php-iban.php");
     if (array_key_exists ("bank_iban",$fields)) {
       if (!verify_iban($fields["bank_iban"])) {
