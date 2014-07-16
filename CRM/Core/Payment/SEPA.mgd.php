@@ -20,7 +20,7 @@ return array (
     "url_recur_test_default"=>"",
     "billing_mode"=>"1", //form, seems to be the easiest
     "is_recur"=>"1",
-    "payment_type"=>"9000" // SDD - needs to be changed and pick up the value from the option values
+    "payment_type" => 1, /* Pretend we are a Credit Card processor, as the back-office Add Contribution form doesn't admit others. */
     ),
   ),
 );

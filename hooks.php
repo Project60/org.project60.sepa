@@ -18,7 +18,10 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     }
   }
   
-  if ("CRM_Contribute_Form_Contribution_Main"  == $formName) { 
+  if ("CRM_Contribute_Form_Contribution_Main"  == $formName || /* Online Contribution Page. */
+      "CRM_Contribute_Form_Contribution" == $formName || /* Back-office Contribution form (new or edit). */
+      "CRM_Contribute_Form_UpdateSubscription" == $formName /* Contribution Recur record edit. */
+  ) {
     require_once("packages/php-iban-1.4.0/php-iban.php");
     if (array_key_exists ("bank_iban",$fields)) {
       if (!verify_iban($fields["bank_iban"])) {
@@ -35,24 +38,23 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     }
   }
 
-  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || 
-      "CRM_Contribute_Form_Contribution_Main" == $formName) { 
+  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || /* On-line Contribution Page. (PP invoked here if a confirmation page is used.) */
+      "CRM_Contribute_Form_Contribution_Main" == $formName || /* On-line Contribution Page. (PP invoked here if no confirmation page is used.) */
+      "CRM_Contribute_Form_Contribution" == $formName && empty($form->_values) /* New back-office Contribution. */
+  ) {
     // check whether this is a SDD contribution, in which case we need to build
     // the context for the mandate logic to pickup up some values
+    if (isset($fields['payment_processor_id'])) {
+      $paymentProcessorId = $fields['payment_processor_id']; /* Back-office Contribution form sets this one... */
+    } elseif (isset($fields['payment_processor'])) {
+      $paymentProcessorId = $fields['payment_processor']; /* Online Contribution Page sets that one... */
+    } else {
+      return; /* "Normal" back-office Contribution not using a PP. */
+    }
     $pp= civicrm_api("PaymentProcessor","getsingle"
-      ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
+      ,array("version"=>3,"id"=>$paymentProcessorId));
     if("Payment_SEPA_DD" != $pp["class_name"])
       return;
-    $GLOBALS["sepa_context"]["processor_id"] = $pp['id'];
-
-    // get the creditor info as well
-    $cred = civicrm_api("SepaCreditor","get"
-      ,array("version"=>3,"sequential"=>1,"payment_processor_id"=>$pp['id']));
-    if ($cred["count"] == 0) {
-       CRM_Core_Error::fatal('creditor not set for the payment processor '. $pp["id"]);   
-    }
-    $cred = $cred["values"][0];
-    $GLOBALS["sepa_context"]["creditor_id"] = $cred['id'];
 
     $type = $fields['is_recur'] ? 'FRST' : 'OOFF';
     $GLOBALS["sepa_context"]["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
