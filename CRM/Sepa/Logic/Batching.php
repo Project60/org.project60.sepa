@@ -140,15 +140,23 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       }
     }
 
-    /* Finally, create the File and Groups in DB. */
+    /* Finally, create the File(s) and Groups in DB. */
     if (!empty($groups)) {
       $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditorId));
       $tag = (isset($creditor['tag'])) ? $creditor['tag'] : $creditor['mandate_prefix'];
 
-      $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+      $perBatchFiles = false; /* DiCo hack */
+
+      if (!$perBatchFiles) {
+        $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+      }
 
       foreach ($groups as $type => $dates) {
         foreach ($dates as $collectionDate => $ids) {
+          if ($perBatchFiles) {
+            $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+          }
+
           $paymentInstrumentId = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
           $txGroup = self::createTxGroup($creditorId, $type, $collectionDate, $paymentInstrumentId, $sddFile->id);
 
@@ -160,10 +168,16 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
             self::setContributionStatus($contributionId, CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'));
           }
+
+          if ($perBatchFiles) {
+            civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
+          }
         }
       }
 
-      civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
+      if (!$perBatchFiles) {
+        civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
+      }
     }
   }
 
