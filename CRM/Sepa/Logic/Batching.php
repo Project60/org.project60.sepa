@@ -73,6 +73,12 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     $contribution->contribution_status_id = $statusId;
     $contribution->receive_date = date('YmdHis', strtotime($contribution->receive_date)); /* BAO fails to accept own date format... */
+    if (isset($contribution->receipt_date)) {
+      $contribution->receipt_date = date('YmdHis', strtotime($contribution->receipt_date));
+    }
+    if (isset($contribution->thankyou_date)) {
+      $contribution->thankyou_date = date('YmdHis', strtotime($contribution->thankyou_date));
+    }
     $contribution->save();
   }
 
