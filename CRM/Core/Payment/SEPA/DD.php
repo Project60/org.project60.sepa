@@ -81,7 +81,12 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       // so we don't have an entity ID here yet...
     }
 
-    if ($creditor['mandate_active']) {
+    if (isset($params['hidden_processor'])) { /* Seems to be the best indication for an actual Online Contribution (through Contribution Page) vs. a back-office Contribution. */
+      $mandateActive = $creditor['mandate_active']; /* Online => use PP default. */
+    } else {
+      $mandateActive = CRM_Utils_Array::value('sepa_active', $params); /* Back-office => selected in form. */
+    }
+    if ($mandateActive) {
       $apiParams['status'] = CRM_Utils_Array::value('is_recur', $params) ? 'FRST' : 'OOFF';
     } else {
       $apiParams['status'] = 'INIT';

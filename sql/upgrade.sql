@@ -1,3 +1,7 @@
+UPDATE `civicrm_payment_processor_type` SET `payment_type` = 1 WHERE `payment_type` = 9000;
+UPDATE `civicrm_payment_processor` SET `payment_type` = 1 WHERE `payment_type` = 9000;
+
+
 DELETE FROM `civicrm_sdd_contribution_txgroup` USING `civicrm_sdd_txgroup` LEFT JOIN `civicrm_sdd_contribution_txgroup` ON `civicrm_sdd_contribution_txgroup`.`txgroup_id` = `civicrm_sdd_txgroup`.`id` WHERE `civicrm_sdd_txgroup`.`sdd_file_id` IS NULL;
 DELETE FROM `civicrm_sdd_txgroup` WHERE `civicrm_sdd_txgroup`.`sdd_file_id` IS NULL;
 

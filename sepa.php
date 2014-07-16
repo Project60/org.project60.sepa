@@ -169,37 +169,142 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       'template' => 'Sepa/Contribute/Form/Contribution/ThankYou.tpl'));
   }
 
-  if ("CRM_Contribute_Form_Contribution" == $formName
-      && isset($form->_values) // Deal with weird recursive partial invocation...
-  ) {
-    if (!array_key_exists("contribution_recur_id",$form->_values)) {
-      // This is a one-off contribution => insert mandate block.
+  if ("CRM_Contribute_Form_Contribution" == $formName) { /* Backoffice Contribution add/edit form */
+    if (!empty($form->_mode)) { /* Submitting new PP-based contribution => need to adjust payment fields if SDD. */
+      $formType = $form->get_template_vars('formType');
+      if (empty($formType)) {
+        /* Main Contribution form. */
+        $paymentProcessorId = CRM_Utils_Array::value('payment_processor_id', $form->_submitValues);
+        if (!$paymentProcessorId) {
+          /* No PP choice submitted yet => need to find the one pre-selected when form was first loaded. */
+          list($paymentProcessorId) = array_keys($form->_processors); /* The option lists always put the default first. */
+        }
+        $className = civicrm_api3('PaymentProcessor', 'getvalue', array('id' => $paymentProcessorId, 'return' => 'class_name'));
+        if ($className == 'Payment_SEPA_DD') {
+          /* The currently selected PP is an SDD one => swap out the Credit Card stuff. */
 
-      if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id'])))
-        return;
+          /* When processing the submitted form, we need to swap out the fields in the main form object. */
+          if ($form->_flagSubmitted) {
+            /* Get rid of CreditCard fields.
+             * (Many of them are mandatory, and thus really in the way when processing the submitted form.) */
+            foreach (array_keys($form->_paymentFields) as $fieldName) {
+              $form->removeElement($fieldName);
+            }
 
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
-      $form->assign($mandate);
+            /* Fields we actually want processed and passed to the PP. */
+            $form->addElement('checkbox', 'sepa_active');
+            $form->addElement('text', 'bank_bic');
+            $form->addElement('text', 'bank_iban');
+          }
 
-      $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue(CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']));
-      $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
-      $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
+          /* When building the form for actual (re)display -- i.e. on first load or after validation failure -- we need to swap out the Credit Card pane. */
+          { /* There doesn't seem to be an obvious conditional for checking whether the form will be (re)displayed -- so just do this unconditionally. */
+            $allPanes = $form->get_template_vars('allPanes');
+            $sepaPane = array(ts('SEPA Mandate') => array(
+              'url' => CRM_Utils_System::url('civicrm/contact/view/contribution', "snippet=4&formType=SDD&mode={$form->_mode}"),
+              'open' => true,
+              'id' => 'SDD',
+            ));
 
-      CRM_Core_Region::instance('page-body')->add(array(
-        'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
-      ));
+            /* Like array_splice(), but preserves the key(s) of the replacement array.
+             * Another entry in the category "useful functions PHP could provide, but doesn't"... */
+            $array_splice_assoc = function(&$input, $offset, $length = 0, $replacement = array()) {
+              $tail = array_splice($input, $offset);
+              $extracted = array_splice($tail, 0, $length);
+              $input += $replacement + $tail;
+              return $extracted;
+            };
+
+            $array_splice_assoc($allPanes, array_search(ts('Credit Card Information'), array_keys($allPanes)), 1, $sepaPane);
+            $form->assign('allPanes', $allPanes);
+
+            $form->assign('processorSupportsFutureStartDate', true); /* Tell the template to display the "Start Date" field. */
+          }
+        } /* Selected PP is SDD */
+
+        /* Switch between CreditCard and SDD panes dynamically when changing PP selection. */
+        $js = <<<'EOD'
+cj('select#payment_processor_id').change( function() {
+  paymentProcessorId = cj(this).val();
+  CRM.api('PaymentProcessor', 'getvalue', {'q': 'civicrm/ajax/rest', 'id': paymentProcessorId, 'return': 'class_name'}, {success: function(data) {
+    isSDD = (data.result == 'Payment_SEPA_DD');
+
+    SDDBlock = cj('.crm-SDD-accordion')[0];
+    CreditCardBlock = cj('.crm-CreditCard-accordion')[0];
+
+    if (!isSDD && SDDBlock) {
+      oldBlock = SDDBlock;
+      newType = 'CreditCard';
+      newName = ts('Credit Card Information');
+    } else if (isSDD && CreditCardBlock) {
+      oldBlock = CreditCardBlock;
+      newType = 'SDD';
+      newName = ts('SEPA Mandate');
     } else {
-      // This is an installment of a recurring contribution.
-      if (false) { //TODO remove definitely if we don't do anything with it
-        //should we be able to set the mandate info from the contribution?
-        $id=$form->_values['contribution_recur_id'];
-        $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
-        if (!array_key_exists("id",$mandate))
-          return;
-        //TODO, add in the form? link to something else?
-      }
+      return;
     }
-  }
+
+    oldBlock.outerHTML = '\n\
+      <div class="crm-accordion-wrapper crm-ajax-accordion crm-' + newType + '-accordion ">\n\
+        <div class="crm-accordion-header" id="' + newType + '">\n\
+          ' + newName + '\n\
+        </div>\n\
+        <div class="crm-accordion-body">\n\
+          <div class="' + newType + '"></div>\n\
+        </div>\n\
+      </div>\n\
+    ';
+    loadPanes(newType);
+  }});
+});
+EOD;
+        CRM_Core_Region::instance('page-header')->add(array('jquery' => $js));
+      } elseif($formType == 'SDD') {
+        /* SDD subform invoked from main form (in place of Credit Card pane) => build Mandate fields. */
+        $form->add('checkbox', 'sepa_active', ts('Active mandate'))->setValue(1);
+        $form->addElement('text', 'bank_bic', ts('BIC'), array('size' => 11, 'maxlength' => 11));
+        $form->addElement('text', 'bank_iban', ts('IBAN'), array('size' => 34, 'maxlength' => 34));
+
+        /* Tell the template to load the $formType (i.e. 'SDD') subform from templates/CRM/Contribute/Form/AdditionalInfo/SDD.tpl
+         * instead of displaying the main Contribution form. */
+        $form->assign('showAdditionalInfo', 1);
+
+        /* The SDD pane template needs to include the CreditCard template for the recur handling JS;
+         * but we don't want the actual Credit Card billing block => disable it. */
+        CRM_Core_Region::instance('billing-block')->update('default', array('disabled' => true));
+      }
+    } else { /* Not a new PP contribution. (I.e. editing existing PP contribution; or adding/editing non-PP contribution.) */
+      if (isset($form->_values)) { // Deal with weird recursive partial invocation...
+        if (!array_key_exists("contribution_recur_id",$form->_values)) {
+          // This is a one-off contribution => insert mandate block.
+
+          if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $form->_values['payment_instrument_id'])))
+            return;
+
+          $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
+          $form->assign($mandate);
+
+          $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue(CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']));
+          $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
+          $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
+
+          CRM_Core_Region::instance('page-body')->add(array(
+            'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
+          ));
+        } else {
+          // This is an installment of a recurring contribution.
+          if (false) { //TODO remove definitely if we don't do anything with it
+            //should we be able to set the mandate info from the contribution?
+            $id=$form->_values['contribution_recur_id'];
+            $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$id));
+            if (!array_key_exists("id",$mandate))
+              return;
+            //TODO, add in the form? link to something else?
+          }
+        }
+      }
+    } /* Not a new PP Contribution. */
+  } /* Backoffice Contribution add/edit form */
 
   if ("CRM_Contribute_Form_UpdateSubscription" == $formName && $form->_paymentProcessor["class_name"] == "Payment_SEPA_DD") {
     $id= $form->getVar( '_crid' );

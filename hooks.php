@@ -38,12 +38,21 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     }
   }
 
-  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || 
-      "CRM_Contribute_Form_Contribution_Main" == $formName) { 
+  if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || /* On-line Contribution Page. (PP invoked here if a confirmation page is used.) */
+      "CRM_Contribute_Form_Contribution_Main" == $formName || /* On-line Contribution Page. (PP invoked here if no confirmation page is used.) */
+      "CRM_Contribute_Form_Contribution" == $formName && empty($form->_values) /* New back-office Contribution. */
+  ) {
     // check whether this is a SDD contribution, in which case we need to build
     // the context for the mandate logic to pickup up some values
+    if (isset($fields['payment_processor_id'])) {
+      $paymentProcessorId = $fields['payment_processor_id']; /* Back-office Contribution form sets this one... */
+    } elseif (isset($fields['payment_processor'])) {
+      $paymentProcessorId = $fields['payment_processor']; /* Online Contribution Page sets that one... */
+    } else {
+      return; /* "Normal" back-office Contribution not using a PP. */
+    }
     $pp= civicrm_api("PaymentProcessor","getsingle"
-      ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
+      ,array("version"=>3,"id"=>$paymentProcessorId));
     if("Payment_SEPA_DD" != $pp["class_name"])
       return;
 
