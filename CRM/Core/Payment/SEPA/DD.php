@@ -79,6 +79,12 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       // Note: for one-off contributions,
       // the contribution record is created only *after* invoking doDirectPayment() --
       // so we don't have an entity ID here yet...
+
+      /* When creating Contributions through the back-office form, a Start Date can be entered;
+       * and for OOFF contributions, CiviCRM automatically passes it as `receive_date` here.
+       * However, for some reason it isn't passed in the same way to the actual Contribution create --
+       * thus we need to save it here, so we can later set it for the Contribution explicitly. */
+      $GLOBALS['sepa_context']['receive_date'] = $params['receive_date'];
     }
 
     if (isset($params['hidden_processor'])) { /* Seems to be the best indication for an actual Online Contribution (through Contribution Page) vs. a back-office Contribution. */
