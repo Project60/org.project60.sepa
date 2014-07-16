@@ -151,7 +151,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditorId));
       $tag = (isset($creditor['tag'])) ? $creditor['tag'] : $creditor['mandate_prefix'];
 
-      $perBatchFiles = false; /* DiCo hack */
+      $perBatchFiles = true; /* Versoehnungsbund hack */
 
       if (!$perBatchFiles) {
         $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
