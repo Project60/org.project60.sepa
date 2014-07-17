@@ -85,6 +85,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   /**
    */
   public static function batchForSubmit($submitDate, $creditorId) {
+    set_time_limit(0); /* This action can take quite long... */
+
     $maximumAdvanceDays = 14; // Default per SEPA Rulebook.
     $dateRangeEnd = date('Y-m-d', strtotime("$submitDate + $maximumAdvanceDays days"));
 
@@ -190,6 +192,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   /**
    */
   public static function updateStatus($txgroupParams, $statusId, $fromStatusId) {
+    set_time_limit(0); /* This action can take quite long... */
+
     $useApi = false;
     $contributionStatusId = $groupStatusId = $statusId;
     switch (CRM_Core_OptionGroup::getValue('contribution_status', $statusId, 'value', 'String', 'name')) {

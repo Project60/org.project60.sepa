@@ -142,6 +142,8 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
 /**
  */
 function civicrm_api3_sepa_contribution_group_createnext($params) {
+  set_time_limit(0); /* This action can take quite long... */
+
   $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
 
   $today = date_create('00:00');
