@@ -86,6 +86,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
    */
   public static function batchForSubmit($submitDate, $creditorId) {
     $maximumAdvanceDays = 14; // Default per SEPA Rulebook.
+    $maximumAdvanceDays = 28; /* Versoehnungsbund hack. (Sparkasse accepts longer advance times, up to 30 days?) */
     $dateRangeEnd = date('Y-m-d', strtotime("$submitDate + $maximumAdvanceDays days"));
 
     #$result = civicrm_api3('SepaCreditor', 'getsingle', array(
