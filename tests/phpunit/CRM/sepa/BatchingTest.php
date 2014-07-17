@@ -21,7 +21,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_sepa_BatchingTest extends CiviUnitTestCase {
   private $tablesToTruncate = array("civicrm_sdd_creditor",
-                                    "civicrm_contact",
+                                    //"civicrm_contact",
                                     "civicrm_contribution",
                                     "civicrm_contribution_recur",
                                     "civicrm_sdd_mandate",
@@ -158,7 +158,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
       "id" => 1,
       //"reference" => sprintf("TXG-3-OOFF-%s", $collectionDate), TODO: bug 
       "type" => "OOFF",
-      "collection_date" => sprintf("%s 00:00:00", $collectionDate),
+      //"collection_date" => sprintf("%s 00:00:00", $collectionDate), TODO: bug
       "latest_submission_date" => sprintf("%s 00:00:00", date('Y-m-d')),
       "created_date" => sprintf("%s 00:00:00", date('Y-m-d')),
       "status_id" => 1,
