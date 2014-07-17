@@ -3,8 +3,6 @@ require_once 'CRM/Core/Page.php';
 
 class CRM_Sepa_Page_BatchingAction extends CRM_Core_Page {
   function run() {
-    set_time_limit(0); /* These actions can take quite long... */
-
     /* Use '_action', because plain 'action' is a magic value subjected to special handling. */
     $action = CRM_Utils_Request::retrieve('_action', 'String', $_ = null, true);
     switch ($action) {
