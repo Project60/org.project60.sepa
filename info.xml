@@ -9,7 +9,7 @@
     <email>info@sfe-ev.org</email>
   </maintainer>
   <releaseDate>2014-07-17</releaseDate>
-  <version>versoehnungsbund-production-5</version>
+  <version>versoehnungsbund-production-5.2</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>4.3</ver>
