@@ -67,7 +67,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         }
 
         // add all form elements and validation rules
- 		    foreach ($this->config_fields as $key => $value) {
+        foreach ($this->config_fields as $key => $value) {
             $this->addElement('text', $this->domainToString($value[0]), ts($value[1]));
             $this->addRule($this->domainToString($value[0]), 
                        ts("Please enter the $value[1] as number (integers only)."),

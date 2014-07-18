@@ -264,21 +264,29 @@ function sepa_civicrm_enable() {
   sepa_pp_install();
 
   // create a dummy creditor if no creditor exists
-  // remark: we're within the enable hook, so we cannot use the 
-  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
+  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');    
   if (empty($creditorCount)) {
-    $dummy_creditor = array(
-      'creditor_id'         => 1,
-      'identifier'          => 'DUMMYCREDITOR',
-      'name'                => 'DUMMY CREDITOR',
-      'address'             => '221B Baker Street\nLondon',
-      'country_id'          => '1226',
-      'iban'                => 'DE12500105170648489890',
-      'bic'                 => 'TESTTEST',
-      'mandate_active'      => 1,
-      'sepa_file_format_id' => 1,
-      );
-    CRM_Sepa_BAO_SEPACreditor::add($dummy_creditor);
+    // to create, we need to first find a default contact
+    $default_contact = 0;
+    $domains = civicrm_api('Domain', 'get', array('version'=>3));
+    foreach ($domains['values'] as $domain) {
+      if (!empty($domain['contact_id'])) {
+        $default_contact = $domain['contact_id'];
+        break;
+      }
+    }
+
+    if (empty($default_contact)) {
+      error_log("org.project60.sepa_dd: Cannot install dummy creditor - no default contact found.");
+    } else {
+      // remark: we're within the enable hook, so we cannot use our own API/BAOs...
+      $create_creditor_sql = "
+      INSERT INTO civicrm_sdd_creditor 
+      (`creditor_id`,    `identifier`,      `name`,           `address`,                   `country_id`, `iban`,                   `bic`,      `mandate_prefix`, `mandate_active`, `sepa_file_format_id`)
+      VALUES
+      ($default_contact, 'DEDUMMYCREDITOR', 'DUMMY CREDITOR', '221B Baker Street\nLondon', '1226',       'DE12500105170648489890', 'TESTTEST', 'TEST',           1,                1);";
+      CRM_Core_DAO::executeQuery($create_creditor_sql);
+    }
   }
   
   return _sepa_civix_civicrm_enable();
