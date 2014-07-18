@@ -21,7 +21,7 @@ require_once "CiviTest/CiviUnitTestCase.php";
  */
 class CRM_sepa_MandateTest extends CiviUnitTestCase {
   private $tablesToTruncate = array("civicrm_sdd_creditor",
-                                    "civicrm_contact",
+                                    //"civicrm_contact",
                                     "civicrm_contribution",
                                     "civicrm_sdd_mandate"
                                     );

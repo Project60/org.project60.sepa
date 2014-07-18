@@ -78,16 +78,34 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         }
 
         // country drop down field
+        $config = CRM_Core_Config::singleton();
         $i18n = CRM_Core_I18n::singleton();
-        $country = array();
-        CRM_Core_PseudoConstant::populate($country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
-        $i18n->localizeArray($country, array('context' => 'country'));
-        asort($country);
+
+        $climit = array();
+        $cnames = array();
+        $ciso = array();
+        $filtered = array();
+
+        $climit = $config->countryLimit();
+        CRM_Core_PseudoConstant::populate($cnames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
+        CRM_Core_PseudoConstant::populate($ciso, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
+
+        foreach ($ciso as $key => $value) {
+          foreach ($climit as $active_country) {
+            if ($active_country == $value) {
+              $filtered[$key] = $cnames[$key];
+            }
+          }
+        }
+        
+        $i18n->localizeArray($filtered, array('context' => 'country'));
+        asort($filtered);
 
         // do not use array_merge() because it discards the original indizes
-        $country_ids = array('' => ts('- select -')) + $country;
+        $country_ids = array('' => ts('- select -')) + $filtered;
 
         // add creditor form elements
+        $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor Owner"));
         $this->addElement('text', 'addcreditor_name', ts("Name"));
         $this->addElement('text', 'addcreditor_id', ts("Identifier"));
         $this->addElement('text', 'addcreditor_address', ts("Address"));
@@ -96,6 +114,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text', 'addcreditor_iban', ts("IBAN"));
         $this->addElement('select', 'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('hidden', 'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
+        $this->addElement('hidden', 'add_creditor_id', '', array('id' => 'add_creditor_id'));
 
         // add all form elements and validation rules
         $index = 0;

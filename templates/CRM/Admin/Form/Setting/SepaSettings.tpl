@@ -46,7 +46,7 @@
       {else}
         <p style="text-align: center;">{ts}No creditors found{/ts}</p>
       {/if}
-      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500);">
+      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); resetValues();">
         <span><div class="icon add-icon"></div>{ts}Add{/ts}</span>
       </a><br/>
       <div id="addcreditor" style="display:none;">
@@ -95,12 +95,9 @@
                 {$form.addcreditor_pain_version.html}
               </td>
             </tr>
-            <tr>
-              <td>
-                {$form.edit_creditor_id.html}
-              </td>
-            </tr>
        </table>
+       {$form.add_creditor_id.html}
+       {$form.edit_creditor_id.html}
      <h3>Custom Batching Settings</h3>
      <table id="custombatching" class="form-layout">
             <tr class="crm-custom-form-block-ooff-horizon-days">
@@ -144,7 +141,7 @@
           <a class="save button" title="Save" onclick="updateCreditor()">
             <span>{ts}Save{/ts}</span>
           </a>
-          <a class="cancel button" title="Cancel" onclick="resetValues()">
+          <a class="cancel button" title="Cancel" onclick="resetValues(); cj('#addcreditor').hide(500);">
             <span>{ts}Cancel{/ts}</span>
           </a><br/>
        </div>
@@ -209,6 +206,23 @@
 <script type="text/javascript">
   cj('#edit_creditor_id').val("none");
   
+  cj(function() {
+    var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact' h=0}"{literal};
+
+    cj('#addcreditor_creditor_id').autocomplete(contactUrl, {
+          width: 200,
+          selectFirst: false,
+          minChars: 1,
+          matchContains: true,
+          delay: 400,
+          max: 1
+    }).result(function(event, data, formatted) {
+         cj('#addcreditor_creditor_id').val(data[0]);
+         cj('#add_creditor_id').val(data[1]);
+         return false;
+      });
+    });
+
   var customBatchingParams = [
               ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon", null],
               ["batching_alt_OOFF_notice_override",  "custom_OOFF_notice", null],
@@ -264,6 +278,7 @@
           if (!isCopy) {
             cj('#edit_creditor_id').val(data['id']);
           }
+          cj('#add_creditor_id').val(data['creditor_id']);
           cj('#addcreditor_name').val(data['name']);
           cj('#addcreditor_address').val(data['address']);
           cj('#addcreditor_country_id').val(data['country_id']);
@@ -272,6 +287,14 @@
           cj('#addcreditor_bic').val(data['bic']);
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
           cj('#addcreditor').show(500);
+
+          CRM.api('Contact', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': data['creditor_id']}, 
+            {success: function(data2) {
+                if (data2['is_error'] == 0) {
+                  cj('#addcreditor_creditor_id').val(data2['display_name']);
+                }
+            }
+          });
 
           for (var i = 0; i < customBatchingParams.length; i++) {
             CRM.api('Setting', 'getvalue', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'group': 'SEPA Direct Debit Preferences', 'name': customBatchingParams[i][0]}, {success: createCallback(data, customBatchingParams, i, id)});
@@ -302,6 +325,9 @@
     for (var i = 0; i < inputCreditorInfo.length; i++) {
       var name = map[(inputCreditorInfo[i]["name"])] || inputCreditorInfo[i]["name"];
       var value = inputCreditorInfo[i]["value"];
+      if (name == "creditor_id") {
+        value = cj('#add_creditor_id').val();
+      }
       if (value != "") {
         updatedCreditorInfo[name] = value;
       }
@@ -312,7 +338,8 @@
       stdObj.id = creditorId;
     };
 
-    CRM.api('SepaCreditor', 'create', cj.extend(stdObj, updatedCreditorInfo),
+    var updObj = cj.extend(stdObj, updatedCreditorInfo);
+    CRM.api('SepaCreditor', 'create', updObj,
             {success: function(data) {
                 if (data['is_error'] == 0) {
                   // check whether we updated an existing creditor 
@@ -359,7 +386,7 @@
     cj('#custombatching :input').val("");
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
-    cj('#addcreditor').hide(500);
+    cj('#add_creditor_id').val("");
   }
 </script>
 {/literal}
