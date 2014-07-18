@@ -46,7 +46,7 @@
       {else}
         <p style="text-align: center;">{ts}No creditors found{/ts}</p>
       {/if}
-      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500);">
+      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); resetValues();">
         <span><div class="icon add-icon"></div>{ts}Add{/ts}</span>
       </a><br/>
       <div id="addcreditor" style="display:none;">
@@ -147,7 +147,7 @@
           <a class="save button" title="Save" onclick="updateCreditor()">
             <span>{ts}Save{/ts}</span>
           </a>
-          <a class="cancel button" title="Cancel" onclick="resetValues()">
+          <a class="cancel button" title="Cancel" onclick="resetValues(); cj('#addcreditor').hide(500);">
             <span>{ts}Cancel{/ts}</span>
           </a><br/>
        </div>
@@ -395,7 +395,6 @@
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
     cj('#add_creditor_id').val("");
-    cj('#addcreditor').hide(500);
   }
 </script>
 {/literal}

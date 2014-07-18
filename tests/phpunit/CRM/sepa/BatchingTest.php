@@ -556,36 +556,40 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
 
   // test for https://github.com/Project60/sepa_dd/issues/128
   public function testUpdateAfterClosedRCUR() {
-    $result = $this->createContactAndRecurContrib();
+    // this test creates 5 contributions
+    $contrib_count = 5;
 
-    // 1. create a due FRST group
+    for ($i=0; $i < $contrib_count; $i++) { 
+      $result = $this->createContactAndRecurContrib();
 
-    // 1.1 create a mandate
-    $txmd5 = md5(date("YmdHis"));
-    $apiParams = array(
-      "type" => "RCUR",
-      "reference" => $txmd5,
-      "status" => "FRST",
-      "source" => "TestSource",
-      "date" => date("Y-m-d H:i:s", strtotime("-130 days")),
-      "creditor_id" => "3",
-      "contact_id" => $result["contactId"],
-      "iban" => "0000000000000000010001",
-      "bic"  => "COLSDE22XXX",
-      "creation_date" => date("Y-m-d H:i:s", strtotime("-130 days")),
-      "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $result["contribution"]["id"]
-      );
+      // 1.1 create a mandate
+      $txmd5 = md5(date("YmdHis") . rand(1,100));
+      $apiParams = array(
+        "type" => "RCUR",
+        "reference" => $txmd5,
+        "status" => "FRST",
+        "source" => "TestSource",
+        "date" => date("Y-m-d H:i:s", strtotime("-130 days")),
+        "creditor_id" => "3",
+        "contact_id" => $result["contactId"],
+        "iban" => "0000000000000000010001",
+        "bic"  => "COLSDE22XXX",
+        "creation_date" => date("Y-m-d H:i:s", strtotime("-130 days")),
+        "entity_table" => "civicrm_contribution_recur",
+        "entity_id" => $result["contribution"]["id"]
+        );
 
-    $this->callAPISuccess("SepaMandate", "create", $apiParams);
+      $this->callAPISuccess("SepaMandate", "create", $apiParams);
+    }
 
     // close the group
     $this->callAPISuccess("SepaAlternativeBatching", "closeended", array("txgroup_id"=>1));
 
     // update txgroup
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
     
-    // test whether there is more than one payment
     $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
+    $this->assertDBQuery($contrib_count, 'select count(*) from civicrm_contribution_recur;', array());
   }
 }
