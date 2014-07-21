@@ -59,7 +59,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
     if (self::is_active(CRM_Utils_Array::value('status', $params))) {
-      $dao->validation_date = date("YmdHis");
+      if ($dao->validation_date == NULL) {
+        $dao->validation_date = date("YmdHis");
+      }
     }
     $dao->save();
 
@@ -187,7 +189,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       CRM_Core_Session::setStatus(ts("You can only modify the end date of recurring contribution mandates."), ts('Error'), 'error');
       return;
     }
-    
+
     // load the contribution
     $contribution_id = $mandate['entity_id'];
     $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
