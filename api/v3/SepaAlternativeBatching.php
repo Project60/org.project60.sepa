@@ -321,7 +321,10 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
   $sql_query = "
     SELECT
       mandate.id AS mandate_id,
+      mandate.date AS mandate_date,
       mandate.entity_id AS mandate_entity_id,
+      mandate.creation_date AS mandate_creation_date,
+      mandate.validation_date AS mandate_validation_date,
       rcontribution.end_date AS end_date
     FROM civicrm_sdd_mandate AS mandate
     INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id
@@ -331,13 +334,16 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
   $results = CRM_Core_DAO::executeQuery($sql_query);
   $mandates_to_end = array();
   while ($results->fetch()) {
-    array_push($mandates_to_end, array('mandate_id'=>$results->mandate_id, 'recur_id'=>$results->mandate_entity_id));
+    array_push($mandates_to_end, array('mandate_id'=>$results->mandate_id, 'recur_id'=>$results->mandate_entity_id, 'creation_date'=>$results->mandate_creation_date, 'validation_date'=>$results->mandate_validation_date, 'date'=>$results->mandate_date));
   }
-  
+
   // then, end them one by one
   foreach ($mandates_to_end as $mandate_to_end) {
     $change_mandate = civicrm_api('SepaMandate', 'create', array(
       'id'                      => $mandate_to_end['mandate_id'],
+      'date'                    => $mandate_to_end['date'],
+      'creation_date'           => $mandate_to_end['creation_date'],
+      'validation_date'         => $mandate_to_end['validation_date'],
       'status'                  => 'COMPLETE',
       'version'                 => 3));
     if (isset($change_mandate['is_error']) && $change_mandate['is_error']) {
