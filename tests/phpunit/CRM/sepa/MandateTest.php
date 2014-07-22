@@ -212,4 +212,61 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
       $this->callAPIFailure("SepaMandate", "delete", "invalid type");
   }
 
+  /*
+  * Test CRM_Sepa_BAO_SEPAMandate::add()
+  */
+  public function testCreateUsingBAO() {
+      // create a new contact
+      $contactId = $this->individualCreate();
+
+      // create a recurring contribution
+      $txmd5 = md5(date("YmdHis".rand(1,100)));
+      $txref = "SDD-TEST-RCUR-" . $txmd5;
+      $cparams = array(
+        'contact_id' => $contactId,
+        'frequency_interval' => '1',
+        'frequency_unit' => 'month',
+        'amount' => 123.42,
+        'contribution_status_id' => 1,
+        'start_date' => date("Ymd")."000000",
+        'currency' => "EUR",
+        'trxn_id' => $txref,
+      );
+
+      $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
+      $contrib = $contrib["values"][ $contrib["id"] ];
+      
+      // mandate parameters array
+      $params = array();
+      $params['status'] = "FRST";
+      $params['is_enabled'] = 1; 
+      $params['version'] = 3;
+      $params['debug'] = 1;
+      $params['contact_id'] = $contactId;
+      $params['source'] = "TestSource"; 
+      $params['entity_table'] = "civicrm_contribution_recur"; 
+      $params['entity_id'] = $contrib;
+      $params['creation_date'] = "20140722092142"; 
+      $params['validation_date'] = "20140722092142";
+      $params['date'] = "20140722092142";
+      $params['iban'] = "BE68844010370034"; 
+      $params['bic'] = "TESTTEST"; 
+      $params['type'] = "RCUR";
+      $params['creditor_id'] = 3;
+
+      $dao = CRM_Sepa_BAO_SEPAMandate::add($params);
+      
+      // close the mandate
+      CRM_Sepa_BAO_SEPAMandate::terminateMandate($dao->id, date("Y-m-d"), "Test");
+
+      // get the mandate via API and test it against the parameters array
+      $mdtest = $this->callAPISuccess("SepaMandate", "get", array("entity_id" => $dao->id));
+      $mdtest = $mdtest["values"][$mdtest["id"]];
+
+      foreach ($params as $key => $value) {
+        $this->assertEquals($params[$key], $value);
+      }
+
+  }
+
 }
