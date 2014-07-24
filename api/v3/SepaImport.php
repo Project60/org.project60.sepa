@@ -208,3 +208,5 @@ function civicrm_api3_sepa_import_create($params) {
 
   return civicrm_api3_create_success($result['values'][0]['api.SepaMandate.create']['values'], $params, 'SepaImport', 'create');
 }
+
+function civicrm_api3_sepaimport_create() {} /* Dummy to work around bug in civicrm_api3_generic_getActions(). */

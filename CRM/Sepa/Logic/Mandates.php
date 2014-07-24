@@ -144,6 +144,12 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
          * but to 'Completed' for one-off contributions...
          * We always want 'Pending' for DD -- so set it explicitly. */
         $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+
+        if (isset($GLOBALS['sepa_context']['receive_date'])) {
+          /* For back-office OOFF Contributions.
+           * Saved from PP $params -- for some reason, CiviCRM sets this appropriately in the PP callback, but not here... */
+          $params['receive_date'] = $GLOBALS['sepa_context']['receive_date'];
+        }
       }
     }
 
@@ -188,6 +194,7 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
     }
 
+    return; /* Hack: Hard-disable mandate mails for now. */
     if (!isset($params['status']) || $params['status'] == 'INIT') {
       $page = new CRM_Sepa_Page_SepaMandatePdf();
       $page->generateHTML($r["values"][0]);
