@@ -306,6 +306,8 @@
   }
 
   function updateCreditor() {
+    cj(".save").addClass("disabled");
+    cj(".save").attr('onclick','').unbind('click');
     var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
     var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
     var creditorId = cj('#edit_creditor_id').val();
