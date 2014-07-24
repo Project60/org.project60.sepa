@@ -89,7 +89,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
       "entity_id" => $contrib["id"],
       );
 
-    $mandate = $this->callAPISuccess("SepaMandate", "create", $apiParams)["values"][1];
+    $result = $this->callAPISuccess("SepaMandate", "create", $apiParams);
+    $mandate = $result["values"][1];
 
     // test civicrm_api3_sepa_mandate_get
     $mdtest = $this->callAPISuccess("SepaMandate", "get", array("entity_id" => $mandate["id"]));
@@ -150,7 +151,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
       "entity_id" => $contrib["id"],
       );
 
-    $mandate = $this->callAPISuccess("SepaMandate", "create", $apiParams)["values"][1];
+    $result = $this->callAPISuccess("SepaMandate", "create", $apiParams);
+    $mandate = $result["values"][1];
 
     // test civicrm_api3_sepa_mandate_get
     $mdtest = $this->callAPISuccess("SepaMandate", "get", array("entity_id" => $mandate["id"]));
