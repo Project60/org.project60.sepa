@@ -445,6 +445,7 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
   $rcur_notice = (int) _sepa_alternative_batching_get_parameter("org.project60.batching.alt.$mode.notice", $creditor_id);
   $now = strtotime("+$rcur_notice days");
   $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
+  $payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', $mode, 'name');
 
   // RCUR-STEP 1: find all active/pending RCUR mandates within the horizon that are NOT in a closed batch
   $sql_query = "
@@ -523,7 +524,8 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
         contribution_recur_id, id
       FROM civicrm_contribution
       WHERE contribution_recur_id in ($rcontrib_id_strings)
-        AND receive_date = '$collection_date';";
+        AND receive_date = '$collection_date'
+        AND payment_instrument_id = $payment_instrument_id;";
     $results = CRM_Core_DAO::executeQuery($sql_query);
     while ($results->fetch()) {
       $existing_contributions_by_recur_id[$results->contribution_recur_id] = $results->id;
@@ -551,7 +553,7 @@ function _sepa_alternative_batching_update_rcur($params, $creditor_id) {
             "financial_type_id"                   => $mandate['rc_financial_type_id'],
             "contribution_status_id"              => $mandate['rc_contribution_status_id'],
             "campaign_id"                         => $mandate['rc_campaign_id'],
-            "payment_instrument_id"               => $mandate['rc_payment_instrument_id'],
+            "payment_instrument_id"               => $payment_instrument_id,
           );
         $contribution = civicrm_api('Contribution', 'create', $contribution_data);
         if (!empty($contribution['is_error'])) {

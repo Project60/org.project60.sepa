@@ -28,9 +28,6 @@ require_once 'packages/php-iban-1.4.0/php-iban.php';
 class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
   function run() {
-    // print_r("<pre>");
-    // print_r($_REQUEST);
-    // print_r("</pre>");
     if (isset($_REQUEST['mandate_type'])) {
       $contact_id = $_REQUEST['contact_id'];
       $this->assign("back_url", CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=${contact_id}&selectedChild=contribute"));

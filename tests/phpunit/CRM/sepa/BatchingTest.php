@@ -36,9 +36,15 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+
+    // FIXME: there seems to be a bug in civix, call this explicitely until fixed:
+    sepa_civicrm_install();
+
     $this->quickCleanup($this->tablesToTruncate);
+
     // create a contact
     $this->creditorId = $this->individualCreate();
+
     // create a creditor
     $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES ('3', '%1', 'TESTCREDITORID', 'TESTCREDITOR', '104 Wayne Street', '1082', '0000000000000000000000', 'COLSDE22XXX', 'TEST', '0', 'MAIN', NULL, '1', '1');", array(1 => array($this->creditorId, "Int")));
   }
@@ -73,6 +79,33 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
                     "contribution" => $contrib);
     return $result;
   }
+
+  /**
+   * HELPER:
+   * get a creditor. If none exists, create one.
+   *
+   * @return creditor_id
+   */
+  function getCreditor() {
+    $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
+    if ($creditors['count']==0) {
+      // none there: create...
+      $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES ('3', '%1', 'TESTCREDITORID', 'TESTCREDITOR', '104 Wayne Street', '1082', '0000000000000000000000', 'COLSDE22XXX', 'TEST', '0', 'MAIN', NULL, '1', '1');", array(1 => array($this->creditorId, "Int")));
+      // and try again
+      $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
+    }
+
+    // make sure, there is at least one creditor...
+    $this->assertGreaterThan(0, $creditors['count'], "Something went wrong, creditor could not be created.");
+    
+    // return the id of the first entry in the values array
+    $first_creditor = reset($creditors['values']);
+    return $first_creditor['id'];
+  }
+
+
+
+
 
   public function testBatchingUpdateOOFF() {
     // create a contact
@@ -592,5 +625,55 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     
     $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
     $this->assertDBQuery($contrib_count, 'select count(*) from civicrm_contribution_recur;', array());
+  }
+
+
+  /**
+   * Test if the correct payment instrument is used throughout the RCUR status changes
+   * 
+   * @see https://github.com/Project60/sepa_dd/issues/124
+   * @author björn endres
+   */
+  public function testCorrectPaymentInstrumentSet() {
+    // read the payment instrument ids  
+    $payment_instrument_FRST = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+    $this->assertNotEmpty($payment_instrument_FRST, "Could not find the 'FRST' payment instrument.");
+    $payment_instrument_RCUR = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name');
+    $this->assertNotEmpty($payment_instrument_RCUR, "Could not find the 'RCUR' payment instrument.");
+
+    // create a contact
+    $result = $this->createContactAndRecurContrib();
+
+    // create a mandate
+    $apiParams = array(
+      "type" => "RCUR",
+      "status" => "FRST",
+      "reference" => md5(microtime()),
+      "source" => "TestSource",
+      "date" => date("Y-m-d H:i:s"),
+      "creditor_id" => $this->getCreditor(),
+      "contact_id" => $result["contactId"],
+      "iban" => "0000000000000000010001",
+      "bic"  => "COLSDE22XXX",
+      "creation_date" => date("Y-m-d H:i:s"),
+      "entity_table" => "civicrm_contribution_recur",
+      "entity_id" => $result["contribution"]["id"],
+      );
+    $mandate = $this->callAPISuccess("SepaMandate", "create", $apiParams);
+
+    // check the batching creates a contribution with ther right payment instrument
+    $sql = "select count(*) from civicrm_contribution where payment_instrument_id = '%1';";
+    $this->assertDBQuery(0, $sql, array(1 => array($payment_instrument_FRST, 'Integer'))); // "There is already a payment in the DB. Weird"
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
+    $this->assertDBQuery(1, $sql, array(1 => array($payment_instrument_FRST, 'Integer'))); // "Batching has not created a correct payment."
+
+    // now change the status of the mandate to 'RCUR'
+    // FIXME: do this via the closegroup API
+    $this->callAPISuccess("SepaMandate", "create", array('id' => $mandate['id'], 'status' => 'RCUR'));
+
+    // again: check the batching creates a contribution with ther right payment instrument
+    $this->assertDBQuery(0, $sql, array(1 => array($payment_instrument_RCUR, 'Integer'))); // "There is already a payment in the DB. Weird"
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+    $this->assertDBQuery(1, $sql, array(1 => array($payment_instrument_RCUR, 'Integer'))); // "Batching has not created a correct payment."
   }
 }
