@@ -112,7 +112,41 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
       (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);");
 
   // step 4: create the sepa file
-  if (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id']) {
+  $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
+  if (isset($result['is_error']) && $result['is_error']) {
+    $lock->release();
+    return civicrm_api3_create_error("Cannot create sepa xml file for group ".$txgroup_id);
+  }else{
+    $txgroup['sdd_file_id'] = $xmlfile['sdd_file_id'];
+  }
+
+  // step 5: close the txgroup object
+  $result = civicrm_api('SepaTransactionGroup', 'create', array(
+        'id'                      => $txgroup_id, 
+        'status_id'               => $group_status_id_closed, 
+        'version'                 => 3));
+  if (isset($result['is_error']) && $result['is_error']) {
+    $lock->release();
+    return civicrm_api3_create_error(sprintf(ts("Cannot close transaction group! Error was: '%s'"), $result['error_message']));
+  } 
+
+  $lock->release();
+  return civicrm_api3_create_success($result, $params);  
+}
+
+function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
+  $params['txgroup_id']['api.required'] = 1;
+}
+
+function civicrm_api3_sepa_alternative_batching_createxml($params) {
+  $override = (isset($params['override'])) ? $params['override'] : false;
+  $txgroup_id = (int) $params['txgroup_id'];
+  $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
+  if (isset($result['is_error']) && $result['is_error']) {
+    return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
+  }
+
+  if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
     // find an available txgroup reference
     $available_name = $name = "SDDXML-".$txgroup['reference'];
     $counter = 1;
@@ -122,10 +156,11 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
       $available_name = $name.'--'.$counter;
       $counter += 1;
       if ($counter>1000) {
-        $lock->release();
         return civicrm_api3_create_error("Cannot create file! Unable to find an available file reference.");
       }
     }
+
+    $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
 
     // now that we found an available reference, create the file
     $sepa_file = civicrm_api('SepaSddFile', 'create', array(
@@ -138,29 +173,25 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
           'status_id'               => $group_status_id_closed)
       );
     if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
-      $lock->release();
       return civicrm_api3_create_error(sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']));
     } else {
-      $txgroup['sdd_file_id'] = $sepa_file['id'];
+
+      // update the txgroup object
+        $result = civicrm_api('SepaTransactionGroup', 'create', array(
+              'id'                      => $txgroup_id, 
+              'sdd_file_id'             => $sepa_file['id'],
+              'version'                 => 3));
+        if (isset($result['is_error']) && $result['is_error']) {
+          return civicrm_api3_create_error(sprintf(ts("Cannot update transaction group! Error was: '%s'"), $result['error_message']));
+        } 
+
+
+      return civicrm_api3_create_success($sepa_file['values'], $params);
     } 
   }
-
-  // step 5: close the txgroup object
-  $result = civicrm_api('SepaTransactionGroup', 'create', array(
-        'id'                      => $txgroup_id, 
-        'status_id'               => $group_status_id_closed, 
-        'sdd_file_id'             => $txgroup['sdd_file_id'],
-        'version'                 => 3));
-  if (isset($result['is_error']) && $result['is_error']) {
-    $lock->release();
-    return civicrm_api3_create_error(sprintf(ts("Cannot close transaction group! Error was: '%s'"), $result['error_message']));
-  } 
-
-  $lock->release();
-  return civicrm_api3_create_success($result, $params);  
 }
 
-function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
+function civicrm_api3_sepa_alternative_batching_createxml_spec(&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
 
