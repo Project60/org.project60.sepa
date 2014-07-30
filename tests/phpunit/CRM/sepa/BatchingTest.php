@@ -56,30 +56,6 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->unsetExtensionSystem();
   }
 
-  function createContactAndRecurContrib() {
-    // create a contact
-    $contactId = $this->individualCreate();
-    // create a recurring contribution
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 1337.42,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd"),
-      'currency' => "EUR",
-      'financial_type_id' => 1,
-      'cycle_day' => date("d", strtotime("+14 days")),
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
-
-    $result = array("contactId" => $contactId,
-                    "contribution" => $contrib);
-    return $result;
-  }
-
   /**
    * HELPER:
    * get a creditor. If none exists, create one.
@@ -103,10 +79,11 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     return $first_creditor['id'];
   }
 
-
-
-
-
+  /**
+   * Test update of one-off (single payment) contributions
+   *
+   * @author niko bochan
+   */
   public function testBatchingUpdateOOFF() {
     // create a contact
     $contactId = $this->individualCreate();
@@ -200,6 +177,11 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBCompareValues("CRM_Sepa_DAO_SEPATransactionGroup", array("id" => 1), $searchParams);
   }
 
+  /**
+   * Test update of recurring payments
+   *
+   * @author niko bochan
+   */
   public function testBatchingUpdateRCUR() {
     $result = $this->createContactAndRecurContrib();
 
@@ -258,14 +240,29 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBCompareValues("CRM_Sepa_DAO_SEPATransactionGroup", array("id" => 1), $searchParams);
   }
 
-  public function testBatchingWithEmptyParameters() {
+  /**
+   * Try to call update method with invalid batching mode
+   *
+   * @author niko bochan
+   */
+  public function testBatchingWithInvalidMode() {
      $this->callAPIFailure("SepaAlternativeBatching", "update", array("type" => "INVALIDBATCHINGMODE"));
   }
 
+  /**
+   * Try to call update method with invalid parameters
+   *
+   * @author niko bochan
+   */
   public function testBatchingWithInvalidParameters() {
      $this->callAPIFailure("SepaAlternativeBatching", "update", 2142);
   }
 
+  /**
+   * Test group closing
+   *
+   * @author niko bochan
+   */
   public function testCloseGroup() {
     // create a contact
     $contactId = $this->individualCreate();
@@ -322,15 +319,31 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBCompareValues("CRM_Contribute_DAO_Contribution", array("id" => 1), $searchParams);
   }
 
+  /**
+   * Try to call close method with empty parameters
+   *
+   * @author niko bochan
+   */
   public function testCloseWithEmptyParameters() {
      $this->callAPIFailure("SepaAlternativeBatching", "close", array());
   }
 
+  /**
+   * Try to close an invalid group
+   *
+   * @author niko bochan
+   */
   public function testCloseWithInvalidParameters() {
     $this->callAPIFailure("SepaAlternativeBatching", "close", array("txgroup_id" => "INVALIDTXGID"));
   }
 
   // Disabled until we fix https://github.com/Project60/sepa_dd/issues/138
+
+  /**
+   * Test if groups are marked correctly as received
+   *
+   * @author niko bochan
+   */
   /*public function testReceivedGroup() {
     //$this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`) VALUES (NULL, '67', 'Received', '6', 'Received', NULL, '0', NULL, '5', NULL, '0', '0', '1', NULL, NULL, NULL);");
     // create a contact
@@ -421,14 +434,29 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     // TODO: Second Contribution
   }*/
 
+  /**
+   * Try to call API with empty parameters
+   *
+   * @author niko bochan
+   */
   public function testReceivedWithEmptyParameters() {
      $this->callAPIFailure("SepaAlternativeBatching", "received", array());
   }
 
+  /**
+   * Try to set an invalid group to received
+   *
+   * @author niko bochan
+   */
   public function testReceivedWithInvalidParameters() {
     $this->callAPIFailure("SepaAlternativeBatching", "received", array("txgroup_id" => "INVALIDTXGID"));
   }
 
+  /**
+   * Test if ended/old groups are closed
+   *
+   * @author niko bochan
+   */
   public function testCloseEndedGroup() {
     // create a contact
     $contactId = $this->individualCreate();
@@ -485,6 +513,11 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBCompareValues("CRM_Contribute_DAO_ContributionRecur", array("id" => 1), $searchParams);
   }
 
+  /**
+   * Test support of multiple creditors
+   *
+   * @author niko bochan
+   */
   public function testMultipleCreditors() {
     // create a contact
     $secondCreditorId = $this->individualCreate();
@@ -538,8 +571,13 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBQuery(2, 'select count(*) from civicrm_sdd_txgroup;', array());
   }
 
+  /**
+   * Test whether there is an error returned when we set a
+   * txgroup status to 'received' before closing the group
+   *
+   * @author niko bochan
+   */
   public function testReceivedBeforeClosed() {
-    //$this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`) VALUES (NULL, '67', 'Received', '6', 'Received', NULL, '0', NULL, '5', NULL, '0', '0', '1', NULL, NULL, NULL);");
     $result = $this->createContactAndRecurContrib();
 
     // create a mandate
@@ -588,7 +626,11 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->callAPIFailure("SepaAlternativeBatching", "received", array("txgroup_id"=>1));
   }
 
-  // test for https://github.com/Project60/sepa_dd/issues/128
+  /**
+   *
+   * @see https://github.com/Project60/sepa_dd/issues/128
+   * @author niko bochan
+   */
   public function testUpdateAfterClosedRCUR() {
     // this test creates 5 contributions
     $contrib_count = 5;
@@ -675,5 +717,41 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBQuery(0, $sql, array(1 => array($payment_instrument_RCUR, 'Integer'))); // "There is already a payment in the DB. Weird"
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
     $this->assertDBQuery(1, $sql, array(1 => array($payment_instrument_RCUR, 'Integer'))); // "Batching has not created a correct payment."
+  }
+
+  // ############################################################################
+  //                              Helper functions
+  // ############################################################################
+
+
+   /**
+   * HELPER:
+   * get a contact and recurring contribution
+   *
+   * @author niko bochan
+   * @return contactId, contribution
+   */
+  function createContactAndRecurContrib() {
+    // create a contact
+    $contactId = $this->individualCreate();
+    // create a recurring contribution
+    $cparams = array(
+      'contact_id' => $contactId,
+      'frequency_interval' => '1',
+      'frequency_unit' => 'month',
+      'amount' => 1337.42,
+      'contribution_status_id' => 1,
+      'start_date' => date("Ymd"),
+      'currency' => "EUR",
+      'financial_type_id' => 1,
+      'cycle_day' => date("d", strtotime("+14 days")),
+    );
+
+    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
+    $contrib = $contrib["values"][ $contrib["id"] ];
+
+    $result = array("contactId" => $contactId,
+                    "contribution" => $contrib);
+    return $result;
   }
 }
