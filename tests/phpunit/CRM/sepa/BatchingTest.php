@@ -17,7 +17,10 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
- * FIXME
+ * SEPA Unit Tests
+ *
+ * Batching Algorithm
+ *
  */
 class CRM_sepa_BatchingTest extends CiviUnitTestCase {
   private $tablesToTruncate = array("civicrm_sdd_creditor",
@@ -56,28 +59,6 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->unsetExtensionSystem();
   }
 
-  /**
-   * HELPER:
-   * get a creditor. If none exists, create one.
-   *
-   * @return creditor_id
-   */
-  function getCreditor() {
-    $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
-    if ($creditors['count']==0) {
-      // none there: create...
-      $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES ('3', '%1', 'TESTCREDITORID', 'TESTCREDITOR', '104 Wayne Street', '1082', '0000000000000000000000', 'COLSDE22XXX', 'TEST', '0', 'MAIN', NULL, '1', '1');", array(1 => array($this->creditorId, "Int")));
-      // and try again
-      $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
-    }
-
-    // make sure, there is at least one creditor...
-    $this->assertGreaterThan(0, $creditors['count'], "Something went wrong, creditor could not be created.");
-    
-    // return the id of the first entry in the values array
-    $first_creditor = reset($creditors['values']);
-    return $first_creditor['id'];
-  }
 
   /**
    * Test update of one-off (single payment) contributions
@@ -627,6 +608,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test if an update after closing a group works correctly
    *
    * @see https://github.com/Project60/sepa_dd/issues/128
    * @author niko bochan
@@ -674,7 +656,7 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
    * Test if the correct payment instrument is used throughout the RCUR status changes
    * 
    * @see https://github.com/Project60/sepa_dd/issues/124
-   * @author björn endres
+   * @author endres -at- systopia.de
    */
   public function testCorrectPaymentInstrumentSet() {
     // read the payment instrument ids  
@@ -719,13 +701,67 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, $sql, array(1 => array($payment_instrument_RCUR, 'Integer'))); // "Batching has not created a correct payment."
   }
 
+  /**
+   * See if the status change from FRST to RCUR works correctly
+   * 
+   * @see https://github.com/Project60/sepa_dd/issues/128
+   * @author endres -at- systopia.de
+   */
+  public function testFRSTtoRCURswitch() {
+    // TODO: implement:
+    // 1) create a FRST mandate, due for collection right now
+    // 2) call batching
+    // 3) close the FRST batch
+    // 4) check if the contribution and mandate are in the correct state (RCUR)
+    // 5) call batching again
+    // 6) check that there NO new group and no new contribution has been created
+  }  
+
+
+
+
+
   // ############################################################################
   //                              Helper functions
   // ############################################################################
 
 
-   /**
-   * HELPER:
+
+  /**
+   * create a mandate
+   *
+   * @author endres -at- systopia.de
+   * @return array with mandate data
+   */
+  function createMandate($params) {
+    // TODO: implement
+    $this->assertTrue(FALSE, 'not yet implemeted');
+  }
+
+  /**
+   * get a creditor. If none exists, create one.
+   *
+   * @author endres -at- systopia.de
+   * @return creditor_id
+   */
+  function getCreditor() {
+    $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
+    if ($creditors['count']==0) {
+      // none there: create...
+      $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES ('3', '%1', 'TESTCREDITORID', 'TESTCREDITOR', '104 Wayne Street', '1082', '0000000000000000000000', 'COLSDE22XXX', 'TEST', '0', 'MAIN', NULL, '1', '1');", array(1 => array($this->creditorId, "Int")));
+      // and try again
+      $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
+    }
+
+    // make sure, there is at least one creditor...
+    $this->assertGreaterThan(0, $creditors['count'], "Something went wrong, creditor could not be created.");
+    
+    // return the id of the first entry in the values array
+    $first_creditor = reset($creditors['values']);
+    return $first_creditor['id'];
+  }
+
+  /**
    * get a contact and recurring contribution
    *
    * @author niko bochan
