@@ -14,7 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'BaseTestCase.php';
 
 /**
  * SEPA Unit Tests
@@ -22,7 +22,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Batching Algorithm
  *
  */
-class CRM_sepa_BatchingTest extends CiviUnitTestCase {
+class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
   private $tablesToTruncate = array("civicrm_sdd_creditor",
                                     //"civicrm_contact",
                                     "civicrm_contribution",
@@ -746,134 +746,4 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertEquals($group_count_before, $group_count_after, "A new group has been created, but shouldn't have!");
     $this->assertDBQuery(1, "SELECT count(id) FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");    
   }  
-
-
-
-
-
-  // ############################################################################
-  //                              Helper functions
-  // ############################################################################
-
-
-
-  /**
-   * create a mandate
-   *
-   * @author endres -at- systopia.de
-   * @return array with mandate data
-   */
-  function createMandate($mandate_parms = array(), $contrib_parms = array()) {
-    // read the payment instrument ids  
-    $payment_instrument_FRST = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
-    $this->assertNotEmpty($payment_instrument_FRST, "Could not find the 'FRST' payment instrument.");
-    $payment_instrument_RCUR = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name');
-    $this->assertNotEmpty($payment_instrument_RCUR, "Could not find the 'RCUR' payment instrument.");
-    $contribution_status_pending = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-    $this->assertNotEmpty($contribution_status_pending, "Could not find the 'Pending' contribution status.");
-
-    $mode = empty($mandate_parms['type'])?'OOFF':$mandate_parms['type'];
-    $this->assertTrue(($mode=='OOFF' || $mode=='RCUR'), "Mandat can only be of type 'OOFF' or 'RCUR'!");
-    $contribution_entity = ($mode=='OOFF')?'Contribution':'ContributionRecur';
-    $contribution_table  = ($mode=='OOFF')?'civicrm_contribution':'civicrm_contribution_recur';
-
-    // create a contribution
-    $create_contribution = array(
-      'contact_id'              => empty($contrib_parms['contact_id'])?$this->individualCreate():$contrib_parms['contact_id'],
-      'financial_type_id'       => empty($contrib_parms['financial_type_id'])?1:$contrib_parms['financial_type_id'],
-      'currency'                => empty($contrib_parms['currency'])?'EUR':$contrib_parms['currency'],
-      'contribution_status_id'  => empty($contrib_parms['contribution_status_id'])?$contribution_status_pending:$contrib_parms['contribution_status_id'],
-    );
-    if ($mode=='RCUR') {
-      $create_contribution['payment_instrument_id'] = $payment_instrument_RCUR;
-      $create_contribution['amount'] =
-          empty($contrib_parms['amount'])?'6.66':$contrib_parms['amount'];
-      $create_contribution['start_date'] =
-          empty($contrib_parms['start_date'])?date("Ymd"):$contrib_parms['start_date'];
-      $create_contribution['frequency_interval'] =
-          empty($contrib_parms['frequency_interval'])?1:$contrib_parms['frequency_interval'];
-      $create_contribution['frequency_unit'] =
-          empty($contrib_parms['frequency_unit'])?'month':$contrib_parms['frequency_unit'];
-      $create_contribution['cycle_day'] =
-          empty($contrib_parms['cycle_day'])?date("d", strtotime("+14 days")):$contrib_parms['cycle_day'];
-    } else {
-      $create_contribution['payment_instrument_id'] = $payment_instrument_FRST;
-      $create_contribution['total_amount'] =
-          empty($contrib_parms['total_amount'])?'6.66':$contrib_parms['total_amount'];
-    }
-    $contribution = $this->callAPISuccess($contribution_entity, "create", $create_contribution);
-
-
-    // create a mandate
-    $create_mandate = array(
-      "type"          => empty($mandate_parms['type'])?'OOFF':$mandate_parms['type'],
-      "status"        => empty($mandate_parms['status'])?'INIT':$mandate_parms['status'],
-      "reference"     => empty($mandate_parms['reference'])?md5(microtime()):$mandate_parms['reference'],
-      "source"        => empty($mandate_parms['source'])?"TestSource":$mandate_parms['source'],
-      "date"          => empty($mandate_parms['date'])?date("YmdHis"):$mandate_parms['date'],
-      "creditor_id"   => empty($mandate_parms['creditor_id'])?$this->getCreditor():$mandate_parms['creditor_id'],
-      "contact_id"    => empty($mandate_parms['contact_id'])?$create_contribution['contact_id']:$mandate_parms['contact_id'],
-      "iban"          => empty($mandate_parms['iban'])?"0000000000000000010001":$mandate_parms['iban'],
-      "bic"           => empty($mandate_parms['bic'])?"COLSDE22XXX":$mandate_parms['bic'],
-      "creation_date" => empty($mandate_parms['creation_date'])?date("YmdHis"):$mandate_parms['creation_date'],
-      "entity_table"  => $contribution_table,
-      "entity_id"     => $contribution['id'],
-    );
-    $mandate = $this->callAPISuccess("SepaMandate", "create", $create_mandate);
-
-    return $mandate['values'][$mandate['id']];
-  }
-
-  /**
-   * get a creditor. If none exists, create one.
-   *
-   * @author endres -at- systopia.de
-   * @return creditor_id
-   */
-  function getCreditor() {
-    $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
-    if ($creditors['count']==0) {
-      // none there: create...
-      $this->assertDBQuery(NULL, "INSERT INTO `civicrm_tests_dev`.`civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES ('3', '%1', 'TESTCREDITORID', 'TESTCREDITOR', '104 Wayne Street', '1082', '0000000000000000000000', 'COLSDE22XXX', 'TEST', '0', 'MAIN', NULL, '1', '1');", array(1 => array($this->creditorId, "Int")));
-      // and try again
-      $creditors = $this->callAPISuccess("SepaCreditor", "get", array());
-    }
-
-    // make sure, there is at least one creditor...
-    $this->assertGreaterThan(0, $creditors['count'], "Something went wrong, creditor could not be created.");
-    
-    // return the id of the first entry in the values array
-    $first_creditor = reset($creditors['values']);
-    return $first_creditor['id'];
-  }
-
-  /**
-   * get a contact and recurring contribution
-   *
-   * @author niko bochan
-   * @return contactId, contribution
-   */
-  function createContactAndRecurContrib() {
-    // create a contact
-    $contactId = $this->individualCreate();
-    // create a recurring contribution
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 1337.42,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd"),
-      'currency' => "EUR",
-      'financial_type_id' => 1,
-      'cycle_day' => date("d", strtotime("+14 days")),
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
-
-    $result = array("contactId" => $contactId,
-                    "contribution" => $contrib);
-    return $result;
-  }
 }

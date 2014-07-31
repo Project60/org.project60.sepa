@@ -14,12 +14,12 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-require_once "CiviTest/CiviUnitTestCase.php";
+require_once "BaseTestCase.php";
 
 /**
  * File for SepaMandate.php
  */
-class CRM_sepa_MandateTest extends CiviUnitTestCase {
+class CRM_sepa_MandateTest extends CRM_sepa_BaseTestCase {
   private $tablesToTruncate = array("civicrm_sdd_creditor",
                                     //"civicrm_contact",
                                     "civicrm_contribution",
@@ -29,6 +29,10 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+    
+    // FIXME: there seems to be a bug in civix, call this explicitely until fixed:
+    sepa_civicrm_install();
+
     $this->quickCleanup($this->tablesToTruncate);
     // create a contact
     $this->creditorId = $this->individualCreate();
@@ -50,56 +54,14 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
    */
   public function testCreateGetDeleteOOFF()
   {
-    // create a contact
-    $contactId = $this->individualCreate();
-    // create a contribution
-    $txmd5 = md5(date("YmdHis"));
-    $txref = "SDD-TEST-OOFF-" . $txmd5;
-    $cparams = array(
-      "contact_id" => $contactId,
-      "receive_date" => date("YmdHis"),
-      "total_amount" => 333.94,
-      "currency" => "EUR",
-      "financial_type_id" => 1,
-      "trxn_id" => $txref,
-      "invoice_id" => $txref,
-      "source" => "Test",
-      "contribution_status_id" => 2,
-    );
-
-    $contrib = $this->callAPISuccess("contribution", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
-
-    // test contribution
-    foreach ($cparams as $key => $value) {
-      $this->assertEquals($contrib[$key], $value);
-    }
-
-    // create a mandate
-    $apiParams = array(
-      "type" => "OOFF",
-      "reference" => $txmd5,
-      "status" => "OOFF",
-      "source" => "TestSource",
-      "date" => date("Y-m-d H:i:s"),
-      "creditor_id" => "3",
-      "contact_id" => $contactId,
-      "iban" => "0000000000000000000000",
-      "bic"  => "COLSDE22XXX",
-      "creation_date" => date("Y-m-d H:i:s"),
-      "entity_table" => "civicrm_contribution",
-      "entity_id" => $contrib["id"],
-      );
-
-    $result = $this->callAPISuccess("SepaMandate", "create", $apiParams);
-    $mandate = $result["values"][1];
+    $mandate = $this->createMandate(array('type'=>'OOFF', 'status'=>'OOFF'));
 
     // test civicrm_api3_sepa_mandate_get
     $mdtest = $this->callAPISuccess("SepaMandate", "get", array("entity_id" => $mandate["id"]));
     $mdtest = $mdtest["values"][$mdtest["id"]];
 
-    foreach ($apiParams as $key => $value) {
-      $this->assertEquals($mdtest[$key], $value);
+    foreach ($mandate as $key => $value) {
+      $this->assertEquals($mandate[$key], $value);
     }
 
     // test civicrm_api3_sepa_mandate_delete
@@ -114,55 +76,18 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
    */
   public function testCreateGetDeleteRCUR() 
   {
-    // create a contact
-    $contactId = $this->individualCreate();
-    // create a recurring contribution
-    $txmd5 = md5(date("YmdHis"));
-    $txref = "SDD-TEST-RCUR-" . $txmd5;
-    $cparams = array(
-      'contact_id' => $contactId,
-      'frequency_interval' => '1',
-      'frequency_unit' => 'month',
-      'amount' => 1337.42,
-      'contribution_status_id' => 1,
-      'start_date' => date("Ymd")."000000",
-      'currency' => "EUR",
-      'trxn_id' => $txref,
-    );
-
-    $contrib = $this->callAPISuccess("contribution_recur", "create", $cparams);
-    $contrib = $contrib["values"][ $contrib["id"] ];
-
-    // test contribution
-    foreach ($cparams as $key => $value) {
-      $this->assertEquals($contrib[$key], $value);
-    }
-
-    // create a mandate
-    $apiParams = array(
-      "type" => "RCUR",
-      "reference" => $txmd5,
-      "status" => "INIT",
-      "source" => "TestSource",
-      "date" => date("Y-m-d H:i:s"),
-      "creditor_id" => "3",
-      "contact_id" => $contactId,
-      "iban" => "0000000000000000000000",
-      "bic"  => "COLSDE22XXX",
-      "creation_date" => date("Y-m-d H:i:s"),
-      "entity_table" => "civicrm_contribution_recur",
-      "entity_id" => $contrib["id"],
-      );
-
-    $result = $this->callAPISuccess("SepaMandate", "create", $apiParams);
-    $mandate = $result["values"][1];
+    $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'INIT'));
 
     // test civicrm_api3_sepa_mandate_get
     $mdtest = $this->callAPISuccess("SepaMandate", "get", array("entity_id" => $mandate["id"]));
     $mdtest = $mdtest["values"][$mdtest["id"]];
 
-    foreach ($apiParams as $key => $value) {
-      $this->assertEquals($mdtest[$key], $value);
+    foreach ($mdtest as $key => $value) {
+      if ($key != 'creation_date' && $key != 'date') {
+        $this->assertEquals($mandate[$key], $value);      
+      }else{
+        $this->assertEquals($mandate[$key], date("YmdHis", strtotime($value)));  
+      }
     }
 
     // test civicrm_api3_sepa_mandate_delete
@@ -262,7 +187,7 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
       $params['iban'] = "BE68844010370034"; 
       $params['bic'] = "TESTTEST"; 
       $params['type'] = "RCUR";
-      $params['creditor_id'] = 3;
+      $params['creditor_id'] = $this->getCreditor();
 
       $dao = CRM_Sepa_BAO_SEPAMandate::add($params);
       
