@@ -708,13 +708,43 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
    * @author endres -at- systopia.de
    */
   public function testFRSTtoRCURswitch() {
-    // TODO: implement:
     // 1) create a FRST mandate, due for collection right now
+    $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'));
+    $mandate_before_batching = $this->callAPISuccess("SepaMandate", "getsingle", array("id" => $mandate['id']));
+    $this->assertTrue(($mandate_before_batching['status']=='FRST'), "Mandate was not created in the correct status.");
+
     // 2) call batching
-    // 3) close the FRST batch
-    // 4) check if the contribution and mandate are in the correct state (RCUR)
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+
+    // 3) find and check the created contribution
+    $contribution_recur_id = $mandate['entity_id'];
+    $this->assertNotEmpty($contribution_recur_id, "No entity set in mandate");
+    $contribution_id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");
+    $this->assertNotEmpty($contribution_id, "Couldn't find created contribution.");    
+    $this->assertDBQuery(1, "SELECT count(id) FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");
+
+    // 4) close the group
+    $txgroup_id = CRM_Core_DAO::singleValueQuery("SELECT txgroup_id FROM civicrm_sdd_contribution_txgroup WHERE contribution_id=$contribution_id;");
+    $this->assertDBQuery(1, "SELECT count(txgroup_id) FROM civicrm_sdd_contribution_txgroup WHERE contribution_id=$contribution_id;");
+    $this->assertNotEmpty($txgroup_id, "Contribution was not added to a group!");
+    $this->callAPISuccess("SepaAlternativeBatching", "close", array("txgroup_id" => $txgroup_id));
+
+    // 5) check if contribution and mandate are in the correct state (RCUR)
+    $mandate_after_batching = $this->callAPISuccess("SepaMandate", "getsingle", array("id" => $mandate['id']));
+    $this->assertTrue(($mandate_after_batching['status']=='RCUR'), "Mandate was not switched to status 'RCUR' after group was closed");
+    $contribution = $this->callAPISuccess("Contribution", "getsingle", array("id" => $contribution_id));
+    $this->assertEquals('FRST', $contribution['contribution_payment_instrument'], "Created contribution does not have payment instrument 'FRST'!");
+    
     // 5) call batching again
+    $group_count_before = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_sdd_txgroup;");
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+
     // 6) check that there NO new group and no new contribution has been created
+    $group_count_after = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_sdd_txgroup;");
+    $this->assertEquals($group_count_before, $group_count_after, "A new group has been created, but shouldn't have!");
+    $this->assertDBQuery(1, "SELECT count(id) FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");    
   }  
 
 
@@ -733,9 +763,65 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
    * @author endres -at- systopia.de
    * @return array with mandate data
    */
-  function createMandate($params) {
-    // TODO: implement
-    $this->assertTrue(FALSE, 'not yet implemeted');
+  function createMandate($mandate_parms = array(), $contrib_parms = array()) {
+    // read the payment instrument ids  
+    $payment_instrument_FRST = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+    $this->assertNotEmpty($payment_instrument_FRST, "Could not find the 'FRST' payment instrument.");
+    $payment_instrument_RCUR = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name');
+    $this->assertNotEmpty($payment_instrument_RCUR, "Could not find the 'RCUR' payment instrument.");
+    $contribution_status_pending = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+    $this->assertNotEmpty($contribution_status_pending, "Could not find the 'Pending' contribution status.");
+
+    $mode = empty($mandate_parms['type'])?'OOFF':$mandate_parms['type'];
+    $this->assertTrue(($mode=='OOFF' || $mode=='RCUR'), "Mandat can only be of type 'OOFF' or 'RCUR'!");
+    $contribution_entity = ($mode=='OOFF')?'Contribution':'ContributionRecur';
+    $contribution_table  = ($mode=='OOFF')?'civicrm_contribution':'civicrm_contribution_recur';
+
+    // create a contribution
+    $create_contribution = array(
+      'contact_id'              => empty($contrib_parms['contact_id'])?$this->individualCreate():$contrib_parms['contact_id'],
+      'financial_type_id'       => empty($contrib_parms['financial_type_id'])?1:$contrib_parms['financial_type_id'],
+      'currency'                => empty($contrib_parms['currency'])?'EUR':$contrib_parms['currency'],
+      'contribution_status_id'  => empty($contrib_parms['contribution_status_id'])?$contribution_status_pending:$contrib_parms['contribution_status_id'],
+    );
+    if ($mode=='RCUR') {
+      $create_contribution['payment_instrument_id'] = $payment_instrument_RCUR;
+      $create_contribution['amount'] =
+          empty($contrib_parms['amount'])?'6.66':$contrib_parms['amount'];
+      $create_contribution['start_date'] =
+          empty($contrib_parms['start_date'])?date("Ymd"):$contrib_parms['start_date'];
+      $create_contribution['frequency_interval'] =
+          empty($contrib_parms['frequency_interval'])?1:$contrib_parms['frequency_interval'];
+      $create_contribution['frequency_unit'] =
+          empty($contrib_parms['frequency_unit'])?'month':$contrib_parms['frequency_unit'];
+      $create_contribution['cycle_day'] =
+          empty($contrib_parms['cycle_day'])?date("d", strtotime("+14 days")):$contrib_parms['cycle_day'];
+    } else {
+      $create_contribution['payment_instrument_id'] = $payment_instrument_FRST;
+      $create_contribution['total_amount'] =
+          empty($contrib_parms['total_amount'])?'6.66':$contrib_parms['total_amount'];
+    }
+    $contribution = $this->callAPISuccess($contribution_entity, "create", $create_contribution);
+
+
+    // create a mandate
+    $create_mandate = array(
+      "type"          => empty($mandate_parms['type'])?'OOFF':$mandate_parms['type'],
+      "status"        => empty($mandate_parms['status'])?'INIT':$mandate_parms['status'],
+      "reference"     => empty($mandate_parms['reference'])?md5(microtime()):$mandate_parms['reference'],
+      "source"        => empty($mandate_parms['source'])?"TestSource":$mandate_parms['source'],
+      "date"          => empty($mandate_parms['date'])?date("YmdHis"):$mandate_parms['date'],
+      "creditor_id"   => empty($mandate_parms['creditor_id'])?$this->getCreditor():$mandate_parms['creditor_id'],
+      "contact_id"    => empty($mandate_parms['contact_id'])?$create_contribution['contact_id']:$mandate_parms['contact_id'],
+      "iban"          => empty($mandate_parms['iban'])?"0000000000000000010001":$mandate_parms['iban'],
+      "bic"           => empty($mandate_parms['bic'])?"COLSDE22XXX":$mandate_parms['bic'],
+      "creation_date" => empty($mandate_parms['creation_date'])?date("YmdHis"):$mandate_parms['creation_date'],
+      "entity_table"  => $contribution_table,
+      "entity_id"     => $contribution['id'],
+    );
+    $mandate = $this->callAPISuccess("SepaMandate", "create", $create_mandate);
+
+    return $mandate['values'][$mandate['id']];
   }
 
   /**
