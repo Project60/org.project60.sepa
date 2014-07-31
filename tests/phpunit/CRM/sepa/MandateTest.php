@@ -45,6 +45,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_api3_sepa_mandate_create (OOFF)
+   *
+   * @author niko bochan
    */
   public function testCreateGetDeleteOOFF()
   {
@@ -107,7 +109,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_api3_sepa_mandate_create (RCUR)
-   * Error expected
+   *
+   * @author niko bochan
    */
   public function testCreateGetDeleteRCUR() 
   {
@@ -169,7 +172,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_api3_sepa_mandate_create with empty parameters
-   * Error expected
+   *
+   * @author niko bochan
    */
   public function testCreateWithEmptyParameters()
   {
@@ -178,7 +182,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_participant_create with invalid parameter type.
-   * Error expected
+   *
+   * @author niko bochan
    */
   public function testCreateWithInvalidParamsType()
   {
@@ -187,7 +192,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
    /**
    * Test civicrm_api3_sepa_mandate_get with invalid parameter type.
-   * Error expected
+   *
+   * @author niko bochan
    */
   public function testGetWithInvalidParamsType()
   {
@@ -196,7 +202,8 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_api3_sepa_mandate_delete with empty parameters
-   * Error expected
+   *
+   * @author niko bochan
    */
   public function testDeleteWithEmptyParameters()
   {
@@ -205,16 +212,19 @@ class CRM_sepa_MandateTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_api3_sepa_mandate_delete with invalid parameter type.
-   * Error expected
+   *
+   * @author niko bochan
    */
   public function testDeleteWithInvalidParamsType()
   {
       $this->callAPIFailure("SepaMandate", "delete", "invalid type");
   }
 
-  /*
-  * Test CRM_Sepa_BAO_SEPAMandate::add()
-  */
+  /**
+   * Test CRM_Sepa_BAO_SEPAMandate::add()
+   *
+   * @author niko bochan
+   */
   public function testCreateUsingBAO() {
       // create a new contact
       $contactId = $this->individualCreate();
