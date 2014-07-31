@@ -708,14 +708,23 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
    * @author endres -at- systopia.de
    */
   public function testFRSTtoRCURswitch() {
+    // 0) select cycle day so that the submission would be due today
+    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_alt_FRST_notice');
+    $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
+    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_alt_RCUR_notice');
+    $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
+    $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
+    $cycle_day = date("d", strtotime("+$frst_notice days"));
+
     // 1) create a FRST mandate, due for collection right now
-    $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'));
+    $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'), array('cycle_day' => $cycle_day));
     $mandate_before_batching = $this->callAPISuccess("SepaMandate", "getsingle", array("id" => $mandate['id']));
     $this->assertTrue(($mandate_before_batching['status']=='FRST'), "Mandate was not created in the correct status.");
 
     // 2) call batching
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+
 
     // 3) find and check the created contribution
     $contribution_recur_id = $mandate['entity_id'];
@@ -725,9 +734,12 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, "SELECT count(id) FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");
 
     // 4) close the group
-    $txgroup_id = CRM_Core_DAO::singleValueQuery("SELECT txgroup_id FROM civicrm_sdd_contribution_txgroup WHERE contribution_id=$contribution_id;");
     $this->assertDBQuery(1, "SELECT count(txgroup_id) FROM civicrm_sdd_contribution_txgroup WHERE contribution_id=$contribution_id;");
+    $txgroup_id = CRM_Core_DAO::singleValueQuery("SELECT txgroup_id FROM civicrm_sdd_contribution_txgroup WHERE contribution_id=$contribution_id;");
     $this->assertNotEmpty($txgroup_id, "Contribution was not added to a group!");
+    $txgroup = $this->callAPISuccess("SepaTransactionGroup", "getsingle", array("id" => $txgroup_id));
+    $latest_submission_date = substr($txgroup['latest_submission_date'], 0, 10);
+    $this->assertEquals(date('Y-m-d'), $latest_submission_date, "The group should be due today! Check test configuration!");
     $this->callAPISuccess("SepaAlternativeBatching", "close", array("txgroup_id" => $txgroup_id));
 
     // 5) check if contribution and mandate are in the correct state (RCUR)
@@ -738,11 +750,14 @@ class CRM_sepa_BatchingTest extends CiviUnitTestCase {
     
     // 5) call batching again
     $group_count_before = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_sdd_txgroup;");
+    $contribution_count_before = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_contribution;");
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
 
     // 6) check that there NO new group and no new contribution has been created
     $group_count_after = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_sdd_txgroup;");
+    $contribution_count_after = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_contribution;");
+    $this->assertEquals($contribution_count_before, $contribution_count_after, "A new contribution has been created, but shouldn't have!");
     $this->assertEquals($group_count_before, $group_count_after, "A new group has been created, but shouldn't have!");
     $this->assertDBQuery(1, "SELECT count(id) FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");    
   }  
