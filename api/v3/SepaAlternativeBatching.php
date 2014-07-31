@@ -44,7 +44,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   $status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');  
   $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');  
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
-  if (isset($result['is_error']) && $result['is_error']) {
+  if (isset($txgroup['is_error']) && $txgroup['is_error']) {
     $lock->release();
     return civicrm_api3_create_error("Cannot find transaction group ".$txgroup_id);
   }
