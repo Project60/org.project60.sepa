@@ -318,8 +318,6 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $this->callAPIFailure("SepaAlternativeBatching", "close", array("txgroup_id" => "INVALIDTXGID"));
   }
 
-  // Disabled until we fix https://github.com/Project60/sepa_dd/issues/138
-
   /**
    * Test if groups are marked correctly as received
    *
@@ -543,31 +541,8 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
    * @author niko bochan
    */
   public function testUpdateAfterClosedRCUR() {
-    // this test creates 5 contributions
-    $contrib_count = 5;
-
-    for ($i=0; $i < $contrib_count; $i++) { 
-      $result = $this->createContactAndRecurContrib();
-
-      // 1.1 create a mandate
-      $txmd5 = md5(date("YmdHis") . rand(1,100));
-      $apiParams = array(
-        "type" => "RCUR",
-        "reference" => $txmd5,
-        "status" => "FRST",
-        "source" => "TestSource",
-        "date" => date("Y-m-d H:i:s", strtotime("-130 days")),
-        "creditor_id" => "3",
-        "contact_id" => $result["contactId"],
-        "iban" => "0000000000000000010001",
-        "bic"  => "COLSDE22XXX",
-        "creation_date" => date("Y-m-d H:i:s", strtotime("-130 days")),
-        "entity_table" => "civicrm_contribution_recur",
-        "entity_id" => $result["contribution"]["id"]
-        );
-
-      $this->callAPISuccess("SepaMandate", "create", $apiParams);
-    }
+    $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'));
+    $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'));
 
     // close the group
     $this->callAPISuccess("SepaAlternativeBatching", "closeended", array("txgroup_id"=>1));
@@ -577,7 +552,7 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
     
     $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
-    $this->assertDBQuery($contrib_count, 'select count(*) from civicrm_contribution_recur;', array());
+    $this->assertDBQuery(2, 'select count(*) from civicrm_contribution_recur;', array());
   }
 
 
