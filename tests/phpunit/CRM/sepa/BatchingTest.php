@@ -686,6 +686,9 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $this->assertTrue(($mandate_after_batching['status']=='RCUR'), "Mandate was not switched to status 'RCUR' after group was closed");
     $contribution = $this->callAPISuccess("Contribution", "getsingle", array("id" => $contribution_id));
     $this->assertEquals('FRST', $contribution['contribution_payment_instrument'], "Created contribution does not have payment instrument 'FRST'!");
+
+    // uncomment this, if you want to provoke an error like https://github.com/Project60/sepa_dd/issues/128
+    //$this->assertDBQuery(0, "UPDATE civicrm_sdd_mandate SET first_contribution_id=NULL WHERE id=".$mandate['id'].";");
     
     // 5) call batching again
     $group_count_before = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_sdd_txgroup;");
