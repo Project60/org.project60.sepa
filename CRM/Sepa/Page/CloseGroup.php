@@ -45,7 +45,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
           if ($_REQUEST['status'] == "") {
 
             // delete old txfile
-            if ($group['sdd_file_id'] != NULL) {
+            if (!empty($group['sdd_file_id'])) {
               $result = civicrm_api('SepaSddFile', 'delete', array('id'=>$group['sdd_file_id'], 'version'=>3));
               if (isset($result['is_error']) && $result['is_error']) {
                 CRM_Core_Session::setStatus("Cannot delete file #".$group['sdd_file_id'].".<br/>Error was: ".$result['error_message'], ts('Error'), 'error');
@@ -54,7 +54,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
             $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$group_id, 'override'=>True, 'version'=>3));
             if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
-              CRM_Core_Session::setStatus("Cannot load file #".$file_id.".<br/>Error was: ".$file['error_message'], ts('Error'), 'error');
+              CRM_Core_Session::setStatus("Cannot load for group #".$group_id.".<br/>Error was: ".$xmlfile['error_message'], ts('Error'), 'error');
             }else{
               $xmlfile = $xmlfile['values'][$xmlfile['id']];
               $file_id = $xmlfile['id'];
