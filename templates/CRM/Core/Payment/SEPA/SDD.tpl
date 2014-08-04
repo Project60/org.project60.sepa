@@ -41,11 +41,16 @@
 	</div>
 </div>
 
-
 <!-- TWEAK THE FORM: -->
 
 <!-- Additional Elements -->
 <span id="currency_indicator"><b>EUR</b></span>
+
+<!-- JS Disclaimer -->
+<noscript>
+<br/><br/>
+<span style="color:#ff0000; font-size:150%; font-style:bold;">{ts}THIS PAGE PAGE DOES NOT WORK PROPERLY WITHOUT JAVASCRIPT. PLEASE ENABLE JAVASCRIPT IN YOUR BROWSER{/ts}</span>
+</noscript>
 
 <!-- JS Magic -->
 <script type="text/javascript">
