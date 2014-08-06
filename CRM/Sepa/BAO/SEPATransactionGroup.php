@@ -129,5 +129,64 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("contributions",$r);
     return $template->fetch('CRM/Sepa/xml/TransactionGroup.tpl');
   }
-}
 
+
+  /**
+   * This method will create the SDD file for the given group
+   * 
+   * @param txgroup_id  the transaction group for which the file should be created
+   * @param override    if true, will override an already existing file and create a new one
+   * 
+   * @return int id of the sepa file entity created, or an error message string
+   */
+  function createFile($txgroup_id, $override = false) {
+    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
+    if (isset($txgroup['is_error']) && $txgroup['is_error']) {
+      return "Cannot find transaction group ".$txgroup_id;
+    }
+
+    if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
+      // find an available txgroup reference
+      $available_name = $name = "SDDXML-".$txgroup['reference'];
+      $counter = 1;
+      $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
+      while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
+        // i.e. available_name is already taken, modify it
+        $available_name = $name.'--'.$counter;
+        $counter += 1;
+        if ($counter>1000) {
+          return "Cannot create file! Unable to find an available file reference.";
+        }
+      }
+
+      $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
+
+      // now that we found an available reference, create the file
+      $sepa_file = civicrm_api('SepaSddFile', 'create', array(
+            'version'                 => 3,
+            'reference'               => $available_name,
+            'filename'                => $available_name.'.xml',
+            'latest_submission_date'  => $txgroup['latest_submission_date'],
+            'created_date'            => date('YmdHis'),
+            'created_id'              => CRM_Core_Session::singleton()->get('userID'),
+            'status_id'               => $group_status_id_closed)
+        );
+      if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
+        return sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']);
+      } else {
+
+        // update the txgroup object
+          $result = civicrm_api('SepaTransactionGroup', 'create', array(
+                'id'                      => $txgroup_id, 
+                'sdd_file_id'             => $sepa_file['id'],
+                'version'                 => 3));
+          if (isset($result['is_error']) && $result['is_error']) {
+            sprintf(ts("Cannot update transaction group! Error was: '%s'"), $result['error_message']);
+          } 
+
+
+        return $sepa_file['id'];
+      } 
+    }
+  }  
+}
