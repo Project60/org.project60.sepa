@@ -105,7 +105,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $country_ids = array('' => ts('- select -')) + $filtered;
 
         // add creditor form elements
-        $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor Owner"));
+        $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor Contact"));
         $this->addElement('text', 'addcreditor_name', ts("Name"));
         $this->addElement('text', 'addcreditor_id', ts("Identifier"));
         $this->addElement('text', 'addcreditor_address', ts("Address"));

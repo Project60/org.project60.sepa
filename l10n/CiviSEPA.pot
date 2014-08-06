@@ -1102,7 +1102,7 @@ msgstr ""
 msgid "Successfully deleted %d now obsolete contributions."
 msgstr ""
 
-#: hooks.php
+#: hooks.php sepa.php
 msgid ""
 "You cannot delete this contribution because it is connected to SEPA mandate "
 "[%s]. Delete the mandate instead!"
@@ -1212,6 +1212,7 @@ msgid "Identifier"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "PAIN Version"
 msgstr ""
 
@@ -1263,6 +1264,7 @@ msgid "You can only select days that are present in <i>every</i> month."
 msgstr ""
 
 #: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Help"
 msgstr ""
 
@@ -1318,8 +1320,231 @@ msgstr ""
 msgid "year(s)"
 msgstr ""
 
-msgid "This recurring contribution will be automatically processed every %1 %2(s)."
+msgid ""
+"This recurring contribution will be automatically processed every %1 %2(s)."
 msgstr ""
 
-msgid "Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt."
+msgid ""
+"Your initial contribution will be processed once you complete the "
+"confirmation step. You will be able to cancel the recurring contribution by "
+"visiting the web page link that will be included in your receipt."
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Creditor Owner"
+msgstr ""
+
+#: CRM/Sepa/DAO/SEPACreditor.php
+msgid "Mandate numbering prefix"
+msgstr ""
+
+#: api/v3/SepaAlternativeBatching.php
+msgid "Cannot update transaction group! Error was: '%s'"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Please enter the $value[1] as number (integers only)."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"This is the name of the creditor. This will be used throughout the system to "
+"refer to this particular creaditor."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "Postal address of the creditor."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"Home country of the creditor. <strong>Only countries that are enabled under "
+"\"Settings - Localization\" are shown here.</strong>"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"This is the Creditor Identifier, an international ID that has to be "
+"requested by the national banks."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "<strong>Be careful when changing this!</strong>"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "International Bank Account Number (IBAN) of the creditor."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"Business Identifier Code (BIC) of the financial institution of the creditor."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"SEPA file format used for the transmission of the payment request file to "
+"the bank."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"After changing this, <i>any</i> file downloaded -old or new- for this "
+"creditor will be in the new format."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"The horizon is the \"look ahead\" time frame (in days) that CiviSEPA uses to "
+"determine which single payments (OOFF) should be generated."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"For instance, a horizon value of 30 means, that the payments and the groups "
+"containing them for the next 30 days will be generated and become visible on "
+"the SEPA dashboard."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "<strong>Only positive values are allowed!</strong>"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"The horizon is the \"look ahead\" time frame (in days) that CiviSEPA uses to "
+"determine which recurring payments (RCUR) should be generated."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"The horizon is the \"look ahead\" time frame (in days) that CiviSEPA uses to "
+"determine which initial recurring payments (FRST) should be generated."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"The 'notice days' value determines the time that the creditor's financial "
+"institution requires the payment file to be submitted <i>before</i> the "
+"collection date."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "<i>Usually, you should not have to adjust this value.</i>"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"CiviSEPA operations like batching require exclusive access to the SEPA data "
+"structures. Therefore, the access of other processes is blocked while these "
+"are in progress. For security reasons, this lock times out after the "
+"specified time."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor Name"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor Address"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor Country"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor Identifier"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Batching Horizon"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Batching Notice Days"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Update lock timeout"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"<font size=\"+1\">Group '%s' <b>is now closed</b> and cannot be changed any "
+"more.</font>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "The money should be on it's way"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Sorry to hear that the bank has rejected your payment XML file."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "You might now want to try the following:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"Find out why exactly it was rejected. Oftentimes there are BICs and IBANs "
+"that are formally correct, but the accounts do not exist. In this case, "
+"banks usually would let you know which data exactly they reject. Fix this "
+"then in your mandates, update the groups, and try again."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"In the unlikely event that the file is formally wrong, try a SEPA validation "
+"tool on the internet to check the generated XML file. Contact us, if the "
+"system really generates incorrect XML files."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "<font size=\"+0.5\">Download Link:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"<b>In order to collect these payments, you have to do the following:</b>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Download the file via the above link"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Submit that file to your bank"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Select one of the options below"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"<b>Do it now! No money will be transferred until the file has been submitted "
+"successfully.</b>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Return to dashboard"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "The file was submitted successfully"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "The file was rejected"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "I changed my mind"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Creditor Contact"
 msgstr ""

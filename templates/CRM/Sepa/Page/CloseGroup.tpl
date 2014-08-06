@@ -31,7 +31,7 @@
 				<li>{ts}In the unlikely event that the file is formally wrong, try a SEPA validation tool on the internet to check the generated XML file. Contact us, if the system really generates incorrect XML files.{/ts}</li>
 			</ul>
 		{else}	
-			<p>{ts}<font size="+0.5">Download Link:{/ts}&nbsp;<a href="{$file_link}" download="{$file_name}">{$file_name}</a></font></p>
+			<p><font size="+0.5">{ts}Download Link:{/ts}&nbsp;<a href="{$file_link}" download="{$file_name}">{$file_name}</a></font></p>
 			
 
 			<p id="closed_group_instruction_text">
