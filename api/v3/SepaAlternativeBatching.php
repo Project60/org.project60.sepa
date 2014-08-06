@@ -116,8 +116,6 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   if (isset($result['is_error']) && $result['is_error']) {
     $lock->release();
     return civicrm_api3_create_error("Cannot create sepa xml file for group ".$txgroup_id);
-  }else{
-    $txgroup['sdd_file_id'] = $xmlfile['sdd_file_id'];
   }
 
   // step 5: close the txgroup object
