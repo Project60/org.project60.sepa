@@ -1,17 +1,18 @@
 {htxt id='id-name'}
-    <p>{ts}This is the name of the creditor used in SEPA forms.{/ts}</p>
+    <p>{ts}This is the name of the creditor. This will be used throughout the system to refer to this particular creaditor.{/ts}</p>
 {/htxt}
 
 {htxt id='id-address'}
-    <p>{ts}Address of the creditor.{/ts}</p>
+    <p>{ts}Postal address of the creditor.{/ts}</p>
 {/htxt}
 
 {htxt id='id-country'}
-    <p>{ts}<strong>Only countries that are enabled under "Settings - Localization" are shown here.</strong>{/ts}</p>
+    <p>{ts}Home country of the creditor. <strong>Only countries that are enabled under "Settings - Localization" are shown here.</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-id'}
-    <p>{ts}Used in reference ids for mandates.{/ts}</p>
+    <p>{ts}This is the Creditor Identifier, an international ID that has to be requested by the national banks.{/ts}</p>
+    <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-iban'}
@@ -25,34 +26,38 @@
 {/htxt}
 
 {htxt id='id-pain'}
-    <p>{ts}SEPA XML file format used by the financial institution of the creditor.{/ts}</p>
+    <p>{ts}SEPA file format used for the transmission of the payment request file to the bank.{/ts}</p>
+    <p>{ts}After changing this, <i>any</i> file downloaded -old or new- for this creditor will be in the new format.{/ts}</p>
     <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-ooff-horizon'}
-    <p>{ts}The horizon is the time frame in days that CiviSEPA uses to determine which single payment mandates (OOFF) should be processed.{/ts}</p>
+    <p>{ts}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which single payments (OOFF) should be generated.{/ts}</p>
+    <p>{ts}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
     <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-rcur-horizon'}
-    <p>{ts}The horizon is the time frame in days that CiviSEPA uses to determine which recurring payment mandates (RCUR) should be processed.{/ts}</p>
+    <p>{ts}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which recurring payments (RCUR) should be generated.{/ts}</p>
+    <p>{ts}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
     <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-frst-horizon'}
-    <p>{ts}The horizon is the time frame in days that CiviSEPA uses to determine which initial payments of recurring mandates (FRST) should be processed.{/ts}</p>
+    <p>{ts}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which initial recurring payments (FRST) should be generated.{/ts}</p>
+    <p>{ts}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
     <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-notice'}
-    <p>{ts}The notice days value determines the time that the creditor's financial institution at least needs in order to handle the direct debit.{/ts}</p>
+    <p>{ts}The 'notice days' value determines the time that the creditor's financial institution requires the payment file to be submitted <i>before</i> the collection date.{/ts}</p>
     <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
+    <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-lock'}
-    <p>{ts}This is the maximum time in seconds where other SEPA related actions are blocked (for example when CiviSEPA is processing mandates) due to security and performance reasons.{/ts}</p>
-    <p>{ts}If the operation times out the lock is automatically released after the specified time.{/ts}</p>
-    <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
+    <p>{ts}<i>Usually, you should not have to adjust this value.</i>{/ts}</p>
+    <p>{ts}CiviSEPA operations like batching require exclusive access to the SEPA data structures. Therefore, the access of other processes is blocked while these are in progress. For security reasons, this lock times out after the specified time.{/ts}</p>
 {/htxt}
 
 
