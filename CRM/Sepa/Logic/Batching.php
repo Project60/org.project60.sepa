@@ -30,9 +30,9 @@ class CRM_Sepa_Logic_Batching {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
 
-    $horizon = (int) CRM_Sepa_Logic_Settings::getSettingLegacy("org.project60.batching.alt.$mode.horizon", $creditor_id);
+    $horizon = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.horizon", $creditor_id);
     $latest_date = date('Y-m-d', strtotime("+$horizon days"));
-    $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSettingLegacy("org.project60.batching.alt.$mode.notice", $creditor_id);
+    $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.notice", $creditor_id);
     $now = strtotime("+$rcur_notice days");
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
     $payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', $mode, 'name');
@@ -197,8 +197,8 @@ class CRM_Sepa_Logic_Batching {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
 
-    $horizon = (int) CRM_Sepa_Logic_Settings::getSettingLegacy('org.project60.batching.alt.OOFF.horizon', $creditor_id);
-    $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSettingLegacy('org.project60.batching.alt.OOFF.notice', $creditor_id);
+    $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
+    $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.notice', $creditor_id);
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
     
     // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
@@ -336,6 +336,12 @@ class CRM_Sepa_Logic_Batching {
 
     $lock->release();
   }
+
+
+
+
+
+
 
   /****************************************************************************
    **                                                                        **

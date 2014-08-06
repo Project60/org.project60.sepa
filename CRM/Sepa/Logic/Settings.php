@@ -29,10 +29,11 @@ class CRM_Sepa_Logic_Settings {
    * @return string
    */
   static function getSetting($param_name, $creditor_id=NULL) {
+    $param_name = str_replace('.', '_', $param_name);
     $override = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name . "_override");
     $stdvalue = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name);
     if (($override == NULL && $stdvalue == NULL) || $stdvalue == NULL) {
-        error_log("org.project60.sepa: get_parameter for unknown key: $parameter_name");
+        error_log("org.project60.sepa: get_parameter for unknown key: $param_name");
         return NULL;
     }else if ($override == NULL) {
       return $stdvalue;
@@ -77,17 +78,8 @@ class CRM_Sepa_Logic_Settings {
    * @return lock object. check if it ->isAcquired() before use
    */
   static function getLock() {
-    $timeout = CRM_Sepa_Logic_Settings::getSettingLegacy('org.project60.batching.alt.UPDATE.lock.timeout');
+    $timeout = CRM_Sepa_Logic_Settings::getSetting('batching.UPDATE.lock.timeout');
     return new CRM_Core_Lock('org.project60.sepa.batching.update', $timeout);
   }
 
-  /**
-   * Get SEPA a setting - LEGACY METHOD
-   * 
-   * @return string
-   */
-  static function getSettingLegacy($parameter_name, $creditor_id=NULL) { 
-    $param_name = str_replace('.', '_', substr($parameter_name, 14));
-    return self::getSetting($param_name, $creditor_id);
-  }
 }
