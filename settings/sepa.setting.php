@@ -17,10 +17,10 @@
 */
 
 return array(
-  'batching_alt_OOFF_horizon_override' => array(
+  'batching_OOFF_horizon_override' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_OOFF_horizon_override',
+    'name' => 'batching_OOFF_horizon_override',
     'type' => 'String',
     'default' => "undefined",
     'add' => '4.3',
@@ -29,10 +29,10 @@ return array(
     'description' => 'OOFF Horizon override',
     'help_text' => 'OOFF horizon override',
   ),
-  'batching_alt_OOFF_notice_override' => array(
+  'batching_OOFF_notice_override' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_OOFF_notice_override',
+    'name' => 'batching_OOFF_notice_override',
     'type' => 'String',
     'default' => "undefined",
     'add' => '4.3',
@@ -41,10 +41,10 @@ return array(
     'description' => 'OOFF Notice override',
     'help_text' => 'OOFF notice override',
   ),
-  'batching_alt_RCUR_horizon_override' => array(
+  'batching_RCUR_horizon_override' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_RCUR_horizon_override',
+    'name' => 'batching_RCUR_horizon_override',
     'type' => 'String',
     'default' => "undefined",
     'add' => '4.3',
@@ -53,10 +53,10 @@ return array(
     'description' => 'RCUR horizon override',
     'help_text' => 'RCUR horizon override',
   ),
-  'batching_alt_RCUR_notice_override' => array(
+  'batching_RCUR_notice_override' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_RCUR_notice_override',
+    'name' => 'batching_RCUR_notice_override',
     'type' => 'String',
     'default' => "undefined",
     'add' => '4.3',
@@ -65,10 +65,10 @@ return array(
     'description' => 'RCUR notice override',
     'help_text' => 'RCUR notice override',
   ),
-    'batching_alt_FRST_horizon_override' => array(
+    'batching_FRST_horizon_override' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_FRST_horizon_override',
+    'name' => 'batching_FRST_horizon_override',
     'type' => 'String',
     'default' => "undefined",
     'add' => '4.3',
@@ -77,10 +77,10 @@ return array(
     'description' => 'FRST horizon override',
     'help_text' => 'FRST horizon override',
   ),
-  'batching_alt_FRST_notice_override' => array(
+  'batching_FRST_notice_override' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_FRST_notice_override',
+    'name' => 'batching_FRST_notice_override',
     'type' => 'String',
     'default' => "undefined",
     'add' => '4.3',
@@ -89,10 +89,10 @@ return array(
     'description' => 'FRST notice override',
     'help_text' => 'FRST notice override',
   ),
-  'batching_alt_OOFF_horizon' => array(
+  'batching_OOFF_horizon' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_OOFF_horizon',
+    'name' => 'batching_OOFF_horizon',
     'type' => 'String',
     'default' => "30",
     'add' => '4.3',
@@ -101,10 +101,10 @@ return array(
     'description' => 'OOFF Horizon',
     'help_text' => 'OOFF horizon',
   ),
-  'batching_alt_OOFF_notice' => array(
+  'batching_OOFF_notice' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_OOFF_notice',
+    'name' => 'batching_OOFF_notice',
     'type' => 'String',
     'default' => "6",
     'add' => '4.3',
@@ -113,10 +113,10 @@ return array(
     'description' => 'OOFF Notice',
     'help_text' => 'OOFF notice',
   ),
-  'batching_alt_RCUR_horizon' => array(
+  'batching_RCUR_horizon' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_RCUR_horizon',
+    'name' => 'batching_RCUR_horizon',
     'type' => 'String',
     'default' => "30",
     'add' => '4.3',
@@ -125,10 +125,10 @@ return array(
     'description' => 'RCUR horizon',
     'help_text' => 'RCUR horizon',
   ),
-  'batching_alt_RCUR_notice' => array(
+  'batching_RCUR_notice' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_RCUR_notice',
+    'name' => 'batching_RCUR_notice',
     'type' => 'String',
     'default' => "6",
     'add' => '4.3',
@@ -137,10 +137,10 @@ return array(
     'description' => 'RCUR notice',
     'help_text' => 'RCUR notice',
   ),
-    'batching_alt_FRST_horizon' => array(
+    'batching_FRST_horizon' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_FRST_horizon',
+    'name' => 'batching_FRST_horizon',
     'type' => 'String',
     'default' => "30",
     'add' => '4.3',
@@ -149,10 +149,10 @@ return array(
     'description' => 'FRST horizon',
     'help_text' => 'FRST horizon',
   ),
-  'batching_alt_FRST_notice' => array(
+  'batching_FRST_notice' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_FRST_notice',
+    'name' => 'batching_FRST_notice',
     'type' => 'String',
     'default' => "6",
     'add' => '4.3',
@@ -161,10 +161,10 @@ return array(
     'description' => 'FRST notice',
     'help_text' => 'FRST notice',
   ),
-  'batching_alt_UPDATE_lock_timeout' => array(
+  'batching_UPDATE_lock_timeout' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
-    'name' => 'batching_alt_UPDATE_lock_timeout',
+    'name' => 'batching_UPDATE_lock_timeout',
     'type' => 'String',
     'default' => "180",
     'add' => '4.3',

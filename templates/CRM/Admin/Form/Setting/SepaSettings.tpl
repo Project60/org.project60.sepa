@@ -153,48 +153,48 @@
         <h2>Default Batching Settings</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-ooff-horizon-days">
-              <td class="label">{$form.batching_alt_OOFF_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td>
+              <td class="label">{$form.batching_OOFF_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td>
               <td>
-                {$form.batching_alt_OOFF_horizon.html}
+                {$form.batching_OOFF_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-ooff-notice-days">
-              <td class="label">{$form.batching_alt_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
               <td>
-                {$form.batching_alt_OOFF_notice.html}
+                {$form.batching_OOFF_notice.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-horizon-days">
-              <td class="label">{$form.batching_alt_RCUR_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
+              <td class="label">{$form.batching_RCUR_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
               <td>
-                {$form.batching_alt_RCUR_horizon.html}
+                {$form.batching_RCUR_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-notice-days">
-              <td class="label">{$form.batching_alt_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
               <td>
-                {$form.batching_alt_RCUR_notice.html}
+                {$form.batching_RCUR_notice.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-frst-horizon-days">
-              <td class="label">{$form.batching_alt_FRST_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-frst-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
+              <td class="label">{$form.batching_FRST_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-frst-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
               <td>
-                {$form.batching_alt_FRST_horizon.html}
+                {$form.batching_FRST_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-frst-notice-days">
-              <td class="label">{$form.batching_alt_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
               <td>
-                {$form.batching_alt_FRST_notice.html}
+                {$form.batching_FRST_notice.html}
               </td>
             </tr>
        </table>
        <h2>System Settings</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
-              <td class="label">{$form.batching_alt_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
               <td>
-                {$form.batching_alt_UPDATE_lock_timeout.html}
+                {$form.batching_UPDATE_lock_timeout.html}
               </td>
             </tr>
        </table>
@@ -225,12 +225,12 @@
     });
 
   var customBatchingParams = [
-              ["batching_alt_OOFF_horizon_override", "custom_OOFF_horizon", null],
-              ["batching_alt_OOFF_notice_override",  "custom_OOFF_notice", null],
-              ["batching_alt_RCUR_horizon_override", "custom_RCUR_horizon", null],
-              ["batching_alt_RCUR_notice_override", "custom_RCUR_notice", null],
-              ["batching_alt_FRST_horizon_override", "custom_FRST_horizon", null],
-              ["batching_alt_FRST_notice_override", "custom_FRST_notice", null]
+              ["batching_OOFF_horizon_override", "custom_OOFF_horizon", null],
+              ["batching_OOFF_notice_override",  "custom_OOFF_notice", null],
+              ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
+              ["batching_RCUR_notice_override", "custom_RCUR_notice", null],
+              ["batching_FRST_horizon_override", "custom_FRST_horizon", null],
+              ["batching_FRST_notice_override", "custom_FRST_notice", null]
              ];
 
   function deletecreditor(id) {

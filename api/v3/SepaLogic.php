@@ -25,7 +25,7 @@
  * This function will close a transaction group,
  * and perform the necessary logical changes to the mandates contained
  */
-function civicrm_api3_sepa_alternative_batching_close($params) {
+function civicrm_api3_sepa_logic_close($params) {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
   }
@@ -38,7 +38,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   }
 }
 
-function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
+function _civicrm_api3_sepa_logic_close_spec (&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -49,7 +49,7 @@ function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
  * @param txgroup_id  the transaction group for which the file should be created
  * @param override    if true, will override an already existing file and create a new one
  */
-function civicrm_api3_sepa_alternative_batching_createxml($params) {
+function civicrm_api3_sepa_logic_createxml($params) {
   $override = (isset($params['override'])) ? $params['override'] : false;
   
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
@@ -62,7 +62,7 @@ function civicrm_api3_sepa_alternative_batching_createxml($params) {
   }
 }
 
-function civicrm_api3_sepa_alternative_batching_createxml_spec(&$params) {
+function civicrm_api3_sepa_logic_createxml_spec(&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -76,7 +76,7 @@ function civicrm_api3_sepa_alternative_batching_createxml_spec(&$params) {
  *
  * @package CiviCRM_SEPA
  */
-function civicrm_api3_sepa_alternative_batching_received($params) {
+function civicrm_api3_sepa_logic_received($params) {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
   }
@@ -89,7 +89,7 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
   }
 }
 
-function _civicrm_api3_sepa_alternative_batching_received_spec (&$params) {
+function _civicrm_api3_sepa_logic_received_spec (&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -102,7 +102,7 @@ function _civicrm_api3_sepa_alternative_batching_received_spec (&$params) {
  * @package CiviCRM_SEPA
  *
  */
-function civicrm_api3_sepa_alternative_batching_closeended($params) {
+function civicrm_api3_sepa_logic_closeended($params) {
   $error = CRM_Sepa_Logic_Batching::closeEnded();
   if (empty($error_message)) {
     return civicrm_api3_create_success();
@@ -120,7 +120,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
  * @package CiviCRM_SEPA
  *
  */
-function civicrm_api3_sepa_alternative_batching_update($params) {
+function civicrm_api3_sepa_logic_update($params) {
   // get creditor list
   $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
 
