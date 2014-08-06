@@ -29,8 +29,47 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
 		if ($pp['class_name'] = "Payment_SDD") {
 			// that's ours!
+
+			// get payment processor id
+			$pp_id = $form->getVar('_id');
+
+			// build and execute query to find the associated creditor
+			$creditor_id      = NULL;
+			$test_creditor_id = NULL;
+
+			$pp_creditor      = NULL;
+			$test_pp_creditor = NULL;
+
+			if (!empty($pp_id)) {
+				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', $pp_id);
+				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test', $pp_id);
+			}
+
+			// load settings from creditor
+			if ($creditor_id) {
+				$pp_creditor      = civicrm_api('SepaCreditor', 'getsingle', array('version'=>3, 'id'=>$creditor_id));
+				$test_pp_creditor = civicrm_api('SepaCreditor', 'getsingle', array('version'=>3, 'id'=>$test_creditor_id));
+				// TODO: ERROR HANDLING
+			}
+			
 			$creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3));
-			$form->assign('creditors', $creditors['values']);
+			$creditors = $creditors['values'];
+
+			// use settings
+			if ($pp_creditor) {
+				$form->assign('user_name', $creditor_id);
+				$form->assign('creditors', $creditors);
+			}else{
+				$form->assign('creditors', $creditors);
+			}
+
+			if ($test_pp_creditor) {
+				$form->assign('test_user_name', $test_creditor_id);
+				$form->assign('creditors', $creditors);
+			}else{
+				$form->assign('creditors', $creditors);
+			}
+
 			$form->assign('cycle_day', 1);
 
 			// build cycle day options
@@ -67,6 +106,15 @@ function sepa_pp_postProcess( $formName, &$form ) {
 		if ($pp['class_name'] = "Payment_SDD") {
 			$paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', 
 				array('name' => $form->_submitValues['name'], 'is_test' => 0));
+
+			$creditor_id = $form->_submitValues['user_name'];
+			$test_creditor_id = $form->_submitValues['test_user_name'];
+			$pp_id = $paymentProcessor['id'];
+
+			// save settings
+			// FIXME: we might consider saving this as a JSON object
+			CRM_Core_BAO_Setting::setItem($creditor_id, 'SEPA Direct Debit PP', $pp_id);
+			CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP Test', $pp_id);
 		}
 	}
 }

@@ -549,7 +549,7 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
 
     // update txgroup
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
-    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "FRST"));
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
     
     $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_txgroup;', array());
     $this->assertDBQuery(2, 'select count(*) from civicrm_contribution_recur;', array());
