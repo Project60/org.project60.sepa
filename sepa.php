@@ -20,7 +20,7 @@ function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
 
-    if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
+    if (!CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
       return;
 
     if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
@@ -47,7 +47,7 @@ function sepa_civicrm_pageRun( &$page ) {
     // This is a one-off contribution => try to show mandate data.
     $template_vars = $page->getTemplate()->get_template_vars('recur');
     $payment_instrument_id = $template_vars['payment_instrument_id'];
-    if (!CRM_Sepa_Logic_Base::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
+    if (!CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
       return;
 
     $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
