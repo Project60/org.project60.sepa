@@ -98,7 +98,9 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         if ($group['status']=='closed') {
           $group['submit'] = 'closed';
         } else {
-          if ($remaining_days <= 1) {
+          if ($remaining_days <= -1) {
+            $group['submit'] = 'missed';
+          } elseif ($remaining_days <= 1) {
             $group['submit'] = 'urgently';
           } elseif ($remaining_days <= 6) {
             $group['submit'] = 'soon';
