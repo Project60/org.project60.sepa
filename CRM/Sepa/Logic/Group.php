@@ -108,7 +108,7 @@ class CRM_Sepa_Logic_Group {
 
     // step 4: create the sepa file
     $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
-    if (isset($result['is_error']) && $result['is_error']) {
+    if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
       $lock->release();
       return "Cannot create sepa xml file for group ".$txgroup_id;
     }
@@ -137,7 +137,7 @@ class CRM_Sepa_Logic_Group {
    *
    * @return error message, unless successful
    */
-  function received($txgroup_id) {
+  static function received($txgroup_id) {
     // step 0: check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (!$lock->isAcquired()) {
