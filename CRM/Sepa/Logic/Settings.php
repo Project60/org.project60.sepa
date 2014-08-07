@@ -41,8 +41,37 @@ class CRM_Sepa_Logic_Settings {
       $override = json_decode($override);
       if (isset($override->{$creditor_id})) {
         return $override->{$creditor_id};
+      } else {
+        return $stdvalue;
       }
-      return $stdvalue;
+    }
+  }
+
+  /**
+   * Set SEPA a setting.
+   * We have extended the system used in CRM_Core_BAO_Setting by 
+   * an override mechanism, so creditors can indivudally have
+   * different values than the default
+   * 
+   * @param string
+   */
+  static function setSetting($param_name, $value, $creditor_id=NULL) {
+    $param_name = str_replace('.', '_', $param_name);
+    if (empty($creditor_id)) {
+      // set the general setting
+      CRM_Core_BAO_Setting::setItem($value, 'SEPA Direct Debit Preferences', $param_name);
+    } else {
+      // set the individual override
+      $override_string = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name . "_override");
+      $override = json_decode($override_string);
+      if ($value==NULL || $value=='') {
+        // remove override
+        unset($override->{$creditor_id});
+      } else {
+        // add override
+        $override->{$creditor_id} = $value;
+      }
+      CRM_Core_BAO_Setting::setItem(json_encode($override), 'SEPA Direct Debit Preferences', $param_name . "_override");
     }
   }
 
