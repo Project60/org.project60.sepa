@@ -132,24 +132,13 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     }
 
     // get the contribution via 'invoiceID'
-    $contr_params = array();
-    $contr_params['invoiceID'] = $params['invoiceID'];
-    try {
-        $contribution = civicrm_api3('Contribution', 'getsingle', $contr_params);
-    }
-    catch (CiviCRM_API3_Exception $e) {
-        CRM_Core_Error::debug_log_message($e->getMessage());
-        //TODO: What is the correct error-handling?
-    }
+    $params['contact_id'] = $this->getForm()->getVar('_contactID');
 
-    $params['contribution_id'] = $contribution['id'];
-    $params['contact_id'] = $contribution['contact_id'];
-
-    error_log(print_r($params));
     if (empty($params['is_recur'])) {
       return $this->_createOOFFmandate($params);
     } else {
-      $params['contribution_recur_id'] = $contribution['contribution_recur_id'];
+      $params['contribution_id'] = $params['contributionID'];
+      $params['contribution_recur_id'] = $params['contributionRecurID'];
       return $this->_createRCURmandate($params);
     }
   }
@@ -158,9 +147,9 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   function _createOOFFmandate(&$params) {
     // fix contribution
     $contribution = civicrm_api3('Contribution', 'create', array(
-        'id' => $params['contribution_id'],
         'total_amount' => $params['amount'],
         'contact_id' => $params['contact_id'],
+        'invoice_id' => $params['invoiceID'],
         'financial_type_id' => $params['contributionTypeID'],
         'payment_instrument_id' => CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name'),
         'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
@@ -188,7 +177,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $mandate_id = $mandate['id'];
     $params['mandate_reference'] = $mandate['values'][$mandate_id]['reference'];
 
-    return array(true);
+    return FALSE;
   }
 
 
