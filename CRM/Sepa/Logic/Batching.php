@@ -22,18 +22,23 @@ class CRM_Sepa_Logic_Batching {
 
   /**
    * runs a batching update for all RCUR mandates for the given creditor
+   * 
+   * @param $creditor_id  the creaditor to be batched
+   * @param $mode         'FRST' or 'RCUR'
+   * @param $now          can be set to cause a batching run from another 
+   *                           temporal point of view than, well, "now".
    */
-  static function updateRCUR($creditor_id, $mode) {
+  static function updateRCUR($creditor_id, $mode, $now = 'now') {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (!$lock->isAcquired()) {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
-
-    $horizon = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.horizon", $creditor_id);
-    $latest_date = date('Y-m-d', strtotime("+$horizon days"));
+    $horizon = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.horizon", $creditor_id);
+    $latest_date = date('Y-m-d', strtotime("$now +$horizon days"));
     $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.notice", $creditor_id);
-    $now = strtotime("+$rcur_notice days");
+    $now = strtotime("$now +$rcur_notice days");  // (virtually) move ahead notice_days
+    $now = strtotime(date('Y-m-d', $now));        // round to full day
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
     $payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', $mode, 'name');
 
@@ -190,7 +195,7 @@ class CRM_Sepa_Logic_Batching {
   /**
    * runs a batching update for all OOFF mandates
    */
-  static function updateOOFF($creditor_id) {
+  static function updateOOFF($creditor_id, $now = 'now') {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (!$lock->isAcquired()) {
@@ -200,7 +205,8 @@ class CRM_Sepa_Logic_Batching {
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
     $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.notice', $creditor_id);
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
-    
+    $date_limit = date('Y-m-d', strtotime("$now +$ooff_notice days"));
+      
     // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
     $sql_query = "
       SELECT
@@ -210,7 +216,7 @@ class CRM_Sepa_Logic_Batching {
         contribution.receive_date AS start_date
       FROM civicrm_sdd_mandate AS mandate
       INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id
-      WHERE contribution.receive_date <= (NOW() + INTERVAL $horizon DAY)
+      WHERE contribution.receive_date <= DATE('$date_limit')
         AND mandate.type = 'OOFF'
         AND mandate.status = 'OOFF'
         AND mandate.creditor_id = $creditor_id;";
@@ -228,7 +234,7 @@ class CRM_Sepa_Logic_Batching {
 
     // step 2: group mandates in collection dates
     $calculated_groups = array();
-    $earliest_collection_date = date('Y-m-d', strtotime("+$ooff_notice days"));
+    $earliest_collection_date = date('Y-m-d', strtotime("$now +$ooff_notice days"));
     $latest_collection_date = '';
 
     foreach ($relevant_mandates as $mandate_id => $mandate) {
