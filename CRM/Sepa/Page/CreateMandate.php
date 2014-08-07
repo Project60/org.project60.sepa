@@ -377,8 +377,11 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $_REQUEST['bic'] = strtoupper($_REQUEST['bic']);
       if (strlen($_REQUEST['bic']) == 0) {
         $errors['bic'] = sprintf(ts("'%s' is a required field."), "BIC");
-      } elseif (!preg_match("/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/", $_REQUEST['bic'])) {
-        $errors['bic'] = ts("BIC is not correct");
+      } else {
+        $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($_REQUEST['bic']);
+        if (!empty($bic_error)) {
+          $errors['bic'] = $bic_error;
+        }
       }
     }
 
@@ -389,8 +392,9 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       if (strlen($_REQUEST['iban']) == 0) {
         $errors['iban'] = sprintf(ts("'%s' is a required field."), "IBAN");
       } else {
-        if (!verify_iban($_REQUEST['iban'])) {
-          $errors['iban'] = ts("IBAN is not correct");
+        $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($_REQUEST['iban']);
+        if (!empty($iban_error)) {
+          $errors['iban'] = $iban_error;
         }
       }
     }

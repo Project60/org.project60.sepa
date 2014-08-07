@@ -613,21 +613,21 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
    */
   public function testFRSTtoRCURswitch() {
     // select cycle day so that the submission would be due today
-    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_alt_FRST_notice');
+    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
     $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
-    CRM_Core_BAO_Setting::setItem('SEPA Direct Debit Preferences', 'batching_alt_RCUR_notice', $frst_notice);
-    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_alt_RCUR_notice');
+    CRM_Core_BAO_Setting::setItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice', $frst_notice);
+    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
     $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
     $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
     $cycle_day = date("d", strtotime("+$frst_notice days"));
 
     // also, horizon mustn't be big enough to create another contribution
-    CRM_Core_BAO_Setting::setItem(27, 'SEPA Direct Debit Preferences', 'batching_alt_FRST_horizon');
-    $frst_horizon = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_alt_FRST_horizon');
+    CRM_Core_BAO_Setting::setItem(27, 'SEPA Direct Debit Preferences', 'batching_FRST_horizon');
+    $frst_horizon = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_horizon');
     $this->assertEquals(27, $frst_horizon);
 
-    CRM_Core_BAO_Setting::setItem(27, 'SEPA Direct Debit Preferences', 'batching_alt_RCUR_horizon');
-    $rcur_horizon = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_alt_RCUR_horizon');
+    CRM_Core_BAO_Setting::setItem(27, 'SEPA Direct Debit Preferences', 'batching_RCUR_horizon');
+    $rcur_horizon = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_horizon');
     $this->assertEquals(27, $rcur_horizon);
 
     // 1) create a FRST mandate, due for collection right now

@@ -20,13 +20,13 @@ require_once 'CRM/Core/BAO/CustomField.php';
 class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 {
     private $config_fields = array(
-                         array('batching.alt.OOFF.horizon', 'OOFF horizon'),
-                         array('batching.alt.OOFF.notice', 'OOFF notice days'),
-                         array('batching.alt.RCUR.horizon', 'RCUR horizon'),
-                         array('batching.alt.RCUR.notice', 'RCUR notice days'),
-                         array('batching.alt.FRST.horizon', 'FRST horizon'),
-                         array('batching.alt.FRST.notice', 'FRST notice days'),
-                         array('batching.alt.UPDATE.lock.timeout', 'Update lock timeout'),
+                         array('batching.OOFF.horizon', 'OOFF horizon'),
+                         array('batching.OOFF.notice', 'OOFF notice days'),
+                         array('batching.RCUR.horizon', 'RCUR horizon'),
+                         array('batching.RCUR.notice', 'RCUR notice days'),
+                         array('batching.FRST.horizon', 'FRST horizon'),
+                         array('batching.FRST.notice', 'FRST notice days'),
+                         array('batching.UPDATE.lock.timeout', 'Update lock timeout'),
                         );
 
     private $custom_fields = array(
@@ -105,7 +105,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $country_ids = array('' => ts('- select -')) + $filtered;
 
         // add creditor form elements
-        $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor Owner"));
+        $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor Contact"));
         $this->addElement('text', 'addcreditor_name', ts("Name"));
         $this->addElement('text', 'addcreditor_id', ts("Identifier"));
         $this->addElement('text', 'addcreditor_address', ts("Address"));
