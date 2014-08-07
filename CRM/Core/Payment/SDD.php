@@ -38,6 +38,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('SEPA Direct Debit');
+    $this->_creditorId = $paymentProcessor['user_name'];
   }
 
   /**
@@ -85,8 +86,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 TRUE, 
                 array());
 
-    $rcur_notice_days = 8; // FIXME: read notice period from settings
-    $ooff_notice_days = 5; // FIXME: read notice period from settings
+    $rcur_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $this->_creditorId);
+    $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
     $form->assign('earliest_rcur_date', date('m/d/Y', strtotime("now + $rcur_notice_days days")));
     $form->assign('earliest_ooff_date', date('m/d/Y', strtotime("now + $ooff_notice_days days")));
 
@@ -117,8 +118,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   function doDirectPayment(&$params) {
     $test_mode = ($this->_mode == 'test');
     
-    // TODO: $this->_paymentProcessor['creditor_id'];
-    $params['creditor_id'] = 3;
+    $params['creditor_id'] = $this->_creditorId;
     
     // copy frequency_interval unit
     $params['frequency_interval'] = $params['frequency'];
@@ -133,6 +133,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['contributionTypeID'] = $financial_type->id;
     }
 
+    // --- DEPRECATED ---
     // look up contact
     $contacts = civicrm_api3('Contact', 'get', array(
       'email' => $params['email'],
@@ -149,6 +150,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $contact = reset($contacts['values']);
     }
     $params['contact_id'] = $contact['id'];
+    // --- DEPRECATED ---
 
     if (empty($params['is_recur'])) {
       return $this->_createOOFFmandate($params);

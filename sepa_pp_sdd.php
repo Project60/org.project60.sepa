@@ -33,7 +33,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			// get payment processor id
 			$pp_id = $form->getVar('_id');
 
-			// build and execute query to find the associated creditor
+			// find the associated creditor(s)
 			$creditor_id      = NULL;
 			$test_creditor_id = NULL;
 
