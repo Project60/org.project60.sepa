@@ -139,7 +139,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    * 
    * @return int id of the sepa file entity created, or an error message string
    */
-  function createFile($txgroup_id, $override = false) {
+  static function createFile($txgroup_id, $override = false) {
     $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
     if (isset($txgroup['is_error']) && $txgroup['is_error']) {
       return "Cannot find transaction group ".$txgroup_id;
@@ -189,4 +189,46 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       } 
     }
   }  
+
+  /**
+   * This method will adjust the collection date, 
+   *   so it can still be submitted by the give submission date
+   * 
+   * @param txgroup_id              the transaction group for which the file should be created
+   * @param latest_submission_date  the date when it should be submitted
+   * 
+   * @return an update array with the txgroup or a string with an error message
+   */
+  static function adjustCollectionDate($txgroup_id, $latest_submission_date) {
+    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('version'=>3, 'id'=>$txgroup_id));
+    if (!empty($txgroup['is_error'])) {
+      return $txgroup['error_message'];
+    }
+
+    $test_date_parse = strtotime($latest_submission_date);
+    if (empty($test_date_parse)) {
+      return "Bad date adjustment given!";
+    }
+
+    $notice_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.${txgroup['type']}.notice", $txgroup['sdd_creditor_id']);
+    $new_collection_date = date('YmdHis', strtotime("$latest_submission_date + $notice_period days"));
+    $new_latest_submission_date = date('YmdHis', strtotime("$latest_submission_date"));
+
+    $result = civicrm_api('SepaTransactionGroup', 'create', array(
+      'version'                => 3, 
+      'id'                     => $txgroup_id,
+      'collection_date'        => $new_collection_date,
+      'latest_submission_date' => $new_latest_submission_date));
+    if (!empty($result['is_error'])) {
+      return $result['error_message'];
+    }
+
+    // reload the item
+    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('version'=>3, 'id'=>$txgroup_id));
+    if (!empty($txgroup['is_error'])) {
+      return $txgroup['error_message'];
+    } else {
+      return $txgroup;
+    }
+  }
 }

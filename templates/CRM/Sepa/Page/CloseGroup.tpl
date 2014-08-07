@@ -30,9 +30,14 @@
 				<li>{ts}Find out why exactly it was rejected. Oftentimes there are BICs and IBANs that are formally correct, but the accounts do not exist. In this case, banks usually would let you know which data exactly they reject. Fix this then in your mandates, update the groups, and try again.{/ts}</li>
 				<li>{ts}In the unlikely event that the file is formally wrong, try a SEPA validation tool on the internet to check the generated XML file. Contact us, if the system really generates incorrect XML files.{/ts}</li>
 			</ul>
-		{else}	
+		{elseif $status eq "missed"}
+			<p><span class="icon red-icon alert-icon"> </span>
+			{ts}<strong>You did not submit this SEPA group in time! It is possible that the bank will reject the payment requests.</strong>{/ts}
+			<span class="icon red-icon alert-icon"> </span></p>
+			<p>{ts}As a workaround, we can adjust the collection date, so that you can still submit the file today. <strong>Today! <font color="red">NOW!</font></strong>{/ts}</p>
+			<p>{ts}However, the bank might still reject the file, since this is an illegal deviation from you announced collection date. Try to avoid this in the future!{/ts}</p>
+		{else}
 			<p><font size="+0.5">{ts}Download Link:{/ts}&nbsp;<a href="{$file_link}" download="{$file_name}">{$file_name}</a></font></p>
-			
 
 			<p id="closed_group_instruction_text">
 				{ts}<b>In order to collect these payments, you have to do the following:</b>{/ts}
@@ -51,8 +56,15 @@
 		<a href="{crmURL p="civicrm/sepa/dashboard" q="status=closed"}" class="button button_export">{ts}Return to dashboard{/ts}</a>
 	{elseif $status eq "invalid"}
 		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts}Return to dashboard{/ts}</a>
+	{elseif $status eq "missed"}
+		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&adjust=today"}" class="button button_export">{ts}Do it! Now!{/ts}</a>
+		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts}I can't submit it right now{/ts}</a>
 	{else}
-		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=closed"}" class="button button_export">{ts}The file was submitted successfully{/ts}</a><a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=invalid"}" class="button button_export">{ts}The file was rejected{/ts}</a><a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts}I changed my mind{/ts}</a>
+		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=closed"}" class="button button_export">{ts}The file was submitted successfully{/ts}</a>
+		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=invalid"}" class="button button_export">{ts}The file was rejected{/ts}</a>
+		{if not $smarty.request.adjust}
+		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts}I changed my mind{/ts}</a>
+		{/if}
 	{/if}
 	</p>
 </div>

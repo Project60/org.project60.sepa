@@ -43,9 +43,9 @@
     <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 
-{htxt id='id-frst-horizon'}
-    <p>{ts}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which initial recurring payments (FRST) should be generated.{/ts}</p>
-    <p>{ts}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
+{htxt id='id-rcur-grace'}
+    <p>{ts}The RCUR grace period is the time, that the submission of a group could be delayed before it gets deleted.{/ts}</p>
+    <p>{ts}For instance, a grace value of 7 means, that if you forget to submit the group in time for a week, it gets deleted. During the grace period, you can still try to submit the group, but it's up to the bank whether it is accepted or rejected.{/ts}</p>
     <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 

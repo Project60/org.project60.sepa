@@ -84,7 +84,12 @@
     <td>
       <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts}Contributions{/ts}</a>
       {if $group.status == 'open'}
-        <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">{ts}Close and Submit{/ts}</a>
+        {if $group.submit == 'missed'}
+        <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id&status=missed"}" class="button button_close">
+        {else}
+        <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">
+        {/if}
+        {ts}Close and Submit{/ts}</a>
       {else}
         <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}.xml" class="button button_export">{ts}Download Again{/ts}</a>
         {if $closed_status_id eq $group.status_id}
@@ -98,6 +103,7 @@
 
 {literal}
 <style>
+  tr.submit_missed {background-color:#000000; color:#FA583F;}
   tr.submit_urgently {background-color:#FA583F;}
   tr.submit_soon {background-color:#FAB83F;}
   tr.submit_closed {background-color:#f0f8ff;}
