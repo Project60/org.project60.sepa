@@ -622,13 +622,8 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $cycle_day = date("d", strtotime("+$frst_notice days"));
 
     // also, horizon mustn't be big enough to create another contribution
-    CRM_Core_BAO_Setting::setItem(27, 'SEPA Direct Debit Preferences', 'batching_FRST_horizon');
-    $frst_horizon = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_horizon');
-    $this->assertEquals(27, $frst_horizon);
-
     CRM_Core_BAO_Setting::setItem(27, 'SEPA Direct Debit Preferences', 'batching_RCUR_horizon');
     $rcur_horizon = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_horizon');
-    $this->assertEquals(27, $rcur_horizon);
 
     // 1) create a FRST mandate, due for collection right now
     $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'), array('cycle_day' => $cycle_day));

@@ -119,16 +119,16 @@
                 {$form.custom_RCUR_horizon.html}
               </td>
             </tr>
+            <tr class="crm-custom-form-block-rcur-grace-days">
+              <td class="label">{$form.custom_RCUR_grace.label} <a onclick='CRM.help("{ts}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td>
+              <td>
+                {$form.custom_RCUR_grace.html}
+              </td>
+            </tr>
             <tr class="crm-custom-form-block-rcur-notice-days">
               <td class="label">{$form.custom_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
               <td>
                 {$form.custom_RCUR_notice.html}
-              </td>
-            </tr>
-            <tr class="crm-custom-form-block-frst-horizon-days">
-              <td class="label">{$form.custom_FRST_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-frst-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td>
-              <td>
-                {$form.custom_FRST_horizon.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-frst-notice-days">
@@ -170,16 +170,16 @@
                 {$form.batching_RCUR_horizon.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-rcur-grace-days">
+              <td class="label">{$form.batching_RCUR_grace.label} <a onclick='CRM.help("{ts}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
+              <td>
+                {$form.batching_RCUR_grace.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-rcur-notice-days">
               <td class="label">{$form.batching_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
               <td>
                 {$form.batching_RCUR_notice.html}
-              </td>
-            </tr>
-            <tr class="crm-alternative_batching-form-block-frst-horizon-days">
-              <td class="label">{$form.batching_FRST_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-frst-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
-              <td>
-                {$form.batching_FRST_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-frst-notice-days">
@@ -228,8 +228,8 @@
               ["batching_OOFF_horizon_override", "custom_OOFF_horizon", null],
               ["batching_OOFF_notice_override",  "custom_OOFF_notice", null],
               ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
+              ["batching_RCUR_grace_override", "custom_RCUR_grace", null],
               ["batching_RCUR_notice_override", "custom_RCUR_notice", null],
-              ["batching_FRST_horizon_override", "custom_FRST_horizon", null],
               ["batching_FRST_notice_override", "custom_FRST_notice", null]
              ];
 

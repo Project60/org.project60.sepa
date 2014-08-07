@@ -23,8 +23,8 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.OOFF.horizon', 'OOFF horizon'),
                          array('batching.OOFF.notice', 'OOFF notice days'),
                          array('batching.RCUR.horizon', 'RCUR horizon'),
+                         array('batching.RCUR.grace', 'RCUR grace'),
                          array('batching.RCUR.notice', 'RCUR notice days'),
-                         array('batching.FRST.horizon', 'FRST horizon'),
                          array('batching.FRST.notice', 'FRST notice days'),
                          array('batching.UPDATE.lock.timeout', 'Update lock timeout'),
                         );
@@ -33,8 +33,8 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('custom_OOFF_horizon', 'OOFF horizon'),
                          array('custom_OOFF_notice', 'OOFF notice days'),
                          array('custom_RCUR_horizon', 'RCUR horizon'),
+                         array('custom_RCUR_grace', 'RCUR grace'),
                          array('custom_RCUR_notice', 'RCUR notice days'),
-                         array('custom_FRST_horizon', 'FRST horizon'),
                          array('custom_FRST_notice', 'FRST notice days'),
                          array('custom_update_lock_timeout', 'Update lock timeout'),
                         );
