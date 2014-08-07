@@ -27,7 +27,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
   function run() {
     if (isset($_REQUEST['group_id'])) {
-        if (isset($_REQUEST['status']) && ($_REQUEST['status'] == "invalid" || $_REQUEST['status'] == "closed")) {
+        if (isset($_REQUEST['status']) && ($_REQUEST['status'] == "missed" || $_REQUEST['status'] == "invalid" || $_REQUEST['status'] == "closed")) {
           $this->assign('status', $_REQUEST['status']);
         }else{
           $_REQUEST['status'] = "";
@@ -42,7 +42,20 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
           CRM_Core_Session::setStatus("Cannot load group #$group_id.<br/>Error was: ".$group['error_message'], ts('Error'), 'error');
         } else {
           $this->assign('txgroup', $group);
+
           if ($_REQUEST['status'] == "") {
+            // first adjust group's collection date if requested
+            if (!empty($_REQUEST['adjust'])) {
+              $result = CRM_Sepa_BAO_SEPATransactionGroup::adjustCollectionDate($group_id, $_REQUEST['adjust']);
+              if (is_string($result)) {
+                // that's an error -> stop here!
+                die($result);
+              } else {
+                // that went well, so result should be the update group data
+                $group = $result;
+              }
+            }
+
 
             // delete old txfile
             if (!empty($group['sdd_file_id'])) {
