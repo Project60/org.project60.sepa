@@ -135,14 +135,17 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $contr_params = array();
     $contr_params['invoiceID'] = $params['invoiceID'];
     try {
-        $contribution = civicrm_api3('Contribution', 'getsingle', $contr_paramss);
-    } catch (CiviCRM_API3_Exception $e) {
-        //TODO: error-handling
+        $contribution = civicrm_api3('Contribution', 'getsingle', $contr_params);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+        CRM_Core_Error::debug_log_message($e->getMessage());
+        //TODO: What is the correct error-handling?
     }
 
     $params['contribution_id'] = $contribution['id'];
     $params['contact_id'] = $contribution['contact_id'];
 
+    error_log(print_r($params));
     if (empty($params['is_recur'])) {
       return $this->_createOOFFmandate($params);
     } else {
