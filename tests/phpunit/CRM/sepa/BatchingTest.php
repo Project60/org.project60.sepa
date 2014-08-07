@@ -615,7 +615,7 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     // select cycle day so that the submission would be due today
     $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
     $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
-    CRM_Core_BAO_Setting::setItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice', $frst_notice);
+    CRM_Core_BAO_Setting::setItem($frst_notice, 'SEPA Direct Debit Preferences', 'batching_RCUR_notice');
     $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
     $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
     $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
@@ -673,4 +673,57 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $this->assertEquals($group_count_before, $group_count_after, "A new group has been created, but shouldn't have!");
     $this->assertDBQuery(1, "SELECT count(id) FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");    
   }  
+
+  /**
+   * Make sure a lost group will not be deleted
+   * 
+   * @see https://github.com/Project60/sepa_dd/issues/...
+   * @author endres -at- systopia.de
+   */
+  public function testLostGroup() {
+    // 1) create a payment and select cycle day so that the submission would be due today
+    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
+    $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
+    CRM_Core_BAO_Setting::setItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice', $frst_notice);
+    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+    $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
+    $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
+    $cycle_day = date("d", strtotime("+$frst_notice days"));
+   
+    // 2) create a FRST mandate, due for collection right now
+    $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'), array('cycle_day' => $cycle_day));
+    $mandate_before_batching = $this->callAPISuccess("SepaMandate", "getsingle", array("id" => $mandate['id']));
+    $this->assertTrue(($mandate_before_batching['status']=='FRST'), "Mandate was not created in the correct status.");
+
+    // 3) batch and find and check the created contribution
+    CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST');
+    $contribution_recur_id = $mandate['entity_id'];
+    $this->assertNotEmpty($contribution_recur_id, "No entity set in mandate");
+    $contribution_id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");
+    $this->assertNotEmpty($contribution_id, "Couldn't find created contribution.");    
+    $this->assertDBQuery(1, "SELECT count(id) FROM civicrm_contribution WHERE contribution_recur_id=$contribution_recur_id;");
+    $this->assertDBQuery(1, "SELECT count(txgroup_id) FROM civicrm_sdd_contribution_txgroup WHERE contribution_id=$contribution_id;");
+    $txgroup_id = CRM_Core_DAO::singleValueQuery("SELECT txgroup_id FROM civicrm_sdd_contribution_txgroup WHERE contribution_id=$contribution_id;");
+    $txgroup = $this->callAPISuccess("SepaTransactionGroup", "getsingle", array("id" => $txgroup_id));
+    $latest_submission_date = explode(' ', $txgroup['latest_submission_date']);
+    $this->assertEquals(date('Y-m-d'), $latest_submission_date[0], "Something went wrong, this group should be due today!");
+
+    // 4) set the grace period to 7 and virtually execute batching for the day after tomorrow
+    //      => the group should be retained
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace', '7');
+    $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $mandate['creditor_id']);
+    $this->assertEquals(7, $grace_period, "Setting the grace period failed!");
+    CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST', date('Y-m-d', strtotime("+3 day")));
+    $txgroups = $this->callAPISuccess("SepaTransactionGroup", "get", array("id" => $txgroup_id));
+    $this->assertEquals(1, $txgroups['count'], "transaction group was deleted!");
+
+    // 5) set the grace period to 0 and virtually execute batching for the day after tomorrow
+    //      => the group should be deleted
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace', '0');
+    $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $mandate['creditor_id']);
+    $this->assertEquals(0, $grace_period, "Setting the grace period failed!");
+    CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST', date('Y-m-d', strtotime("+3 day")));
+    $txgroups = $this->callAPISuccess("SepaTransactionGroup", "get", array("id" => $txgroup_id));
+    $this->assertEquals(0, $txgroups['count'], "transaction group was not deleted!");
+  }
 }

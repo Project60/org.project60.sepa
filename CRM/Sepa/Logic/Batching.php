@@ -35,9 +35,12 @@ class CRM_Sepa_Logic_Batching {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.horizon", $creditor_id);
+    $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $creditor_id);
     $latest_date = date('Y-m-d', strtotime("$now +$horizon days"));
+
     $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.notice", $creditor_id);
-    $now = strtotime("$now +$rcur_notice days");  // (virtually) move ahead notice_days
+    // (virtually) move ahead notice_days, but also go back grace days
+    $now = strtotime("$now +$rcur_notice days -$grace_period days");
     $now = strtotime(date('Y-m-d', $now));        // round to full day
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
     $payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', $mode, 'name');
