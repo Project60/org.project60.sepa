@@ -29,18 +29,63 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
 		if ($pp['class_name'] = "Payment_SDD") {
 			// that's ours!
+
+			// get payment processor id
+			$pp_id = $form->getVar('_id');
+
+			// find the associated creditor(s)
+			$creditor_id      = NULL;
+			$test_creditor_id = NULL;
+
+			$pp_creditor      = NULL;
+			$test_pp_creditor = NULL;
+
+			$cycle_day        = 1;
+			$test_cycle_day   = 1;
+
+			if (!empty($pp_id)) {
+				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', $pp_id);
+				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test', $pp_id);
+				$cycle_day        = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP CD', $pp_id);
+				$test_cycle_day   = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test CD', $pp_id);
+			}
+
+			// load settings from creditor
+			if ($creditor_id) {
+				$pp_creditor      = civicrm_api('SepaCreditor', 'getsingle', array('version'=>3, 'id'=>$creditor_id));
+				$test_pp_creditor = civicrm_api('SepaCreditor', 'getsingle', array('version'=>3, 'id'=>$test_creditor_id));
+				// TODO: ERROR HANDLING
+			}
+			
 			$creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3));
-			$form->assign('creditors', $creditors['values']);
-			$form->assign('cycle_day', 1);
+			$creditors = $creditors['values'];
+
+			// use settings
+			if ($pp_creditor) {
+				$form->assign('user_name', $creditor_id);
+				$form->assign('creditors', $creditors);
+			}else{
+				$form->assign('creditors', $creditors);
+			}
+
+			if ($test_pp_creditor) {
+				$form->assign('test_user_name', $test_creditor_id);
+				$form->assign('creditors', $creditors);
+			}else{
+				$form->assign('creditors', $creditors);
+			}
+
+			$form->assign('cycle_day', $cycle_day);
+			$form->assign('test_cycle_day', $test_cycle_day);			
 
 			// build cycle day options
 			$cycle_day_options = range(0,28);
 			$cycle_day_options[0] = ts('Any');
 			unset($cycle_day_options[0]); // 'any' disabled for now
+			$form->assign('cycle_days', $cycle_day_options);
+			$form->assign('test_cycle_days', $cycle_day_options);
 
 			// add new elements
-			$form->add('select', 'cycle_day', ts('Cycle Day'), $cycle_day_options);
-			$form->add('select', 'test_cycle_day', ts('Cycle Day'), $cycle_day_options);
 			CRM_Core_Region::instance('page-body')->add(array(
 				'template' => 'CRM/Admin/Form/PaymentProcessor/SDD.tpl'
 			));
@@ -67,6 +112,20 @@ function sepa_pp_postProcess( $formName, &$form ) {
 		if ($pp['class_name'] = "Payment_SDD") {
 			$paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', 
 				array('name' => $form->_submitValues['name'], 'is_test' => 0));
+
+			$creditor_id = $form->_submitValues['user_name'];
+			$test_creditor_id = $form->_submitValues['test_user_name'];
+			$pp_id = $paymentProcessor['id'];
+
+			$creditor_cycle_day = $form->_submitValues['cycle_day'];
+			$test_creditor_cycle_day = $form->_submitValues['test_cycle_day'];
+
+			// save settings
+			// FIXME: we might consider saving this as a JSON object
+			CRM_Core_BAO_Setting::setItem($creditor_id, 'SEPA Direct Debit PP', $pp_id);
+			CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP Test', $pp_id);
+			CRM_Core_BAO_Setting::setItem($creditor_cycle_day, 'SEPA Direct Debit PP CD', $pp_id);
+			CRM_Core_BAO_Setting::setItem($test_creditor_cycle_day, 'SEPA Direct Debit PP Test CD', $pp_id);
 		}
 	}
 }

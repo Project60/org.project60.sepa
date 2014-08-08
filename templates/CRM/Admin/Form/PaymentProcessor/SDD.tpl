@@ -34,10 +34,14 @@
 <table>
 <tr id="cycle_day_field" class="crm-paymentProcessor-form-block-{$form.cycle_day.name}">
   <td class="label">
-    {$form.cycle_day.label}
+    {ts}Cycle Day{/ts}
   </td>
   <td>
-    {$form.cycle_day.html}
+    <select id="cycle_day" name="cycle_day">
+        {foreach from=$cycle_days item=day}
+        <option value="{$day}" {if $day eq $cycle_day}selected{/if}>{$day}</option>
+        {/foreach}
+    </select>
     <a id='cycle_day_help' onclick='CRM.help("{ts}Cycle Day{/ts}", {literal}{"id":"id-cycle_day-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
   </td>
 </tr>
@@ -62,10 +66,14 @@
 <table>
 <tr id="test_cycle_day_field" class="crm-paymentProcessor-form-block-{$form.test_cycle_day.name}">
   <td class="label">
-    {$form.test_cycle_day.label}
+    {ts}Cycle Day{/ts}
   </td>
   <td>
-    {$form.test_cycle_day.html}
+    <select id="test_cycle_day" name="test_cycle_day">
+        {foreach from=$test_cycle_days item=day}
+        <option value="{$day}" {if $day eq $test_cycle_day}selected{/if}>{$day}</option>
+        {/foreach}
+    </select>
     <a id='cycle_day_help' onclick='CRM.help("{ts}Cycle Day{/ts}", {literal}{"id":"id-cycle_day-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
   </td>
 </tr>
