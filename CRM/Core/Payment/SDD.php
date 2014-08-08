@@ -131,7 +131,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['contributionTypeID'] = $financial_type->id;
     }
 
-    // get the contribution via 'invoiceID'
+    // get the contribution via contactID
     $params['contact_id'] = $this->getForm()->getVar('_contactID');
 
     if (empty($params['is_recur'])) {
