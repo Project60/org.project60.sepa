@@ -56,7 +56,6 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
             if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
               CRM_Core_Session::setStatus("Cannot load for group #".$group_id.".<br/>Error was: ".$xmlfile['error_message'], ts('Error'), 'error');
             }else{
-              $xmlfile = $xmlfile['values'][$xmlfile['id']];
               $file_id = $xmlfile['id'];
               $this->assign('file_link', CRM_Utils_System::url('civicrm/sepa/xml', "id=$file_id"));
               $this->assign('file_name', $xmlfile['filename']);
