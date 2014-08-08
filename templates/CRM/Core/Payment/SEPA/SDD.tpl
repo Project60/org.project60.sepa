@@ -89,8 +89,11 @@ function _is_recur_visualize() {
 		cj("#start_date_display").datepicker("option", 'minDate', earliest_ooff_date);
 	}
 }
-cj("#is_recur").change(_is_recur_visualize);
-_is_recur_visualize();
+
+cj(function() {
+	cj("#is_recur").change(_is_recur_visualize);
+	_is_recur_visualize();
+});
 
 </script>
 {/literal}
