@@ -120,7 +120,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (isset($contribution['is_error']) && $contribution['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't create contribution for contact #%s"), $cid), ts('Error'), 'error');
       $this->assign("error_title", ts("Couldn't create contribution"));
-      $this->assign("error_message", ts($contribution['error_message']));
+      $this->assign("error_message", $contribution['error_message']);
       return;
     }
 
@@ -167,7 +167,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (isset($mandate['is_error']) && $mandate['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't create %s mandate for contact #%s"), $type, $cid), ts('Error'), 'error');
       $this->assign("error_title", ts("Couldn't create mandate"));
-      $this->assign("error_message", ts($mandate['error_message']));
+      $this->assign("error_message", $mandate['error_message']);
       return;
     }
 
