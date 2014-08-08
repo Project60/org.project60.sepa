@@ -109,7 +109,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $params['toName']  = $params['toEmail'];
 
       if (empty ($params['toEmail'])){
-        CRM_Core_Session::setStatus(ts("Error sending $fileName: Contact doesn't have an email."));
+        CRM_Core_Session::setStatus(sprintf(ts("Error sending %s: Contact doesn't have an email."), $fileName));
         return false;
       }
       $params['subject'] = "SEPA " . $fileName;

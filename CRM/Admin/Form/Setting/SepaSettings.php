@@ -19,25 +19,30 @@ require_once 'CRM/Core/BAO/CustomField.php';
  
 class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 {
-    private $config_fields = array(
-                         array('batching.OOFF.horizon', 'OOFF horizon'),
-                         array('batching.OOFF.notice', 'OOFF notice days'),
-                         array('batching.RCUR.horizon', 'RCUR horizon'),
-                         array('batching.RCUR.grace', 'RCUR grace'),
-                         array('batching.RCUR.notice', 'RCUR notice days'),
-                         array('batching.FRST.notice', 'FRST notice days'),
-                         array('batching.UPDATE.lock.timeout', 'Update lock timeout'),
-                        );
+    private $config_fields;
+    private $custom_fields;
 
-    private $custom_fields = array(
-                         array('custom_OOFF_horizon', 'OOFF horizon'),
-                         array('custom_OOFF_notice', 'OOFF notice days'),
-                         array('custom_RCUR_horizon', 'RCUR horizon'),
-                         array('custom_RCUR_grace', 'RCUR grace'),
-                         array('custom_RCUR_notice', 'RCUR notice days'),
-                         array('custom_FRST_notice', 'FRST notice days'),
-                         array('custom_update_lock_timeout', 'Update lock timeout'),
-                        );
+    function __construct() {
+       parent::__construct();
+
+       $this->config_fields = array(
+                         array('batching.OOFF.horizon', ts('OOFF horizon')),
+                         array('batching.OOFF.notice', ts('OOFF notice days')),
+                         array('batching.RCUR.horizon', ts('RCUR horizon')),
+                         array('batching.RCUR.notice', ts('RCUR notice days')),
+                         array('batching.FRST.horizon', ts('FRST horizon')),
+                         array('batching.FRST.notice', ts('FRST notice days')),
+                         array('batching.UPDATE.lock.timeout', ts('Update lock timeout')));
+
+      $this->custom_fields = array(
+                         array('custom_OOFF_horizon', ts('OOFF horizon')),
+                         array('custom_OOFF_notice', ts('OOFF notice days')),
+                         array('custom_RCUR_horizon', ts('RCUR horizon')),
+                         array('custom_RCUR_notice', ts('RCUR notice days')),
+                         array('custom_FRST_horizon', ts('FRST horizon')),
+                         array('custom_FRST_notice', ts('FRST notice days')),
+                         array('custom_update_lock_timeout', ts('Update lock timeout')));
+    }
 
     function domainToString($raw) {
       return str_replace('.', '_', $raw);
@@ -68,12 +73,12 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         // add all form elements and validation rules
         foreach ($this->config_fields as $key => $value) {
-            $this->addElement('text', $this->domainToString($value[0]), ts($value[1]));
+            $this->addElement('text', $this->domainToString($value[0]), $value[1]);
             $this->addRule($this->domainToString($value[0]), 
-                       ts("Please enter the $value[1] as number (integers only)."),
+                       sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
                       'positiveInteger');
             $this->addRule($this->domainToString($value[0]), 
-                       ts("Please enter the $value[1] as number (integers only)."),
+                       sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
                       'required');
         }
 
@@ -119,9 +124,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add all form elements and validation rules
         $index = 0;
         foreach ($this->custom_fields as $key => $value) {
-            $this->addElement('text', $this->domainToString($value[0]), ts($value[1]), array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]))));
+            $this->addElement('text', $this->domainToString($value[0]), $value[1], array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]))));
             $this->addRule($this->domainToString($value[0]), 
-                       ts("Please enter the $value[1] as number (integers only)."),
+                       sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
                       'positiveInteger');
             $index++;
         }
