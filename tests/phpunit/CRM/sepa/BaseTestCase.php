@@ -30,8 +30,8 @@ class CRM_sepa_BaseTestCase extends CiviUnitTestCase {
    */
   function createMandate($mandate_parms = array(), $contrib_parms = array()) {
     // read the payment instrument ids  
-    $payment_instrument_FRST = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
-    $this->assertNotEmpty($payment_instrument_FRST, "Could not find the 'FRST' payment instrument.");
+    $payment_instrument_OOFF = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name');
+    $this->assertNotEmpty($payment_instrument_OOFF, "Could not find the 'OOFF' payment instrument.");
     $payment_instrument_RCUR = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name');
     $this->assertNotEmpty($payment_instrument_RCUR, "Could not find the 'RCUR' payment instrument.");
     $contribution_status_pending = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
@@ -62,9 +62,11 @@ class CRM_sepa_BaseTestCase extends CiviUnitTestCase {
       $create_contribution['cycle_day'] =
           empty($contrib_parms['cycle_day'])?date("d", strtotime("+14 days")):$contrib_parms['cycle_day'];
     } else {
-      $create_contribution['payment_instrument_id'] = $payment_instrument_FRST;
+      $create_contribution['payment_instrument_id'] = $payment_instrument_OOFF;
       $create_contribution['total_amount'] =
           empty($contrib_parms['total_amount'])?'6.66':$contrib_parms['total_amount'];
+      $create_contribution['receive_date'] = 
+        empty($contrib_parms['receive_date'])?date('YmdHis'):$contrib_parms['receive_date'];
     }
     $contribution = $this->callAPISuccess($contribution_entity, "create", $create_contribution);
 
