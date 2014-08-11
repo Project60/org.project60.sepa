@@ -63,17 +63,12 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			// use settings
 			if ($pp_creditor) {
 				$form->assign('user_name', $creditor_id);
-				$form->assign('creditors', $creditors);
-			}else{
-				$form->assign('creditors', $creditors);
 			}
-
 			if ($test_pp_creditor) {
 				$form->assign('test_user_name', $test_creditor_id);
-				$form->assign('creditors', $creditors);
-			}else{
-				$form->assign('creditors', $creditors);
 			}
+			$form->assign('creditors', $creditors);
+			
 
 			$form->assign('cycle_day', $cycle_day);
 			$form->assign('test_cycle_day', $test_cycle_day);			
