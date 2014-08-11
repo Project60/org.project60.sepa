@@ -23,6 +23,7 @@ class CRM_sepa_MandateTest extends CRM_sepa_BaseTestCase {
   private $tablesToTruncate = array("civicrm_sdd_creditor",
                                     //"civicrm_contact",
                                     "civicrm_contribution",
+                                    "civicrm_line_item",
                                     "civicrm_sdd_mandate"
                                     );
   private $creditorId = NULL;
@@ -202,6 +203,43 @@ class CRM_sepa_MandateTest extends CRM_sepa_BaseTestCase {
         $this->assertEquals($params[$key], $value);
       }
 
+  }
+
+
+  /**
+   * Test SepaMandate.creatfull API call
+   *
+   * @author bjoern -at- systopia.de
+   */
+  public function testAPICreateFull() {
+    $this->assertDBQuery(0, 'select count(*) from civicrm_contribution;', array());
+    $this->assertDBQuery(0, 'select count(*) from civicrm_sdd_mandate;', array());
+    // get a contact
+    $contactId = $this->individualCreate();
+    $parameters = array(
+      'version'             => 3,
+      'type'                => 'OOFF',
+      'reference'           => "REFERENCE_COLLISION",
+      'contact_id'          => $contactId,
+      'financial_type_id'   => 1,
+      'total_amount'        => '100.00',
+      'start_date'          => date('YmdHis'),
+      'receive_date'        => date('YmdHis'),
+      'date'                => date('YmdHis'),
+      'iban'                => "BE68844010370034",
+      'bic'                 => "TESTTEST",
+      'creditor_id'         => $this->getCreditor(),
+      'is_enabled'          => 1,
+    );
+    $this->callAPISuccess("SepaMandate", "createfull", $parameters);
+    $this->assertDBQuery(1, 'select count(*) from civicrm_contribution;', array());
+    $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_mandate;', array());
+
+    // make it fail and check if rollback works
+    unset($parameters['is_enabled']);
+    $this->callAPIFailure("SepaMandate", "createfull", $parameters);
+    $this->assertDBQuery(1, 'select count(*) from civicrm_contribution;', array());
+    $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_mandate;', array());
   }
 
 }
