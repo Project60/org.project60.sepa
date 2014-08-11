@@ -53,6 +53,78 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
 
 }
 
+
+/**
+ * Creates a mandate object along with its "contract", 
+ * i.e. the payment details as recorded in an
+ * associated contribution or recurring contribution 
+ * 
+ * @author endres -at- systopia.de 
+ *
+ * @return array API result array
+ */
+function civicrm_api3_sepa_mandate_createfull($params) {
+    // create the "contract" first: a contribution
+    // TODO: sanity checks
+    $create_contribution = $params; // copy array
+    $create_contribution['version'] = 3;
+    if (isset($create_contribution['contribution_contact_id'])) {
+    	// in case someone wants another contact for the contribution than for the mandate...
+    	$create_contribution['contact_id'] = $create_contribution['contribution_contact_id'];
+    }
+	if (empty($create_contribution['currency'])) 
+		$create_contribution['currency'] = 'EUR'; // set default status
+	if (empty($create_contribution['contribution_status_id'])) 
+		$create_contribution['contribution_status_id'] = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+
+    if ($params['type']=='RCUR') {
+    	$contribution_entity = 'ContributionRecur';
+	    $contribution_table  = 'civicrm_contribution_recur';
+      	$create_contribution['payment_instrument_id'] = 
+      		(int) CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name');
+      	if (empty($create_contribution['status'])) 
+      		$create_contribution['status'] = 'FRST'; // set default status
+      	if (empty($create_contribution['is_pay_later'])) 
+      		$create_contribution['status'] = 'FRST'; // set default status
+
+    } elseif ($params['type']=='OOFF') {
+	 	$contribution_entity = 'Contribution';
+	    $contribution_table  = 'civicrm_contribution';
+      	$create_contribution['payment_instrument_id'] = 
+      		(int) CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name');
+      	if (empty($create_contribution['status'])) 
+      		$create_contribution['status'] = 'INIT'; // set default status
+      	if (empty($create_contribution['total_amount'])) 
+      		$create_contribution['total_amount'] = $create_contribution['amount']; // copy from amount
+
+    } else {
+    	return civicrm_api3_create_error('Unknown mandata type: '.$params['type']);
+    }
+
+    // create the contribution
+    $contribution = civicrm_api($contribution_entity, "create", $create_contribution);
+    if (!empty($contribution['is_error'])) {
+    	return $contribution;
+    }
+
+    // create the mandate object itself
+    // TODO: sanity checks
+    $create_mandate = $create_contribution; // copy array
+    $create_mandate['version'] = 3;
+    $create_mandate['entity_table'] = $contribution_table;
+    $create_mandate['entity_id'] = $contribution['id'];
+    $mandate = civicrm_api("SepaMandate", "create", $create_mandate);
+    if (!empty($mandate['is_error'])) {
+    	// this didn't work, so we also have to roll back the created contribution
+    	$delete = civicrm_api($contribution_entity, "delete", array('id'=>$contribution['id'], 'version'=>3));
+    	if (!empty($delete['is_error'])) {
+    		error_log("org.project60.sepa: createfull couldn't roll back created contribution: ".$delete['error_message']);
+    	}
+    }
+	return $mandate;
+}
+
+
 /**
  * Deletes an existing Mandate
  *
