@@ -336,7 +336,7 @@
       }
     }
 
-    var stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1};
+    var stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1, 'mandate_active': 1};
     if (creditorId != "none") {
       stdObj.id = creditorId;
     };
