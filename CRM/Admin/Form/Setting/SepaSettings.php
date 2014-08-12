@@ -120,6 +120,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('select', 'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('hidden', 'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
         $this->addElement('hidden', 'add_creditor_id', '', array('id' => 'add_creditor_id'));
+        $this->addElement('checkbox','is_test_creditor', ts("Is a Test Creditor"), "", array('value' =>'0'));
 
         // add all form elements and validation rules
         $index = 0;

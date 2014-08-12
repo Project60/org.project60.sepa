@@ -54,6 +54,13 @@
      <h3>Creditor Information</h3>
      <table id="creditorinfo" class="form-layout">
             <tr>
+              <td class="label">{$form.addcreditor_creditor_id.label} <a onclick='CRM.help("{ts}Creditor Contact{/ts}", {literal}{"id":"id-contact","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
+        </div></td>
+              <td>
+                {$form.addcreditor_creditor_id.html}
+              </td>
+            </tr>
+            <tr>
               <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
         </div></td>
               <td>
@@ -95,6 +102,12 @@
               <td>
                 {$form.addcreditor_pain_version.html}
               </td>
+            </tr>
+            <tr>
+               <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+                <td>
+                  {$form.is_test_creditor.html}
+                </td>
             </tr>
        </table>
        {$form.add_creditor_id.html}
@@ -287,6 +300,7 @@
           cj('#addcreditor_iban').val(data['iban']);
           cj('#addcreditor_bic').val(data['bic']);
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
+          cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
           cj('#addcreditor').show(500);
 
           CRM.api('Contact', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': data['creditor_id']}, 
@@ -322,6 +336,7 @@
     map["addcreditor_iban"]         = "iban";
     map["addcreditor_bic"]          = "bic";
     map["addcreditor_pain_version"] = "sepa_file_format_id";
+    map["addcreditor_creditor_id"]  = "creditor_id";
 
     // update creditor information
     var updatedCreditorInfo = new Array();
@@ -334,6 +349,13 @@
       if (value != "") {
         updatedCreditorInfo[name] = value;
       }
+    }
+
+    var isTestCreditor = cj('#is_test_creditor').is(':checked');
+    if (isTestCreditor) {
+      updatedCreditorInfo['category'] = "TEST";
+    }else{
+      updatedCreditorInfo['category'] = "";
     }
 
     var stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1, 'mandate_active': 1};

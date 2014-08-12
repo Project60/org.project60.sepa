@@ -1,3 +1,7 @@
+{htxt id='id-contact'}
+    <p>{ts}This is the name of the contact to which this creditor is associated to.{/ts}</p>
+{/htxt}
+
 {htxt id='id-name'}
     <p>{ts}This is the name of the creditor. This will be used throughout the system to refer to this particular creaditor.{/ts}</p>
 {/htxt}
@@ -29,6 +33,11 @@
     <p>{ts}SEPA file format used for the transmission of the payment request file to the bank.{/ts}</p>
     <p>{ts}After changing this, <i>any</i> file downloaded -old or new- for this creditor will be in the new format.{/ts}</p>
     <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
+{/htxt}
+
+{htxt id='id-test-creditor'}
+    <p>{ts}The payment processor's test mode will only accept creditors that are defined as a test creditor.{/ts}</p>
+    <p>{ts}Transaction groups of a test creditor can be downloaded, but <i>NOT</i> closed.{/ts}</p>
 {/htxt}
 
 {htxt id='id-ooff-horizon'}
