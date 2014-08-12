@@ -231,4 +231,19 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       return $txgroup;
     }
   }
+
+
+  /**
+   * This method will delete a transaction group
+   *
+   * If required, it could also delete all 
+   * 
+   * @param txgroup_id              the transaction group that should be deleted
+   * @param latest_submission_date  the date when it should be submitted
+   * 
+   * @return an array of all the contribution ids that have been deleted or a string with an error message
+   */
+  static function deleteGroup($txgroup_id, $latest_submission_date) {
+    // TODO: Implement
+  }
 }
