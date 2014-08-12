@@ -33,9 +33,13 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         $group_id = (int) $_REQUEST['group_id'];
         $this->assign('txgid', $group_id);
         $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$group_id, 'version'=>3));
-        $txgroup['status_label'] = CRM_Core_OptionGroup::optionLabel('batch_status', $txgroup['status_id']);
-        $txgroup['status_name'] = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'name');
-        $this->assign('txgroup', $txgroup);
+        if (!empty($txgroup['is_error'])) {
+        	$_REQUEST['confirmed'] = 'error'; // skip the parts below
+        } else {
+	        $txgroup['status_label'] = CRM_Core_OptionGroup::optionLabel('batch_status', $txgroup['status_id']);
+	        $txgroup['status_name'] = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'name');
+	        $this->assign('txgroup', $txgroup);        	
+        }
 
         if (empty($_REQUEST['confirmed'])) {
         	// gather information to display
@@ -58,10 +62,34 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         	}
         	$this->assign('stats', $stats);
 	    	$this->assign('status', 'unconfirmed');
+	        $this->assign('submit_url', CRM_Utils_System::url('civicrm/sepa/deletegroup'));
         } else {
-        	// delete the group
-        	$result = CRM_Sepa_BAO_SEPATransactionGroup::deleteGroup($group_id);
-        	$this->assign('status', 'confirmed');
+        	if ($_REQUEST['confirmed']=='error') {
+	        	$this->assign('status', 'error');
+
+        	} elseif ($_REQUEST['confirmed']=='yes') {
+	        	// delete the group
+				$delete_contributions_mode = $_REQUEST['delete_contents'];
+				$deleted_ok = 0;
+				$deleted_error = 0;
+	        	$result = CRM_Sepa_BAO_SEPATransactionGroup::deleteGroup($group_id, $delete_contributions_mode);
+				$deleted_total = count($result);
+	        	foreach ($result as $contribution_id => $message) {
+	        		if ($message=='ok') {
+	        			array_push($deleted_ok, $contribution_id);
+	        		} else {
+	        			array_push($deleted_error, $contribution_id);
+	        		}
+	        	}
+	        	
+	        	$this->assign('status', 'done');
+				$this->assign('deleted_result', $result);
+				$this->assign('deleted_ok', $deleted_ok);
+				$this->assign('deleted_error', $deleted_error);
+
+        	} else {
+        		CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa'));        		
+        	}
         }
     }
 
