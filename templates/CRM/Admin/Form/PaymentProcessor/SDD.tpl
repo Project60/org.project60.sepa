@@ -51,7 +51,7 @@
 {* Create creditors dropdown for test pp *}
 {if $creditors}
 <select id="test_creditor_id" name="test_user_name">
-  {foreach from=$creditors item=creditor key=id}
+  {foreach from=$test_creditors item=creditor key=id}
   <option value="{$id}" {if $id eq $test_user_name}selected{/if}>{$creditor.name}&nbsp;[{$id}]</option>
   {/foreach}
 </select>

@@ -60,6 +60,9 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3));
 			$creditors = $creditors['values'];
 
+			$test_creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3, 'category'=>'TEST'));
+			$test_creditors = $test_creditors['values'];
+
 			// use settings
 			if ($pp_creditor) {
 				$form->assign('user_name', $creditor_id);
@@ -68,6 +71,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 				$form->assign('test_user_name', $test_creditor_id);
 			}
 			$form->assign('creditors', $creditors);
+			$form->assign('test_creditors', $test_creditors);
 			
 
 			$form->assign('cycle_day', $cycle_day);
