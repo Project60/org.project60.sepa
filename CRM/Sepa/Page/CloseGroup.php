@@ -48,7 +48,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
           if (isset($creditor['is_error']) && $creditor['is_error']) {
             CRM_Core_Session::setStatus("Cannot load creditor.<br/>Error was: ".$creditor['error_message'], ts('Error'), 'error');
           }else{
-              $isTestGroup = isset($creditor['category']) ? (($creditor['category'] == "TEST") ? : false ) : false;
+              $isTestGroup = isset($creditor['category']) && ($creditor['category'] == "TEST");
               $this->assign('is_test_group', $isTestGroup);
 
               if ($_REQUEST['status'] == "") {
