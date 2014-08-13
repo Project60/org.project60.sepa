@@ -340,7 +340,7 @@ msgstr ""
 msgid "BIC too short"
 msgstr ""
 
-#: CRM/Sepa/Page/CreateMandate.php
+#: CRM/Sepa/Page/CreateMandate.php CRM/Sepa/Logic/Verification.php
 msgid "IBAN is not correct"
 msgstr ""
 
@@ -507,10 +507,6 @@ msgid "SEPA Creditor"
 msgstr ""
 
 #: CRM/Sepa/Page/SepaMandatePdf.php
-msgid "Error sending $fileName: Contact doesn't have an email."
-msgstr ""
-
-#: CRM/Sepa/Page/SepaMandatePdf.php
 msgid "Mail sent"
 msgstr ""
 
@@ -535,6 +531,7 @@ msgstr ""
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+#: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Delete"
 msgstr ""
 
@@ -705,10 +702,12 @@ msgid "In Public Honor Roll?"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "Yes"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "No"
 msgstr ""
 
@@ -903,6 +902,7 @@ msgid "Payment Details"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "Contribution"
 msgstr ""
 
@@ -1082,11 +1082,11 @@ msgstr ""
 msgid "SEPA Mandates"
 msgstr ""
 
-#: api/v3/SepaAlternativeBatching.php
+#: api/v3/SepaAlternativeBatching.php CRM/Sepa/BAO/SEPATransactionGroup.php
 msgid "Cannot create file! Error was: '%s'"
 msgstr ""
 
-#: api/v3/SepaAlternativeBatching.php
+#: api/v3/SepaAlternativeBatching.php CRM/Sepa/Logic/Group.php
 msgid "Cannot close transaction group! Error was: '%s'"
 msgstr ""
 
@@ -1182,7 +1182,7 @@ msgstr ""
 msgid "Will generate a Prenotification PDF with this mandate's data."
 msgstr ""
 
-#: CRM/Sepa/Page/CreateMandate.php
+#: CRM/Sepa/Page/CreateMandate.php CRM/Sepa/Logic/Verification.php
 msgid "BIC is not correct"
 msgstr ""
 
@@ -1330,20 +1330,12 @@ msgid ""
 "visiting the web page link that will be included in your receipt."
 msgstr ""
 
-#: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Creditor Owner"
-msgstr ""
-
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Mandate numbering prefix"
 msgstr ""
 
-#: api/v3/SepaAlternativeBatching.php
+#: api/v3/SepaAlternativeBatching.php CRM/Sepa/BAO/SEPATransactionGroup.php
 msgid "Cannot update transaction group! Error was: '%s'"
-msgstr ""
-
-#: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Please enter the $value[1] as number (integers only)."
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
@@ -1466,13 +1458,8 @@ msgid "Batching Notice Days"
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+#: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Update lock timeout"
-msgstr ""
-
-#: templates/CRM/Sepa/Page/CloseGroup.tpl
-msgid ""
-"<font size=\"+1\">Group '%s' <b>is now closed</b> and cannot be changed any "
-"more.</font>"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
@@ -1500,10 +1487,6 @@ msgid ""
 "In the unlikely event that the file is formally wrong, try a SEPA validation "
 "tool on the internet to check the generated XML file. Contact us, if the "
 "system really generates incorrect XML files."
-msgstr ""
-
-#: templates/CRM/Sepa/Page/CloseGroup.tpl
-msgid "<font size=\"+0.5\">Download Link:"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
@@ -1546,5 +1529,335 @@ msgid "I changed my mind"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Creditor Contact"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "OOFF horizon"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "OOFF notice days"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "RCUR horizon"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "RCUR grace"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "RCUR notice days"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "FRST notice days"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Please enter the %s as number (integers only)."
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Is a Test Creditor"
+msgstr ""
+
+#: CRM/Sepa/Page/SepaMandatePdf.php
+msgid "Error sending %s: Contact doesn't have an email."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"This is the name of the contact to which this creditor is associated to."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"The payment processor's test mode will only accept creditors that are "
+"defined as a test creditor."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"Transaction groups of a test creditor can be downloaded, but <i>NOT</i> "
+"closed."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"The RCUR grace period is the time, that the submission of a group could be "
+"delayed before it gets deleted."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"For instance, a grace value of 7 means, that if you forget to submit the "
+"group in time for a week, it gets deleted. During the grace period, you can "
+"still try to submit the group, but it's up to the bank whether it is "
+"accepted or rejected."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Test Creditor"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Grace Period"
+msgstr ""
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid ""
+"THIS PAGE PAGE DOES NOT WORK PROPERLY WITHOUT JAVASCRIPT. PLEASE ENABLE "
+"JAVASCRIPT IN YOUR BROWSER"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"<strong>You did not submit this SEPA group in time! It is possible that the "
+"bank will reject the payment requests.</strong>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"As a workaround, we can adjust the collection date, so that you can still "
+"submit the file today. <strong>Today! <font color=\"red\">NOW!</font></"
+"strong>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid ""
+"However, the bank might still reject the file, since this is an illegal "
+"deviation from you announced collection date. Try to avoid this in the "
+"future!"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "This is a test group. You can not close it."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Do it! Now!"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "I can't submit it right now"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "one-off direct debit payment"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "recurring direct debit payment"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "mandates"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "contributions"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Deleting SEPA transaction group '%1'"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "This %1 transaction group is currently in status '<b>%2</b>'."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "This means, that is has already been submitted to the bank."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Deleting the group will erase any record of this transaction."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "This means, that the payments should have already been processed."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "This is an illegal state!"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Only proceed if you know what you're doing."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "The group has a total of %1 associated %2."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "None of them have been processed yet, so they could be deleted."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "All of them have already been transmitted to the bank."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "All of them have already been fully processed."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"%1 of them have not been processed yet, and could be deleted. However, there "
+"are %2 %4 that have already been sent to the bank for collection, and "
+"another %3 that have been fully processed."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "What do you want to do with the associated %1?"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "don't delete any %1"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "delete all %1"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "delete pending %1"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"You should consider deleting the open contributions. If the recurring "
+"transaction group is deleted, these payments do not make sense any more. "
+"They will also be generated again, once you hit update."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"You should be very careful when deleting processed contributions. It usually "
+"means, that related 'real world activites' (like money transfers) have "
+"already been initiated or even completed."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A closed group has usually been sent to a bank to initiate the payment "
+"process, so you shouldn't want to delete this group anyway. However if you "
+"do, you should also consider deleting all associated contributions, since "
+"they will otherwise remain in the status 'in progress' and not be processed "
+"any more."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A closed group has usually been sent to a bank to initiate the payment "
+"process, so you shouldn't want to delete this group anyway. However if you "
+"do, deleting all associated contributions is a good choice, since they will "
+"otherwise remain in the status 'in progress' and not be processed any more."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A transaction group marked as received has usually been fully processed, i."
+"e. the money actually arrived on your account. You shouldn't want to delete "
+"this group. However if you do, be sure to delete the associated "
+"contributions in case there was no money transferred in the first place."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A transaction group marked as received has usually been fully processed, i."
+"e. the money actually arrived on your account. You shouldn't want to delete "
+"this group. However if you do, you should consider not deleting the "
+"associated contributions in case money was actually transferred."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"If you delete the mandates associated with this group, they cannot be "
+"collected any more. Be sure that you know what you're doing before "
+"proceeding."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A closed group has usually been sent to a bank to initiate the payment "
+"process, so you shouldn't want to delete this group anyway. However if you "
+"do, you should also consider deleting all associated mandates, since they "
+"will otherwise remain in the status 'in progress' and not be processed any "
+"more."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A closed group has usually been sent to a bank to initiate the payment "
+"process, so you shouldn't want to delete this in the first place. However, "
+"if there's something wrong with it, be sure not to delete any mandates that "
+"you still want to collect or keep on record."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A transaction group marked as received has usually been fully processed, i."
+"e. the money actually arrived on your account. You shouldn't want to delete "
+"this group in the first place."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"A transaction group marked as received has usually been fully processed, i."
+"e. the money actually arrived on your account. You shouldn't want to delete "
+"this group in the first place. However, if there's something wrong with it, "
+"be sure not to delete any mandates that you still want to collect or keep a "
+"record of."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Are you sure this is what you want to do?"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "SEPA transaction group '%1' could not be deleted succesfully."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Error was:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid ""
+"SEPA transaction group '%1' was deleted, but the following problems were "
+"encountered:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "contribution ID"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "error message"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "%1 %2 have been deleted along with the group."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "SEPA transaction group '%1' has been succesfully deleted."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Back"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "No group_id given!"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Transaction group [%1] couldn't be loaded."
 msgstr ""

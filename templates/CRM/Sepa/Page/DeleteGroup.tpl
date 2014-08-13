@@ -38,7 +38,7 @@ things
 			{ts}This means, that the payments should have already been processed.{/ts}
 			{ts}Deleting the group will erase any record of this transaction.{/ts}
 		{else}
-			<span class="status message">{ts}<b>This is an illegal state!{/ts}</b></span>
+			<span class="status message"><b>{ts}This is an illegal state!{/ts}</b></span>
 		{/if}
 		<p class="status message"><span class="icon red-icon alert-icon"></span>{ts}Only proceed if you know what you're doing.{/ts}</p>
 	{/if}
