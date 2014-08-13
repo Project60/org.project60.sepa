@@ -60,6 +60,7 @@ class CRM_Sepa_Logic_Batching {
         rcontribution.cancel_date AS cancel_date,
         rcontribution.end_date AS end_date,
         rcontribution.amount AS rc_amount,
+        rcontribution.is_test AS rc_is_test,
         rcontribution.contact_id AS rc_contact_id,
         rcontribution.financial_type_id AS rc_financial_type_id,
         rcontribution.contribution_status_id AS rc_contribution_status_id,
@@ -93,6 +94,7 @@ class CRM_Sepa_Logic_Batching {
           'rc_contribution_status_id'     => $results->rc_contribution_status_id,
           'rc_campaign_id'                => $results->rc_campaign_id,
           'rc_payment_instrument_id'      => $results->rc_payment_instrument_id,
+          'rc_is_test'                    => $results->rc_is_test,
         );
     }
 
@@ -151,6 +153,7 @@ class CRM_Sepa_Logic_Batching {
               "financial_type_id"                   => $mandate['rc_financial_type_id'],
               "contribution_status_id"              => $mandate['rc_contribution_status_id'],
               "campaign_id"                         => $mandate['rc_campaign_id'],
+              "is_test"                             => $mandate['rc_is_test'],
               "payment_instrument_id"               => $payment_instrument_id,
             );
           $contribution = civicrm_api('Contribution', 'create', $contribution_data);

@@ -726,4 +726,46 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $txgroups = $this->callAPISuccess("SepaTransactionGroup", "get", array("id" => $txgroup_id));
     $this->assertEquals(0, $txgroups['count'], "transaction group was not deleted!");
   }
+
+  /**
+   * See if the is_test flag is properly passed on through batching
+   * 
+   * @see https://github.com/Project60/sepa_dd/issues/114
+   * @author endres -at- systopia.de
+   */
+  public function testTestMandates() {
+    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
+    $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
+    CRM_Core_BAO_Setting::setItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice', $frst_notice);
+    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+    $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
+    $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
+    $cycle_day = date("d", strtotime("+$frst_notice days"));
+   
+    // 2) create a RCUR mandate, due for collection right now
+    $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'), array('cycle_day' => $cycle_day));
+    CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST');
+    $rcontrib = $this->callAPISuccess("ContributionRecur", "getsingle", array("id" => $mandate['entity_id']));
+    $this->assertEquals('0', $rcontrib['is_test'], "Test flag should not be set!");
+    $contrib = $this->callAPISuccess("Contribution", "getsingle", array("contribution_recur_id" => $rcontrib['id']));
+    $this->assertEquals('0', $contrib['is_test'], "Test flag should not be set!");
+    
+    // 3) create a RCUR TEST mandate, due for collection right now
+    $ccount = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_contribution;");
+    $tccount = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_contribution WHERE is_test=1;");
+    $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'), array('is_test' => 1, 'cycle_day' => $cycle_day));
+    CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST');
+    $this->assertDBQuery($ccount+1, "SELECT count(id) FROM civicrm_contribution;");
+    $rcontrib = $this->callAPISuccess("ContributionRecur", "getsingle", array("id" => $mandate['entity_id']));
+    $this->assertEquals('1', $rcontrib['is_test'], "Test flag should be set!");
+    // cannot use API for Contribution, wouldn't load test contributions    
+    $this->assertDBQuery($tccount+1, "SELECT count(id) FROM civicrm_contribution WHERE is_test=1;");
+
+    // 4) create a OOFF TEST mandate
+    $mandate = $this->createMandate(array('type'=>'OOFF', 'status'=>'INIT'), array('is_test' => 1));
+    CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST');
+    $contrib = $this->callAPISuccess("Contribution", "getsingle", array("id" => $mandate['entity_id']));
+    $this->assertEquals('1', $contrib['is_test'], "Test flag should be set!");
+  }
+
 }

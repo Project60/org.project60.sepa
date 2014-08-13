@@ -48,6 +48,7 @@ class CRM_sepa_BaseTestCase extends CiviUnitTestCase {
       'financial_type_id'       => empty($contrib_parms['financial_type_id'])?1:$contrib_parms['financial_type_id'],
       'currency'                => empty($contrib_parms['currency'])?'EUR':$contrib_parms['currency'],
       'contribution_status_id'  => empty($contrib_parms['contribution_status_id'])?$contribution_status_pending:$contrib_parms['contribution_status_id'],
+      'is_test'                 => empty($contrib_parms['is_test'])?0:$contrib_parms['is_test'],
     );
     if ($mode=='RCUR') {
       $create_contribution['payment_instrument_id'] = $payment_instrument_RCUR;
