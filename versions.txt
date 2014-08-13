@@ -3,4 +3,11 @@ sepa_dd (org.project60.sepa) release history
 
 Version 1.0
 ===========
-- merged SYSTOPIA Version 0.5 (https://github.com/systopia/sepa_dd/tree/master)
+- added payment processor
+- multiple creditor support
+- code cleanup
+- configuration UI
+- delete groups UI
+- introduced tx group grace period
+- various bugfixes
+- based on SYSTOPIA Version 0.5 (https://github.com/systopia/sepa_dd/tree/master)
