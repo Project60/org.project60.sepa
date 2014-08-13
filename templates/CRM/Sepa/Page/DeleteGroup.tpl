@@ -1,7 +1,7 @@
 {capture assign=type_label}
 {if $txgroup.type eq "OOFF"}
 {ts}one-off direct debit payment{/ts}
-{elseif $txgroup.type eq "RCUR"}
+{elseif $txgroup.type eq "RCUR" or $txgroup.type eq "FRST"}
 {ts}recurring direct debit payment{/ts}
 {else}
 {$txgroup.type}
@@ -11,7 +11,7 @@
 {capture assign=entity_label}
 {if $txgroup.type eq "OOFF"}
 {ts}mandates{/ts}
-{elseif $txgroup.type eq "RCUR"}
+{elseif $txgroup.type eq "RCUR" or $txgroup.type eq "FRST"}
 {ts}contributions{/ts}
 {else}
 things
@@ -64,13 +64,12 @@ things
 	<input id="delete_contents_NO" name="delete_contents" value="no" class="form-radio" type="radio">
 	<label for="delete_contents_NO">{ts 1=$entity_label}don't delete any %1{/ts}</label>
 	</input>
-	<input id="delete_contents_OPEN" name="delete_contents" value="open" class="form-radio" type="radio">
-	<label for="delete_contents_OPEN">{ts 1=$entity_label}delete pending %1{/ts}</label>
-	</input>
 	<input id="delete_contents_ALL" name="delete_contents" value="all" class="form-radio" type="radio">
 	<label for="delete_contents_ALL">{ts 1=$entity_label}delete all %1{/ts}</label>
 	</input>
-
+	<input id="delete_contents_OPEN" name="delete_contents" value="open" class="form-radio" type="radio">
+	<label for="delete_contents_OPEN">{ts 1=$entity_label}delete pending %1{/ts}</label>
+	</input>
 </p>
 
 
@@ -187,6 +186,7 @@ things
 
 
 
+
 {* ...and some JS to make it interactive *}
 <script type="text/javascript">
 var group_type = "{$txgroup.type}";
@@ -228,9 +228,37 @@ function leaveForm(object) {
 
 
 {elseif $status eq 'done'}
-
-
-
+{if $error}
+<p class="status message">
+	{ts 1=$txgroup.reference}SEPA transaction group '%1' could not be deleted succesfully.{/ts}<br/>
+	{ts}Error was:{/ts} {$error}
+</p>
+{elseif $deleted_error}
+<p class="status message">
+	{ts 1=$txgroup.reference}SEPA transaction group '%1' was deleted, but the following problems were encountered:{/ts}
+	<table>
+		<thead>
+			<td>{ts}contribution ID{/ts}</td>
+			<td>{ts}error message{/ts}</td>
+		</thead>
+	{foreach from=$deleted_error item=contribution_id}
+		<tr>
+			<td>{ts}Contribution{/ts} [{$contribution_id}]</td>
+			<td>{$deleted_result[$contribution_id]}</td>
+		</tr>
+	{/foreach}
+	</table>
+	{ts 1=$deleted_ok|@count 2=$entity_label}%1 %2 have been deleted along with the group.{/ts}
+</p>
+{else}
+<p>
+	{ts 1=$txgroup.reference}SEPA transaction group '%1' has been succesfully deleted.{/ts}
+	{ts 1=$deleted_ok|@count 2=$entity_label}%1 %2 have been deleted along with the group.{/ts}
+</p>
+{/if}
+<div class="crm-submit-buttons">
+	<a id="back_button" class="button button_close" href="{crmURL p='civicrm/sepa'}"><span><div class="icon back-icon"></div>{ts}Back{/ts}</span></a>
+</div> 
 
 
 
@@ -246,4 +274,8 @@ function leaveForm(object) {
 	{ts 1=$smarty.request.group_id}Transaction group [%1] couldn't be loaded.{/ts}
 	{/if}
 </p>
+<div class="crm-submit-buttons">
+	<a id="back_button" class="button button_close" href="{crmURL p='civicrm/sepa'}"><span><div class="icon back-icon"></div>{ts}Back{/ts}</span></a>
+</div> 
+
 {/if}

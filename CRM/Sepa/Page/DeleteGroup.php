@@ -33,12 +33,12 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         $group_id = (int) $_REQUEST['group_id'];
         $this->assign('txgid', $group_id);
         $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$group_id, 'version'=>3));
-        if (!empty($txgroup['is_error'])) {
-        	$_REQUEST['confirmed'] = 'error'; // skip the parts below
-        } else {
+        if (empty($txgroup['is_error'])) {
 	        $txgroup['status_label'] = CRM_Core_OptionGroup::optionLabel('batch_status', $txgroup['status_id']);
 	        $txgroup['status_name'] = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'name');
 	        $this->assign('txgroup', $txgroup);        	
+        } else {
+        	$_REQUEST['confirmed'] = 'error'; // skip the parts below
         }
 
         if (empty($_REQUEST['confirmed'])) {
@@ -63,16 +63,19 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         	$this->assign('stats', $stats);
 	    	$this->assign('status', 'unconfirmed');
 	        $this->assign('submit_url', CRM_Utils_System::url('civicrm/sepa/deletegroup'));
-        } else {
-        	if ($_REQUEST['confirmed']=='error') {
-	        	$this->assign('status', 'error');
 
-        	} elseif ($_REQUEST['confirmed']=='yes') {
-	        	// delete the group
-				$delete_contributions_mode = $_REQUEST['delete_contents'];
-				$deleted_ok = 0;
-				$deleted_error = 0;
-	        	$result = CRM_Sepa_BAO_SEPATransactionGroup::deleteGroup($group_id, $delete_contributions_mode);
+        } elseif ($_REQUEST['confirmed']=='yes') {
+        	// delete the group
+        	$this->assign('status', 'done');
+			$delete_contributions_mode = $_REQUEST['delete_contents'];
+			$deleted_ok = array();
+			$deleted_error = array();
+        	$result = CRM_Sepa_BAO_SEPATransactionGroup::deleteGroup($group_id, $delete_contributions_mode);
+        	if (is_string($result)) {
+        		// a very basic error happened
+        		$this->assign('error', $result);
+        	} else {
+        		// do some stats on the result
 				$deleted_total = count($result);
 	        	foreach ($result as $contribution_id => $message) {
 	        		if ($message=='ok') {
@@ -80,16 +83,17 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
 	        		} else {
 	        			array_push($deleted_error, $contribution_id);
 	        		}
-	        	}
-	        	
-	        	$this->assign('status', 'done');
+	        	}	        	
 				$this->assign('deleted_result', $result);
 				$this->assign('deleted_ok', $deleted_ok);
 				$this->assign('deleted_error', $deleted_error);
-
-        	} else {
-        		CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa'));        		
         	}
+
+        } elseif ($_REQUEST['confirmed']=='error') {
+	        $this->assign('status', 'error');
+
+    	} else {
+    		CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa'));
         }
     }
 
