@@ -54,4 +54,10 @@
     <title>CiviSEPA settings</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/sepa/deletegroup</path>
+    <page_callback>CRM_Sepa_Page_DeleteGroup</page_callback>
+    <title>Delete transaction group</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
 </menu>

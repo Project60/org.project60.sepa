@@ -231,4 +231,124 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       return $txgroup;
     }
   }
+
+
+  /**
+   * This method will delete a transaction group
+   *
+   * If required, it could also delete all 
+   * 
+   * @param txgroup_id                 the transaction group that should be deleted
+   * @param delete_contributions_mode  select what to do with the associated mandates (OOFF) or contributions (RCUR):
+   *                                      'no'   -  don't touch them
+   *                                      'open' -  delete only open ones
+   *                                      'all'  -  delete them all
+   * 
+   * @return an array (contribution_id => error message) that have been deleted or a string with an error message.
+   *            an error message of 'ok' means deletion succesfull 
+   */
+  static function deleteGroup($txgroup_id, $delete_contributions_mode = 'no') {
+    // load the group
+    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id, 'version' => 3));
+    if (!empty($txgroup['is_error'])) {
+      return "Transaction group [$txgroup_id] could not be loaded. Error was: ".$txgroup['error_message'];
+    }
+
+    // first, delete the contents of this group
+    if ($delete_contributions_mode == 'no') {
+      $contributions_deleted = array();
+    } elseif ($delete_contributions_mode == 'open') {
+      $status_id_pending = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+      $contributions_deleted = self::_deleteGroupContents($txgroup_id, $txgroup['type'], "civicrm_contribution.contribution_status_id = $status_id_pending");
+    } elseif ($delete_contributions_mode == 'all') {
+      $contributions_deleted = self::_deleteGroupContents($txgroup_id, $txgroup['type'], "TRUE");
+    } else {
+      return "Undefined deleteGroup mode '$delete_contributions_mode'. Ignored.";
+    }
+
+    // now: detach all the associated contribtuions
+    $detach_contributions = "DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id = $txgroup_id";
+    CRM_Core_DAO::executeQuery($detach_contributions);
+
+    // then delete the group itself
+    $result = civicrm_api('SepaTransactionGroup', 'delete', array('id' => $txgroup_id, 'version' => 3));
+    if (empty($result['is_error'])) {
+      return $contributions_deleted;
+    } else {
+      return "Transaction group [$txgroup_id] could not be deleted. Error was: ".$result['error_message'];
+    }
+  }
+
+
+  /**
+   * Helper method to delete a txgroup along with all the contents that match the selector
+   */
+  static function _deleteGroupContents($txgroup_id, $type, $selector) {
+    $txgroup_id = (int) $txgroup_id;
+    $deleted_contributions = array();
+
+    if ($type=='OOFF') {
+      // delete the mandates first
+      $query = "
+      SELECT
+        civicrm_contribution.id  AS contribution_id,
+        civicrm_sdd_mandate.id   AS mandate_id
+      FROM
+        civicrm_sdd_contribution_txgroup
+      LEFT JOIN
+        civicrm_contribution ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
+      LEFT JOIN
+        civicrm_sdd_mandate ON civicrm_sdd_mandate.entity_id = civicrm_contribution.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution' AND civicrm_sdd_mandate.type = 'OOFF'
+      WHERE
+        civicrm_sdd_contribution_txgroup.txgroup_id = $txgroup_id
+      AND
+        $selector;";
+      $results = CRM_Core_DAO::executeQuery($query);
+      while ($results->fetch()) {
+        $contribution_id = (int) $results->contribution_id;
+        // delete the mandate
+        if (empty($results->mandate_id)) {
+          $deleted_contributions[$contribution_id] = "No mandate found!";
+        } else {
+          $delete = civicrm_api('SepaMandate', 'delete', array('id' => $results->mandate_id, 'version' => 3));
+          if (!empty($delete['is_error'])) {
+            $deleted_contributions[$contribution_id] = $delete['error_message'];
+          }          
+        }
+      }
+    }
+
+    // now delete all the contributions
+    $query = "
+    SELECT
+      civicrm_contribution.id  AS contribution_id
+    FROM
+      civicrm_sdd_contribution_txgroup
+    LEFT JOIN
+      civicrm_contribution ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
+    WHERE
+      civicrm_sdd_contribution_txgroup.txgroup_id = $txgroup_id
+    AND
+      $selector;";
+    $results = CRM_Core_DAO::executeQuery($query);
+    while ($results->fetch()) {
+      if (isset($deleted_contributions[$results->contribution_id])) {
+        // there has already been an error -> skip
+        continue;
+      } else {
+        // remove contribution from mandate.first_contribution_id
+        $contribution_id = (int) $results->contribution_id;
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_sdd_mandate SET first_contribution_id = NULL WHERE first_contribution_id = $contribution_id;");
+
+        // delete the contribution
+        $delete = civicrm_api('Contribution', 'delete', array('id' => $contribution_id, 'version' => 3));
+        if (empty($delete['is_error'])) {
+          $deleted_contributions[$contribution_id] = "ok";
+        } else {
+          $deleted_contributions[$contribution_id] = $delete['error_message'];
+        }
+      }
+    }
+    return $deleted_contributions;
+  }
 }

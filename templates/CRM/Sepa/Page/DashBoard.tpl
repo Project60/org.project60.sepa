@@ -96,6 +96,9 @@
         <a onClick="mark_received({$group_id});" class="button button_export">{ts}Mark Received{/ts}</a>
         {/if}
       {/if}
+      {if $can_delete eq yes}
+      <a href="{crmURL p="civicrm/sepa/deletegroup" q="group_id=$group_id"}" class="button button_view">{ts}Delete{/ts}</a>
+      {/if}
     </td>
   </tr>
   {/foreach}
