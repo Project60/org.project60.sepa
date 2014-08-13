@@ -27,7 +27,7 @@
 function sepa_pp_buildForm ( $formName, &$form ) {
 	if ($formName == "CRM_Admin_Form_PaymentProcessor") {
 		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
-		if ($pp['class_name'] = "Payment_SDD") {
+		if ($pp['class_name'] == "Payment_SDD") {
 			// that's ours!
 
 			// get payment processor id
