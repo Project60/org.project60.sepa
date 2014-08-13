@@ -48,6 +48,9 @@
 				</ol>
 				{ts}<b>Do it now! No money will be transferred until the file has been submitted successfully.</b>{/ts}
 			</p>
+			{if $is_test_group}
+			<span style="color:#ff0000;font-size:150%;">{ts}This is a test group. You can not close it.{/ts}</span>
+			{/if}
 			</p>
 		{/if}
 	</div>
@@ -60,8 +63,10 @@
 		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&adjust=today"}" class="button button_export">{ts}Do it! Now!{/ts}</a>
 		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts}I can't submit it right now{/ts}</a>
 	{else}
+		{if not $is_test_group}
 		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=closed"}" class="button button_export">{ts}The file was submitted successfully{/ts}</a>
 		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=invalid"}" class="button button_export">{ts}The file was rejected{/ts}</a>
+		{/if}
 		{if not $smarty.request.adjust}
 		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts}I changed my mind{/ts}</a>
 		{/if}
