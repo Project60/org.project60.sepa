@@ -1175,7 +1175,7 @@ msgid "Do you really want to mark this groups as 'payment received'?"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "PDF Prenotfication"
+msgid "PDF Prenotification"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
@@ -1630,7 +1630,7 @@ msgstr ""
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid ""
 "However, the bank might still reject the file, since this is an illegal "
-"deviation from you announced collection date. Try to avoid this in the "
+"deviation from your announced collection date. Try to avoid this in the "
 "future!"
 msgstr ""
 

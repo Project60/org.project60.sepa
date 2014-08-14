@@ -35,7 +35,7 @@
 			{ts}<strong>You did not submit this SEPA group in time! It is possible that the bank will reject the payment requests.</strong>{/ts}
 			<span class="icon red-icon alert-icon"> </span></p>
 			<p>{ts}As a workaround, we can adjust the collection date, so that you can still submit the file today. <strong>Today! <font color="red">NOW!</font></strong>{/ts}</p>
-			<p>{ts}However, the bank might still reject the file, since this is an illegal deviation from you announced collection date. Try to avoid this in the future!{/ts}</p>
+			<p>{ts}However, the bank might still reject the file, since this is an illegal deviation from your announced collection date. Try to avoid this in the future!{/ts}</p>
 		{else}
 			<p><font size="+0.5">{ts}Download Link:{/ts}&nbsp;<a href="{$file_link}" download="{$file_name}">{$file_name}</a></font></p>
 

@@ -1181,7 +1181,7 @@ msgid "Do you really want to mark this groups as 'payment received'?"
 msgstr "Haben Sie die Zahlung für diese Gruppe wirklich bereits erhalten?"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "PDF Prenotfication"
+msgid "PDF Prenotification"
 msgstr "PDF Prenotifikation"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
@@ -1492,7 +1492,7 @@ msgstr "Die Datei wurde zurückgewiesen"
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "I changed my mind"
-msgstr "Doch nicht"
+msgstr "Jetzt noch nicht"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -1576,7 +1576,7 @@ msgid "As a workaround, we can adjust the collection date, so that you can still
 msgstr "Als Übergangslösung können wir das Einzugsdatum anpassen, so dass Sie die Gruppe heute übermitteln können. <strong>Heute! <font color=\"red\">JETZT!</font></strong>"
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
-msgid "However, the bank might still reject the file, since this is an illegal deviation from you announced collection date. Try to avoid this in the future!"
+msgid "However, the bank might still reject the file, since this is an illegal deviation from your announced collection date. Try to avoid this in the future!"
 msgstr "Die Bank könnte die Datei allerdings zurückweisen, denn es handelt sich um eine illegale Abweichung von dem vorangekündigten Zahlungszyklus. Versuchen Sie auf jeden Fall, diese Situation in der Zukunft zu vermeiden."
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl

@@ -124,7 +124,7 @@
             </tr>
 
             <tr>
-                <td id='mandate_pdf_action' class="label" style="vertical-align: middle;"><a class="button" href="{crmURL p='civicrm/sepa/pdf' q="reset=1&pdfaction=print&id=$mandate_id"}">{ts}PDF Prenotfication{/ts}</td>
+                <td id='mandate_pdf_action' class="label" style="vertical-align: middle;"><a class="button" href="{crmURL p='civicrm/sepa/pdf' q="reset=1&pdfaction=print&id=$mandate_id"}">{ts}PDF Prenotification{/ts}</td>
                 <td>
                     {ts}Will generate a Prenotification PDF with this mandate's data.{/ts}
                 </td>
