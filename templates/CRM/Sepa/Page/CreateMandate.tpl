@@ -31,15 +31,11 @@
 		<tr>	<!-- CREDITOR -->
 			<td>{ts}Creditor{/ts}:</td>
 			<td>
-				<select name="creditor_id" disabled>
+				<select name="creditor_id">
 					{foreach from=$creditors item=name key=id}
 					<option value="{$id}" {if $id eq $creditor_id}selected{/if}>{$name}</option>
 					{/foreach}
 				</select>
-				{foreach from=$creditors item=name key=id} 
-				{* this is a hack for the disabled creditor selector *}
-				<input type="hidden" name="creditor_id" value="{$id}" />
-				{/foreach}
 			</td>
 		</tr>
 		<tr>	<!-- CONTACT -->

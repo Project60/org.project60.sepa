@@ -9,10 +9,10 @@
     <email>endres@systopia.de</email>
   </maintainer>
   <releaseDate></releaseDate>
-  <version>1.0</version>
-  <develStage>under development</develStage>
+  <version>1.0alpha1</version>
+  <develStage>alpha</develStage>
   <compatibility>
-    <ver>4.4.6</ver>
+    <ver>4.4</ver>
   </compatibility>
   <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches.</comments>
   <civix>
