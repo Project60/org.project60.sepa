@@ -17,7 +17,7 @@
 	<div class="crm-block crm-form-block crm-import-datasource-form-block">
 		{if $status eq "closed"}
 			{capture assign=group_text}
-			{ts}<font size="+1">Group '%s' <b>is now closed</b> and cannot be changed any more.</font>{/ts}
+			<font size="+1">{ts}Group '%s' <b>is now closed</b> and cannot be changed any more.{/ts}</font>
 			{/capture}
 			<p>{$group_text|sprintf:$txgroup.reference}</p>
 			<p>{ts}The money should be on it's way{/ts}</p>

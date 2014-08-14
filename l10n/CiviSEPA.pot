@@ -1861,3 +1861,15 @@ msgstr ""
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "Transaction group [%1] couldn't be loaded."
 msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Deleting these contributions will <i>not</i> affect the associated mandates."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Deleting these mandates will also delete the associated contributions."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Group '%s' <b>is now closed</b> and cannot be changed any more."
+msgstr ""
