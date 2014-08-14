@@ -1455,10 +1455,6 @@ msgid "In the unlikely event that the file is formally wrong, try a SEPA validat
 msgstr "Falls Sie vermuten, dass die erzeugte SEPA-Datei formell falsch ist, verwenden Sie ein SEPA Format Validierungstool. Die findet man im Internet, und so lässt sich die Datei auch gezielt reparieren. Kontaktieren Sie uns, falls das System tatsächlich inkorrekte Dateien erzeugt hat."
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
-msgid "<font size=\"+0.5\">Download Link:"
-msgstr "<font size=\"+0.5\">Download Link:"
-
-#: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "<b>In order to collect these payments, you have to do the following:</b>"
 msgstr "<b>Um diese Zahlungen einzuziehen, muss nun folgendes gemacht werden:</b>"
 
@@ -1629,7 +1625,7 @@ msgstr "Das bedeutet, dass die Zahlungen bereits verarbeitet worden sein sollten
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "This is an illegal state!"
-msgstr "Das ist ein defekter Zustand!""
+msgstr "Das ist ein defekter Zustand!"
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "Only proceed if you know what you're doing."
@@ -1759,3 +1755,17 @@ msgstr "Keine Gruppen-ID (group_id) angegeben."
 msgid "Transaction group [%1] couldn't be loaded."
 msgstr "SEPA Gruppe [%1] konnte nicht geladen werden."
 
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Deleting these contributions will <i>not</i> affect the associated mandates."
+msgstr "Das Löschen dieser Zuwendungen wird <i>nicht</i> die damit verbundenen Mandate modifizieren."
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Deleting these mandates will also delete the associated contributions."
+msgstr "Das Löschen dieser Mandate wird auch die damit verbundenen Zuwendungen löschen."
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Group '%s' <b>is now closed</b> and cannot be changed any more."
+msgstr "Die Gruppe \"%s\" <b>wurde geschlossen</b> und kann nicht mehr verändert werden."
+
+#~ msgid "<font size=\"+0.5\">Download Link:"
+#~ msgstr "<font size=\"+0.5\">Download Link:"
