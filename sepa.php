@@ -284,9 +284,9 @@ function sepa_civicrm_enable() {
       // remark: we're within the enable hook, so we cannot use our own API/BAOs...
       $create_creditor_sql = "
       INSERT INTO civicrm_sdd_creditor 
-      (`creditor_id`,    `identifier`,      `name`,           `address`,                   `country_id`, `iban`,                   `bic`,      `mandate_prefix`, `mandate_active`, `sepa_file_format_id`)
+      (`creditor_id`,    `identifier`,      `name`,           `address`,                   `country_id`, `iban`,                   `bic`,      `mandate_prefix`, `mandate_active`, `sepa_file_format_id`, `category`)
       VALUES
-      ($default_contact, 'TESTCREDITORDE', 'TEST CREDITOR', '221B Baker Street\nLondon', '1226',       'DE12500105170648489890', 'SEPATEST', 'TEST',           1,                1);";
+      ($default_contact, 'TESTCREDITORDE', 'TEST CREDITOR', '221B Baker Street\nLondon', '1226',       'DE12500105170648489890', 'SEPATEST', 'TEST',           1,                1, 'TEST');";
       CRM_Core_DAO::executeQuery($create_creditor_sql);
     }
   }
