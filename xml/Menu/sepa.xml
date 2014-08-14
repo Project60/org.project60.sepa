@@ -52,7 +52,10 @@
     <path>civicrm/admin/setting/sepa</path>
     <page_callback>CRM_Admin_Form_Setting_SepaSettings</page_callback>
     <title>CiviSEPA settings</title>
+    <desc>Configuration for the CiviSEPA module: SEPA creditors and notice, grace and horizon periods</desc>
     <access_arguments>administer CiviCRM</access_arguments>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/online_contribution_pages.png</icon>
   </item>
   <item>
     <path>civicrm/sepa/deletegroup</path>
