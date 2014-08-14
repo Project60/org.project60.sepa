@@ -30,15 +30,13 @@
 </div>
 
 <div class="crm-submit-buttons" id="new_submit_buttons">
-    <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon"></div>{ts}Clone{/ts}</span></a-->
-
     <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon"></div>{ts}Mandate Options{/ts}</span></a>
 </div>
 
 {literal}
 <script type="text/javascript">
 cj(document).ready(function() {
-  cj("div.crm-submit-buttons").last().hide();
+  cj("div.crm-submit-buttons div:not(#new_submit_buttons)").last().hide();
 });
 </script>
 {/literal}
