@@ -434,15 +434,14 @@ function sepa_civicrm_navigationMenu(&$params) {
   }
 
   // Find the CiviContribute menu
-  $administerId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Administer', 'id', 'name');
-  $civiContributeID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'CiviContribute', 'id', 'name');
+  $civiContributeID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Contributions', 'id', 'name');
   if (!empty($civiContributeID)) {
-    $civiContributeChildren = $params[$administerId]['child'][$civiContributeID]['child'];
+    $civiContributeChildren = $params[$civiContributeID]['child'];
   
     // now insert the CiviSEPA dashboard element
     $newNavId = $lastElement['attributes']['navID'] + 1;
 
-    $params[$administerId]['child'][$civiContributeID]['child'][$newNavId] = array(
+    $params[$civiContributeID]['child'][$newNavId] = array(
         'attributes' => array (
         'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
         'name' => 'Dashboard',
