@@ -420,3 +420,40 @@ function sepa_civicrm_alterSettingsFolders(&$metaDataFolders = NULL){
   _sepa_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
+/**
+* Implementation of hook_civicrm_navigationMenu
+*/
+function sepa_civicrm_navigationMenu(&$params) {
+  // Check that our item doesn't already exist
+  $menu_item_search = array('url' => 'civicrm/sepa');
+  $menu_items = array();
+  CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
+ 
+  if (!empty($menu_items)) {
+    return;
+  }
+
+  // Find the CiviContribute menu
+  $administerId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Administer', 'id', 'name');
+  $civiContributeID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'CiviContribute', 'id', 'name');
+  if (!empty($civiContributeID)) {
+    $civiContributeChildren = $params[$administerId]['child'][$civiContributeID]['child'];
+  
+    // now insert the CiviSEPA dashboard element
+    $newNavId = $lastElement['attributes']['navID'] + 1;
+
+    $params[$administerId]['child'][$civiContributeID]['child'][$newNavId] = array(
+        'attributes' => array (
+        'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
+        'name' => 'Dashboard',
+        'url' => 'civicrm/sepa',
+        'permission' => 'administer CiviCRM',
+        'operator' => NULL,
+        'separator' => 2,
+        'parentID' => $civiContributeID,
+        'navID' => $newNavId,
+        'active' => 1
+      ));
+  }
+}
+
