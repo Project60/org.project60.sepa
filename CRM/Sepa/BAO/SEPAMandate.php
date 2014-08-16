@@ -35,7 +35,15 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     require_once("packages/php-iban-1.4.0/php-iban.php");
     $params['iban'] = iban_to_machine_format($params['iban']);
-    $params['bic'] = iban_to_machine_format($params['bic']);
+    if (!verify_iban($params['iban'])) {
+      throw new CRM_Exception('Invalid IBAN');
+    }
+    if (!empty($params['bic'])) {
+      $params['bic'] = iban_to_machine_format($params['bic']);
+      if (!preg_match('/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i', $params['bic'])) {
+        throw new CRM_Exception('Invalid BIC');
+      }
+    }
     
     // handle 'normal' creation process inlcuding hooks
     
