@@ -6,6 +6,45 @@
 class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   /**
+   * Clean up (normalise) the passed IBAN and BIC, and check for validity.
+   *
+   * The result is in a format convenient for use in form validation functions --
+   * but it can be easily used to create an exception as well,
+   * which we do internally in the add() method.
+   *
+   * The parameters are also normalised for storage in the DB in addition to the validation.
+   * This is useful in some contexts;
+   * and the BIC at least needs to be normalised anyways for the validation to work.
+   *
+   * @param string &$iban IBAN to be cleaned up and validated
+   * @param string &$bic BIC to be cleaned up and validated
+   *
+   * @return array Array of errors (if any), keyed by form field names
+   *
+   * @access public
+   * @static
+   */
+  public static function validate_account(&$iban, &$bic) {
+    require_once("packages/php-iban-1.4.0/php-iban.php");
+
+    $errors = array();
+
+    $iban = iban_to_machine_format($iban);
+    if (!verify_iban($iban)) {
+      $errors['bank_iban'] = ts('Invalid IBAN');
+    }
+
+    if (!empty($bic)) {
+      $bic = iban_to_machine_format($bic);
+      if (!preg_match('/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i', $bic)) {
+        $errors['bank_bic'] = ts('Invalid BIC');
+      }
+    }
+
+    return $errors;
+  }
+
+  /**
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_SEPAMandate object on success, null otherwise
@@ -33,16 +72,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);
     }
 
-    require_once("packages/php-iban-1.4.0/php-iban.php");
-    $params['iban'] = iban_to_machine_format($params['iban']);
-    if (!verify_iban($params['iban'])) {
-      throw new CRM_Exception('Invalid IBAN');
-    }
-    if (!empty($params['bic'])) {
-      $params['bic'] = iban_to_machine_format($params['bic']);
-      if (!preg_match('/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i', $params['bic'])) {
-        throw new CRM_Exception('Invalid BIC');
-      }
+    $errors = self::validate_account($params['iban'], $params['bic']);
+    if ($errors) {
+      throw new CRM_Exception(implode('; ', $errors));
     }
     
     // handle 'normal' creation process inlcuding hooks

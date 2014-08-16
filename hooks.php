@@ -22,20 +22,7 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
       "CRM_Contribute_Form_Contribution" == $formName || /* Back-office Contribution form (new or edit). */
       "CRM_Contribute_Form_UpdateSubscription" == $formName /* Contribution Recur record edit. */
   ) {
-    require_once("packages/php-iban-1.4.0/php-iban.php");
-    if (array_key_exists ("bank_iban",$fields)) {
-      if (!verify_iban($fields["bank_iban"])) {
-         $errors['bank_iban'] = ts( 'invalid IBAN' );
-         return;
-      }
-      if (!empty($fields['bank_bic'])) {
-        // we use the same function that cleans iban to clean bic
-        $fields["bank_bic"] = iban_to_machine_format($fields["bank_bic"]);
-        if (!preg_match("/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i", $fields["bank_bic"])) {
-           $errors['bank_bic'] = ts( 'invalid BIC' );
-        } 
-      }
-    }
+    $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['bank_iban'], $fields['bank_bic']);
   }
 
   if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || /* On-line Contribution Page. (PP invoked here if a confirmation page is used.) */
