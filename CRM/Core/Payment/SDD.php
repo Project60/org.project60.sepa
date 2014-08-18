@@ -88,8 +88,12 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     $rcur_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $this->_creditorId);
     $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
-    $form->assign('earliest_rcur_date', date('m/d/Y', strtotime("now + $rcur_notice_days days")));
-    $form->assign('earliest_ooff_date', date('m/d/Y', strtotime("now + $ooff_notice_days days")));
+    $timestamp_rcur = strtotime("now + $rcur_notice_days days");
+    $timestamp_ooff = strtotime("now + $ooff_notice_days days");
+    $earliest_rcur_date = array(date('Y', $timestamp_rcur), date('m', $timestamp_rcur), date('d', $timestamp_rcur));
+    $earliest_ooff_date = array(date('Y', $timestamp_ooff), date('m', $timestamp_ooff), date('d', $timestamp_ooff));
+    $form->assign('earliest_rcur_date', $earliest_rcur_date);
+    $form->assign('earliest_ooff_date', $earliest_ooff_date);
 
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));

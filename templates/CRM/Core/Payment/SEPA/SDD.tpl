@@ -57,8 +57,8 @@
 // translated captions
 var label_months = "{ts}month(s){/ts}";
 var label_years = "{ts}year(s){/ts}";
-var earliest_ooff_date = "{$earliest_ooff_date}";
-var earliest_rcur_date = "{$earliest_rcur_date}";
+var earliest_ooff_date = new Date({$earliest_ooff_date[0]}, {$earliest_ooff_date[1]} - 1, {$earliest_ooff_date[2]});
+var earliest_rcur_date = new Date({$earliest_rcur_date[0]}, {$earliest_rcur_date[1]} - 1, {$earliest_rcur_date[2]});
 
 {literal}
 // fix up the frequency interval field
@@ -84,9 +84,9 @@ function _is_recur_visualize() {
 	cj("#frequency_unit").attr('disabled', !is_recur);
 	cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
 	if (is_recur) {
-		cj("#start_date_display").datepicker("option", 'minDate', earliest_rcur_date);
+		cj("#start_date_display").datepicker("option", "minDate", earliest_rcur_date);
 	} else {
-		cj("#start_date_display").datepicker("option", 'minDate', earliest_ooff_date);
+		cj("#start_date_display").datepicker("option", "minDate", earliest_ooff_date);
 	}
 }
 
