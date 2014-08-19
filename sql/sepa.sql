@@ -1,12 +1,3 @@
-SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS civicrm_sdd_mandate;
-DROP TABLE IF EXISTS civicrm_sdd_creditor;
-DROP TABLE IF EXISTS civicrm_sdd_file;
-DROP TABLE IF EXISTS civicrm_sdd_txgroup;
-DROP TABLE IF EXISTS civicrm_sdd_contribution_txgroup;
-SET FOREIGN_KEY_CHECKS = 1;
-
-
 -- /*******************************************************
 -- *
 -- * civicrm_sdd_creditor
@@ -112,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
 -- * civicrm_sdd_file
 -- *
 -- *******************************************************/
-CREATE TABLE `civicrm_sdd_file` (
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_file` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
@@ -141,7 +132,7 @@ CREATE TABLE `civicrm_sdd_file` (
 
 
 
-CREATE TABLE `civicrm_sdd_txgroup` (
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_txgroup` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
@@ -166,7 +157,7 @@ CREATE TABLE `civicrm_sdd_txgroup` (
 
 
 
-CREATE TABLE `civicrm_sdd_contribution_txgroup` (
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_contribution_txgroup` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'primary key',
