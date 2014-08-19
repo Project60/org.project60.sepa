@@ -4,8 +4,7 @@ If you are in Europe and use CiviCRM to manage recurring contributions, you need
 
 This branch if currently maintained by Xavier Dutoit (TTTP, xavier@tttp.eu) and  Björn Endres (SYSTOPIA, endres@systopia.de).
 
-
-*You will find the dashboard at `civicrm/sepa`*
+Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSEPA
 
 
 # What it can do
@@ -27,7 +26,7 @@ This branch if currently maintained by Xavier Dutoit (TTTP, xavier@tttp.eu) and 
 
 # Customisation
 
-You should add a sepa customization extension implementing the following hooks:
+If you need customised mandate references, exclude certain collection dates, or add a custom transaction message to the collection, you want to create a sepa customization extension implementing the following hooks:
 * `civicrm_create_mandate` - to generate custom mandate reference numbers
 * `civicrm_defer_collection_date` - to avoid days when your bank won't accept collections
 * `civicrm_modify_txmessage` - to customize the transaction message
@@ -97,3 +96,4 @@ function sepademo_civicrm_modify_txmessage(&$txmessage, $info, $creditor) {
 }
 ```
 
+If you need help on how to create an extension, check out Tim Otten's great work on ```civix```: https://github.com/totten/civix/
