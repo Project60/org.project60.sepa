@@ -147,6 +147,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['bic']  = $params['bank_bic'];
       $params['creation_date'] = date('YmdHis');
       $params['is_test'] = ($this->_mode == 'test') ? 1 : 0;
+      $params['source'] = $params['description'];
       $contribution = civicrm_api3('SepaMandate', 'createfull', $params);
 
       return FALSE;
@@ -168,6 +169,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['contribution_id'] = $params['contributionID'];
       $params['contribution_recur_id'] = $params['contributionRecurID'];
       $params['is_test'] = ($this->_mode == 'test') ? 1 : 0;
+      $params['source'] = $params['description'];
       $contribution = civicrm_api3('SepaMandate', 'createfull', $params);
 
       return FALSE;
