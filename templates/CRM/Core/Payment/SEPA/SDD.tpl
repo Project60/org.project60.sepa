@@ -44,7 +44,7 @@
 <!-- TWEAK THE FORM: -->
 
 <!-- Additional Elements -->
-<span id="currency_indicator"><b>EUR</b></span>
+<span id="currency_indicator" hidden="1"><b>EUR</b></span>
 
 <!-- JS Disclaimer -->
 <noscript>
@@ -74,8 +74,11 @@ if (!cj("#frequency_interval").val()) {
 cj("#frequency_unit > option[value='month']").text(label_months);
 cj("#frequency_unit > option[value='year']").text(label_years);
 
-// set currency to EUR
-cj(".other_amount-content > input").parent().append(cj("#currency_indicator"));
+// show currency indicater and move next to field
+if (cj(".other_amount-content > input").length) {
+	cj("#currency_indicator").show();
+	cj(".other_amount-content > input").parent().append(cj("#currency_indicator"));	
+}
 
 // disable the recur_selector fields if disabled
 function _is_recur_visualize() {
