@@ -81,21 +81,23 @@ if (cj(".other_amount-content > input").length) {
 }
 
 // disable the recur_selector fields if disabled
-function _is_recur_visualize() {
+function _sdd_update_elements() {
 	var is_recur = cj("#is_recur").attr('checked')=='checked';
 	cj("#frequency_interval").attr('disabled', !is_recur);
 	cj("#frequency_unit").attr('disabled', !is_recur);
 	cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
 	if (is_recur) {
 		cj("#start_date_display").datepicker("option", "minDate", earliest_rcur_date);
+		cj("#start_date_display").datepicker("setDate", earliest_rcur_date);
 	} else {
 		cj("#start_date_display").datepicker("option", "minDate", earliest_ooff_date);
+		cj("#start_date_display").datepicker("setDate", earliest_ooff_date);
 	}
 }
 
 cj(function() {
-	cj("#is_recur").change(_is_recur_visualize);
-	_is_recur_visualize();
+	cj("#is_recur").change(_sdd_update_elements);
+	_sdd_update_elements();
 });
 
 </script>
