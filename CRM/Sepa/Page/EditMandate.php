@@ -116,7 +116,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       }
     } else {
       // this is a simple contribution
-      $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contribution', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
+      $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contribution', "reset=1&action=view&id=".$contribution['id']."&cid=".$contact2['id']);
       $contribution['amount'] = CRM_Utils_Money::format($contribution['total_amount'], 'EUR');
     }
 
