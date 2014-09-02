@@ -93,7 +93,7 @@
             	<td>{ts}Completely delete this mandate along with the contribution. This is only possible because it has not yet been submitted to the bank.{/ts}</td>
             </tr>{/if}{/if}
 
-        	{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
+        	{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT' or $sepa.status eq 'OOFF'}<tr>
             	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_cancel();">{ts}Cancel{/ts}</td>
             	<td>{ts}Cancel this mandate immediately for the following reason:{/ts}&nbsp;<input type="text" name="cancel_reason" size="32" /></td>
             </tr>{/if}
