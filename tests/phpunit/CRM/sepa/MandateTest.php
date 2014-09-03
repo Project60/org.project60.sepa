@@ -242,4 +242,51 @@ class CRM_sepa_MandateTest extends CRM_sepa_BaseTestCase {
     $this->assertDBQuery(1, 'select count(*) from civicrm_sdd_mandate;', array());
   }
 
+  /**
+   * Test civicrm_api3_sepa_mandate_create with default creditor
+   *
+   * @author niko bochan
+   */
+  public function testCreateWithDefaultCreditor()
+  {
+    $contactId = $this->individualCreate();
+    $contribution = $this->callAPISuccess("Contribution", "create", array(
+      'version'             => 3,
+      'financial_type_id'   => 1,
+      'contribution_status_id' => 2,
+      'total_amount'        => '100.00',
+      'currency'            => 'EUR',
+      'contact_id'          => $contactId,
+    ));
+    $create_data = array(
+      'version'             => 3,
+      'type'                => 'OOFF',
+      'status'              => 'INIT',
+      'entity_id'           => $contribution['id'],
+      'entity_table'        => 'civicrm_contribution',
+      'contact_id'          => $contactId,
+      'start_date'          => date('YmdHis'),
+      'receive_date'        => date('YmdHis'),
+      'date'                => date('YmdHis'),
+      'iban'                => "BE68844010370034",
+      'bic'                 => "TESTTEST",
+      'is_enabled'          => 1,
+      );
+
+    // this should fail, since no creditor_id is set and no default creditor either
+    $this->callAPIFailure("SepaMandate", "create", $create_data);
+    
+    // set default creditor
+    $creditor_id = $this->getCreditor();
+    CRM_Sepa_Logic_Settings::setSetting('batching_default_creditor', $creditor_id);
+    
+    // this should work, since no creditor_id is set BUT the default creditor is
+    $this->callAPISuccess("SepaMandate", "create", $create_data);
+
+    // set bad default creditor
+    CRM_Sepa_Logic_Settings::setSetting('batching_default_creditor', '999');
+
+    // this should fail, since no creditor_id is set and the default creditor is bad
+    $this->callAPIFailure("SepaMandate", "create", $create_data);
+  }
 }
