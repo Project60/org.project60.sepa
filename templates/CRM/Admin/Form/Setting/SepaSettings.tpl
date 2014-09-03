@@ -204,6 +204,12 @@
        </table>
        <h2>System Settings</h2>
         <table class="form-layout">
+            <tr class="crm-alternative_batching-form-block-batching_default_creditor">
+              <td class="label">{$form.batching_default_creditor.label} <a onclick='CRM.help("{ts}Default Creditor{/ts}", {literal}{"id":"id-defaultcreditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td>
+                {$form.batching_default_creditor.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
               <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
               <td>
@@ -251,8 +257,21 @@
     CRM.confirm(function() {
               CRM.api('SepaCreditor', 'delete', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
                 {success: function(data) {
-                    CRM.alert("{/literal}{ts}Creditor deleted{/ts}", "{ts}Success{/ts}{literal}", "success");
-                    location.reload();
+                    CRM.api('Setting', 'get', {'q': 'civicrm/ajax/rest', 'sequential': 1},
+                    {success: function(data) {
+                        if (data['is_error'] == 0) {
+                          cj.each(data["values"], function(key, value) {
+                              if (value.batching_default_creditor == id) {
+                                CRM.api('Setting', 'create', {'batching_default_creditor': '0'}, {success: function(data) {}});
+                              }
+                          });
+
+                          CRM.alert("{/literal}{ts}Creditor deleted{/ts}", "{ts}Success{/ts}{literal}", "success");
+                          location.reload();
+                        }
+                      }
+                    }
+                  );
                 }
               }
             );
@@ -394,7 +413,6 @@
                     }
 
                     param[name] = JSON.stringify(param[name]);
-
                     CRM.api('Setting', 'create', param, {success: function(data) {
                          CRM.alert("{/literal}{ts}Creditor updated{/ts}", "{ts}Success{/ts}{literal}", "success");
                          resetValues();

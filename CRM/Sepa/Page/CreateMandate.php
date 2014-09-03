@@ -285,6 +285,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       if (isset($_REQUEST[$parameter]))
         $this->assign($parameter, $_REQUEST[$parameter]);
     }
+
+    // set default creditor, if not provided
+    if (empty($_REQUEST['creditor_id'])) {
+      $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
+      if ($default_creditor != NULL) {
+        $this->assign('creditor_id', $default_creditor->id);
+      }
+    }
   }
 
 

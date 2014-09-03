@@ -34,6 +34,7 @@
  * @access public
  */
 function civicrm_api3_sepa_mandate_create($params) {
+  _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -66,6 +67,7 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
 function civicrm_api3_sepa_mandate_createfull($params) {
     // create the "contract" first: a contribution
     // TODO: sanity checks
+    _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
     $create_contribution = $params; // copy array
     $create_contribution['version'] = 3;
     if (isset($create_contribution['contribution_contact_id'])) {
@@ -154,5 +156,17 @@ function civicrm_api3_sepa_mandate_delete($params) {
  */
 function civicrm_api3_sepa_mandate_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * will add the default creditor_id if no creditor_id is given, and the default creditor is valid
+ */
+function _civicrm_api3_sepa_mandate_adddefaultcreditor(&$params) {
+  if (empty($params['creditor_id'])) {
+    $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
+    if ($default_creditor != NULL) {
+      $params['creditor_id'] = $default_creditor->id;
+    }
+  }
 }
 

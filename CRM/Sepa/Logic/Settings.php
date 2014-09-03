@@ -111,4 +111,22 @@ class CRM_Sepa_Logic_Settings {
     return new CRM_Core_Lock('org.project60.sepa.batching.update', $timeout);
   }
 
+
+  /**
+   * Reads the default creditor from the settings
+   * Will only return a creditor if it exists and if it's active
+   * 
+   * @return CRM_Sepa_BAO_SEPACreditor object or NULL
+   */
+  static function defaultCreditor() {
+    $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
+    if (empty($default_creditor_id)) return NULL;
+    $default_creditor = new CRM_Sepa_DAO_SEPACreditor();
+    $default_creditor->get('id', $default_creditor_id);
+    if (empty($default_creditor->mandate_active)) {
+      return NULL;
+    } else {
+      return $default_creditor;
+    }
+  }
 }

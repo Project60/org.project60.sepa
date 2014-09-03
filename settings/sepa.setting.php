@@ -17,6 +17,19 @@
 */
 
 return array(
+  'batching_default_creditor' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'batching_default_creditor',
+    'type' => 'Integer',
+    'html_type' => 'Select',
+    'default' => 0,
+    'add' => '4.3',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Default Creditor',
+    'help_text' => 'This creditor will be used when no other creditor is explicitely set',
+  ),
   'batching_OOFF_horizon_override' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
