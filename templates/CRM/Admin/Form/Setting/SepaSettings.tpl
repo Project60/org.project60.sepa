@@ -257,8 +257,21 @@
     CRM.confirm(function() {
               CRM.api('SepaCreditor', 'delete', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
                 {success: function(data) {
-                    CRM.alert("{/literal}{ts}Creditor deleted{/ts}", "{ts}Success{/ts}{literal}", "success");
-                    location.reload();
+                    CRM.api('Setting', 'get', {'q': 'civicrm/ajax/rest', 'sequential': 1},
+                    {success: function(data) {
+                        if (data['is_error'] == 0) {
+                          cj.each(data["values"], function(key, value) {
+                              if (value.batching_default_creditor == id) {
+                                CRM.api('Setting', 'create', {'batching_default_creditor': '0'}, {success: function(data) {}});
+                              }
+                          });
+
+                          CRM.alert("{/literal}{ts}Creditor deleted{/ts}", "{ts}Success{/ts}{literal}", "success");
+                          location.reload();
+                        }
+                      }
+                    }
+                  );
                 }
               }
             );
@@ -400,7 +413,6 @@
                     }
 
                     param[name] = JSON.stringify(param[name]);
-
                     CRM.api('Setting', 'create', param, {success: function(data) {
                          CRM.alert("{/literal}{ts}Creditor updated{/ts}", "{ts}Success{/ts}{literal}", "success");
                          resetValues();

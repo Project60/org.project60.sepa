@@ -32,7 +32,6 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.RCUR.grace', ts('RCUR grace')),
                          array('batching.RCUR.notice', ts('RCUR notice days')),
                          array('batching.FRST.notice', ts('FRST notice days')),
-                         array('batching.default.creditor', ts('Default Creditor')),
                          array('batching.UPDATE.lock.timeout', ts('Update lock timeout')));
 
       $this->custom_fields = array(
@@ -134,6 +133,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         }
 
         // get creditor list
+        $creditors_default_list = array();
         $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
         if (!empty($creditor_query['is_error'])) {
           return civicrm_api3_create_error("Cannot get creditor list: " . $creditor_query['error_message']);
@@ -141,9 +141,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
           $creditors = array();
           foreach ($creditor_query['values'] as $creditor) {
               $creditors[] = $creditor;
+              $creditors_default_list[$creditor['id']] = $creditor['name'];
           }
         }
         $this->assign('creditors', $creditors);
+        $default_creditors = $this->addElement('select', 'batching_default_creditor', ts("Default Creditor"), array('' => ts('- select -')) + $creditors_default_list);
+        $default_creditors->setSelected(CRM_Sepa_Logic_Settings::getSetting('batching.default.creditor'));
+
         parent::buildQuickForm();
     }
 
@@ -156,6 +160,8 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                 CRM_Core_BAO_Setting::setItem($values[$this->domainToString($value[0])], 'SEPA Direct Debit Preferences', $this->domainToString($value[0]));
             }  
         }
+
+        CRM_Core_BAO_Setting::setItem($values['batching_default_creditor'], 'SEPA Direct Debit Preferences', 'batching_default_creditor');
         
         $session = CRM_Core_Session::singleton();
         $session->setStatus(ts("Settings successfully saved"));
