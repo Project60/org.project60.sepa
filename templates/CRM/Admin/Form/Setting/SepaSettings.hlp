@@ -69,5 +69,8 @@
     <p>{ts}CiviSEPA operations like batching require exclusive access to the SEPA data structures. Therefore, the access of other processes is blocked while these are in progress. For security reasons, this lock times out after the specified time.{/ts}</p>
 {/htxt}
 
+{htxt id='id-defaultcreditor'}
+    <p>{ts}The default creditor will be used when no other creditor is exclicitely set. It will also be pre-selected in the back office forms.{/ts}</p>
+{/htxt}
 
 

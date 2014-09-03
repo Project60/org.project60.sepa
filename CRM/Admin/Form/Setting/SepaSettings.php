@@ -32,6 +32,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.RCUR.grace', ts('RCUR grace')),
                          array('batching.RCUR.notice', ts('RCUR notice days')),
                          array('batching.FRST.notice', ts('FRST notice days')),
+                         array('batching.default.creditor', ts('Default Creditor')),
                          array('batching.UPDATE.lock.timeout', ts('Update lock timeout')));
 
       $this->custom_fields = array(

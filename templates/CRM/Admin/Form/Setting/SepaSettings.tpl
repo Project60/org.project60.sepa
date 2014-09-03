@@ -204,6 +204,12 @@
        </table>
        <h2>System Settings</h2>
         <table class="form-layout">
+            <tr class="crm-alternative_batching-form-block-batching_default_creditor">
+              <td class="label">{$form.batching_default_creditor.label} <a onclick='CRM.help("{ts}Default Creditor{/ts}", {literal}{"id":"id-defaultcreditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td>
+                {$form.batching_default_creditor.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
               <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
               <td>
