@@ -11,12 +11,12 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 
 * OOFF and RCUR payments
 * SEPA dashboard gives you great status overview
-* payment processer e.g. for online donations (planned for 0.5)
+* payment processer e.g. for online donations
 * UI to manipulate mandates
 * full SEPA group life cycle: 'open'-'closed/sent'->'received'
 * record SEPA payment action and form for contacts
 * manual batching with parameters for notice period and horizon
-* automatic adjustment of late OOFF transactions
+* automatic adjustment of late OOFF and RCUR transactions
 * integration with CiviBanking
 
 
