@@ -123,6 +123,10 @@ function mark_received(group_id) {
       {success: function(data) {
         // reload page
         location.reload();     
+      },
+       error: function(data) {
+        // show error message
+        alert(data.error_message.error_message);
       }}
     );    
   }
