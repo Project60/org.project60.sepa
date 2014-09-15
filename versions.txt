@@ -1,6 +1,13 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
+Version 1.1
+===========
+- implemented default creditor setting (#169)
+- implemented cancel option for OOFF mandates (#170)
+- minor fixes (#175, #183)
+
+
 Version 1.0
 ===========
 - added payment processor
