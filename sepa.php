@@ -379,9 +379,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
       $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table' => 'civicrm_contribution', 'entity_id' => $form->_id));
     }
     foreach ($fieldMapping as $field => $api) {
-      if($mandate[$api] !=$form->_submitValues[$field]) {
-        $newMandate[$api] = $form->_submitValues[$field];
-      }
+      $newMandate[$api] = $form->_submitValues[$field];
     }
 
     $oldActive = CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']);
@@ -408,16 +406,14 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
       }
     }
 
-    if ($newMandate) {
-      $newMandate["id"]=$mandate["id"];
-      //not strictly needed, uncomment if proven handy in the underlying api/bao
-      //$newMandate["entity_id"]=$mandate["entity_id"];
-      //$newMandate["entity_table"]=$mandate["entity_table"];
-      $newMandate["version"] = 3;
-      $mandate = civicrm_api("SepaMandate","create",$newMandate);
-      if ($mandate["is_error"]) {
-        CRM_Core_Error::fatal($mandate["error_message"]);
-      }
+    $newMandate["id"]=$mandate["id"];
+    //not strictly needed, uncomment if proven handy in the underlying api/bao
+    //$newMandate["entity_id"]=$mandate["entity_id"];
+    //$newMandate["entity_table"]=$mandate["entity_table"];
+    $newMandate["version"] = 3;
+    $mandate = civicrm_api("SepaMandate","create",$newMandate);
+    if ($mandate["is_error"]) {
+      CRM_Core_Error::fatal($mandate["error_message"]);
     }
   }
   
