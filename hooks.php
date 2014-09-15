@@ -22,7 +22,9 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
       "CRM_Contribute_Form_Contribution" == $formName || /* Back-office Contribution form (new or edit). */
       "CRM_Contribute_Form_UpdateSubscription" == $formName /* Contribution Recur record edit. */
   ) {
-    $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['bank_iban'], $fields['bank_bic']);
+    if (array_key_exists ("bank_iban",$fields)) {
+      $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['bank_iban'], $fields['bank_bic']);
+    }
   }
 
   if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || /* On-line Contribution Page. (PP invoked here if a confirmation page is used.) */
