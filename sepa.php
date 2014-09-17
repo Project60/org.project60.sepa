@@ -456,3 +456,12 @@ function sepa_civicrm_navigationMenu(&$params) {
   }
 }
 
+/**
+ * Set permission to the API calls
+ */
+function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
+  // TODO: add more
+  $permissions['sepa_alternative_batching']['received'] = array('edit contributions');
+  $permissions['sepa_logic']['received'] = array('edit contributions');
+  $permissions['sepa_transaction_group']['toaccgroup'] = array('edit contributions');
+}
