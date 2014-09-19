@@ -775,13 +775,15 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
    * @see https://github.com/Project60/sepa_dd/issues/190
    */
   public function testRCURGracePeriod_190() {
-    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+    $rcur_notice = 6;
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.notice', $rcur_notice);    
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace', 2 * $rcur_notice);
     $contactId = $this->individualCreate();
     $collection_date = strtotime("+1 days");
     $deferred_collection_date = strtotime("+$rcur_notice days");
 
     // count the existing contributions
-    $count = $this->callAPISuccess("Contribution", "getcount", array('version' =>3));
+    $count = $this->callAPISuccess("Contribution", "getcount", array('version' => 3));
 
     // create a mandate, that's already late
     $parameters = array(
@@ -804,10 +806,10 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $this->callAPISuccess("SepaMandate", "createfull", $parameters);
 
     // batch it
-    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR", 'version' => 3));
 
     // check contributions count again
-    $newcount = $this->callAPISuccess("Contribution", "getcount", array('version' =>3));
+    $newcount = $this->callAPISuccess("Contribution", "getcount", array('version' => 3));
     $this->assertEquals($count+1, $newcount, "A contribution should have been created!");
 
     // adjust collection date, close the group and thus modify the contribution's receive date
@@ -816,10 +818,10 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     CRM_Sepa_Logic_Group::close($txgroup['id']);
 
     // batch again
-    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR", 'version' => 3));
 
     // verify, that NO new contribution is created
-    $newcount = $this->callAPISuccess("Contribution", "getcount", array('version' =>3));
+    $newcount = $this->callAPISuccess("Contribution", "getcount", array('version' => 3));
     $this->assertEquals($count+1, $newcount, "Yet another contribution has been created. Issue #190 still active!");
   }
 }
