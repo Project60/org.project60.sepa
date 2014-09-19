@@ -768,4 +768,58 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     $this->assertEquals('1', $contrib['is_test'], "Test flag should be set!");
   }
 
+  /**
+   * Test update of recurring payments after a deferred submission
+   *
+   * @author Björn Endres
+   * @see https://github.com/Project60/sepa_dd/issues/190
+   */
+  public function testRCURGracePeriod_190() {
+    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+    $contactId = $this->individualCreate();
+    $collection_date = strtotime("+1 days");
+    $deferred_collection_date = strtotime("+$rcur_notice days");
+
+    // count the existing contributions
+    $count = $this->callAPISuccess("Contribution", "getcount", array('version' =>3));
+
+    // create a mandate, that's already late
+    $parameters = array(
+      'version'             => 3,
+      'type'                => 'RCUR',
+      'status'              => 'RCUR',
+      'contact_id'          => $contactId,
+      'financial_type_id'   => 1,
+      'amount'              => '6.66',
+      'start_date'          => date('YmdHis'),
+      'date'                => date('YmdHis'),
+      'cycle_day'           => date('d', $collection_date),
+      'frequency_interval'  => 1,
+      'frequency_unit'      => 'month',
+      'iban'                => "BE68844010370034",
+      'bic'                 => "TESTTEST",
+      'creditor_id'         => $this->getCreditor(),
+      'is_enabled'          => 1,
+    );
+    $this->callAPISuccess("SepaMandate", "createfull", $parameters);
+
+    // batch it
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+
+    // check contributions count again
+    $newcount = $this->callAPISuccess("Contribution", "getcount", array('version' =>3));
+    $this->assertEquals($count+1, $newcount, "A contribution should have been created!");
+
+    // adjust collection date, close the group and thus modify the contribution's receive date
+    $txgroup = $this->callAPISuccess("SepaTransactionGroup", "getsingle", array('version' =>3));
+    CRM_Sepa_BAO_SEPATransactionGroup::adjustCollectionDate($txgroup['id'], date('Y-m-d', $deferred_collection_date));
+    CRM_Sepa_Logic_Group::close($txgroup['id']);
+
+    // batch again
+    $this->callAPISuccess("SepaAlternativeBatching", "update", array("type" => "RCUR"));
+
+    // verify, that NO new contribution is created
+    $newcount = $this->callAPISuccess("Contribution", "getcount", array('version' =>3));
+    $this->assertEquals($count+1, $newcount, "Yet another contribution has been created. Issue #190 still active!");
+  }
 }
