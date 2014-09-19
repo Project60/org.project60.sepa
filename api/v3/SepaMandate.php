@@ -75,7 +75,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     	$create_contribution['contact_id'] = $create_contribution['contribution_contact_id'];
     }
 	if (empty($create_contribution['currency'])) 
-		$create_contribution['currency'] = 'EUR'; // set default status
+		$create_contribution['currency'] = 'EUR'; // set default currency
 	if (empty($create_contribution['contribution_status_id'])) 
 		$create_contribution['contribution_status_id'] = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
 
@@ -87,7 +87,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       	if (empty($create_contribution['status'])) 
       		$create_contribution['status'] = 'FRST'; // set default status
       	if (empty($create_contribution['is_pay_later'])) 
-      		$create_contribution['status'] = 'FRST'; // set default status
+      		$create_contribution['is_pay_later'] = 1; // set default pay_later
 
     } elseif ($params['type']=='OOFF') {
 	 	$contribution_entity = 'Contribution';
