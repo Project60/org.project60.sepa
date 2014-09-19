@@ -64,6 +64,7 @@ class CRM_Sepa_Logic_Batching {
         rcontribution.contact_id AS rc_contact_id,
         rcontribution.financial_type_id AS rc_financial_type_id,
         rcontribution.contribution_status_id AS rc_contribution_status_id,
+        rcontribution.currency AS rc_currency,
         rcontribution.campaign_id AS rc_campaign_id,
         rcontribution.payment_instrument_id AS rc_payment_instrument_id
       FROM civicrm_sdd_mandate AS mandate
@@ -90,6 +91,7 @@ class CRM_Sepa_Logic_Batching {
           'cancel_date'                   => $results->cancel_date,
           'rc_contact_id'                 => $results->rc_contact_id,
           'rc_amount'                     => $results->rc_amount,
+          'rc_currency'                   => $results->rc_currency,
           'rc_financial_type_id'          => $results->rc_financial_type_id,
           'rc_contribution_status_id'     => $results->rc_contribution_status_id,
           'rc_campaign_id'                => $results->rc_campaign_id,
@@ -146,6 +148,7 @@ class CRM_Sepa_Logic_Batching {
           $contribution_data = array(
               "version"                             => 3,
               "total_amount"                        => $mandate['rc_amount'],
+              "currency"                            => $mandate['rc_currency'],
               "receive_date"                        => $collection_date,
               "contact_id"                          => $mandate['rc_contact_id'],
               "contribution_recur_id"               => $recur_id,
