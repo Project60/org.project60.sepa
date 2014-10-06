@@ -22,8 +22,15 @@
 		{ts}Record SEPA Contribution{/ts}
 	</span>
 </a>
+
 <script type="text/javascript">
+{literal}
+if (cj(".action-link").length==0) {
+	// if the user has insufficient permissions, the action-link div doesn't exist
+	cj(".view-content").prepend('<div class="action-link"></div>');
+}
 cj(".action-link").prepend(cj("#sepa_payment_extra_button"));
+{/literal}
 </script>
 
 
