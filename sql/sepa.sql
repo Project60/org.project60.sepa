@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
      `iban` varchar(42) NULL   COMMENT 'Iban of the debtor',
      `bic` varchar(11)    COMMENT 'BIC of the debtor',
     `type` varchar(4) NOT NULL  DEFAULT 'RCUR' COMMENT 'RCUR for recurrent (default), OOFF for one-shot',
-     `status` varchar(8) NOT NULL  DEFAULT 'INIT' COMMENT 'Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)',
+     `status` varchar(8) NOT NULL  DEFAULT 'INIT' COMMENT 'Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, ONHOLD)',
      `is_enabled` tinyint NOT NULL  DEFAULT 1 COMMENT 'If the mandate has been validated',
      `creation_date` datetime    ,
      `first_contribution_id` int unsigned    COMMENT 'FK to civicrm_contribution',

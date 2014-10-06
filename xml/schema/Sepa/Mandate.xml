@@ -150,7 +150,7 @@
     <required>true</required>  
     <default>"INIT"</default> 
     <add>4.3</add>
-    <comment>Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)</comment>
+    <comment>Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, ONHOLD)</comment>
   </field>
   
   <field>
