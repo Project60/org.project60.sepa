@@ -8,8 +8,8 @@
     <author>Software für Engagierte e.V.</author>
     <email>info@sfe-ev.org</email>
   </maintainer>
-  <releaseDate>2014-07-17</releaseDate>
-  <version>versoehnungsbund-production-5.2</version>
+  <releaseDate>2014-10-30</releaseDate>
+  <version>versoehnungsbund-production-6</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>4.3</ver>
