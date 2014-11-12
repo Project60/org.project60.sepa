@@ -8,6 +8,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
   /**
    * Clean up (normalise) the passed IBAN and BIC, and check for validity.
    *
+   * If the BIC is empty, check whether this is a domestic payment (i.e. IBAN-only is allowed),
+   * by comparing the country code part of the IBAN
+   * against the country code part of Creditor IBAN.
+   *
    * The result is in a format convenient for use in form validation functions --
    * but it can be easily used to create an exception as well,
    * which we do internally in the add() method.
@@ -24,7 +28,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    * @access public
    * @static
    */
-  public static function validate_account(&$iban, &$bic) {
+  public static function validate_account(&$iban, &$bic, $creditorIBAN) {
     require_once("packages/php-iban-1.4.0/php-iban.php");
 
     $errors = array();
@@ -38,6 +42,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $bic = iban_to_machine_format($bic);
       if (!preg_match('/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i', $bic)) {
         $errors['bank_bic'] = ts('Invalid BIC');
+      }
+    } else {
+      /* Check whether IBAN-only is allowed in this case. */
+      if (substr($iban, 0, 2) != substr($creditorIBAN, 0, 2)) { /* Country code not same as for creditor. */
+        $errors['bank_bic'] = ts('BIC is mandatory for non-domestic payments');
       }
     }
 
@@ -72,7 +81,8 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);
     }
 
-    $errors = self::validate_account($params['iban'], $params['bic']);
+    $creditorIBAN = civicrm_api3('SepaCreditor', 'getvalue', array ('id' => $params['creditor_id'], 'return' => 'iban'));
+    $errors = self::validate_account($params['iban'], $params['bic'], $creditorIBAN);
     if ($errors) {
       throw new CRM_Exception(implode('; ', $errors));
     }

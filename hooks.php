@@ -18,15 +18,7 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     }
   }
   
-  if ("CRM_Contribute_Form_Contribution_Main"  == $formName || /* Online Contribution Page. */
-      "CRM_Contribute_Form_Contribution" == $formName || /* Back-office Contribution form (new or edit). */
-      "CRM_Contribute_Form_UpdateSubscription" == $formName /* Contribution Recur record edit. */
-  ) {
-    if (array_key_exists ("bank_iban",$fields)) {
-      $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['bank_iban'], $fields['bank_bic']);
-    }
-  }
-
+  /* Forms that initiate a PP transaction. */
   if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || /* On-line Contribution Page. (PP invoked here if a confirmation page is used.) */
       "CRM_Contribute_Form_Contribution_Main" == $formName || /* On-line Contribution Page. (PP invoked here if no confirmation page is used.) */
       "CRM_Contribute_Form_Contribution" == $formName && empty($form->_values) /* New back-office Contribution. */
@@ -49,8 +41,35 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     $GLOBALS["sepa_context"]["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
-    }
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('payment_processor_id' => $paymentProcessorId, 'return' => 'iban'));
 
+  /* Other forms that might have an IBAN/BIC input we need to verify. */
+  } elseif ("CRM_Contribute_Form_Contribution" == $formName) { /* Back-office Contribution edit form. */
+    if (!CRM_Sepa_Logic_Base::isSDD($fields)) {
+      return;
+    }
+    $result = civicrm_api3('SepaMandate', 'getsingle', array(
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $form->_values['contribution_id'],
+      'return' => 'creditor_id',
+      'api.SepaCreditor.getsingle' => array(
+        'id' => '$value.creditor_id',
+        'return' => 'iban',
+      ),
+    ));
+    $creditor = $result['api.SepaCreditor.getsingle'];
+  } elseif ("CRM_Contribute_Form_UpdateSubscription" == $formName) { /* Contribution Recur record edit. */
+    if ($form->_paymentProcessor['payment_processor_type'] != 'sepa_dd') {
+      return;
+    }
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('payment_processor_id' => $from->_paymentProcessor['id'], 'return' => 'iban'));
+  }
+
+  /* Perform IBAN/BIC check for any forms that carry these fields. */
+  if (array_key_exists('bank_iban', $fields)) {
+    assert($creditor, 'Failed to determine SEPA Creditor for IBAN/BIC check');
+    $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['bank_iban'], $fields['bank_bic'], $creditor['iban']);
+  }
 }
 
 /**
