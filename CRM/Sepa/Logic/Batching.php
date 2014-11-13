@@ -87,6 +87,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function batchForSubmit($submitDate, $creditorId) {
     set_time_limit(0); /* This action can take quite long... */
 
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditorId));
+    $creditorCountry = substr($creditor['iban'], 0, 2); /* IBAN begins with country code. (Needed for COR1 handling.) */
+
     $maximumAdvanceDays = 14; // Default per SEPA Rulebook.
     $dateRangeEnd = date('Y-m-d', strtotime("$submitDate + $maximumAdvanceDays days"));
 
@@ -113,6 +116,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       'return' => array('payment_instrument_id', 'receive_date'),
       'mandate' => array(
         'creditor_id' => $creditorId,
+        'return' => array('iban'),
       )
     ));
 
@@ -122,71 +126,83 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       $receiveDate = date('Y-m-d', strtotime($contribution['receive_date']));
       $instrument = $contribution['payment_instrument_id'];
 
-      $pendingGroups = array_replace_recursive($pendingGroups, array($instrument => array($receiveDate => array()))); /* Create any missing array levels, to avoid PHP notice. */
-      $pendingGroups[$instrument][$receiveDate][] = $contributionId;
+      $isCor1 = (substr($contribution['iban'], 0, 2) == $creditorCountry) ? 'cor1' : ''; /* Need to use strings rather than actual bool values, so we can use them as array indices. */
+
+      $pendingGroups = array_replace_recursive($pendingGroups, array($isCor1 => array($instrument => array($receiveDate => array())))); /* Create any missing array levels, to avoid PHP notice. */
+      $pendingGroups[$isCor1][$instrument][$receiveDate][] = $contributionId;
     }
 
     /* Now adjust each temporary group to earliest possible Collection Date, and merge groups accordingly. */
     $groups = array();
-    foreach ($pendingGroups as $instrument => $dates) {
-      foreach ($dates as $receiveDate => $ids) {
-        $bestCollectionDate = self::adjustBankDays($receiveDate, 0);
-        /* Re-check, as date might exceed range after adjustment. */
-        if ($bestCollectionDate > $dateRangeEnd) {
-          continue;
+    foreach ($pendingGroups as $isCor1 => $instruments) {
+      foreach ($instruments as $instrument => $dates) {
+        foreach ($dates as $receiveDate => $ids) {
+          $bestCollectionDate = self::adjustBankDays($receiveDate, 0);
+          /* Re-check, as date might exceed range after adjustment. */
+          if ($bestCollectionDate > $dateRangeEnd) {
+            continue;
+          }
+
+          $type = CRM_Core_OptionGroup::getValue('payment_instrument', $instrument, 'value', 'String', 'name');
+
+          $advanceDays = $isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5);
+          $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
+          $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
+          $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
+
+          $groups = array_merge_recursive($groups, array($isCor1 => array($type => array($collectionDate => $ids))));
         }
-
-        $type = CRM_Core_OptionGroup::getValue('payment_instrument', $instrument, 'value', 'String', 'name');
-
-        $isCor1 = true; /* DiCo hack */
-        $advanceDays = $isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5);
-        $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
-        $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
-        $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
-
-        $groups = array_merge_recursive($groups, array($type => array($collectionDate => $ids)));
       }
     }
 
     /* Finally, create the File(s) and Groups in DB. */
-    if (!empty($groups)) {
-      $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditorId));
+    if (!empty($groups)) { /* Have anything to generate. */
       $tag = (isset($creditor['tag'])) ? $creditor['tag'] : $creditor['mandate_prefix'];
 
-      $perBatchFiles = false; /* DiCo hack */
+      $perBatchFiles = 'COR'; /* DiCo hack */
 
-      if (!$perBatchFiles) {
+      if ($perBatchFiles == 'NONE') {
         $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
       }
 
-      foreach ($groups as $type => $dates) {
-        foreach ($dates as $collectionDate => $ids) {
-          if ($perBatchFiles) {
-            $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+      foreach ($groups as $isCor1 => $types) {
+        if ($perBatchFiles == 'COR') {
+          $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+        }
+
+        foreach ($types as $type => $dates) {
+          foreach ($dates as $collectionDate => $ids) {
+            if ($perBatchFiles == 'ALL') {
+              $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+            }
+
+            $paymentInstrumentId = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
+            $txGroup = self::createTxGroup($creditorId, (bool)$isCor1, $type, $collectionDate, $paymentInstrumentId, $sddFile->id);
+
+            foreach ($ids as $contributionId) {
+              $result = civicrm_api3('SepaContributionGroup', 'create', array(
+                'txgroup_id' => $txGroup->id,
+                'contribution_id' => $contributionId,
+              ));
+
+              self::setContributionStatus($contributionId, CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'));
+            }
+
+            if ($perBatchFiles == 'ALL') {
+              civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
+            }
           }
+        }
 
-          $paymentInstrumentId = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
-          $txGroup = self::createTxGroup($creditorId, $type, $collectionDate, $paymentInstrumentId, $sddFile->id);
-
-          foreach ($ids as $contributionId) {
-            $result = civicrm_api3('SepaContributionGroup', 'create', array(
-              'txgroup_id' => $txGroup->id,
-              'contribution_id' => $contributionId,
-            ));
-
-            self::setContributionStatus($contributionId, CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'));
-          }
-
-          if ($perBatchFiles) {
-            civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
-          }
+        if ($perBatchFiles == 'COR') {
+          civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
         }
       }
 
-      if (!$perBatchFiles) {
+      if ($perBatchFiles == 'NONE') {
         civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
       }
-    }
+    } /* !empty($groups) */
   }
 
   /**
@@ -285,9 +301,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     return null;
   }
 
-  public static function createTxGroup($creditor_id, $type, $receive_date, $payment_instrument_id, $sddFileId = null) {
+  public static function createTxGroup($creditor_id, $isCor1, $type, $receive_date, $payment_instrument_id, $sddFileId = null) {
     $collection_date = substr($receive_date, 0, 10);
-    CRM_Sepa_Logic_Base::debug("Creating new TXG( CRED=$creditor_id, TYPE=$type, COLLDATE=" . $collection_date . ')');
+    CRM_Sepa_Logic_Base::debug("Creating new TXG( CRED=$creditor_id, IS_COR1=$isCor1, TYPE=$type, COLLDATE=" . $collection_date . ')');
 
     $status = isset($sddFileId) ? 'Batched' : 'Pending';
 
@@ -295,6 +311,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $reference = time() . rand(); // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
     $params = array(
         'reference' => $reference,
+        'is_cor1' => $isCor1,
         'type' => $type,
         'sdd_creditor_id' => $creditor_id,
         'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', $status, 'name'),
@@ -316,7 +333,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     // Now that we have the auto ID, create the proper reference.
     $prefix = ($status == 'Pending') ? 'PENDING' : 'TXG';
     $creditorPrefix = civicrm_api3('SepaCreditor', 'getvalue', array('id' => $creditor_id, 'return' => 'mandate_prefix'));
-    $reference = "$prefix-$creditorPrefix-$creditor_id-$type-$collection_date-$txgroup_id";
+    $instrument = $isCor1 ? 'COR1' : 'CORE';
+    $reference = "$prefix-$creditorPrefix-$creditor_id-$instrument-$type-$collection_date-$txgroup_id";
     civicrm_api3('SEPATransactionGroup', 'create', array('id' => $txgroup_id, 'reference' => $reference)); // Not very efficient, but easier than fiddling with BAO mess...
 
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();

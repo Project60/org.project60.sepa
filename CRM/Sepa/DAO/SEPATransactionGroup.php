@@ -101,6 +101,12 @@ class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Core_DAO
    */
   public $reference;
   /**
+   * Payment Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).
+   *
+   * @var boolean
+   */
+  public $is_cor1;
+  /**
    * FRST, RCUR or OOFF
    *
    * @var string
@@ -196,6 +202,11 @@ class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Core_DAO
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
         ) ,
+        'is_cor1' => array(
+          'name' => 'is_cor1',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('COR1 Payments') ,
+        ) ,
         'type' => array(
           'name' => 'type',
           'type' => CRM_Utils_Type::T_STRING,
@@ -250,6 +261,7 @@ class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Core_DAO
       self::$_fieldKeys = array(
         'id' => 'id',
         'reference' => 'reference',
+        'is_cor1' => 'is_cor1',
         'type' => 'type',
         'collection_date' => 'collection_date',
         'latest_submission_date' => 'latest_submission_date',

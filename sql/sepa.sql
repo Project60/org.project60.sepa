@@ -139,6 +139,7 @@ CREATE TABLE `civicrm_sdd_txgroup` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
      `reference` varchar(64)    COMMENT 'End-to-end reference for this tx group.',
+     `is_cor1` tinyint    COMMENT 'Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).',
      `type` char(4)    COMMENT 'FRST, RCUR or OOFF',
      `collection_date` datetime    COMMENT 'Target collection date',
      `latest_submission_date` datetime    COMMENT 'Latest submission date',

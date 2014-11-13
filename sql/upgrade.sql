@@ -1,3 +1,6 @@
+ALTER TABLE `civicrm_sdd_txgroup` ADD `is_cor1` tinyint COMMENT 'Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).' AFTER `reference`;
+
+
 UPDATE `civicrm_payment_processor_type` SET `payment_type` = 1 WHERE `payment_type` = 9000;
 UPDATE `civicrm_payment_processor` SET `payment_type` = 1 WHERE `payment_type` = 9000;
 
