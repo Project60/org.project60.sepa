@@ -171,6 +171,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         }
 
         foreach ($types as $type => $dates) {
+          if ($perBatchFiles == 'TYPE') {
+            $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+          }
+
           foreach ($dates as $collectionDate => $ids) {
             if ($perBatchFiles == 'ALL') {
               $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
@@ -191,6 +195,10 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
             if ($perBatchFiles == 'ALL') {
               civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
             }
+          }
+
+          if ($perBatchFiles == 'TYPE') {
+            civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
           }
         }
 
