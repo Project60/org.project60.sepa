@@ -17,7 +17,12 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
       }
     }
   }
-  
+
+  if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
+    $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['creditor_iban'], $fields['creditor_bic'], null);
+    return;
+  }
+
   /* Forms that initiate a PP transaction. */
   if ("CRM_Contribute_Form_Contribution_Confirm" == $formName || /* On-line Contribution Page. (PP invoked here if a confirmation page is used.) */
       "CRM_Contribute_Form_Contribution_Main" == $formName || /* On-line Contribution Page. (PP invoked here if no confirmation page is used.) */

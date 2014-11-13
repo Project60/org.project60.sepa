@@ -13,6 +13,11 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
    * @static
    */
   static function add(&$params) {
+    $errors = CRM_Sepa_BAO_SEPAMandate::validate_account($params['iban'], $params['bic'], null);
+    if ($errors) {
+      throw new CRM_Exception(implode('; ', $errors));
+    }
+
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaCreditor', CRM_Utils_Array::value('id', $params), $params);
 

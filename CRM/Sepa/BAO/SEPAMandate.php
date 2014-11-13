@@ -8,7 +8,8 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
   /**
    * Clean up (normalise) the passed IBAN and BIC, and check for validity.
    *
-   * If the BIC is empty, check whether this is a domestic payment (i.e. IBAN-only is allowed),
+   * If the BIC is empty, and the relevant Creditor IBAN was supplied,
+   * check whether this is a domestic payment (i.e. IBAN-only is allowed),
    * by comparing the country code part of the IBAN
    * against the country code part of Creditor IBAN.
    *
@@ -43,7 +44,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       if (!preg_match('/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i', $bic)) {
         $errors['bank_bic'] = ts('Invalid BIC');
       }
-    } else {
+    } elseif (isset($creditorIBAN)) {
       /* Check whether IBAN-only is allowed in this case. */
       if (substr($iban, 0, 2) != substr($creditorIBAN, 0, 2)) { /* Country code not same as for creditor. */
         $errors['bank_bic'] = ts('BIC is mandatory for non-domestic payments');
