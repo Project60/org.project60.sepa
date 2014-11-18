@@ -162,22 +162,23 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       $perBatchFiles = 'COR'; /* DiCo hack */
 
       if ($perBatchFiles == 'NONE') {
-        $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+        $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, null, null, null);
       }
 
       foreach ($groups as $isCor1 => $types) {
+        $instrument = $isCor1 ? 'COR1' : 'CORE';
         if ($perBatchFiles == 'COR') {
-          $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+          $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, $instrument, null, null);
         }
 
         foreach ($types as $type => $dates) {
           if ($perBatchFiles == 'TYPE') {
-            $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+            $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, $instrument, $type, null);
           }
 
           foreach ($dates as $collectionDate => $ids) {
             if ($perBatchFiles == 'ALL') {
-              $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag);
+              $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, $instrument, $type, $collectionDate);
             }
 
             $paymentInstrumentId = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
@@ -405,7 +406,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     
   }
 
-  public static function createSddFile($txgroup, $tag) {
+  public static function createSddFile($txgroup, $tag, $instrument, $type, $collectionDate) {
     self::debug('Creating new SDDFILE( LATEST_SUBMISSION=' . substr($txgroup->latest_submission_date,0,8) . ', TAG=' . $tag . ')');
 
     // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
@@ -429,7 +430,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $sddfile_id = $result['id'];
 
     // Now that we have the auto ID, create the proper reference.
-    $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date, 0, 8) . '-' . $sddfile_id;
+    $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date, 0, 8) . (isset($instrument) ? "-$instrument" : '') . (isset($type) ? "-$type" : '') . (isset($collectionDate) ? '-' . date('Ymd', strtotime($collectionDate)) : '') . '-' . $sddfile_id;
     $filename = str_replace('-', '_', $reference . ".xml");
     civicrm_api3('SEPASddFile', 'create', array('id' => $sddfile_id, 'reference' => $reference, 'filename' => $filename)); // Not very efficient, but easier than fiddling with BAO mess...
 
