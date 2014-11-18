@@ -47,4 +47,9 @@
     <page_callback>CRM_Sepa_Page_ImportTest</page_callback>
     <title>Test SEPA Import API</title>
   </item>
+  <item>
+    <path>civicrm/sepa/upgrade</path>
+    <page_callback>CRM_Sepa_Page_Upgrade</page_callback>
+    <title>Upgrade database for new version of SEPA DD extension</title>
+  </item>
 </menu>
