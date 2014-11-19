@@ -134,7 +134,7 @@
 </tr>
 </script>
 <script>
-cj(function($){
+(function($, _){
   $(".contribution_group").click(function(){
     var $tr=$(this);
     if ($tr.next().hasClass("detail")) {
@@ -142,7 +142,6 @@ cj(function($){
      return;
     }
     function show_contribs(data) {
-      var _ = CRM._; /* CiviCRM Core loads lodash.js, but scopes it through noconflict.js... */
       _.extend(data,$tr.data());
       $tr.after(_.template($("#detail").html(),data));
     }
@@ -168,7 +167,7 @@ cj(function($){
       CRM.api("SepaContributionGroup","getdetail",{"id":$tr.data("id")},{"success":show_contribs});
     }
   });
-});
+})(CRM.$, CRM._);
 </script>
 <style>
   .contribution_group {cursor:pointer}
