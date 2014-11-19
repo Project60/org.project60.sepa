@@ -142,6 +142,7 @@ cj(function($){
      return;
     }
     function show_contribs(data) {
+      var _ = CRM._; /* CiviCRM Core loads lodash.js, but scopes it through noconflict.js... */
       _.extend(data,$tr.data());
       $tr.after(_.template($("#detail").html(),data));
     }
