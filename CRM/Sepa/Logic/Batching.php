@@ -31,7 +31,7 @@ class CRM_Sepa_Logic_Batching {
   static function updateRCUR($creditor_id, $mode, $now = 'now') {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (!$lock->isAcquired()) {
+    if (empty($lock)) {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.horizon", $creditor_id);
@@ -207,7 +207,7 @@ class CRM_Sepa_Logic_Batching {
   static function updateOOFF($creditor_id, $now = 'now') {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (!$lock->isAcquired()) {
+    if (empty($lock)) {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
 
@@ -298,7 +298,7 @@ class CRM_Sepa_Logic_Batching {
   static function closeEnded() {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (!$lock->isAcquired()) {
+    if (empty($lock)) {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
 

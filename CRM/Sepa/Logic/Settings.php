@@ -104,11 +104,11 @@ class CRM_Sepa_Logic_Settings {
    * the lock is needed so that only one relevant process can access the 
    * SEPA data structures at a time
    * 
-   * @return lock object. check if it ->isAcquired() before use
+   * @return CRM_Utils_SepaSafeLock object, or NULL if acquisition timed out
    */
   static function getLock() {
     $timeout = CRM_Sepa_Logic_Settings::getSetting('batching.UPDATE.lock.timeout');
-    return new CRM_Core_Lock('org.project60.sepa.batching.update', $timeout);
+    return CRM_Utils_SepaSafeLock::acquireLock('org.project60.sepa.batching.update', $timeout);
   }
 
 

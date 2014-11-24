@@ -29,7 +29,7 @@ class CRM_Sepa_Logic_Group {
   static function close($txgroup_id) {
     // step 0: check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (!$lock->isAcquired()) {
+    if (empty($lock)) {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
 
@@ -140,7 +140,7 @@ class CRM_Sepa_Logic_Group {
   static function received($txgroup_id) {
     // step 0: check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (!$lock->isAcquired()) {
+    if (empty($lock)) {
       return "batching is busy. Please wait, process should complete within {$timeout}s.";
     }
 
