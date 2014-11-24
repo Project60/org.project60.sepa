@@ -1737,7 +1737,7 @@ msgstr "Fehlermeldung"
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "%1 %2 have been deleted along with the group."
-msgstr "%1 %2 wurden zusammen mit der Grippe gelöscht."
+msgstr "%1 %2 wurden zusammen mit der Gruppe gelöscht."
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "SEPA transaction group '%1' has been succesfully deleted."
