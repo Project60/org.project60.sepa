@@ -41,7 +41,7 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function create_mandate(&$mandate_parameters) {
-    return CRM_Utils_Hook::singleton()->invoke(1, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
+    return CRM_Utils_Hook::singleton()->invoke(1, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
   }
 
 
@@ -52,13 +52,13 @@ class CRM_Utils_SepaCustomisationHooks {
    *  debtor, even an individualised one (like "Thank you, Hans!")
    *
    * @param string $txmessage    the message that will go with the transaction. Modify or extend
-   * @param array  $cinfo        some information on the mandate/contribution 
+   * @param array  $cinfo        some information on the mandate/contribution
    * @param array  $creditor     the creditor involved
    *
    * @access public
    */
   static function modify_txmessage(&$txmessage, $contribution, $creditor) {
-    return CRM_Utils_Hook::singleton()->invoke(3, $txmessage, $contribution, $creditor, self::$null, self::$null, 'civicrm_modify_txmessage');
+    return CRM_Utils_Hook::singleton()->invoke(3, $txmessage, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_txmessage');
   }
 
 
@@ -72,7 +72,7 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function mend_rcontrib($rcontribId, &$rcontrib) {
-    return CRM_Utils_Hook::singleton()->invoke(2, $rcontribId, $rcontrib, self::$null, self::$null, self::$null, 'civicrm_mend_rcontrib');
+    return CRM_Utils_Hook::singleton()->invoke(2, $rcontribId, $rcontrib, self::$null, self::$null, self::$null, self::$null, 'civicrm_mend_rcontrib');
   }
 
   /**
@@ -87,6 +87,6 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function defer_collection_date(&$collection_date, $creditor_id) {
-    return CRM_Utils_Hook::singleton()->invoke(2, $collection_date, $creditor_id, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
+    return CRM_Utils_Hook::singleton()->invoke(2, $collection_date, $creditor_id, self::$null, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
   }
 }
