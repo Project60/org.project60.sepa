@@ -457,7 +457,7 @@ function sepa_civicrm_navigationMenu(&$params) {
           'operator' => NULL,
           'separator' => 2,
           'parentID' => $contributions_menu_id,
-          //'navID' => $newNavId,
+          'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
           'active' => 1
         ));
     }
