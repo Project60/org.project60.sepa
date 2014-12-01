@@ -17,7 +17,13 @@ require_once 'sepa_pp_sdd.php';
 
 
 function sepa_civicrm_pageRun( &$page ) {
-  if (get_class($page) == "CRM_Contribute_Page_Tab") {
+  if (get_class($page) == "CRM_Contact_Page_View_Summary") {
+    // mods for summary view
+    CRM_Core_Region::instance('page-body')->add(array(
+      'template' => 'CRM/Contact/Page/View/Summary.sepa.tpl'
+    ));
+
+  } elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
 
     if (!CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
