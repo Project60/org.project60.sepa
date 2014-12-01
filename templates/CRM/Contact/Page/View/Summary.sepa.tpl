@@ -16,6 +16,9 @@
 <script type="text/javascript">
 var contribution_snippet_changed = false;
 var contribution_tab_selector = "#{ts}Contributions{/ts} > div.crm-container-snippet";
+// 4.5.x specific
+var contribution_tab_selector_45x = ".crm-contact-tabs-list #tab_contribute";
+// ---
 var contribution_extra_button = '<a id="sepa_payment_extra_button" class="button" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contactId"}"><span><div class="icon add-icon"></div>{ts}Record SEPA Contribution{/ts}</span></a>';
 var sepa_edit_mandate_html = "{ts}edit mandate{/ts}";
 var sepa_edit_mandate_title = "{ts}edit sepa mandate{/ts}";
@@ -30,6 +33,10 @@ function sepa_modify_summary_tab_contribution() {
 
   // check if the tab is fully loaded
   var contribution_tab = cj("#mainTabContainer").find(contribution_tab_selector);
+  // 4.5.x specific selection
+  var contribution_tab_id = cj("#mainTabContainer").find(contribution_tab_selector_45x).attr("aria-controls");
+  var contribution_tab = cj("#" + contributions_tab_id);
+
   if (contribution_tab.length) {
     contribution_snippet_changed = true; // important to do this BEFORE changing the model
 
@@ -67,4 +74,3 @@ function sepa_modify_summary_tab_contribution() {
 }
 {/literal}
 </script>
-
