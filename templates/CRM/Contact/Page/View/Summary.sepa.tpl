@@ -36,7 +36,7 @@ function sepa_modify_summary_tab_contribution() {
   if (!contribution_tab.length) {
     // 4.5.x specific selection fallback
     var contribution_tab_id = cj("#mainTabContainer").find(contribution_tab_selector_45x).attr("aria-controls");
-    var contribution_tab = cj("#" + contributions_tab_id);
+    var contribution_tab = cj("#" + contribution_tab_id);
   }
 
   if (contribution_tab.length) {
