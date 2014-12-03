@@ -39,9 +39,8 @@ function sepa_modify_summary_tab_contribution() {
     var contribution_tab = cj("#" + contribution_tab_id);
   }
 
-  if (contribution_tab.length) {
+  if (contribution_tab.text().length > 0) {
     contribution_snippet_changed = true; // important to do this BEFORE changing the model
-
     // add the extra button
     contribution_tab.find(".action-link").prepend(contribution_extra_button);
 
