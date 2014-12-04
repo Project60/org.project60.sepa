@@ -120,6 +120,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    * @return array the result in an nice formatted array (or an error object)
    */
   function doDirectPayment(&$params) {
+    $original_parameters = $params;
     $params['creditor_id'] = $this->_creditorId;
 
     // copy frequency_interval unit
@@ -148,9 +149,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['creation_date'] = date('YmdHis');
       $params['is_test'] = ($this->_mode == 'test') ? 1 : 0;
       $params['source'] = $params['description'];
-      $contribution = civicrm_api3('SepaMandate', 'createfull', $params);
-
-      return FALSE;
     } else {
       // RCUR
 
@@ -170,10 +168,18 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['contribution_recur_id'] = $params['contributionRecurID'];
       $params['is_test'] = ($this->_mode == 'test') ? 1 : 0;
       $params['source'] = $params['description'];
-      $contribution = civicrm_api3('SepaMandate', 'createfull', $params);
-
-      return FALSE;
     }
+
+    // Allow further manipulation of the arguments via custom hooks ..
+    CRM_Utils_Hook::alterPaymentProcessorParams($this, $original_parameters, $params);
+
+    // finally, create the mandate
+    $contribution = civicrm_api3('SepaMandate', 'createfull', $params);
+
+    // RETURN 
+    $params['trxn_id'] = CRM_Utils_Array::value('transactionid', $result);
+    $params['gross_amount'] = CRM_Utils_Array::value('amt', $result);
+    return $params;
   }
 
   function &error($errorCode = NULL, $errorMessage = NULL) {
