@@ -14,25 +14,38 @@
 +-------------------------------------------------------*}
 
 <script type="text/javascript">
-var contribution_snippet_changed = false;
-var contribution_tab_selector = "#{ts}Contributions{/ts} > div.crm-container-snippet";
-var contribution_extra_button = '<a id="sepa_payment_extra_button" class="button" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contactId"}"><span><div class="icon add-icon"></div>{ts}Record SEPA Contribution{/ts}</span></a>';
-var sepa_edit_mandate_html = "{ts}edit mandate{/ts}";
-var sepa_edit_mandate_title = "{ts}edit sepa mandate{/ts}";
-var sepa_edit_mandate_href = '{crmURL p="civicrm/sepa/xmandate" q="mid=___mandate_id___"}'.replace('&amp;', '&');
+var contribution_snippet_changed  = false;
+var contribution_extra_button     = '<a id="sepa_payment_extra_button" class="button" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contactId"}"><span><div class="icon add-icon"></div>{ts}Record SEPA Contribution{/ts}</span></a>';
+var sepa_edit_mandate_html        = "{ts}edit mandate{/ts}";
+var sepa_edit_mandate_title       = "{ts}edit sepa mandate{/ts}";
+var sepa_edit_mandate_href        = '{crmURL p="civicrm/sepa/xmandate" q="mid=___mandate_id___"}'.replace('&amp;', '&');
+
+// these selectors differ from 4.4.x to 4.5.x
+var contribution_tab_selector_44x = "#{ts}Contributions{/ts} > div.crm-container-snippet";
+{literal}
+var contribution_tab_id_45x       = cj("#mainTabContainer").find(".crm-contact-tabs-list #tab_contribute").attr("aria-controls");
+if (contribution_tab_id_45x) {
+  var contribution_tab_selector_45x = cj("#" + contribution_tab_id_45x + " form[id='Search']");  
+} else {
+  var contribution_tab_selector_45x = cj([]);
+}
+// ---
 
 // listen to DOM changes
 cj("#mainTabContainer").bind("DOMSubtreeModified", sepa_modify_summary_tab_contribution);
 
-{literal}
 function sepa_modify_summary_tab_contribution() {
   if (contribution_snippet_changed) return;
 
   // check if the tab is fully loaded
-  var contribution_tab = cj("#mainTabContainer").find(contribution_tab_selector);
-  if (contribution_tab.length) {
-    contribution_snippet_changed = true; // important to do this BEFORE changing the model
+  var contribution_tab = cj("#mainTabContainer").find(contribution_tab_selector_45x);
+  if (!contribution_tab.length) {
+    // fallback for CiviCRM 4.4.x:
+    var contribution_tab = cj("#mainTabContainer").find(contribution_tab_selector_44x);
+  }
 
+  if (contribution_tab.length > 0) {
+    contribution_snippet_changed = true; // important to do this BEFORE changing the model
     // add the extra button
     contribution_tab.find(".action-link").prepend(contribution_extra_button);
 
@@ -40,8 +53,10 @@ function sepa_modify_summary_tab_contribution() {
     var recurring_contribution_table_rows = contribution_tab.find("table.selector:eq(1) > tbody > tr[id]");
     for (var i=0; i<recurring_contribution_table_rows.length; i++) {
       var recurring_contribution_table_row = cj(recurring_contribution_table_rows[i]);
-      var rcur_id = recurring_contribution_table_row.attr('id').split('_')[1];
-      if (!rcur_id) continue;
+      var rcur_id_components = recurring_contribution_table_row.attr('id').split(/[_\-]+/);
+      if (rcur_id_components.length==0) continue;
+      var rcur_id = rcur_id_components[rcur_id_components.length-1];
+      if (!rcur_id.match(/^[0-9]+$/)) continue;   // only digits, we're looking for an ID
 
       CRM.api('SepaMandate', 'get', {'q': 'civicrm/ajax/rest', 'entity_id': rcur_id, entity_table: 'civicrm_contribution_recur'},
       {success: function(data) {
