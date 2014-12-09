@@ -126,6 +126,10 @@ function sepa_pp_postProcess( $formName, &$form ) {
 			CRM_Core_BAO_Setting::setItem($creditor_cycle_day, 'SEPA Direct Debit PP CD', $pp_id);
 			CRM_Core_BAO_Setting::setItem($test_creditor_cycle_day, 'SEPA Direct Debit PP Test CD', $pp_id);
 		}
+
+	} elseif ('CRM_Contribute_Form_Contribution_Confirm' == $formName) {
+		// post process the contributions created
+		CRM_Core_Payment_SDD::processPartialMandates();
 	}
 }
 
