@@ -132,7 +132,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $params['bic']           = $params['bank_bic'];
     $params['creation_date'] = date('YmdHis');
     $params['status']        = 'PARTIAL';
-    $params['entity_id']     = 1;  // TODO: 0 doesn't work...
 
     if (empty($params['is_recur'])) {
       $params['type']          = 'OOFF';
@@ -142,18 +141,35 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['entity_table']  = 'civicrm_contribution_recur';
     }
 
+    // FIXME: remove this hack! (we cannot create mandate with noexistant entity_id)
+    $params['entity_id']       = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM `{$params['entity_table']}`;");
+
     // Allow further manipulation of the arguments via custom hooks ..
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $original_parameters, $params);
 
-    // finally, create the mandate
+    // create the mandate
     $params['version'] = 3;
     $mandate = civicrm_api('SepaMandate', 'create', $params);
     if (!empty($mandate['is_error'])) {
       return CRM_Core_Error::createError(ts("Couldn't create SEPA mandate. Error was: ").$mandate['error_message']);
     }
-
-    // set resulting parameters
     $params['trxn_id'] = $mandate['values'][$mandate['id']]['reference'];
+    $params['sepa_start_date'] = empty($params['start_date'])?date('YmdHis'):date('YmdHis', strtotime($params['start_date']));
+
+    // update the contribution, if existing (RCUR case)
+    if (!empty($params['contributionID'])) {
+      civicrm_api3('Contribution', 'create', array(
+        'id'           => $params['contributionID'], 
+        'receive_date' => $params['sepa_start_date'],
+        'trxn_id'      => $params['trxn_id']));
+    }
+
+    if (!empty($params['contributionRecurID'])) {
+      civicrm_api3('ContributionRecur', 'create', array(
+        'id'            => $params['contributionRecurID'], 
+        'start_date'    => $params['sepa_start_date'],
+        'trxn_id'       => $params['trxn_id']));
+    }
 
     return $params;
   }
@@ -201,9 +217,49 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
 
       } elseif ($mandate['type']=='RCUR') {
-        // in the RCUR case...
-        // TODO: implement!
+        // in the RCUR case, we also need to find the contribution, and connect it
+        
+        // load the contribution AND the associated recurring contribution
+        $contribution =  civicrm_api('Contribution', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
+        $rcontribution = civicrm_api('ContributionRecur', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
+        if (empty($contribution['is_error']) && empty($rcontribution['is_error'])) {
+          // fix contribution
+          $contribution_bao = new CRM_Contribute_BAO_Contribution();
+          $contribution_bao->get('id', $contribution['id']);
+          $contribution_bao->is_pay_later = 1;
+          $contribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+          $contribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+          $contribution_bao->receive_date = date('YmdHis', strtotime($contribution_bao->receive_date));
+          $contribution_bao->save();
 
+          // fix recurring contribution
+          $rcontribution_bao = new CRM_Contribute_BAO_ContributionRecur();
+          $rcontribution_bao->get('id', $rcontribution['id']);
+          $rcontribution_bao->start_date = date('YmdHis', strtotime($rcontribution_bao->start_date));
+          $rcontribution_bao->create_date = date('YmdHis', strtotime($rcontribution_bao->create_date));
+          $rcontribution_bao->modified_date = date('YmdHis', strtotime($rcontribution_bao->modified_date));
+          $rcontribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+          $rcontribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+          $rcontribution_bao->save();
+
+          // ...and connect it to the mandate
+          $mandate_update = array();
+          $mandate_update['id']                    = $mandate['id'];
+          $mandate_update['entity_id']             = $rcontribution['id'];
+          $mandate_update['type']                  = $mandate['type'];
+          $mandate_update['first_contribution_id'] = $contribution['id'];
+          
+          // initialize according to the creditor settings
+          CRM_Sepa_BAO_SEPACreditor::initialiseMandateData($mandate['creditor_id'], $mandate_update);
+
+          // finally, write the changes to the mandate
+          civicrm_api3('SepaMandate', 'create', $mandate_update);
+
+        } else {
+          // something went wrong, delete partial
+          error_log("org.project60.sepa: deleting partial mandate " . $mandate['reference']);
+          civicrm_api3('SepaMandate', 'delete', array('id' => $mandate_id));
+        }
       }
     }
   }
