@@ -223,13 +223,18 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         $contribution =  civicrm_api('Contribution', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
         $rcontribution = civicrm_api('ContributionRecur', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
         if (empty($contribution['is_error']) && empty($rcontribution['is_error'])) {
+          // we need to set the receive date to the correct collection date, otherwise it will be created again (w/o)
+          $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $mandate['creditor_id']);
+          $now = strtotime(date('Y-m-d', strtotime("now +$rcur_notice days")));        // round to full day
+          $collection_date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now);
+
           // fix contribution
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
           $contribution_bao->get('id', $contribution['id']);
           $contribution_bao->is_pay_later = 1;
           $contribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
           $contribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
-          $contribution_bao->receive_date = date('YmdHis', strtotime($contribution_bao->receive_date));
+          $contribution_bao->receive_date = date('YmdHis', strtotime($collection_date));
           $contribution_bao->save();
 
           // fix recurring contribution
@@ -247,7 +252,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           $mandate_update['id']                    = $mandate['id'];
           $mandate_update['entity_id']             = $rcontribution['id'];
           $mandate_update['type']                  = $mandate['type'];
-          $mandate_update['first_contribution_id'] = $contribution['id'];
+          //NO: $mandate_update['first_contribution_id'] = $contribution['id'];
           
           // initialize according to the creditor settings
           CRM_Sepa_BAO_SEPACreditor::initialiseMandateData($mandate['creditor_id'], $mandate_update);

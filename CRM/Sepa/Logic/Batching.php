@@ -500,7 +500,7 @@ class CRM_Sepa_Logic_Batching {
   /**
    * Calculate the next execution date for a recurring contribution
    */
-  protected static function getNextExecutionDate($rcontribution, $now) {
+  public static function getNextExecutionDate($rcontribution, $now) {
     $now =  strtotime(date('Y-m-d', $now));     // ignore time of day
     $cycle_day = $rcontribution['cycle_day'];
     $interval = $rcontribution['frequency_interval'];
