@@ -40,14 +40,9 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$pp_creditor      = NULL;
 			$test_pp_creditor = NULL;
 
-			$cycle_day        = 1;
-			$test_cycle_day   = 1;
-
 			if (!empty($pp_id)) {
-				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', $pp_id);
-				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test', $pp_id);
-				$cycle_day        = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP CD', $pp_id);
-				$test_cycle_day   = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test CD', $pp_id);
+				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP',         'pp'.$pp_id);
+				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test',    'pp'.$pp_id);
 			}
 
 			// load settings from creditor
@@ -73,17 +68,6 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$form->assign('creditors', $creditors);
 			$form->assign('test_creditors', $test_creditors);
 			
-
-			$form->assign('cycle_day', $cycle_day);
-			$form->assign('test_cycle_day', $test_cycle_day);			
-
-			// build cycle day options
-			$cycle_day_options = range(0,28);
-			$cycle_day_options[0] = ts('Any');
-			unset($cycle_day_options[0]); // 'any' disabled for now
-			$form->assign('cycle_days', $cycle_day_options);
-			$form->assign('test_cycle_days', $cycle_day_options);
-
 			// add new elements
 			CRM_Core_Region::instance('page-body')->add(array(
 				'template' => 'CRM/Admin/Form/PaymentProcessor/SDD.tpl'
@@ -116,15 +100,10 @@ function sepa_pp_postProcess( $formName, &$form ) {
 			$test_creditor_id = $form->_submitValues['test_user_name'];
 			$pp_id = $paymentProcessor['id'];
 
-			$creditor_cycle_day = $form->_submitValues['cycle_day'];
-			$test_creditor_cycle_day = $form->_submitValues['test_cycle_day'];
-
 			// save settings
 			// FIXME: we might consider saving this as a JSON object
-			CRM_Core_BAO_Setting::setItem($creditor_id, 'SEPA Direct Debit PP', $pp_id);
-			CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP Test', $pp_id);
-			CRM_Core_BAO_Setting::setItem($creditor_cycle_day, 'SEPA Direct Debit PP CD', $pp_id);
-			CRM_Core_BAO_Setting::setItem($test_creditor_cycle_day, 'SEPA Direct Debit PP Test CD', $pp_id);
+			CRM_Core_BAO_Setting::setItem($creditor_id,             'SEPA Direct Debit PP',         'pp'.$pp_id);
+			CRM_Core_BAO_Setting::setItem($test_creditor_id,        'SEPA Direct Debit PP Test',    'pp'.$pp_id);
 		}
 
 	} elseif ('CRM_Contribute_Form_Contribution_Confirm' == $formName) {

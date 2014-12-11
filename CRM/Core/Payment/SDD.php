@@ -60,6 +60,13 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
 
   function buildForm(&$form) {
+    // check if we're in test mode
+    if ($this->_mode == 'test') {
+      $test = ' Test';
+    } else {
+      $test = '';
+    }
+
     // we don't need the default stuff:
     $form->_paymentFields = array();
 
@@ -75,10 +82,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 array('size' => 11, 'maxlength' => 11), 
                 TRUE);
 
-    $form->add( 'text', 
+    $form->add( 'select', 
                 'cycle_day', 
-                ts('day of month'), 
-                array('size' => 2, 'value' => 1), 
+                ts('Collection Day'), 
+                CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
                 FALSE);
 
     $form->addDate('start_date', 

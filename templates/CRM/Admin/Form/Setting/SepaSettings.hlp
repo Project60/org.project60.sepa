@@ -14,6 +14,10 @@
     <p>{ts}Home country of the creditor. <strong>Only countries that are enabled under "Settings - Localization" are shown here.</strong>{/ts}</p>
 {/htxt}
 
+{htxt id='id-cycle-days'}
+    <p>{ts}You should a day (as in "day of month") on which you plan to collect the monthly payments. You can also provide a comma separated list of such days.{/ts}</p>
+{/htxt}
+
 {htxt id='id-id'}
     <p>{ts}This is the Creditor Identifier, an international ID that has to be requested by the national banks.{/ts}</p>
     <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>

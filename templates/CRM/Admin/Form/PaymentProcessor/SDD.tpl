@@ -30,23 +30,6 @@
 {* Create creditors dropdown help *}
 <a id='creditor_id_help' onclick='CRM.help("{ts}Creditor{/ts}", {literal}{"id":"id-creditor-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
 
-{* create cycle day field *}
-<table>
-<tr id="cycle_day_field" class="crm-paymentProcessor-form-block-{$form.cycle_day.name}">
-  <td class="label">
-    {ts}Cycle Day{/ts}
-  </td>
-  <td>
-    <select id="cycle_day" name="cycle_day">
-        {foreach from=$cycle_days item=day}
-        <option value="{$day}" {if $day eq $cycle_day}selected{/if}>{$day}</option>
-        {/foreach}
-    </select>
-    <a id='cycle_day_help' onclick='CRM.help("{ts}Cycle Day{/ts}", {literal}{"id":"id-cycle_day-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
-  </td>
-</tr>
-</table>
-
 
 {* Create creditors dropdown for test pp *}
 {if $creditors}
@@ -61,24 +44,6 @@
 
 {* Create test creditors dropdown help *}
 <a id='test_creditor_id_help' onclick='CRM.help("{ts}Creditor{/ts}", {literal}{"id":"id-creditor-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
-
-{* create test cycle day field *}
-<table>
-<tr id="test_cycle_day_field" class="crm-paymentProcessor-form-block-{$form.test_cycle_day.name}">
-  <td class="label">
-    {ts}Cycle Day{/ts}
-  </td>
-  <td>
-    <select id="test_cycle_day" name="test_cycle_day">
-        {foreach from=$test_cycle_days item=day}
-        <option value="{$day}" {if $day eq $test_cycle_day}selected{/if}>{$day}</option>
-        {/foreach}
-    </select>
-    <a id='cycle_day_help' onclick='CRM.help("{ts}Cycle Day{/ts}", {literal}{"id":"id-cycle_day-help","file":"CRM\/Admin\/Form\/PaymentProcessor/SDD"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
-  </td>
-</tr>
-</table>
-
 
 
 
@@ -100,8 +65,5 @@ cj('.crm-paymentProcessor-form-block-test_user_name').find('.helpicon').replaceW
 cj('#user_name').replaceWith(cj('#creditor_id'));
 cj('#test_user_name').replaceWith(cj('#test_creditor_id'));
 
-// append cycle day
-cj('tr.crm-paymentProcessor-form-block-user_name').parent().append(cj('#cycle_day_field'));
-cj('tr.crm-paymentProcessor-form-block-test_user_name').parent().append(cj('#test_cycle_day_field'));
 </script>
 {/literal}

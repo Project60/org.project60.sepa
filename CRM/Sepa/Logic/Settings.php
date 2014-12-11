@@ -21,7 +21,7 @@
 class CRM_Sepa_Logic_Settings {
 
   /**
-   * Get SEPA a setting.
+   * Get a SEPA setting.
    * We have extended the system used in CRM_Core_BAO_Setting by 
    * an override mechanism, so creditors can indivudally have
    * different values than the default
@@ -46,6 +46,23 @@ class CRM_Sepa_Logic_Settings {
       }
     }
   }
+
+  /**
+   * Get a SEPA setting as a list
+   *
+   * @see self::getSetting
+   * 
+   * @return string
+   */
+  static function getListSetting($param_name, $default, $creditor_id=NULL) {
+    $value = self::getSetting($param_name, $creditor_id);
+    if (empty($value)) {
+      return $default;
+    } else {
+      return split(',', $value);
+    }
+  }
+
 
   /**
    * Set SEPA a setting.
@@ -129,4 +146,20 @@ class CRM_Sepa_Logic_Settings {
       return $default_creditor;
     }
   }
+
+  /**
+   * Form rule to only allow empty value or a list of
+   * valid days (e.g. 1 <= x <= 28)
+   */
+  static function sepa_cycle_day_list($value) {
+    if (!empty($value)) {
+      $days = split(',', $value);
+      foreach ($days as $day) {
+        if (!is_numeric($day) || $day < 1 || $day > 28) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }  
 }
