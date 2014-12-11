@@ -57,10 +57,17 @@ class CRM_Sepa_Logic_Settings {
   static function getListSetting($param_name, $default, $creditor_id=NULL) {
     $value = self::getSetting($param_name, $creditor_id);
     if (empty($value)) {
-      return $default;
+      $list = $default;
     } else {
-      return split(',', $value);
+      $list = split(',', $value);
     }
+
+    // make it into an associative array (for dropdown elements) 
+    $result = array();
+    foreach ($list as $item) {
+      $result[$item] = $item;
+    }
+    return $result;
   }
 
 

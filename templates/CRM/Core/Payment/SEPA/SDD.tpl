@@ -29,12 +29,14 @@
 		<div class="content">{$form.bank_bic.html}</div>
 		<div class="clear"></div>
 	</div>
-	<div class="crm-section {$form.cycle_day.name}-section">
+	<div class="crm-section {$form.cycle_day.name}-section" hidden="1">
+		<!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 		<div class="label">{$form.cycle_day.label}</div>
 		<div class="content">{$form.cycle_day.html}</div>
 		<div class="clear"></div>
 	</div>
-	<div class="crm-section {$form.start_date.name}-section">
+	<div class="crm-section {$form.start_date.name}-section" hidden="1">
+		<!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 		<div class="label">{$form.start_date.label}</div>
 		<div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
 		<div class="clear"></div>
@@ -86,7 +88,8 @@ function _sdd_update_elements() {
 	var is_recur = cj("#is_recur").attr('checked')=='checked';
 	cj("#frequency_interval").attr('disabled', !is_recur);
 	cj("#frequency_unit").attr('disabled', !is_recur);
-	cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
+	// this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension
+	// cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
 	if (is_recur) {
 		cj("#start_date_display").datepicker("option", "minDate", earliest_rcur_date);
 		if (currently_set_date > earliest_rcur_date) {
