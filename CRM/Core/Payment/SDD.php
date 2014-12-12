@@ -197,10 +197,20 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         // in the OOFF case, we need to find the contribution, and connect it
         $contribution = civicrm_api('Contribution', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
         if (empty($contribution['is_error'])) {
+          // check collection date
+          $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $mandate['creditor_id']);
+          $first_collection_date = strtotime("+$ooff_notice days");
+          $collection_date = strtotime($contribution['receive_date']);
+          if ($collection_date < $first_collection_date) {
+            // adjust collection date to the earliest possible one
+            $collection_date = $first_collection_date;
+          }
+
           // FOUND! Update the contribution... 
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
           $contribution_bao->get('id', $contribution['id']);
           $contribution_bao->is_pay_later = 1;
+          $contribution_bao->receive_date = date('YmdHis', $collection_date);
           $contribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
           $contribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name');
           $contribution_bao->save();

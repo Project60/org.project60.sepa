@@ -151,7 +151,7 @@ function sepa_pp_install() {
 		    "url_recur_test_default"    => "",
 		    "billing_mode"              => "1",
 		    "is_recur"                  => "1",
-		    "payment_type"              => "9002"	// TODO
+		    "payment_type"              => "0"
 		);
 		$result = civicrm_api('PaymentProcessorType', 'create', $payment_processor_data);
 		if (!empty($result['is_error'])) {

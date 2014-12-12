@@ -96,7 +96,7 @@
       </tr>
     {else}
       <tr id="sepa-thankyou-date">
-        <td>{ts}Estimated Collection Date{/ts}</td>
+        <td>{ts}Earliest Collection Date{/ts}</td>
         <td class="content">{$collection_date|crmDate}</td>
       </tr>
     {/if}
