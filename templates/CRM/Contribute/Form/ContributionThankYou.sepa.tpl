@@ -112,4 +112,7 @@ cj('.credit_card-group').html("");
 // modify amount display group
 cj(".amount_display-group > .display-block").replaceWith(cj("#sepa-thank-amount-display"));
 
+// remove "print" button - this doesn't work here
+cj("#printer-friendly").hide();
+
 </script>
