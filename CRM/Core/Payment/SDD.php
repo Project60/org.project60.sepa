@@ -93,6 +93,12 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 TRUE, 
                 array());
 
+    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
+    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
+    $form->addRule('bank_iban', ts('This is not a correct IBAN.'), 'sepa_iban_valid');
+    $form->addRule('bank_bic',  ts('This is not a correct BIC.'),  'sepa_bic_valid');
+
+
     $rcur_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $this->_creditorId);
     $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
     $timestamp_rcur = strtotime("now + $rcur_notice_days days");
