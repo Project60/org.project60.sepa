@@ -1904,5 +1904,13 @@ msgstr "Frühester Einzugstermin"
 msgid "yearly"
 msgstr "jährlich"
 
+#: CRM/Core/Payment/SDD.php
+msgid "This is not a correct IBAN."
+msgstr "Das ist keine gültige IBAN."
+
+#: CRM/Core/Payment/SDD.php
+msgid "This is not a correct BIC."
+msgstr "Das ist keine gültige BIC."
+
 #~ msgid "<font size=\"+0.5\">Download Link:"
 #~ msgstr "<font size=\"+0.5\">Download Link:"

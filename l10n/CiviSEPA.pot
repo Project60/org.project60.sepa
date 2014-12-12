@@ -2015,3 +2015,11 @@ msgstr ""
 #: templates/CRM/Core/Payment/SEPA/SDD.tpl
 msgid "yearly"
 msgstr ""
+
+#: CRM/Core/Payment/SDD.php
+msgid "This is not a correct IBAN."
+msgstr ""
+
+#: CRM/Core/Payment/SDD.php
+msgid "This is not a correct BIC."
+msgstr ""
