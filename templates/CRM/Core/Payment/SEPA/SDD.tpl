@@ -95,6 +95,9 @@ if (cj("#frequency_interval").length) {
 	}
 }
 
+// fix recur label
+cj("label[for='is_recur']").get(0).nextSibling.textContent = ": ";
+
 // show currency indicater and move next to field
 if (cj(".other_amount-content > input").length) {
 	cj("#currency_indicator").show();
