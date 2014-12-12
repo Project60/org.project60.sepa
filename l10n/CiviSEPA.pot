@@ -5,6 +5,8 @@
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "IBAN"
 msgstr ""
 
@@ -15,6 +17,8 @@ msgstr ""
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "BIC"
 msgstr ""
 
@@ -76,6 +80,7 @@ msgstr ""
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/CRM/Sepa/Page/ListGroup.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Amount"
 msgstr ""
 
@@ -153,6 +158,7 @@ msgid "Mandate signature date"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Creditor ID"
 msgstr ""
 
@@ -573,6 +579,8 @@ msgid "Interval"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Total Amount"
 msgstr ""
 
@@ -918,11 +926,13 @@ msgstr ""
 msgid "Frequency"
 msgstr ""
 
-#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl CRM/Core/Payment/SDD.php
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Collection Day"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Date"
 msgstr ""
 
@@ -1305,10 +1315,12 @@ msgid "Creditor updated"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Direct Debit Payment"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionThankYou.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Mandate Reference"
 msgstr ""
 
@@ -1863,7 +1875,8 @@ msgid "Transaction group [%1] couldn't be loaded."
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
-msgid "Deleting these contributions will <i>not</i> affect the associated mandates."
+msgid ""
+"Deleting these contributions will <i>not</i> affect the associated mandates."
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
@@ -1872,4 +1885,133 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "Group '%s' <b>is now closed</b> and cannot be changed any more."
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Cycle Day(s)"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Please give a comma separated list of valid days."
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Default Creditor"
+msgstr ""
+
+#: CRM/Core/Payment/SDD.php
+msgid "Couldn't create SEPA mandate. Error was: "
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot close mandate [%s], batching in progress!"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot close mandate [%s], it's alread batched in a non-open group!"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot properly end mandate [%s]. Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cannot terminate mandate [%s], batching in progress!"
+msgstr ""
+
+#: sepa.php
+msgid "CiviSEPA Dashboard"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"You should a day (as in \"day of month\") on which you plan to collect the "
+"monthly payments. You can also provide a comma separated list of such days."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"The default creditor will be used when no other creditor is exclicitely set. "
+"It will also be pre-selected in the back office forms."
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "monthly"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "quarterly"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "semi-annually"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "annually"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "every %1 months"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "every %1 years"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "on an irregular basis"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+msgid "I want to contribute this amount %1."
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+msgid "This payment will be debited from the following account:"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "Payment Reference"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "The amount will be debited %1."
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "The following will be debited from your account."
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "The collection date is subject to bank working days."
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "Collection Frequency"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "First Collection Date"
+msgstr ""
+
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+msgid "Earliest Collection Date"
+msgstr ""
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "yearly"
 msgstr ""
