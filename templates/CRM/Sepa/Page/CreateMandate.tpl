@@ -13,6 +13,10 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{* check for the org.project60.bic extension *}
+{crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'}
+{capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
+
 {literal}
 <style>
 .create_mandate td {
@@ -95,7 +99,7 @@
 		</tr>
 		<tr>	<!-- BIC -->
 			<td>BIC:</td>
-			<td><input name="bic" type="text" size="14" value="{$bic}"/></td>
+			<td><input name="bic" type="text" size="14" value="{$bic}"/>&nbsp;&nbsp;<font color="gray"><span id="bank_name"></span></font></td>
 		</tr>
 	</table>
 
@@ -186,7 +190,8 @@ change_bank_account();
 function change_bank_account() {
 	var values = cj("#account").val().split("/");
 	cj("[name='iban']").val(values[0]);
-	cj("[name='bic']").val(values[1]);	
+	cj("[name='bic']").val(values[1]);
+	if (typeof sepa_lookup_bic != 'undefined') sepa_lookup_bic();
 }
 {/literal}
 
@@ -217,3 +222,33 @@ cj('#replace_date').datepicker(dateOptions);
 </script>
 
 
+
+{if $bic_extension_installed}
+<script type="text/javascript">
+cj("[name='iban']").change(sepa_lookup_bic);
+cj("[name='bic']").change(sepa_clear_bank);
+{literal}
+
+function sepa_clear_bank() {
+  cj("#bank_name").text('');
+}
+
+function sepa_lookup_bic() {
+	var iban_partial = cj("[name='iban']").attr('value');
+  CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
+    {success: function(data) {
+    	if ('bic' in data) {
+        // use the following to urldecode the link url
+        cj("[name='bic']").attr('value', data['bic']);
+        cj("#bank_name").text(data['title']);
+      } else {
+      	sepa_clear_bank();
+      }
+    }});	
+}
+
+// call it once 
+sepa_lookup_bic();
+{/literal}
+</script>
+{/if}

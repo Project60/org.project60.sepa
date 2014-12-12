@@ -13,6 +13,10 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{* check for the org.project60.bic extension *}
+{crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'}
+{capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
+
 <div id="payment_information">
 	<fieldset class="billing_mode-group direct_debit_info-group">
 	<legend>
@@ -26,7 +30,7 @@
 	</div>
 	<div class="crm-section {$form.bank_bic.name}-section">
 		<div class="label">{$form.bank_bic.label}</div>
-		<div class="content">{$form.bank_bic.html}</div>
+		<div class="content">{$form.bank_bic.html}&nbsp;&nbsp;<font color="gray"><span id="bank_name"></span></font></div>
 		<div class="clear"></div>
 	</div>
 	<div class="crm-section {$form.cycle_day.name}-section" hidden="1">
@@ -152,3 +156,33 @@ cj(function() {
 
 </script>
 {/literal}
+
+{if $bic_extension_installed}
+<script type="text/javascript">
+cj("#bank_iban").change(sepa_lookup_bic);
+cj("#bank_bic").change(sepa_clear_bank);
+{literal}
+
+function sepa_clear_bank() {
+  cj("#bank_name").text('');
+}
+
+function sepa_lookup_bic() {
+	var iban_partial = cj("#bank_iban").attr('value');
+  CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
+    {success: function(data) {
+    	if ('bic' in data) {
+        // use the following to urldecode the link url
+        cj("#bank_bic").attr('value', data['bic']);
+        cj("#bank_name").text(data['title']);
+      } else {
+      	sepa_clear_bank();
+      }      
+    }});	
+}
+
+// call it once 
+sepa_lookup_bic();
+{/literal}
+</script>
+{/if}
