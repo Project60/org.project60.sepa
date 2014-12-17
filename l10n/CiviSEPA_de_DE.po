@@ -1870,7 +1870,7 @@ msgstr "Ich möchte diesen Betrag %1 zahlen."
 
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 msgid "This payment will be debited from the following account:"
-msgstr "Die Zahlung wird von dem folgende Bankkonto abgebucht:"
+msgstr "Die Zahlung wird von dem folgenden Bankkonto abgebucht:"
 
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 msgid "Payment Reference"
