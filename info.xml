@@ -13,6 +13,7 @@
   <develStage>dev</develStage>
   <compatibility>
     <ver>4.4</ver>
+    <ver>4.5</ver>
   </compatibility>
   <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches.</comments>
   <civix>

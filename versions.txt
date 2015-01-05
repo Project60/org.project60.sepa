@@ -3,9 +3,17 @@ sepa_dd (org.project60.sepa) release history
 
 Version 1.1
 ===========
-- implemented default creditor setting (#169)
-- implemented cancel option for OOFF mandates (#170)
-- minor fixes (#175, #183)
+- Default creditor setting (https://github.com/Project60/sepa_dd/issues/169)
+- Cancel option for OOFF mandates (https://github.com/Project60/sepa_dd/issues/170)
+- Minor fixes (#175, #183, ...)
+
+
+Version 1.0.1
+=============
+- CiviCRM 4.5 compatibility (https://github.com/Project60/sepa_dd/issues/207)
+- FIX: misplaced Dashboard link (https://github.com/Project60/sepa_dd/issues/195)
+- FIX: misplaced 'record SEPA contribution' button (https://github.com/Project60/sepa_dd/issues/214)
+- FIX: parallel update issues (https://github.com/Project60/sepa_dd/issues/213)
 
 
 Version 1.0
