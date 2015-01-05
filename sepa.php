@@ -424,35 +424,43 @@ function sepa_civicrm_alterSettingsFolders(&$metaDataFolders = NULL){
 * Implementation of hook_civicrm_navigationMenu
 */
 function sepa_civicrm_navigationMenu(&$params) {
-  // Check that our item doesn't already exist
-  $menu_item_search = array('url' => 'civicrm/sepa');
+  $sepa_dashboard_url = 'civicrm/sepa';
+  //error_log(print_r($params,1));
+
+  // see if it is already in the menu...
+  $menu_item_search = array('url' => $sepa_dashboard_url);
   $menu_items = array();
   CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
- 
-  if (!empty($menu_items)) {
-    return;
-  }
 
-  // Find the CiviContribute menu
-  $civiContributeID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Contributions', 'id', 'name');
-  if (!empty($civiContributeID)) {
-    $civiContributeChildren = $params[$civiContributeID]['child'];
-  
-    // now insert the CiviSEPA dashboard element
-    $newNavId = $lastElement['attributes']['navID'] + 1;
+  if (empty($menu_items)) {
+    // it's not already contained, so we want to add it to the menu
+    
+    // now, by default we want to add it to the Contributions menu -> find it
+    $contributions_menu_id = 0;
+    foreach ($params as $key => $value) {
+      if ($value['attributes']['name'] == 'Contributions') {
+        $contributions_menu_id = $key;
+        break;
+      }
+    }
 
-    $params[$civiContributeID]['child'][$newNavId] = array(
-        'attributes' => array (
-        'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
-        'name' => 'Dashboard',
-        'url' => 'civicrm/sepa',
-        'permission' => 'administer CiviCRM',
-        'operator' => NULL,
-        'separator' => 2,
-        'parentID' => $civiContributeID,
-        'navID' => $newNavId,
-        'active' => 1
-      ));
+    if (empty($contributions_menu_id)) {
+      error_log("org.project60.sepa_dd: Connot find 'Contributions' menu item.");
+    } else {
+      // insert at the bottom
+      $params[$contributions_menu_id]['child'][] = array(
+          'attributes' => array (
+          'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
+          'name' => 'Dashboard',
+          'url' => 'civicrm/sepa',
+          'permission' => 'administer CiviCRM',
+          'operator' => NULL,
+          'separator' => 2,
+          'parentID' => $contributions_menu_id,
+          'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
+          'active' => 1
+        ));
+    }
   }
 }
 
