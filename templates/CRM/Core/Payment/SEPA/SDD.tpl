@@ -105,7 +105,7 @@ cj("label[for='is_recur']").get(0).nextSibling.textContent = ": ";
 // show currency indicater and move next to field
 if (cj(".other_amount-content > input").length) {
 	cj("#currency_indicator").show();
-	cj(".other_amount-content > input").parent().append(cj("#currency_indicator"));	
+	cj(".other_amount-content > input").parent().append(cj("#currency_indicator"));
 }
 
 // disable the recur_selector fields if disabled
@@ -143,7 +143,7 @@ function sepa_copy_combined() {
 		cj("#frequency_interval").attr('value', '1');
 	} else {
 		cj("#frequency_unit").attr('value', 'month');
-		cj("#frequency_interval").attr('value', value);		
+		cj("#frequency_interval").attr('value', value);
 	}
 }
 sepa_copy_combined();
@@ -177,11 +177,18 @@ function sepa_lookup_bic() {
         cj("#bank_name").text(data['title']);
       } else {
       	sepa_clear_bank();
-      }      
-    }});	
+      }
+    }, error: function(result, settings) {
+			// we suppress the message box here
+			// and log the error via console
+			if (result.is_error) {
+				console.log(result.error_message);
+			}
+			return false;
+		}});
 }
 
-// call it once 
+// call it once
 sepa_lookup_bic();
 {/literal}
 </script>
