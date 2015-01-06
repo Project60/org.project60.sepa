@@ -50,7 +50,7 @@
 </div>
 
 
-
+{if $bank_iban} {* only for SEPA PPs *}
 <fieldset class="label-left crm-sepa">
 <div class="header-dark">{ts}Direct Debit Payment{/ts}</div>
 
@@ -103,11 +103,13 @@
   </table>
 </div>
 </fieldset>
-
+{/if}
 
 <script type="text/javascript">
 // hide credit card info
+{if $bank_iban} {* only for SEPA PPs *}
 cj('.credit_card-group').html("");
+{/if}
 
 // modify amount display group
 cj(".amount_display-group > .display-block").replaceWith(cj("#sepa-thank-amount-display"));

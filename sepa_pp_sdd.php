@@ -25,7 +25,7 @@
  * buildForm Hook for payment processor
  */
 function sepa_pp_buildForm ( $formName, &$form ) {
-	if ($formName == "CRM_Admin_Form_PaymentProcessor") {
+	if ($formName == "CRM_Admin_Form_PaymentProcessor") {					// PAYMENT PROCESSOR CONFIGURATION PAGE
 		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
 		if ($pp['class_name'] == "Payment_SDD") {
 			// that's ours!
@@ -74,14 +74,22 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			));
 		}
 
-	} elseif ($formName == "CRM_Contribute_Form_Contribution_Confirm") {
+	} elseif ($formName == "CRM_Contribute_Form_Contribution_Confirm") {					// PAYMENT PROCESS CONFIRMATION PAGE
+		// only for our SDD payment processors:
+		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
+		if ($pp['class_name'] != "Payment_SDD") return;
+
 		$form->assign("bank_iban",			    $form->_params["bank_iban"]);
 		$form->assign("bank_bic",			      $form->_params["bank_bic"]);
 
 		CRM_Core_Region::instance('page-body')->add(array(
 		  'template' => 'CRM/Contribute/Form/ContributionConfirm.sepa.tpl'));
 
-	} elseif ($formName == "CRM_Contribute_Form_Contribution_ThankYou") {
+	} elseif ($formName == "CRM_Contribute_Form_Contribution_ThankYou") {					// PAYMENT PROCESS THANK YOU PAGE
+		// only for our SDD payment processors:
+		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
+		if ($pp['class_name'] != "Payment_SDD") return;
+
 		$mandate_reference = $form->getTemplate()->get_template_vars('trxn_id');
 		if ($mandate_reference) {
 			$mandate      = civicrm_api3('SepaMandate',  'getsingle', array('reference' => $mandate_reference));

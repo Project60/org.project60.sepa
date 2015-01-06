@@ -44,11 +44,13 @@
   <p id="sepa-confirm-text-recur"><strong>{ts 1=$frequency_words}I want to contribute this amount %1.{/ts}</strong></p>
   {/if}
 
+  {if $bank_iban}
   <p id="sepa-confirm-text-account">{ts}This payment will be debited from the following account:{/ts}</p>
   <table class="sepa-confirm-text-account-details display" id="sepa-confirm-text-account-details">
     <tr><td>{ts}IBAN{/ts}</td> <td>{$bank_iban}</td> </tr>
     <tr><td>{ts}BIC{/ts}</td>  <td>{$bank_bic}</td>  </tr>
   </table>
+  {/if}
 </div>
 
 <script type="text/javascript">
