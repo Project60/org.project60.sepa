@@ -171,8 +171,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     // update the contribution, if existing (RCUR case)
     if (!empty($params['contributionID'])) {
+      $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contributionID'])); 
       civicrm_api3('Contribution', 'create', array(
         'id'           => $params['contributionID'], 
+        'contact_id'   => $contribution['contact_id'], // resubmit, leaving it out causes errors sometimes
         'receive_date' => $params['sepa_start_date'],
         'trxn_id'      => $params['trxn_id']));
     }
@@ -215,7 +217,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           // FOUND! Update the contribution... 
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
           $contribution_bao->get('id', $contribution['id']);
-          $contribution_bao->is_pay_later = 1;
+          $contribution_bao->is_pay_later = 0;
           $contribution_bao->receive_date = date('YmdHis', $collection_date);
           $contribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
           $contribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name');
@@ -254,7 +256,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           // fix contribution
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
           $contribution_bao->get('id', $contribution['id']);
-          $contribution_bao->is_pay_later = 1;
+          $contribution_bao->is_pay_later = 0;
           $contribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
           $contribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
           $contribution_bao->receive_date = date('YmdHis', strtotime($collection_date));
