@@ -214,7 +214,7 @@ class CRM_Sepa_Logic_Batching {
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
     $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.notice', $creditor_id);
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
-    $date_limit = date('Y-m-d', strtotime("$now +$ooff_notice days"));
+    $date_limit = date('Y-m-d', strtotime("$now +$horizon days"));
       
     // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
     $sql_query = "
