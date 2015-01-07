@@ -76,6 +76,7 @@ var earliest_rcur_date = new Date({$earliest_rcur_date[0]}, {$earliest_rcur_date
 var currently_set_date = new Date("{$form.start_date.value}");
 
 {literal}
+
 if (cj("#frequency_interval").length) {
 	// this is an custom interval page -> replace dropdown altogether
 	cj("#frequency_interval").hide();
@@ -100,7 +101,9 @@ if (cj("#frequency_interval").length) {
 }
 
 // fix recur label
-cj("label[for='is_recur']").get(0).nextSibling.textContent = ": ";
+if(cj("label[for='is_recur']").length) {
+	cj("label[for='is_recur']").get(0).nextSibling.textContent = ": ";
+}
 
 // show currency indicater and move next to field
 if (cj(".other_amount-content > input").length) {
@@ -147,7 +150,6 @@ function sepa_copy_combined() {
 	}
 }
 sepa_copy_combined();
-
 
 cj(function() {
 	cj("#is_recur").change(_sdd_update_elements);
