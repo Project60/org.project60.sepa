@@ -154,8 +154,11 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $params['entity_table']  = 'civicrm_contribution_recur';
     }
 
-    // FIXME: remove this hack! (we cannot create mandate with noexistant entity_id)
-    $params['entity_id']       = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM `{$params['entity_table']}`;");
+    // we don't have the associated entity id yet
+    // so we set MAX_INT as a dummy value
+    // remark: setting this to 0/NULL does not work
+    // due to complications with the api
+    $params['entity_id'] = pow(2,32)-1;
 
     // Allow further manipulation of the arguments via custom hooks ..
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $original_parameters, $params);
