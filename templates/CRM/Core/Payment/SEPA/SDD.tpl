@@ -170,7 +170,7 @@ function sepa_clear_bank() {
 }
 
 function sepa_lookup_bic() {
-	var iban_partial = cj("#bank_iban").attr('value');
+	var iban_partial = cj("#bank_iban").val();
   CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
     {success: function(data) {
     	if ('bic' in data) {
