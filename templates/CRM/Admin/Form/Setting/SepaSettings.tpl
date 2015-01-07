@@ -256,7 +256,7 @@
     });
 
   var customBatchingParams = [
-              ["custom_cycledays_override",      "custom_cycledays",    null],
+              ["cycledays_override",      "custom_cycledays",    null],
               ["batching_OOFF_horizon_override", "custom_OOFF_horizon", null],
               ["batching_OOFF_notice_override",  "custom_OOFF_notice", null],
               ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
