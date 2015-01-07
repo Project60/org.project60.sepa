@@ -275,6 +275,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     }
     $this->assign('creditors', $creditors);
     
+    // add cycle_days per creditor
+    $creditor2cycledays = array();
+    foreach ($creditors as $creditor_id => $creditor_name) {
+      $creditor2cycledays[$creditor_id] = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor_id);
+    }
+    $this->assign("creditor2cycledays", json_encode($creditor2cycledays));
+
     // all seems to be ok.
     $this->assign("submit_url", CRM_Utils_System::url('civicrm/sepa/cmandate'));
 

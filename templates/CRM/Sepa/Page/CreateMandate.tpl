@@ -35,7 +35,7 @@
 		<tr>	<!-- CREDITOR -->
 			<td>{ts}Creditor{/ts}:</td>
 			<td>
-				<select name="creditor_id">
+				<select name="creditor_id" onChange='sepa_update_cycledays();' >
 					{foreach from=$creditors item=name key=id}
 					<option value="{$id}" {if $id eq $creditor_id}selected{/if}>{$name}</option>
 					{/foreach}
@@ -129,7 +129,7 @@
 			<td style="vertical-align: top;"><input name="mandate_type" id='mtype_OOFF' type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
 			<td>{ts}Earliest execution date{/ts}:</td>
 			<td>
-				<input id="date" name="date" type="text" value="{$date}"/>
+				<input id="date" name="date" type="text" value="{$date}" onChange='cj("#mtype_OOFF").prop("checked",true);'/>
 			</td>
 			<td></td>
 		</tr>
@@ -145,13 +145,22 @@
 			<td></td>
 		</tr>
 		<tr>
-			<td>{ts}Cycle Day{/ts}:</td>
-			<td><input name="cycle_day" type="number" size="3" value="{$cycle_day}" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
+			<td>{ts}Collection Date{/ts}:</td>
+			<td>
+				<select id="default_element_cycle_day" name="cycle_day" onChange='cj("#mtype_RCUR").prop("checked",true);' />
+			</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}Interval{/ts}:</td>
-			<td><input name="interval" type="number" size="3" value="{$interval}" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
+			<td>
+				<select class="form-select" id="default_frequency_interval" name="interval" onChange='cj("#mtype_RCUR").prop("checked",true);'>
+					<option value="1">{ts}monthly{/ts}</option>
+					<option value="3">{ts}quarterly{/ts}</option>
+					<option value="6">{ts}semi-annually{/ts}</option>
+					<option value="12">{ts}annually{/ts}</option>
+				</select>
+			</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -183,6 +192,7 @@
 
 
 <script type="text/javascript">
+var creditor2cycledays = {$creditor2cycledays};
 {literal}
 // logic for the bank account selector
 cj("#account").change(change_bank_account);
@@ -193,6 +203,23 @@ function change_bank_account() {
 	cj("[name='bic']").val(values[1]);
 	if (typeof sepa_lookup_bic != 'undefined') sepa_lookup_bic();
 }
+
+// cycle days depend on the creditor settings
+function sepa_update_cycledays() {
+	var default_element_cycle_day = cj('#default_element_cycle_day');
+	if (default_element_cycle_day.length==0) return;
+
+	var creditor_id = cj("[name='creditor_id']").val();
+	var old_value = default_element_cycle_day.val();
+
+	cj('#default_element_cycle_day').empty();
+	for (var value in creditor2cycledays[creditor_id]){
+		var label = creditor2cycledays[creditor_id][value];
+		var is_selected = (value == old_value)?'selected':'';
+		cj('#default_element_cycle_day').append('<option value="' + value + '" ' + is_selected + '>' + label + '.</option>');
+	}
+}
+sepa_update_cycledays();
 {/literal}
 
 // Validation handling
