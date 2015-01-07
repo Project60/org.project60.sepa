@@ -115,7 +115,7 @@
      <h3>Custom Batching Settings</h3>
      <table id="custombatching" class="form-layout">
             <tr class="crm-custom-form-block-cycle-days">
-              <td class="label">{$form.custom_cycledays.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td>
+              <td class="label">{$form.custom_cycledays.label} <a onclick='CRM.help("{ts}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td>
               <td>
                 {$form.custom_cycledays.html}
               </td>
@@ -256,6 +256,7 @@
     });
 
   var customBatchingParams = [
+              ["custom_cycledays_override",      "custom_cycledays",    null],
               ["batching_OOFF_horizon_override", "custom_OOFF_horizon", null],
               ["batching_OOFF_notice_override",  "custom_OOFF_notice", null],
               ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
