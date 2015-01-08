@@ -214,6 +214,8 @@ class CRM_Sepa_Logic_Group {
     LEFT JOIN
       civicrm_contribution AS contribution ON contribution.id = txn_to_contribution.contribution_id
     WHERE
+      contribution_status_id != $status_closed
+    AND
       txn_to_contribution.txgroup_id IN ($txgroup_id);
     ";
     $contribution = CRM_Core_DAO::executeQuery($find_txgroup_contributions_sql);
