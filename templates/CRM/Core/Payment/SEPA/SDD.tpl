@@ -81,7 +81,6 @@ if (cj("#frequency_interval").length) {
 	// this is an custom interval page -> replace dropdown altogether
 	cj("#frequency_interval").hide();
 	cj("#frequency_unit").hide();
-	cj("[name=frequency_unit]").hide();
 	cj("#frequency_combined").show();
 	cj("#frequency_combined").insertBefore(cj("#frequency_interval"));
 
