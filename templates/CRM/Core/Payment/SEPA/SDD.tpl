@@ -81,6 +81,7 @@ if (cj("#frequency_interval").length) {
 	// this is an custom interval page -> replace dropdown altogether
 	cj("#frequency_interval").hide();
 	cj("#frequency_unit").hide();
+	cj("[name=frequency_unit]").hide();
 	cj("#frequency_combined").show();
 	cj("#frequency_combined").insertBefore(cj("#frequency_interval"));
 
@@ -89,15 +90,23 @@ if (cj("#frequency_interval").length) {
 	var options = cj("#frequency_unit > option");
 	for (var i = 0; i < options.length; i++) {
 		var option = cj(options[i]);
-		if (option.attr('value') == 'month') {
+		if (option.val() == 'month') {
 			option.text(label_months);
-		} else if (option.attr('value') == 'year') {
+		} else if (option.val() == 'year') {
 			option.text(label_years);
 		} else {
 			// this module cannot deal with weekly/daily payments
 			option.remove();
 		}
 	}
+}
+
+// fix invertal label
+// remark: if there is only one frequency unit available
+// frequency_interval is only a static text and no longer
+// a select box
+if(cj("[name=frequency_interval]").length) {
+	cj("[name=frequency_interval]").get(0).nextSibling.textContent = "";
 }
 
 // fix recur label
@@ -113,10 +122,10 @@ if (cj(".other_amount-content > input").length) {
 
 // disable the recur_selector fields if disabled
 function _sdd_update_elements() {
-	var is_recur = cj("#is_recur").attr('checked')=='checked';
-	cj("#frequency_interval").attr('disabled', !is_recur);
-	cj("#frequency_unit").attr('disabled', !is_recur);
-	cj("#frequency_combined").attr('disabled', !is_recur);
+	var is_recur = cj("#is_recur").prop('checked');
+	cj("#frequency_interval").prop('disabled', !is_recur);
+	cj("#frequency_unit").prop('disabled', !is_recur);
+	cj("#frequency_combined").prop('disabled', !is_recur);
 	// this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension
 	// cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
 	if (is_recur) {
@@ -140,13 +149,15 @@ function _sdd_update_elements() {
 function sepa_copy_combined() {
 	if (!cj("#frequency_combined").length) return;
 
-	var value = cj("#frequency_combined").attr('value');
+	var value = cj("#frequency_combined").val();
 	if (value == 12) {
-		cj("#frequency_unit").attr('value', 'year');
-		cj("#frequency_interval").attr('value', '1');
+		cj("#frequency_unit").val('year');
+		cj("[name=frequency_unit]").val('year');
+		cj("#frequency_interval").val('1');
 	} else {
-		cj("#frequency_unit").attr('value', 'month');
-		cj("#frequency_interval").attr('value', value);
+		cj("#frequency_unit").val('month');
+		cj("[name=frequency_unit]").val('month');
+		cj("#frequency_interval").val(value);
 	}
 }
 sepa_copy_combined();

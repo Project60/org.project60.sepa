@@ -261,12 +261,12 @@ function sepa_clear_bank() {
 }
 
 function sepa_lookup_bic() {
-	var iban_partial = cj("[name='iban']").attr('value');
+	var iban_partial = cj("[name='iban']").val();
   CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
     {success: function(data) {
     	if ('bic' in data) {
         // use the following to urldecode the link url
-        cj("[name='bic']").attr('value', data['bic']);
+        cj("[name='bic']").val(data['bic']);
         cj("#bank_name").text(data['title']);
       } else {
       	sepa_clear_bank();
