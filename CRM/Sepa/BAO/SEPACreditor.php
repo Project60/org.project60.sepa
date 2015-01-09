@@ -46,5 +46,40 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
     return $dao;
   }
 
+  /**
+   * Will set the inital parameters 'status', 'validation_date' and 'date', 'is_enabled'
+   * in the $mandate_data array with respect to the creditor settings
+   * 
+   * Caution: will NOT modify the mandata on the database!
+   */
+  public static function initialiseMandateData($creditor_id, &$mandate_data) {
+    if (empty($creditor_id) || empty($mandate_data['id']) || empty($mandate_data['type'])) return;
+
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id'=>$creditor_id));
+    if (empty($creditor['mandate_active'])) {
+      // mandate is being created as 'not activated'
+      $mandate_data['is_enabled'] = 0;
+      if (empty($mandate_data['creation_date']))   $mandate_data['creation_date'] = date('YmdHis');
+
+      if ($mandate_data['type'] == 'RCUR') {
+        $mandate_data['status'] = 'INIT';
+      } elseif ($mandate_data['type'] == 'OOFF') {
+        $mandate_data['status'] = 'INIT';
+      }
+
+    } else {
+      // mandate is activated right away
+      $mandate_data['is_enabled'] = 1; 
+      if (empty($mandate_data['date']))            $mandate_data['date']            = date('YmdHis');
+      if (empty($mandate_data['creation_date']))   $mandate_data['creation_date']   = date('YmdHis');
+      if (empty($mandate_data['validation_date'])) $mandate_data['validation_date'] = date('YmdHis');
+      
+      if ($mandate_data['type'] == 'RCUR') {
+        $mandate_data['status'] = 'FRST';
+      } elseif ($mandate_data['type'] == 'OOFF') {
+        $mandate_data['status'] = 'OOFF';
+      }
+    }
+  }
 }
 

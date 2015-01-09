@@ -25,7 +25,7 @@
  * buildForm Hook for payment processor
  */
 function sepa_pp_buildForm ( $formName, &$form ) {
-	if ($formName == "CRM_Admin_Form_PaymentProcessor") {
+	if ($formName == "CRM_Admin_Form_PaymentProcessor") {					// PAYMENT PROCESSOR CONFIGURATION PAGE
 		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
 		if ($pp['class_name'] == "Payment_SDD") {
 			// that's ours!
@@ -40,14 +40,9 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$pp_creditor      = NULL;
 			$test_pp_creditor = NULL;
 
-			$cycle_day        = 1;
-			$test_cycle_day   = 1;
-
 			if (!empty($pp_id)) {
-				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', $pp_id);
-				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test', $pp_id);
-				$cycle_day        = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP CD', $pp_id);
-				$test_cycle_day   = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test CD', $pp_id);
+				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP',         'pp'.$pp_id);
+				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test',    'pp'.$pp_id);
 			}
 
 			// load settings from creditor
@@ -73,32 +68,45 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$form->assign('creditors', $creditors);
 			$form->assign('test_creditors', $test_creditors);
 			
-
-			$form->assign('cycle_day', $cycle_day);
-			$form->assign('test_cycle_day', $test_cycle_day);			
-
-			// build cycle day options
-			$cycle_day_options = range(0,28);
-			$cycle_day_options[0] = ts('Any');
-			unset($cycle_day_options[0]); // 'any' disabled for now
-			$form->assign('cycle_days', $cycle_day_options);
-			$form->assign('test_cycle_days', $cycle_day_options);
-
 			// add new elements
 			CRM_Core_Region::instance('page-body')->add(array(
 				'template' => 'CRM/Admin/Form/PaymentProcessor/SDD.tpl'
 			));
 		}
 
-	} elseif ($formName == "CRM_Contribute_Form_Contribution_Confirm") {
+	} elseif ($formName == "CRM_Contribute_Form_Contribution_Confirm") {					// PAYMENT PROCESS CONFIRMATION PAGE
+		// only for our SDD payment processors:
+		$pp = civicrm_api("PaymentProcessor", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
+		if ($pp['class_name'] != "Payment_SDD") return;
 
+		$form->assign("bank_iban",			    $form->_params["bank_iban"]);
+		$form->assign("bank_bic",			      $form->_params["bank_bic"]);
 
-	} elseif ($formName == "CRM_Contribute_Form_Contribution_ThankYou") {
-		$form->assign("mandate_reference",	$form->_params["mandate_reference"]);
-		$form->assign("bank_iban",			$form->_params["bank_iban"]);
-		$form->assign("bank_bic",			$form->_params["bank_bic"]);
+		CRM_Core_Region::instance('page-body')->add(array(
+		  'template' => 'CRM/Contribute/Form/ContributionConfirm.sepa.tpl'));
+
+	} elseif ($formName == "CRM_Contribute_Form_Contribution_ThankYou") {					// PAYMENT PROCESS THANK YOU PAGE
+		// only for our SDD payment processors:
+		$pp = civicrm_api("PaymentProcessor", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
+		if ($pp['class_name'] != "Payment_SDD") return;
+
+		$mandate_reference = $form->getTemplate()->get_template_vars('trxn_id');
+		if ($mandate_reference) {
+			$mandate      = civicrm_api3('SepaMandate',  'getsingle', array('reference' => $mandate_reference));
+			$creditor     = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $mandate['creditor_id']));
+			$contribution = civicrm_api3('Contribution', 'getsingle', array('trxn_id' => $mandate_reference));
+			$form->assign('mandate_reference',  $mandate_reference);
+			$form->assign("bank_iban",          $mandate["iban"]);
+			$form->assign("bank_bic",           $mandate["bic"]);
+			$form->assign("collection_day",     $form->_params["cycle_day"]);
+			$form->assign("frequency_interval", $form->_params["frequency_interval"]);
+			$form->assign("frequency_unit",     $form->_params["frequency_unit"]);
+			$form->assign("creditor_id",        $creditor['identifier']);
+			$form->assign("collection_date",    $contribution['receive_date']);
+		}
+
 		CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
-		  'template' => 'CRM/Contribute/Form/ContributionThankYou.tpl'));
+		  'template' => 'CRM/Contribute/Form/ContributionThankYou.sepa.tpl'));
 	}
 }
 
@@ -116,16 +124,15 @@ function sepa_pp_postProcess( $formName, &$form ) {
 			$test_creditor_id = $form->_submitValues['test_user_name'];
 			$pp_id = $paymentProcessor['id'];
 
-			$creditor_cycle_day = $form->_submitValues['cycle_day'];
-			$test_creditor_cycle_day = $form->_submitValues['test_cycle_day'];
-
 			// save settings
 			// FIXME: we might consider saving this as a JSON object
-			CRM_Core_BAO_Setting::setItem($creditor_id, 'SEPA Direct Debit PP', $pp_id);
-			CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP Test', $pp_id);
-			CRM_Core_BAO_Setting::setItem($creditor_cycle_day, 'SEPA Direct Debit PP CD', $pp_id);
-			CRM_Core_BAO_Setting::setItem($test_creditor_cycle_day, 'SEPA Direct Debit PP Test CD', $pp_id);
+			CRM_Core_BAO_Setting::setItem($creditor_id,             'SEPA Direct Debit PP',         'pp'.$pp_id);
+			CRM_Core_BAO_Setting::setItem($test_creditor_id,        'SEPA Direct Debit PP Test',    'pp'.$pp_id);
 		}
+
+	} elseif ('CRM_Contribute_Form_Contribution_Confirm' == $formName) {
+		// post process the contributions created
+		CRM_Core_Payment_SDD::processPartialMandates();
 	}
 }
 
@@ -152,7 +159,7 @@ function sepa_pp_install() {
 		    "url_recur_test_default"    => "",
 		    "billing_mode"              => "1",
 		    "is_recur"                  => "1",
-		    "payment_type"              => "9002"	// TODO
+		    "payment_type"              => "0"
 		);
 		$result = civicrm_api('PaymentProcessorType', 'create', $payment_processor_data);
 		if (!empty($result['is_error'])) {

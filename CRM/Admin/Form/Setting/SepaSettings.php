@@ -26,21 +26,23 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
        parent::__construct();
 
        $this->config_fields = array(
-                         array('batching.OOFF.horizon', ts('OOFF horizon')),
-                         array('batching.OOFF.notice', ts('OOFF notice days')),
-                         array('batching.RCUR.horizon', ts('RCUR horizon')),
-                         array('batching.RCUR.grace', ts('RCUR grace')),
-                         array('batching.RCUR.notice', ts('RCUR notice days')),
-                         array('batching.FRST.notice', ts('FRST notice days')),
+                         array('cycledays',             ts('Cycle Day(s)')),
+                         array('batching.OOFF.horizon',  ts('OOFF horizon')),
+                         array('batching.OOFF.notice',   ts('OOFF notice days')),
+                         array('batching.RCUR.horizon',  ts('RCUR horizon')),
+                         array('batching.RCUR.grace',    ts('RCUR grace')),
+                         array('batching.RCUR.notice',   ts('RCUR notice days')),
+                         array('batching.FRST.notice',   ts('FRST notice days')),
                          array('batching.UPDATE.lock.timeout', ts('Update lock timeout')));
 
       $this->custom_fields = array(
-                         array('custom_OOFF_horizon', ts('OOFF horizon')),
-                         array('custom_OOFF_notice', ts('OOFF notice days')),
-                         array('custom_RCUR_horizon', ts('RCUR horizon')),
-                         array('custom_RCUR_grace', ts('RCUR grace')),
-                         array('custom_RCUR_notice', ts('RCUR notice days')),
-                         array('custom_FRST_notice', ts('FRST notice days')),
+                         array('custom_cycledays',      ts('Cycle Day(s)')),
+                         array('custom_OOFF_horizon',    ts('OOFF horizon')),
+                         array('custom_OOFF_notice',     ts('OOFF notice days')),
+                         array('custom_RCUR_horizon',    ts('RCUR horizon')),
+                         array('custom_RCUR_grace',      ts('RCUR grace')),
+                         array('custom_RCUR_notice',     ts('RCUR notice days')),
+                         array('custom_FRST_notice',     ts('FRST notice days')),
                          array('custom_update_lock_timeout', ts('Update lock timeout')));
     }
 
@@ -73,13 +75,17 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         // add all form elements and validation rules
         foreach ($this->config_fields as $key => $value) {
-            $this->addElement('text', $this->domainToString($value[0]), $value[1]);
-            $this->addRule($this->domainToString($value[0]), 
-                       sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
-                      'positiveInteger');
-            $this->addRule($this->domainToString($value[0]), 
-                       sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
-                      'required');
+            $elementName = $this->domainToString($value[0]);
+            $this->addElement('text', $elementName, $value[1]);
+            if ($elementName != 'cycledays') {
+                // integer only rules, except for cycledays (list)
+              $this->addRule($this->domainToString($value[0]), 
+                         sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
+                        'positiveInteger');
+              $this->addRule($this->domainToString($value[0]), 
+                         sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
+                        'required');
+            }
         }
 
         // country drop down field
@@ -110,27 +116,36 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $country_ids = array('' => ts('- select -')) + $filtered;
 
         // add creditor form elements
-        $this->addElement('text', 'addcreditor_creditor_id', ts("Creditor Contact"));
-        $this->addElement('text', 'addcreditor_name', ts("Name"));
-        $this->addElement('text', 'addcreditor_id', ts("Identifier"));
-        $this->addElement('text', 'addcreditor_address', ts("Address"));
-        $this->addElement('select', 'addcreditor_country_id', ts("Country"), $country_ids);
-        $this->addElement('text', 'addcreditor_bic', ts("BIC"));
-        $this->addElement('text', 'addcreditor_iban', ts("IBAN"));
-        $this->addElement('select', 'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
-        $this->addElement('hidden', 'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
-        $this->addElement('hidden', 'add_creditor_id', '', array('id' => 'add_creditor_id'));
-        $this->addElement('checkbox','is_test_creditor', ts("Is a Test Creditor"), "", array('value' =>'0'));
+        $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact"));
+        $this->addElement('text',       'addcreditor_name',         ts("Name"));
+        $this->addElement('text',       'addcreditor_id',           ts("Identifier"));
+        $this->addElement('text',       'addcreditor_address',      ts("Address"));
+        $this->addElement('select',     'addcreditor_country_id',   ts("Country"), $country_ids);
+        $this->addElement('text',       'addcreditor_bic',          ts("BIC"));
+        $this->addElement('text',       'addcreditor_iban',         ts("IBAN"));
+        $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
+        $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor"), "", array('value' =>'0'));
+        $this->addElement('hidden',   'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
+        $this->addElement('hidden',   'add_creditor_id', '', array('id' => 'add_creditor_id'));
 
-        // add all form elements and validation rules
+        // add custom form elements and validation rules
         $index = 0;
         foreach ($this->custom_fields as $key => $value) {
             $this->addElement('text', $this->domainToString($value[0]), $value[1], array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]))));
-            $this->addRule($this->domainToString($value[0]), 
+            $elementName = $this->domainToString($value[0]);
+            if ($elementName != 'custom_cycledays') {
+              // integer only rules, except for cycledays (list)
+              $this->addRule($elementName, 
                        sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
                       'positiveInteger');
+            }
             $index++;
         }
+
+        // add an extra rule for the days
+        $this->registerRule('sepa_cycle_day_list', 'callback', 'sepa_cycle_day_list', 'CRM_Sepa_Logic_Settings');
+        $this->addRule('cycledays',        ts('Please give a comma separated list of valid days.'), 'sepa_cycle_day_list');
+        $this->addRule('custom_cycledays', ts('Please give a comma separated list of valid days.'), 'sepa_cycle_day_list');
 
         // get creditor list
         $creditors_default_list = array();

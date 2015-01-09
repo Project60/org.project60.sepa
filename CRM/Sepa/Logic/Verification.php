@@ -27,10 +27,21 @@ class CRM_Sepa_Logic_Verification {
    * @return NULL if given IBAN is valid, localized error message otherwise
    */
   static function verifyIBAN($iban) {
-    if (verify_iban($_REQUEST['iban'])) {
+    if (verify_iban($iban)) {
       return NULL;
     } else {
       return ts("IBAN is not correct");
+    }
+  }
+
+  /**
+   * Form rule wrapper for ::verifyIBAN
+   */
+  static function rule_valid_IBAN($value) {
+    if (self::verifyIBAN($value)===NULL) {
+      return 1;
+    } else {
+      return 0;
     }
   }
 
@@ -46,6 +57,17 @@ class CRM_Sepa_Logic_Verification {
       return NULL;
     } else {
       return ts("BIC is not correct");
+    }
+  }
+
+  /**
+   * Form rule wrapper for ::verifyBIC
+   */
+  static function rule_valid_BIC($value) {
+    if (self::verifyBIC($value)===NULL) {
+      return 1;
+    } else {
+      return 0;
     }
   }
 }

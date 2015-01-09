@@ -13,6 +13,10 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{* check for the org.project60.bic extension *}
+{crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'}
+{capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
+
 {literal}
 <style>
 .create_mandate td {
@@ -31,7 +35,7 @@
 		<tr>	<!-- CREDITOR -->
 			<td>{ts}Creditor{/ts}:</td>
 			<td>
-				<select name="creditor_id">
+				<select name="creditor_id" onChange='sepa_update_cycledays();' >
 					{foreach from=$creditors item=name key=id}
 					<option value="{$id}" {if $id eq $creditor_id}selected{/if}>{$name}</option>
 					{/foreach}
@@ -95,7 +99,7 @@
 		</tr>
 		<tr>	<!-- BIC -->
 			<td>BIC:</td>
-			<td><input name="bic" type="text" size="14" value="{$bic}"/></td>
+			<td><input name="bic" type="text" size="14" value="{$bic}"/>&nbsp;&nbsp;<font color="gray"><span id="bank_name"></span></font></td>
 		</tr>
 	</table>
 
@@ -125,7 +129,7 @@
 			<td style="vertical-align: top;"><input name="mandate_type" id='mtype_OOFF' type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
 			<td>{ts}Earliest execution date{/ts}:</td>
 			<td>
-				<input id="date" name="date" type="text" value="{$date}"/>
+				<input id="date" name="date" type="text" value="{$date}" onChange='cj("#mtype_OOFF").prop("checked",true);'/>
 			</td>
 			<td></td>
 		</tr>
@@ -141,13 +145,22 @@
 			<td></td>
 		</tr>
 		<tr>
-			<td>{ts}Cycle Day{/ts}:</td>
-			<td><input name="cycle_day" type="number" size="3" value="{$cycle_day}" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
+			<td>{ts}Collection Date{/ts}:</td>
+			<td>
+				<select id="default_element_cycle_day" name="cycle_day" onChange='cj("#mtype_RCUR").prop("checked",true);' />
+			</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td>{ts}Interval{/ts}:</td>
-			<td><input name="interval" type="number" size="3" value="{$interval}" onChange='cj("#mtype_RCUR").prop("checked",true);' /></td>
+			<td>
+				<select class="form-select" id="default_frequency_interval" name="interval" onChange='cj("#mtype_RCUR").prop("checked",true);'>
+					<option value="1">{ts}monthly{/ts}</option>
+					<option value="3">{ts}quarterly{/ts}</option>
+					<option value="6">{ts}semi-annually{/ts}</option>
+					<option value="12">{ts}annually{/ts}</option>
+				</select>
+			</td>
 			<td></td>
 		</tr>
 		<tr>
@@ -179,6 +192,7 @@
 
 
 <script type="text/javascript">
+var creditor2cycledays = {$creditor2cycledays};
 {literal}
 // logic for the bank account selector
 cj("#account").change(change_bank_account);
@@ -186,8 +200,26 @@ change_bank_account();
 function change_bank_account() {
 	var values = cj("#account").val().split("/");
 	cj("[name='iban']").val(values[0]);
-	cj("[name='bic']").val(values[1]);	
+	cj("[name='bic']").val(values[1]);
+	if (typeof sepa_lookup_bic != 'undefined') sepa_lookup_bic();
 }
+
+// cycle days depend on the creditor settings
+function sepa_update_cycledays() {
+	var default_element_cycle_day = cj('#default_element_cycle_day');
+	if (default_element_cycle_day.length==0) return;
+
+	var creditor_id = cj("[name='creditor_id']").val();
+	var old_value = default_element_cycle_day.val();
+
+	cj('#default_element_cycle_day').empty();
+	for (var value in creditor2cycledays[creditor_id]){
+		var label = creditor2cycledays[creditor_id][value];
+		var is_selected = (value == old_value)?'selected':'';
+		cj('#default_element_cycle_day').append('<option value="' + value + '" ' + is_selected + '>' + label + '.</option>');
+	}
+}
+sepa_update_cycledays();
 {/literal}
 
 // Validation handling
@@ -217,3 +249,33 @@ cj('#replace_date').datepicker(dateOptions);
 </script>
 
 
+
+{if $bic_extension_installed}
+<script type="text/javascript">
+cj("[name='iban']").change(sepa_lookup_bic);
+cj("[name='bic']").change(sepa_clear_bank);
+{literal}
+
+function sepa_clear_bank() {
+  cj("#bank_name").text('');
+}
+
+function sepa_lookup_bic() {
+	var iban_partial = cj("[name='iban']").val();
+  CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
+    {success: function(data) {
+    	if ('bic' in data) {
+        // use the following to urldecode the link url
+        cj("[name='bic']").val(data['bic']);
+        cj("#bank_name").text(data['title']);
+      } else {
+      	sepa_clear_bank();
+      }
+    }});	
+}
+
+// call it once 
+sepa_lookup_bic();
+{/literal}
+</script>
+{/if}
