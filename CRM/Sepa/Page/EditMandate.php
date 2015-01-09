@@ -82,6 +82,16 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       }      
     }
 
+    // load the creditor
+    if (!empty($mandate['creditor_id'])) {
+      $creditor = civicrm_api("SepaCreditor", "getsingle", array('id'=>$mandate['creditor_id'], 'version'=>3));
+      if (!empty($creditor['is_error'])) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read creditor [%s]. Error was: '%s'"), $mandate['creditor_id'], $creditor['error_message']), ts('Error'), 'error');
+      } else {
+        $mandate['creditor_name'] = $creditor['name'];
+      }
+    }
+
     // load the campaign
     if (isset($contribution['contribution_campaign_id']) && $contribution['contribution_campaign_id']) {
       $campaign_id = $contribution['contribution_campaign_id'];

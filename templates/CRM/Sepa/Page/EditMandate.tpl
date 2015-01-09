@@ -40,6 +40,7 @@
             <tr><td class="label">{ts}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
             <tr><td class="label">{ts}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>
             <tr><td class="label">{ts}BIC{/ts}</td><td>{$sepa.bic}</td></tr>
+            <tr><td class="label">{ts}Creditor{/ts}</td><td>{$sepa.creditor_name} [{$sepa.creditor_id}]</td></tr>
             <tr><td class="label">{ts}Source{/ts}</td><td>{$sepa.source}</td></tr>
             <tr><td class="label">{ts}Status{/ts}</td><td>{$sepa.status}</td></tr>
             <tr><td class="label">{ts}Creation date{/ts}</td><td>{$sepa.creation_date}</td></tr>
