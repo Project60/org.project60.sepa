@@ -39,10 +39,10 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
     // add button URLs
     $this->assign("status", $status);
-    $this->assign("show_closed_url", CRM_Utils_System::url('civicrm/sepa/dashbord', 'status=closed'));
-    $this->assign("show_open_url", CRM_Utils_System::url('civicrm/sepa/dashbord', 'status=active'));
-    $this->assign("batch_ooff", CRM_Utils_System::url('civicrm/sepa/dashbord', 'update=OOFF'));
-    $this->assign("batch_recur", CRM_Utils_System::url('civicrm/sepa/dashbord', 'update=RCUR'));
+    $this->assign("show_closed_url", CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed'));
+    $this->assign("show_open_url", CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
+    $this->assign("batch_ooff", CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=OOFF'));
+    $this->assign("batch_recur", CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=RCUR'));
 
     // check permissions
     $this->assign('can_delete', CRM_Core_Permission::check('administer CiviCRM'));
