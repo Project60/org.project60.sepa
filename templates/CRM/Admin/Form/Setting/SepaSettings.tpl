@@ -323,6 +323,8 @@
         if (data['is_error'] == 0) {
           if (!isCopy) {
             cj('#edit_creditor_id').val(data['id']);
+          }else{
+            cj('#edit_creditor_id').val("none");
           }
           cj('#add_creditor_id').val(data['creditor_id']);
           cj('#addcreditor_name').val(data['name']);
