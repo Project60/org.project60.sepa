@@ -95,11 +95,18 @@
 		</tr>
 		<tr>	<!-- IBAN -->
 			<td>IBAN:</td>
-			<td><input name="iban" type="text" size="32" value="{$iban}"/></td>
+			<td>
+				<input name="iban" type="text" size="32" value="{$iban}"/>
+				<a id="bic_lookup_btn" onClick="sepa_lookup_bic();" hidden="1">lookup BIC</a>
+			</td>
 		</tr>
 		<tr>	<!-- BIC -->
 			<td>BIC:</td>
-			<td><input name="bic" type="text" size="14" value="{$bic}"/>&nbsp;&nbsp;<font color="gray"><span id="bank_name"></span></font></td>
+			<td>
+				<input name="bic" type="text" size="14" value="{$bic}"/>&nbsp;&nbsp;
+				<img id="bic_busy" height="8" src="{$config->resourceBase}i/loading.gif" hidden="1" />
+				<font color="gray"><span id="bank_name"></span></font>
+			</td>
 		</tr>
 	</table>
 
@@ -254,20 +261,25 @@ cj('#replace_date').datepicker(dateOptions);
 <script type="text/javascript">
 cj("[name='iban']").change(sepa_lookup_bic);
 cj("[name='bic']").change(sepa_clear_bank);
+//cj("#bic_lookup_btn").show();
 {literal}
 
 function sepa_clear_bank() {
   cj("#bank_name").text('');
+  cj("#bic_busy").hide();
 }
 
 function sepa_lookup_bic() {
 	var iban_partial = cj("[name='iban']").val();
+	cj("#bic_busy").show();
+	cj("#bank_name").text('');
   CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
     {success: function(data) {
     	if ('bic' in data) {
         // use the following to urldecode the link url
         cj("[name='bic']").val(data['bic']);
         cj("#bank_name").text(data['title']);
+        cj("#bic_busy").hide();
       } else {
       	sepa_clear_bank();
       }

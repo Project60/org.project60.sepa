@@ -29,8 +29,13 @@
 		<div class="clear"></div>
 	</div>
 	<div class="crm-section {$form.bank_bic.name}-section">
-		<div class="label">{$form.bank_bic.label}</div>
-		<div class="content">{$form.bank_bic.html}&nbsp;&nbsp;<font color="gray"><span id="bank_name"></span></font></div>
+		<div class="label">{$form.bank_bic.label}
+			<a id="bic_lookup_btn" onClick="sepa_lookup_bic();" hidden="1">lookup BIC</a>
+		</div>
+		<div class="content">{$form.bank_bic.html}&nbsp;&nbsp;
+			<img id="bic_busy" height="8" src="{$config->resourceBase}i/loading.gif" hidden="1" />
+			<font color="gray"><span id="bank_name"></span></font>
+		</div>
 		<div class="clear"></div>
 	</div>
 	<div class="crm-section {$form.cycle_day.name}-section" hidden="1">
@@ -173,26 +178,32 @@ cj(function() {
 <script type="text/javascript">
 cj("#bank_iban").change(sepa_lookup_bic);
 cj("#bank_bic").change(sepa_clear_bank);
+//cj("#bic_lookup_btn").show();
 {literal}
 
 function sepa_clear_bank() {
   cj("#bank_name").text('');
+  cj("#bic_busy").hide();
 }
 
 function sepa_lookup_bic() {
 	var iban_partial = cj("#bank_iban").val();
+	cj("#bic_busy").show();
+	cj("#bank_name").text('');
   CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
     {success: function(data) {
     	if ('bic' in data) {
         // use the following to urldecode the link url
         cj("#bank_bic").attr('value', data['bic']);
         cj("#bank_name").text(data['title']);
+        cj("#bic_busy").hide();
       } else {
       	sepa_clear_bank();
       }
     }, error: function(result, settings) {
 			// we suppress the message box here
 			// and log the error via console
+      cj("#bic_busy").hide();
 			if (result.is_error) {
 				console.log(result.error_message);
 			}
