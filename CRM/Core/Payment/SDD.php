@@ -231,6 +231,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           $mandate_update['id']        = $mandate['id'];
           $mandate_update['entity_id'] = $contribution['id'];
           $mandate_update['type']      = $mandate['type'];
+          if (empty($mandate['contact_id'])) {
+            // this happens when the payment gets created AFTER the doDirectPayment method
+            $mandate_update['contact_id'] = $contribution_bao->contact_id;
+          }
           
           // initialize according to the creditor settings
           CRM_Sepa_BAO_SEPACreditor::initialiseMandateData($mandate['creditor_id'], $mandate_update);

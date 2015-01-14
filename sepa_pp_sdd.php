@@ -85,6 +85,29 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 		CRM_Core_Region::instance('page-body')->add(array(
 		  'template' => 'CRM/Contribute/Form/ContributionConfirm.sepa.tpl'));
 
+
+	} elseif ($formName == "CRM_Event_Form_Registration_Confirm") {					      // EVENT REGISTRATION CONFIRMATION PAGE
+		// only for our SDD payment processors:
+		$pp = $form->getTemplate()->get_template_vars('paymentProcessor');
+		if ($pp['class_name'] != "Payment_SDD") return;
+
+		// FIXME: this is a gross hack, please help me if you know 
+		//    how to extract bank_bic and bank_iban variables properly...
+		$form_data = print_r($form,true);
+		$matches = array();
+		if (preg_match('/\[bank_bic\] => (?P<bank_bic>[\w0-9]+)/i', $form_data, $matches)) {
+			$form->assign("bank_bic",$matches[1]);
+		}
+		$matches = array();
+		if (preg_match('/\[bank_iban\] => (?P<bank_iban>[\w0-9]+)/i', $form_data, $matches)) {
+			$form->assign("bank_iban",$matches[1]);
+		}
+		unset($form_data);
+
+		CRM_Core_Region::instance('page-body')->add(array(
+		  'template' => 'CRM/Event/Form/RegistrationConfirm.sepa.tpl'));
+
+
 	} elseif ($formName == "CRM_Contribute_Form_Contribution_ThankYou") {					// PAYMENT PROCESS THANK YOU PAGE
 		// only for our SDD payment processors:
 		$pp = civicrm_api("PaymentProcessor", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
@@ -107,6 +130,27 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 
 		CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
 		  'template' => 'CRM/Contribute/Form/ContributionThankYou.sepa.tpl'));
+
+
+	} elseif ($formName == "CRM_Event_Form_Registration_ThankYou") {						// EVENT REGISTRATION THANK YOU PAGE
+		// only for our SDD payment processors:
+		$pp = $form->getTemplate()->get_template_vars('paymentProcessor');
+		if ($pp['class_name'] != "Payment_SDD") return;
+
+		$mandate_reference = $form->getTemplate()->get_template_vars('trxn_id');
+		if ($mandate_reference) {
+			$mandate      = civicrm_api3('SepaMandate',  'getsingle', array('reference' => $mandate_reference));
+			$creditor     = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $mandate['creditor_id']));
+			$contribution = civicrm_api3('Contribution', 'getsingle', array('trxn_id' => $mandate_reference));
+			$form->assign('mandate_reference',  $mandate_reference);
+			$form->assign("bank_iban",          $mandate["iban"]);
+			$form->assign("bank_bic",           $mandate["bic"]);
+			$form->assign("creditor_id",        $creditor['identifier']);
+			$form->assign("collection_date",    $contribution['receive_date']);
+		}
+
+		CRM_Core_Region::instance('page-body')->add(array(
+		  'template' => 'CRM/Event/Form/RegistrationThankYou.sepa.tpl'));
 	}
 }
 
@@ -131,6 +175,10 @@ function sepa_pp_postProcess( $formName, &$form ) {
 		}
 
 	} elseif ('CRM_Contribute_Form_Contribution_Confirm' == $formName) {
+		// post process the contributions created
+		CRM_Core_Payment_SDD::processPartialMandates();
+
+	} elseif ('CRM_Event_Form_Registration_Confirm' == $formName) {
 		// post process the contributions created
 		CRM_Core_Payment_SDD::processPartialMandates();
 	}
