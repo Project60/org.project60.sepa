@@ -189,8 +189,8 @@ class CRM_Sepa_Logic_Group {
       error_log("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
     }
 
-    // step 1.2: in CiviCRM pre 4.4.4, the status 'In Progress' => 'Completed' was not allowed:
-    if (CRM_Utils_System::version() < '4.4.4') {
+    // step 1.2: in CiviCRM before 4.4.4, the status 'In Progress' => 'Completed' was not allowed:
+    if (version_compare(CRM_Utils_System::version(), '4.4.4', '<')) {
       // therefore, we change all these contributions' statuses back to 'Pending'
       $fix_status_query = "
       UPDATE
