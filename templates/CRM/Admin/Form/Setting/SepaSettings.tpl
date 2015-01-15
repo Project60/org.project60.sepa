@@ -247,7 +247,7 @@
           minChars: 1,
           matchContains: true,
           delay: 400,
-          max: 1
+          max: 20
     }).result(function(event, data, formatted) {
          cj('#addcreditor_creditor_id').val(data[0]);
          cj('#add_creditor_id').val(data[1]);
