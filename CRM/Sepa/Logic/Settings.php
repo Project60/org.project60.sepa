@@ -122,6 +122,41 @@ class CRM_Sepa_Logic_Settings {
     return false;
   }
 
+  /**
+    * Gets the mandate of the given contribution
+    *
+    * @param contribution_id  ID of the contribution
+    * @return a map <mandate ID> => <mandate type> of all mandates (should be 0 or 1!), e.g. array(7 => 'OOFF')
+    */
+  public static function getMandateFor($contribution_id) {
+    $mandates = array();
+    $contribution_id = (int) $contribution_id;
+    if (empty($contribution_id)) return $mandates;
+    $sql_query = "
+    SELECT 
+      ooff.id AS ooff_id, ooff.type AS ooff_type, ooff.status AS ooff_status,
+      rcur.id AS rcur_id, rcur.type AS rcur_type, rcur.status AS rcur_status
+    FROM civicrm_contribution
+    LEFT JOIN civicrm_sdd_mandate ooff ON ooff.entity_id = civicrm_contribution.id AND ooff.entity_table = 'civicrm_contribution'
+    LEFT JOIN civicrm_sdd_mandate rcur ON rcur.entity_id = civicrm_contribution.contribution_recur_id AND rcur.entity_table = 'civicrm_contribution_recur'
+    WHERE civicrm_contribution.id = $contribution_id;";
+    $mandate_ids = CRM_Core_DAO::executeQuery($sql_query);
+
+    while ($mandate_ids->fetch()) {
+      if ($mandate_ids->ooff_id) {
+        $mandates[$mandate_ids->ooff_id] = 'OOFF';
+      } 
+      if ($mandate_ids->rcur_id) {
+        if ($mandate_ids->rcur_status == 'FRST') {
+          $mandates[$mandate_ids->rcur_id] = 'FRST';
+        } else {
+          $mandates[$mandate_ids->rcur_id] = 'RCUR';
+        }
+      } 
+    }
+    return $mandates;
+  }
+
 
   /**
    * Get a batching lock

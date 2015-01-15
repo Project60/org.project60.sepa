@@ -431,8 +431,6 @@ function sepa_civicrm_alterSettingsFolders(&$metaDataFolders = NULL){
 */
 function sepa_civicrm_navigationMenu(&$params) {
   $sepa_dashboard_url = 'civicrm/sepa';
-  //error_log(print_r($params,1));
-
   // see if it is already in the menu...
   $menu_item_search = array('url' => $sepa_dashboard_url);
   $menu_items = array();
@@ -478,4 +476,48 @@ function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissi
   $permissions['sepa_alternative_batching']['received'] = array('edit contributions');
   $permissions['sepa_logic']['received'] = array('edit contributions');
   $permissions['sepa_transaction_group']['toaccgroup'] = array('edit contributions');
+}
+
+
+/**
+ * CiviCRM validateForm hook
+ *
+ * make sure, people don't create (broken) payment with SDD payment instrument, but w/o mandates
+ */
+function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$errors ) {
+  if ($formName == 'CRM_Contribute_Form_Contribution') {
+    // we'll just focus on the payment_instrument_id 
+    if (empty($fields['payment_instrument_id'])) return;
+
+    // find the contribution id
+    $contribution_id = $form->getVar('_id');
+    if (empty($contribution_id)) return;
+
+    // find the attached mandate, if exists
+    $mandates = CRM_Sepa_Logic_Settings::getMandateFor($contribution_id);
+    if (empty($mandates)) {
+      // the contribution has no mandate, 
+      //   so we should not allow the payment_instrument be set to an SDD one
+      if (CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $fields['payment_instrument_id']))) {
+        $errors['payment_instrument_id'] = ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.");
+      }
+
+    } else {
+      // the contribution has a mandate which determines the payment instrument
+
+      // ..but first some sanity checks...
+      if (count($mandates) != 1) {
+        error_log("org.project60.sepa_dd: contribution [$contribution_id] has more than one mandate.");
+      }
+
+      // now compare requested with expected payment instrument
+      $mandate_id = key($mandates);
+      $mandate_pi = $mandates[$mandate_id];
+      $requested_pi = CRM_Core_OptionGroup::getValue('payment_instrument', $fields['payment_instrument_id'], 'value', 'String', 'name');
+
+      if ($requested_pi != $mandate_pi) {
+        $errors['payment_instrument_id'] = sprintf(ts("This contribution has a mandate, its payment instrument has to be '%s'"), $mandate_pi);
+      }
+    }
+  }
 }
