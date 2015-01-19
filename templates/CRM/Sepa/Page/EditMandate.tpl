@@ -17,7 +17,7 @@
 
 {if not $deleted_mandate}
 
-<h3>{if $contribution.cycle_day}{ts}SEPA Recurring Mandate{/ts}{else}{ts}SEPA Single Payment Mandate{/ts}{/if} [{$sepa.id}]</h3>	
+<h3>{if $contribution.cycle_day}{ts}SEPA Recurring Mandate{/ts}{else}{ts}SEPA Single Payment Mandate{/ts}{/if} [{$sepa.id}]</h3>
 <div class="crm-container">
     <div class="crm-block crm-content-block crm-sdd-mandate">
         <table class="crm-info-panel">
@@ -125,7 +125,7 @@
             </tr>
 
             <tr>
-                <td id='mandate_pdf_action' class="label" style="vertical-align: middle;"><a class="button" href="{crmURL p='civicrm/sepa/pdf' q="reset=1&pdfaction=print&id=$mandate_id"}">{ts}PDF Prenotification{/ts}</td>
+                <td id='mandate_pdf_action' class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_create_pdf();">{ts}PDF Prenotification{/ts}</td>
                 <td>
                     {ts}Will generate a Prenotification PDF with this mandate's data.{/ts}
                 </td>
@@ -140,6 +140,10 @@ end_date_message = "{ts}You need to specify a date!{/ts}";
 replace_url = "{crmURL p="civicrm/sepa/cmandate" q="replace=$mandate_id"}";
 
 {literal}
+function mandate_action_create_pdf() {
+  window.open({/literal}'{crmURL p='civicrm/sepa/pdf' h=0 q="reset=1&pdfaction=print&id=$mandate_id"}'{literal}, '_blank');
+}
+
 function mandate_action_delete() {
 	cj("#mandate_action_value").val('delete');
 	cj("#sepa_action_form").submit();
