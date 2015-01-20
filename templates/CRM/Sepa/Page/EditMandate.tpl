@@ -129,6 +129,17 @@
                 <td>
                     {ts}Will generate a Prenotification PDF with this mandate's data.{/ts}
                 </td>
+                <td>
+                  {if !empty($sepa_templates)}
+                  <select id="sepa_tpl_select" style="">
+                    {foreach from=$sepa_templates item=item}
+                    <option value="{$item[0]}">{$item[1]}</option>
+                    {/foreach}
+                  </select>
+                  <a id='template_help' style="float: right;" onclick='CRM.help("{ts}Template{/ts}", {literal}{"id":"id-template-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
+
+                  {/if}
+                </td>
             </tr>
         </table>
 	</div>
@@ -141,7 +152,8 @@ replace_url = "{crmURL p="civicrm/sepa/cmandate" q="replace=$mandate_id"}";
 
 {literal}
 function mandate_action_create_pdf() {
-  window.open({/literal}'{crmURL p='civicrm/sepa/pdf' h=0 q="reset=1&pdfaction=print&id=$mandate_id"}'{literal}, '_blank');
+  var selected_template = cj("#sepa_tpl_select").val();
+  window.open({/literal}'{crmURL p='civicrm/sepa/pdf' h=0 q="reset=1&pdfaction=print&id=$mandate_id"}'{literal} + '&tpl=' + selected_template, '_blank');
 }
 
 function mandate_action_delete() {

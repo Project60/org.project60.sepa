@@ -109,10 +109,32 @@ function sepa_civicrm_install() {
 
   //add the required option groups
   sepa_civicrm_install_options(sepa_civicrm_options());
+  // add all required message templates
+  sepa_install_msg_templates();
 
   return _sepa_civix_civicrm_install();
 }
 
+function sepa_install_msg_templates() {
+  $name = "sepa_mandate_pdf";
+  $group = "msg_tpl_workflow_contribution";
+  $tpl= civicrm_api('OptionValue', 'getsingle', array('version' => 3,'option_group_name' => $group,'name'=>$name));
+  if (array_key_exists("is_error",$tpl)) {
+    $grp= civicrm_api('OptionGroup', 'getsingle', array('version' => 3,'name'=>$group));
+    $tpl= civicrm_api('OptionValue', 'create', array('version' => 3,'option_group_id' => $grp["id"],'name'=>$name,"label"=>$name));
+  }
+
+  $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
+  if (array_key_exists("is_error",$msg)) {
+    $msg =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
+          "msg_title"=>$name,
+          "msg_subject"=>$name,
+          "is_reserved"=>0,
+          "msg_html"=> file_get_contents(__DIR__ . "/msg_template/$name.html"),
+          "msg_text"=>"N/A"
+          ));
+  };
+}
 
 function sepa_civicrm_install_options($data) {
   foreach ($data as $groupName => $group) {

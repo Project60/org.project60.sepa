@@ -79,7 +79,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $contact2 = civicrm_api("Contact", "getsingle", array('id'=>$contribution['contact_id'], 'version'=>3));
       if (isset($contact2['is_error']) && $contact2['is_error']) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $contact2, $contact2['error_message']), ts('Error'), 'error');
-      }      
+      }
     }
 
     // load the creditor
@@ -130,11 +130,28 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $contribution['amount'] = CRM_Utils_Money::format($contribution['total_amount'], 'EUR');
     }
 
+    // load template ids
+    $tpl_ids = array();
+    $query = "SELECT `id`, `msg_title`, `msg_subject`
+              FROM `civicrm_msg_template`
+              WHERE `is_active` = 1
+              AND (`msg_title` LIKE 'sepa_mandate_%' OR `msg_title` LIKE 'SEPA%');";
+
+    $result = CRM_Core_DAO::executeQuery($query);
+    while ($result->fetch()) {
+      if($result->msg_subject == "sepa_mandate_pdf") {
+        $tpl_ids[] = array($result->id, ts("standard template"));
+      }else{
+        $tpl_ids[] = array($result->id, $result->msg_subject);
+      }
+    }
+
     $this->assign('sepa', $mandate);
     $this->assign('contribution', $contribution);
     $this->assign('contact1', $contact1);
     $this->assign('contact2', $contact2);
     $this->assign('can_delete', CRM_Core_Permission::check('administer CiviCRM'));
+    $this->assign('sepa_templates', $tpl_ids);
 
     parent::run();
   }
