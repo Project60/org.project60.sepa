@@ -30,23 +30,48 @@ class CRM_Utils_SepaOptionGroupTools {
   public static function checkRecurringFrequencyUnits($reset = FALSE, $warning = TRUE) {
     // compare option group values
     $checkUnits = array('month', 'year');
-    $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
+
+    // get group id
+    $params = array(
+      'name' => 'recur_frequency_units',
+    );
+    $result = civicrm_api3('OptionGroup', 'get', $params);
+    if(isset($result['is_error']) && $result['is_error'] != 0) {
+      error_log(sprintf("org.project60.sepa_dd: option group '%s' does not exist.",
+      $params['name']));
+      return;
+    }
+    $oid = $result['id'];
+
+    // get all values
+    $params = array(
+      'option.limit' => 99999,
+      'option_group_id' => $oid,
+    );
+    $result = civicrm_api3('OptionValue', 'get', $params);
+    if(isset($result['is_error']) && $result['is_error'] != 0) {
+      error_log(sprintf("org.project60.sepa_dd: could not retrieve values of group '%d'.",
+      $oid));
+      return;
+    }
+    $frequencyUnits = $result['values'];
 
     foreach($checkUnits as $c) {
-      if (array_key_exists($c, $frequencyUnits)) {
-        if($frequencyUnits[$c] != $c) {
+      foreach($frequencyUnits as $f) {
+        if($c == $f['name'] && ($f['label'] != $c || $f['value'] != $c)) {
           error_log(sprintf("org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']",
           $c,
-          $frequencyUnits[$c]));
+          $f['label']));
 
           if ($reset) {
-            $query = "UPDATE civicrm_option_value v,
-                             civicrm_option_group g
-                      SET v.label = '{$c}'
-                      WHERE  v.option_group_id = g.id
-                      AND    g.name            = 'recur_frequency_units'
-                      AND v.value = '{$c}';";
-            CRM_Core_DAO::singleValueQuery($query);
+            $params = array(
+              'option_group_id' => $oid,
+              'name' => $c,
+              'label' => $c,
+              'value' => $c,
+              'id' => $f['id']
+            );
+            $result = civicrm_api3('OptionValue', 'create', $params);
 
             if($warning) {
               CRM_Core_Session::setStatus(sprintf(ts("org.project60.sepa_dd: resetting label '%s' of option group 'recur_frequency_units' to '%s'"), $c, $c), ts('Warning'), 'warn');
