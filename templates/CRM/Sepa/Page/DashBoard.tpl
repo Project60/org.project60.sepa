@@ -71,7 +71,10 @@
   <tr bgcolor="#FF0000" class="status_{$group.status_id} submit_{$group.submit}" data-id="{$group.id}" data-type="{$group.type}">
 
     <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
-    <td>{$group.status_label}</td>
+    <td>
+      {$group.status_label}
+      <img id="busy_{$group_id}" height="16" src="{$config->resourceBase}i/loading.gif" style="float: right; padding: 0px 4px;" hidden="1" />
+    </td>
     <td>{$group.type}</td>
   {if $status eq 'closed'}
     <td>{$group.file_created_date}</td>
@@ -94,7 +97,7 @@
         <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}.xml" class="button button_export">{ts}Download Again{/ts}</a>
         {if $closed_status_id eq $group.status_id}
           {if $group.collection_date|strtotime lt $smarty.now}
-            <a onClick="mark_received({$group_id});" class="button button_export">{ts}Mark Received{/ts}</a>
+            <a id="mark_received_{$group_id}" onClick="mark_received({$group_id});" class="button button_export">{ts}Mark Received{/ts}</a>
           {/if}
         {/if}
       {/if}
@@ -121,6 +124,8 @@ var received_confirmation_message = "{ts}Do you really want to mark this groups 
 {literal}
 function mark_received(group_id) {
   if (confirm(received_confirmation_message)) {
+    cj("#mark_received_" + group_id).hide();
+    cj("#busy_" + group_id).show();
     CRM.api('SepaAlternativeBatching', 'received', {'q': 'civicrm/ajax/rest', 'txgroup_id': group_id},
       {success: function(data) {
         // reload page
@@ -128,6 +133,7 @@ function mark_received(group_id) {
       },
        error: function(data) {
         // show error message
+        cj("#busy_" + group_id).hide();
         alert(data.error_message.error_message);
       }}
     );    
