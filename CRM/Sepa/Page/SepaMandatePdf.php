@@ -26,30 +26,16 @@ require_once 'api/class.api.php';
 class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
   /* get the template message, if not exist, creates it */
-  function getMessage ($name,$group="msg_tpl_workflow_contribution",$file = null) {
-    $tpl= civicrm_api('OptionValue', 'getsingle', array('version' => 3,'option_group_name' => $group,'name'=>$name));
-    if (array_key_exists("is_error",$tpl)) {
-      $grp= civicrm_api('OptionGroup', 'getsingle', array('version' => 3,'name'=>$group));
-      $tpl= civicrm_api('OptionValue', 'create', array('version' => 3,'option_group_id' => $grp["id"],'name'=>$name,"label"=>$name));
-    }
+  function getMessage ($id) {
+     $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"id"=>$id));
+     if (array_key_exists("is_error",$msg)) {
+       return CRM_Core_Error::fatal(sprintf(ts("The selected message template does not exist (%d)"), $id));
+     };
 
-    $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
-    if (array_key_exists("is_error",$msg)) {
-      $msg =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
-            "msg_title"=>$name,
-            "msg_subject"=>$name,
-            "is_reserved"=>0,
-            "msg_html"=> file_get_contents(__DIR__ . "/../../../msg_template/$name.html"),
-            "msg_text"=>"N/A"
-            ));
-    };
     return $msg;
-  
   }
 
-
-
-  function generateHTML($mandate) {
+  function generateHTML($mandate, $template_id) {
     if (is_array($mandate)) {
        $mandate= json_decode(json_encode($mandate), FALSE);
     }
@@ -75,7 +61,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         return CRM_Core_Error::fatal("We don't know how to handle mandates for ".$mandate->entity_table);
     }
 
-    $msg = $this->getMessage("sepa_mandate_pdf");
+    $msg = $this->getMessage($template_id);
     CRM_Utils_System::setTitle($msg["msg_title"]  ." ". $mandate->reference);
     $this->assign("contact",(array) $this->contact);
     $this->assign("contactId",$this->contact->contact_id);
@@ -88,13 +74,13 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     $api->SepaCreditor->getsingle(array('id' => $mandate->creditor_id, 'api.PaymentProcessor.getsingle' => array('id' => '$value.payment_processor_id')));
     if (isset($api->result->{'api.PaymentProcessor.getsingle'})) {
       $pp = $api->result->{'api.PaymentProcessor.getsingle'};
-      $this->assign("creditor",$pp->user_name);      
+      $this->assign("creditor",$pp->user_name);
     }
 
     $this->html = $this->getTemplate()->fetch("string:".$msg["msg_html"]);
   }
 
-  function generatePDF($send =false) {
+  function generatePDF($send = FALSE, $template_id) {
     require_once 'CRM/Utils/PDF/Utils.php';
     $fileName = $this->mandate->reference.".pdf";
     if ($send) {
@@ -122,14 +108,14 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
           'cleanName' => $fileName,
           );
       ;
-      $mail = $this->getMessage("sepa_mandate");
+      $mail = $this->getMessage($template_id);
       $params['text'] = "this is the mandate, please return signed";
       $params['html'] = $this->getTemplate()->fetch("string:".$mail["msg_html"]);
       CRM_Utils_Mail::send($params);
 //      CRM_Core_Session::setStatus(ts("Mail sent"));
     }  else {
       CRM_Utils_PDF_Utils::html2pdf( $this->html, $fileName, false, null );
-    } 
+    }
   }
 
   function run() {
@@ -137,11 +123,12 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     $api = $this->api;
     $id = (int)CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $reference = CRM_Utils_Request::retrieve('ref', 'String', $this);
+    $template = (int)CRM_Utils_Request::retrieve('tpl', 'Positive', $this, TRUE);
     //TODO: once debugged, force POST, not GET
     $action = CRM_Utils_Request::retrieve('pdfaction', 'String', $this);
     if ($id>0) {
       $api->SepaMandate->get($id);
-    } elseif ($reference){ 
+    } elseif ($reference){
       $api->SepaMandate->get(array("reference"=>$reference));
     } else {
       CRM_Core_Error::fatal("missing parameter. you need id or ref of the mandate");
@@ -151,17 +138,42 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       CRM_Core_Error::fatal($api->errorMsg());
       return;
     }
-    $this->generateHTML ($api->values[0]);
+    $this->generateHTML ($api->values[0], $template);
     if (!$action) {
       $this->assign("html",$this->html);
       parent::run();
       return;
     }
     if ($action != "email") {
-      $this->generatePDF (false);
+      $this->generatePDF (false, $template);
       CRM_Utils_System::civiExit();
-    } 
-    $this->generatePDF (true);
+    }
+    $this->generatePDF (true, $template);
   }
 
+  /**
+   * Install SEPA's default message template, if not yet installed
+   *
+   * @author X+
+   */
+  static function installMessageTemplate() {
+    $name = "sepa_mandate_pdf";
+    $group = "msg_tpl_workflow_contribution";
+    $tpl= civicrm_api('OptionValue', 'getsingle', array('version' => 3,'option_group_name' => $group,'name'=>$name));
+    if (array_key_exists("is_error",$tpl)) {
+      $grp= civicrm_api('OptionGroup', 'getsingle', array('version' => 3,'name'=>$group));
+      $tpl= civicrm_api('OptionValue', 'create', array('version' => 3,'option_group_id' => $grp["id"],'name'=>$name,"label"=>$name));
+    }
+
+    $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
+    if (array_key_exists("is_error",$msg)) {
+      $msg =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
+            "msg_title"=>$name,
+            "msg_subject"=>$name,
+            "is_reserved"=>0,
+            "msg_html"=> file_get_contents(__DIR__ . "/msg_template/$name.html"),
+            "msg_text"=>"N/A"
+            ));
+    };
+  }
 }
