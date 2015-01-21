@@ -20,12 +20,17 @@
 class CRM_Utils_SepaOptionGroupTools {
 
   /**
-   * This method provides a workaround for issue #225
-   * (https://github.com/Project60/sepa_dd/issues/225)
+   * This method provides a workaround for CRM-14114
+   * SEPA-225 (https://github.com/Project60/sepa_dd/issues/225)
    *
-   * Checks labels of recurring frequency units and resets them if necessary
-   * @param $reset boolean resets altered labels to standard values
-   * @param $warning boolean displays a warning if a label has been reset
+   * The problem is, that in current CiviCRM versions, payment processors
+   * write recurring interval _labels_ into the frequency_unit field of 
+   * contribution_recur. This is very wrong, since this value is translated!
+   * 
+   * As a workaround, we check the labels of recurring frequency units and reset them if necessary
+   *
+   * @param $reset    boolean  resets altered labels to standard values
+   * @param $warning  boolean  displays a warning if a label has been reset
    */
   public static function checkRecurringFrequencyUnits($reset = FALSE, $warning = TRUE) {
     // compare option group values
@@ -36,55 +41,65 @@ class CRM_Utils_SepaOptionGroupTools {
       'name' => 'recur_frequency_units',
     );
     $result = civicrm_api3('OptionGroup', 'get', $params);
-    if(isset($result['is_error']) && $result['is_error'] != 0) {
-      error_log(sprintf("org.project60.sepa_dd: option group '%s' does not exist.",
-      $params['name']));
+    if(!empty($result['is_error'])) {
+      $message = sprintf("Option group '%s' does not exist. Error was: %s", $params['name'], $result['error_message']);
+      error_log("org.project60.sepa_dd: ".$message);
+      if($warning) {
+        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+      }
       return;
     }
     $oid = $result['id'];
 
+
     // get all values
     $params = array(
-      'option.limit' => 99999,
+      'option.limit'    => 99999,
       'option_group_id' => $oid,
     );
     $result = civicrm_api3('OptionValue', 'get', $params);
-    if(isset($result['is_error']) && $result['is_error'] != 0) {
-      error_log(sprintf("org.project60.sepa_dd: could not retrieve values of group '%d'.",
-      $oid));
+    if(!empty($result['is_error'])) {
+      $message = sprintf("Could not retrieve values of group '%d'. Error was: %s", $oid, $result['error_message']);
+      error_log("org.project60.sepa_dd: ".$message);
+      if($warning) {
+        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+      }
       return;
     }
     $frequencyUnits = $result['values'];
 
+    // check all the values for
     foreach($checkUnits as $c) {
       foreach($frequencyUnits as $f) {
         if($c == $f['name'] && ($f['label'] != $c || $f['value'] != $c)) {
-          error_log(sprintf("org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']",
-          $c,
-          $f['label']));
+          error_log(sprintf("org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']", $c, $f['label']));
 
           if ($reset) {
             $params = array(
               'option_group_id' => $oid,
-              'name' => $c,
-              'label' => $c,
-              'value' => $c,
-              'id' => $f['id']
+              'name'            => $c,
+              'label'           => $c,
+              'value'           => $c,
+              'id'              => $f['id']
             );
             $result = civicrm_api3('OptionValue', 'create', $params);
-
-            if($warning) {
-              CRM_Core_Session::setStatus(sprintf(ts("org.project60.sepa_dd: resetting label '%s' of option group 'recur_frequency_units' to '%s'"), $c, $c), ts('Warning'), 'warn');
+            if(!empty($result['is_error'])) {
+              $message = sprintf("Could not reset option value [%d] ('%s'). Error was: %s", $f['id'], $c, $result['error_message']);
+              error_log("org.project60.sepa_dd: ".$message);
+              if($warning) {
+                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+              }
+              // FIXME: why not try again? return;
+            } else {
+              $message = sprintf("Label '%s' of option group 'recur_frequency_units' reset to '%s'", $c, $c);
+              error_log("org.project60.sepa_dd: ".$message);
+              if($warning) {
+                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+              }
             }
-
-            error_log(sprintf("org.project60.sepa_dd: resetting label '%s' of option group 'recur_frequency_units' to '%s'",
-            $c,
-            $c));
           }
-
         }
       }
     }
-
   }
 }
