@@ -40,7 +40,7 @@ class CRM_Utils_SepaOptionGroupTools {
     $params = array(
       'name' => 'recur_frequency_units',
     );
-    $result = civicrm_api3('OptionGroup', 'get', $params);
+    $result = civicrm_api3('OptionGroup', 'getsingle', $params);
     if(!empty($result['is_error'])) {
       $message = sprintf("Option group '%s' does not exist. Error was: %s", $params['name'], $result['error_message']);
       error_log("org.project60.sepa_dd: ".$message);
