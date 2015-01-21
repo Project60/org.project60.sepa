@@ -151,4 +151,29 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     $this->generatePDF (true, $template);
   }
 
+  /**
+   * Install SEPA's default message template, if not yet installed
+   *
+   * @author X+
+   */
+  static function installMessageTemplate() {
+    $name = "sepa_mandate_pdf";
+    $group = "msg_tpl_workflow_contribution";
+    $tpl= civicrm_api('OptionValue', 'getsingle', array('version' => 3,'option_group_name' => $group,'name'=>$name));
+    if (array_key_exists("is_error",$tpl)) {
+      $grp= civicrm_api('OptionGroup', 'getsingle', array('version' => 3,'name'=>$group));
+      $tpl= civicrm_api('OptionValue', 'create', array('version' => 3,'option_group_id' => $grp["id"],'name'=>$name,"label"=>$name));
+    }
+
+    $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
+    if (array_key_exists("is_error",$msg)) {
+      $msg =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
+            "msg_title"=>$name,
+            "msg_subject"=>$name,
+            "is_reserved"=>0,
+            "msg_html"=> file_get_contents(__DIR__ . "/msg_template/$name.html"),
+            "msg_text"=>"N/A"
+            ));
+    };
+  }
 }

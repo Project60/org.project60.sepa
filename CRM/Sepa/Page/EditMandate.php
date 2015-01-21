@@ -79,7 +79,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $contact2 = civicrm_api("Contact", "getsingle", array('id'=>$contribution['contact_id'], 'version'=>3));
       if (isset($contact2['is_error']) && $contact2['is_error']) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $contact2, $contact2['error_message']), ts('Error'), 'error');
-      }
+      }      
     }
 
     // load the creditor
