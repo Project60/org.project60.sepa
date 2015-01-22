@@ -118,7 +118,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       // this is a recurring contribution
       $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
       $contribution['amount'] = CRM_Utils_Money::format($contribution['amount'], 'EUR');
-      $contribution['cycle'] = sprintf(ts("every %d %s"), $contribution['frequency_interval'], ts($contribution['frequency_unit'])); 
+      $contribution['cycle'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($contribution['frequency_interval'], $contribution['frequency_unit'], true);
       if (isset($contribution['end_date']) && $contribution['end_date']) {
         $contribution['default_end_date'] = date('Y-m-d', strtotime($contribution['end_date']));
       } else {
