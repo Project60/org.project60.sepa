@@ -178,6 +178,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // extract the reference id from the create mandate reply
     $this->assign("reference", $mandate['values'][$mandate['id']]['reference']);
+    $this->assign("mandate_url", CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}"));
   }
 
 

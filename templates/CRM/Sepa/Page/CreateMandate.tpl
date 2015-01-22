@@ -186,15 +186,15 @@
 		<p>{$error_message}</p>
 	{else}
 		<h2>{ts}Mandate successfully created.{/ts}<br/>
-		{ts}Reference is{/ts}: {$reference}</h2>
+		{ts}Reference is{/ts}: <font face="Courier New, monospace">{$reference}</font></h2>
 	{/if}
 	<br/><br/>
-	<a href="{$back_url}" class="back button" title="{ts}back{/ts}">
-    	<span>
-    		<div class="icon back-icon"></div>
-    		{ts}view{/ts}
-    	</span>
-    </a>
+	<a href="{$back_url}" class="view button" title="{ts}back to contact{/ts}">
+		<span><div class="icon preview-icon"></div>{ts}view contact{/ts}</span>
+	</a>
+	<a href="{$mandate_url}" class="view button" title="{ts}view mandate{/ts}">
+		<span><div class="icon preview-icon"></div>{ts}view mandate{/ts}</span>
+	</a>
 {/if}
 
 
