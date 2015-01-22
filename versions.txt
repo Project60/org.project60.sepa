@@ -7,6 +7,7 @@ Version 1.0.1
 - FIX: misplaced Dashboard link (https://github.com/Project60/sepa_dd/issues/195)
 - FIX: misplaced 'record SEPA contribution' button (https://github.com/Project60/sepa_dd/issues/214)
 - FIX: parallel update issues (https://github.com/Project60/sepa_dd/issues/213)
+- FIX: invalid group names (https://github.com/Project60/sepa_dd/issues/244)
 
 
 Version 1.0
