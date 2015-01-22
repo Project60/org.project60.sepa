@@ -25,9 +25,11 @@ require_once 'api/class.api.php';
 
 class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
-  /* get the template message, if not exist, creates it */
+  /**
+   * Lookup and get a message template
+   */
   function getMessage ($id) {
-     $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"id"=>$id));
+     $msg = civicrm_api('MessageTemplate','getSingle',array("version"=>3,"id"=>$id));
      if (array_key_exists("is_error",$msg)) {
        return CRM_Core_Error::fatal(sprintf(ts("The selected message template does not exist (%d)"), $id));
      };
@@ -35,54 +37,111 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     return $msg;
   }
 
+  function addContactTokens($contact_id, $variable_name) {
+    if (empty($contact_id)) return;
+
+    // use the API to load a extensive contact information bulk
+    $contact = civicrm_api('Contact', 'getsingle', array('id'=>$contact_id, 'version'=>3));
+
+    // ... add some missing fields
+    $bao = new CRM_Contact_BAO_Contact();
+    $bao->get('id', $contact_id);
+    $contact['postal_greeting_display'] = $bao->postal_greeting_display;
+    $contact['email_greeting_display']  = $bao->email_greeting_display;
+    $contact['addressee_display']       = $bao->addressee_display;
+    
+    if (empty($contact['is_error'])) {
+      $this->assign($variable_name, $contact);
+    }
+  }
+
   /**
    * generate the HTML text, and assign all the required variables (tokens)
    * this is a precondition for PDF generation as well as emails
    */
   function generateHTML($mandate, $template_id) {
-    if (is_array($mandate)) {
-       $mandate= json_decode(json_encode($mandate), FALSE);
-    }
-    $this->mandate = $mandate;
-    if (!isset($this->api))
-      $this->api = new civicrm_api3();
+    // init API wrapper object
+    if (!isset($this->api)) $this->api = new civicrm_api3();
     $api = $this->api;
 
+    
+    // LOAD INFORMATION and set tokens (smarty variables)
+
+    // fix mandate. @X+: Why?
+    if (is_array($mandate)) {
+      $mandate = json_decode(json_encode($mandate), FALSE);
+    }
+    $this->mandate = $mandate;
+    $this->assign("sepa",    (array) $mandate);
+    $this->assign("mandate", (array) $mandate);
+
+    // load the associated contribution
     switch ($mandate->entity_table) {
       case "civicrm_contribution_recur":
         $api->ContributionRecur->getsingle(array("id"=>$mandate->entity_id));
-        $recur=$api->result;
-        $api->Contact->getsingle(array("id"=>$recur->contact_id));
-        $this->contact=$api->result;
+        $recur = $api->result;
+        $this->assign("recur", (array) $recur);
+        $this->assign("contactId", $recur->contact_id);
+        $this->addContactTokens($recur->contact_id, 'contact');
+
+        // first_conttribution
+        if (!empty($mandate->first_contribution_id)) {
+          $api->Contribution->getsingle(array("id"=>$mandate->first_contribution_id));
+          $this->assign("first_contribution", (array) $api->result);
+        }
+
+        // some more extra information:
+        $recur_extra = array();
+        $recur_extra['frequency_text'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($recur->frequency_interval, $recur->frequency_unit, false);
+        $recur_extra['frequency_text_l10n'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($recur->frequency_interval, $recur->frequency_unit, true);
+        $recur_extra['yearly_amount'] = $recur->amount;
+        if ($recur->frequency_unit == 'month') {
+          $recur_extra['yearly_amount'] = $recur_extra['yearly_amount'] * (12/$recur->frequency_interval);
+        } elseif ($recur->frequency_unit == 'year') {
+          $recur_extra['yearly_amount'] = $recur_extra['yearly_amount'] / $recur->frequency_interval;
+        } else {
+          // we don't support other units
+          unset($recur_extra['yearly_amount']);
+        }
+        $this->assign("recur_extra", (array) $recur_extra);
+
         break;
       case "civicrm_contribution":
         $api->Contribution->getsingle(array("id"=>$mandate->entity_id));
-        $contribution=$api->result;
-        $api->Contact->getsingle(array("id"=>$contribution->contact_id));
-        $this->contact=$api->result;
+        $contribution = $api->result;
+        $this->assign("contribution", (array) $contribution);
+        $this->assign("contactId", $contribution->contact_id);
+        $this->addContactTokens($contribution->contact_id, 'contact');
         break;
       default:
         return CRM_Core_Error::fatal("We don't know how to handle mandates for ".$mandate->entity_table);
     }
 
-    $msg = $this->getMessage($template_id);
-    CRM_Utils_System::setTitle($msg["msg_title"]  ." ". $mandate->reference);
-    $this->assign("contact",(array) $this->contact);
-    $this->assign("contactId",$this->contact->contact_id);
-    $this->assign("sepa",(array) $mandate);
-    if (isset($recur))
-      $this->assign("recur",(array) $recur);
-    if (isset($contribution))
-      $this->assign("contribution",(array) $contribution);
+    // add creditor information
+    $api->SepaCreditor->getsingle(array('id' => $mandate->creditor_id));
+    $creditor = $api->result;
+    $this->assign("mandate_creditor", $creditor);
 
-    $api->SepaCreditor->getsingle(array('id' => $mandate->creditor_id, 'api.PaymentProcessor.getsingle' => array('id' => '$value.payment_processor_id')));
-    if (isset($api->result->{'api.PaymentProcessor.getsingle'})) {
-      $pp = $api->result->{'api.PaymentProcessor.getsingle'};
-      $this->assign("creditor",$pp->user_name);
+    // add payment processor information
+    $api->PaymentProcessor->getsingle(array('id' => $creditor->payment_processor_id));
+    if (isset($api->$result)) {
+      $this->assign("payment_processor", $api->$result);
+      // LEGACY: set 'creditor' to the following (@X+: why?)
+      $this->assign("creditor", $api->$result->user_name);
     }
 
+    // set some more basic information
+    $this->addContactTokens($mandate->contact_id,                         'mandate_contact');
+    $this->addContactTokens($creditor->creditor_id,                       'creditor_contact');
+    $this->addContactTokens(CRM_Core_Session::singleton()->get('userID'), 'user');
+
+    // Load the template and run SMARTY
+    $msg = $this->getMessage($template_id);
+    CRM_Utils_System::setTitle($msg["msg_title"]  ." ". $mandate->reference);
     $this->html = $this->getTemplate()->fetch("string:".$msg["msg_html"]);
   }
+
+
 
   function generatePDF($send = FALSE, $template_id) {
     require_once 'CRM/Utils/PDF/Utils.php';

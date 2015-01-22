@@ -102,4 +102,43 @@ class CRM_Utils_SepaOptionGroupTools {
       }
     }
   }
+
+  /**
+   * Offers a textual representation for the donation interval
+   *
+   * @param unit      unit of time: 'month' or 'year'
+   * @param interval  payment interval, like 1 or 6
+   * @param ts        set to true, if you want a localised version
+   */
+  public static function getFrequencyText($interval, $unit, $ts=false) {
+    if ($unit == 'month') {
+      if ($interval == 1) {
+        return $ts?ts('monthly'):'monthly';
+      } elseif ($interval == 3) {
+        return $ts?ts('quarterly'):'quarterly';
+      } elseif ($interval == 6) {
+          return $ts?ts('semi-annually'):'semi-annually';
+      } elseif ($interval == 12) {
+        return $ts?ts('annually'):'annually';
+      } else {
+        if ($ts) {
+          return sprintf(ts("every %1 months"), $interval);
+        } else {
+          return sprintf("every %1 months", $interval);
+        }
+      }
+    } elseif ($unit == 'year') {
+      if ($interval == 1) {
+        return $ts?ts('annually'):'annually';
+      } else {
+        if ($ts) {
+          return sprintf(ts("every %1 years"), $interval);
+        } else {
+          return sprintf("every %1 years", $interval);
+        }
+      }
+    } else {
+      return $ts?ts('on an irregular basis'):'on an irregular basis';
+    }
+  }
 }
