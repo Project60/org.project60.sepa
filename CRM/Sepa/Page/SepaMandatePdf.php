@@ -106,6 +106,9 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         $this->assign("recur_extra", (array) $recur_extra);
 
         break;
+
+
+
       case "civicrm_contribution":
         $api->Contribution->getsingle(array("id"=>$mandate->entity_id));
         $contribution = $api->result;
@@ -123,11 +126,15 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     $this->assign("mandate_creditor", $creditor);
 
     // add payment processor information
-    $api->PaymentProcessor->getsingle(array('id' => $creditor->payment_processor_id));
-    if (isset($api->$result)) {
-      $this->assign("payment_processor", $api->$result);
-      // LEGACY: set 'creditor' to the following (@X+: why?)
-      $this->assign("creditor", $api->$result->user_name);
+    if (!empty($recur->payment_processor_id))        $payment_processor_id = $recur->payment_processor_id;
+    if (!empty($contribution->payment_processor_id)) $payment_processor_id = $contribution->payment_processor_id;
+    if (!empty($payment_processor_id)) {
+      $api->PaymentProcessor->getsingle(array('id' => $payment_processor_id));
+      if (isset($api->$result)) {
+        $this->assign("payment_processor", $api->$result);
+        // LEGACY: set 'creditor' to the following (@X+: why?)
+        $this->assign("creditor", $api->$result->user_name);
+      }
     }
 
     // set some more basic information
