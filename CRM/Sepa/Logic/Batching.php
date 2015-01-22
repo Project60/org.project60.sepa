@@ -380,7 +380,7 @@ class CRM_Sepa_Logic_Batching {
         $counter = 0;
         while (self::referenceExists($reference)) {
           $counter += 1;
-          $reference = "TXG-${creditor_id}-${mode}-${collection_date}_".$counter;
+          $reference = "TXG-${creditor_id}-${mode}-${collection_date}--".$counter;
         }
 
         $group = civicrm_api('SepaTransactionGroup', 'create', array(
