@@ -83,7 +83,7 @@
   {/if}
     <td>{$group.collection_date}</td>
     <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
-    <td>{$group.total} &euro;</td>
+    <td style="white-space:nowrap;">{$group.total|crmMoney}</td>
     <td>
       <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts}Contributions{/ts}</a>
       {if $group.status == 'open'}

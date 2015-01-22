@@ -27,7 +27,7 @@
 		{foreach from=$contributions item=contribution}
 		<tr>
 			<td><a href="{$contribution.contribution_link}">[{$contribution.contribution_id}]</a></td>
-			<td align="right"><a href="{$contribution.contribution_link}"><b>{$contribution.contribution_amount_str}</b></a></td>
+			<td style="text-align: right;"><a href="{$contribution.contribution_link}"><b>{$contribution.contribution_amount_str}</b></a></td>
 			<td>&nbsp;</td>
 			<td><a href="{$contribution.contact_link}"><div class="icon crm-icon {$contribution.contact_type}-icon"></div>{$contribution.contact_display_name}</a></td>
 			<td>{$contribution.financial_type}</td>
