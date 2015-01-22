@@ -127,18 +127,19 @@
             <tr>
                 <td id='mandate_pdf_action' class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_create_pdf();">{ts}PDF Prenotification{/ts}</td>
                 <td>
-                    {ts}Will generate a Prenotification PDF with this mandate's data.{/ts}
-                </td>
-                <td>
-                  {if !empty($sepa_templates)}
-                  <select id="sepa_tpl_select" style="">
-                    {foreach from=$sepa_templates item=item}
-                    <option value="{$item[0]}">{$item[1]}</option>
-                    {/foreach}
-                  </select>
-                  <a id='template_help' style="float: right;" onclick='CRM.help("{ts}Template{/ts}", {literal}{"id":"id-template-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
-
-                  {/if}
+                    {ts}Will generate a Prenotification PDF with this mandate's data.{/ts}                    
+                    <br/>
+                    {if !empty($sepa_templates)}
+                    {ts}Select the template to be used:{/ts}<a id='template_help' onclick='CRM.help("{ts}Template{/ts}", {literal}{"id":"id-template-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
+                    &nbsp;
+                    <select id="sepa_tpl_select" style="">
+                        {foreach from=$sepa_templates item=item}
+                        <option value="{$item[0]}">{$item[1]}</option>
+                        {/foreach}
+                    </select>
+                    {else}
+                    <strong>{ts}No suitable templates found! Reinstall the SEPA extensions and check your message templates.{/ts}</strong>
+                    {/if}
                 </td>
             </tr>
         </table>

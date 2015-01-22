@@ -107,13 +107,6 @@ function sepa_civicrm_install() {
   $sql = file_get_contents(dirname( __FILE__ ) .'/sql/sepa.sql', true);
   CRM_Utils_File::sourceSQLFile($config->dsn, $sql, NULL, true);
 
-  //add the required option groups
-  sepa_civicrm_install_options(sepa_civicrm_options());
-  
-  // add all required message templates
-  require_once 'CRM/Sepa/Page/SepaMandatePdf.php';
-  CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
-
   return _sepa_civix_civicrm_install();
 }
 
@@ -270,6 +263,13 @@ function sepa_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function sepa_civicrm_enable() {
+  //add/check the required option groups
+  sepa_civicrm_install_options(sepa_civicrm_options());
+  
+  // add all required message templates
+  require_once 'CRM/Sepa/Page/SepaMandatePdf.php';
+  CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
+
   // install/activate SEPA payment processor
   sepa_pp_install();
 

@@ -130,20 +130,21 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $contribution['amount'] = CRM_Utils_Money::format($contribution['total_amount'], 'EUR');
     }
 
-    // load template ids
+    // load eligeble templates
+    // first: the dafault template
+    $template_entry = civicrm_api('OptionValue', 'getsingle', array(
+                                  'version'           => 3,
+                                  'option_group_name' => 'msg_tpl_workflow_contribution',
+                                  'name'              => 'sepa_mandate_pdf'));
     $tpl_ids = array();
     $query = "SELECT `id`, `msg_title`, `msg_subject`
-              FROM `civicrm_msg_template`
-              WHERE `is_active` = 1
-              AND (`msg_title` LIKE 'sepa_mandate_%' OR `msg_title` LIKE 'SEPA%');";
-
+              FROM   `civicrm_msg_template`
+              WHERE  `is_active` = 1
+              AND (  (`workflow_id` = '{$template_entry['id']}')
+                  OR (`msg_title` LIKE 'SEPA%' AND `workflow_id` IS NULL) );";
     $result = CRM_Core_DAO::executeQuery($query);
     while ($result->fetch()) {
-      if($result->msg_subject == "sepa_mandate_pdf") {
-        $tpl_ids[] = array($result->id, ts("standard template"));
-      }else{
-        $tpl_ids[] = array($result->id, $result->msg_subject);
-      }
+      $tpl_ids[] = array($result->id, $result->msg_title);
     }
 
     $this->assign('sepa', $mandate);

@@ -35,6 +35,10 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     return $msg;
   }
 
+  /**
+   * generate the HTML text, and assign all the required variables (tokens)
+   * this is a precondition for PDF generation as well as emails
+   */
   function generateHTML($mandate, $template_id) {
     if (is_array($mandate)) {
        $mandate= json_decode(json_encode($mandate), FALSE);
@@ -154,26 +158,55 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
   /**
    * Install SEPA's default message template, if not yet installed
    *
-   * @author X+
+   * @author endres@systopia.de
    */
   static function installMessageTemplate() {
-    $name = "sepa_mandate_pdf";
-    $group = "msg_tpl_workflow_contribution";
-    $tpl= civicrm_api('OptionValue', 'getsingle', array('version' => 3,'option_group_name' => $group,'name'=>$name));
-    if (array_key_exists("is_error",$tpl)) {
-      $grp= civicrm_api('OptionGroup', 'getsingle', array('version' => 3,'name'=>$group));
-      $tpl= civicrm_api('OptionValue', 'create', array('version' => 3,'option_group_id' => $grp["id"],'name'=>$name,"label"=>$name));
-    }
+    $default_templates = array( "sepa_mandate"     => ts("SEPA default email template."),
+                                "sepa_mandate_pdf" => ts("SEPA default PDF template."));
 
-    $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
-    if (array_key_exists("is_error",$msg)) {
-      $msg =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
-            "msg_title"=>$name,
-            "msg_subject"=>$name,
-            "is_reserved"=>0,
-            "msg_html"=> file_get_contents(__DIR__ . "/msg_template/$name.html"),
-            "msg_text"=>"N/A"
-            ));
-    };
+    foreach ($default_templates as $template_name => $template_title) {
+      // find the template's entry in the option group
+      $template_entry = civicrm_api('OptionValue', 'getsingle', array(
+                                        'version'           => 3,
+                                        'option_group_name' => 'msg_tpl_workflow_contribution',
+                                        'name'              => $template_name));
+      if (!empty($template_entry['is_error'])) {
+        error_log("org.project60.sepa: OptionGroup 'msg_tpl_workflow_contribution' not properly populated. Reinstal extension. Error was: " . $template_entry['error_message']);
+        continue;
+      }
+
+      // find the template itself
+      $template = civicrm_api('MessageTemplate', 'get', array(
+                                        'version'           => 3,
+                                        'workflow_id'       => $template_entry['id']));
+
+      if (!empty($template['is_error'])) {
+        error_log("org.project60.sepa: Error while checking template '$template_name': ".$template['error_message']);
+      } else if ($template['count'] > 1) {
+        error_log("org.project60.sepa: There's multiple templates installed for '$template_name'.");
+      } else if ($template['count'] == 1) {
+        error_log("org.project60.sepa: Template '$template_name' seems to be correctly installed. Not updated.");
+      } else {
+        // template not yet installed, do it!
+        $filepath = __DIR__ . "/../../../templates/Sepa/DefaultMessageTemplates/$template_name.html";
+        if (!file_exists($filepath)) {
+          error_log("org.project60.sepa: Couldn't find default template date at '$filepath'");
+          continue;
+        }
+        $result =  civicrm_api('MessageTemplate', 'create', array(
+              'version'     => 3,
+              'workflow_id' => $template_entry['id'],
+              'msg_title'   => $template_title,
+              'msg_subject' => ts("SEPA Direct Debit Payment Information"),
+              'is_reserved' => 0,
+              'msg_html'    => file_get_contents($filepath),
+              'msg_text'    => 'N/A'
+              ));
+
+        if (!empty($result['is_error'])) {
+          error_log("org.project60.sepa: There was an error trying to create template '$template_name': " . $result['error_message']);
+        }
+      }
+    }
   }
 }
