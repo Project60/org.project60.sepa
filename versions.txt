@@ -3,9 +3,14 @@ sepa_dd (org.project60.sepa) release history
 
 Version 1.1
 ===========
+- Improved payment processor for donation and event registration pages
+- Improved paper mandate / prenotification generation
+- Better compatibility with CiviCRM 4.5
+- Integrates with Little BIC extension
 - Default creditor setting (https://github.com/Project60/sepa_dd/issues/169)
 - Cancel option for OOFF mandates (https://github.com/Project60/sepa_dd/issues/170)
-- Minor fixes (#175, #183, ...)
+- More than 11 minor bugfixes
+- see: (https://github.com/Project60/sepa_dd/issues?q=is%3Aissue+milestone%3A1.1)
 
 
 Version 1.0.1
@@ -14,6 +19,7 @@ Version 1.0.1
 - FIX: misplaced Dashboard link (https://github.com/Project60/sepa_dd/issues/195)
 - FIX: misplaced 'record SEPA contribution' button (https://github.com/Project60/sepa_dd/issues/214)
 - FIX: parallel update issues (https://github.com/Project60/sepa_dd/issues/213)
+- FIX: invalid group names (https://github.com/Project60/sepa_dd/issues/244)
 
 
 Version 1.0
