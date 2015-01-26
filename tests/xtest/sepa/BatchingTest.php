@@ -346,7 +346,7 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
       "creditor_id" => $this->getCreditor(),
       "contact_id" => $result["contactId"],
       "iban" => "DE12500105170648489890",
-      "bic"  => "COLSDE33XXX",
+      "bic"  => "INGDDEFFXXX",
       "creation_date" => date("Y-m-d H:i:s"),
       "entity_table" => "civicrm_contribution_recur",
       "entity_id" => $result["contribution"]["id"],
