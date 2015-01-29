@@ -174,7 +174,7 @@ class CRM_sepa_MandateTest extends SEPA_BaseTestCase {
       $params['validation_date'] = "20140722092142";
       $params['date'] = "20140722092142";
       $params['iban'] = "DE12500105170648489890";
-      $params['bic'] = "TESTTEST";
+      $params['bic'] = "COLSDE33XXX";
       $params['type'] = "RCUR";
       $params['creditor_id'] = $this->getCreditor();
 
@@ -216,7 +216,7 @@ class CRM_sepa_MandateTest extends SEPA_BaseTestCase {
       'receive_date'        => date('YmdHis'),
       'date'                => date('YmdHis'),
       'iban'                => "DE12500105170648489890",
-      'bic'                 => "TESTTEST",
+      'bic'                 => "COLSDE33XXX",
       'creditor_id'         => $this->getCreditor(),
       'is_enabled'          => 1,
     );
@@ -258,7 +258,7 @@ class CRM_sepa_MandateTest extends SEPA_BaseTestCase {
       'receive_date'        => date('YmdHis'),
       'date'                => date('YmdHis'),
       'iban'                => "DE12500105170648489890",
-      'bic'                 => "TESTTEST",
+      'bic'                 => "COLSDE33XXX",
       'is_enabled'          => 1,
       );
 

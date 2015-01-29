@@ -107,14 +107,17 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
     // clear contacts and contributions
     $this->assertDBQuery(NULL, 'delete from civicrm_contact;', array());
     $this->assertDBQuery(NULL, 'delete from civicrm_contribution;', array());
+    $this->assertDBQuery(NULL, 'delete from civicrm_sdd_mandate;', array());
+    $this->assertDBQuery(NULL, 'delete from civicrm_sdd_contribution_txgroup;', array());
+    $this->assertDBQuery(NULL, 'delete from civicrm_sdd_txgroup;', array());
 
     $mandate  = $this->createMandate(array('type'=>'OOFF', 'status'=>'OOFF'));
 
     // update txgroup
     $this->callAPISuccess("SepaAlternativeBatching", "update", array("type"=>"OOFF"));
     // get txgroup/contribution id
-    $txgid = CRM_Core_DAO::singleValueQuery('select MIN(id) from civicrm_sdd_txgroup;', array());
-    $contribid = CRM_Core_DAO::singleValueQuery('select MIN(id) from civicrm_contribution;', array());
+    $txgid = CRM_Core_DAO::singleValueQuery('select MAX(id) from civicrm_sdd_txgroup;', array());
+    $contribid = CRM_Core_DAO::singleValueQuery('select MAX(id) from civicrm_contribution;', array());
     // close the group
     $this->callAPISuccess("SepaAlternativeBatching", "close", array("txgroup_id"=>$txgid));
     // check txgroup attributes
@@ -248,10 +251,14 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
    * @author niko bochan
    */
   public function testMultipleCreditors() {
+    // clear txgroups etc.
+    CRM_Core_DAO::singleValueQuery('delete from civicrm_sdd_contribution_txgroup;', array());
+    CRM_Core_DAO::singleValueQuery('delete from civicrm_sdd_txgroup;', array());
+    CRM_Core_DAO::singleValueQuery('delete from civicrm_sdd_mandate;', array());
     // backup txgroup count
     $txGroupCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_sdd_txgroup;', array());
     // create another creditor
-    $this->assertDBQuery(NULL, "INSERT INTO `civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES (NULL, '%1', '2NDTESTCREDITORID', '2NDTESTCREDITOR', '104 Wayne Street', '1082', '0000000000000133700000', 'COLSDE77XXX', 'TEST', '0', 'MAIN', NULL, '1', '1');", array(1 => array(1, "Int")));
+    $this->assertDBQuery(NULL, "INSERT INTO `civicrm_sdd_creditor` (`id`, `creditor_id`, `identifier`, `name`, `address`, `country_id`, `iban`, `bic`, `mandate_prefix`, `payment_processor_id`, `category`, `tag`, `mandate_active`, `sepa_file_format_id`) VALUES (NULL, '%1', '2NDTESTCREDITORID', '2NDTESTCREDITOR', '104 Wayne Street', '1082', '0000000000000133700000', 'COLSDE77XXX', 'TEST', NULL, NULL, NULL, '1', '1');", array(1 => array(1, "Int")));
     $newCreditorId = CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
 
     $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'));
@@ -321,6 +328,7 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
     // clear txgroups and contributions
     $this->assertDBQuery(NULL, 'delete from civicrm_sdd_contribution_txgroup;', array());
     $this->assertDBQuery(NULL, 'delete from civicrm_sdd_txgroup;', array());
+    $this->assertDBQuery(NULL, 'delete from civicrm_sdd_mandate;', array());
     $this->assertDBQuery(NULL, 'delete from civicrm_contribution_recur;', array());
     $this->assertDBQuery(NULL, 'delete from civicrm_contribution;', array());
 
@@ -543,7 +551,10 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
    * @see https://github.com/Project60/sepa_dd/issues/190
    */
   public function testRCURGracePeriod_190() {
+    $this->assertDBQuery(NULL, 'delete from civicrm_sdd_contribution_txgroup;', array());
+    $this->assertDBQuery(NULL, 'delete from civicrm_sdd_txgroup;', array());
     $this->assertDBQuery(NULL, 'delete from civicrm_contribution;', array());
+    $this->assertDBQuery(NULL, 'delete from civicrm_sdd_mandate;', array());
     $rcur_notice = 6;
     CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.notice', $rcur_notice);
     CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace', 2 * $rcur_notice);
