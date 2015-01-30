@@ -161,8 +161,9 @@ function sepa_civicrm_install_options($data) {
 
 function sepa_civicrm_options() {
   $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => 'payment_instrument'));
-  if (!isset($result['id']))
-    die ($result["error_message"]);
+  if (!isset($result['id'])) {
+    die($result["error_message"]);    
+  }
   $gid= $result['id'];
 
   //find the value to give to the payment instruments

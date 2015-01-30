@@ -435,6 +435,7 @@ function _iban_get_info($iban,$code) {
 
 # Get information from the IBAN registry by country / code combination
 function _iban_country_get_info($country,$code) {
+ _iban_load_registry();
  global $_iban_registry;
  $country = strtoupper($country);
  $code = strtolower($code);

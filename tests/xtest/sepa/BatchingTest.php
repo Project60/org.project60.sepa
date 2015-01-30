@@ -14,7 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-require_once 'sepa/BaseTestCase.php';
+require_once 'BaseTestCase.php';
 
 /**
  * SEPA Unit Tests
