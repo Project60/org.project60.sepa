@@ -51,7 +51,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 				$test_pp_creditor = civicrm_api('SepaCreditor', 'getsingle', array('version'=>3, 'id'=>$test_creditor_id));
 				// TODO: ERROR HANDLING
 			}
-			
+
 			$creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3));
 			$creditors = $creditors['values'];
 
@@ -67,7 +67,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			}
 			$form->assign('creditors', $creditors);
 			$form->assign('test_creditors', $test_creditors);
-			
+
 			// add new elements
 			CRM_Core_Region::instance('page-body')->add(array(
 				'template' => 'CRM/Admin/Form/PaymentProcessor/SDD.tpl'
@@ -91,7 +91,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 		$pp = $form->getTemplate()->get_template_vars('paymentProcessor');
 		if ($pp['class_name'] != "Payment_SDD") return;
 
-		// FIXME: this is a gross hack, please help me if you know 
+		// FIXME: this is a gross hack, please help me if you know
 		//    how to extract bank_bic and bank_iban variables properly...
 		$form_data = print_r($form,true);
 		$matches = array();
@@ -161,7 +161,7 @@ function sepa_pp_postProcess( $formName, &$form ) {
 	if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
 		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
 		if ($pp['class_name'] = "Payment_SDD") {
-			$paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', 
+			$paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle',
 				array('name' => $form->_submitValues['name'], 'is_test' => 0));
 
 			$creditor_id = $form->_submitValues['user_name'];
@@ -207,7 +207,7 @@ function sepa_pp_install() {
 		    "url_recur_test_default"    => "",
 		    "billing_mode"              => "1",
 		    "is_recur"                  => "1",
-		    "payment_type"              => "0"
+		    "payment_type"              => CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT 
 		);
 		$result = civicrm_api('PaymentProcessorType', 'create', $payment_processor_data);
 		if (!empty($result['is_error'])) {
