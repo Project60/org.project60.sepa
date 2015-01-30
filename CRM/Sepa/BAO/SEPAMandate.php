@@ -61,12 +61,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     // validate IBAN / BIC
     if (!empty($params['iban'])) {
       $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban']);
-      if ($iban_error) throw new CRM_Exception($iban_error);      
+      if ($iban_error) throw new CRM_Exception($iban_error . ':' . $params['iban']);      
     }
     
     if (!empty($params['bic'])) {
       $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic']);
-      if ($bic_error) throw new CRM_Exception($bic_error);      
+      if ($bic_error) throw new CRM_Exception($bic_error . ':' . $params['bic']);      
     }
 
 

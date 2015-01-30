@@ -83,7 +83,7 @@ class SEPA_BaseTestCase extends CiviUnitXtestCase {
       "date"          => empty($mandate_parms['date'])?date("YmdHis"):$mandate_parms['date'],
       "creditor_id"   => empty($mandate_parms['creditor_id'])?$this->getCreditor():$mandate_parms['creditor_id'],
       "contact_id"    => empty($mandate_parms['contact_id'])?$create_contribution['contact_id']:$mandate_parms['contact_id'],
-      "iban"          => empty($mandate_parms['iban'])?"DE12500105170648489890":$mandate_parms['iban'],
+      "iban"          => empty($mandate_parms['iban'])?"DE89370400440532013000":$mandate_parms['iban'],
       "bic"           => empty($mandate_parms['bic'])?"INGDDEFFXXX":$mandate_parms['bic'],
       "creation_date" => empty($mandate_parms['creation_date'])?date("YmdHis"):$mandate_parms['creation_date'],
       "entity_table"  => $contribution_table,
