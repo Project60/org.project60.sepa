@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!-- if you want to use this extension, be sure to rename this file to info.xml -->
 <extension key="org.project60.sepacustom" type="module">
   <file>sepacustom</file>
   <name>SEPA Customisation Extension</name>
