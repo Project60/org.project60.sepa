@@ -150,10 +150,20 @@ cj(function() {
 	// remove other payment fields
 	cj("fieldset.billing_name_address-group").remove();
 	cj("#payment_notice").remove();
+	cj("#bank_account_number").change(sepa_process_iban);
 
 	cj("#is_recur").change(_sdd_update_elements);
 	_sdd_update_elements();
 });
+
+function sepa_process_iban() {
+	var iban_partial = cj("#bank_account_number").val();
+	var sanitized_iban = iban_partial.replace(" ", "", 'g');
+	cj("#bank_account_number").val(sanitized_iban);
+	{/literal}{if $bic_extension_installed}
+	sepa_lookup_bic();
+	{/if}{literal}
+}
 
 </script>
 {/literal}
@@ -165,8 +175,7 @@ var busy_icon_url = "{$config->resourceBase}i/loading.gif";
 
 cj(function() {
 	cj("#bank_account_number").parent().append('&nbsp;<img id="bic_busy" height="12" src="' + busy_icon_url + '" hidden="1"/>');
-	cj("#bank_account_number").change(sepa_lookup_bic);
-	
+
 	// call it once
 	sepa_lookup_bic();
 });
