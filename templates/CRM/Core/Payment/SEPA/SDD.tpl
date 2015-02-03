@@ -157,8 +157,9 @@ cj(function() {
 });
 
 function sepa_process_iban() {
-	var iban_partial = cj("#bank_account_number").val();
-	var sanitized_iban = iban_partial.replace(" ", "", 'g');
+	var sanitized_iban = cj("#bank_account_number").val();
+	var sanitized_iban = sanitized_iban.replace(" ", "", 'g');
+	var sanitized_iban = sanitized_iban.replace("-", "", 'g');
 	cj("#bank_account_number").val(sanitized_iban);
 	{/literal}{if $bic_extension_installed}
 	sepa_lookup_bic();
