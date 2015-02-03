@@ -79,9 +79,6 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 		$pp = civicrm_api("PaymentProcessor", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
 		if ($pp['class_name'] != "Payment_SDD") return;
 
-		$form->assign("bank_iban",			    $form->_params["bank_iban"]);
-		$form->assign("bank_bic",			      $form->_params["bank_bic"]);
-
 		CRM_Core_Region::instance('page-body')->add(array(
 		  'template' => 'CRM/Contribute/Form/ContributionConfirm.sepa.tpl'));
 
@@ -95,12 +92,12 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 		//    how to extract bank_bic and bank_iban variables properly...
 		$form_data = print_r($form,true);
 		$matches = array();
-		if (preg_match('/\[bank_bic\] => (?P<bank_bic>[\w0-9]+)/i', $form_data, $matches)) {
-			$form->assign("bank_bic",$matches[1]);
+		if (preg_match('/\[bank_identification_number\] => (?P<bank_identification_number>[\w0-9]+)/i', $form_data, $matches)) {
+			$form->assign("bank_identification_number",$matches[1]);
 		}
 		$matches = array();
-		if (preg_match('/\[bank_iban\] => (?P<bank_iban>[\w0-9]+)/i', $form_data, $matches)) {
-			$form->assign("bank_iban",$matches[1]);
+		if (preg_match('/\[bank_account_number\] => (?P<bank_account_number>[\w0-9]+)/i', $form_data, $matches)) {
+			$form->assign("bank_account_number",$matches[1]);
 		}
 		unset($form_data);
 
@@ -118,14 +115,14 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$mandate      = civicrm_api3('SepaMandate',  'getsingle', array('reference' => $mandate_reference));
 			$creditor     = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $mandate['creditor_id']));
 			$contribution = civicrm_api3('Contribution', 'getsingle', array('trxn_id' => $mandate_reference));
-			$form->assign('mandate_reference',  $mandate_reference);
-			$form->assign("bank_iban",          $mandate["iban"]);
-			$form->assign("bank_bic",           $mandate["bic"]);
-			$form->assign("collection_day",     $form->_params["cycle_day"]);
-			$form->assign("frequency_interval", $form->_params["frequency_interval"]);
-			$form->assign("frequency_unit",     $form->_params["frequency_unit"]);
-			$form->assign("creditor_id",        $creditor['identifier']);
-			$form->assign("collection_date",    $contribution['receive_date']);
+			$form->assign('mandate_reference',          $mandate_reference);
+			$form->assign("bank_account_number",        $mandate["iban"]);
+			$form->assign("bank_identification_number", $mandate["bic"]);
+			$form->assign("collection_day",             $form->_params["cycle_day"]);
+			$form->assign("frequency_interval",         $form->_params["frequency_interval"]);
+			$form->assign("frequency_unit",             $form->_params["frequency_unit"]);
+			$form->assign("creditor_id",                $creditor['identifier']);
+			$form->assign("collection_date",            $contribution['receive_date']);
 		}
 
 		CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
@@ -142,11 +139,11 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$mandate      = civicrm_api3('SepaMandate',  'getsingle', array('reference' => $mandate_reference));
 			$creditor     = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $mandate['creditor_id']));
 			$contribution = civicrm_api3('Contribution', 'getsingle', array('trxn_id' => $mandate_reference));
-			$form->assign('mandate_reference',  $mandate_reference);
-			$form->assign("bank_iban",          $mandate["iban"]);
-			$form->assign("bank_bic",           $mandate["bic"]);
-			$form->assign("creditor_id",        $creditor['identifier']);
-			$form->assign("collection_date",    $contribution['receive_date']);
+			$form->assign('mandate_reference',          $mandate_reference);
+			$form->assign("bank_account_number",        $mandate["iban"]);
+			$form->assign("bank_identification_number", $mandate["bic"]);
+			$form->assign("creditor_id",                $creditor['identifier']);
+			$form->assign("collection_date",            $contribution['receive_date']);
 		}
 
 		CRM_Core_Region::instance('page-body')->add(array(

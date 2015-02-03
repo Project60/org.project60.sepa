@@ -17,40 +17,20 @@
 {crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'}
 {capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
 
-<div id="payment_information">
-	<fieldset class="billing_mode-group direct_debit_info-group">
-	<legend>
-	{ts}Direct Debit Information{/ts}
-	</legend>
-
-	<div class="crm-section {$form.bank_iban.name}-section">
-		<div class="label">{$form.bank_iban.label}</div>
-		<div class="content">{$form.bank_iban.html}</div>
-		<div class="clear"></div>
-	</div>
-	<div class="crm-section {$form.bank_bic.name}-section">
-		<div class="label">{$form.bank_bic.label}
-			<a id="bic_lookup_btn" onClick="sepa_lookup_bic();" hidden="1">lookup BIC</a>
-		</div>
-		<div class="content">{$form.bank_bic.html}&nbsp;&nbsp;
-			<img id="bic_busy" height="8" src="{$config->resourceBase}i/loading.gif" hidden="1" />
-			<font color="gray"><span id="bank_name"></span></font>
-		</div>
-		<div class="clear"></div>
-	</div>
-	<div class="crm-section {$form.cycle_day.name}-section" hidden="1">
-		<!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
-		<div class="label">{$form.cycle_day.label}</div>
-		<div class="content">{$form.cycle_day.html}</div>
-		<div class="clear"></div>
-	</div>
-	<div class="crm-section {$form.start_date.name}-section" hidden="1">
-		<!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
-		<div class="label">{$form.start_date.label}</div>
-		<div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
-		<div class="clear"></div>
-	</div>
+<!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
+<div class="crm-section {$form.cycle_day.name}-section" hidden="1">
+	<div class="label">{$form.cycle_day.label}</div>
+	<div class="content">{$form.cycle_day.html}</div>
+	<div class="clear"></div>
 </div>
+
+<!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
+<div class="crm-section {$form.start_date.name}-section" hidden="1">
+	<div class="label">{$form.start_date.label}</div>
+	<div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
+	<div class="clear"></div>
+</div>
+
 
 <!-- TWEAK THE FORM: -->
 
@@ -167,6 +147,10 @@ function sepa_copy_combined() {
 sepa_copy_combined();
 
 cj(function() {
+	// remove other payment fields
+	cj("fieldset.billing_name_address-group").remove();
+	cj("#payment_notice").remove();
+
 	cj("#is_recur").change(_sdd_update_elements);
 	_sdd_update_elements();
 });
@@ -176,26 +160,32 @@ cj(function() {
 
 {if $bic_extension_installed}
 <script type="text/javascript">
-cj("#bank_iban").change(sepa_lookup_bic);
-cj("#bank_bic").change(sepa_clear_bank);
-//cj("#bic_lookup_btn").show();
+var busy_icon_url = "{$config->resourceBase}i/loading.gif";
 {literal}
 
+cj(function() {
+	cj("#bank_account_number").parent().append('&nbsp;<img id="bic_busy" height="12" src="' + busy_icon_url + '" hidden="1"/>');
+	cj("#bank_account_number").change(sepa_lookup_bic);
+	
+	// call it once
+	sepa_lookup_bic();
+});
+
 function sepa_clear_bank() {
-  cj("#bank_name").text('');
+  cj("#bank_name").val('');
   cj("#bic_busy").hide();
 }
 
 function sepa_lookup_bic() {
-	var iban_partial = cj("#bank_iban").val();
+	var iban_partial = cj("#bank_account_number").val();
 	cj("#bic_busy").show();
-	cj("#bank_name").text('');
+	//cj("#bank_name").val('');
   CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
     {success: function(data) {
     	if ('bic' in data) {
         // use the following to urldecode the link url
-        cj("#bank_bic").attr('value', data['bic']);
-        cj("#bank_name").text(data['title']);
+        cj("#bank_identification_number").attr('value', data['bic']);
+        cj("#bank_name").val(data['title']);
         cj("#bic_busy").hide();
       } else {
       	sepa_clear_bank();
@@ -211,8 +201,6 @@ function sepa_lookup_bic() {
 		}});
 }
 
-// call it once
-sepa_lookup_bic();
 {/literal}
 </script>
 {/if}

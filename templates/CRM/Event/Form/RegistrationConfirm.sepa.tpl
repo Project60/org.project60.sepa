@@ -13,13 +13,13 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
-{if $bank_iban}
+{if $bank_account_number}
 <div id="sepa-new-info-block" class="crm-group">
   <div class="header-dark">{ts}Direct Debit Payment{/ts}</div>
   <p id="sepa-confirm-text-account">{ts}This payment will be debited from the following account:{/ts}</p>
   <table class="sepa-confirm-text-account-details display" id="sepa-confirm-text-account-details">
-    <tr><td>{ts}IBAN{/ts}</td> <td>{$bank_iban}</td> </tr>
-    <tr><td>{ts}BIC{/ts}</td>  <td>{$bank_bic}</td>  </tr>
+    <tr><td>{ts}IBAN{/ts}</td> <td>{$bank_account_number}</td> </tr>
+    <tr><td>{ts}BIC{/ts}</td>  <td>{$bank_identification_number}</td>  </tr>
   </table>
 </div>
 

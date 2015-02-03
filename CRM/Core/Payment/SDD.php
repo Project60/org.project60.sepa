@@ -71,16 +71,28 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $form->_paymentFields = array();
 
     $form->add( 'text', 
-                'bank_iban', 
+                'bank_account_number', 
                 ts('IBAN'), 
                 array('size' => 34, 'maxlength' => 34,), 
                 TRUE);
 
     $form->add( 'text', 
-                'bank_bic', 
+                'bank_identification_number', 
                 ts('BIC'), 
                 array('size' => 11, 'maxlength' => 11), 
                 TRUE);
+
+    $form->add( 'text', 
+                'bank_name', 
+                ts('Bank Name'), 
+                array('size' => 20, 'maxlength' => 64), 
+                FALSE);
+
+    $form->add( 'text', 
+                'account_holder', 
+                ts('Account Holder'), 
+                array('size' => 20, 'maxlength' => 64), 
+                FALSE);
 
     $form->add( 'select', 
                 'cycle_day', 
@@ -95,8 +107,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
     $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
-    $form->addRule('bank_iban', ts('This is not a correct IBAN.'), 'sepa_iban_valid');
-    $form->addRule('bank_bic',  ts('This is not a correct BIC.'),  'sepa_bic_valid');
+    $form->addRule('bank_account_number', ts('This is not a correct IBAN.'), 'sepa_iban_valid');
+    $form->addRule('bank_identification_number',  ts('This is not a correct BIC.'),  'sepa_bic_valid');
 
 
     $rcur_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $this->_creditorId);
@@ -142,8 +154,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $params['creditor_id']   = $this->_creditorId;
     $params['contact_id']    = $this->getForm()->getVar('_contactID');
     $params['source']        = $params['description'];
-    $params['iban']          = $params['bank_iban'];
-    $params['bic']           = $params['bank_bic'];
+    $params['iban']          = $params['bank_account_number'];
+    $params['bic']           = $params['bank_identification_number'];
     $params['creation_date'] = date('YmdHis');
     $params['status']        = 'PARTIAL';
 

@@ -38,22 +38,29 @@
   {/if}
 {/if}
 
+<input type="hidden" name="account_holder" value="{$account_holder}" />
+<input type="hidden" name="bank_name"      value="{$bank_name}"      />
+
 <div id="sepa-new-amount-display" class="display-block">
   <p id="sepa-confirm-text-amount">{ts}Total Amount{/ts}: <strong>{$amount|crmMoney:$currencyID}</strong></p>
   {if $is_recur}
   <p id="sepa-confirm-text-recur"><strong>{ts 1=$frequency_words}I want to contribute this amount %1.{/ts}</strong></p>
   {/if}
 
-  {if $bank_iban}
+  {if $bank_account_number}
   <p id="sepa-confirm-text-account">{ts}This payment will be debited from the following account:{/ts}</p>
   <table class="sepa-confirm-text-account-details display" id="sepa-confirm-text-account-details">
-    <tr><td>{ts}IBAN{/ts}</td> <td>{$bank_iban}</td> </tr>
-    <tr><td>{ts}BIC{/ts}</td>  <td>{$bank_bic}</td>  </tr>
+    {if $account_holder}<tr><td>{ts}Account Holder{/ts}</td> <td>{$account_holder}</td> </tr>{/if}
+    <tr><td>{ts}IBAN{/ts}</td> <td>{$bank_account_number}</td> </tr>
+    <tr><td>{ts}BIC{/ts}</td>  <td>{$bank_identification_number}</td>  </tr>
+    {if $bank_name}<tr><td>{ts}Bank Name{/ts}</td> <td>{$bank_name}</td> </tr>{/if}
   </table>
   {/if}
 </div>
 
 <script type="text/javascript">
 cj("div.amount_display-group > div.display-block").replaceWith(cj("#sepa-new-amount-display"));
+cj("div.credit_card-group > div.display-block").remove();
+cj("div.credit_card-group > div.header-dark").remove();
 </script>
 

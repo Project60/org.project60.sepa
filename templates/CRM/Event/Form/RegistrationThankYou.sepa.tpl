@@ -14,7 +14,7 @@
 +-------------------------------------------------------*}
 
 
-{if $bank_iban} {* only for SEPA PPs *}
+{if $bank_account_number} {* only for SEPA PPs *}
 
 <div class="crm-section sepa-section no-label">
   <br/>
@@ -34,11 +34,11 @@
     </tr>
     <tr id="sepa-thankyou-iban">
       <td>{ts}IBAN{/ts}</td>
-      <td class="content">{$bank_iban}</td>
+      <td class="content">{$bank_account_number}</td>
     </tr>
     <tr id="sepa-thankyou-bic">
       <td>{ts}BIC{/ts}</td>
-      <td class="content">{$bank_bic}</td>
+      <td class="content">{$bank_identification_number}</td>
     </tr>
     {if $is_recur}
       <tr id="sepa-thankyou-collectionday">
@@ -66,7 +66,7 @@
 
 <script type="text/javascript">
 // hide credit card info
-{if $bank_iban} {* only for SEPA PPs *}
+{if $bank_account_number} {* only for SEPA PPs *}
 cj(".credit_card-group").html("");
 cj("div.billing_name_address-group").html("");
 {/if}
