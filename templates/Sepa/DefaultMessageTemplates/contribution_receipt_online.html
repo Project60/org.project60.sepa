@@ -262,6 +262,41 @@
      {/if}
 
      {if $contributeMode eq 'direct' AND !$is_pay_later AND $amount GT 0}
+      {if $bank_identification_number}
+      {* DIRECT DEBIT PAYMENT *}
+      <tr>
+       <th {$headerStyle}>
+        {ts}Direct Debit Payment{/ts}
+       </th>
+      </tr>
+      {if $account_holder}
+      <tr>
+       <td {$labelStyle}>{ts}Account Holder{/ts}</td>
+       <td {$valueStyle}>{$account_holder}</td>
+      </tr>
+      {/if}
+      <tr>
+       <td {$labelStyle}>{ts}Mandate Reference{/ts}</td>
+       <td {$valueStyle}>{$trxn_id}</td>
+      </tr>
+      <tr>
+       <td {$labelStyle}>{ts}Bank Account Number{/ts}</td>
+       <td {$valueStyle}>{$bank_account_number}</td>
+      </tr>
+      {if $bank_identification_number}
+      <tr>
+       <td {$labelStyle}>{ts}BIC{/ts}</td>
+       <td {$valueStyle}>{$bank_identification_number}</td>
+      </tr>
+      {/if}
+      {if $bank_name}
+      <tr>
+       <td {$labelStyle}>{ts}Bank Name{/ts}</td>
+       <td {$valueStyle}>{$bank_name}</td>
+      </tr>
+      {/if}
+      {else}
+      {* CREDIT CARD PAYMENT *}
       <tr>
        <th {$headerStyle}>
         {ts}Credit Card Information{/ts}
@@ -274,6 +309,7 @@
         {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}<br />
        </td>
       </tr>
+      {/if}
      {/if}
 
      {if $selectPremium}
