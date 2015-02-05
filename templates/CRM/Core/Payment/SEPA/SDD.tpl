@@ -158,8 +158,8 @@ cj(function() {
 
 function sepa_process_iban() {
 	var sanitized_iban = cj("#bank_account_number").val();
-	var sanitized_iban = sanitized_iban.replace(" ", "", 'g');
-	var sanitized_iban = sanitized_iban.replace("-", "", 'g');
+	var reSpaceAndMinus = new RegExp('[\\s-]', 'g');
+	var sanitized_iban = sanitized_iban.replace(reSpaceAndMinus, "");
 	cj("#bank_account_number").val(sanitized_iban);
 	{/literal}{if $bic_extension_installed}
 	sepa_lookup_bic();
