@@ -23,10 +23,17 @@ class CRM_Sepa_Logic_Verification {
    * Verifies if the given IBAN is formally correct
    *
    * @param iban  string, IBAN candidate
-   * 
+   *
    * @return NULL if given IBAN is valid, localized error message otherwise
    */
   static function verifyIBAN($iban) {
+    // FIXME: We do not accept whitespaces and hyphens
+    // until there is a proper sanitization routine enabled
+    // on all IBAN/BIC forms
+    if (preg_match("/[\s\-]/", $iban)) {
+      return ts("IBAN is not correct");
+    }
+
     if (verify_iban($iban)) {
       return NULL;
     } else {
@@ -49,7 +56,7 @@ class CRM_Sepa_Logic_Verification {
    * Verifies if the given BIC is formally correct
    *
    * @param bic  string, BIC candidate
-   * 
+   *
    * @return NULL if given BIC is valid, localized error message otherwise
    */
   static function verifyBIC($bic) {
