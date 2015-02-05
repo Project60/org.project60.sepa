@@ -45,7 +45,13 @@ function sepa_modify_summary_tab_contribution() {
   if (contribution_tab.length > 0) {
     contribution_snippet_changed = true; // important to do this BEFORE changing the model
     // add the extra button
-    contribution_tab.find(".action-link").prepend(contribution_extra_button);
+    var action_link = contribution_tab.find(".action-link");
+    if (action_link.length==0) {
+      contribution_tab.find(".view-content").prepend('<div class="action-link"></div>');
+      contribution_tab.find(".view-content > .action-link").prepend(contribution_extra_button);
+    } else {
+      action_link.prepend(contribution_extra_button);  
+    }    
 
     // modify the edit links for recurring contributons, if they are mandates
     var recurring_contribution_table_rows = contribution_tab.find("table.selector:eq(1) > tbody > tr[id]");
