@@ -53,6 +53,9 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     if (!CRM_Sepa_Logic_Base::isSDD($fields)) {
       return;
     }
+    if (isset($form->_values['contribution_recur_id'])) { /* Installment of a recurring contribution => no account data here. */
+      return;
+    }
     $result = civicrm_api3('SepaMandate', 'getsingle', array(
       'entity_table' => 'civicrm_contribution',
       'entity_id' => $form->_values['contribution_id'],
