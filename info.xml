@@ -5,12 +5,17 @@
   <description>This extension provides SEPA Direct Debit processing.</description>
   <license>aGPL3</license>
   <maintainer>
-    <author>Project60</author>
+    <author>B. Endres</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate></releaseDate>
-  <version>1.0.1rc2</version>
+  <releaseDate>2015-02-12</releaseDate>
+  <version>1.0.1</version>
   <develStage>stable</develStage>
+  <urls>
+    <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
+    <url desc="Documentation">https://wiki.civicrm.org/confluence/display/CRM/CiviSEPA</url>
+    <url desc="Support">https://github.com/Project60/org.project60.sepa/issues/new</url>
+  </urls>
   <compatibility>
     <ver>4.4</ver>
     <ver>4.5</ver>
