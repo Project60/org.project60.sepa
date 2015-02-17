@@ -215,12 +215,12 @@ class CRM_Sepa_Logic_Base {
 
     if (in_array($frequencyUnit, array('month', 'year')) && $dueDate->format('d') != $startDate->format('d')) { /* Month wrapped. */
       $wrapDays = $dueDate->format('d');
-      $monthWrapPolicy = 'pre'; /* DiCo hack */
+      $monthWrapPolicy = 'PRE'; /* DiCo hack */
       switch ($monthWrapPolicy) {
-        case 'pre':
+        case 'PRE':
           $dueDate->modify("-$wrapDays days");
           break;
-        case 'post':
+        case 'POST':
           $dueDate->modify("-$wrapDays days +1 day");
           break;
       }
