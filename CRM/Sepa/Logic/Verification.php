@@ -27,9 +27,7 @@ class CRM_Sepa_Logic_Verification {
    * @return NULL if given IBAN is valid, localized error message otherwise
    */
   static function verifyIBAN($iban) {
-    // FIXME: We do not accept whitespaces and hyphens
-    // until there is a proper sanitization routine enabled
-    // on all IBAN/BIC forms
+    // We do not accept whitespaces and hyphens (machine format)
     if (preg_match("/[\s\-]/", $iban)) {
       return ts("IBAN is not correct");
     }
