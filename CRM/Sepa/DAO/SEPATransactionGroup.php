@@ -101,7 +101,7 @@ class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Core_DAO
    */
   public $reference;
   /**
-   * Payment Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).
+   * Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).
    *
    * @var boolean
    */
