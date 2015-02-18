@@ -163,8 +163,9 @@ class CRM_Sepa_Logic_Batching {
           if (!empty($contribution['is_error'])) {
             // TODO: Error handling
             error_log("org.project60.sepa: batching:updateRCUR/createContrib ".$contribution['error_message']);
+          } else {
+            $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution['id'];
           }
-          $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution['id'];
           unset($existing_contributions_by_recur_id[$recur_id]);
         }
       }
