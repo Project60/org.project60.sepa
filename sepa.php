@@ -138,7 +138,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         "mandate_active"=>$cred["mandate_active"],
         "creditor_prefix"=>$cred["mandate_prefix"],
         "creditor_iban"=>$cred["iban"],
-        "creditor_bic"=>$cred["bic"],
+        "creditor_bic"=> isset($cred["bic"]) ? $cred["bic"] : null,
         "sepa_file_format_id"=>$cred["sepa_file_format_id"],
       ));
     } else {
