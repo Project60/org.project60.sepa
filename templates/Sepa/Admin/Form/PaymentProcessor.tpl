@@ -37,6 +37,10 @@
   <td class="label">{$form.sepa_file_format_id.label}</td>
   <td>{$form.sepa_file_format_id.html}</td>
 </tr>
+<tr id="crmf-extra_advance_days">
+  <td class="label">{$form.extra_advance_days.label}</td>
+  <td>{$form.extra_advance_days.html} {help id='extra_advance_days' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
           
 </table>
 </div>

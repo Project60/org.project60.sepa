@@ -174,6 +174,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $sepa_file_format_id;
   /**
+   * How many banking days (if any) to add on top of all minimum advance presentation deadlines defined in the SEPA rulebook.
+   *
+   * @var int unsigned
+   */
+  public $extra_advance_days;
+  /**
    * class constructor
    *
    * @access public
@@ -303,6 +309,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
             'optionGroupName' => 'sepa_file_format',
           )
         ) ,
+        'extra_advance_days' => array(
+          'name' => 'extra_advance_days',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Extra Advance Days') ,
+          'default' => '1',
+        ) ,
       );
     }
     return self::$_fields;
@@ -332,6 +344,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'tag' => 'tag',
         'mandate_active' => 'mandate_active',
         'sepa_file_format_id' => 'sepa_file_format_id',
+        'extra_advance_days' => 'extra_advance_days',
       );
     }
     return self::$_fieldKeys;

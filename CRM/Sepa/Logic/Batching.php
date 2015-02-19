@@ -145,8 +145,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
           $type = CRM_Core_OptionGroup::getValue('payment_instrument', $instrument, 'value', 'String', 'name');
 
-          $advanceDays = $isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5);
-          $advanceDays += 1; /* DiCo hack: some(?) banks need an extra day on top of all standard advance periods... */
+          $advanceDays = ($isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5)) + $creditor['extra_advance_days'];
           $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
           $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
 

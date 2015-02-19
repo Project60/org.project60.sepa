@@ -123,6 +123,9 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     }
     $form->addGroup($fileFormatOptions, 'sepa_file_format_id', ts('SEPA File Format'));
 
+    $form->add('text', 'extra_advance_days', ts('Extra advance days'), null, true);
+    $form->addRule('extra_advance_days', ts('%1 must be a whole number.', array(1 => ts('Extra advance days'))), 'integer');
+
     // get the creditor info as well
     $ppid=$form->getVar("_id");
     if (isset($ppid)) {
@@ -140,10 +143,16 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         "creditor_iban"=>$cred["iban"],
         "creditor_bic"=> isset($cred["bic"]) ? $cred["bic"] : null,
         "sepa_file_format_id"=>$cred["sepa_file_format_id"],
+        'extra_advance_days' => $cred['extra_advance_days'],
       ));
     } else {
       $session = CRM_Core_Session::singleton();
-      $form->setDefaults(array("creditor_prefix"=>"SEPA","creditor_contact_id"=>$session->get('userID'),"sepa_file_format_id"=>CRM_Core_OptionGroup::getDefaultValue('sepa_file_format')));
+      $form->setDefaults(array(
+        'creditor_prefix' => 'SEPA',
+        'creditor_contact_id' => $session->get('userID'),
+        'sepa_file_format_id' => CRM_Core_OptionGroup::getDefaultValue('sepa_file_format'),
+        'extra_advance_days' => 1,
+      ));
     }
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'Sepa/Admin/Form/PaymentProcessor.tpl'
@@ -351,6 +360,9 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
       $creditor[$api] = $form->_submitValues[$field];
     }
     $creditor['mandate_active'] = isset($form->_submitValues['mandate_active']);
+
+    $creditor['extra_advance_days'] = $form->_submitValues['extra_advance_days'];
+
     if (!$creditor["id"]) {
       unset($creditor["id"]);
     } 

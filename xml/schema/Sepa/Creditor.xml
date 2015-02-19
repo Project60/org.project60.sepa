@@ -151,4 +151,13 @@
     </pseudoconstant>
     <add>4.4</add>
   </field>
+
+  <field>
+    <name>extra_advance_days</name>
+    <title>Extra Advance Days</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>How many banking days (if any) to add on top of all minimum advance presentation deadlines defined in the SEPA rulebook.</comment>
+    <add>4.5</add>
+  </field>
 </table>
