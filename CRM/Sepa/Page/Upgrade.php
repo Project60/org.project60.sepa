@@ -22,6 +22,10 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` ADD `use_cor1` tinyint DEFAULT 0 COMMENT 'Generate SEPA XML files using \"Local Instrument\" COR1 instead of CORE (along with the shorter minimum advance presentation deadlines) for domestic payments.'");
       $messages[] = 'Added `civicrm_sdd_creditor`.`use_cor1`.';
     }
+    if (!CRM_Core_DAO::checkFieldExists('civicrm_sdd_creditor', 'group_batching_mode')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` ADD `group_batching_mode` varchar(4) DEFAULT \"COR\" COMMENT 'How to batch TxGroups into files. NONE: every TxGroup in a separate file; TYPE: one file for each Sequence Type (FRST/RCUR/OOFF); COR: one file for all COR1 and one for all CORE; ALL: single file with all groups.'");
+      $messages[] = 'Added `civicrm_sdd_creditor`.`group_batching_mode`.';
+    }
 
     $this->assign('messages', $messages);
     parent::run();

@@ -49,6 +49,10 @@
   <td class="label">{$form.use_cor1.label}</td>
   <td>{$form.use_cor1.html} {help id='use_cor1' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
 </tr>
+<tr id="crmf-group_batching_mode">
+  <td class="label">{$form.group_batching_mode.label}</td>
+  <td>{$form.group_batching_mode.html} {help id='group_batching_mode' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
           
 </table>
 </div>

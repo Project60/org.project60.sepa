@@ -14,3 +14,20 @@
   <p>{ts}However, not all creditor banks accept SEPA XML files with COR1 collections; and even if they do, it only works in combination with some debtor banks &mdash; in all other cases, we still need to use non-COR1 transactions. Determining whether COR1 is allowed for any particular transaction is too involved in the generic case; but in our understanding, at least in Germany and in Austria, it should always work for all domestic payments. (Possibly also in Spain.){/ts}</p>
   <p>{ts}Accordingly, the SEPA payment processor offers the option to automatically use COR1 for all domestic payments, i.e. all payments where the country code of the debtor IBAN matches the country code of the creditor IBAN. Enable it if your creditor bank is in one of the countries listed above, and is able to process files with COR1 payments.{/ts}</p>
 {/htxt}
+
+{htxt id='group_batching_mode'}
+  <p>{ts}SEPA XML files can contain several transaction groups, which in turn can consist of several individual transactions. All transactions within each group need to share the same due date, sequence type (OOFF/FRST/RCUR), and payment instrument (CORE/COR1). A file can contrain groups with different due dates and sequence types.{/ts}</p>
+  <p>{ts}However, not all banks can actually process files with several transaction groups; and also some organisations prefer to submit different groups separately. Thus, the SEPA payment processor offers several different modes for batching groups into files:{/ts}</p>
+  <ul>
+    <li>
+      <p>{ts}No batching: A separate file is created for every group, i.e. for every due date, every sequence type, and every instrument.{/ts}</p>
+      <p>{ts}Some banks only support this mode.{/ts}</p>
+    </li>
+    <li>{ts}Batch by sequence type: Separate files are created for OOFF, FRST, and RCUR groups; but files can contain several groups of the same type with different due dates.{/ts}</li>
+    <li>
+      <p>{ts}Batch by type and instrument: Only two files are generated at most &mdash; one for CORE groups, and one for COR1. Each can contain groups with different types and due dates.{/ts}</p>
+      <p>{ts}This is the recommended mode for use with banks that follow the SEPA implementation guidelines.{/ts}</p>
+    </li>
+    <li>{ts}All groups in one file: All groups are batched into a single file, i.e. only one file is ever generated in a batching run. Note though that mixing COR1 and CORE groups in one file is actually not allowed by the SEPA implementation guidelines (although the file format would allow it) &mdash; so this option is most likely useful only for testing purposes.{/ts}</li>
+  </ul>
+{/htxt}

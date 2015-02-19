@@ -131,6 +131,17 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
 
     $form->add('checkbox', 'use_cor1', ts('Use COR1 for domestic payments'));
 
+    $form->addRadio(
+      'group_batching_mode',
+      'Group batching mode',
+      array(
+        'NONE' => 'No batching (each group in separate file)',
+        'TYPE' => 'Batch by sequence type',
+        'COR' => 'Batch by type and instrument (CORE/COR1)',
+        'ALL' => 'All groups in one file',
+      )
+    );
+
     // get the creditor info as well
     $ppid=$form->getVar("_id");
     if (isset($ppid)) {
@@ -151,6 +162,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         'extra_advance_days' => $cred['extra_advance_days'],
         'maximum_advance_days' => $cred['maximum_advance_days'],
         'use_cor1' => $cred['use_cor1'],
+        'group_batching_mode' => $cred['group_batching_mode'],
       ));
     } else {
       $session = CRM_Core_Session::singleton();
@@ -161,6 +173,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         'extra_advance_days' => 1,
         'maximum_advance_days' => 14,
         'use_cor1' => false,
+        'group_batching_mode' => 'COR',
       ));
     }
     CRM_Core_Region::instance('page-body')->add(array(
@@ -373,6 +386,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     $creditor['extra_advance_days'] = $form->_submitValues['extra_advance_days'];
     $creditor['maximum_advance_days'] = $form->_submitValues['maximum_advance_days'];
     $creditor['use_cor1'] = isset($form->_submitValues['use_cor1']);
+    $creditor['group_batching_mode'] = $form->_submitValues['group_batching_mode'];
 
     if (!$creditor["id"]) {
       unset($creditor["id"]);

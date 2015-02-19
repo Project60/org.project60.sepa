@@ -192,6 +192,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $use_cor1;
   /**
+   * How to batch TxGroups into files. NONE: every TxGroup in a separate file; TYPE: one file for each Sequence Type (FRST/RCUR/OOFF); COR: one file for all COR1 and one for all CORE; ALL: single file with all groups.
+   *
+   * @var string
+   */
+  public $group_batching_mode;
+  /**
    * class constructor
    *
    * @access public
@@ -338,6 +344,14 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Use COR1') ,
         ) ,
+        'group_batching_mode' => array(
+          'name' => 'group_batching_mode',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('TxGroups Batching Mode') ,
+          'maxlength' => 4,
+          'size' => CRM_Utils_Type::FOUR,
+          'default' => 'COR',
+        ) ,
       );
     }
     return self::$_fields;
@@ -370,6 +384,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'extra_advance_days' => 'extra_advance_days',
         'maximum_advance_days' => 'maximum_advance_days',
         'use_cor1' => 'use_cor1',
+        'group_batching_mode' => 'group_batching_mode',
       );
     }
     return self::$_fieldKeys;

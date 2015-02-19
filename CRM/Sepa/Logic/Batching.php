@@ -158,25 +158,23 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     if (!empty($groups)) { /* Have anything to generate. */
       $tag = (isset($creditor['tag'])) ? $creditor['tag'] : $creditor['mandate_prefix'];
 
-      $groupBatchingMode = 'COR'; /* DiCo hack */
-
-      if ($groupBatchingMode == 'ALL') {
+      if ($creditor['group_batching_mode'] == 'ALL') {
         $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, null, null, null);
       }
 
       foreach ($groups as $isCor1 => $types) {
         $instrument = $isCor1 ? 'COR1' : 'CORE';
-        if ($groupBatchingMode == 'COR') {
+        if ($creditor['group_batching_mode'] == 'COR') {
           $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, $instrument, null, null);
         }
 
         foreach ($types as $type => $dates) {
-          if ($groupBatchingMode == 'TYPE') {
+          if ($creditor['group_batching_mode'] == 'TYPE') {
             $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, $instrument, $type, null);
           }
 
           foreach ($dates as $collectionDate => $ids) {
-            if ($groupBatchingMode == 'NONE') {
+            if ($creditor['group_batching_mode'] == 'NONE') {
               $sddFile = self::createSddFile((object)array('latest_submission_date' => date('Ymd', strtotime($submitDate))), $tag, $instrument, $type, $collectionDate);
             }
 
@@ -192,22 +190,22 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
               self::setContributionStatus($contributionId, CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'));
             }
 
-            if ($groupBatchingMode == 'NONE') {
+            if ($creditor['group_batching_mode'] == 'NONE') {
               civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
             }
           }
 
-          if ($groupBatchingMode == 'TYPE') {
+          if ($creditor['group_batching_mode'] == 'TYPE') {
             civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
           }
         }
 
-        if ($groupBatchingMode == 'COR') {
+        if ($creditor['group_batching_mode'] == 'COR') {
           civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
         }
       }
 
-      if ($groupBatchingMode == 'ALL') {
+      if ($creditor['group_batching_mode'] == 'ALL') {
         civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
       }
     } /* !empty($groups) */
