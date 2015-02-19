@@ -31,3 +31,13 @@
     <li>{ts}All groups in one file: All groups are batched into a single file, i.e. only one file is ever generated in a batching run. Note though that mixing COR1 and CORE groups in one file is actually not allowed by the SEPA implementation guidelines (although the file format would allow it) &mdash; so this option is most likely useful only for testing purposes.{/ts}</li>
   </ul>
 {/htxt}
+
+{htxt id='month_wrap_policy'}
+  <p>{ts}When recurring payments using a frequency unit of 'month' (i.e. monthly, quaterly etc.) start on a day near the end of a long month, such as on Octorber 31st, followup payments in shorter months such as November or even February cannot happen on the same day of month. Instead, they either need to be moved earlier to the actual last day of the month; or they wrap over to the beginning of the next month. The same is true for yearly payments starting on February 29th in a leap year, with followup payments in regular years.{/ts}</p>
+  <p>{ts}The SEPA payment processor offers several ways to handle these situations:{/ts}</p>
+  <ul>
+    <li>{ts}Move date before end of month: The payment always happens at the end of each month, moving the date to the last day of that month as necessary &mdash; so a monthly payment starting on Octorber 31st will be collected again on November 30th, December 31st, January 31th, February 28th (or 29th in leap years), March 31st etc.; a quaterly payment starting on May 30th will be collected on August 30th, November 30th, February 28th or 29th, May 30th etc.; a yearly payment starting on February 29th will be collected on February 28th in ordinary years, and February 29th in leap years.{/ts}</li>
+    <li>{ts}Wrap to 1st of next month: If a short month doesn't have the day on which the payment started and would normally repeat, the payment wraps over to the first day of the next month &mdash; so a monthly payment starting on Octorber 31st will be collected again on December 1st, December 31st, January 31th, March 1st, March 31st etc. Note that this way a payment never happens earlier than expected; but it can be quite confusing that some months don't have any payment at all, while others have two.{/ts}</li>
+    <li>{ts}No explicit handling: Like above, except rather than always wrapping to the first day of the next month, the payment can move further into the month if more than one day is "missing". Specifically that means that for February, payments normally scheduled for the 31st of a month will wrap to March 3th (or 2nd in leap years), and payments scheduled for the 30th will wrap to March 2nd in non-leap years. For all other cases the effect is the same as above.{/ts}</li>
+  </ul>
+{/htxt}

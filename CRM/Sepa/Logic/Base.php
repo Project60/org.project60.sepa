@@ -210,12 +210,11 @@ class CRM_Sepa_Logic_Base {
     return floor($signedUnits / $frequencyInterval);
   }
 
-  public static function addPeriods($startDate, $periods, $frequencyUnit, $frequencyInterval) {
+  public static function addPeriods($startDate, $periods, $frequencyUnit, $frequencyInterval, $monthWrapPolicy) {
     $dueDate = date_add(clone $startDate, DateInterval::createFromDateString($periods * $frequencyInterval . $frequencyUnit));
 
     if (in_array($frequencyUnit, array('month', 'year')) && $dueDate->format('d') != $startDate->format('d')) { /* Month wrapped. */
       $wrapDays = $dueDate->format('d');
-      $monthWrapPolicy = 'PRE'; /* DiCo hack */
       switch ($monthWrapPolicy) {
         case 'PRE':
           $dueDate->modify("-$wrapDays days");

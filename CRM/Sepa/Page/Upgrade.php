@@ -26,6 +26,10 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` ADD `group_batching_mode` varchar(4) DEFAULT \"COR\" COMMENT 'How to batch TxGroups into files. NONE: every TxGroup in a separate file; TYPE: one file for each Sequence Type (FRST/RCUR/OOFF); COR: one file for all COR1 and one for all CORE; ALL: single file with all groups.'");
       $messages[] = 'Added `civicrm_sdd_creditor`.`group_batching_mode`.';
     }
+    if (!CRM_Core_DAO::checkFieldExists('civicrm_sdd_creditor', 'month_wrap_policy')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` ADD `month_wrap_policy` varchar(4) DEFAULT \"PRE\" COMMENT 'How to handle due dates of recurring payment installments (using \'month\' or \'year\' `frequency_unit`) that would wrap over into next month. PRE: move date before end of month; POST: wrap to 1st of next month; NONE: no explicit handling (February payments might wrap up to 3 days into March).'");
+      $messages[] = 'Added `civicrm_sdd_creditor`.`month_wrap_policy`.';
+    }
 
     $this->assign('messages', $messages);
     parent::run();

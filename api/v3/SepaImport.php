@@ -161,9 +161,10 @@ function civicrm_api3_sepa_import_create($params) {
   #  $firstPaymentPeriod = 0;
   #}
 
+  $monthWrapPolicy = civicrm_api3('SepaCreditor', 'getvalue', array('payment_processor_id' => $params['payment_processor_id'], 'return' => 'month_wrap_policy'));
   for ($firstPaymentPeriod = 0, $firstPaymentDate = $startDate; $firstPaymentDate < $createDate; ) {
     ++$firstPaymentPeriod;
-    $firstPaymentDate = CRM_Sepa_Logic_Base::addPeriods($startDate, $firstPaymentPeriod, $frequencyUnit, $frequencyInterval);
+    $firstPaymentDate = CRM_Sepa_Logic_Base::addPeriods($startDate, $firstPaymentPeriod, $frequencyUnit, $frequencyInterval, $monthWrapPolicy);
   }
 
   $params = array_merge($params, array(

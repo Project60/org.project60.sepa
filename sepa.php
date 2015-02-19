@@ -142,6 +142,16 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       )
     );
 
+    $form->addRadio(
+      'month_wrap_policy',
+      'Month Wrap Policy',
+      array(
+        'PRE' => 'Move date before end of month',
+        'POST' => 'Wrap to 1st of next month',
+        'NONE' => 'No explicit handling',
+      )
+    );
+
     // get the creditor info as well
     $ppid=$form->getVar("_id");
     if (isset($ppid)) {
@@ -163,6 +173,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         'maximum_advance_days' => $cred['maximum_advance_days'],
         'use_cor1' => $cred['use_cor1'],
         'group_batching_mode' => $cred['group_batching_mode'],
+        'month_wrap_policy' => $cred['month_wrap_policy'],
       ));
     } else {
       $session = CRM_Core_Session::singleton();
@@ -174,6 +185,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         'maximum_advance_days' => 14,
         'use_cor1' => false,
         'group_batching_mode' => 'COR',
+        'month_wrap_policy' => 'PRE',
       ));
     }
     CRM_Core_Region::instance('page-body')->add(array(
@@ -387,6 +399,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     $creditor['maximum_advance_days'] = $form->_submitValues['maximum_advance_days'];
     $creditor['use_cor1'] = isset($form->_submitValues['use_cor1']);
     $creditor['group_batching_mode'] = $form->_submitValues['group_batching_mode'];
+    $creditor['month_wrap_policy'] = $form->_submitValues['month_wrap_policy'];
 
     if (!$creditor["id"]) {
       unset($creditor["id"]);

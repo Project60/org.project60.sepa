@@ -198,6 +198,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $group_batching_mode;
   /**
+   * How to handle due dates of recurring payment installments (using 'month' or 'year' `frequency_unit`) that would wrap over into next month. PRE: move date before end of month; POST: wrap to 1st of next month; NONE: no explicit handling (February payments might wrap up to 3 days into March).
+   *
+   * @var string
+   */
+  public $month_wrap_policy;
+  /**
    * class constructor
    *
    * @access public
@@ -352,6 +358,14 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'size' => CRM_Utils_Type::FOUR,
           'default' => 'COR',
         ) ,
+        'month_wrap_policy' => array(
+          'name' => 'month_wrap_policy',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Month Wrap Policy') ,
+          'maxlength' => 4,
+          'size' => CRM_Utils_Type::FOUR,
+          'default' => 'PRE',
+        ) ,
       );
     }
     return self::$_fields;
@@ -385,6 +399,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'maximum_advance_days' => 'maximum_advance_days',
         'use_cor1' => 'use_cor1',
         'group_batching_mode' => 'group_batching_mode',
+        'month_wrap_policy' => 'month_wrap_policy',
       );
     }
     return self::$_fieldKeys;

@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `extra_advance_days` int unsigned   DEFAULT 1 COMMENT 'How many banking days (if any) to add on top of all minimum advance presentation deadlines defined in the SEPA rulebook.',
      `maximum_advance_days` tinyint   DEFAULT 14 COMMENT 'When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)',
      `use_cor1` tinyint   DEFAULT 0 COMMENT 'Generate SEPA XML files using \"Local Instrument\" COR1 instead of CORE (along with the shorter minimum advance presentation deadlines) for domestic payments.',
-     `group_batching_mode` varchar(4)   DEFAULT "COR" COMMENT 'How to batch TxGroups into files. NONE: every TxGroup in a separate file; TYPE: one file for each Sequence Type (FRST/RCUR/OOFF); COR: one file for all COR1 and one for all CORE; ALL: single file with all groups.'
+     `group_batching_mode` varchar(4)   DEFAULT "COR" COMMENT 'How to batch TxGroups into files. NONE: every TxGroup in a separate file; TYPE: one file for each Sequence Type (FRST/RCUR/OOFF); COR: one file for all COR1 and one for all CORE; ALL: single file with all groups.',
+     `month_wrap_policy` varchar(4)   DEFAULT "PRE" COMMENT 'How to handle due dates of recurring payment installments (using \'month\' or \'year\' `frequency_unit`) that would wrap over into next month. PRE: move date before end of month; POST: wrap to 1st of next month; NONE: no explicit handling (February payments might wrap up to 3 days into March).' 
 ,
     PRIMARY KEY ( `id` )
 

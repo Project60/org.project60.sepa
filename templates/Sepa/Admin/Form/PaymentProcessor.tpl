@@ -53,6 +53,10 @@
   <td class="label">{$form.group_batching_mode.label}</td>
   <td>{$form.group_batching_mode.html} {help id='group_batching_mode' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
 </tr>
+<tr id="crmf-month_wrap_policy">
+  <td class="label">{$form.month_wrap_policy.label}</td>
+  <td>{$form.month_wrap_policy.html} {help id='month_wrap_policy' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
           
 </table>
 </div>

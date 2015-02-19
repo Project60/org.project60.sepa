@@ -169,7 +169,11 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
     'api.SepaMandate.getsingle' => array(
       'entity_table' => 'civicrm_contribution_recur',
       'entity_id' => '$value.id',
-      'return' => 'status',
+      'return' => array('status', 'creditor_id'),
+      'api.SepaCreditor.getsingle' => array(
+        'id' => '$value.creditor_id',
+        'return' => 'month_wrap_policy',
+      ),
     ),
     'api.Contact.getcount' => array(
       'id' => '$value.contact_id',
@@ -180,6 +184,7 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
   foreach ($result['values'] as $recur) {
     $lastContrib = $recur['api.Contribution.getsingle'];
     $mandate = $recur['api.SepaMandate.getsingle'];
+    $monthWrapPolicy = $mandate['api.SepaCreditor.getsingle']['month_wrap_policy'];
     $contactCount = $recur['api.Contact.getcount'];
 
     if (!CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status'])) {
@@ -195,10 +200,10 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
     $frequencyInterval = $recur['frequency_interval'];
 
     $lastPeriod = $lastContrib[$sequenceNumberField] - 1;
-    $lastDueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $lastPeriod, $frequencyUnit, $frequencyInterval);
+    $lastDueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $lastPeriod, $frequencyUnit, $frequencyInterval, $monthWrapPolicy);
 
     for ($period = $lastPeriod + 1; $lastDueDate < $today; ++$period, $lastDueDate = $dueDate) {
-      $dueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $period, $frequencyUnit, $frequencyInterval);
+      $dueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $period, $frequencyUnit, $frequencyInterval, $monthWrapPolicy);
 
       $result = civicrm_api3('Contribution', 'create', array(
         'contact_id' => $recur['contact_id'],

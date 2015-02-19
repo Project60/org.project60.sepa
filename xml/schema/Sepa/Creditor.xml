@@ -188,4 +188,14 @@
     <comment>How to batch TxGroups into files. NONE: every TxGroup in a separate file; TYPE: one file for each Sequence Type (FRST/RCUR/OOFF); COR: one file for all COR1 and one for all CORE; ALL: single file with all groups.</comment>
     <add>4.5</add>
   </field>
+
+  <field>
+    <name>month_wrap_policy</name>
+    <title>Month Wrap Policy</title>
+    <type>varchar</type>
+    <length>4</length>
+    <default>"PRE"</default>
+    <comment>How to handle due dates of recurring payment installments (using 'month' or 'year' `frequency_unit`) that would wrap over into next month. PRE: move date before end of month; POST: wrap to 1st of next month; NONE: no explicit handling (February payments might wrap up to 3 days into March).</comment>
+    <add>4.5</add>
+  </field>
 </table>
