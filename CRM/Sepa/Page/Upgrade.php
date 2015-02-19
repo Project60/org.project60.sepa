@@ -14,6 +14,10 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` ADD `extra_advance_days` int unsigned DEFAULT 1 COMMENT 'How many banking days (if any) to add on top of all minimum advance presentation deadlines defined in the SEPA rulebook.'");
       $messages[] = 'Added `civicrm_sdd_creditor`.`extra_advance_days`.';
     }
+    if (!CRM_Core_DAO::checkFieldExists('civicrm_sdd_creditor', 'maximum_advance_days')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` ADD `maximum_advance_days` tinyint DEFAULT 14 COMMENT 'When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)'");
+      $messages[] = 'Added `civicrm_sdd_creditor`.`maximum_advance_days`.';
+    }
 
     $this->assign('messages', $messages);
     parent::run();

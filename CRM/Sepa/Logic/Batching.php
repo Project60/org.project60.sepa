@@ -90,7 +90,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditorId));
     $creditorCountry = substr($creditor['iban'], 0, 2); /* IBAN begins with country code. (Needed for COR1 handling.) */
 
-    $maximumAdvanceDays = 14; // Default per SEPA Rulebook.
+    $maximumAdvanceDays = $creditor['maximum_advance_days'];
     $dateRangeEnd = date('Y-m-d', strtotime("$submitDate + $maximumAdvanceDays days"));
 
     #$result = civicrm_api3('SepaCreditor', 'getsingle', array(

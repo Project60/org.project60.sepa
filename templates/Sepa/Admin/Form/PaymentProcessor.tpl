@@ -41,6 +41,10 @@
   <td class="label">{$form.extra_advance_days.label}</td>
   <td>{$form.extra_advance_days.html} {help id='extra_advance_days' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
 </tr>
+<tr id="crmf-maximum_advance_days">
+  <td class="label">{$form.maximum_advance_days.label}</td>
+  <td>{$form.maximum_advance_days.html} {help id='maximum_advance_days' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
           
 </table>
 </div>

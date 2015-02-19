@@ -180,6 +180,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $extra_advance_days;
   /**
+   * When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)
+   *
+   * @var boolean
+   */
+  public $maximum_advance_days;
+  /**
    * class constructor
    *
    * @access public
@@ -315,6 +321,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'title' => ts('Extra Advance Days') ,
           'default' => '1',
         ) ,
+        'maximum_advance_days' => array(
+          'name' => 'maximum_advance_days',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Maximum Advance Days') ,
+          'default' => '14',
+        ) ,
       );
     }
     return self::$_fields;
@@ -345,6 +357,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'mandate_active' => 'mandate_active',
         'sepa_file_format_id' => 'sepa_file_format_id',
         'extra_advance_days' => 'extra_advance_days',
+        'maximum_advance_days' => 'maximum_advance_days',
       );
     }
     return self::$_fieldKeys;

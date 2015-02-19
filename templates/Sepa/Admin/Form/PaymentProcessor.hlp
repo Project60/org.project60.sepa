@@ -2,3 +2,9 @@
   <p>{ts}The SEPA DD Rulebook specifies how many banking days (more precisely, TARGET inter-bank days) in advance (before the due date) a collection has to be presented to the debtor bank at the latest. However, many (all?) creditor banks need an additional banking day to process the collections before presenting them to the debtor bank.{/ts}</p>
   <p>{ts}If you know that your (creditor) bank doesn't need that extra day, specify 0 here; otherwise, leave it at the default of 1. (Larger numbers are also possible, in case some bank needs even more than one day.) If you are unsure, check with your bank.{/ts}</p>
 {/htxt}
+
+{htxt id='maximum_advance_days'}
+  <p>{ts}When preparing SEPA XML files for submitting to the bank, include all outstanding payments with a due date up to these many calendar(!) days in the future.{/ts}</p>
+  <p>{ts}Longer advance times allow for longer intervals between submissions without interrupting the payment flow; and give more leeway in case of delays. On the other hand, too long advance times can cause trouble if it turns out that a contribution needs to be cancelled, as collections cannot be easily retracted once submitted to the bank. The default of 14 calendar days seems a good compromise for most organisations, if making use of the increased flexibility offered by COR1 payments. If COR1 cannot be used, a couple more days might be desirable.{/ts}</p>
+  <p>{ts}Note however that according to the SEPA DD Rulebook, banks only have to accept collections presented up to 14 days in advance &mdash; unless they explicitly offer a longer option. So if a longer time is desired, please check with your bank first how much they actually permit.{/ts}</p>
+{/htxt}
