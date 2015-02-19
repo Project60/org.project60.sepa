@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `mandate_active` tinyint    COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.',
      `sepa_file_format_id` int unsigned    COMMENT 'Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.',
      `extra_advance_days` int unsigned   DEFAULT 1 COMMENT 'How many banking days (if any) to add on top of all minimum advance presentation deadlines defined in the SEPA rulebook.',
-     `maximum_advance_days` tinyint   DEFAULT 14 COMMENT 'When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)'
+     `maximum_advance_days` tinyint   DEFAULT 14 COMMENT 'When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)',
+     `use_cor1` tinyint   DEFAULT 0 COMMENT 'Generate SEPA XML files using \"Local Instrument\" COR1 instead of CORE (along with the shorter minimum advance presentation deadlines) for domestic payments.'
 ,
     PRIMARY KEY ( `id` )
 

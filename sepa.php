@@ -129,6 +129,8 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
     $form->add('text', 'maximum_advance_days', ts('Maximum advance days', null, true));
     $form->addRule('maximum_advance_days', ts('%1 must be a whole positive number.', array(1 => ts('Maximum advance days'))), 'positiveInteger');
 
+    $form->add('checkbox', 'use_cor1', ts('Use COR1 for domestic payments'));
+
     // get the creditor info as well
     $ppid=$form->getVar("_id");
     if (isset($ppid)) {
@@ -148,6 +150,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         "sepa_file_format_id"=>$cred["sepa_file_format_id"],
         'extra_advance_days' => $cred['extra_advance_days'],
         'maximum_advance_days' => $cred['maximum_advance_days'],
+        'use_cor1' => $cred['use_cor1'],
       ));
     } else {
       $session = CRM_Core_Session::singleton();
@@ -157,6 +160,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         'sepa_file_format_id' => CRM_Core_OptionGroup::getDefaultValue('sepa_file_format'),
         'extra_advance_days' => 1,
         'maximum_advance_days' => 14,
+        'use_cor1' => false,
       ));
     }
     CRM_Core_Region::instance('page-body')->add(array(
@@ -368,6 +372,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
 
     $creditor['extra_advance_days'] = $form->_submitValues['extra_advance_days'];
     $creditor['maximum_advance_days'] = $form->_submitValues['maximum_advance_days'];
+    $creditor['use_cor1'] = isset($form->_submitValues['use_cor1']);
 
     if (!$creditor["id"]) {
       unset($creditor["id"]);

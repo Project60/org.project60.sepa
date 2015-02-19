@@ -169,4 +169,13 @@
     <comment>When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)</comment>
     <add>4.5</add>
   </field>
+
+  <field>
+    <name>use_cor1</name>
+    <title>Use COR1</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Generate SEPA XML files using "Local Instrument" COR1 instead of CORE (along with the shorter minimum advance presentation deadlines) for domestic payments.</comment>
+    <add>4.5</add>
+  </field>
 </table>

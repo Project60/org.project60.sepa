@@ -186,6 +186,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $maximum_advance_days;
   /**
+   * Generate SEPA XML files using "Local Instrument" COR1 instead of CORE (along with the shorter minimum advance presentation deadlines) for domestic payments.
+   *
+   * @var boolean
+   */
+  public $use_cor1;
+  /**
    * class constructor
    *
    * @access public
@@ -327,6 +333,11 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'title' => ts('Maximum Advance Days') ,
           'default' => '14',
         ) ,
+        'use_cor1' => array(
+          'name' => 'use_cor1',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Use COR1') ,
+        ) ,
       );
     }
     return self::$_fields;
@@ -358,6 +369,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'sepa_file_format_id' => 'sepa_file_format_id',
         'extra_advance_days' => 'extra_advance_days',
         'maximum_advance_days' => 'maximum_advance_days',
+        'use_cor1' => 'use_cor1',
       );
     }
     return self::$_fieldKeys;

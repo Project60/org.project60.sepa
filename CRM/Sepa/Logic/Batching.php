@@ -126,7 +126,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
       $receiveDate = date('Y-m-d', strtotime($contribution['receive_date']));
       $instrument = $contribution['payment_instrument_id'];
 
-      $isCor1 = (substr($contribution['iban'], 0, 2) == $creditorCountry) ? 'cor1' : ''; /* Need to use strings rather than actual bool values, so we can use them as array indices. */
+      $isCor1 = (isset($creditor['use_cor1']) && substr($contribution['iban'], 0, 2) == $creditorCountry) ? 'cor1' : ''; /* Need to use strings rather than actual bool values, so we can use them as array indices. */
 
       $pendingGroups = array_replace_recursive($pendingGroups, array($isCor1 => array($instrument => array($receiveDate => array())))); /* Create any missing array levels, to avoid PHP notice. */
       $pendingGroups[$isCor1][$instrument][$receiveDate][] = $contributionId;
