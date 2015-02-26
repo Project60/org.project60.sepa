@@ -35,6 +35,11 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = 'Added `civicrm_sdd_creditor`.`month_wrap_policy`.';
     }
 
+    if (!CRM_Core_DAO::checkFieldExists('civicrm_sdd_creditor', 'remittance_info')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` ADD `remittance_info` varchar(140) NOT NULL  DEFAULT '' COMMENT 'String used as the <RmtInf> value for each collection in SEPA XML files.' AFTER `category`");
+      $messages[] = 'Added `civicrm_sdd_creditor`.`remittance_info`.';
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }

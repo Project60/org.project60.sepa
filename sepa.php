@@ -152,6 +152,8 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
       )
     );
 
+    $form->add('text', 'remittance_info', ts('Remittance Information text'));
+
     // get the creditor info as well
     $ppid=$form->getVar("_id");
     if (isset($ppid)) {
@@ -174,6 +176,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         'use_cor1' => $cred['use_cor1'],
         'group_batching_mode' => $cred['group_batching_mode'],
         'month_wrap_policy' => $cred['month_wrap_policy'],
+        'remittance_info' => $cred['remittance_info'],
       ));
     } else {
       $session = CRM_Core_Session::singleton();
@@ -400,6 +403,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     $creditor['use_cor1'] = isset($form->_submitValues['use_cor1']);
     $creditor['group_batching_mode'] = $form->_submitValues['group_batching_mode'];
     $creditor['month_wrap_policy'] = $form->_submitValues['month_wrap_policy'];
+    $creditor['remittance_info'] = !empty($form->_submitValues['remittance_info']) ? $form->_submitValues['remittance_info'] : false; /* Using FALSE to work around bug, where attempting to store an empty string stores the string(!) value 'null' instead... */
 
     if (!$creditor["id"]) {
       unset($creditor["id"]);

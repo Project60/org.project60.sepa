@@ -124,6 +124,16 @@
     <comment>Default value</comment>
     <add>4.3</add>
   </field>
+  <field>
+    <name>remittance_info</name>
+    <title>Remittance Information text</title>
+    <type>varchar</type>
+    <length>140</length>
+    <required>true</required>
+    <default>''</default>
+    <comment>String used as the &lt;RmtInf> value for each collection in SEPA XML files.</comment>
+    <add>4.5</add>
+  </field>
 
   <field>
     <name>tag</name>

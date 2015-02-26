@@ -57,6 +57,10 @@
   <td class="label">{$form.month_wrap_policy.label}</td>
   <td>{$form.month_wrap_policy.html} {help id='month_wrap_policy' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
 </tr>
+<tr id="crmf-remittance_info">
+  <td class="label">{$form.remittance_info.label}</td>
+  <td>{$form.remittance_info.html} {help id='remittance_info' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
           
 </table>
 </div>

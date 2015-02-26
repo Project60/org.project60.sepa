@@ -41,3 +41,8 @@
     <li>{ts}No explicit handling: Like above, except rather than always wrapping to the first day of the next month, the payment can move further into the month if more than one day is "missing". Specifically that means that for February, payments normally scheduled for the 31st of a month will wrap to March 3rd (or 2nd in leap years), and payments scheduled for the 30th will wrap to March 2nd in non-leap years. For all other cases the effect is the same as above.{/ts}</li>
   </ul>
 {/htxt}
+
+{htxt id='remittance_info'}
+  <p>{ts}Text used to populate the &lt;RmtInf> field for all payments (pertaining to this Creditor) in the generated SEPA XML files. Presently, we only support a constant string here, i.e. the exact same text will be used for every payment.{/ts}</p>
+  <p>{ts}Note that this text will show up on the debtor's account statement. (Along with some other fields, such as the unique End-to-end ID and the Mandate Reference.) While it's valid to omit it (no &lt;RmtInf> field is created in the XML files in that case), this will look suspicious on the bank statement, and might prompt some debtors to initiate a refund. To be safe, use some phrase that indicates a legit collection.{/ts}</p>
+{/htxt}

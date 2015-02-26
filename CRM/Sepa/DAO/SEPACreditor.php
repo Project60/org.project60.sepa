@@ -156,6 +156,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $category;
   /**
+   * String used as the <RmtInf> value for each collection in SEPA XML files.
+   *
+   * @var string
+   */
+  public $remittance_info;
+  /**
    * Place this creditor's transaction groups in an XML file tagged with this value.
    *
    * @var string
@@ -313,6 +319,15 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
         ) ,
+        'remittance_info' => array(
+          'name' => 'remittance_info',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Remittance Information text') ,
+          'required' => true,
+          'maxlength' => 140,
+          'size' => CRM_Utils_Type::HUGE,
+          'default' => '',
+        ) ,
         'tag' => array(
           'name' => 'tag',
           'type' => CRM_Utils_Type::T_STRING,
@@ -392,6 +407,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'mandate_prefix' => 'mandate_prefix',
         'payment_processor_id' => 'payment_processor_id',
         'category' => 'category',
+        'remittance_info' => 'remittance_info',
         'tag' => 'tag',
         'mandate_active' => 'mandate_active',
         'sepa_file_format_id' => 'sepa_file_format_id',

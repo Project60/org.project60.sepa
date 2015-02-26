@@ -72,10 +72,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t=$contrib->toArray();
       $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
 
-      // create an individual transaction message
-      $tx_message = "Digitalcourage sagt Danke";
-//TODO @systopia      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
-      $t["message"] = $tx_message;
+      $t['message'] = $creditor['remittance_info'];
 
       $t['trxn_id'] = "{$creditor['mandate_prefix']}-{$t['contribution_id']}";
       civicrm_api3('Contribution', 'create', array(
