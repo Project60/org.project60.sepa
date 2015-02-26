@@ -231,11 +231,11 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
 
           /* When processing the submitted form, we need to swap out the fields in the main form object. */
           if ($form->_flagSubmitted) {
-            /* Make all original (CreditCard) payment fields non-mandatory.
-             *
-             * We can't just remove the fields alltogether,
-             * because the new "Chain Select" handling in CiviCRM 4.5 errors out if we do. */
-            $form->_required = array_diff($form->_required, array_keys($form->_paymentFields));
+            /* Get rid of CreditCard fields.
+             * (Many of them are mandatory, and thus really in the way when processing the submitted form.) */
+            foreach (array_keys($form->_paymentFields) as $fieldName) {
+              $form->removeElement($fieldName);
+            }
 
             /* Fields we actually want processed and passed to the PP. */
             $form->addElement('checkbox', 'sepa_active');
