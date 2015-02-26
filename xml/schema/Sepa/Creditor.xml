@@ -166,7 +166,7 @@
     <title>Maximum Advance Days</title>
     <type>boolean</type>
     <default>14</default>
-    <comment>When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)</comment>
+    <comment>When generating SEPA XML files, include payments up to this many calendar days from now. (14 is the minimum banks have to allow according to rulebook.)</comment>
     <add>4.5</add>
   </field>
 

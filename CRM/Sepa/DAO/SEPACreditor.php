@@ -180,7 +180,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $extra_advance_days;
   /**
-   * When generating SEPA XML files, include payments up to this many calender days from now. (14 is the minimum banks have to allow according to rulebook.)
+   * When generating SEPA XML files, include payments up to this many calendar days from now. (14 is the minimum banks have to allow according to rulebook.)
    *
    * @var boolean
    */
