@@ -461,6 +461,7 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
     }
 
     $newMandate["id"]=$mandate["id"];
+    $newMandate['creditor_id'] = $mandate['creditor_id'];
     //not strictly needed, uncomment if proven handy in the underlying api/bao
     //$newMandate["entity_id"]=$mandate["entity_id"];
     //$newMandate["entity_table"]=$mandate["entity_table"];
