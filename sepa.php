@@ -169,7 +169,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         "mandate_active"=>$cred["mandate_active"],
         "creditor_prefix"=>$cred["mandate_prefix"],
         "creditor_iban"=>$cred["iban"],
-        "creditor_bic"=> isset($cred["bic"]) ? $cred["bic"] : null,
+        'creditor_bic' => CRM_Utils_Array::value('bic', $cred),
         "sepa_file_format_id"=>$cred["sepa_file_format_id"],
         'extra_advance_days' => $cred['extra_advance_days'],
         'maximum_advance_days' => $cred['maximum_advance_days'],
