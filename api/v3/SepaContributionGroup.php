@@ -182,6 +182,7 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
   )));
 
   foreach ($result['values'] as $recur) {
+    $installments = CRM_Utils_Array::value('installments', $recur, 0);
     $lastContrib = $recur['api.Contribution.getsingle'];
     $mandate = $recur['api.SepaMandate.getsingle'];
     $monthWrapPolicy = $mandate['api.SepaCreditor.getsingle']['month_wrap_policy'];
@@ -202,7 +203,7 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
     $lastPeriod = $lastContrib[$sequenceNumberField] - 1;
     $lastDueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $lastPeriod, $frequencyUnit, $frequencyInterval, $monthWrapPolicy);
 
-    for ($period = $lastPeriod + 1; $lastDueDate < $today; ++$period, $lastDueDate = $dueDate) {
+    for ($period = $lastPeriod + 1; $lastDueDate < $today && (!$installments || $period < $installments); ++$period, $lastDueDate = $dueDate) {
       $dueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $period, $frequencyUnit, $frequencyInterval, $monthWrapPolicy);
 
       $result = civicrm_api3('Contribution', 'create', array(
