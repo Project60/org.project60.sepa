@@ -331,7 +331,7 @@ EOD;
           $form->assign($mandate);
 
           $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue(CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']));
-          $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
+          $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue(CRM_Utils_Array::value('bic', $mandate));
           $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
 
           CRM_Core_Region::instance('page-body')->add(array(
@@ -364,7 +364,7 @@ EOD;
     $form->assign($mandate);
     //TODO, add in the form, as a region?
     $form->add( 'checkbox', 'sepa_active',  ts('Active mandate'))->setValue(CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status']));
-    $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue($mandate["bic"]);
+    $form->add( 'text', 'bank_bic',  ts('BIC'),"size=11 maxlength=11")->setValue(CRM_Utils_Array::value('bic', $mandate));
     $form->addElement( 'text', 'bank_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34))->setValue($mandate["iban"]);
     CRM_Core_Region::instance('page-body')->add(array(
       'template' => 'CRM/Sepa/Form/SepaMandate.tpl'
