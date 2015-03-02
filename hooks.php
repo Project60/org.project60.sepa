@@ -70,7 +70,7 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     if ($form->_paymentProcessor['payment_processor_type'] != 'sepa_dd') {
       return;
     }
-    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('payment_processor_id' => $from->_paymentProcessor['id'], 'return' => 'iban'));
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('payment_processor_id' => $form->_paymentProcessor['id'], 'return' => 'iban'));
   }
 
   /* Perform IBAN/BIC check for any forms that carry these fields. */
