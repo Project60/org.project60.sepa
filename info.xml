@@ -12,7 +12,7 @@
   <version>1.1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>4.4.7</ver>
+    <ver>4.4</ver>
     <ver>4.5</ver>
   </compatibility>
   <urls>
