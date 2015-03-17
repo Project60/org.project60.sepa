@@ -37,6 +37,30 @@
   <td class="label">{$form.sepa_file_format_id.label}</td>
   <td>{$form.sepa_file_format_id.html}</td>
 </tr>
+<tr id="crmf-extra_advance_days">
+  <td class="label">{$form.extra_advance_days.label}</td>
+  <td>{$form.extra_advance_days.html} {help id='extra_advance_days' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
+<tr id="crmf-maximum_advance_days">
+  <td class="label">{$form.maximum_advance_days.label}</td>
+  <td>{$form.maximum_advance_days.html} {help id='maximum_advance_days' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
+<tr id="crmf-use_cor1">
+  <td class="label">{$form.use_cor1.label}</td>
+  <td>{$form.use_cor1.html} {help id='use_cor1' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
+<tr id="crmf-group_batching_mode">
+  <td class="label">{$form.group_batching_mode.label}</td>
+  <td>{$form.group_batching_mode.html} {help id='group_batching_mode' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
+<tr id="crmf-month_wrap_policy">
+  <td class="label">{$form.month_wrap_policy.label}</td>
+  <td>{$form.month_wrap_policy.html} {help id='month_wrap_policy' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
+<tr id="crmf-remittance_info">
+  <td class="label">{$form.remittance_info.label}</td>
+  <td>{$form.remittance_info.html} {help id='remittance_info' file='Sepa/Admin/Form/PaymentProcessor.hlp'}</td>
+</tr>
           
 </table>
 </div>

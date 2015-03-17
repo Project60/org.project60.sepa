@@ -47,6 +47,11 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
   function doDirectPayment(&$params) {
     $params['trxn_id'] = "TODO GENERATE MANDATE ID";
 
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array(
+      'payment_processor_id' => $params['payment_processor_id'],
+      'return' => array('id', 'mandate_active'),
+    ));
+
     // create the mandate
     if ($this->_mode == 'test') {
       $params['trxn_id'] = "TEST:" . $params['trxn_id'];
@@ -55,7 +60,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         "iban"=> $params["bank_iban"],
         "bic" => $params["bank_bic"],
         );
-    $apiParams ["creditor_id"] = $GLOBALS["sepa_context"]["creditor_id"];
+    $apiParams['creditor_id'] = $creditor['id'];
     // set the contract entity for this mandate
     if (CRM_Utils_Array::value('is_recur', $params) &&
         $params['contributionRecurID']
@@ -74,10 +79,20 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       // Note: for one-off contributions,
       // the contribution record is created only *after* invoking doDirectPayment() --
       // so we don't have an entity ID here yet...
+
+      /* When creating Contributions through the back-office form, a Start Date can be entered;
+       * and for OOFF contributions, CiviCRM automatically passes it as `receive_date` here.
+       * However, for some reason it isn't passed in the same way to the actual Contribution create --
+       * thus we need to save it here, so we can later set it for the Contribution explicitly. */
+      $GLOBALS['sepa_context']['receive_date'] = $params['receive_date'];
     }
 
-    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $GLOBALS["sepa_context"]["creditor_id"], 'return' => 'mandate_active'));
-    if ($creditor['mandate_active']) {
+    if (isset($params['hidden_processor'])) { /* Seems to be the best indication for an actual Online Contribution (through Contribution Page) vs. a back-office Contribution. */
+      $mandateActive = $creditor['mandate_active']; /* Online => use PP default. */
+    } else {
+      $mandateActive = CRM_Utils_Array::value('sepa_active', $params); /* Back-office => selected in form. */
+    }
+    if ($mandateActive) {
       $apiParams['status'] = CRM_Utils_Array::value('is_recur', $params) ? 'FRST' : 'OOFF';
     } else {
       $apiParams['status'] = 'INIT';
@@ -138,7 +153,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
         'title' => ts('BIC'),
         'cc_field' => TRUE,
         'attributes' => array('size' => 11, 'maxlength' => 11, /* 'autocomplete' => 'off' */ ),
-        'is_required' => TRUE,
+        'is_required' => FALSE,
         );
 
     foreach ($form->_paymentFields as $name => $field) {

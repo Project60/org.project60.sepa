@@ -127,8 +127,6 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
         (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = contrib.id)
       )
     WHERE txgroup_id=$group
-      /* AND mandate.is_enabled=1 */
-      AND mandate.status IN ('FRST','OOFF','RCUR')
   ";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
@@ -141,3 +139,92 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
 }
 
 
+/**
+ */
+function civicrm_api3_sepa_contribution_group_createnext($params) {
+  set_time_limit(0); /* This action can take quite long... */
+
+  $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
+
+  $today = date_create('00:00');
+
+  $instruments = array();
+  foreach (array('FRST', 'RCUR') as $type) {
+    $instruments[] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
+  }
+
+  $result = civicrm_api3('ContributionRecur', 'get', array_merge($params, array(
+    'options' => array('limit' => 1234567890),
+    'payment_instrument_id' => array('IN' => $instruments),
+    'contribution_status_id' => array('IN' => array(
+      CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+      CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name'),
+    )),
+    'api.Contribution.getsingle' => array(
+      'options' => array(
+        'sort' => "$sequenceNumberField DESC",
+        'limit' => 1,
+      ),
+    ),
+    'api.SepaMandate.getsingle' => array(
+      'entity_table' => 'civicrm_contribution_recur',
+      'entity_id' => '$value.id',
+      'return' => array('status', 'creditor_id'),
+      'api.SepaCreditor.getsingle' => array(
+        'id' => '$value.creditor_id',
+        'return' => 'month_wrap_policy',
+      ),
+    ),
+    'api.Contact.getcount' => array(
+      'id' => '$value.contact_id',
+      'is_deleted' => 0,
+    ),
+  )));
+
+  foreach ($result['values'] as $recur) {
+    $installments = CRM_Utils_Array::value('installments', $recur, 0);
+    $lastContrib = $recur['api.Contribution.getsingle'];
+    $mandate = $recur['api.SepaMandate.getsingle'];
+    $monthWrapPolicy = $mandate['api.SepaCreditor.getsingle']['month_wrap_policy'];
+    $contactCount = $recur['api.Contact.getcount'];
+
+    if (!CRM_Sepa_BAO_SEPAMandate::is_active($mandate['status'])) {
+      continue;
+    }
+
+    if (!$contactCount) { /* Deleted Contact (or otherwise orphaned Recur record). */
+      continue;
+    }
+
+    $recurStart = date_create_from_format("!Y-m-d+", $recur['start_date']);
+    $frequencyUnit = $recur['frequency_unit'];
+    $frequencyInterval = $recur['frequency_interval'];
+
+    $lastPeriod = $lastContrib[$sequenceNumberField] - 1;
+    $lastDueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $lastPeriod, $frequencyUnit, $frequencyInterval, $monthWrapPolicy);
+
+    for ($period = $lastPeriod + 1; $lastDueDate < $today && (!$installments || $period < $installments); ++$period, $lastDueDate = $dueDate) {
+      $dueDate = CRM_Sepa_Logic_Base::addPeriods($recurStart, $period, $frequencyUnit, $frequencyInterval, $monthWrapPolicy);
+
+      $result = civicrm_api3('Contribution', 'create', array(
+        'contact_id' => $recur['contact_id'],
+        'financial_type_id' => $recur['financial_type_id'],
+        'contribution_page_id' => $lastContrib['contribution_page_id'],
+        'payment_instrument_id' => CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name'),
+        'receive_date' => date_format($dueDate, 'Y-m-d'),
+        'total_amount' => $recur['amount'],
+        'currency' => $recur['currency'],
+        'source' => $lastContrib['source'],
+        'amount_level' => $lastContrib['amount_level'],
+        'contribution_recur_id' => $recur['id'],
+        'honor_contact_id' => $lastContrib['honor_contact_id'],
+        'is_test' => $recur['is_test'],
+        'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+        'honor_type_id' => $lastContrib['honor_type_id'],
+        'address_id' => $lastContrib['address_id'],
+        'campaign_id' => $recur['campaign_id'],
+        $sequenceNumberField => $period + 1,
+      ));
+    } /* for($period) */
+  } /* foreach($recur) */
+}

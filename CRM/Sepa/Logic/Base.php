@@ -2,8 +2,8 @@
 
 class CRM_Sepa_Logic_Base {
 
-  public static $debugByStatus = 1;
-  public static $debugByEcho = 1;
+  public static $debugByStatus = 0;
+  public static $debugByEcho = 0;
   public static $debugByLog = 1;
   public static $debugLogPath = '';
 
@@ -66,75 +66,46 @@ class CRM_Sepa_Logic_Base {
   }
 
   /**
-   * Adjust this date by a number of bank working days. 
+   * Advance given date by a number of inter-bank working days, according to TARGET calendar.
+   *
+   * If the given date is not on a banking day itself,
+   * counting starts with the next banking day as day 0.
    * 
-   * @param type $date_to_adjust
-   * @param type $days_delta
-   * @return type
+   * @param string $date_to_adjust
+   * @param string $days_delta
+   * @return string
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
+    $startDate = date_create_from_format("!Y-m-d+", $date_to_adjust, timezone_open('UTC'));
 
-    $days = array( 1=>'Monday',2=>'Tuesday',3=>'Wednesday',4=>'Thursday', 5=>'Friday');
-//absolutely broken, right now do nothing is better
-    $date_part = substr($date_to_adjust, 0, 10);
-    //return $date_part;
+    $weekend = array('Sat', 'Sun');
+    $fixedHolidays = array(
+      '01-01', /* New Year's Day */
+      '05-01', /* Labour Day */
+      '12-25', /* Christmas Day */
+      '12-26', /* Christmas Holiday */
+    );
 
-    // convert to date
-    $date_ta = date_create($date_part);
-    $tinfo = getdate(strtotime($date_part));
-    $wday = $tinfo['wday'];   // 0 is Sunday, 6 is Saturday
-    
-    if ($days_delta > 0) {
-      // echo ' moving forward from ', $date_part, ' (', $wday, ')';
-      // adjust for bankdays -> real days
-      $delta = floor($days_delta / 5) * 7 + ($days_delta % 5);
-      // adjust for first weekend jump, if today's weekday + delta would land in a weekend (6 or 7/0)
-      if ($wday + $delta > 6) $delta += 2; 
-      else if ($wday + $delta == 6) $delta += 1;
-      $date_ta = date_add($date_ta, date_interval_create_from_date_string($delta . ' days'));
-      //echo ' +', $delta, ' days to become ', date_format($date_ta,'Y-m-d');
-      // push forward if on a weekend
-      $tinfo = getdate(strtotime(date_format($date_ta,'Y-m-d')));
-      switch ($tinfo['wday']) {
-        case 0 : // Sunday
-          $date_ta = date_add($date_ta, date_interval_create_from_date_string('1 days'));
-          //echo ' -- on a Sunday so adding 1 day to become ', date_format($date_ta,'Y-m-d');
-          break;
-        case 6 : // Saturday
-          $date_ta = date_add($date_ta, date_interval_create_from_date_string('2 days'));
-          //echo ' -- on a Saturday so adding 2 days to become ', date_format($date_ta,'Y-m-d');
-          break;
-        default:
-          //echo ' -- on ', $days[$tinfo['wday']];
-          break;
-      }
-    } else if ($days_delta < 0) {
-      //echo ' moving backward from ', $date_part;
-      $days_delta = - $days_delta;
-      // adjust for bankdays -> real days
-      $delta = floor($days_delta / 5) * 7 + ($days_delta % 5);
-      if ($wday - $delta < 0) $delta += 1; 
-      else if ($wday - $delta == 0) $delta += 2;
-      $date_ta = date_sub($date_ta, date_interval_create_from_date_string($delta . ' days'));
-      //echo ' -', $delta, ' days to become ', date_format($date_ta,'Y-m-d');
-      // pull back if on a weekend
-      $tinfo = getdate(strtotime(date_format($date_ta,'Y-m-d')));
-      switch ($tinfo['wday']) {
-        case 0 : // Sunday
-          $date_ta = date_sub($date_ta, date_interval_create_from_date_string('2 days'));
-          //echo ' -- on a Sunday so subtracting 2 days to become ', date_format($date_ta,'Y-m-d');
-          break;
-        case 6 : // Saturday
-          $date_ta = date_sub($date_ta, date_interval_create_from_date_string('1 days'));
-          //echo ' -- on a Saturday so subtracting 1 day to become ', date_format($date_ta,'Y-m-d');
-          break;
-        default:
-          //echo ' -- on ', $days[$tinfo['wday']];
-          break;
+    for ($nextDate = $startDate, $bankDays = -1; $bankDays < $days_delta; $nextDate->modify('+1 day')) {
+      $date = clone $nextDate;
+
+      $year = $date->format('Y');
+      $easterDays = easter_days($year);
+      $variableHolidays = array(
+        date('Y-m-d', strtotime("$year-03-19 +$easterDays days")), /* Good Friday */
+        date('Y-m-d', strtotime("$year-03-22 +$easterDays days")), /* Easter Monday */
+      );
+
+      if (
+        !in_array($date->format('D'), $weekend)
+        && !in_array($date->format('m-d'), $fixedHolidays)
+        && !in_array($date->format('Y-m-d'), $variableHolidays)
+      ) {
+        ++$bankDays;
       }
     }
 
-    return date_format($date_ta,'Y-m-d');
+    return date_format($date, 'Y-m-d');
   }
 
   /**
@@ -219,6 +190,46 @@ class CRM_Sepa_Logic_Base {
     $string = preg_replace('%[^[:alnum:]/?:().,\' +-]%', '.', $string);
 
     return $string;
+  }
+
+  public static function countPeriods($fromDate, $toDate, $frequencyUnit, $frequencyInterval) {
+    $origTimezone = date_default_timezone_get();
+    date_default_timezone_set('UTC');
+    $diff = date_diff($fromDate, $toDate);
+    date_default_timezone_set($origTimezone);
+
+    switch ($frequencyUnit) {
+      case 'year': $units = $diff->y; break;
+      case 'month': $units = 12 * $diff->y + $diff->m; break;
+      case 'week': $units = floor($diff->days / 7); break;
+      case 'day': $units = $diff->days; break;
+      default: throw new Exception("Unknown frequency unit: $frequencyUnit");
+    }
+    $signedUnits = $units * ($diff->inverse ? -1 : 1);
+#echo('<pre>'.print_r($fromDate, true).print_r($toDate, true).print_r($diff, true).print_r($signedUnits, true).'</pre>'); #DEBUG
+    return floor($signedUnits / $frequencyInterval);
+  }
+
+  public static function addPeriods($startDate, $periods, $frequencyUnit, $frequencyInterval, $monthWrapPolicy) {
+    $dueDate = date_add(clone $startDate, DateInterval::createFromDateString($periods * $frequencyInterval . $frequencyUnit));
+
+    if (in_array($frequencyUnit, array('month', 'year')) && $dueDate->format('d') != $startDate->format('d')) { /* Month wrapped. */
+      $wrapDays = $dueDate->format('d');
+      switch ($monthWrapPolicy) {
+        case 'PRE':
+          $dueDate->modify("-$wrapDays days");
+          break;
+        case 'POST':
+          $dueDate->modify("-$wrapDays days +1 day");
+          break;
+      }
+    }
+
+    return $dueDate;
+  }
+
+  public static function getSequenceNumberField() {
+    return 'custom_' . civicrm_api3('CustomField', 'getvalue', array('name' => 'sdd_contribution_sequence_number', 'return' => 'id'));
   }
 }
 

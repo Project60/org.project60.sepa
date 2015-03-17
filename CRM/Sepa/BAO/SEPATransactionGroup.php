@@ -64,7 +64,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
       WHERE g.txgroup_id = %1
         AND contribution_status_id != 3
-        AND mandate.is_enabled = true
+        AND mandate.status IN ('FRST','OOFF','RCUR')
     "; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
 
@@ -72,10 +72,14 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t=$contrib->toArray();
       $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
 
-      // create an individual transaction message
-      $tx_message = "";
-//TODO @systopia      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
-      $t["message"] = $tx_message;
+      $t['message'] = $creditor['remittance_info'];
+
+      $t['trxn_id'] = "{$creditor['mandate_prefix']}-{$t['contribution_id']}";
+      civicrm_api3('Contribution', 'create', array(
+        'id' => $contrib->contribution_id,
+        'trxn_id' => $t['trxn_id'],
+        'contribution_status_id' => $t['contribution_status_id'], /* Need to resubmit the value explicitly, as otherwise it changes to 'completed' instead of keeping the original value... */
+      ));
 
       $r[] = array_map('CRM_Sepa_Logic_Base::utf8ToSEPA', $t);
       if ($creditor_id == null) {

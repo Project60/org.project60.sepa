@@ -124,6 +124,16 @@
     <comment>Default value</comment>
     <add>4.3</add>
   </field>
+  <field>
+    <name>remittance_info</name>
+    <title>Remittance Information text</title>
+    <type>varchar</type>
+    <length>140</length>
+    <required>true</required>
+    <default>''</default>
+    <comment>String used as the &lt;RmtInf> value for each collection in SEPA XML files.</comment>
+    <add>4.5</add>
+  </field>
 
   <field>
     <name>tag</name>
@@ -150,5 +160,52 @@
       <optionGroupName>sepa_file_format</optionGroupName>
     </pseudoconstant>
     <add>4.4</add>
+  </field>
+
+  <field>
+    <name>extra_advance_days</name>
+    <title>Extra Advance Days</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>How many banking days (if any) to add on top of all minimum advance presentation deadlines defined in the SEPA rulebook.</comment>
+    <add>4.5</add>
+  </field>
+
+  <field>
+    <name>maximum_advance_days</name>
+    <title>Maximum Advance Days</title>
+    <type>boolean</type>
+    <default>14</default>
+    <comment>When generating SEPA XML files, include payments up to this many calendar days from now. (14 is the minimum banks have to allow according to rulebook.)</comment>
+    <add>4.5</add>
+  </field>
+
+  <field>
+    <name>use_cor1</name>
+    <title>Use COR1</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Generate SEPA XML files using "Local Instrument" COR1 instead of CORE (along with the shorter minimum advance presentation deadlines) for domestic payments.</comment>
+    <add>4.5</add>
+  </field>
+
+  <field>
+    <name>group_batching_mode</name>
+    <title>TxGroups Batching Mode</title>
+    <type>varchar</type>
+    <length>4</length>
+    <default>"COR"</default>
+    <comment>How to batch TxGroups into files. NONE: every TxGroup in a separate file; TYPE: one file for each Sequence Type (FRST/RCUR/OOFF); COR: one file for all COR1 and one for all CORE; ALL: single file with all groups.</comment>
+    <add>4.5</add>
+  </field>
+
+  <field>
+    <name>month_wrap_policy</name>
+    <title>Month Wrap Policy</title>
+    <type>varchar</type>
+    <length>4</length>
+    <default>"PRE"</default>
+    <comment>How to handle due dates of recurring payment installments (using 'month' or 'year' `frequency_unit`) that would wrap over into next month. PRE: move date before end of month; POST: wrap to 1st of next month; NONE: no explicit handling (February payments might wrap up to 3 days into March).</comment>
+    <add>4.5</add>
   </field>
 </table>

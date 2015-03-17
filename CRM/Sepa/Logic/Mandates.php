@@ -14,16 +14,6 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     // TODO: move this to CRM_Utils_SepaCustomisationHooks?
   }
 
-  /**
-   * Trick : keep the created membership id in GLOBALS to the postProcess can pick it up
-   * 
-   * @param type $objectId
-   * @param type $objectRef
-   */
-  public static function hook_post_membership_create($objectId, $objectRef) {
-    $GLOBALS["sepa_context"]["membership_id"] = $objectId;
-  }
-
   public static function hook_post_contributionrecur_create($objectId, $objectRef) {
     // TODO: move this whole thing to CRM_Utils_SepaCustomisationHooks::mend_rcontrib? When is it called anyways?
     if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
@@ -49,28 +39,24 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       $rc->get('id', $bao->entity_id);
 
       // set start date if not set
-      if (strlen($rc->start_date)>0) {
-        $rc->start_date = date('Y-m', strtotime("now"))."-".$rc->cycle_day;
+      if (!isset($rc->start_date)) {
+        $rc->start_date = date('Ymd');
+      } else {
         $rc->start_date = date("Ymd",strtotime($rc->start_date));             // copied that from X+, must be sth about the format...
-      }
-
-      // adjust start date, if in the past or less than five days in the future
-      if (strtotime($rc->start_date) < strtotime("now + 5 days")) {
-        $rc->start_date = date("Ymd", strtotime('+1 month', strtotime($rc->start_date)));
       }
 
       $rc->create_date = date("YmdHis",strtotime($rc->create_date));
       $rc->modified_date = date("YmdHis",strtotime("now"));
 
-      if (!$bao->is_enabled && $api_mandate["is_enabled"]) {
-        $rc->contribution_status_id=1; //TODO match the status to the mandate is_enabled
+      if (!CRM_Sepa_BAO_SEPAMandate::is_active($bao->status) && CRM_Sepa_BAO_SEPAMandate::is_active($api_mandate["status"])) {
+        $rc->contribution_status_id=1; //TODO match the status to the mandate is_active
         // figure out whether there is a contribution for this mandate
         $contrib = $bao->findContribution();
         $contrib->receive_date = $rc->start_date;
         $contrib->save();
-      } elseif (!$bao->is_enabled && !$api_mandate["is_enabled"]) {
+      } elseif (!CRM_Sepa_BAO_SEPAMandate::is_active($bao->status) && !CRM_Sepa_BAO_SEPAMandate::is_active($api_mandate["status"])) {
         // TODO should we disable the next contribution or only the recurring contrib? 
-        $rc->contribution_status_id=3; //TODO match the status to the mandate is_enabled
+        $rc->contribution_status_id=3; //TODO match the status to the mandate is_active
       }
       $rc->save();
     }
@@ -153,26 +139,46 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
     public static function hook_pre_contribution_create($id, &$params) {
       if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
         $params["payment_instrument_id"] = $GLOBALS["sepa_context"]["payment_instrument_id"];
-//        CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
+
+        /* For some reason (hopefully not SEPA-related), the status defaults to 'Pending' for recurring contributions,
+         * but to 'Completed' for one-off contributions...
+         * We always want 'Pending' for DD -- so set it explicitly. */
+        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+
+        if (isset($GLOBALS['sepa_context']['receive_date'])) {
+          /* For back-office OOFF Contributions.
+           * Saved from PP $params -- for some reason, CiviCRM sets this appropriately in the PP callback, but not here... */
+          $params['receive_date'] = $GLOBALS['sepa_context']['receive_date'];
+        }
       }
     }
 
   public static function hook_post_contribution_create($objectId, $objectRef) {
-    // check whether this is a SDD contribution. This could be done using a financial_type_id created specially 
-    // for that purpose, or by examining the contrib->payment_instrument->pptype
-    if (array_key_exists("sepa_context", $GLOBALS) && $GLOBALS["sepa_context"]["payment_instrument_id"]) {
-      $objectRef->payment_instrument_id = $GLOBALS["sepa_context"]["payment_instrument_id"];
-      $objectRef->contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'); // For some reason (hopefully not SEPA-related), this is pre-set to 'pending' for recurring contributions, but to 'completed' for one-off contributions... We always want 'pending' for DD -- so set it explicitly.
-      $objectRef->save();
-      //CRM_Core_Session::setStatus('Picking up context-defined payment instrument ' . $GLOBALS["sepa_context"]["payment_instrument_id"], '', 'info');
-    }
+    if (CRM_Sepa_Logic_Base::isSDD((array)$objectRef)) {
+      /*
+       * Set `sequence_number` default value.
+       *
+       * Using API here, as the BAO (which is passed in the hook) doesn't seem to handle custom fields.
+       *
+       * The 'get' -> 'create' dance is necessary to prevent overwriting the status with the default 'Completed' value...
+       */
+      $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
+      civicrm_api3('Contribution', 'getsingle', array(
+        'id' => $objectId,
+        'return' => 'contribution_status_id',
+        'api.Contribution.create' => array(
+          $sequenceNumberField => 1,
+          'contribution_status_id' => '$value.contribution_status_id',
+        ),
+      ));
 
-    // If this is a one-off payment, doDirectPayment() has already been invoked before creating the contribution.
-    // However, we can only create the mandate once the contribution record is in place, i.e. now.
-    if (isset($GLOBALS['sepa_context']['mandateParams'])) {
-      $mandateParams = $GLOBALS['sepa_context']['mandateParams'];
-      $mandateParams["entity_id"] = $objectId;
-      self::createMandate($mandateParams);
+      /* If this is a one-off payment, doDirectPayment() has already been invoked before creating the contribution.
+       * However, we can only create the mandate once the contribution record is in place, i.e. now. */
+      if (isset($GLOBALS['sepa_context']['mandateParams'])) {
+        $mandateParams = $GLOBALS['sepa_context']['mandateParams'];
+        $mandateParams["entity_id"] = $objectId;
+        self::createMandate($mandateParams);
+      }
     }
   }
 
@@ -188,129 +194,12 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
       CRM_Core_Error::fatal( 'Mandate creation failed : ' . $r["error_message"]);
     }
 
+    return; /* Hack: Hard-disable mandate mails for now. */
     if (!isset($params['status']) || $params['status'] == 'INIT') {
       $page = new CRM_Sepa_Page_SepaMandatePdf();
       $page->generateHTML($r["values"][0]);
       $page->generatePDF (true);
     }
-  }
-
-  
-  public static function handleMembershipSepaPayment($membership_id,$params) {
-    self::debug('Creating mandate for membership ' . $membership_id);
-    //echo '<pre>';print_r($params);echo '</pre>';
-    $mparams = array();
-    $membership = civicrm_api3('Membership','getsingle',array('id'=>$membership_id));
-    $membershipType = civicrm_api3('MembershipType','getsingle',array('id'=>$membership['membership_type_id']));
-    $start = isset($params['contract_start_date']) ? trim($params['contract_start_date']) : date("Y-m-d");
-    
-    // create the contract object that goes with this membership
-    switch ($params['contract_frequency']) {
-
-      case '0' :
-        // one-off mandate
-        $mparams['type'] = 'OOFF';
-        $mparams['status'] = $params['is_enabled'] ? 'OOFF' : 'INIT';
-        $ref = 'MEMBER-SDD-'.$mparams['status'].'-'.$membership_id;
-        $txref = $ref.'-'.md5(date('YmdHis'));
-        $contractType = 'civicrm_contribution';
-        $rcontrib = null;
-        break;
-      
-      default :
-        // recurring mandate
-        $mparams['type'] = 'RCUR';
-        $mparams['status'] = $params['is_enabled'] ? 'FRST' : 'INIT';
-        $ref = 'MEMBER-SDD-'.$mparams['status'].'-'.$membership_id;
-        $txref = $ref.'-'.md5(date('YmdHis'));
-        $contractType = 'civicrm_contribution_recur';
-        // create recurring contribution
-        $freq = isset($_REQUEST['freq']) ? trim($_REQUEST['freq']) : '';
-        $start = isset($params['contract_start_date']) ? trim($params['contract_start_date']) : date("Y-m-d");
-        $pi_rcur = CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name', 'String', 'value');
-        $rparams = array(
-          'contact_id' => $membership['contact_id'],
-          'frequency_interval' => '1',
-          'frequency_unit' => 'month',
-          'amount' => $params['contract_amount'],
-          'contribution_status_id' => 1,
-          'start_date' => $start,
-          'currency' => $params['contract_currency'],
-          'payment_instrument_id' => $pi_rcur,
-          'trxn_id' => $ref,
-        );
-//        print_r($rparams);
-        $rcontrib = civicrm_api3('contribution_recur', 'create', $rparams);
-        if($rcontrib['is_error']) {
-          echo '<br/>Error creating recurring contribution :';
-          echo '<pre>';print_r($rcontrib);echo '</pre>';
-          return;
-        }
-        $rcontrib = $rcontrib['values'][ $rcontrib['id'] ];
-        echo '<br/>Succesfully created recurring contribution #', $rcontrib['id'];
-        $upparams = array(
-            'id' => $membership_id,
-            'contribution_recur_id' => $rcontrib['id'],
-        );
-        civicrm_api3('Membership','create',$upparams);
-
-        break;
-    }
-
-    // create simple contribution
-    $pi = CRM_Core_OptionGroup::getValue('payment_instrument', $mparams['status'], 'name', 'String', 'value');
-    $cparams = array(
-      'contact_id' => $membership['contact_id'],
-      'receive_date' => $start,
-      'total_amount' => $params['contract_amount'],
-      'currency' => $params['contract_currency'],
-      'financial_type_id' => $membershipType['financial_type_id'],
-      'trxn_id' => $txref,
-      'invoice_id' => $txref,
-      'source' => $membership['source'],
-      'contribution_status_id' => 2,  // moet nog geparametriseerd worden
-      'payment_instrument_id' => $pi,
-    );
-    if ($rcontrib) $cparams['contribution_recur_id'] = $rcontrib['id'];
-
-    $contrib = civicrm_api3('contribution', 'create', $cparams);
-    if($contrib['is_error']) {
-      echo '<br/>Error creating contribution :';
-      echo '<pre>';print_r($contrib);echo '</pre>';
-      return;
-    }
-    $contrib = $contrib['values'][ $contrib['id'] ];
-    echo '<br/>Successfully created contribution #', $contrib['id'];
-    
-    // link membership and contribution
-    $r = civicrm_api3('membership_payment', 'create', array('membership_id' => $membership_id, 'contribution_id' => $contrib['id']));
-
-    // create the mandate
-    $moreparams = array(
-      "source" => $membership['source'],
-      "date" => $start,
-      "creditor_id" => "1",       // make variable as well
-      "contact_id" => $membership['contact_id'],
-      "iban" => $params['iban'],
-      "bic" => $params['bic'],
-      "creation_date" => date("Y-m-d H:i:s"),
-      'entity_table' => $contractType,
-      'entity_id' => $rcontrib ? $rcontrib['id'] : $contrib['id'],
-    );
-    $mparams = array_merge($mparams,$moreparams);
-    if ($params['reference']) $mparams['reference'] = $params['reference'];
-
-    print_r($mparams);
-    $m = civicrm_api3( 'SepaMandate','create', $mparams);
-    if($m['is_error']) {
-      echo '<br/>Error creating mandate : ';
-      echo '<pre>';print_r($m);echo '</pre>';
-      return;
-    }
-    $m= $m['values'][ $m['id'] ];
-    echo '<br/>Successfully created mandate #', $m['id'];
-
-//    die();
   }
 
 }

@@ -103,5 +103,53 @@ function _civicrm_api3_sepa_sdd_file_generatexml_spec(&$params) {
 function civicrm_api3_sepa_sdd_file_generatexml($params) {
 //fetch the file, then the group
   $file = new CRM_Sepa_BAO_SEPASddFile();
-  $file->generateXML($params["id"]);
+  $xml = $file->generateXML($params["id"]);
+
+  $config = CRM_Core_Config::singleton();
+
+  $sepaFile = civicrm_api3('SepaSddFile', 'getvalue', array('id' => $params['id'], 'return' => 'filename'));
+  #$filename = CRM_Utils_File::makeFileName($sepaFile);
+  $filename = $sepaFile;
+  $outfile = $config->customFileUploadDir . $filename;
+
+  file_put_contents($outfile, $xml);
+
+  $fileDAO = new CRM_Core_DAO_File();
+  $fileDAO->uri = $filename;
+  $fileDAO->mime_type = 'application/xml';
+  $fileDAO->upload_date = date('Ymdhis');
+  $fileDAO->save();
+
+  $entityFileDAO = new CRM_Core_DAO_EntityFile();
+  $entityFileDAO->entity_table = 'civicrm_sdd_file';
+  $entityFileDAO->entity_id = $params['id'];
+  $entityFileDAO->file_id = $fileDAO->id;
+  $entityFileDAO->save();
+}
+
+/**
+ */
+function _civicrm_api3_sepa_sdd_file_batchforsubmit_spec(&$params) {
+  $params['submit_date']['api.default'] = date('Y-m-d', strtotime('today'));
+  $params['creditor_id']['api.required'] = 1;
+}
+
+/**
+ */
+function civicrm_api3_sepa_sdd_file_batchforsubmit($params) {
+  CRM_Sepa_Logic_Batching::batchForSubmit($params['submit_date'], $params['creditor_id']);
+}
+
+/**
+ */
+function _civicrm_api3_sepa_sdd_file_updatestatus_spec(&$params) {
+  $params['id']['api.required'] = 1;
+  $params['to_status_id']['api.required'] = 1;
+  $params['from_status_id']['api.required'] = 1;
+}
+
+/**
+ */
+function civicrm_api3_sepa_sdd_file_updatestatus($params) {
+  CRM_Sepa_Logic_Batching::updateStatus(array('sdd_file_id' => $params['id']), $params['to_status_id'], $params['from_status_id']);
 }

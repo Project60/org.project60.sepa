@@ -1,3 +1,52 @@
+ALTER TABLE `civicrm_sdd_txgroup` ADD `is_cor1` tinyint COMMENT 'Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).' AFTER `reference`;
+
+
+UPDATE `civicrm_payment_processor_type` SET `payment_type` = 1 WHERE `payment_type` = 9000;
+UPDATE `civicrm_payment_processor` SET `payment_type` = 1 WHERE `payment_type` = 9000;
+
+
+DELETE FROM `civicrm_sdd_contribution_txgroup` USING `civicrm_sdd_txgroup` LEFT JOIN `civicrm_sdd_contribution_txgroup` ON `civicrm_sdd_contribution_txgroup`.`txgroup_id` = `civicrm_sdd_txgroup`.`id` WHERE `civicrm_sdd_txgroup`.`sdd_file_id` IS NULL;
+DELETE FROM `civicrm_sdd_txgroup` WHERE `civicrm_sdd_txgroup`.`sdd_file_id` IS NULL;
+
+
+-- Before executing following queries, manually add option 'Batched' to 'contribution_status' option group!
+-- (Under civicrm/admin/options )
+-- Parameters:
+--   'Name' => 'Batched'
+--   'Title' (label visible in UI) can be freely choosen (installer sets it to 'Pending/Batched')
+--   'Weight' => keep default (doesn't really matter; can be rearranged late if desired)
+--   'Value' => set same as default 'Weight' (doesn't matter either -- but this has a good chance not to conflict...)
+UPDATE `civicrm_sdd_txgroup`
+  SET `status_id` = (SELECT `value` FROM `civicrm_option_value` WHERE `name` = 'Batched' AND `option_group_id` = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'contribution_status'))
+  WHERE `status_id` = 2 AND `sdd_file_id` IS NOT NULL;
+UPDATE `civicrm_contribution`
+  SET `contribution_status_id` = (SELECT `value` FROM `civicrm_option_value` WHERE `name` = 'Batched' AND `option_group_id` = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'contribution_status'))
+  WHERE `contribution_status_id` = 2
+    AND EXISTS (
+      SELECT * FROM `civicrm_sdd_contribution_txgroup`
+        WHERE `contribution_id` = `civicrm_contribution`.`id`
+          AND (SELECT `status_id` FROM `civicrm_sdd_txgroup` WHERE `id` = `civicrm_sdd_contribution_txgroup`.`txgroup_id`)
+            = (SELECT `value` FROM `civicrm_option_value` WHERE `name` = 'Batched' AND `option_group_id` = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'contribution_status'))
+    );
+DELETE FROM `civicrm_sdd_contribution_txgroup`
+  WHERE (SELECT `status_id` FROM `civicrm_sdd_txgroup` WHERE `id` = `txgroup_id`) = 2
+    AND (SELECT `contribution_status_id` FROM `civicrm_contribution` WHERE `id` = `contribution_id`) != 2;
+
+
+UPDATE `civicrm_sdd_txgroup` SET `status_id` = CASE `status_id`
+  WHEN 1 THEN 2 -- 'Open' (batch_status) => 'Pending' (contribution_status)
+  WHEN 2 THEN 2 -- 'Closed' (batch_status) => 'Pending' (contribution_status)
+  WHEN 666 THEN 3 -- 'Cancelled'
+END;
+UPDATE `civicrm_sdd_file` SET `status_id` = 2 WHERE `status_id` = 1; -- 'Open' (batch_status) => 'Pending' (contribution_status)
+
+
+ALTER TABLE `civicrm_sdd_contribution_txgroup` DROP INDEX `contriblookup`, ADD INDEX `contriblookup`(`contribution_id`); -- Drop UNIQUE.
+
+
+ALTER TABLE `civicrm_sdd_mandate` DROP `is_enabled`;
+
+
 ALTER TABLE `civicrm_sdd_txgroup` ADD INDEX `creditor_id` (`sdd_creditor_id`);
 ALTER TABLE `civicrm_sdd_txgroup` ADD INDEX `file_id` (`sdd_file_id`);
 

@@ -9,7 +9,11 @@
           <Cd>SEPA</Cd>
         </SvcLvl>
         <LclInstrm>
+{if ($group.is_cor1)}
+          <Cd>COR1</Cd>
+{else}
           <Cd>CORE</Cd>
+{/if}
         </LclInstrm>
         <SeqTp>{$group.type}</SeqTp>
       </PmtTpInf>
@@ -24,7 +28,13 @@
       </CdtrAcct>
       <CdtrAgt>
         <FinInstnId>
+{if !empty($creditor.bic)}
           <BIC>{$creditor.bic}</BIC>
+{else}
+          <Othr>
+            <Id>NOTPROVIDED</Id>
+          </Othr>
+{/if}
         </FinInstnId>
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
@@ -47,7 +57,7 @@
 {foreach from=$contributions item="contribution"}
       <DrctDbtTxInf>
         <PmtId>
-          <EndToEndId>{$contribution.contribution_id}</EndToEndId>
+          <EndToEndId>{$contribution.trxn_id}</EndToEndId>
         </PmtId>
         <InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</InstdAmt>
         <DrctDbtTx>
@@ -58,7 +68,13 @@
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
+{if !empty($contribution.bic)}
             <BIC>{$contribution.bic}</BIC>
+{else}
+            <Othr>
+              <Id>NOTPROVIDED</Id>
+            </Othr>
+{/if}
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>

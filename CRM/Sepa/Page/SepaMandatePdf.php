@@ -33,6 +33,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     if (is_array($mandate)) {
        $mandate= json_decode(json_encode($mandate), FALSE);
     }
+    $mandate->is_enabled = CRM_Sepa_BAO_SEPAMandate::is_active($mandate->status);
     $this->mandate = $mandate;
     if (!isset($this->api))
       $this->api = new civicrm_api3();

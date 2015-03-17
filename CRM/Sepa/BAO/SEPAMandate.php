@@ -6,6 +6,55 @@
 class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   /**
+   * Clean up (normalise) the passed IBAN and BIC, and check for validity.
+   *
+   * If the BIC is empty, and the relevant Creditor IBAN was supplied,
+   * check whether this is a domestic payment (i.e. IBAN-only is allowed),
+   * by comparing the country code part of the IBAN
+   * against the country code part of Creditor IBAN.
+   *
+   * The result is in a format convenient for use in form validation functions --
+   * but it can be easily used to create an exception as well,
+   * which we do internally in the add() method.
+   *
+   * The parameters are also normalised for storage in the DB in addition to the validation.
+   * This is useful in some contexts;
+   * and the BIC at least needs to be normalised anyways for the validation to work.
+   *
+   * @param string &$iban IBAN to be cleaned up and validated
+   * @param string &$bic BIC to be cleaned up and validated
+   *
+   * @return array Array of errors (if any), keyed by form field names
+   *
+   * @access public
+   * @static
+   */
+  public static function validate_account(&$iban, &$bic, $creditorIBAN) {
+    require_once("packages/php-iban-1.4.0/php-iban.php");
+
+    $errors = array();
+
+    $iban = iban_to_machine_format($iban);
+    if (!verify_iban($iban)) {
+      $errors['bank_iban'] = ts('Invalid IBAN');
+    }
+
+    if (!empty($bic)) {
+      $bic = iban_to_machine_format($bic);
+      if (!preg_match('/^[0-9a-z]{4}[a-z]{2}[0-9a-z]{2}([0-9a-z]{3})?\z/i', $bic)) {
+        $errors['bank_bic'] = ts('Invalid BIC');
+      }
+    } elseif (isset($creditorIBAN)) {
+      /* Check whether IBAN-only is allowed in this case. */
+      if (substr($iban, 0, 2) != substr($creditorIBAN, 0, 2)) { /* Country code not same as for creditor. */
+        $errors['bank_bic'] = ts('BIC is mandatory for non-domestic payments');
+      }
+    }
+
+    return $errors;
+  }
+
+  /**
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
    * @return object       CRM_Core_BAO_SEPAMandate object on success, null otherwise
@@ -16,6 +65,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // handle creation of a new mandate 
 
+    $fallback_reference = false;
     if (!CRM_Utils_Array::value('id', $params) && !CRM_Utils_Array::value('reference', $params)) {
       CRM_Utils_SepaCustomisationHooks::create_mandate($params);
 
@@ -28,8 +78,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     // fix payment processor-created contributions before continuing
-    if (CRM_Utils_Array::value('is_enabled', $params)) {
+    if (!empty($params['id']) && self::is_active(CRM_Utils_Array::value('status', $params))) {
       CRM_Sepa_Logic_Mandates::fix_recurring_contribution($params);
+    }
+
+    $creditorIBAN = civicrm_api3('SepaCreditor', 'getvalue', array ('id' => $params['creditor_id'], 'return' => 'iban'));
+    $errors = self::validate_account($params['iban'], $params['bic'], $creditorIBAN);
+    if ($errors) {
+      throw new CRM_Exception(implode('; ', $errors));
     }
     
     // handle 'normal' creation process inlcuding hooks
@@ -45,7 +101,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $dao = new CRM_Sepa_DAO_SEPAMandate();
     $dao->copyValues($params);
     if (self::is_active(CRM_Utils_Array::value('status', $params))) {
-      $dao->validation_date = date("YmdHis");
+      if (empty($params['validation_date'])) {
+        $dao->validation_date = date("YmdHis");
+      }
     }
     $dao->save();
 
@@ -56,10 +114,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $dao->save();
     }
     
-    // if the mandate is enabled, kick off the batching process
-    if (self::is_active(CRM_Utils_Array::value('status', $params))) {
-      CRM_Sepa_Logic_Batching::batch_initial_contribution($dao->id, $dao);
-    }
     CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
     return $dao;
   }

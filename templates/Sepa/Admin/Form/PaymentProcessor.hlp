@@ -1,0 +1,48 @@
+{htxt id='extra_advance_days'}
+  <p>{ts}The SEPA DD Rulebook specifies how many banking days (more precisely, TARGET inter-bank days) in advance (before the due date) a collection has to be presented to the debtor bank at the latest. However, many (all?) creditor banks need an additional banking day to process the collections before presenting them to the debtor bank.{/ts}</p>
+  <p>{ts}If you know that your (creditor) bank doesn't need that extra day, specify 0 here; otherwise, leave it at the default of 1. (Larger numbers are also possible, in case some bank needs even more than one day.) If you are unsure, check with your bank.{/ts}</p>
+{/htxt}
+
+{htxt id='maximum_advance_days'}
+  <p>{ts}When preparing SEPA XML files for submitting to the bank, include all outstanding payments with a due date up to these many calendar(!) days in the future.{/ts}</p>
+  <p>{ts}Longer advance times allow for longer intervals between submissions without interrupting the payment flow; and give more leeway in case of delays. On the other hand, too long advance times can cause trouble if it turns out that a contribution needs to be cancelled, as collections cannot be easily retracted once submitted to the bank. The default of 14 calendar days seems a good compromise for most organisations, if making use of the increased flexibility offered by COR1 payments. If COR1 cannot be used, a couple more days might be desirable.{/ts}</p>
+  <p>{ts}Note however that according to the SEPA DD Rulebook, banks only have to accept collections presented up to 14 days in advance &mdash; unless they explicitly offer a longer option. So if a longer time is desired, please check with your bank first how much they actually permit.{/ts}</p>
+{/htxt}
+
+{htxt id='use_cor1'}
+  <p>{ts}Using the COR1 option allows presenting collections to the debtor bank as little as one banking day in advance, instead of the ordinary five days for FRST/OOFF or two days for RCUR transactions &mdash; which considerably improves flexibility. (Any extra advance day(s) required by the creditor bank are still added on top of that.){/ts}</p>
+  <p>{ts}However, not all creditor banks accept SEPA XML files with COR1 collections; and even if they do, it only works in combination with some debtor banks &mdash; in all other cases, we still need to use non-COR1 transactions. Determining whether COR1 is allowed for any particular transaction is too involved in the generic case; but in our understanding, at least in Germany and in Austria, it should always work for all domestic payments. (Possibly also in Spain.){/ts}</p>
+  <p>{ts}Accordingly, the SEPA payment processor offers the option to automatically use COR1 for all domestic payments, i.e. all payments where the country code of the debtor IBAN matches the country code of the creditor IBAN. Enable it if your creditor bank is in one of the countries listed above, and is able to process files with COR1 payments.{/ts}</p>
+{/htxt}
+
+{htxt id='group_batching_mode'}
+  <p>{ts}SEPA XML files can contain several transaction groups, which in turn can consist of several individual transactions. All transactions within each group need to share the same due date, sequence type (OOFF/FRST/RCUR), and payment instrument (CORE/COR1). A file can contain groups with different due dates and sequence types.{/ts}</p>
+  <p>{ts}However, not all banks can actually process files with several transaction groups; and also some organisations prefer to submit different groups separately. Thus, the SEPA payment processor offers several different modes for batching groups into files:{/ts}</p>
+  <ul>
+    <li>
+      <p>{ts}No batching: A separate file is created for every group, i.e. for every due date, every sequence type, and every instrument.{/ts}</p>
+      <p>{ts}Some banks only support this mode.{/ts}</p>
+    </li>
+    <li>{ts}Batch by sequence type: Separate files are created for OOFF, FRST, and RCUR groups; but files can contain several groups of the same type with different due dates.{/ts}</li>
+    <li>
+      <p>{ts}Batch by type and instrument: Only two files are generated at most &mdash; one for CORE groups, and one for COR1. Each can contain groups with different types and due dates.{/ts}</p>
+      <p>{ts}This is the recommended mode for use with banks that follow the SEPA implementation guidelines.{/ts}</p>
+    </li>
+    <li>{ts}All groups in one file: All groups are batched into a single file, i.e. only one file is ever generated in a batching run. Note though that mixing COR1 and CORE groups in one file is actually not allowed by the SEPA implementation guidelines (although the file format would allow it) &mdash; so this option is most likely useful only for testing purposes.{/ts}</li>
+  </ul>
+{/htxt}
+
+{htxt id='month_wrap_policy'}
+  <p>{ts}When recurring payments using a frequency unit of 'month' (i.e. monthly, quaterly etc.) start on a day near the end of a long month, such as on October 31st, followup payments in shorter months such as November or even February cannot happen on the same day of month. Instead, they either need to be moved earlier to the actual last day of the month; or they wrap over to the beginning of the next month. The same is true for yearly payments starting on February 29th in a leap year, with followup payments in regular years.{/ts}</p>
+  <p>{ts}The SEPA payment processor offers several ways to handle these situations:{/ts}</p>
+  <ul>
+    <li>{ts}Move date before end of month: The payment always happens at the end of each month, moving the date to the last day of that month as necessary &mdash; so a monthly payment starting on October 31st will be collected again on November 30th, December 31st, January 31th, February 28th (or 29th in leap years), March 31st etc.; a quaterly payment starting on May 30th will be collected on August 30th, November 30th, February 28th or 29th, May 30th etc.; a yearly payment starting on February 29th will be collected on February 28th in ordinary years, and February 29th in leap years.{/ts}</li>
+    <li>{ts}Wrap to 1st of next month: If a short month doesn't have the day on which the payment started and would normally repeat, the payment wraps over to the first day of the next month &mdash; so a monthly payment starting on October 31st will be collected again on December 1st, December 31st, January 31th, March 1st, March 31st etc. Note that this way a payment never happens earlier than expected; but it can be quite confusing that some months don't have any payment at all, while others have two.{/ts}</li>
+    <li>{ts}No explicit handling: Like above, except rather than always wrapping to the first day of the next month, the payment can move further into the month if more than one day is "missing". Specifically that means that for February, payments normally scheduled for the 31st of a month will wrap to March 3rd (or 2nd in leap years), and payments scheduled for the 30th will wrap to March 2nd in non-leap years. For all other cases the effect is the same as above.{/ts}</li>
+  </ul>
+{/htxt}
+
+{htxt id='remittance_info'}
+  <p>{ts}Text used to populate the &lt;RmtInf> field for all payments (pertaining to this Creditor) in the generated SEPA XML files. Presently, we only support a constant string here, i.e. the exact same text will be used for every payment.{/ts}</p>
+  <p>{ts}Note that this text will show up on the debtor's account statement. (Along with some other fields, such as the unique End-to-end ID and the Mandate Reference.) While it's valid to omit it (no &lt;RmtInf> field is created in the XML files in that case), this will look suspicious on the bank statement, and might prompt some debtors to initiate a refund. To be safe, use some phrase that indicates a legit collection.{/ts}</p>
+{/htxt}

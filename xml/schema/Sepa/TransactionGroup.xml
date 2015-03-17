@@ -35,6 +35,14 @@
   </index>
 
   <field>
+    <name>is_cor1</name>
+    <title>COR1 Payments</title>
+    <type>boolean</type>
+    <comment>Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
     <name>type</name>
     <type>char</type>
     <length>4</length>
@@ -64,7 +72,7 @@
     <name>status_id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>fk sepa group Status options in civicrm_option_values</comment>
+    <comment>fk Contribution Status options in civicrm_option_values</comment>
     <add>4.3</add>
   </field>
   <field>
