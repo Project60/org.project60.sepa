@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension key="org.project60.sepa" type="module">
   <file>sepa</file>
-  <name>SEPA Direct Debit</name>
-  <description>This extension provides a new payement processor SEPA Direct Debit</description>
+  <name>SEPA Direct Debit payments</name>
+  <description>Complete implementation of SEPA Direct Debit payments in CiviCRM, including a Payment Processor, as well as integration with CiviCRM's backoffice interface; along with functionality for generating and handling SEPA XML files to be submitted directly to your bank.</description>
   <license>aGPL3</license>
   <maintainer>
     <author>Software für Engagierte e.V.</author>
@@ -12,9 +12,9 @@
   <version>0.1</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>4.3</ver>
+    <ver>4.5</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
+  <comments></comments>
   <civix>
     <namespace>CRM/Sepa</namespace>
   </civix>
