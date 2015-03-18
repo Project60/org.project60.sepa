@@ -435,41 +435,81 @@ function sepa_civicrm_alterSettingsFolders(&$metaDataFolders = NULL){
 * Implementation of hook_civicrm_navigationMenu
 */
 function sepa_civicrm_navigationMenu(&$params) {
+  //add menu entry for SEPA Dashboard to Contributions menu
   $sepa_dashboard_url = 'civicrm/sepa';
+  // now, by default we want to add it to the Contributions menu -> find it
+  $contributions_menu_id = 0;
+  foreach ($params as $key => $value) {
+    if ($value['attributes']['name'] == 'Contributions') {
+      $contributions_menu_id = $key;
+      break;
+    }
+  }
+  $sepa_dashboard_menu = array (
+      'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
+      'name' => 'Dashboard',
+      'url' => $sepa_dashboard_url,
+      'permission' => 'administer CiviCRM',
+      'operator' => NULL,
+      'separator' => 2,
+      'parentID' => $contributions_menu_id,
+      'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
+      'active' => 1
+  );
+  if (empty($contributions_menu_id)) {
+    error_log("org.project60.sepa_dd: Cannot find parent menu Contributions for $sepa_dashboard_url.");
+  } else {
+    _add_navigationMenuEntry($params[$contributions_menu_id], $sepa_dashboard_menu);
+  }
+  
+  //add menu entry for SEPA settings to Administer>CiviContribute menu
+  $sepa_settings_url = 'civicrm/admin/setting/sepa';
+  // now, by default we want to add it to the CiviContribute Administer menu -> find it
+  $administer_menu_id = 0;
+  $administer_civicontribute_menu_id = 0;
+  foreach ($params as $key => $value) {
+    if ($value['attributes']['name'] == 'Administer') {
+      $administer_menu_id = $key;
+      foreach ($params[$administer_menu_id]['child'] as $key => $value) {
+        if ($value['attributes']['name'] == 'CiviContribute') {
+          $administer_civicontribute_menu_id = $key;
+          break;
+        }
+      }
+      break;
+    }
+  }
+  $sepa_settings_menu = array (
+      'label' => ts('CiviSEPA Settings',array('domain' => 'org.project60.sepa')),
+      'name' => 'CiviSEPA Settings',
+      'url' => $sepa_settings_url,
+      'permission' => 'administer CiviCRM',
+      'operator' => NULL,
+      'separator' => 2,
+      'parentID' => $administer_civicontribute_menu_id,
+      'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params[$administer_menu_id]['child']),
+      'active' => 1
+  );
+  _add_navigationMenuEntry($params[$administer_menu_id]['child'][$administer_civicontribute_menu_id], $sepa_settings_menu);
+}
+
+/**
+ * Add the given menu item to the CiviCRM navigation menu if it does not exist yet.
+ * @param array parent_params the params array into whose 'child' attribute the new item will be added.
+ * @param array $attributes the attributes array to be added to the navigation menu
+ */
+function _add_navigationMenuEntry(&$parent_params, $menu_entry_attributes) {
   // see if it is already in the menu...
-  $menu_item_search = array('url' => $sepa_dashboard_url);
+  $menu_item_search = array('url' => $menu_entry_attributes['url']);
   $menu_items = array();
   CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
-
+  
   if (empty($menu_items)) {
     // it's not already contained, so we want to add it to the menu
-    
-    // now, by default we want to add it to the Contributions menu -> find it
-    $contributions_menu_id = 0;
-    foreach ($params as $key => $value) {
-      if ($value['attributes']['name'] == 'Contributions') {
-        $contributions_menu_id = $key;
-        break;
-      }
-    }
 
-    if (empty($contributions_menu_id)) {
-      error_log("org.project60.sepa_dd: Connot find 'Contributions' menu item.");
-    } else {
-      // insert at the bottom
-      $params[$contributions_menu_id]['child'][] = array(
-          'attributes' => array (
-          'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
-          'name' => 'Dashboard',
-          'url' => 'civicrm/sepa',
-          'permission' => 'administer CiviCRM',
-          'operator' => NULL,
-          'separator' => 2,
-          'parentID' => $contributions_menu_id,
-          'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
-          'active' => 1
-        ));
-    }
+    // insert at the bottom
+    $parent_params['child'][] = array(
+        'attributes' => $menu_entry_attributes);
   }
 }
 
