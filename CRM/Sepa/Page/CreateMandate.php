@@ -203,7 +203,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign("display_name", $contact['display_name']);
 
     // look up campaigns
-    $campaign_query = civicrm_api('Campaign', 'get', array('version'=>3, 'is_active'=>1, 'option.limit' => 999));
+    $campaign_query = civicrm_api('Campaign', 'get', array('version'=>3, 'is_active'=>1, 'option.limit' => 9999, 'option.sort'=>'title'));
     $campaigns = array();
     $campaigns[''] = ts("No Campaign");
     if (isset($campaign_query['is_error']) && $campaign_query['is_error']) {
