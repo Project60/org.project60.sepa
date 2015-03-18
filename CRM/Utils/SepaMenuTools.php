@@ -49,4 +49,25 @@ class CRM_Utils_SepaMenuTools {
     }
     return $max_id;
   }
+
+
+  /**
+   * Add the given menu item to the CiviCRM navigation menu if it does not exist yet.
+   * @param array parent_params the params array into whose 'child' attribute the new item will be added.
+   * @param array $attributes the attributes array to be added to the navigation menu
+   */
+  static function addNavigationMenuEntry(&$parent_params, $menu_entry_attributes) {
+    // see if it is already in the menu...
+    $menu_item_search = array('url' => $menu_entry_attributes['url']);
+    $menu_items = array();
+    CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
+    
+    if (empty($menu_items)) {
+      // it's not already contained, so we want to add it to the menu
+
+      // insert at the bottom
+      $parent_params['child'][] = array(
+          'attributes' => $menu_entry_attributes);
+    }
+  }  
 }

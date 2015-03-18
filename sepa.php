@@ -445,21 +445,22 @@ function sepa_civicrm_navigationMenu(&$params) {
       break;
     }
   }
-  $sepa_dashboard_menu = array (
-      'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
-      'name' => 'Dashboard',
-      'url' => $sepa_dashboard_url,
-      'permission' => 'administer CiviCRM',
-      'operator' => NULL,
-      'separator' => 2,
-      'parentID' => $contributions_menu_id,
-      'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
-      'active' => 1
-  );
   if (empty($contributions_menu_id)) {
     error_log("org.project60.sepa_dd: Cannot find parent menu Contributions for $sepa_dashboard_url.");
   } else {
-    _add_navigationMenuEntry($params[$contributions_menu_id], $sepa_dashboard_menu);
+    // add sepa dashboard menu entry
+    $sepa_dashboard_menu = array (
+        'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
+        'name' => 'Dashboard',
+        'url' => $sepa_dashboard_url,
+        'permission' => 'administer CiviCRM',
+        'operator' => NULL,
+        'separator' => 2,
+        'parentID' => $contributions_menu_id,
+        'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
+        'active' => 1
+    );
+    CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$contributions_menu_id], $sepa_dashboard_menu);
   }
   
   //add menu entry for SEPA settings to Administer>CiviContribute menu
@@ -479,37 +480,22 @@ function sepa_civicrm_navigationMenu(&$params) {
       break;
     }
   }
-  $sepa_settings_menu = array (
-      'label' => ts('CiviSEPA Settings',array('domain' => 'org.project60.sepa')),
-      'name' => 'CiviSEPA Settings',
-      'url' => $sepa_settings_url,
-      'permission' => 'administer CiviCRM',
-      'operator' => NULL,
-      'separator' => 2,
-      'parentID' => $administer_civicontribute_menu_id,
-      'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params[$administer_menu_id]['child']),
-      'active' => 1
-  );
-  _add_navigationMenuEntry($params[$administer_menu_id]['child'][$administer_civicontribute_menu_id], $sepa_settings_menu);
-}
-
-/**
- * Add the given menu item to the CiviCRM navigation menu if it does not exist yet.
- * @param array parent_params the params array into whose 'child' attribute the new item will be added.
- * @param array $attributes the attributes array to be added to the navigation menu
- */
-function _add_navigationMenuEntry(&$parent_params, $menu_entry_attributes) {
-  // see if it is already in the menu...
-  $menu_item_search = array('url' => $menu_entry_attributes['url']);
-  $menu_items = array();
-  CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
-  
-  if (empty($menu_items)) {
-    // it's not already contained, so we want to add it to the menu
-
-    // insert at the bottom
-    $parent_params['child'][] = array(
-        'attributes' => $menu_entry_attributes);
+  if (empty($administer_menu_id)) {
+    error_log("org.project60.sepa_dd: Cannot find parent menu Administer/CiviContribute for $sepa_settings_url.");
+  } else {
+    // add sepa dashboard menu entry
+    $sepa_settings_menu = array (
+        'label' => ts('CiviSEPA Settings',array('domain' => 'org.project60.sepa')),
+        'name' => 'CiviSEPA Settings',
+        'url' => $sepa_settings_url,
+        'permission' => 'administer CiviCRM',
+        'operator' => NULL,
+        'separator' => 2,
+        'parentID' => $administer_civicontribute_menu_id,
+        'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params[$administer_menu_id]['child']),
+        'active' => 1
+    );
+    CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$administer_menu_id]['child'][$administer_civicontribute_menu_id], $sepa_settings_menu);
   }
 }
 
