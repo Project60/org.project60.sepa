@@ -40,6 +40,51 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = 'Added `civicrm_sdd_creditor`.`remittance_info`.';
     }
 
+    $instruments = implode(',', array_map(
+      function ($type) { return CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name'); },
+      array('FRST', 'RCUR', 'OOFF')
+    ));
+    if (CRM_Core_DAO::singleValueQuery("
+      SELECT EXISTS (
+        SELECT * FROM `civicrm_financial_trxn`
+        WHERE `payment_instrument_id` IS NULL
+          AND (
+            SELECT `payment_instrument_id`
+            FROM `civicrm_contribution`
+            WHERE `id` = (
+              SELECT `entity_id`
+              FROM `civicrm_entity_financial_trxn`
+              WHERE `entity_table` = 'civicrm_contribution' AND `financial_trxn_id` = `civicrm_financial_trxn`.`id`
+            )
+          ) IN($instruments)
+      )
+    ")) {
+      $dao = CRM_Core_DAO::executeQuery("
+        UPDATE `civicrm_financial_trxn`
+        SET `payment_instrument_id` = (
+          SELECT `payment_instrument_id`
+          FROM `civicrm_contribution`
+          WHERE `id` = (
+            SELECT `entity_id`
+            FROM `civicrm_entity_financial_trxn`
+            WHERE `entity_table` = 'civicrm_contribution' AND `financial_trxn_id` = `civicrm_financial_trxn`.`id`
+          )
+        )
+        WHERE `payment_instrument_id` IS NULL
+          AND (
+            SELECT `payment_instrument_id`
+            FROM `civicrm_contribution`
+            WHERE `id` = (
+              SELECT `entity_id`
+              FROM `civicrm_entity_financial_trxn`
+              WHERE `entity_table` = 'civicrm_contribution' AND `financial_trxn_id` = `civicrm_financial_trxn`.`id`
+            )
+          ) IN($instruments)
+      ");
+      $rows = $dao->affectedRows();
+      $messages[] = "Fixed $rows missing `payment_instrument_id` values in `civicrm_financial_trxn` records for SEPA Contributions.";
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }

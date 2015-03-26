@@ -230,7 +230,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $result = civicrm_api3('SepaTransactionGroup', 'get', array_merge($txgroupParams, array(
       'options' => array('limit' => 1234567890),
       'status_id' => $fromStatusId,
-      'return' => array('sdd_creditor_id', 'collection_date'),
+      'return' => array('sdd_creditor_id', 'collection_date', 'type'),
       'api.SepaTransactionGroup.create' => array(
         /* 'id' inherited */
         'status_id' => $groupStatusId,
@@ -249,6 +249,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     }
 
     foreach ($result['values'] as $group) {
+      $paymentInstrumentId = CRM_Core_OptionGroup::getValue('payment_instrument', $group['type'], 'name');
+
       foreach ($group['api.SepaContributionGroup.get']['values'] as $groupMember) {
         if ($groupMember['api.Contribution.getsingle']['contribution_status_id'] != $fromStatusId) {
           continue;
@@ -259,6 +261,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
             'id' => $groupMember['contribution_id'],
             'contribution_status_id' => $contributionStatusId,
             'receive_date' => $group['collection_date'],
+            'payment_instrument_id' => $paymentInstrumentId, /* With CiviCRM 4.5, we need to pass this in again here, to get it correct in the created `financial_trxn` records. */
           ));
         } else {
           self::setContributionStatus($groupMember['contribution_id'], $contributionStatusId);
