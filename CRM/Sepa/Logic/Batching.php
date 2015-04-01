@@ -112,7 +112,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     $result = civicrm_api3('SepaContributionPending', 'get', array(
       'options' => array('sort' => 'payment_instrument_id, receive_date'), /* Make sure Groups are batched in a clear order. */
-      'filter.receive_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter the ones obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
+      'filter.receive_date_high' => date('Ymd', strtotime($dateRangeEnd)), /* Pre-filter those obviously out of range, to improve performance. (Needs further filtering after bank days adjustment.) */
       'return' => array('payment_instrument_id', 'receive_date'),
       'mandate' => array(
         'creditor_id' => $creditorId,
@@ -137,17 +137,17 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     foreach ($pendingGroups as $isCor1 => $instruments) {
       foreach ($instruments as $instrument => $dates) {
         foreach ($dates as $receiveDate => $ids) {
-          $bestCollectionDate = self::adjustBankDays($receiveDate, 0);
+          $desiredCollectionDate = self::adjustBankDays($receiveDate, 0);
           /* Re-check, as date might exceed range after adjustment. */
-          if ($bestCollectionDate > $dateRangeEnd) {
+          if ($desiredCollectionDate > $dateRangeEnd) {
             continue;
           }
 
           $type = CRM_Core_OptionGroup::getValue('payment_instrument', $instrument, 'value', 'String', 'name');
 
           $advanceDays = ($isCor1 ? 1 : ($type == 'RCUR' ? 2 : 5)) + $creditor['extra_advance_days'];
-          $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays);
-          $collectionDate = max($earliestCollectionDate, $bestCollectionDate);
+          $earliestCollectionDate = self::adjustBankDays($submitDate, $advanceDays); /* Earliest allowed. */
+          $collectionDate = max($earliestCollectionDate, $desiredCollectionDate);
 
           $groups = array_merge_recursive($groups, array($isCor1 => array($type => array($collectionDate => $ids))));
         }
