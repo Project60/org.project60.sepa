@@ -8,8 +8,8 @@
     <author>Software für Engagierte e.V.</author>
     <email>info@sfe-ev.org</email>
   </maintainer>
-  <releaseDate>2014-03-17</releaseDate>
-  <version>0.2 (alpha)</version>
+  <releaseDate>2014-04-01</releaseDate>
+  <version>0.2.1 (alpha)</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>4.5</ver>
