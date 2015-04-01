@@ -77,6 +77,9 @@ class CRM_Sepa_Logic_Base {
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
     $startDate = date_create_from_format("!Y-m-d+", $date_to_adjust, timezone_open('UTC'));
+    if (!($startDate instanceof DateTime)) {
+      throw new Exception(sprintf('Failed parsing date "%s": %s', $date_to_adjust, print_r(date_get_last_errors(), true)));
+    }
 
     $weekend = array('Sat', 'Sun');
     $fixedHolidays = array(
