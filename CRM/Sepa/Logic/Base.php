@@ -72,7 +72,7 @@ class CRM_Sepa_Logic_Base {
    * counting starts with the next banking day as day 0.
    * 
    * @param string $date_to_adjust
-   * @param string $days_delta
+   * @param integer $days_delta
    * @return string
    */
   public static function adjustBankDays($date_to_adjust, $days_delta) {
