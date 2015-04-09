@@ -536,7 +536,6 @@ function sepa_civicrm_install_options($data) {
 
     if (is_array($group['values'])) {
       $groupValues = $group['values'];
-      $weight = 1;
       foreach ($groupValues as $valueName => $value) {
         $result = civicrm_api('option_value', 'getsingle', array('version' => 3, 'name' => $valueName));
         if (isset($result['is_error']) && $result['is_error']) {
@@ -546,7 +545,6 @@ function sepa_civicrm_install_options($data) {
               'option_group_id' => $group_id,
               'name' => $valueName,
               'label' => $value['label'],
-              'weight' => $weight,
               'is_default' => $value['is_default'],
               'is_active' => 1,
           );
@@ -554,8 +552,6 @@ function sepa_civicrm_install_options($data) {
             $params['value'] = $value['value'];
           }
           $result = civicrm_api('option_value', 'create', $params);
-        } else {
-          $weight = $result['weight'] + 1;
         }
       }
     }
@@ -567,14 +563,7 @@ function sepa_civicrm_options() {
   if (!isset($result['id']))
     die ($result["error_message"]);
   $gid= $result['id'];
-  //find the value to give to the payment instruments
-  $query = "SELECT max( `weight` ) as weight FROM `civicrm_option_value` where option_group_id=" . $gid;
-  $dao = new CRM_Core_DAO();
-  $dao->query($query);
-  $dao->fetch();
-  $weight = $dao->weight + 1;
 
-  // start with the lowest weight value
   return array(
       'msg_tpl_workflow_contribution' => array(
           'values' => array(
@@ -598,17 +587,14 @@ function sepa_civicrm_options() {
           'values' => array(
               'FRST' => array(
                   'label' => 'SEPA DD First Transaction',
-                  'weight' => $weight,
                   'is_default' => 0,
               ),
               'RCUR' => array(
                   'label' => 'SEPA DD Recurring Transaction',
-                  'weight' => $weight+1,
                   'is_default' => 0,
               ),
               'OOFF' => array(
                   'label' => 'SEPA DD One-off Transaction',
-                  'weight' => $weight+2,
                   'is_default' => 0,
               ),
           ),
