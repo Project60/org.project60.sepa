@@ -48,6 +48,16 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
 
     $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('payment_processor_id' => $paymentProcessorId, 'return' => 'iban'));
 
+    /* Work around upstream issue CRM-16285 by performing the check here. */
+    if (!empty($fields['is_recur'])) {
+      if ($fields['frequency_interval'] <= 0) {
+        $errors['frequency_interval'] = ts('Please enter a number for how often you want to make this recurring contribution (EXAMPLE: Every 3 months).');
+      }
+      if ($fields['frequency_unit'] == '0') {
+        $errors['frequency_unit'] = ts('Please select a period (e.g. months, years ...) for how often you want to make this recurring contribution (EXAMPLE: Every 3 MONTHS).');
+      }
+    }
+
   /* Other forms that might have an IBAN/BIC input we need to verify. */
   } elseif ("CRM_Contribute_Form_Contribution" == $formName) { /* Back-office Contribution edit form. */
     if (!CRM_Sepa_Logic_Base::isSDD($fields)) {
