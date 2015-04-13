@@ -151,7 +151,7 @@ function civicrm_api3_sepa_import_create($params) {
     throw new API_Exception("Invalid value '$frequencyUnit' for parameter 'frequency_unit'");
   }
   $frequencyInterval = $params['frequency_interval'];
-  if (!CRM_Utils_Rule::positiveInteger($frequencyInterval)) {
+  if (!(CRM_Utils_Rule::positiveInteger($frequencyInterval) && $frequencyInterval > 0)) {
     throw new API_Exception("Invalid value '$frequencyInterval' for parameter 'frequency_interval'");
   }
 
