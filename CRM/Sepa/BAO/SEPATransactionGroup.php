@@ -75,6 +75,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t['message'] = $creditor['remittance_info'];
 
       $t['trxn_id'] = "{$creditor['mandate_prefix']}-{$t['contribution_id']}";
+      if (strlen($t['trxn_id']) > 35) {
+        throw new CRM_Exception("Can't create SEPA XML file: <EndToEndId> value \"{$t['trxn_id']}\" is longer than the allowed 35 characters.");
+      }
       civicrm_api3('Contribution', 'create', array(
         'id' => $contrib->contribution_id,
         'trxn_id' => $t['trxn_id'],

@@ -352,6 +352,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $creditorPrefix = civicrm_api3('SepaCreditor', 'getvalue', array('id' => $creditor_id, 'return' => 'mandate_prefix'));
     $instrument = $isCor1 ? 'COR1' : 'CORE';
     $reference = "$prefix-$creditorPrefix-$creditor_id-$instrument-$type-$collection_date-$txgroup_id";
+    if (strlen($reference) > 35) {
+      throw new CRM_Exception("Can't create SEPA XML file: <PmtInfId> value \"$reference\" is longer than the allowed 35 characters.");
+    }
     civicrm_api3('SEPATransactionGroup', 'create', array('id' => $txgroup_id, 'reference' => $reference)); // Not very efficient, but easier than fiddling with BAO mess...
 
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
@@ -439,6 +442,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
 
     // Now that we have the auto ID, create the proper reference.
     $reference = "SDDXML-" . $tag . '-' . substr($txgroup->latest_submission_date, 0, 8) . (isset($instrument) ? "-$instrument" : '') . (isset($type) ? "-$type" : '') . (isset($collectionDate) ? '-' . date('Ymd', strtotime($collectionDate)) : '') . '-' . $sddfile_id;
+    if (strlen($reference) > 35) {
+      throw new CRM_Exception("Can't create SEPA XML file: <MsgId> value \"$reference\" is longer than the allowed 35 characters.");
+    }
     $filename = str_replace('-', '_', $reference . ".xml");
     civicrm_api3('SEPASddFile', 'create', array('id' => $sddfile_id, 'reference' => $reference, 'filename' => $filename)); // Not very efficient, but easier than fiddling with BAO mess...
 

@@ -112,7 +112,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if ($fallback_reference) {
       // If no mandate reference was supplied by the caller nor the customisation hook, create a nice default one.
       $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix'));
-      $dao->reference = $creditor['mandate_prefix'] . '-' . $params['type'] . '-' . date("Y") . '-' . $dao->id;
+      $reference = $creditor['mandate_prefix'] . '-' . $params['type'] . '-' . date("Y") . '-' . $dao->id;
+      if (strlen($reference) > 35) {
+        throw new CRM_Exception("Can't create Mandate: <MndtId> (Mandate Reference) value \"$reference\" is longer than the allowed 35 characters.");
+      }
+      $dao->reference = $reference;
       $dao->save();
     }
 
