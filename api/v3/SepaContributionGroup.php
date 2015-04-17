@@ -148,6 +148,8 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
 
   $today = date_create('00:00');
 
+  $transaction = new CRM_Core_Transaction();
+
   $instruments = array();
   foreach (array('FRST', 'RCUR') as $type) {
     $instruments[] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
@@ -227,4 +229,6 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
       ));
     } /* for($period) */
   } /* foreach($recur) */
+
+  $transaction->commit();
 }

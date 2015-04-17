@@ -87,6 +87,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
   public static function batchForSubmit($submitDate, $creditorId) {
     set_time_limit(0); /* This action can take quite long... */
 
+    $transaction = new CRM_Core_Transaction();
+
     $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditorId));
     $creditorCountry = substr($creditor['iban'], 0, 2); /* IBAN begins with country code. (Needed for COR1 handling.) */
 
@@ -209,12 +211,16 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         civicrm_api3('SepaSddFile', 'generatexml', array('id' => $sddFile->id));
       }
     } /* !empty($groups) */
+
+    $transaction->commit();
   }
 
   /**
    */
   public static function updateStatus($txgroupParams, $statusId, $fromStatusId) {
     set_time_limit(0); /* This action can take quite long... */
+
+    $transaction = new CRM_Core_Transaction();
 
     $useApi = false;
     $contributionStatusId = $groupStatusId = $statusId;
@@ -268,6 +274,8 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         }
       }
     }
+
+    $transaction->commit();
   }
 
   /**

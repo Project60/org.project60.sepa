@@ -101,6 +101,8 @@ function _civicrm_api3_sepa_sdd_file_generatexml_spec(&$params) {
 }
 
 function civicrm_api3_sepa_sdd_file_generatexml($params) {
+  $transaction = new CRM_Core_Transaction();
+
 //fetch the file, then the group
   $file = new CRM_Sepa_BAO_SEPASddFile();
   $xml = $file->generateXML($params["id"]);
@@ -125,6 +127,8 @@ function civicrm_api3_sepa_sdd_file_generatexml($params) {
   $entityFileDAO->entity_id = $params['id'];
   $entityFileDAO->file_id = $fileDAO->id;
   $entityFileDAO->save();
+
+  $transaction->commit();
 }
 
 /**
