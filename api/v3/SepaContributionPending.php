@@ -42,7 +42,7 @@ function civicrm_api3_sepa_contribution_pending_get($params) {
   $contactParams = CRM_Utils_Array::value('contact', $params, array());
   $recurParams = CRM_Utils_Array::value('recur', $params); /* No default here, as this one is optional, and will be fetched only if the 'recur' sub-array is supplied. */
 
-  $transaction = new CRM_Core_Transaction(); /* We only do read operations here -- however, we better make sure the data doesn't change beneath our feet while fetching the related objects. */
+  $transaction = new CRM_Sepa_Utils_Transaction(); /* We only do read operations here -- however, we better make sure the data doesn't change beneath our feet while fetching the related objects. */
 
   #$instruments = array();
   #foreach (array('FRST', 'RCUR', 'OOFF') as $type) {

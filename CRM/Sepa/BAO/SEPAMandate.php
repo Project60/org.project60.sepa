@@ -77,7 +77,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       //      CRM_Sepa_Logic_Mandates::fix_initial_contribution($this); not possible to fix from here this undefined, id undefined
     }
 
-    $transaction = new CRM_Core_Transaction(); /* This doesn't actually seem to be necessary in any of the tested use cases, as CiviContribute apparently uses transactions at a higher level everywhere -- but better safe than sorry... */
+    $transaction = new CRM_Sepa_Utils_Transaction(); /* This doesn't actually seem to be necessary in any of the tested use cases, as CiviContribute apparently uses transactions at a higher level everywhere -- but better safe than sorry... */
 
     // fix payment processor-created contributions before continuing
     if (!empty($params['id']) && self::is_active(CRM_Utils_Array::value('status', $params))) {

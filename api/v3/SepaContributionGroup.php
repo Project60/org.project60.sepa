@@ -148,7 +148,7 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
 
   $today = date_create('00:00');
 
-  $transaction = new CRM_Core_Transaction();
+  $transaction = new CRM_Sepa_Utils_Transaction();
 
   $instruments = array();
   foreach (array('FRST', 'RCUR') as $type) {
