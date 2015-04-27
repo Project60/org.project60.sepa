@@ -446,16 +446,16 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $fullSubmitDate = date('Ymd', strtotime($txgroup->latest_submission_date));
     $shortSubmitDate = date('ymd', strtotime($txgroup->latest_submission_date));
 
-    $fullInstrument = isset($instrument) ? '_' . $instrument : '';
+    $fullInstrument = isset($instrument) ? '-' . $instrument : '';
     $shortInstrument = $instrument;
 
-    $fullSequenceType = isset($type) ? '_' . $type : '';
+    $fullSequenceType = isset($type) ? '-' . $type : '';
     $shortSequenceType = isset($type) ? '-' . substr($type, 0, 1) : '';
 
-    $fullCollectionDate = isset($collectionDate) ? '_' . date('Ymd', strtotime($collectionDate)) : '';
+    $fullCollectionDate = isset($collectionDate) ? '-' . date('Ymd', strtotime($collectionDate)) : '';
     $shortCollectionDate = isset($collectionDate) ? date('ymd', strtotime($collectionDate)) : '';
 
-    $filename = "SDDXML_{$tag}_$fullSubmitDate$fullInstrument$fullSequenceType{$fullCollectionDate}_$sddfile_id.xml";
+    $filename = "SDDXML-$tag-$fullSubmitDate$fullInstrument$fullSequenceType$fullCollectionDate-$sddfile_id.xml";
     $reference = "F-$tag-$shortSubmitDate$shortInstrument$shortSequenceType$shortCollectionDate-$sddfile_id";
     if (strlen($reference) > 35) {
       throw new CRM_Exception("Can't create SEPA XML file: <MsgId> value \"$reference\" is longer than the allowed 35 characters.");
