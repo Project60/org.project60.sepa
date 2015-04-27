@@ -219,14 +219,15 @@ class CRM_Sepa_Logic_BatchingTest extends CiviUnitTestCase {
 
 
   /**
-   * Test error handling for overlong IDs generated in batchForSubmit().
+   * Test IDs generated in batchForSubmit().
    *
-   * Specifically, these are the <MsgId> and the <PmtInfId>.
+   * Specifically, these are the <MsgId> and the <PmtInfId>;
+   * and also the XML file name, which is closely related to the <MsgId>.
    *
    * @dataProvider batchForSubmit_ids_provider
    *
    * @param array $creditorParams
-   * @param mixed $expectedResult NULL for success (batchForSubmit() doesn't have a return value); or exception object when expecting error.
+   * @param mixed $expectedResult array(<PmtInfId>, <MsgId>, fileName); or exception object when expecting error.
    */
   function test_batchForSubmit_ids(array $creditorParams, $expectedResult) {
     list($paymentProcessorID, $creditorID) = $this->_createPP($creditorParams);
@@ -235,23 +236,51 @@ class CRM_Sepa_Logic_BatchingTest extends CiviUnitTestCase {
 
     if ($expectedResult instanceof Exception) {
       $this->setExpectedException(get_class($expectedResult), $expectedResult->getMessage(), $expectedResult->getCode());
+      CRM_Sepa_Logic_Batching::batchForSubmit('2015-05-05', $creditorID);
+    } else {
+      list($pmtInfId, $msgId, $fileName) = $expectedResult;
+
+      CRM_Sepa_Logic_Batching::batchForSubmit('2015-05-05', $creditorID);
+      $this->assertEquals(1, civicrm_api3('SepaSddFile', 'getcount'), "No SEPA XML file created:");
+      $this->assertEquals($pmtInfId, civicrm_api3('SepaTransactionGroup', 'getvalue', array('return' => 'reference')), "Wrong <PmtInfId>:");
+      $this->assertEquals($msgId, civicrm_api3('SepaSddFile', 'getvalue', array('return' => 'reference')), "Wrong <MsgId>:");
+      $this->assertEquals($fileName, civicrm_api3('SepaSddFile', 'getvalue', array('return' => 'filename')), "Wrong file name:");
     }
-    CRM_Sepa_Logic_Batching::batchForSubmit('2015-05-05', $creditorID);
-    $this->assertEquals(1, civicrm_api3('SepaSddFile', 'getcount'), "No SEPA XML file created:");
   }
 
   function batchForSubmit_ids_provider() {
     return array(
-      'no overflow' => array(
+      'batching mode NONE' => array(
+        'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'NONE'),
+        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505COR1-F150507-1', 'SDDXML_TEST_20150505_COR1_FRST_20150507_1.xml'),
+      ),
+      'batching mode TYPE' => array(
+        'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'TYPE'),
+        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505COR1-F-1', 'SDDXML_TEST_20150505_COR1_FRST_1.xml'),
+      ),
+      'batching mode COR' => array(
+        'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'COR'),
+        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505COR1-1', 'SDDXML_TEST_20150505_COR1_1.xml'),
+      ),
+      'batching mode ALL' => array(
         'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'ALL'),
-        'expectedResult' => null,
+        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505-1', 'SDDXML_TEST_20150505_1.xml'),
+      ),
+
+      'no overflow (batching mode NONE)' => array(
+        'params' => array('mandate_prefix' => 'LONGPREFIX', 'group_batching_mode' => 'NONE'),
+        'expectedResult' => array('G-LONGPREFIX-1-COR1-F150507-1', 'F-LONGPREFIX-150505COR1-F150507-1', 'SDDXML_LONGPREFIX_20150505_COR1_FRST_20150507_1.xml'),
+      ),
+      'no overflow (batching mode ALL)' => array(
+        'params' => array('mandate_prefix' => 'MUCHLONGERPREFIX', 'group_batching_mode' => 'ALL'),
+        'expectedResult' => array('G-MUCHLONGERPREFIX-1-COR1-F150507-1', 'F-MUCHLONGERPREFIX-150505-1', 'SDDXML_MUCHLONGERPREFIX_20150505_1.xml'),
       ),
       'overflow <MsgId>' => array(
-        'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'NONE'),
+        'params' => array('mandate_prefix' => 'TOOLONGPREFIX', 'group_batching_mode' => 'NONE'),
         'expectedResult' => new CRM_Exception('Can\'t create SEPA XML file: <MsgId>'),
       ),
       'overflow <PmtInfId>' => array(
-        'params' => array('mandate_prefix' => 'LONGPREFIX', 'group_batching_mode' => 'ALL'),
+        'params' => array('mandate_prefix' => 'WAAAYTOOLONGPREFIX', 'group_batching_mode' => 'ALL'),
         'expectedResult' => new CRM_Exception('Can\'t create SEPA XML file: <PmtInfId>'),
       ),
     );
