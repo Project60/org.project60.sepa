@@ -318,11 +318,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     return null;
   }
 
-  public static function createTxGroup($creditor_id, $isCor1, $type, $receive_date, $payment_instrument_id, $sddFileId = null) {
+  public static function createTxGroup($creditor_id, $isCor1, $type, $receive_date, $payment_instrument_id, $sddFileId) {
     $collection_date = substr($receive_date, 0, 10);
     CRM_Sepa_Logic_Base::debug("Creating new TXG( CRED=$creditor_id, IS_COR1=$isCor1, TYPE=$type, COLLDATE=" . $collection_date . ')');
-
-    $status = isset($sddFileId) ? 'Batched' : 'Pending';
 
     $session = CRM_Core_Session::singleton();
     $reference = time() . rand(); // Just need something unique at this point. (Will generate a nicer one once we have the auto ID from the DB -- see further down.)
@@ -331,7 +329,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
         'is_cor1' => $isCor1,
         'type' => $type,
         'sdd_creditor_id' => $creditor_id,
-        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', $status, 'name'),
+        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Batched', 'name'),
         'payment_instrument_id' => $payment_instrument_id,
         'collection_date' => $collection_date,
         'created_date' => date('Ymdhis'),
@@ -348,10 +346,9 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $txgroup_id = $result['id'];
 
     // Now that we have the auto ID, create the proper reference.
-    $prefix = ($status == 'Pending') ? 'PENDING' : 'TXG';
     $creditorPrefix = civicrm_api3('SepaCreditor', 'getvalue', array('id' => $creditor_id, 'return' => 'mandate_prefix'));
     $instrument = $isCor1 ? 'COR1' : 'CORE';
-    $reference = "$prefix-$creditorPrefix-$creditor_id-$instrument-$type-$collection_date-$txgroup_id";
+    $reference = "TXG-$creditorPrefix-$creditor_id-$instrument-$type-$collection_date-$txgroup_id";
     if (strlen($reference) > 35) {
       throw new CRM_Exception("Can't create SEPA XML file: <PmtInfId> value \"$reference\" is longer than the allowed 35 characters.");
     }
