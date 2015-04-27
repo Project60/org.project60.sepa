@@ -252,28 +252,28 @@ class CRM_Sepa_Logic_BatchingTest extends CiviUnitTestCase {
     return array(
       'batching mode NONE' => array(
         'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'NONE'),
-        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505COR1-F150507-1', 'SDDXML_TEST_20150505_COR1_FRST_20150507_1.xml'),
+        'expectedResult' => array('G-TEST,1-COR1-F150507-1', 'F-TEST-150505COR1-F150507-1', 'SDDXML_TEST_20150505_COR1_FRST_20150507_1.xml'),
       ),
       'batching mode TYPE' => array(
         'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'TYPE'),
-        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505COR1-F-1', 'SDDXML_TEST_20150505_COR1_FRST_1.xml'),
+        'expectedResult' => array('G-TEST,1-COR1-F150507-1', 'F-TEST-150505COR1-F-1', 'SDDXML_TEST_20150505_COR1_FRST_1.xml'),
       ),
       'batching mode COR' => array(
         'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'COR'),
-        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505COR1-1', 'SDDXML_TEST_20150505_COR1_1.xml'),
+        'expectedResult' => array('G-TEST,1-COR1-F150507-1', 'F-TEST-150505COR1-1', 'SDDXML_TEST_20150505_COR1_1.xml'),
       ),
       'batching mode ALL' => array(
         'params' => array('mandate_prefix' => 'TEST', 'group_batching_mode' => 'ALL'),
-        'expectedResult' => array('G-TEST-1-COR1-F150507-1', 'F-TEST-150505-1', 'SDDXML_TEST_20150505_1.xml'),
+        'expectedResult' => array('G-TEST,1-COR1-F150507-1', 'F-TEST-150505-1', 'SDDXML_TEST_20150505_1.xml'),
       ),
 
       'no overflow (batching mode NONE)' => array(
         'params' => array('mandate_prefix' => 'LONGPREFIX', 'group_batching_mode' => 'NONE'),
-        'expectedResult' => array('G-LONGPREFIX-1-COR1-F150507-1', 'F-LONGPREFIX-150505COR1-F150507-1', 'SDDXML_LONGPREFIX_20150505_COR1_FRST_20150507_1.xml'),
+        'expectedResult' => array('G-LONGPREFIX,1-COR1-F150507-1', 'F-LONGPREFIX-150505COR1-F150507-1', 'SDDXML_LONGPREFIX_20150505_COR1_FRST_20150507_1.xml'),
       ),
       'no overflow (batching mode ALL)' => array(
         'params' => array('mandate_prefix' => 'MUCHLONGERPREFIX', 'group_batching_mode' => 'ALL'),
-        'expectedResult' => array('G-MUCHLONGERPREFIX-1-COR1-F150507-1', 'F-MUCHLONGERPREFIX-150505-1', 'SDDXML_MUCHLONGERPREFIX_20150505_1.xml'),
+        'expectedResult' => array('G-MUCHLONGERPREFIX,1-COR1-F150507-1', 'F-MUCHLONGERPREFIX-150505-1', 'SDDXML_MUCHLONGERPREFIX_20150505_1.xml'),
       ),
       'overflow <MsgId>' => array(
         'params' => array('mandate_prefix' => 'TOOLONGPREFIX', 'group_batching_mode' => 'NONE'),

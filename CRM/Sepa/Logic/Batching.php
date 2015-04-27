@@ -352,7 +352,7 @@ class CRM_Sepa_Logic_Batching extends CRM_Sepa_Logic_Base {
     $shortSequenceType = substr($type, 0, 1);
     $shortCollectionDate = date('ymd', strtotime($collection_date));
 
-    $reference = "G-$creditorPrefix-$creditor_id-$instrument-$shortSequenceType$shortCollectionDate-$txgroup_id";
+    $reference = "G-$creditorPrefix,$creditor_id-$instrument-$shortSequenceType$shortCollectionDate-$txgroup_id";
     if (strlen($reference) > 35) {
       throw new CRM_Exception("Can't create SEPA XML file: <PmtInfId> value \"$reference\" is longer than the allowed 35 characters.");
     }
