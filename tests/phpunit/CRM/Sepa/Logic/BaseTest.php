@@ -26,10 +26,7 @@ class CRM_Sepa_Logic_BaseTest extends CiviUnitTestCase {
     if ($expectedResult instanceof Exception) {
       $this->setExpectedException(get_class($expectedResult), $expectedResult->getMessage(), $expectedResult->getCode());
     }
-    $actualResult = CRM_Sepa_Logic_Base::adjustBankDays($date_to_adjust, $days_delta);
-    if (! $expectedResult instanceof Exception) {
-      $this->assertSame($expectedResult, $actualResult);
-    }
+    $this->assertSame($expectedResult, CRM_Sepa_Logic_Base::adjustBankDays($date_to_adjust, $days_delta));
   }
 
   function adjustBankDays_provider() {
