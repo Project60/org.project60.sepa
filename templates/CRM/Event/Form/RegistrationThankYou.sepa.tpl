@@ -18,7 +18,7 @@
 
 <div class="crm-section sepa-section no-label">
   <br/>
-  <h2>{ts}Direct Debit Payment{/ts}</h2>
+  <div class="header-dark">{ts}Direct Debit Payment{/ts}</div>
   <table class="sepa-confirm-text-account-details display" id="sepa-confirm-text-account-details">
     <tr id="sepa-thankyou-amount">
       <td>{ts}Amount{/ts}</td>
