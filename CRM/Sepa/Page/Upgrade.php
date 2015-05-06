@@ -85,6 +85,11 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = "Fixed $rows missing `payment_instrument_id` values in `civicrm_financial_trxn` records for SEPA Contributions.";
     }
 
+    if (CRM_Core_DAO::singleValueQuery("SELECT CHARACTER_MAXIMUM_LENGTH != 35 FROM INFORMATION_SCHEMA.COLUMNS WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'civicrm_sdd_creditor' AND `COLUMN_NAME` = 'mandate_prefix'")) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_creditor` MODIFY `mandate_prefix` varchar(35) COMMENT 'Actually more a Creditor prefix -- it\'s used in various other references (<EndToEndId>, <PmtInfId>, and usually <MsgId>) as well.'");
+      $messages[] = 'Updated field length (and comment) for `civicrm_sdd_creditor`.`mandate_prefix`.';
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }

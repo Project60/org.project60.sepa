@@ -138,7 +138,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $bic;
   /**
-   * prefix for mandate identifiers
+   * Actually more a Creditor prefix -- it's used in various other references (<EndToEndId>, <PmtInfId>, and usually <MsgId>) as well.
    *
    * @var string
    */
@@ -303,9 +303,9 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'mandate_prefix' => array(
           'name' => 'mandate_prefix',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Mandate numering prefix') ,
-          'maxlength' => 4,
-          'size' => CRM_Utils_Type::FOUR,
+          'title' => ts('Mandate Reference prefix') ,
+          'maxlength' => 35,
+          'size' => CRM_Utils_Type::BIG,
         ) ,
         'payment_processor_id' => array(
           'name' => 'payment_processor_id',

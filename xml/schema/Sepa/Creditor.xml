@@ -94,10 +94,10 @@
 
   <field>
     <name>mandate_prefix</name>
-    <title>Mandate numering prefix</title>
+    <title>Mandate Reference prefix</title>
     <type>varchar</type>
-    <length>4</length>
-    <comment>prefix for mandate identifiers</comment>
+    <length>35</length> <!-- This is in fact the maximum length of the fields this value appears in. As those fields contain other data as well, this value should never really be as long. However, there is no clear fixed maximum; and thus any other value would be rather arbitrary... -->
+    <comment>Actually more a Creditor prefix -- it's used in various other references (&lt;EndToEndId>, &lt;PmtInfId>, and usually &lt;MsgId>) as well.</comment>
     <add>4.3</add>
   </field>
 

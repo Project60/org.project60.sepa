@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `country_id` int unsigned    COMMENT 'Which Country does this address belong to.',
      `iban` varchar(42) NULL   COMMENT 'Iban of the creditor',
      `bic` varchar(11)    COMMENT 'BIC of the creditor',
-     `mandate_prefix` varchar(4)    COMMENT 'prefix for mandate identifiers',
+     `mandate_prefix` varchar(35)    COMMENT 'Actually more a Creditor prefix -- it\'s used in various other references (<EndToEndId>, <PmtInfId>, and usually <MsgId>) as well.',
      `payment_processor_id` int unsigned    ,
      `category` varchar(4)    COMMENT 'Default value',
      `remittance_info` varchar(140) NOT NULL  DEFAULT '' COMMENT 'String used as the <RmtInf> value for each collection in SEPA XML files.',

@@ -105,7 +105,7 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
 
     $form->add('textarea', 'creditor_address', ts('Address'), array('cols' => '60', 'rows' => '3'));
     $form->add('checkbox', 'mandate_active', ts('Activate new mandates directly when submitted'));
-    $form->add( 'text', 'creditor_prefix',  ts('Mandate Prefix'));
+    $form->add( 'text', 'creditor_prefix',  ts('Mandate Prefix'), array('size' => 10, 'maxlength' => 35));
     $form->add( 'text', 'creditor_contact_id',  ts('Contact ID'));
     $form->add( 'text', 'creditor_bic',  ts('BIC'),"size=11 maxlength=11");
     $form->addElement( 'text', 'creditor_iban',  ts('IBAN'),array("size"=>34,"maxlength"=>34));
