@@ -66,4 +66,4 @@ In essence, these steps are necessary to get everything set up properly:
 
 Now it should be possible to run test for individual classes with `civix test
 <classname>` (from the extension's root directory), or run all available tests
-with just `civix test`.
+with `civix test <absolute path to tests/phpunit directory>`.
