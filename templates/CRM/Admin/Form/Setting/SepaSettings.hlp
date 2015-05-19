@@ -15,7 +15,7 @@
 {/htxt}
 
 {htxt id='id-cycle-days'}
-    <p>{ts}You should a day (as in "day of month") on which you plan to collect the monthly payments. You can also provide a comma separated list of such days.{/ts}</p>
+    <p>{ts}You should specify a day (as in "day of month") on which you plan to collect the monthly payments. You can also provide a comma separated list of such days.{/ts}</p>
 {/htxt}
 
 {htxt id='id-id'}

@@ -20,7 +20,7 @@
 			<font size="+1">{ts}Group '%s' <b>is now closed</b> and cannot be changed any more.{/ts}</font>
 			{/capture}
 			<p>{$group_text|sprintf:$txgroup.reference}</p>
-			<p>{ts}The money should be on it's way{/ts}</p>
+			<p>{ts}The money should be on its way{/ts}</p>
 		{elseif $status eq "invalid"}
 			{capture assign=settings_url}{crmURL p="civicrm/admin/setting/sepa"}{/capture}
 			<p>{ts}Sorry to hear that the bank has rejected your payment XML file.{/ts}</p>
