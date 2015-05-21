@@ -112,19 +112,21 @@ function _sdd_update_elements() {
 	cj("#frequency_combined").prop('disabled', !is_recur);
 	// this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension
 	// cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
+	// the name of this field is randomly generated
+	var start_date_display = cj('.start_date-section .content input:nth-child(2)');
 	if (is_recur) {
-		cj("#start_date_display").datepicker("option", "minDate", earliest_rcur_date);
+		cj(start_date_display).datepicker("option", "minDate", earliest_rcur_date);
 		if (currently_set_date > earliest_rcur_date) {
-			cj("#start_date_display").datepicker("setDate", currently_set_date);
+			cj(start_date_display).datepicker("setDate", currently_set_date);
 		} else {
-			cj("#start_date_display").datepicker("setDate", earliest_rcur_date);
+			cj(start_date_display).datepicker("setDate", earliest_rcur_date);
 		}
 	} else {
-		cj("#start_date_display").datepicker("option", "minDate", earliest_ooff_date);
+		cj(start_date_display).datepicker("option", "minDate", earliest_ooff_date);
 		if (currently_set_date > earliest_ooff_date) {
-			cj("#start_date_display").datepicker("setDate", currently_set_date);
+			cj(start_date_display).datepicker("setDate", currently_set_date);
 		} else {
-			cj("#start_date_display").datepicker("setDate", earliest_ooff_date);
+			cj(start_date_display).datepicker("setDate", earliest_ooff_date);
 		}
 	}
 }
