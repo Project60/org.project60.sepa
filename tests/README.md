@@ -56,13 +56,19 @@ In essence, these steps are necessary to get everything set up properly:
     however needs to be available in the extension folder, so the tests can
     activate it when necessary.
 
-    Also, to make CiviCRM find the code reliably, it may be necessary to put
-    (or link) it into `civicrm/tools/extensions/`, rather than the explicitly
-    configured extension folder that is used for extensions installed through
-    the UI. (This is also the case for any other extensions that are activated
-    on the linked site, and thus civix tries to auto-install on the test DB.)
-    Watch out, as failures in the auto-install can cause rather unhelpful error
-    messages, which do not point to the actual problem...
+  * Civix presently has a bug (see https://github.com/totten/civix/pull/57 )
+    that makes it fail to set up the extensions folder properly, if CiviCRM
+    stores it as a relative path. (That happens when the extensions folder is
+    in the same folder as `templates_c` AIUI.) This will probably make the
+    testsuite error out -- either because it tries to access a non-existant
+    folder; or because it can't find the extensions. (Both the tested
+    extension, as well as any extensions that are active on the linked site and
+    civix thus tries to auto-install.)
+
+    This could be worked around by changing the location of the extensions
+    folder; or in the latter case, by putting all extensions into the CiviCRM
+    source tree under civicrm/tools/extensions (this location is always
+    accessible) -- but better just get a fixed version of civix...
 
 Now it should be possible to run test for individual classes with `civix test
 <classname>` (from the extension's root directory), or run all available tests
