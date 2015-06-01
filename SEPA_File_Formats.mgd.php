@@ -10,6 +10,7 @@ return array (
       'title' => ts('SEPA XML File Format Variants'),
       'is_reserved' => 1,
       'is_active' => 1,
+      'is_locked' => 1, /* Don't allow meddling with the values through the UI. */
       'api.OptionValue.create' => array (
         array(
           'name' => 'pain.008.001.02',

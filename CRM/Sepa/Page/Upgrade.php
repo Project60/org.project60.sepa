@@ -95,6 +95,14 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = 'Updated `name` and `label` in `civicrm_extension` to match newer info.xml.';
     }
 
+    if (!civicrm_api3('OptionGroup', 'getvalue', array('name' => 'sepa_file_format', 'return' => 'is_locked'))) {
+      civicrm_api3('OptionGroup', 'getsingle', array(
+        'name' => 'sepa_file_format',
+        'api.OptionGroup.setvalue' => array('id' => '$value.id', 'field' => 'is_locked', 'value' => 1),
+      ));
+      $messages[] = 'Set `is_locked` for "SEPA File Formats" Option Group.';
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
