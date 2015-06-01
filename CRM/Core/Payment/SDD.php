@@ -199,6 +199,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       civicrm_api3('ContributionRecur', 'create', array(
         'id'            => $params['contributionRecurID'], 
         'start_date'    => $params['sepa_start_date'],
+        'cycle_day'     => $params['cycle_day'],
         'trxn_id'       => $params['trxn_id']));
     }
 
