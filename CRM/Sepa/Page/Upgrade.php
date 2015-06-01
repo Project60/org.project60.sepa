@@ -90,6 +90,11 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = 'Updated field length (and comment) for `civicrm_sdd_creditor`.`mandate_prefix`.';
     }
 
+    if (CRM_Core_DAO::singleValueQuery("SELECT `name` != 'SEPA Direct Debit payments' FROM `civicrm_extension` WHERE `full_name` = 'org.project60.sepa'")) {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_extension` SET `name` = 'SEPA Direct Debit payments', `label` = 'SEPA Direct Debit payments' WHERE `full_name` = 'org.project60.sepa'");
+      $messages[] = 'Updated `name` and `label` in `civicrm_extension` to match newer info.xml.';
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
