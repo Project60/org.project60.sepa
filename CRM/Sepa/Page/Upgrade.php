@@ -103,6 +103,25 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = 'Set `is_locked` for "SEPA File Formats" Option Group.';
     }
 
+    $optionGroups = array(
+      'msg_tpl_workflow_contribution' => array('sepa_mandate_pdf', 'sepa_mandate'),
+      'payment_instrument' => array('FRST', 'RCUR', 'OOFF'),
+      'contribution_status' => array('Batched'),
+    );
+    foreach ($optionGroups as $groupName => $groupValues) {
+      $optionGroup = civicrm_api3('OptionGroup', 'getsingle', array('name' => $groupName));
+      foreach ($groupValues as $valueName) {
+        $optionValue = civicrm_api3('OptionValue', 'getsingle', array('option_group_id' => $optionGroup['id'], 'name' => $valueName));
+
+        if (civicrm_api3('OptionValue', 'getcount', array('option_group_id' => $optionGroup['id'], 'weight' => $optionValue['weight'])) > 1) { /* This Option Value has the same `weight` as some other in this group => need to fix. */
+          $newWeight = CRM_Core_BAO_OptionValue::getDefaultWeight(array('option_group_id' => $optionGroup['id']));
+          civicrm_api3('OptionValue', 'setvalue', array('id' => $optionValue['id'], 'field' => 'weight', 'value' => $newWeight));
+
+          $messages[] = "Fixed `weight` for Option Value \"$valueName\" in Option Group \"$groupName\".";
+        }
+      }
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
