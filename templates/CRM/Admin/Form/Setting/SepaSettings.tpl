@@ -237,23 +237,38 @@
 {literal}
 <script type="text/javascript">
   cj('#edit_creditor_id').val("none");
-  
-  cj(function() {
-    var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact' h=0}"{literal};
 
-    cj('#addcreditor_creditor_id').autocomplete(contactUrl, {
-          width: 200,
-          selectFirst: false,
-          minChars: 1,
-          matchContains: true,
-          delay: 400,
-          max: 20
-    }).result(function(event, data, formatted) {
-         cj('#addcreditor_creditor_id').val(data[0]);
-         cj('#add_creditor_id').val(data[1]);
-         return false;
-      });
+  cj(function() {
+
+    cj('#addcreditor_creditor_id').autocomplete({
+      source: function(request, response) {
+        var
+          option = cj('#addcreditor_creditor_id'),
+          params = {
+                  'sequential': 1,
+                  'sort_name': option.val()
+                };
+        CRM.api3('Contact', 'get', params).done(function(result) {
+          var ret = [];
+          if (result.values) {
+            cj.each(result.values, function(k, v) {
+              ret.push({value: v.contact_id, label: v.display_name});
+            })
+          }
+          response(ret);
+        })
+      },
+      focus: function (event, ui) {
+        return false;
+      },
+      select: function (event, ui) {
+        cj('#addcreditor_creditor_id').val(ui.item.label);
+        cj('#add_creditor_id').val(ui.item.value);
+        return false;
+      }
     });
+
+  });
 
   var customBatchingParams = [
               ["cycledays_override",      "custom_cycledays",    null],
