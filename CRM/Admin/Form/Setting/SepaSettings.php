@@ -147,8 +147,6 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addRule('cycledays',        ts('Please give a comma separated list of valid days.'), 'sepa_cycle_day_list');
         $this->addRule('custom_cycledays', ts('Please give a comma separated list of valid days.'), 'sepa_cycle_day_list');
 
-        $this->addRule('addcreditor_creditor_id', ts('This field is required.'), 'required');
-
         // get creditor list
         $creditors_default_list = array();
         $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
