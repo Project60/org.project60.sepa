@@ -31,13 +31,13 @@
             <td>{$creditor.bic}</td>
             <td>
               <a class="add button" title="Copy" onclick="fetchCreditor({$creditor.id}, true);">
-                <span><div class="icon add-icon"></div>{ts}Copy{/ts}</span>
+                <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Copy{/ts}</span>
               </a>
               <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id}, false);">
-                <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+                <span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
               </a>
               <a class="delete button" title="Delete" onclick="deletecreditor({$creditor.id});">
-                <span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span>
+                <span><div class="icon delete-icon ui-icon-trash"></div>{ts}Delete{/ts}</span>
               </a>
             </td>
           </tr>
