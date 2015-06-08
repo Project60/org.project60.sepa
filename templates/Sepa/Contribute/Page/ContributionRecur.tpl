@@ -34,9 +34,9 @@
 </div>    
  
 <div class="crm-submit-buttons">
-    <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon"></div>{ts}Clone{/ts}</span></a-->
+    <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Clone{/ts}</span></a-->
 
-    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon"></div>{ts}Mandate Options{/ts}</span></a>
+    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Mandate Options{/ts}</span></a>
 </div>
 
 <!--div class="crm-submit-buttons">
@@ -46,7 +46,7 @@
         <a class="button" href="{crmURL p='civicrm/contact/view' q="action=browse&selectedChild=contribute&cid=$contactId"}"><span><div class="icon ui-icon-close"></div>{ts}Done{/ts}</span></a>
 
         {assign var="crid" value=$recur.id}
-        <a class="button" href="{crmURL p='civicrm/contribute/updaterecur' q="reset=1&crid=$crid&cid=$contactId&context=contribution"}"><span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+        <a class="button" href="{crmURL p='civicrm/contribute/updaterecur' q="reset=1&crid=$crid&cid=$contactId&context=contribution"}"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
         <button name="pdfaction" value="print" class="ui-button ui-button-text-icon-primary">
             <span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
             <span class="ui-button-text">Print</span>
@@ -77,4 +77,3 @@ cj("div.crm-recurcontrib-view-block > table > tbody").append(cj("[name='note_add
 .crm-recurcontrib-view-block .crm-submit-buttons {display:none;}
 </style>
 {/literal}
-
