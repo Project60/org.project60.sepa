@@ -240,6 +240,39 @@
 
   cj(function() {
 
+    CRM.api3('Domain', 'getsingle', {
+      'sequential': 1,
+      'return': 'version'
+    }).done(function(result) {
+      if(result['is_error'] === 0) {
+        var raw_version = result['version'].split('.', 3);
+        var version = [];
+
+        cj.each(raw_version, function(k,v) {
+          version[k] = parseInt(v, 10);
+        });
+
+        // <= 4.4.x
+        if(version[0] <= 4 && version[1] <= 4) {
+
+        var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact' h=0}"{literal};
+
+          cj('#addcreditor_creditor_id').autocomplete(contactUrl, {
+                width: 200,
+                selectFirst: false,
+                minChars: 1,
+                matchContains: true,
+                delay: 400,
+                max: 20
+          }).result(function(event, data, formatted) {
+             cj('#addcreditor_creditor_id').val(data[0]);
+             cj('#add_creditor_id').val(data[1]);
+             return false;
+          });
+
+        }else{
+          // > 4.4.x (4.5.x+)
+
     cj('#addcreditor_creditor_id').autocomplete({
       source: function(request, response) {
         var
@@ -265,6 +298,10 @@
         cj('#addcreditor_creditor_id').val(ui.item.label);
         cj('#add_creditor_id').val(ui.item.value);
         return false;
+      }
+    });
+
+        }
       }
     });
 
