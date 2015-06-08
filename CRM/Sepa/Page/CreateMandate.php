@@ -156,6 +156,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'date'                      => date('YmdHis'),
         'iban'                      => $_REQUEST['iban'],
         'bic'                       => $_REQUEST['bic'],
+        'reference'                 => $_REQUEST['reference'],
         'status'                    => $initial_status,
         'type'                      => $type,
         'creditor_id'               => $_REQUEST['creditor_id'],
@@ -288,7 +289,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // copy known parameters
     $copy_params = array('contact_id', 'creditor_id', 'total_amount', 'financial_type_id', 'campaign_id', 'source', 'note',
-      'iban', 'bic', 'date', 'mandate_type', 'start_date', 'cycle_day', 'interval', 'end_date');
+      'iban', 'bic', 'date', 'mandate_type', 'start_date', 'cycle_day', 'interval', 'end_date', 'reference');
     foreach ($copy_params as $parameter) {
       if (isset($_REQUEST[$parameter]))
         $this->assign($parameter, $_REQUEST[$parameter]);
@@ -412,6 +413,20 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($_REQUEST['iban']);
         if (!empty($iban_error)) {
           $errors['iban'] = $iban_error;
+        }
+      }
+    }
+
+    // check reference
+    if (!empty($_REQUEST['reference'])) {
+      // check if it is formally correct
+      if (!preg_match("/^[A-Z0-9\\-]{4,35}$/", $_REQUEST['reference'])) {
+        $errors['reference'] = ts("Reference has to be an upper case alphanumeric string between 4 and 35 characters long.");
+      } else {
+        // check if the reference is taken
+        $count = civicrm_api3('SepaMandate', 'getcount', array("reference" => $_REQUEST['reference']));        
+        if ($count > 0) {
+          $errors['reference'] = ts("This reference is already in use.");
         }
       }
     }

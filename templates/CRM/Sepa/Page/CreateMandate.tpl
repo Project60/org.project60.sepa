@@ -70,13 +70,17 @@
 				</select>
 			</td>
 		</tr>
+		<tr>	<!-- MANDATE REFERENCE -->
+			<td>{ts}Mandate Reference{/ts}:</td>
+			<td><input name="reference" type="text" size="34" value="{$reference}" placeholder="{ts}not required, will be generated{/ts}"/></td>
+		</tr>
 		<tr>	<!-- SOURCE -->
 			<td>{ts}Source{/ts}:</td>
-			<td><input name="source" type="text" value="{$source}"/></td>
+			<td><input name="source" type="text" value="{$source}" placeholder="{ts}not required{/ts}"/></td>
 		</tr>
 		<tr>	<!-- NOTE -->
 			<td id="mandate_note_label">{ts}Note{/ts}:</td>
-			<td><input name="note" type="text" size="32" value="{$note}"/></td>
+			<td><input name="note" type="text" size="32" value="{$note}" placeholder="{ts}not required{/ts}"/></td>
 		</tr>
 
 		<tr><td colspan="4"><hr></td></tr>
