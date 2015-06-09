@@ -399,5 +399,111 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $lock->release();
     return TRUE;
   }
+
+
+  /**
+   * changes the amount of a SEPA mandate
+   * 
+   * @return success as boolean
+   * @author endres -at- systopia.de 
+   */
+  static function adjustAmount($mandate_id, $adjusted_amount) {
+    $adjusted_amount = (float) $adjusted_amount;
+    $contribution_id_pending = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+
+    // use a lock, in case somebody is batching just now
+    $lock = CRM_Sepa_Logic_Settings::getLock();
+    if (empty($lock)) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot adjust mandate [%s], batching in progress!"), $mandate_id), ts('Error'), 'error');
+      return FALSE;
+    }
+
+     // first, load the mandate
+    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
+    if (isset($mandate['is_error'])) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+      $lock->release();
+      return FALSE;
+    }
+    
+    // check the mandate type
+    if ( $mandate['type']!="RCUR" ) {
+      CRM_Core_Session::setStatus(ts("You can only adjust the amount of recurring contribution mandates."), ts('Error'), 'error');
+      $lock->release();
+      return FALSE;
+    }
+
+    // load the contribution
+    $contribution_id = $mandate['entity_id'];
+    $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
+    if (isset($contribution['is_error']) && $contribution['is_error']) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      $lock->release();
+      return FALSE;
+    }
+
+    // check the amount
+    if ($adjusted_amount <= 0) {
+      CRM_Core_Session::setStatus(ts("The amount cannot be changed to zero or less."), ts('Error'), 'error');
+      $lock->release();
+      return FALSE;
+    }
+
+    // check the amount
+    $old_amount = (float) $contribution['amount'];
+    if ($old_amount == $adjusted_amount) {
+      CRM_Core_Session::setStatus(ts("The requested amount is the same as the current one."), ts('Error'), 'error');
+      $lock->release();
+      return FALSE;
+    }
+
+    // modify the amount in the recurring contribution
+    $query = array(
+      'version'   => 3,
+      'id'        => $contribution_id,
+      'amount'    => $adjusted_amount);
+    $result = civicrm_api("ContributionRecur", "create", $query);
+    if (!empty($result['is_error'])) {
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'"), $contribution_id, $result['error_message']), ts('Error'), 'error');
+      $lock->release();
+      return FALSE;
+    }
+
+    // find already created contributions. Those also need to be modified
+    $contributions2adjust = array();
+    $adjusted_ids = array();
+    $find_need2adjust = "
+    SELECT id
+    FROM civicrm_contribution
+    WHERE receive_date >= DATE(NOW())
+      AND contribution_recur_id = $contribution_id
+      AND contribution_status_id = $contribution_id_pending;";
+    $contributions2adjust_query = CRM_Core_DAO::executeQuery($find_need2adjust);
+    while ($contributions2adjust_query->fetch()) {
+      $contributions2adjust[] = $contributions2adjust_query->id;
+    }
+
+    // ...and adjust them:
+    foreach ($contributions2adjust as $contribution2adjust_id) {
+      $update_result = civicrm_api("Contribution", "create", array(
+        'version'                => 3,
+        'id'                     => $contribution2adjust_id, 
+        'total_amount'           => $adjusted_amount,
+        'contribution_status_id' => $contribution_id_pending));
+      if (!empty($update_result['is_error'])) {
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot update scheduled contribution [%s]. Error was: '%s'"), $contribution2adjust_id, $update_result['error_message']), ts('Error'), 'warn');
+      } else {
+        array_push($adjusted_ids, $contribution2adjust_id);
+      }
+    }
+  
+    if (count($adjusted_ids)) {
+      CRM_Core_Session::setStatus(sprintf(ts("Successfully updated %d generated contributions."), count($adjusted_ids)), ts('Mandate updated.'), 'info');
+    }
+
+    $lock->release();
+    return TRUE;    
+  }
 }
+
 

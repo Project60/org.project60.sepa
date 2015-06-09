@@ -125,8 +125,8 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_iban',         ts("IBAN"));
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor"), "", array('value' =>'0'));
-        $this->addElement('hidden',   'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
-        $this->addElement('hidden',   'add_creditor_id', '', array('id' => 'add_creditor_id'));
+        $this->addElement('hidden',     'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
+        $this->addElement('hidden',     'add_creditor_id', '', array('id' => 'add_creditor_id'));
 
         // add custom form elements and validation rules
         $index = 0;
@@ -163,6 +163,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $default_creditors = $this->addElement('select', 'batching_default_creditor', ts("Default Creditor"), array('' => ts('- select -')) + $creditors_default_list);
         $default_creditors->setSelected(CRM_Sepa_Logic_Settings::getSetting('batching.default.creditor'));
 
+        // add general config options
+        $amm_options = CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')?array('checked'=>'checked'):array();
+        $this->addElement('checkbox', 'allow_mandate_modification', ts("Mandate Modifications"), NULL, $amm_options);
+
         parent::buildQuickForm();
     }
 
@@ -176,7 +180,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
             }  
         }
 
+        // save general config options:
+        // default creditor
         CRM_Core_BAO_Setting::setItem($values['batching_default_creditor'], 'SEPA Direct Debit Preferences', 'batching_default_creditor');
+
+        // mandate modification
+        $allow_mandate_modification = empty($values['allow_mandate_modification'])?'0':'1';
+        CRM_Core_BAO_Setting::setItem($allow_mandate_modification, 'SEPA Direct Debit Preferences', 'allow_mandate_modification');       
         
         $session = CRM_Core_Session::singleton();
         $session->setStatus(ts("Settings successfully saved"));
