@@ -1,4 +1,6 @@
 <?php
+require_once 'packages/array_column/array_column.php';
+
 require_once 'CRM/Core/Page.php';
 
 class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
@@ -118,6 +120,58 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
           civicrm_api3('OptionValue', 'setvalue', array('id' => $optionValue['id'], 'field' => 'weight', 'value' => $newWeight));
 
           $messages[] = "Fixed `weight` for Option Value \"$valueName\" in Option Group \"$groupName\".";
+        }
+      }
+    }
+
+    /* Purge surplus SEPA File Format option values, and turn the correct ones into "managed" entities. */
+    {
+      $optionGroupID = civicrm_api3('OptionGroup', 'getvalue', array('name' => 'sepa_file_format', 'return' => 'id'));
+      $optionValues = civicrm_api3('OptionValue', 'get', array('option_group_id' => $optionGroupID, 'options' => array('sort' => 'id', 'limit' => 0)));
+      $options = $optionValues['values'];
+
+      $correctEntries = array_unique(array_column($options, 'name', 'id'));
+      $correctOptions = array_intersect_key($options, $correctEntries);
+      $wrongOptions = array_diff_key($options, $correctEntries);
+
+      if (!empty($wrongOptions)) {
+        $wrongValues = array_column($wrongOptions, 'value');
+        $wrongCreditors = civicrm_api3('SepaCreditor', 'get', array('sepa_file_format_id' => array('IN' => $wrongValues)));
+
+        if ($wrongCreditors['count']) {
+          $valueToName = array_column($options, 'name', 'value');
+          $nameToCorrectValue = array_column($correctOptions, 'value', 'name');
+
+          foreach ($wrongCreditors['values'] as $creditor) {
+            civicrm_api3('SepaCreditor', 'setvalue', array(
+              'id' => $creditor['id'],
+              'field' => 'sepa_file_format_id',
+              'value' => $nameToCorrectValue[$valueToName[$creditor['sepa_file_format_id']]]
+            ));
+          }
+          $updateMessage = ", and updated {$wrongCreditors['count']} Creditor(s) accordingly";
+        } else {
+          $updateMessage = '';
+        }
+
+        foreach ($wrongOptions as $id => $_) {
+          civicrm_api3('OptionValue', 'delete', array('id' => $id));
+        }
+        $messages[] = "Dropped " . count($wrongOptions) . " surplus \"SEPA File Format\" Option Values$updateMessage.";
+      }
+
+      /* Add "managed" entries. */
+      foreach ($correctOptions as $option) {
+        /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
+        $dao = new CRM_Core_DAO_Managed();
+        $dao->module = 'org.project60.sepa';
+        $dao->name = "SEPA File Format {$option['name']}";
+        if (!$dao->find()) {
+          $dao->entity_type = 'OptionValue';
+          $dao->entity_id = $option['id'];
+          $dao->save();
+
+          $messages[] = "Turned '{$option['name']}' \"SEPA File Format\" Option Value into a \"managed\" entity.";
         }
       }
     }
