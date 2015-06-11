@@ -176,6 +176,32 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       }
     }
 
+    {
+      $result = civicrm_api3('OptionGroup', 'getsingle', array(
+        'name' => 'contribution_status',
+        'api.OptionValue.getsingle' => array(
+          'name' => 'Batched',
+        )
+      ));
+      $batchedOptionValue = $result['api.OptionValue.getsingle'];
+      if (!$batchedOptionValue['is_reserved']) {
+        civicrm_api3('OptionValue', 'setvalue', array('id' => $batchedOptionValue['id'], 'field' => 'is_reserved', 'value' => 1));
+        $messages[] = "Marked 'Batched' Contribution Status as \"reserved\".";
+      }
+
+      /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
+      $dao = new CRM_Core_DAO_Managed();
+      $dao->module = 'org.project60.sepa';
+      $dao->name = 'Batched Contribution Status';
+      if (!$dao->find()) {
+        $dao->entity_type = 'OptionValue';
+        $dao->entity_id = $batchedOptionValue['id'];
+        $dao->cleanup = 'unused';
+        $dao->save();
+        $messages[] = "Turned 'Batched' Contribution Status into a \"managed\" entity.";
+      }
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
