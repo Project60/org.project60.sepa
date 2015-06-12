@@ -579,26 +579,6 @@ function sepa_civicrm_options() {
               ),
           ),
        ),
-      
-      // These will be used to mark a contribution with the correct type and will
-      // greatly facilitate batching later on
-      
-      'payment_instrument' => array(
-          'values' => array(
-              'FRST' => array(
-                  'label' => 'SEPA DD First Transaction',
-                  'is_default' => 0,
-              ),
-              'RCUR' => array(
-                  'label' => 'SEPA DD Recurring Transaction',
-                  'is_default' => 0,
-              ),
-              'OOFF' => array(
-                  'label' => 'SEPA DD One-off Transaction',
-                  'is_default' => 0,
-              ),
-          ),
-      ),
   );
 }
 

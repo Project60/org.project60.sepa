@@ -202,6 +202,37 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       }
     }
 
+    $instruments = array(
+      'FRST' => 'SEPA Payment Instrument FRST',
+      'RCUR' => 'SEPA Payment Instrument RCUR',
+      'OOFF' => 'SEPA Payment Instrument OOFF',
+    );
+    foreach ($instruments as $instrumentName => $managedName) {
+      $result = civicrm_api3('OptionGroup', 'getsingle', array(
+        'name' => 'payment_instrument',
+        'api.OptionValue.getsingle' => array(
+          'name' => $instrumentName,
+        )
+      ));
+      $optionValue = $result['api.OptionValue.getsingle'];
+      if (!$optionValue['is_reserved']) {
+        civicrm_api3('OptionValue', 'setvalue', array('id' => $optionValue['id'], 'field' => 'is_reserved', 'value' => 1));
+        $messages[] = "Marked '$instrumentName' Payment Instrument as \"reserved\".";
+      }
+
+      /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
+      $dao = new CRM_Core_DAO_Managed();
+      $dao->module = 'org.project60.sepa';
+      $dao->name = $managedName;
+      if (!$dao->find()) {
+        $dao->entity_type = 'OptionValue';
+        $dao->entity_id = $optionValue['id'];
+        $dao->cleanup = 'unused';
+        $dao->save();
+        $messages[] = "Turned '$instrumentName' Payment Instrument into a \"managed\" entity.";
+      }
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
