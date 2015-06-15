@@ -565,20 +565,6 @@ function sepa_civicrm_options() {
   $gid= $result['id'];
 
   return array(
-      'msg_tpl_workflow_contribution' => array(
-          'values' => array(
-              'sepa_mandate_pdf' => array(
-                  'label' => 'PDF Mandate',
-                  'value' => 1,
-                  'is_default' => 0,
-              ),
-              'sepa_mandate' => array(
-                  'label' => 'Mail Sepa Mandate',
-                  'value' => 1,
-                  'is_default' => 0,
-              ),
-          ),
-       ),
   );
 }
 

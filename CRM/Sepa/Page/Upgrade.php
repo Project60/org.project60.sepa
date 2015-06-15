@@ -233,6 +233,36 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       }
     }
 
+    $templates = array(
+      'sepa_mandate_pdf' => 'Mandate Template (PDF variant)',
+      'sepa_mandate' => 'Mandate Template (HTML variant)',
+    );
+    foreach ($templates as $templateName => $managedName) {
+      $result = civicrm_api3('OptionGroup', 'getsingle', array(
+        'name' => 'msg_tpl_workflow_contribution',
+        'api.OptionValue.getsingle' => array(
+          'name' => $templateName,
+        )
+      ));
+      $optionValue = $result['api.OptionValue.getsingle'];
+      if (!$optionValue['is_reserved']) {
+        civicrm_api3('OptionValue', 'setvalue', array('id' => $optionValue['id'], 'field' => 'is_reserved', 'value' => 1));
+        $messages[] = "Marked '$templateName' Message Template as \"reserved\".";
+      }
+
+      /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
+      $dao = new CRM_Core_DAO_Managed();
+      $dao->module = 'org.project60.sepa';
+      $dao->name = $managedName;
+      if (!$dao->find()) {
+        $dao->entity_type = 'OptionValue';
+        $dao->entity_id = $optionValue['id'];
+        $dao->cleanup = 'never';
+        $dao->save();
+        $messages[] = "Turned '$templateName' Message Template into a \"managed\" entity.";
+      }
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
