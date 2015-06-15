@@ -507,65 +507,7 @@ function sepa_civicrm_install() {
   $sql = file_get_contents(dirname( __FILE__ ) .'/sql/sepa.sql', true);
   CRM_Utils_File::sourceSQLFile($config->dsn, $sql, NULL, true);
 
-    //add the required option groups
-  sepa_civicrm_install_options(sepa_civicrm_options());
-
   return _sepa_civix_civicrm_install();
-}
-
-
-function sepa_civicrm_install_options($data) {
-  foreach ($data as $groupName => $group) {
-    // check group existence
-    $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => $groupName));
-    if (isset($result['is_error']) && $result['is_error']) {
-      $params = array(
-          'version' => 3,
-          'sequential' => 1,
-          'name' => $groupName,
-          'is_reserved' => 1,
-          'is_active' => 1,
-          'title' => $group['title'],
-          'description' => $group['description'],
-      );
-      $result = civicrm_api('option_group', 'create', $params);
-      $group_id = $result['values'][0]['id'];
-    } else {
-      $group_id = $result['id'];
-    }
-
-    if (is_array($group['values'])) {
-      $groupValues = $group['values'];
-      foreach ($groupValues as $valueName => $value) {
-        $result = civicrm_api('option_value', 'getsingle', array('version' => 3, 'name' => $valueName));
-        if (isset($result['is_error']) && $result['is_error']) {
-          $params = array(
-              'version' => 3,
-              'sequential' => 1,
-              'option_group_id' => $group_id,
-              'name' => $valueName,
-              'label' => $value['label'],
-              'is_default' => $value['is_default'],
-              'is_active' => 1,
-          );
-          if (isset($value['value'])) {
-            $params['value'] = $value['value'];
-          }
-          $result = civicrm_api('option_value', 'create', $params);
-        }
-      }
-    }
-  }
-}
-
-function sepa_civicrm_options() {
-  $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => 'payment_instrument'));
-  if (!isset($result['id']))
-    die ($result["error_message"]);
-  $gid= $result['id'];
-
-  return array(
-  );
 }
 
 /**
