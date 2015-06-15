@@ -515,6 +515,40 @@ function sepa_civicrm_install() {
  */
 function sepa_civicrm_uninstall() {
   //should we delete the tables?
+
+  /* Delete "workflow" Option Value entries for the Mandate Templates, if the actual Templates are not populated.
+   *
+   * The Option Value entries are presently created on installation,
+   * while the actual Templates (in `civicrm_msg_template`) are created lazily on first use.
+   * Thus, we can have Option Value entries with no actual Template attached.
+   *
+   * Although we create the Option Values as "managed" entities,
+   * we have to set the cleanup mode to 'never' and remove the unused Options manually,
+   * as the automatic 'unused' cleanup mode doesn't currently recognise the `msg_template` references,
+   * and thus would remove even the used ones. */
+  foreach (array('sepa_mandate_pdf', 'sepa_mandate') as $templateName) {
+    $result = civicrm_api3('OptionGroup', 'getsingle', array(
+      'name' => 'msg_tpl_workflow_contribution',
+      'api.OptionValue.getsingle' => array(
+        'name' => $templateName,
+      )
+    ));
+    $workflowID = $result['api.OptionValue.getsingle']['id'];
+
+    if (!civicrm_api3('MessageTemplate', 'getcount', array('workflow_id' => $workflowID))) {
+      civicrm_api3('OptionValue', 'delete', array('id' => $workflowID));
+
+      /* Also need to remove the corresponding `civicrm_managed` entries manually.
+       * (When the `cleanup` mode is 'never', the `managed` entries are not automatically removed either, even if the actual entities are gone.)
+       *
+       * Need to use DAO here, as there is no API (yet?) for `civicrm_managed`. */
+      $managedDao = new CRM_Core_DAO_Managed();
+      $managedDao->entity_type = 'OptionValue';
+      $managedDao->entity_id = $workflowID;
+      $managedDao->delete();
+    }
+  }
+
   return _sepa_civix_civicrm_uninstall();
 }
 
