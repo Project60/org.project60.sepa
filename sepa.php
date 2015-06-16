@@ -549,6 +549,15 @@ function sepa_civicrm_uninstall() {
     }
   }
 
+  /* Drop the Custom Group if it's not in use.
+   *
+   * (We know it's not in use if it's deactivated,
+   * as we checked that in the sepa_civicrm_disable() hook before deactivating.) */
+  $group = civicrm_api3('CustomGroup', 'getsingle', array('name' => 'sdd_contribution'));
+  if (!$group['is_active']) {
+    civicrm_api3('CustomGroup', 'delete', array('id' => $group['id']));
+  }
+
   return _sepa_civix_civicrm_uninstall();
 }
 
@@ -556,6 +565,9 @@ function sepa_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function sepa_civicrm_enable() {
+  $group = civicrm_api3('CustomGroup', 'getsingle', array('name' => 'sdd_contribution'));
+  civicrm_api3('CustomGroup', 'setvalue', array('id' => $group['id'], 'field' => 'is_active', 'value' => 1));
+
   return _sepa_civix_civicrm_enable();
 }
 
@@ -563,6 +575,15 @@ function sepa_civicrm_enable() {
  * Implementation of hook_civicrm_disable
  */
 function sepa_civicrm_disable() {
+  /* Deactivate the Custom Group if it's not in use.
+   *
+   * (If there are still contributions having the "Sequence Number" set, we want to continue showing it,
+   * even when the extension is disabled, and possibly later uninstalled.) */
+  $group = civicrm_api3('CustomGroup', 'getsingle', array('name' => 'sdd_contribution'));
+  if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM `{$group['table_name']}`")) { /* I sure wish there was an API for that... */
+    civicrm_api3('CustomGroup', 'setvalue', array('id' => $group['id'], 'field' => 'is_active', 'value' => 0));
+  }
+
   return _sepa_civix_civicrm_disable();
 }
 
