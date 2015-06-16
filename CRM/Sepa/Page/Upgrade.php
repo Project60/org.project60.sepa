@@ -263,6 +263,12 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       }
     }
 
+    $group = civicrm_api3('CustomGroup', 'getsingle', array('name' => 'sdd_contribution'));
+    if (!$group['collapse_adv_display']) {
+      civicrm_api3('CustomGroup', 'setvalue', array('id' => $group['id'], 'field' => 'collapse_adv_display', 'value' => 1));
+      $messages[] = "Set the `collapse_adv_display` flag for the SEPA \"Recurring Contribution\" Custom Group.";
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
