@@ -285,6 +285,25 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = "Removed default value for the \"Sequence Number\" Custom Field.";
     }
 
+    /* Now that we do not create bogus `sequence_number` values anymore, purge those present in the database. */
+    $instruments = implode(',', array_map(
+      function ($type) { return CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name'); },
+      array('FRST', 'RCUR', 'OOFF')
+    ));
+    $tableName = civicrm_api3('CustomGroup', 'getvalue', array('name' => 'sdd_contribution', 'return' => 'table_name'));
+    /* API is both too slow and too buggy/incomplete for this... */
+    $dao = CRM_Core_DAO::executeQuery("
+      DELETE FROM `$tableName` WHERE (
+        SELECT `contribution_recur_id` IS NULL OR `payment_instrument_id` NOT IN($instruments)
+        FROM `civicrm_contribution`
+        WHERE `id` = `entity_id`
+      )
+    ");
+    $rows = $dao->affectedRows();
+    if ($rows) {
+      $messages[] = "Purged $rows \"Sequence Number\" values attached to non-SEPA or non-recurring Contributions.";
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
