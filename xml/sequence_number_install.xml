@@ -27,7 +27,7 @@
       <is_searchable>1</is_searchable>
       <is_search_range>1</is_search_range>
       <is_active>1</is_active>
-      <is_view>0</is_view>
+      <is_view>1</is_view>
       <column_name>sequence_number</column_name>    <!-- The column name is not generated automatically, unlike the table name... -->
       <custom_group_name>sdd_contribution</custom_group_name>
     </CustomField>

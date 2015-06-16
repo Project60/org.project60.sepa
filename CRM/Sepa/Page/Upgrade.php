@@ -273,6 +273,12 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = "Marked the SEPA \"Recurring Contribution\" Custom Group as \"reserved\".";
     }
 
+    $field = civicrm_api3('CustomField', 'getsingle', array('name' => 'sdd_contribution_sequence_number'));
+    if (!$field['is_view']) {
+      civicrm_api3('CustomField', 'setvalue', array('id' => $field['id'], 'field' => 'is_view', 'value' => 1));
+      $messages[] = "Set the SEPA \"Sequence Number\" Custom Field to view-only.";
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }
