@@ -278,6 +278,12 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       civicrm_api3('CustomField', 'setvalue', array('id' => $field['id'], 'field' => 'is_view', 'value' => 1));
       $messages[] = "Set the SEPA \"Sequence Number\" Custom Field to view-only.";
     }
+    if (isset($field['default_value'])) {
+      /* We have to use 'create' here, as 'setvalue' only sets the value in `civicrm_custom_field`, but doesn't alter the schema for `civicrm_value_recurring_contribution_*`. */
+      $field['default_value'] = 'NULL';
+      civicrm_api3('CustomField', 'create', $field);
+      $messages[] = "Removed default value for the \"Sequence Number\" Custom Field.";
+    }
 
     $this->assign('messages', $messages);
     parent::run();
