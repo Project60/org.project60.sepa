@@ -268,6 +268,10 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       civicrm_api3('CustomGroup', 'setvalue', array('id' => $group['id'], 'field' => 'collapse_adv_display', 'value' => 1));
       $messages[] = "Set the `collapse_adv_display` flag for the SEPA \"Recurring Contribution\" Custom Group.";
     }
+    if (!$group['is_reserved']) {
+      civicrm_api3('CustomGroup', 'setvalue', array('id' => $group['id'], 'field' => 'is_reserved', 'value' => 1));
+      $messages[] = "Marked the SEPA \"Recurring Contribution\" Custom Group as \"reserved\".";
+    }
 
     $this->assign('messages', $messages);
     parent::run();
