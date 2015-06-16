@@ -162,15 +162,17 @@ class CRM_Sepa_Logic_Mandates extends CRM_Sepa_Logic_Base {
        *
        * The 'get' -> 'create' dance is necessary to prevent overwriting the status with the default 'Completed' value...
        */
-      $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
-      civicrm_api3('Contribution', 'getsingle', array(
-        'id' => $objectId,
-        'return' => 'contribution_status_id',
-        'api.Contribution.create' => array(
-          $sequenceNumberField => 1,
-          'contribution_status_id' => '$value.contribution_status_id',
-        ),
-      ));
+      if ($objectRef->contribution_recur_id) { /* Sequence Number doesn't make sense for OOFF payments. */
+        $sequenceNumberField = CRM_Sepa_Logic_Base::getSequenceNumberField();
+        civicrm_api3('Contribution', 'getsingle', array(
+          'id' => $objectId,
+          'return' => 'contribution_status_id',
+          'api.Contribution.create' => array(
+            $sequenceNumberField => 1,
+            'contribution_status_id' => '$value.contribution_status_id',
+          ),
+        ));
+      }
 
       /* If this is a one-off payment, doDirectPayment() has already been invoked before creating the contribution.
        * However, we can only create the mandate once the contribution record is in place, i.e. now. */
