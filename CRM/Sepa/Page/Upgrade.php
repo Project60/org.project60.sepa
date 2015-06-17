@@ -304,6 +304,11 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = "Purged $rows \"Sequence Number\" values attached to non-SEPA or non-recurring Contributions.";
     }
 
+    if (!CRM_Core_DAO::singleValueQuery("SELECT `cleanup` = 'unused' FROM `civicrm_managed` WHERE `module` = 'org.project60.sepa' AND `name` = 'CRM_Sepa_Direct_Debit'")) {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_managed` SET `cleanup` = 'unused' WHERE `module` = 'org.project60.sepa' AND `name` = 'CRM_Sepa_Direct_Debit'");
+      $messages[] = "Set the `clenup` mode (in `civicrm_managed`) for the SEPA Payment Processor Type to 'unused'.";
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }

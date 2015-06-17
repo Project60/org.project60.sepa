@@ -5,6 +5,7 @@ return array (
   array (
     'name' => 'CRM_Sepa_Direct_Debit',
     'entity' => 'PaymentProcessorType',
+    'cleanup' => 'unused',
     'params' => 
     array (
       'version' => 3,
