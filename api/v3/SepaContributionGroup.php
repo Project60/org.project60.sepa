@@ -198,6 +198,10 @@ function civicrm_api3_sepa_contribution_group_createnext($params) {
       continue;
     }
 
+    if (!$lastContrib[$sequenceNumberField]) {
+      throw new CRM_Exception("Contribution {$lastContrib['id']} (recur {$recur['id']}; contact {$recur['contact_id']}) is missing a valid Sequence Number value.");
+    }
+
     $recurStart = date_create_from_format("!Y-m-d+", $recur['start_date']);
     $frequencyUnit = $recur['frequency_unit'];
     $frequencyInterval = $recur['frequency_interval'];
