@@ -527,6 +527,34 @@ function sepa_civicrm_uninstall() {
    * I believe it would only cause confusion, and possibly complicate re-installation. */
   if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM `civicrm_sdd_creditor`")) { /* Can't use API here, as at this point the extension is already disabled... */
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS `civicrm_sdd_contribution_txgroup`, `civicrm_sdd_txgroup`, `civicrm_sdd_file`, `civicrm_sdd_mandate`, `civicrm_sdd_creditor`"); /* The 'IF EXISTS' should not be necessary -- however, in case something goes horribly wrong, this might slightly increase the chances to get a clean uninstall?... */
+
+    /* Won't need the "SEPA File Formats" Option Values anymore after dropping the Creditor table.
+     *
+     * We have to clean these up manually
+     * (rather than using the automatic 'unused' `cleanup` mode for the "managed" entities),
+     * because there is no automatic reference tracking for the (non-core) SEPA tables;
+     * and also because the Option Group entity is handled before the Option Values,
+     * as that's the order they were installed in.
+     * (While we would need the reverse order to correctly handle the dependency on uninstall.) */
+    $group = civicrm_api3('OptionGroup', 'getsingle', array(
+      'name' => 'sepa_file_format',
+      'api.OptionValue.get' => array(), /* Need the OptionValue IDs to remove the "managed" entries. */
+    ));
+    civicrm_api3('OptionGroup', 'delete', array('id' => $group['id']));
+
+    /* Also need to remove the corresponding `civicrm_managed` entries manually.
+     * (When the `cleanup` mode is 'never', the `managed` entries are not automatically removed either, even if the actual entities are gone.) */
+    $entities = array_merge(
+      array(array('type' => 'OptionGroup', 'id' => $group['id'])),
+      array_map(function ($option) { return array('type' => 'OptionValue', 'id' => $option['id']); }, $group['api.OptionValue.get']['values'])
+    );
+    foreach($entities as $entity) {
+      /* Need to use DAO here, as there is no API (yet?) for `civicrm_managed`. */
+      $managedDao = new CRM_Core_DAO_Managed();
+      $managedDao->entity_type = $entity['type'];
+      $managedDao->entity_id = $entity['id'];
+      $managedDao->delete();
+    }
   }
 
   /* Delete "workflow" Option Value entries for the Mandate Templates, if the actual Templates are not populated.

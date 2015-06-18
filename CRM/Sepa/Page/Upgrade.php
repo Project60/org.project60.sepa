@@ -309,6 +309,18 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
       $messages[] = "Set the `clenup` mode (in `civicrm_managed`) for the SEPA Payment Processor Type to 'unused'.";
     }
 
+    $fileFormatEntities = array(
+      'SEPA File Formats' => "'sepa_file_format' Option Group",
+      'SEPA File Format pain.008.001.02' => "'pain.008.001.02' \"File Format\" Option Value",
+      'SEPA File Format pain.008.003.02' => "'pain.008.003.02' \"File Format\" Option Value",
+    );
+    foreach ($fileFormatEntities as $name => $description) {
+      if (!CRM_Core_DAO::singleValueQuery("SELECT `cleanup` = 'never' FROM `civicrm_managed` WHERE `module` = 'org.project60.sepa' AND `name` = '$name'")) {
+        CRM_Core_DAO::executeQuery("UPDATE `civicrm_managed` SET `cleanup` = 'never' WHERE `module` = 'org.project60.sepa' AND `name` = '$name'");
+        $messages[] = "Set the `clenup` mode (in `civicrm_managed`) for the $description to 'never'.";
+      }
+    }
+
     $this->assign('messages', $messages);
     parent::run();
   }

@@ -22,6 +22,7 @@ return array (
   array (
     'name' => 'SEPA File Formats',
     'entity' => 'OptionGroup',
+    'cleanup' => 'never',
     'params' => array (
       'version' => 3,
       'id' => $optionGroupID,
@@ -35,6 +36,7 @@ return array (
   array (
     'name' => 'SEPA File Format pain.008.001.02',
     'entity' => 'OptionValue',
+    'cleanup' => 'never',
     'params' => array (
       'version' => 3,
       'option_group_id' => $optionGroupID,
@@ -47,6 +49,7 @@ return array (
   array(
     'name' => 'SEPA File Format pain.008.003.02',
     'entity' => 'OptionValue',
+    'cleanup' => 'never',
     'params' => array (
       'version' => 3,
       'option_group_id' => $optionGroupID,
