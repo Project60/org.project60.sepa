@@ -509,7 +509,25 @@ function sepa_civicrm_install() {
  * Implementation of hook_civicrm_uninstall
  */
 function sepa_civicrm_uninstall() {
-  //should we delete the tables?
+  /* Drop the SEPA tables if they are not in use.
+   *
+   * This means that uninstalling the SEPA extension does *not* drop the associated data,
+   * including existing SEPA Contributions, created SEPA Files etc.
+   * This is important data, that should be kept even if SEPA itself is no longer in use.
+   * Also, when the extension is re-installed at a later point,
+   * the existing data can be used actively again.
+   *
+   * Note: We actually only check whether the Creditor table is in use.
+   * All the other tables directly or indirectly reference this one --
+   * so there should never be any data in the other tables, if there is none here.
+   *
+   * We could also check all the tables individually,
+   * and drop any that are empty, even if the Creditor table stays in place.
+   * However, I don't see any use case for this --
+   * I believe it would only cause confusion, and possibly complicate re-installation. */
+  if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM `civicrm_sdd_creditor`")) { /* Can't use API here, as at this point the extension is already disabled... */
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS `civicrm_sdd_contribution_txgroup`, `civicrm_sdd_txgroup`, `civicrm_sdd_file`, `civicrm_sdd_mandate`, `civicrm_sdd_creditor`"); /* The 'IF EXISTS' should not be necessary -- however, in case something goes horribly wrong, this might slightly increase the chances to get a clean uninstall?... */
+  }
 
   /* Delete "workflow" Option Value entries for the Mandate Templates, if the actual Templates are not populated.
    *
