@@ -502,11 +502,6 @@ function sepa_civicrm_xmlMenu(&$files) {
  * Implementation of hook_civicrm_install
  */
 function sepa_civicrm_install() {
-  $config = CRM_Core_Config::singleton();
-  //create the tables
-  $sql = file_get_contents(dirname( __FILE__ ) .'/sql/sepa.sql', true);
-  CRM_Utils_File::sourceSQLFile($config->dsn, $sql, NULL, true);
-
   return _sepa_civix_civicrm_install();
 }
 
