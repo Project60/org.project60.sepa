@@ -94,14 +94,11 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         return false;
       }
       $params['subject'] = "SEPA " . $fileName;
-      if (!CRM_Utils_Array::value('attachments', $instanceInfo)) {
-        $instanceInfo['attachments'] = array();
-      }
-      $params['attachments'][] = array(
+      $params['attachments'] = array(array(
           'fullPath' => $pdfFullFilename,
           'mime_type' => 'application/pdf',
           'cleanName' => $fileName,
-          );
+          ));
       ;
       $mail = $this->getMessage("sepa_mandate");
       $params['text'] = "this is the mandate, please return signed";
