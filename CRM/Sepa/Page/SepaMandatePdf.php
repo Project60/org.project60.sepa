@@ -15,13 +15,15 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
     $msg =  civicrm_api('MessageTemplate','getSingle',array("version"=>3,"workflow_id"=>$tpl["id"]));
     if (array_key_exists("is_error",$msg)) {
-      $msg =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
+      $result =  civicrm_api('MessageTemplate','create',array("version"=>3,"workflow_id"=>$tpl["id"],
             "msg_title"=>$name,
             "msg_subject"=>$name,
             "is_reserved"=>0,
             "msg_html"=> file_get_contents(__DIR__ . "/../../../msg_template/$name.html"),
-            "msg_text"=>"N/A"
+            "msg_text"=>"N/A",
+            'sequential' => 1,
             ));
+      $msg = $result['values'][0];
     };
     return $msg;
   
