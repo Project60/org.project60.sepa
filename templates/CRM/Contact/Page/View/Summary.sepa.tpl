@@ -54,7 +54,7 @@ function sepa_modify_summary_tab_contribution() {
     }    
 
     // modify the edit links for recurring contributons, if they are mandates
-    var recurring_contribution_table_rows = contribution_tab.find("table.selector:eq(1) > tbody > tr[id]");
+    var recurring_contribution_table_rows = contribution_tab.find("table.selector:last() > tbody > tr[id]");
     for (var i=0; i<recurring_contribution_table_rows.length; i++) {
       var recurring_contribution_table_row = cj(recurring_contribution_table_rows[i]);
       var rcur_id_components = recurring_contribution_table_row.attr('id').split(/[_\-]+/);
@@ -85,4 +85,3 @@ function sepa_modify_summary_tab_contribution() {
 }
 {/literal}
 </script>
-
