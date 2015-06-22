@@ -407,8 +407,6 @@
   }
 
   function updateCreditor() {
-    cj(".save").addClass("disabled");
-    cj(".save").attr('onclick','').unbind('click');
     var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
     var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
     var creditorId = cj('#edit_creditor_id').val();
@@ -447,9 +445,18 @@
     var stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1, 'mandate_active': 1};
     if (creditorId != "none") {
       stdObj.id = creditorId;
-    };
+    }
+    
+    if(updatedCreditorInfo['creditor_id'] === undefined) {
+      CRM.alert("{/literal}{ts}You must provide a valid contact to save this creditor{/ts}", "{ts}Error{/ts}{literal}", "error");
+      return;
+    }
+
+    cj(".save").addClass("disabled");
+    cj(".save").attr('onclick','').unbind('click');
 
     var updObj = cj.extend(stdObj, updatedCreditorInfo);
+
     CRM.api('SepaCreditor', 'create', updObj,
             {success: function(data) {
                 if (data['is_error'] == 0) {
@@ -480,10 +487,14 @@
                     }
 
                     param[name] = JSON.stringify(param[name]);
+		    var once = true;
                     CRM.api('Setting', 'create', param, {success: function(data) {
-                         CRM.alert("{/literal}{ts}Creditor updated{/ts}", "{ts}Success{/ts}{literal}", "success");
-                         resetValues();
-                         location.reload();
+			 if(once) {
+                           once = !once;
+			   CRM.alert("{/literal}{ts}Creditor updated{/ts}", "{ts}Success{/ts}{literal}", "success");
+                           resetValues();
+                           location.reload();
+			 }
                       }});
                   }
                 }
