@@ -502,6 +502,12 @@ function sepa_civicrm_xmlMenu(&$files) {
  * Implementation of hook_civicrm_install
  */
 function sepa_civicrm_install() {
+  /* If we are indeed doing a fresh install,
+   * signal the sepa_civicrm_managed() hook (which is invoked after this one),
+   * not to attempt an automatic upgrade --
+   * it would be pointless, and in fact it would fail. */
+  $GLOBALS['sepaFreshInstall'] = true;
+
   return _sepa_civix_civicrm_install();
 }
 
@@ -648,6 +654,27 @@ function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * is installed, disabled, uninstalled.
  */
 function sepa_civicrm_managed(&$entities) {
+  /* If this hook is invoked in any situation other than during fresh install,
+   * make sure we upgrade all SEPA-related entities to the current schema
+   * before we let the automatic "managed" entity handling touch them.
+   *
+   * This is important, as otherwise some entities might not yet be under the "managed" regime,
+   * in which case the automatic handling would create duplicates. */
+  if (!isset($GLOBALS['sepaFreshInstall'])) {
+    $messages = CRM_Sepa_Upgrade::run();
+    if (!empty($messages)) {
+      /* Store the upgrade messages in the session, so they will show up on whatever page triggered the automatic upgrade. */
+      $messagesHtml = implode('', array_map(function ($message) { return "<br />\n$message"; }, $messages));
+      CRM_Core_Session::setStatus($messagesHtml, 'Upgraded database for new version of SEPA DD extension', 'no-popup');
+    }
+  } else {
+    /* Make sure the flag is not carried over to future invocations.
+     *
+     * This is important for situations where several actions are performed in one PHP run,
+     * such as in the test suite. */
+    unset($GLOBALS['sepaFreshInstall']);
+  }
+
   return _sepa_civix_civicrm_managed($entities);
 }
 
