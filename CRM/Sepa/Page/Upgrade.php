@@ -43,7 +43,7 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
     }
 
     $instruments = implode(',', array_map(
-      function ($type) { return CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name'); },
+      function ($type) { return CRM_Core_DAO::singleValueQuery("SELECT `value` FROM `civicrm_option_value` WHERE `option_group_id` = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'payment_instrument') AND `name` = '$type'"); }, /* Can't use CRM_Core_OptionGroup::getValue() here, as the values might be inactive if the extension was disabled. */
       array('FRST', 'RCUR', 'OOFF')
     ));
     if (CRM_Core_DAO::singleValueQuery("
@@ -287,7 +287,7 @@ class CRM_Sepa_Page_Upgrade extends CRM_Core_Page {
 
     /* Now that we do not create bogus `sequence_number` values anymore, purge those present in the database. */
     $instruments = implode(',', array_map(
-      function ($type) { return CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name'); },
+      function ($type) { return CRM_Core_DAO::singleValueQuery("SELECT `value` FROM `civicrm_option_value` WHERE `option_group_id` = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'payment_instrument') AND `name` = '$type'"); }, /* Can't use CRM_Core_OptionGroup::getValue() here, as the values might be inactive if the extension was disabled. */
       array('FRST', 'RCUR', 'OOFF')
     ));
     $tableName = civicrm_api3('CustomGroup', 'getvalue', array('name' => 'sdd_contribution', 'return' => 'table_name'));
