@@ -5,6 +5,19 @@ class CRM_Sepa_Upgrade {
   public static function run() {
     $messages = array();
 
+    /* If an old version of the extension is installed, first "hijack" its data before we upgrade the DB state to the newest version. */
+    if (CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM `civicrm_extension` WHERE `full_name` = 'org.project60.sepa'")) {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_managed` SET `module` = 'sfe.ssepa' WHERE `module` = 'org.project60.sepa'");
+      $messages[] = "Taken over \"managed\" entities from old version of SEPA extension.";
+
+      /* The old extension should no longer be considered installed after we have taken over. */
+      CRM_Core_DAO::executeQuery("DELETE FROM `civicrm_extension` WHERE `full_name` = 'org.project60.sepa'");
+      $messages[] = "Removed old version of SEPA extension.";
+
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_payment_processor_type` SET `description` = 'SEPA Direct Debit (sfe.ssepa)' WHERE `name` = 'sepa_dd'");
+      $messages[] = "Updated extension name (key) in description of SEPA Payment Processor Type.";
+    }
+
     if (!CRM_Core_DAO::checkFieldExists('civicrm_sdd_txgroup', 'is_cor1')) {
       CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sdd_txgroup` ADD `is_cor1` tinyint COMMENT 'Instrument for payments in this group will be COR1 (true/1) or CORE (false/0).' AFTER `reference`");
       $messages[] = 'Added `civicrm_sdd_txgroup`.`is_cor1`.';

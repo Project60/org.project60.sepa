@@ -502,6 +502,12 @@ function sepa_civicrm_xmlMenu(&$files) {
  * Implementation of hook_civicrm_install
  */
 function sepa_civicrm_install() {
+  /* If an old version of the extension is installed, do not proceed with ordinary installation.
+   * Rather, the existing DB entries will be taken over and auto-upgraded in the sepa_civicrm_managed() hook. */
+  if (CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM `civicrm_extension` WHERE `full_name` = 'org.project60.sepa'")) {
+    return;
+  }
+
   /* If we are indeed doing a fresh install,
    * signal the sepa_civicrm_managed() hook (which is invoked after this one),
    * not to attempt an automatic upgrade --
