@@ -461,7 +461,8 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $query = array(
       'version'   => 3,
       'id'        => $contribution_id,
-      'amount'    => $adjusted_amount);
+      'amount'    => $adjusted_amount,
+      'currency'  => 'EUR');
     $result = civicrm_api("ContributionRecur", "create", $query);
     if (!empty($result['is_error'])) {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'"), $contribution_id, $result['error_message']), ts('Error'), 'error');
