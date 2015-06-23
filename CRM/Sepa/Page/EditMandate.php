@@ -46,6 +46,9 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       } else if ($_REQUEST['action']=='cancel') {
         $this->cancelMandate($mandate_id);
 
+      } else if ($_REQUEST['action']=='adjustamount') {
+        $this->adjustAmount($mandate_id);
+
       } else {
         CRM_Core_Session::setStatus(sprintf(ts("Unkown action '%s'. Ignored."), $_REQUEST['action']), ts('Error'), 'error');
       }
@@ -117,7 +120,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     if (isset($contribution['amount']) && $contribution['amount']) {
       // this is a recurring contribution
       $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
-      $contribution['amount'] = CRM_Utils_Money::format($contribution['amount'], 'EUR');
+      $contribution['currency'] = $contribution['currency'];
       $contribution['cycle'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($contribution['frequency_interval'], $contribution['frequency_unit'], true);
       if (isset($contribution['end_date']) && $contribution['end_date']) {
         $contribution['default_end_date'] = date('Y-m-d', strtotime($contribution['end_date']));
@@ -127,7 +130,8 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     } else {
       // this is a simple contribution
       $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contribution', "reset=1&action=view&id=".$contribution['id']."&cid=".$contact2['id']);
-      $contribution['amount'] = CRM_Utils_Money::format($contribution['total_amount'], 'EUR');
+      $contribution['amount'] = $contribution['total_amount'];
+      $contribution['currency'] = $contribution['currency'];
     }
 
     // load eligeble templates
@@ -152,6 +156,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $this->assign('contact1', $contact1);
     $this->assign('contact2', $contact2);
     $this->assign('can_delete', CRM_Core_Permission::check('administer CiviCRM'));
+    $this->assign('can_modify', CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification'));
     $this->assign('sepa_templates', $tpl_ids);
 
     parent::run();
@@ -255,4 +260,19 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
   }
 
+  function adjustAmount($mandate_id) {
+    // check if we are allowed to...
+    if (CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
+      $adjusted_amount = (float) $_REQUEST['adjust_amount'];
+      if ($adjusted_amount > 0) {
+        if (CRM_Sepa_BAO_SEPAMandate::adjustAmount($mandate_id, $adjusted_amount)) {
+          CRM_Core_Session::setStatus(sprintf(ts("The amount of this mandate was modified. You should send out a new prenotification to the debtor.")), ts('Advice'), 'info');
+        }
+      } else {
+        CRM_Core_Session::setStatus(sprintf(ts("Invalid amount. Mandate not modified.")), ts('Error'), 'error');  
+      }
+    } else {
+      CRM_Core_Session::setStatus(sprintf(ts("Modifying an existing mandate is currently not allowed. You can change this on the SEPA settings page.")), ts('Error'), 'error');
+    }
+  }
 }

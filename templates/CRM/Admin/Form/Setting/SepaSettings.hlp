@@ -77,4 +77,10 @@
     <p>{ts}The default creditor will be used when no other creditor is exclicitely set. It will also be pre-selected in the back office forms.{/ts}</p>
 {/htxt}
 
+{htxt id='id-mandatemodifications'}
+    <p>{ts}A strict interpretation of the SEPA standards would not allow you to modify an active mandate. Furthermore, it can potentially cause technial problems.{/ts}</p>
+    <p>{ts}If you enable this option, you will get extra actions on the 'edit mandate' page.{/ts}</p>
+    <p>{ts}Be aware that you should send out a new prenotification to the debitor every time you modify a mandate.{/ts}</p>
+{/htxt}
+
 

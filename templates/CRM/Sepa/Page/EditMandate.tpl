@@ -56,7 +56,7 @@
             <tr><td class="label">{ts}Contact{/ts}</td><td><a href="{$contact2.link}"><div class="icon crm-icon {$contact2.contact_type}-icon"></div>{$contact2.display_name}</a></td></tr>
             <tr><td class="label">{ts}Financial Type{/ts}</td><td>{$contribution.financial_type}</td></tr>
             <tr><td class="label">{ts}Campaign{/ts}</td><td>{$contribution.campaign}</td></tr>
-            <tr><td class="label">{ts}Amount{/ts}</td><td>{$contribution.amount}</td></tr>
+            <tr><td class="label">{ts}Amount{/ts}</td><td>{$contribution.amount|crmMoney:$contribution.currency}</td></tr>
             {if $contribution.cycle_day}
             	{* this is a recurring contribution *}
 	            <tr><td class="label">{ts}Create Date{/ts}</td><td>{$contribution.create_date}</td></tr>
@@ -119,6 +119,13 @@
                 </td>
             </tr>{/if}{/if}
 
+            {if $can_modify}{if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
+                <td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_adjust_amount();">{ts}Adjust Amount{/ts}</td>
+                <td>
+                    {ts}Change amount to:{/ts}&nbsp;<input type="text" name="adjust_amount" id="adjust_amount" size="12" value="{$contribution.amount}" />&nbsp;EUR
+                </td>
+            </tr>{/if}{/if}{/if}
+
             <tr>
             	<td class="label" style="vertical-align: middle;"><a href="{crmURL p="civicrm/sepa/cmandate" q="clone=$mandate_id"}" class="button">{ts}Clone{/ts}</td>
             	<td>{ts}Create a new mandate similar to this.{/ts}</td>
@@ -160,6 +167,11 @@ function mandate_action_create_pdf() {
 function mandate_action_delete() {
 	cj("#mandate_action_value").val('delete');
 	cj("#sepa_action_form").submit();
+}
+
+function mandate_action_adjust_amount() {
+    cj("#mandate_action_value").val('adjustamount');
+    cj("#sepa_action_form").submit();
 }
 
 function mandate_action_cancel() {

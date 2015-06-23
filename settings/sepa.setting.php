@@ -17,6 +17,21 @@
 */
 
 return array(
+  'allow_mandate_modification' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'allow_mandate_modification',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'html_type' => 'checkbox',
+    'default' => '0',
+    'add' => '4.3',
+    'title' => 'allow SEPA mandate modifications',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "Set this value to Yes if you want want to allow SEPA mandate modifications",
+    'help_text' => "Set this value to Yes if you want want to allow SEPA mandate modifications",
+  ),
   'batching_default_creditor' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',

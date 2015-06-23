@@ -127,7 +127,7 @@
               </td>
             </tr>
             <tr class="crm-custom-form-block-ooff-notice-days">
-              <td class="label">{$form.custom_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.custom_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td>
               <td>
                 {$form.custom_OOFF_notice.html}
               </td>
@@ -145,13 +145,13 @@
               </td>
             </tr>
             <tr class="crm-custom-form-block-rcur-notice-days">
-              <td class="label">{$form.custom_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.custom_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td>
               <td>
                 {$form.custom_RCUR_notice.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-frst-notice-days">
-              <td class="label">{$form.custom_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
+              <td class="label">{$form.custom_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_FRST_notice.html}
               </td>
@@ -172,43 +172,43 @@
         <h2>Default Batching Settings</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-cycle-days">
-              <td class="label">{$form.cycledays.label} <a onclick='CRM.help("{ts}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td>
+              <td class="label">{$form.cycledays.label} <a onclick='CRM.help("{ts}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.cycledays.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-ooff-horizon-days">
-              <td class="label">{$form.batching_OOFF_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td>
+              <td class="label">{$form.batching_OOFF_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_OOFF_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-ooff-notice-days">
-              <td class="label">{$form.batching_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_OOFF_notice.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-horizon-days">
-              <td class="label">{$form.batching_RCUR_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
+              <td class="label">{$form.batching_RCUR_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_RCUR_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-grace-days">
-              <td class="label">{$form.batching_RCUR_grace.label} <a onclick='CRM.help("{ts}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td>
+              <td class="label">{$form.batching_RCUR_grace.label} <a onclick='CRM.help("{ts}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_RCUR_grace.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-notice-days">
-              <td class="label">{$form.batching_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td>
               <td>
                 {$form.batching_RCUR_notice.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-frst-notice-days">
-              <td class="label">{$form.batching_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td>
               <td>
                 {$form.batching_FRST_notice.html}
               </td>
@@ -217,13 +217,19 @@
        <h2>System Settings</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-batching_default_creditor">
-              <td class="label">{$form.batching_default_creditor.label} <a onclick='CRM.help("{ts}Default Creditor{/ts}", {literal}{"id":"id-defaultcreditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_default_creditor.label} <a onclick='CRM.help("{ts}Default Creditor{/ts}", {literal}{"id":"id-defaultcreditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
               <td>
                 {$form.batching_default_creditor.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-allow_mandate_modification">
+              <td class="label">{$form.allow_mandate_modification.label} <a onclick='CRM.help("{ts}Mandate Modifications{/ts}", {literal}{"id":"id-mandatemodifications","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+              <td>
+                {$form.allow_mandate_modification.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
-              <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
               <td>
                 {$form.batching_UPDATE_lock_timeout.html}
               </td>
