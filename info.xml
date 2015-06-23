@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension key="org.project60.sepa" type="module">
+<extension key="sfe.ssepa" type="module">
   <file>sepa</file>
   <name>SEPA Direct Debit payments</name>
   <description>Complete implementation of SEPA Direct Debit payments in CiviCRM, including a Payment Processor, as well as integration with CiviCRM's backoffice interface; along with functionality for generating and handling SEPA XML files to be submitted directly to your bank.</description>

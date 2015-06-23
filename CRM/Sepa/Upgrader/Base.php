@@ -39,7 +39,7 @@ class CRM_Sepa_Upgrader_Base {
     if (! self::$instance) {
       // FIXME auto-generate
       self::$instance = new CRM_Sepa_Upgrader(
-        'org.project60.sepa',
+        'sfe.ssepa',
         realpath(__DIR__ .'/../../../')
       );
     }

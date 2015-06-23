@@ -9,7 +9,7 @@ return array (
     'params' => 
     array (
       'version' => 3,
-      'description' => 'SEPA Direct Debit (org.project60.sepa)',
+      'description' => 'SEPA Direct Debit (sfe.ssepa)',
     'name' => 'sepa_dd',
     'title' => 'SEPA Direct Debit',
     "is_active"=> 1,

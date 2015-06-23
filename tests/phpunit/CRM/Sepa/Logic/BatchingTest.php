@@ -35,7 +35,7 @@ class CRM_Sepa_Logic_BatchingTest extends CiviUnitTestCase {
       "USE {$dbName}",
       "SET FOREIGN_KEY_CHECKS = 0",
       "DROP TABLE IF EXISTS `civicrm_sdd_contribution_txgroup`, `civicrm_sdd_txgroup`, `civicrm_sdd_file`, `civicrm_sdd_mandate`, `civicrm_sdd_creditor`",
-      "DELETE FROM `civicrm_extension` WHERE `full_name` = 'org.project60.sepa'",
+      "DELETE FROM `civicrm_extension` WHERE `full_name` = 'sfe.ssepa'",
       "SET FOREIGN_KEY_CHECKS = 1",
     );
     foreach ($queries as $query) {
@@ -82,7 +82,7 @@ class CRM_Sepa_Logic_BatchingTest extends CiviUnitTestCase {
     }
 
     self::_purgeExtension();
-    civicrm_api3('Extension', 'install', array('keys' => 'org.project60.sepa'));
+    civicrm_api3('Extension', 'install', array('keys' => 'sfe.ssepa'));
   }
 
   function setUp() {

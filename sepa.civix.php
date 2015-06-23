@@ -151,7 +151,7 @@ function _sepa_civix_civicrm_managed(&$entities) {
     $es = include $file;
     foreach ($es as $e) {
       if (empty($e['module'])) {
-        $e['module'] = 'org.project60.sepa';
+        $e['module'] = 'sfe.ssepa';
       }
       $entities[] = $e;
     }

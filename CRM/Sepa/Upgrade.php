@@ -90,8 +90,8 @@ class CRM_Sepa_Upgrade {
       $messages[] = 'Updated field length (and comment) for `civicrm_sdd_creditor`.`mandate_prefix`.';
     }
 
-    if (CRM_Core_DAO::singleValueQuery("SELECT `name` != 'SEPA Direct Debit payments' FROM `civicrm_extension` WHERE `full_name` = 'org.project60.sepa'")) {
-      CRM_Core_DAO::executeQuery("UPDATE `civicrm_extension` SET `name` = 'SEPA Direct Debit payments', `label` = 'SEPA Direct Debit payments' WHERE `full_name` = 'org.project60.sepa'");
+    if (CRM_Core_DAO::singleValueQuery("SELECT `name` != 'SEPA Direct Debit payments' FROM `civicrm_extension` WHERE `full_name` = 'sfe.ssepa'")) {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_extension` SET `name` = 'SEPA Direct Debit payments', `label` = 'SEPA Direct Debit payments' WHERE `full_name` = 'sfe.ssepa'");
       $messages[] = 'Updated `name` and `label` in `civicrm_extension` to match newer info.xml.';
     }
 
@@ -162,7 +162,7 @@ class CRM_Sepa_Upgrade {
       foreach ($correctOptions as $option) {
         /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
         $dao = new CRM_Core_DAO_Managed();
-        $dao->module = 'org.project60.sepa';
+        $dao->module = 'sfe.ssepa';
         $dao->name = "SEPA File Format {$option['name']}";
         if (!$dao->find()) {
           $dao->entity_type = 'OptionValue';
@@ -189,7 +189,7 @@ class CRM_Sepa_Upgrade {
 
       /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
       $dao = new CRM_Core_DAO_Managed();
-      $dao->module = 'org.project60.sepa';
+      $dao->module = 'sfe.ssepa';
       $dao->name = 'Batched Contribution Status';
       if (!$dao->find()) {
         $dao->entity_type = 'OptionValue';
@@ -220,7 +220,7 @@ class CRM_Sepa_Upgrade {
 
       /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
       $dao = new CRM_Core_DAO_Managed();
-      $dao->module = 'org.project60.sepa';
+      $dao->module = 'sfe.ssepa';
       $dao->name = $managedName;
       if (!$dao->find()) {
         $dao->entity_type = 'OptionValue';
@@ -250,7 +250,7 @@ class CRM_Sepa_Upgrade {
 
       /* Have to use DAO here: there is no API for this; and creating new records with SQL is too fragile. */
       $dao = new CRM_Core_DAO_Managed();
-      $dao->module = 'org.project60.sepa';
+      $dao->module = 'sfe.ssepa';
       $dao->name = $managedName;
       if (!$dao->find()) {
         $dao->entity_type = 'OptionValue';
@@ -302,8 +302,8 @@ class CRM_Sepa_Upgrade {
       $messages[] = "Purged $rows \"Sequence Number\" values attached to non-SEPA or non-recurring Contributions.";
     }
 
-    if (!CRM_Core_DAO::singleValueQuery("SELECT `cleanup` = 'unused' FROM `civicrm_managed` WHERE `module` = 'org.project60.sepa' AND `name` = 'CRM_Sepa_Direct_Debit'")) {
-      CRM_Core_DAO::executeQuery("UPDATE `civicrm_managed` SET `cleanup` = 'unused' WHERE `module` = 'org.project60.sepa' AND `name` = 'CRM_Sepa_Direct_Debit'");
+    if (!CRM_Core_DAO::singleValueQuery("SELECT `cleanup` = 'unused' FROM `civicrm_managed` WHERE `module` = 'sfe.ssepa' AND `name` = 'CRM_Sepa_Direct_Debit'")) {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_managed` SET `cleanup` = 'unused' WHERE `module` = 'sfe.ssepa' AND `name` = 'CRM_Sepa_Direct_Debit'");
       $messages[] = "Set the `clenup` mode (in `civicrm_managed`) for the SEPA Payment Processor Type to 'unused'.";
     }
 
@@ -313,8 +313,8 @@ class CRM_Sepa_Upgrade {
       'SEPA File Format pain.008.003.02' => "'pain.008.003.02' \"File Format\" Option Value",
     );
     foreach ($fileFormatEntities as $name => $description) {
-      if (!CRM_Core_DAO::singleValueQuery("SELECT `cleanup` = 'never' FROM `civicrm_managed` WHERE `module` = 'org.project60.sepa' AND `name` = '$name'")) {
-        CRM_Core_DAO::executeQuery("UPDATE `civicrm_managed` SET `cleanup` = 'never' WHERE `module` = 'org.project60.sepa' AND `name` = '$name'");
+      if (!CRM_Core_DAO::singleValueQuery("SELECT `cleanup` = 'never' FROM `civicrm_managed` WHERE `module` = 'sfe.ssepa' AND `name` = '$name'")) {
+        CRM_Core_DAO::executeQuery("UPDATE `civicrm_managed` SET `cleanup` = 'never' WHERE `module` = 'sfe.ssepa' AND `name` = '$name'");
         $messages[] = "Set the `clenup` mode (in `civicrm_managed`) for the $description to 'never'.";
       }
     }
