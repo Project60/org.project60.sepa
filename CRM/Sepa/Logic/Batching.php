@@ -343,6 +343,7 @@ class CRM_Sepa_Logic_Batching {
         'id'                      => $mandate_to_end['recur_id'],
         'contribution_status_id'  => $contribution_status_closed,
         'modified_date'           => date('YmdHis'),
+        'currency'                => 'EUR',
         'version'                 => 3));
       if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
         $lock->release();
