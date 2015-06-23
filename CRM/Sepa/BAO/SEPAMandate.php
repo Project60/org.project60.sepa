@@ -322,6 +322,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $query = array(
       'version'   => 3,
       'id'        => $contribution_id,
+      'currency'  => 'EUR',
       'end_date'  => date('YmdHis', $new_end_date));
     if ($cancel_reason) {
       // FIXME: cancel_reason does not exist in contribution_recur!!
