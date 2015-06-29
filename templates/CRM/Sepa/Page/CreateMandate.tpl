@@ -256,6 +256,21 @@ cj('#end_date').addClass('dateplugin');
 cj('#end_date').datepicker(dateOptions);
 cj('#replace_date').addClass('dateplugin');
 cj('#replace_date').datepicker(dateOptions);
+
+// normalise IBAN upon change
+function sepa_iban_changed() {
+	// normalise IBAN
+	var reSpaceAndMinus = new RegExp('[\\s-]', 'g');
+	var sanitized_iban = cj("[name='iban']").val();
+	sanitized_iban = sanitized_iban.replace(reSpaceAndMinus, "");
+	sanitized_iban = sanitized_iban.toUpperCase();
+	cj("[name='iban']").val(sanitized_iban);
+
+	{/literal}{if $bic_extension_installed}
+	sepa_lookup_bic();
+	{/if}{literal}
+}
+cj("[name='iban']").change(sepa_iban_changed);
 {/literal}
 </script>
 
@@ -263,7 +278,6 @@ cj('#replace_date').datepicker(dateOptions);
 
 {if $bic_extension_installed}
 <script type="text/javascript">
-cj("[name='iban']").change(sepa_lookup_bic);
 cj("[name='bic']").change(sepa_clear_bank);
 //cj("#bic_lookup_btn").show();
 {literal}
@@ -272,6 +286,7 @@ function sepa_clear_bank() {
   cj("#bank_name").text('');
   cj("#bic_busy").hide();
 }
+
 
 function sepa_lookup_bic() {
 	var iban_partial = cj("[name='iban']").val();

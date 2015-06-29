@@ -27,8 +27,9 @@ class CRM_Sepa_Logic_Verification {
    * @return NULL if given IBAN is valid, localized error message otherwise
    */
   static function verifyIBAN($iban) {
-    // We do not accept whitespaces and hyphens (machine format)
-    if (preg_match("/[\s\-]/", $iban)) {
+    // We only accept uppecase characters and numerals (machine format)
+    // see https://github.com/Project60/org.project60.sepa/issues/246
+    if (!preg_match("/^[A-Z0-9]+$/", $iban)) {
       return ts("IBAN is not correct");
     }
 
