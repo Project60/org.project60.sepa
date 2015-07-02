@@ -523,11 +523,11 @@ class CRM_Sepa_Logic_Batching {
 
     // and check if it's not after the end_date
     $return_date = date('Y-m-d', $next_date);
-    if ($rcontribution['end_date'] && strtotime($rcontribution['end_date'])<$next_date) {
+    if (!empty($rcontribution['end_date']) && strtotime($rcontribution['end_date'])<$next_date) {
       return NULL;
     }
     // ..or the cancel_date
-    if ($rcontribution['cancel_date'] && strtotime($rcontribution['cancel_date'])<$next_date) {
+    if (!empty($rcontribution['cancel_date']) && strtotime($rcontribution['cancel_date'])<$next_date) {
       return NULL;
     }
 
