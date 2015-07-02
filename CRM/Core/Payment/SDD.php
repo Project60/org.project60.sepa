@@ -298,6 +298,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           $mandate_update['id']                    = $mandate['id'];
           $mandate_update['entity_id']             = $rcontribution['id'];
           $mandate_update['type']                  = $mandate['type'];
+          if (empty($mandate['contact_id'])) {
+            $mandate_update['contact_id']          = $contribution['contact_id'];
+            $mandate['contact_id']                 = $contribution['contact_id'];
+          }
           //NO: $mandate_update['first_contribution_id'] = $contribution['id'];
           
           // initialize according to the creditor settings
@@ -305,6 +309,14 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
           // finally, write the changes to the mandate
           civicrm_api3('SepaMandate', 'create', $mandate_update);
+
+          // ...and trigger notification 
+          // FIXME: WORKAROUND, see https://github.com/Project60/org.project60.sepa/issues/296)
+          CRM_Contribute_BAO_ContributionPage::recurringNotify(
+            CRM_Core_Payment::RECURRING_PAYMENT_START,
+            $mandate['contact_id'],
+            $contribution_bao->contribution_page_id,
+            $rcontribution_bao);
 
         } else {
           // something went wrong, delete partial
