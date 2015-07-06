@@ -53,9 +53,9 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     $this->get((int)$id);
     $template->assign("file", $this->toArray());
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
-    $txgroup->sdd_file_id=$this->id;
+    $txgroup->sdd_file_id = $this->id;
     $txgroup->find();
-    $total =0; 
+    $total =0;
     $nbtransactions =0; 
     $fileFormats = array();
     while ($txgroup->fetch()) {
@@ -66,12 +66,14 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     }
     if (count(array_unique($fileFormats)) > 1) {
       throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
+    } else {
+      $fileFormatName = reset($fileFormats);
     }
-    $template->assign("file",$this->toArray());
-    $template->assign("total",$total );
-    $template->assign("nbtransactions",$nbtransactions);
-    $head = $template->fetch('CRM/Sepa/xml/file_header.tpl');
-    $footer = $template->fetch('CRM/Sepa/xml/file_footer.tpl');
+    $template->assign("file", $this->toArray());
+    $template->assign("total", $total );
+    $template->assign("nbtransactions", $nbtransactions);
+    $head = $template->fetch('CRM/Sepa/Formats/'.$fileFormatName.'/transaction-header.tpl');
+    $footer = $template->fetch('CRM/Sepa/Formats/'.$fileFormatName.'/transaction-footer.tpl');
     return $head.$xml.$footer;
   }
 }
