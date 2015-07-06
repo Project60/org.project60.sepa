@@ -47,7 +47,7 @@
         <p style="text-align: center;">{ts}No creditors found{/ts}</p>
       {/if}
       <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); resetValues();">
-        <span><div class="icon add-icon"></div>{ts}Add{/ts}</span>
+        <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Add{/ts}</span>
       </a><br/>
       <div id="addcreditor" style="display:none;">
      <h2>Add/Edit Creditor</h2>
