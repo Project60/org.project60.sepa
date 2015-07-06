@@ -104,6 +104,12 @@
               </td>
             </tr>
             <tr>
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Customized Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+              <td>
+                {$form.custom_txmsg.html}
+              </td>
+            </tr>
+            <tr>
                <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
                 <td>
                   {$form.is_test_creditor.html}
@@ -234,6 +240,12 @@
                 {$form.batching_UPDATE_lock_timeout.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-exclude-weekends">
+              <td class="label">{$form.exclude_weekends.label} <a onclick='CRM.help("{ts}Exclude Weekends{/ts}", {literal}{"id":"id-exclude-weekends","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td>
+                {$form.exclude_weekends.html}
+              </td>
+            </tr>
        </table>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div> 
   </div>
@@ -320,7 +332,8 @@
               ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
               ["batching_RCUR_grace_override", "custom_RCUR_grace", null],
               ["batching_RCUR_notice_override", "custom_RCUR_notice", null],
-              ["batching_FRST_notice_override", "custom_FRST_notice", null]
+              ["batching_FRST_notice_override", "custom_FRST_notice", null],
+              ["custom_txmsg_override", "custom_txmsg", null]
              ];
 
   function deletecreditor(id) {
@@ -415,6 +428,7 @@
   function updateCreditor() {
     var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
     var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
+    inputCustomBatching.push({'name': "custom_txmsg", 'value': cj('#custom_txmsg').val()});
     var creditorId = cj('#edit_creditor_id').val();
 
     var map = new Array();
@@ -427,6 +441,7 @@
     map["addcreditor_bic"]          = "bic";
     map["addcreditor_pain_version"] = "sepa_file_format_id";
     map["addcreditor_creditor_id"]  = "creditor_id";
+    map["custom_txmsg"]             = "custom_txmsg";
 
     // update creditor information
     var updatedCreditorInfo = new Array();
