@@ -53,18 +53,24 @@
      <h2>Add/Edit Creditor</h2>
      <h3>Creditor Information</h3>
      <table id="creditorinfo" class="form-layout">
+         <tr>
+           <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
+     </div></td>
+           <td>
+             {$form.addcreditor_name.html}
+           </td>
+         </tr>
+         <tr>
+            <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+             <td>
+               {$form.is_test_creditor.html}
+             </td>
+         </tr>
             <tr>
               <td class="label">{$form.addcreditor_creditor_id.label} <a onclick='CRM.help("{ts}Creditor Contact{/ts}", {literal}{"id":"id-contact","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
         </div></td>
               <td>
                 {$form.addcreditor_creditor_id.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
-        </div></td>
-              <td>
-                {$form.addcreditor_name.html}
               </td>
             </tr>
             <tr>
@@ -108,12 +114,6 @@
               <td>
                 {$form.custom_txmsg.html}
               </td>
-            </tr>
-            <tr>
-               <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
-                <td>
-                  {$form.is_test_creditor.html}
-                </td>
             </tr>
        </table>
        {$form.add_creditor_id.html}
@@ -174,6 +174,7 @@
    </div>
    </div>
   <div>
+  <br/><br/><br/><br/>
     <fieldset>
         <h2>Default Batching Settings</h2>
         <table class="form-layout">
