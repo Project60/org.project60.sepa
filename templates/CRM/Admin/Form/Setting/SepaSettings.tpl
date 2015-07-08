@@ -33,7 +33,7 @@
               <a class="add button" title="Copy" onclick="fetchCreditor({$creditor.id}, true);">
                 <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Copy{/ts}</span>
               </a>
-              <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id}, false);">
+              <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id}, false); cj('a.add').hide();">
                 <span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
               </a>
               <a class="delete button" title="Delete" onclick="deletecreditor({$creditor.id});">
@@ -46,7 +46,7 @@
       {else}
         <p style="text-align: center;">{ts}No creditors found{/ts}</p>
       {/if}
-      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); resetValues();">
+      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); cj(this).hide(); resetValues();">
         <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Add{/ts}</span>
       </a><br/>
       <div id="addcreditor" style="display:none;">
@@ -164,10 +164,10 @@
             </tr>
        </table>
        <div>
-          <a class="save button" title="Save" onclick="updateCreditor()">
+          <a class="save button" title="Save" onclick="updateCreditor();">
             <span>{ts}Save{/ts}</span>
           </a>
-          <a class="cancel button" title="Cancel" onclick="resetValues(); cj('#addcreditor').hide(500);">
+          <a class="cancel button" title="Cancel" onclick="resetValues(); cj('#addcreditor').hide(500); cj('a.add').show(); return;">
             <span>{ts}Cancel{/ts}</span>
           </a><br/>
        </div>
