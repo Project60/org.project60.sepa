@@ -110,7 +110,7 @@
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Customized Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
               <td>
                 {$form.custom_txmsg.html}
               </td>
@@ -236,7 +236,7 @@
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-custom-txmsg">
-              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}TODO{/ts}", {literal}{"id":"id-txmsg-general","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
               <td>
                 {$form.custom_txmsg.html}
               </td>

@@ -34,7 +34,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.RCUR.notice',   ts('RCUR notice days')),
                          array('batching.FRST.notice',   ts('FRST notice days')),
                          array('batching.UPDATE.lock.timeout', ts('Update lock timeout')),
-                         array('custom_txmsg', ts('Custom Transaction Message')));
+                         array('custom_txmsg', ts('Transaction Message')));
 
       $this->custom_fields = array(
                          array('custom_cycledays',      ts('Cycle Day(s)')),

@@ -88,10 +88,6 @@
     <p>{ts}If left empty it defaults to "Thank you".{/ts}</p>
 {/htxt}
 
-{htxt id='id-txmsg-general'}
-    <p>{ts}TODO{/ts}</p>
-{/htxt}
-
 {htxt id='id-exclude-weekends'}
     <p>{ts}Some banks reject SDD groups with a collection date that doesn't happen to be a bank day, for example a week end.{/ts}</p>
     <p>{ts}If you activate this option, the collection date will be automatically deferred to the following Monday.{/ts}</p>
