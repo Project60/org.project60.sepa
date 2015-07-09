@@ -87,6 +87,10 @@
     <p>{ts}You can use this field to define a customized transaction message per creditor. If left empty it defaults to "Thank you.".{/ts}</p>
 {/htxt}
 
+{htxt id='id-txmsg-general'}
+    <p>{ts}TODO{/ts}</p>
+{/htxt}
+
 {htxt id='id-exclude-weekends'}
     <p>{ts}TODO{/ts}</p>
 {/htxt}
