@@ -34,7 +34,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.RCUR.notice',   ts('RCUR notice days')),
                          array('batching.FRST.notice',   ts('FRST notice days')),
                          array('batching.UPDATE.lock.timeout', ts('Update lock timeout')),
-                         array('custom_txmsg', ts('Transaction Message')));
+                         array('custom_txmsg', ts('Transaction Message'), array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'custom_txmsg'))));
 
       $this->custom_fields = array(
                          array('custom_cycledays',      ts('Cycle Day(s)')),
@@ -77,7 +77,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add all form elements and validation rules
         foreach ($this->config_fields as $key => $value) {
             $elementName = $this->domainToString($value[0]);
-            $this->addElement('text', $elementName, $value[1]);
+            $elem = $this->addElement('text', $elementName, $value[1], (isset($value[2]) ? $value[2] : array()));
             if (!in_array($elementName, array('cycledays', 'custom_txmsg'))) {
                 // integer only rules, except for cycledays (list)
               $this->addRule($this->domainToString($value[0]), 
