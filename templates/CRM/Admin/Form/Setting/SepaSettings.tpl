@@ -235,6 +235,12 @@
                 {$form.allow_mandate_modification.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-custom-txmsg">
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}TODO{/ts}", {literal}{"id":"id-txmsg-general","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+              <td>
+                {$form.custom_txmsg.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
               <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
               <td>
