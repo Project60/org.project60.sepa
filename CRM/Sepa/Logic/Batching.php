@@ -373,7 +373,20 @@ class CRM_Sepa_Logic_Batching {
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
     foreach ($calculated_groups as $collection_date => $mandates) {
+      // check if we need to defer the collection date (e.g. due to bank holidays)
+      $exclude_weekends = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
+      if ($exclude_weekends) {
+        // skip (western) week ends, if the option is activated.
+        $day_of_week = date('N', strtotime($collection_date));
+        if ($day_of_week > 5) {
+          // this is a weekend -> skip to Monday
+          $defer_days = 8 - $day_of_week;
+          $collection_date = date('Y-m-d', strtotime("+$defer_days day", strtotime($collection_date)));
+        }        
+      }
+      // also run the hook, in case somebody has a 
       CRM_Utils_SepaCustomisationHooks::defer_collection_date($collection_date, $creditor_id);
+
       if (!isset($existing_groups[$collection_date])) {
         // this group does not yet exist -> create
         
