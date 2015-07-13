@@ -33,7 +33,8 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.RCUR.grace',    ts('RCUR grace')),
                          array('batching.RCUR.notice',   ts('RCUR notice days')),
                          array('batching.FRST.notice',   ts('FRST notice days')),
-                         array('batching.UPDATE.lock.timeout', ts('Update lock timeout')));
+                         array('batching.UPDATE.lock.timeout', ts('Update lock timeout')),
+                         array('custom_txmsg', ts('Transaction Message'), array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'custom_txmsg'))));
 
       $this->custom_fields = array(
                          array('custom_cycledays',      ts('Cycle Day(s)')),
@@ -76,8 +77,8 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add all form elements and validation rules
         foreach ($this->config_fields as $key => $value) {
             $elementName = $this->domainToString($value[0]);
-            $this->addElement('text', $elementName, $value[1]);
-            if ($elementName != 'cycledays') {
+            $elem = $this->addElement('text', $elementName, $value[1], (isset($value[2]) ? $value[2] : array()));
+            if (!in_array($elementName, array('cycledays', 'custom_txmsg'))) {
                 // integer only rules, except for cycledays (list)
               $this->addRule($this->domainToString($value[0]), 
                          sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
@@ -115,6 +116,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // do not use array_merge() because it discards the original indizes
         $country_ids = array('' => ts('- select -')) + $filtered;
 
+        $exw = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
+        if($exw){
+          $exw = array('checked' => 'checked');
+        }else{
+          $exw = array();
+        }
+
         // add creditor form elements
         $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact"));
         $this->addElement('text',       'addcreditor_name',         ts("Name"));
@@ -125,6 +133,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_iban',         ts("IBAN"));
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor"), "", array('value' =>'0'));
+        $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends"), "", $exw);
         $this->addElement('hidden',     'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
         $this->addElement('hidden',     'add_creditor_id', '', array('id' => 'add_creditor_id'));
 
@@ -133,7 +142,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         foreach ($this->custom_fields as $key => $value) {
             $this->addElement('text', $this->domainToString($value[0]), $value[1], array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]))));
             $elementName = $this->domainToString($value[0]);
-            if ($elementName != 'custom_cycledays') {
+            if (!in_array($elementName, array('custom_cycledays', 'custom_txmsg'))) {
               // integer only rules, except for cycledays (list)
               $this->addRule($elementName, 
                        sprintf(ts("Please enter the %s as number (integers only)."), $value[1]),
@@ -142,7 +151,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
             $index++;
         }
 
-        // add an extra rule for the days
+        // register and add extra validation rules
         $this->registerRule('sepa_cycle_day_list', 'callback', 'sepa_cycle_day_list', 'CRM_Sepa_Logic_Settings');
         $this->addRule('cycledays',        ts('Please give a comma separated list of valid days.'), 'sepa_cycle_day_list');
         $this->addRule('custom_cycledays', ts('Please give a comma separated list of valid days.'), 'sepa_cycle_day_list');
@@ -186,8 +195,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         // mandate modification
         $allow_mandate_modification = empty($values['allow_mandate_modification'])?'0':'1';
-        CRM_Core_BAO_Setting::setItem($allow_mandate_modification, 'SEPA Direct Debit Preferences', 'allow_mandate_modification');       
-        
+        CRM_Core_BAO_Setting::setItem($allow_mandate_modification, 'SEPA Direct Debit Preferences', 'allow_mandate_modification');
+
+        CRM_Core_BAO_Setting::setItem((isset($values['exclude_weekends']) ? "1" : "0"), 'SEPA Direct Debit Preferences', 'exclude_weekends');
+
         $session = CRM_Core_Session::singleton();
         $session->setStatus(ts("Settings successfully saved"));
 

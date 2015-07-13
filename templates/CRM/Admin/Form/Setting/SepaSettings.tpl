@@ -33,7 +33,7 @@
               <a class="add button" title="Copy" onclick="fetchCreditor({$creditor.id}, true);">
                 <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Copy{/ts}</span>
               </a>
-              <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id}, false);">
+              <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id}, false); cj('a.add').hide();">
                 <span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
               </a>
               <a class="delete button" title="Delete" onclick="deletecreditor({$creditor.id});">
@@ -46,25 +46,31 @@
       {else}
         <p style="text-align: center;">{ts}No creditors found{/ts}</p>
       {/if}
-      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); resetValues();">
-        <span><div class="icon add-icon"></div>{ts}Add{/ts}</span>
+      <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); cj(this).hide(); resetValues();">
+        <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Add{/ts}</span>
       </a><br/>
       <div id="addcreditor" style="display:none;">
      <h2>Add/Edit Creditor</h2>
      <h3>Creditor Information</h3>
      <table id="creditorinfo" class="form-layout">
+         <tr>
+           <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
+     </div></td>
+           <td>
+             {$form.addcreditor_name.html}
+           </td>
+         </tr>
+         <tr>
+            <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+             <td>
+               {$form.is_test_creditor.html}
+             </td>
+         </tr>
             <tr>
               <td class="label">{$form.addcreditor_creditor_id.label} <a onclick='CRM.help("{ts}Creditor Contact{/ts}", {literal}{"id":"id-contact","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
         </div></td>
               <td>
                 {$form.addcreditor_creditor_id.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
-        </div></td>
-              <td>
-                {$form.addcreditor_name.html}
               </td>
             </tr>
             <tr>
@@ -104,10 +110,10 @@
               </td>
             </tr>
             <tr>
-               <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
-                <td>
-                  {$form.is_test_creditor.html}
-                </td>
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+              <td>
+                {$form.custom_txmsg.html}
+              </td>
             </tr>
        </table>
        {$form.add_creditor_id.html}
@@ -158,16 +164,17 @@
             </tr>
        </table>
        <div>
-          <a class="save button" title="Save" onclick="updateCreditor()">
+          <a class="save button" title="Save" onclick="updateCreditor();">
             <span>{ts}Save{/ts}</span>
           </a>
-          <a class="cancel button" title="Cancel" onclick="resetValues(); cj('#addcreditor').hide(500);">
+          <a class="cancel button" title="Cancel" onclick="resetValues(); cj('#addcreditor').hide(500); cj('a.add').show(); return;">
             <span>{ts}Cancel{/ts}</span>
           </a><br/>
        </div>
    </div>
    </div>
   <div>
+  <br/><br/><br/><br/>
     <fieldset>
         <h2>Default Batching Settings</h2>
         <table class="form-layout">
@@ -228,10 +235,22 @@
                 {$form.allow_mandate_modification.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-custom-txmsg">
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
+              <td>
+                {$form.custom_txmsg.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
               <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
               <td>
                 {$form.batching_UPDATE_lock_timeout.html}
+              </td>
+            </tr>
+            <tr class="crm-alternative_batching-form-block-exclude-weekends">
+              <td class="label">{$form.exclude_weekends.label} <a onclick='CRM.help("{ts}Exclude Weekends{/ts}", {literal}{"id":"id-exclude-weekends","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td>
+                {$form.exclude_weekends.html}
               </td>
             </tr>
        </table>
@@ -320,7 +339,8 @@
               ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
               ["batching_RCUR_grace_override", "custom_RCUR_grace", null],
               ["batching_RCUR_notice_override", "custom_RCUR_notice", null],
-              ["batching_FRST_notice_override", "custom_FRST_notice", null]
+              ["batching_FRST_notice_override", "custom_FRST_notice", null],
+              ["custom_txmsg_override", "custom_txmsg", null]
              ];
 
   function deletecreditor(id) {
@@ -415,6 +435,7 @@
   function updateCreditor() {
     var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
     var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
+    inputCustomBatching.push({'name': "custom_txmsg", 'value': cj('#custom_txmsg').val()});
     var creditorId = cj('#edit_creditor_id').val();
 
     var map = new Array();
@@ -427,6 +448,7 @@
     map["addcreditor_bic"]          = "bic";
     map["addcreditor_pain_version"] = "sepa_file_format_id";
     map["addcreditor_creditor_id"]  = "creditor_id";
+    map["custom_txmsg"]             = "custom_txmsg";
 
     // update creditor information
     var updatedCreditorInfo = new Array();

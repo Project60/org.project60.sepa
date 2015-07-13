@@ -49,6 +49,29 @@ class CRM_Sepa_Logic_Settings {
   }
 
   /**
+   * generate a transaction message for the given mandate/creditor
+   *
+   * @return a SEPA compliant transaction message
+   */
+  static function getTransactionMessage($mandate, $creditor) {
+    // get tx message from settings
+    $transaction_message = self::getSetting('custom_txmsg', $creditor['id']);
+
+    // run hook for further customisation
+    CRM_Utils_SepaCustomisationHooks::modify_txmessage($transaction_message, $mandate, $creditor);
+
+    // fallback is "Thanks."
+    if (empty($transaction_message)) {
+      $transaction_message = ts("Thank you");
+    }
+
+    // make sure that it doesn't contain any special characters
+    $transaction_message = preg_replace("#[^a-zA-Z0-9\/\-\:\(\)\'\+ \.\*]#", '?', $transaction_message);
+
+    return $transaction_message;
+  }
+
+  /**
    * Get a SEPA setting as a list
    *
    * @see self::getSetting
