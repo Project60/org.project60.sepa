@@ -25,13 +25,12 @@ function sepa_civicrm_pageRun( &$page ) {
 
   } elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
-
     if (!CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
       return;
 
     if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
       // This is an installment of a recurring contribution.
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution_recur', 'entity_id'=>$page->getTemplate()->get_template_vars('contribution_recur_id')));
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_tabl  e'=>'civicrm_contribution_recur', 'entity_id'=>$page->getTemplate()->get_template_vars('contribution_recur_id')));
     } 
     else {
       // this is a OOFF contribtion

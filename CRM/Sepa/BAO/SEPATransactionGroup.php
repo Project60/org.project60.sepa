@@ -65,7 +65,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
     $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
-    $template->assign("fileFormat",$this->fileFormat);
+    $this->fileFormat = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($this->fileFormat);
+    $template->assign("fileFormat", $this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
@@ -127,7 +128,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("total",$this->total );
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
-    return $template->fetch('formats/'.$this->fileFormat.'/transaction-details.tpl');
+    return $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl');
   }
 
 
@@ -149,6 +150,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $fileFormatName = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'name');
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
+      $fileFormatName = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($fileFormatName);
       self::loadFormatClass($fileFormatName);
       $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
       $format = new $format_class();
@@ -360,8 +362,18 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
   }
 
   static function loadFormatClass($fileFormat) {
-    // todo check if directory & file exists
-    require 'formats/'.$fileFormat.'/Format.php';
+    $s = DIRECTORY_SEPARATOR;
+    $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}formats{$s}".$fileFormat;
+    $file = $directory."{$s}Format.php";
+    if (file_exists($directory)) {
+      if (file_exists($file)) {
+        require $file;
+      } else {
+        throw new Exception('File with class format does not exist.');
+      }
+    } else {
+      throw new Exception('Directory for file format does not exist.');
+    }
   }
 
 }
