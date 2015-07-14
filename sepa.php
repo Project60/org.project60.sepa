@@ -30,7 +30,7 @@ function sepa_civicrm_pageRun( &$page ) {
 
     if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
       // This is an installment of a recurring contribution.
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_tabl  e'=>'civicrm_contribution_recur', 'entity_id'=>$page->getTemplate()->get_template_vars('contribution_recur_id')));
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution_recur', 'entity_id'=>$page->getTemplate()->get_template_vars('contribution_recur_id')));
     } 
     else {
       // this is a OOFF contribtion
