@@ -214,7 +214,7 @@ function sepa_civicrm_options() {
       ),
 
       'sepa_file_format' => array(
-          'title' => 'SEPA XML File Format Variants',
+          'title' => 'SEPA File Format Variants',
           'description' => '',
           'is_reserved' => 1,
           'is_active' => 1,
@@ -236,6 +236,12 @@ function sepa_civicrm_options() {
               'is_default' => 0,
               'is_reserved' => 1,
               'value' => 3,
+            ),
+            'citibankpl' => array(
+              'label' => ts('CitiBank PL direct debit'),
+              'is_default' => 0,
+              'is_reserved' => 1,
+              'value' => 4,
             ),
           ),
         ),
