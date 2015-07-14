@@ -109,9 +109,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t["display_name"] = preg_replace("/[^ 0-9a-zA-Z':?,\-(+.)\/\"]/", '?', $t["display_name"]);
 
       // create an individual transaction message
-      $tx_message = "Thanks.";
-      CRM_Utils_SepaCustomisationHooks::modify_txmessage($tx_message, $t, $creditor);
-      $t["message"] = $tx_message;
+      $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor);
 
       $r[]=$t;
       if ($creditor_id == null) {

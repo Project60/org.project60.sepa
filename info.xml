@@ -9,8 +9,8 @@
     <email>endres@systopia.de</email>
   </maintainer>
   <releaseDate></releaseDate>
-  <version>1.2dev</version>
-  <develStage>development</develStage>
+  <version>1.2rc1</version>
+  <develStage>beta</develStage>
   <compatibility>
     <ver>4.4</ver>
     <ver>4.5</ver>
