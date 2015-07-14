@@ -481,7 +481,7 @@
     }
 
     if(!IBAN.isValid(updatedCreditorInfo['iban'])) {
-      CRM.alert("{/literal}{ts}IBAN \"" + updatedCreditorInfo['iban'] + "\" is not correct{/ts}", "{ts}Error{/ts}{literal}", "error");
+      CRM.alert("{/literal}{ts}IBAN \"" + updatedCreditorInfo['iban'] + "\" is invalid{/ts}", "{ts}Error{/ts}{literal}", "error");
       return;
     }
 
