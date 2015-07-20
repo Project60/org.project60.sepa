@@ -385,12 +385,17 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
    */
   public function testFRSTtoRCURswitch() {
     // select cycle day so that the submission would be due today
+    $frst_payment_instrument = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+    $this->assertNotEmpty($frst_payment_instrument, "Payment Instrument FRST not found!");    
+
     $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
     $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
     CRM_Core_BAO_Setting::setItem($frst_notice, 'SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+
     $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
     $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
     $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
+    
     $cycle_day = date("d", strtotime("+$frst_notice days"));
 
     // also, horizon mustn't be big enough to create another contribution
@@ -427,7 +432,7 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
     $mandate_after_batching = $this->callAPISuccess("SepaMandate", "getsingle", array("id" => $mandate['id']));
     $this->assertTrue(($mandate_after_batching['status']=='RCUR'), "Mandate was not switched to status 'RCUR' after group was closed");
     $contribution = $this->callAPISuccess("Contribution", "getsingle", array("id" => $contribution_id));
-    $this->assertEquals('FRST', $contribution['contribution_payment_instrument'], "Created contribution does not have payment instrument 'FRST'!");
+    $this->assertEquals($frst_payment_instrument, $contribution['payment_instrument_id'], "Created contribution does not have payment instrument 'FRST'!");
 
     // uncomment this, if you want to provoke an error like https://github.com/Project60/sepa_dd/issues/128
     //$this->assertDBQuery(0, "UPDATE civicrm_sdd_mandate SET first_contribution_id=NULL WHERE id=".$mandate['id'].";");
