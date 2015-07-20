@@ -37,6 +37,12 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/sepa/lmandate</path>
+    <page_callback>CRM_Sepa_Page_ListMandate</page_callback>
+    <title>List of mandates</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
     <path>civicrm/sepa/closegroup</path>
     <page_callback>CRM_Sepa_Page_CloseGroup</page_callback>
     <title>Close Group</title>
