@@ -432,7 +432,13 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
     $mandate_after_batching = $this->callAPISuccess("SepaMandate", "getsingle", array("id" => $mandate['id']));
     $this->assertTrue(($mandate_after_batching['status']=='RCUR'), "Mandate was not switched to status 'RCUR' after group was closed");
     $contribution = $this->callAPISuccess("Contribution", "getsingle", array("id" => $contribution_id));
-    $this->assertEquals($frst_payment_instrument, $contribution['payment_instrument_id'], "Created contribution does not have payment instrument 'FRST'!");
+    if (isset($contribution['payment_instrument_id'])) {
+      $this->assertEquals($frst_payment_instrument, $contribution['payment_instrument_id'], "Created contribution does not have payment instrument 'FRST'!");
+    } else {
+      // CiviCRM <= 4.4 doesn't have $contribution['payment_instrument_id']
+      $payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+      $this->assertEquals($frst_payment_instrument, $payment_instrument_id, "Created contribution does not have payment instrument 'FRST'!");
+    }
 
     // uncomment this, if you want to provoke an error like https://github.com/Project60/sepa_dd/issues/128
     //$this->assertDBQuery(0, "UPDATE civicrm_sdd_mandate SET first_contribution_id=NULL WHERE id=".$mandate['id'].";");
