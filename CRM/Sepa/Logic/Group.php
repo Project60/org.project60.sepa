@@ -30,7 +30,7 @@ class CRM_Sepa_Logic_Group {
     // step 0: check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      return "batching is busy. Please wait, process should complete within {$timeout}s.";
+      return "Batching in progress. Please try again later.";
     }
 
     // step 1: gather data
@@ -141,7 +141,7 @@ class CRM_Sepa_Logic_Group {
     // step 0: check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      return "batching is busy. Please wait, process should complete within {$timeout}s.";
+      return "Batching in progress. Please try again later.";
     }
 
     // step 1: gather data

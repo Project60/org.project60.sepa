@@ -54,6 +54,10 @@ class CRM_Utils_SepaSafeLock {
     if (self::$_acquired_lock == NULL) {
       // it's free, we'll try to take it
       $lock = new CRM_Core_Lock($name, $timeout);
+      if (version_compare(CRM_Utils_System::version(), '4.6', '>=')) {
+        // before 4.6, a new lock would be automatically acquired
+        $lock->acquire();
+      }
       if ($lock!=NULL && $lock->isAcquired()) {
         // we got it!
         self::$_acquired_lock = new CRM_Utils_SepaSafeLock($lock, $name);

@@ -32,7 +32,7 @@ class CRM_Sepa_Logic_Batching {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      return "batching is busy. Please wait, process should complete within {$timeout}s.";
+      return "Batching in progress. Please try again later.";
     }
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.horizon", $creditor_id);
     $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $creditor_id);
@@ -209,7 +209,7 @@ class CRM_Sepa_Logic_Batching {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      return "batching is busy. Please wait, process should complete within {$timeout}s.";
+      return "Batching in progress. Please try again later.";
     }
 
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
@@ -300,7 +300,7 @@ class CRM_Sepa_Logic_Batching {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      return "batching is busy. Please wait, process should complete within {$timeout}s.";
+      return "Batching in progress. Please try again later.";
     }
 
     $contribution_status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');  
