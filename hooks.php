@@ -19,7 +19,9 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
   }
 
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
-    $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['creditor_iban'], $fields['creditor_bic'], null);
+    if (civicrm_api3('PaymentProcessorType', 'getvalue', array('id' => $fields['payment_processor_type_id'], 'return' => 'name')) == 'sepa_dd') {
+      $errors += CRM_Sepa_BAO_SEPAMandate::validate_account($fields['creditor_iban'], $fields['creditor_bic'], null);
+    }
     return;
   }
 
