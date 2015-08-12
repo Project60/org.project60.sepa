@@ -170,3 +170,35 @@ function _civicrm_api3_sepa_mandate_adddefaultcreditor(&$params) {
   }
 }
 
+
+function civicrm_api3_sepa_mandate_getlist($params) {
+
+    $results = civicrm_api3('SepaMandate', 'get', array(
+        'sequential' => 1,
+        'status' => $params['status'],
+    ));
+
+    /** contacts & contributions details */
+    $contact_ids = array();
+    $contributions_ids = array();
+    if ($results['values'] > 0) {
+        foreach ($results['values'] as $mandate) {
+            $contact_ids[$mandate['contact_id']] = $mandate['contact_id'];
+            $contributions_ids[$mandate['entity_table']][$mandate['entity_id']] = $mandate['entity_id'];
+        }
+    }
+
+    $result_contact = civicrm_api3('Contact', 'get', array(
+        'id' => $contact_ids,
+        'return' => "id,display_name,email",
+    ));
+
+    if ($results['values'] > 0) {
+        foreach ($results['values'] as $key => $mandate) {
+            $results['values'][$key]['contact'] = $result_contact['values'][$mandate['contact_id']];
+        }
+    }
+
+    return civicrm_api3_create_success($results['values']);
+
+}

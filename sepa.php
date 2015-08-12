@@ -466,6 +466,19 @@ function sepa_civicrm_navigationMenu(&$params) {
         'active' => 1
     );
     CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$contributions_menu_id], $sepa_dashboard_menu);
+    // add sepa mandates menu entry
+    $sepa_mandate_menu = array (
+        'label' => ts('CiviSEPA Mandates', array('domain' => 'org.project60.sepa')),
+        'name' => 'Dashboard',
+        'url' => 'civicrm/sepa/lmandate',
+        'permission' => 'administer CiviCRM',
+        'operator' => NULL,
+        'separator' => 0,
+        'parentID' => $contributions_menu_id,
+        'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
+        'active' => 1
+    );
+    CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$contributions_menu_id], $sepa_mandate_menu);
   }
   
   //add menu entry for SEPA settings to Administer>CiviContribute menu
