@@ -65,7 +65,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
     $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
-    $template->assign("fileFormat",$this->fileFormat);
+    $this->fileFormat = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($this->fileFormat);
+    $template->assign("fileFormat", $this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
@@ -125,7 +126,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("total",$this->total );
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
-    return $template->fetch('CRM/Sepa/xml/TransactionGroup.tpl');
+    return $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl');
   }
 
 
@@ -143,9 +144,17 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       return "Cannot find transaction group ".$txgroup_id;
     }
 
+    $creditor = civicrm_api ("SepaCreditor", "getsingle", array("sequential"=>1, "version"=>3, "id"=>$txgroup["sdd_creditor_id"]));
+    $fileFormatName = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'name');
+
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
+      $fileFormatName = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($fileFormatName);
+      self::loadFormatClass($fileFormatName);
+      $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
+      $format = new $format_class();
+
       // find an available txgroup reference
-      $available_name = $name = "SDDXML-".$txgroup['reference'];
+      $available_name = $name = $format->getDDFilePrefix().$txgroup['reference'];
       $counter = 1;
       $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
       while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
@@ -163,7 +172,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $sepa_file = civicrm_api('SepaSddFile', 'create', array(
             'version'                 => 3,
             'reference'               => $available_name,
-            'filename'                => $available_name.'.xml',
+            'filename'                => $format->getFilename($available_name),
             'latest_submission_date'  => $txgroup['latest_submission_date'],
             'created_date'            => date('YmdHis'),
             'created_id'              => CRM_Core_Session::singleton()->get('userID'),
@@ -349,4 +358,20 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     }
     return $deleted_contributions;
   }
+
+  static function loadFormatClass($fileFormat) {
+    $s = DIRECTORY_SEPARATOR;
+    $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}formats{$s}".$fileFormat;
+    $file = $directory."{$s}Format.php";
+    if (file_exists($directory)) {
+      if (file_exists($file)) {
+        require $file;
+      } else {
+        throw new Exception('File with class format does not exist.');
+      }
+    } else {
+      throw new Exception('Directory for file format does not exist.');
+    }
+  }
+
 }
