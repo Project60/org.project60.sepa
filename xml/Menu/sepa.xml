@@ -39,7 +39,7 @@
   <item>
     <path>civicrm/sepa/lmandate</path>
     <page_callback>CRM_Sepa_Page_ListMandate</page_callback>
-    <title>List of mandates</title>
+    <title>Find Mandates</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>

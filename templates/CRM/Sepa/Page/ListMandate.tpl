@@ -22,7 +22,7 @@
                 </select>
             </div>
             <button id='bGetMandates' class='button' type='button' ng-click='getMandates()'>
-                {ts}Szukaj{/ts}
+                {ts}Find{/ts}
             </button>
         </div>
         <div id="loadingHeader"></div>
