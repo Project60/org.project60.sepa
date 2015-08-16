@@ -44,7 +44,14 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
     if("Payment_SEPA_DD" != $pp["class_name"])
       return;
 
-    $type = CRM_Utils_Array::value('is_recur', $fields) ? 'FRST' : 'OOFF';
+    if ($formName == 'CRM_Contribute_Form_Contribution_Confirm') {
+      /* is_recur doesn't show up as an actual form field on the confirm page;
+       * however, the values are passed on from the main page in a dedicated variable. */
+      $isRecur = CRM_Utils_Array::value('is_recur', $form->_params);
+    } else {
+      $isRecur = CRM_Utils_Array::value('is_recur', $fields);
+    }
+    $type = $isRecur ? 'FRST' : 'OOFF';
     $GLOBALS["sepa_context"]["payment_instrument_id"] = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
     //CRM_Core_Session::setStatus('Set payment instrument in context to ' . $cred['payment_instrument_id'], '', 'info');
 
