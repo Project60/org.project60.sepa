@@ -1,7 +1,19 @@
 <?php
 require_once 'packages/array_column/array_column.php';
 
-class CRM_Sepa_Upgrade {
+class CRM_Sepa_Upgrade extends CRM_Sepa_SensitiveUpgrader {
+  protected static function tasks() {
+    return array(
+    );
+  } /* tasks() */
+
+  /**
+   * Perform upgrade actions as necessary to get to version sfe-0.3
+   *
+   * Leaving this in place for now just in case.
+   * It's not fully tested though for how it interacts with the new upgrade mechanism --
+   * especially when performing the rename magic...
+   */
   public static function run() {
     $messages = array();
 

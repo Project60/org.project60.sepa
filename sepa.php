@@ -650,7 +650,22 @@ function sepa_civicrm_disable() {
  *                for 'enqueue', returns void
  */
 function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _sepa_civix_civicrm_upgrade($op, $queue);
+  /* Note: We are not using the civix-generated upgrade,
+   * because that one relies solely on linear numeric version numbers,
+   * which is a poor pattern.
+   *
+   * Instead, we are using a custom upgrading mechanisms,
+   * which checks the actual DB state relevant for each upgrade step.
+   * This is more robust, and way more flexible.
+   *
+   * See the implementation in CRM/Sepa/SensitiveUpgrader.php for a more detailed explanation. */
+  switch($op) {
+    case 'check':
+      return CRM_Sepa_Upgrade::checkUpgradeNeeded();
+
+    case 'enqueue':
+      return CRM_Sepa_Upgrade::enqueueUpgrades($queue);
+  }
 }
 
 /**
