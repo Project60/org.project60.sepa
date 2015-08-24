@@ -3,6 +3,8 @@
 <tables xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="Creditor.xml"            parse="xml" />
   <xi:include href="Mandate.xml"             parse="xml" />
+  <xi:include href="MandateFile.xml"         parse="xml" />
+  <xi:include href="MandateFileRow.xml"      parse="xml" />
   <xi:include href="TransactionGroup.xml"    parse="xml" />
   <xi:include href="File.xml"                parse="xml" />
   <xi:include href="ContributionGroup.xml"   parse="xml" />

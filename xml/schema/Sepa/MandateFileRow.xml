@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Sepa</base>
+  <class>SEPAMandateFileRow</class>
+  <name>civicrm_sdd_mandate_file_row</name>
+  <add>4.7</add>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <length>10</length>
+    <required>true</required>
+    <comment>ID</comment>
+    <export>true</export>
+    <add>4.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>mandate_file_id</name>
+    <type>int unsigned</type>
+    <length>10</length>
+    <required>true</required>
+    <export>true</export>
+    <add>4.7</add>
+  </field>
+  <index>
+    <name>mandate_file_id</name>
+    <fieldName>mandate_file_id</fieldName>
+    <add>4.7</add>
+  </index>
+  <foreignKey>
+    <name>mandate_file_id</name>
+    <table>civicrm_sdd_mandate_file</table>
+    <key>id</key>
+    <add>4.7</add>
+    <onDelete>RESTRICT</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>mandate_id</name>
+    <type>int unsigned</type>
+    <length>10</length>
+    <required>true</required>
+    <export>true</export>
+    <add>4.7</add>
+  </field>
+  <index>
+    <name>mandate_id</name>
+    <fieldName>mandate_id</fieldName>
+    <add>4.7</add>
+  </index>
+  <foreignKey>
+    <name>mandate_id</name>
+    <table>civicrm_sdd_mandate</table>
+    <key>id</key>
+    <add>4.7</add>
+    <onDelete>RESTRICT</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>response_date</name>
+    <type>datetime</type>
+    <required>false</required>
+    <title>Response Date</title>
+    <comment>DateTime when creditor responsed to uploaded file with mandates.</comment>
+    <export>true</export>
+    <add>4.7</add>
+  </field>
+
+  <field>
+    <name>response_filename</name>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <title>Response filename</title>
+    <comment>Filename from creditor</comment>
+    <export>true</export>
+    <add>4.7</add>
+  </field>
+
+  <field>
+    <name>response_status</name>
+    <type>varchar</type>
+    <length>10</length>
+    <required>false</required>
+    <title>Response status</title>
+    <comment>Status response</comment>
+    <export>true</export>
+    <add>4.7</add>
+  </field>
+
+  <field>
+    <name>response_comment</name>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <title>Response comment</title>
+    <comment>Optional response comment</comment>
+    <export>true</export>
+    <add>4.7</add>
+  </field>
+
+</table>
