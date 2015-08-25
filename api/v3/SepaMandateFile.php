@@ -20,7 +20,7 @@
  * @access public
  */
 function civicrm_api3_sepa_mandate_file_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'SepaMandateFile');
 }
 
 /**
@@ -62,5 +62,5 @@ function civicrm_api3_sepa_mandate_file_delete($params) {
  * @access public
  */
 function civicrm_api3_sepa_mandate_file_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, true, 'SepaMandateFile');
 }
