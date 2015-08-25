@@ -1,27 +1,18 @@
 {crmScript ext=org.project60.sepa file=js/angular/angular.min.js}
-{crmScript ext=org.project60.sepa file=js/ListMandate.js}
-{crmScript ext=org.project60.sepa file=js/angularController.js}
-{crmStyle ext=org.project60.sepa file=css/ListMandate.css}
+{crmScript ext=org.project60.sepa file=js/angularControllerPackages.js}
+{crmStyle ext=org.project60.sepa file=css/List.css}
 
-<div ng-app="ListMandateApp">
-    <div ng-controller="ListMandateCtrl" id="ListMandateCtrl">
+<div ng-app="PackageMandateApp">
+    <div ng-controller="PackageMandateCtrl" id="ListCtrl">
         <div class="searchFields">
             <div id='divSelectGroup' class="queryField">
                 <label for="thisStatus" class="calloutRow">{ts}Status{/ts}</label>
                 <select class="filterField" id="thisStatus" name="field_status">
                     <option value="">{ts}- select -{/ts}</option>
-                    <option value="INIT">INIT</option>
-                    <option value="OOFF">OOFF</option>
-                    <option value="FRST">FRST</option>
-                    <option value="RCUR">RCUR</option>
-                    <option value="SENT">SENT</option>
-                    <option value="INVALID">INVALID</option>
-                    <option value="PARTIAL">PARTIAL</option>
-                    <option value="ONHOLD">ONHOLD</option>
-                    <option value="COMPLETE">COMPLETE</option>
+                    <option value="SUBMITTED">SUBMITTED</option>
                 </select>
             </div>
-            <button id='bGetMandates' class='button' type='button' ng-click='getMandates()'>
+            <button id='bGetList' class='button' type='button' ng-click='getList()'>
                 {ts}Find{/ts}
             </button>
         </div>
@@ -30,23 +21,19 @@
             <thead>
             <tr>
                 <th>{ts}ID{/ts}</th>
-                <th>{ts}Contact{/ts}</th>
-                <th>{ts}Reference{/ts}</th>
-                <th>{ts}IBAN / BIC{/ts}</th>
+                <th>{ts}Filename{/ts}</th>
+                <th>{ts}Create date{/ts}</th>
+                <th>{ts}Submiossion date{/ts}</th>
                 <th><a ng-click="sort('status')">{ts}Status{/ts}</a></th>
             </tr>
             </thead>
             <tbody id="resultTableBody">
-            <tr id="resultRow" ng-repeat="mandate in mandates | filter:searchText | orderBy:predicate:reverse">
-                <td id="id">[[mandate.id]]</td>
-                <td id="contact_id">
-                    <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=[[mandate.contact_id]]"}">
-                        [[mandate.contact.display_name]]
-                    </a>
-                </td>
-                <td id="reference">[[mandate.reference]]</td>
-                <td id="iban">[[mandate.iban]]<br>[[mandate.bic]]</td>
-                <td id="status">[[mandate.status]]</td>
+            <tr id="resultRow" ng-repeat="item in list | filter:searchText | orderBy:predicate:reverse">
+                <td id="id">[[item.id]]</td>
+                <td id="filename">[[item.filename]]</td>
+                <td id="create_date">[[item.create_date]]</td>
+                <td id="submission_date">[[item.submission_date]]</td>
+                <td id="status">[[item.status]]</td>
             </tr>
             </tbody>
         </table>

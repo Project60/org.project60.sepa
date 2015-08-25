@@ -64,3 +64,9 @@ function civicrm_api3_sepa_mandate_file_delete($params) {
 function civicrm_api3_sepa_mandate_file_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, true, 'SepaMandateFile');
 }
+
+
+
+function civicrm_api3_sepa_mandate_file_getlist($params) {
+  return civicrm_api3_sepa_mandate_file_get($params);
+}

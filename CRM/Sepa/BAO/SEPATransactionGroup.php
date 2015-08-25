@@ -149,7 +149,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
       $fileFormatName = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($fileFormatName);
-      self::loadFormatClass($fileFormatName);
+      CRM_Sepa_Logic_Format::loadFormatClass($fileFormatName);
       $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
       $format = new $format_class();
 
@@ -294,7 +294,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $txgroup_id = (int) $txgroup_id;
     $deleted_contributions = array();
 
-    if ($type=='OOFF') {
+    if ($type == 'OOFF') {
       // delete the mandates first
       $query = "
       SELECT
@@ -316,11 +316,12 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         // delete the mandate
         if (empty($results->mandate_id)) {
           $deleted_contributions[$contribution_id] = "No mandate found!";
-        } else {
+        }
+        else {
           $delete = civicrm_api('SepaMandate', 'delete', array('id' => $results->mandate_id, 'version' => 3));
           if (!empty($delete['is_error'])) {
             $deleted_contributions[$contribution_id] = $delete['error_message'];
-          }          
+          }
         }
       }
     }
@@ -356,22 +357,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         }
       }
     }
-    return $deleted_contributions;
-  }
 
-  static function loadFormatClass($fileFormat) {
-    $s = DIRECTORY_SEPARATOR;
-    $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}formats{$s}".$fileFormat;
-    $file = $directory."{$s}Format.php";
-    if (file_exists($directory)) {
-      if (file_exists($file)) {
-        require $file;
-      } else {
-        throw new Exception('File with class format does not exist.');
-      }
-    } else {
-      throw new Exception('Directory for file format does not exist.');
-    }
+    return $deleted_contributions;
   }
 
 }

@@ -1,8 +1,8 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
-| Author: X+                                             |
+| Copyright (C) 2013-2015 Scardinius                     |
+| Author: Scardinius                                     |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
 | Affero GPL license. You can redistribute it and/or     |
@@ -16,10 +16,9 @@
 
 require_once 'CRM/Core/Page.php';
 
-class CRM_Sepa_Page_ListMandate extends CRM_Core_Page {
+class CRM_Sepa_Page_PackageMandate extends CRM_Core_Page {
                         
   function run() {
-
     parent::run();
   }
 

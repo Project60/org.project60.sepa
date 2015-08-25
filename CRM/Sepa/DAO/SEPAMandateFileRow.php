@@ -157,6 +157,7 @@ class CRM_Sepa_DAO_SEPAMandateFileRow extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('ID'),
           'description' => 'ID',
           'required' => true,
           'export' => true,
@@ -167,6 +168,8 @@ class CRM_Sepa_DAO_SEPAMandateFileRow extends CRM_Core_DAO
         'mandate_file_id' => array(
           'name' => 'mandate_file_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mandate file ID'),
+          'description' => 'Mandate file ID',
           'required' => true,
           'export' => true,
           'where' => 'civicrm_sdd_mandate_file_row.mandate_file_id',
@@ -177,6 +180,8 @@ class CRM_Sepa_DAO_SEPAMandateFileRow extends CRM_Core_DAO
         'mandate_id' => array(
           'name' => 'mandate_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mandate ID'),
+          'description' => 'Mandate ID',
           'required' => true,
           'export' => true,
           'where' => 'civicrm_sdd_mandate_file_row.mandate_id',

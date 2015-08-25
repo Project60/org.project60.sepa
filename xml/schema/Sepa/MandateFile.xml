@@ -12,6 +12,7 @@
     <type>int unsigned</type>
     <length>10</length>
     <required>true</required>
+    <title>ID</title>
     <comment>ID</comment>
     <export>true</export>
     <add>4.7</add>
@@ -26,6 +27,7 @@
     <type>int unsigned</type>
     <length>10</length>
     <required>true</required>
+    <title>Creditor ID</title>
     <comment>Creditor</comment>
     <export>true</export>
     <add>4.7</add>
@@ -49,6 +51,7 @@
     <length>10</length>
     <required>true</required>
     <unique>false</unique>
+    <title>Contact ID</title>
     <comment>Contact</comment>
     <export>true</export>
     <add>4.7</add>
@@ -71,6 +74,7 @@
     <type>varchar</type>
     <length>255</length>
     <required>true</required>
+    <title>Filename</title>
     <comment>Filename generated for creditor</comment>
     <add>4.7</add>
   </field>
@@ -80,6 +84,7 @@
     <type>datetime</type>
     <required>true</required>
     <title>Create Date</title>
+    <comment>Date of creation the package</comment>
     <add>4.7</add>
   </field>
 
@@ -87,6 +92,7 @@
     <name>submission_date</name>
     <type>datetime</type>
     <title>Submission Date</title>
+    <comment>Date of submission the package to the creditor</comment>
     <add>4.7</add>
   </field>
 
@@ -95,6 +101,7 @@
     <type>varchar</type>
     <length>45</length>
     <required>false</required>
+    <title>Status</title>
     <comment>Status</comment>
     <add>4.7</add>
   </field>

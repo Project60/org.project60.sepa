@@ -157,6 +157,7 @@ class CRM_Sepa_DAO_SEPAMandateFile extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('ID'),
           'description' => 'ID',
           'required' => true,
           'export' => true,
@@ -167,6 +168,7 @@ class CRM_Sepa_DAO_SEPAMandateFile extends CRM_Core_DAO
         'creditor_id' => array(
           'name' => 'creditor_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Creditor ID'),
           'description' => 'Creditor',
           'required' => true,
           'export' => true,
@@ -178,6 +180,7 @@ class CRM_Sepa_DAO_SEPAMandateFile extends CRM_Core_DAO
         'contact_id' => array(
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Contact ID'),
           'description' => 'Contact',
           'required' => true,
           'export' => true,
@@ -199,12 +202,14 @@ class CRM_Sepa_DAO_SEPAMandateFile extends CRM_Core_DAO
           'name' => 'create_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Create Date') ,
+          'description' => 'Date of creation the package',
           'required' => true,
         ) ,
         'submission_date' => array(
           'name' => 'submission_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Submission Date') ,
+          'description' => 'Date of submission the package to the creditor',
         ) ,
         'status' => array(
           'name' => 'status',

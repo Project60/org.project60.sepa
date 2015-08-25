@@ -12,6 +12,7 @@
     <type>int unsigned</type>
     <length>10</length>
     <required>true</required>
+    <title>ID</title>
     <comment>ID</comment>
     <export>true</export>
     <add>4.7</add>
@@ -26,6 +27,8 @@
     <type>int unsigned</type>
     <length>10</length>
     <required>true</required>
+    <title>Mandate File ID</title>
+    <comment>Mandate File ID</comment>
     <export>true</export>
     <add>4.7</add>
   </field>
@@ -47,6 +50,8 @@
     <type>int unsigned</type>
     <length>10</length>
     <required>true</required>
+    <title>Mandate ID</title>
+    <comment>Mandate ID</comment>
     <export>true</export>
     <add>4.7</add>
   </field>

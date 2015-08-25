@@ -1,11 +1,11 @@
-var myApp = angular.module('ListMandateApp', [])
+var myApp = angular.module('PackageMandateApp', [])
     .config(['$interpolateProvider', function ($interpolateProvider) {
         $interpolateProvider.startSymbol('[[');
         $interpolateProvider.endSymbol(']]');
     }]);
   
-myApp.controller('ListMandateCtrl', function ($scope) {
-    $scope.mandates = [];
+myApp.controller('PackageMandateCtrl', function ($scope) {
+    $scope.list = [];
     $scope.predicate = 'status';
     $scope.reverse = false;
     
@@ -18,27 +18,28 @@ myApp.controller('ListMandateCtrl', function ($scope) {
         $scope.predicate = predicate;
     }
     
-    $scope.getMandates = function() {
-        var mandates = [];
+    $scope.getList = function() {
+        var list = [];
         var status = cj('#thisStatus').val() || null;
         var loading = cj('#loadingHeader');
         loading.show();
-        CRM.api3('SepaMandate', 'getlist', {
-            "sequential": 1,
+        CRM.api3('SepaMandateFile', 'getlist', {
+            "sequential": 1
+            ,
             "status": status
         }).done(function (data) {
             angular.forEach(data.values, function (key, value) {
-                var mandate = {};
-                mandate['id'] = key.id;
-                mandate['contact_id'] = key.contact_id;
-                mandate['contact'] = key.contact;
-                mandate['reference'] = key.reference;
-                mandate['iban'] = key.iban;
-                mandate['bic'] = key.bic;
-                mandate['status'] = key.status;
-                mandates.push(mandate);
+                var item = {};
+                item['id'] = key.id;
+                item['contact_id'] = key.contact_id;
+                item['creditor_id'] = key.creditor_id;
+                item['filename'] = key.filename;
+                item['create_date'] = key.create_date;
+                item['submission_date'] = key.submission_date;
+                item['status'] = key.status;
+                list.push(item);
             });
-            $scope.mandates = mandates;
+            $scope.list = list;
             $scope.$apply();
         }).always(function(data){
             loading.hide();
