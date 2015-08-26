@@ -23,8 +23,9 @@
                 <th>{ts}ID{/ts}</th>
                 <th>{ts}Filename{/ts}</th>
                 <th>{ts}Create date{/ts}</th>
-                <th>{ts}Submiossion date{/ts}</th>
+                <th>{ts}Submission date{/ts}</th>
                 <th><a ng-click="sort('status')">{ts}Status{/ts}</a></th>
+                <th>{ts}Download{/ts}</th>
             </tr>
             </thead>
             <tbody id="resultTableBody">
@@ -34,6 +35,7 @@
                 <td id="create_date">[[item.create_date]]</td>
                 <td id="submission_date">[[item.submission_date]]</td>
                 <td id="status">[[item.status]]</td>
+                <td id="download"><a href="{crmURL p="civicrm/sepa/dpackage" q="pid=[[item.id]]"}" download="[[item.filename]]" class="button">[[item.filename]]</a></td>
             </tr>
             </tbody>
         </table>

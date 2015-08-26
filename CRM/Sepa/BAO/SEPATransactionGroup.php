@@ -65,7 +65,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
     $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
-    $this->fileFormat = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($this->fileFormat);
+    $this->fileFormat = CRM_Sepa_Logic_Format::sanitizeFileFormat($this->fileFormat);
     $template->assign("fileFormat", $this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
@@ -148,7 +148,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $fileFormatName = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'name');
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
-      $fileFormatName = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($fileFormatName);
+      $fileFormatName = CRM_Sepa_Logic_Format::sanitizeFileFormat($fileFormatName);
       CRM_Sepa_Logic_Format::loadFormatClass($fileFormatName);
       $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
       $format = new $format_class();

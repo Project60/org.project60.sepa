@@ -1,2 +1,1 @@
-{* TODO mandate-header *}
-mandate-header
+"{$filename}",{$createDate},{$createTime},{$fileNumber},"Fundacja","{$client}",

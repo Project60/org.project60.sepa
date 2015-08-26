@@ -2,7 +2,14 @@
 
 abstract class CRM_Sepa_Logic_Format {
 
-  static function loadFormatClass($fileFormat) {
+  /**
+   * Load class based on format name.
+   *
+   * @param $fileFormat
+   *
+   * @throws Exception
+   */
+  public static function loadFormatClass($fileFormat) {
     $s = DIRECTORY_SEPARATOR;
     $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}formats{$s}".$fileFormat;
     $file = $directory."{$s}Format.php";
@@ -17,6 +24,32 @@ abstract class CRM_Sepa_Logic_Format {
     }
   }
 
+
+  /**
+   * Sanitize file format name which is used in directory name.
+   *
+   * @param $fileFormat
+   *
+   * @return mixed
+   */
+  public static function sanitizeFileFormat($fileFormat) {
+    $fileFormat = preg_replace(array('/[^a-zA-Z0-9]+/'), '_', $fileFormat);
+    return $fileFormat;
+  }
+
+
+  /**
+   * Method returns fileformat based on child class name.
+   *
+   * @param $class
+   *
+   * @return mixed
+   */
+  public static function getFileFormat($class) {
+    return str_replace(__CLASS__.'_', '', $class);
+  }
+
+
   /**
    * Method returns prefix for transactional file.
    *
@@ -25,6 +58,7 @@ abstract class CRM_Sepa_Logic_Format {
   public function getDDFilePrefix() {
     return 'SDDXML-';
   }
+
 
   /**
    * Method returns filename with extension for transactional file.
@@ -37,6 +71,7 @@ abstract class CRM_Sepa_Logic_Format {
     return $variable_string.'.xml';
   }
 
+
   /**
    * Method returns last number for package of mandates.
    *
@@ -47,6 +82,7 @@ abstract class CRM_Sepa_Logic_Format {
     return $packageFile->count();
   }
 
+
   /**
    * Method returns new filename for package of mandates.
    *
@@ -54,6 +90,18 @@ abstract class CRM_Sepa_Logic_Format {
    */
   public function getNewPackageFilename() {
     return ($this->getLastPackageNumber()+1).'PACKAGE.txt';
+  }
+
+
+  /**
+   * Method returns content of file for package of mandates.
+   *
+   * @param $result
+   *
+   * @return string
+   */
+  public function getMandatePackage($result) {
+    return "file content, change in child class";
   }
 
 }
