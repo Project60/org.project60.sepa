@@ -100,7 +100,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       // If we don't yet have an entity to attach the mandate to, we need to postpone the mandate creation.
       $GLOBALS['sepa_context']['mandateParams'] = $apiParams;
     }
-    return array(true); // Need to return a non-empty array to indicate success...
+    return $params;
   }
 
   
