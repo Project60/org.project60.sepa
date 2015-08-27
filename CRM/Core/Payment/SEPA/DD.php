@@ -45,17 +45,11 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
    * @public
    */
   function doDirectPayment(&$params) {
-    $params['trxn_id'] = "TODO GENERATE MANDATE ID";
-
     $creditor = civicrm_api3('SepaCreditor', 'getsingle', array(
       'payment_processor_id' => $params['payment_processor_id'],
       'return' => array('id', 'mandate_active'),
     ));
 
-    // create the mandate
-    if ($this->_mode == 'test') {
-      $params['trxn_id'] = "TEST:" . $params['trxn_id'];
-    }
     $apiParams = array (
         "iban"=> $params["bank_iban"],
         "bic" => $params["bank_bic"],
