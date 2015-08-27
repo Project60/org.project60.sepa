@@ -61,9 +61,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     $group = civicrm_api ("SepaTransactionGroup","getsingle",array("sequential"=>1,"version"=>3,"id"=>$this->id));
     $creditor_id = $group["sdd_creditor_id"];
-    $template->assign("group",$group );
+    $template->assign("group", $group);
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
-    $template->assign("creditor",$creditor );
+    $template->assign("creditor", $creditor);
     $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
     $this->fileFormat = CRM_Sepa_Logic_Format::sanitizeFileFormat($this->fileFormat);
     $template->assign("fileFormat", $this->fileFormat);
@@ -72,6 +72,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       SELECT
         c.id,
         civicrm_contact.display_name,
+        a.street_address,
+        a.postal_code,
+        a.city,
         invoice_id,
         currency,
         total_amount,
@@ -86,6 +89,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = c.id)
       )
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
+      LEFT JOIN civicrm_address a ON c.contact_id = a.contact_id AND a.is_primary = 1
       WHERE g.txgroup_id = %1
         AND contribution_status_id != 3
         AND mandate.is_enabled = true
