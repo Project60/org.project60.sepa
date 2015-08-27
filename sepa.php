@@ -65,6 +65,24 @@ function sepa_civicrm_pageRun( &$page ) {
   }
 }
 
+function sepa_civicrm_preProcess($formName, &$form) {
+  if ($formName == "CRM_Contribute_Form_Contribution") { /* Backoffice Contribution add/edit form */
+    /* Switch the payment processor used for building the billing pane.
+     *
+     * The original form always builds the billing fields according to the default processor;
+     * however, when we reload the pane after the user selects a different PP,
+     * we need to make sure the new PP is used for building the billing fields instead. */
+    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $_GET);
+    if ($paymentProcessorID && $form->_paymentProcessor['id'] != $paymentProcessorID) {
+      $paymentProcessors = $form->getValidProcessors();
+      $form->_paymentProcessor = $paymentProcessors[$paymentProcessorID];
+    }
+
+    /* Tell the PP class to include the 'Mandate Active' field in form. */
+    $GLOBALS['sepa_context']['back_office'] = true;
+  }
+}
+
 function _sepa_buildForm_Contribution_Main ($formName, &$form ){
   $pp= civicrm_api("PaymentProcessor","getsingle"
     ,array("version"=>3,"id"=>$form->_values["payment_processor"]));
@@ -82,6 +100,14 @@ cj(function($) {
 });
 EOD;
   CRM_Core_Region::instance('page-header')->add(array('script' => $js));
+
+  /* There is no way (yet) to prevent the billing address fields from being added for all PPs -- so we need to drop them explicitly. */
+  $billingAddressFields = array_diff_key($form->_paymentFields, $form->billingFieldSets['direct_debit']['fields']); /* Drop the address fields, but keep the actual SEPA fields. */
+  foreach ($billingAddressFields as $fieldName => $field) {
+    $form->removeElement($fieldName);
+    unset($form->_paymentFields[$fieldName]);
+  }
+  $form->assign('billingDetailsFields', null);
 }
 
 function sepa_civicrm_buildForm ( $formName, &$form ){
@@ -227,65 +253,38 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
         }
         $className = civicrm_api3('PaymentProcessor', 'getvalue', array('id' => $paymentProcessorId, 'return' => 'class_name'));
         if ($className == 'Payment_SEPA_DD') {
-          /* The currently selected PP is an SDD one => swap out the Credit Card stuff. */
-
-          /* When processing the submitted form, we need to swap out the fields in the main form object. */
+          /* There is no way (yet) to prevent the billing address fields from being added for all PPs -- so we need to drop them for our processor explicitly. */
           if ($form->_flagSubmitted) {
-            /* Get rid of CreditCard fields.
-             * (Many of them are mandatory, and thus really in the way when processing the submitted form.) */
-            foreach ($form->_paymentFields as $fieldName => $field) {
+            $billingAddressFields = array_diff_key($form->_paymentFields, $form->billingFieldSets['direct_debit']['fields']); /* Drop the address fields, but keep the actual SEPA fields. */
+            foreach ($billingAddressFields as $fieldName => $field) {
               $form->removeElement($fieldName);
             }
-
-            /* Fields we actually want processed and passed to the PP. */
-            $form->addElement('checkbox', 'sepa_active');
-            $form->addElement('text', 'bank_bic');
-            $form->addElement('text', 'bank_iban');
           }
 
-          /* When building the form for actual (re)display -- i.e. on first load or after validation failure -- we need to swap out the Credit Card pane. */
-          { /* There doesn't seem to be an obvious conditional for checking whether the form will be (re)displayed -- so just do this unconditionally. */
-            $allPanes = $form->get_template_vars('allPanes');
-            $sepaPane = array(ts('SEPA Mandate') => array(
-              'url' => CRM_Utils_System::url('civicrm/contact/view/contribution', "snippet=4&formType=SDD&mode={$form->_mode}"),
-              'open' => true,
-              'id' => 'SDD',
-            ));
-
-            /* Like array_splice(), but preserves the key(s) of the replacement array.
-             * Another entry in the category "useful functions PHP could provide, but doesn't"... */
-            $array_splice_assoc = function(&$input, $offset, $length = 0, $replacement = array()) {
-              $tail = array_splice($input, $offset);
-              $extracted = array_splice($tail, 0, $length);
-              $input += $replacement + $tail;
-              return $extracted;
-            };
-
-            $array_splice_assoc($allPanes, array_search(ts('Credit Card Information'), array_keys($allPanes)), 1, $sepaPane);
-            $form->assign('allPanes', $allPanes);
-
-            $form->assign('processorSupportsFutureStartDate', true); /* Tell the template to display the "Start Date" field. */
-          }
+          /* Tell the template to display the "Start Date" field.
+           *
+           * Note: There is a supportsFutureRecurStartDate() callback in the PP class as of CiviCRM 4.6 -- but it doesn't seem to work (yet)... */
+          $form->assign('processorSupportsFutureStartDate', true);
         } /* Selected PP is SDD */
 
-        /* Switch between CreditCard and SDD panes dynamically when changing PP selection. */
+        /* Switch between CreditCard and DirectDebit panes dynamically when changing PP selection. */
         $js = <<<'EOD'
 cj('select#payment_processor_id').change( function() {
   paymentProcessorId = cj(this).val();
   CRM.api('PaymentProcessor', 'getvalue', {'q': 'civicrm/ajax/rest', 'id': paymentProcessorId, 'return': 'class_name'}, {success: function(data) {
     isSDD = (data.result == 'Payment_SEPA_DD');
 
-    SDDBlock = cj('.crm-SDD-accordion')[0];
+    DirectDebitBlock = cj('.crm-DirectDebit-accordion')[0];
     CreditCardBlock = cj('.crm-CreditCard-accordion')[0];
 
-    if (!isSDD && SDDBlock) {
-      oldBlock = SDDBlock;
+    if (!isSDD && DirectDebitBlock) {
+      oldBlock = DirectDebitBlock;
       newType = 'CreditCard';
       newName = ts('Credit Card Information');
     } else if (isSDD && CreditCardBlock) {
       oldBlock = CreditCardBlock;
-      newType = 'SDD';
-      newName = ts('SEPA Mandate');
+      newType = 'DirectDebit';
+      newName = ts('SEPA Mandate Information');
     } else {
       return;
     }
@@ -300,24 +299,17 @@ cj('select#payment_processor_id').change( function() {
         </div>\n\
       </div>\n\
     ';
-    loadPanes(newType);
+    loadPaneSwitchPP(newType, paymentProcessorId); /* Custom variation of loadPane() (from Contribution.tpl), defined in ContributionSwitchPP.tpl */
   }});
 });
 EOD;
         CRM_Core_Region::instance('page-header')->add(array('jquery' => $js));
-      } elseif($formType == 'SDD') {
-        /* SDD subform invoked from main form (in place of Credit Card pane) => build Mandate fields. */
-        $form->add('checkbox', 'sepa_active', ts('Active mandate'))->setValue(1);
-        $form->addElement('text', 'bank_bic', ts('BIC'), array('size' => 11, 'maxlength' => 11));
-        $form->addElement('text', 'bank_iban', ts('IBAN'), array('size' => 34, 'maxlength' => 34));
+        CRM_Core_Region::instance('page-body')->add(array('template' => 'CRM/Contribute/Form/ContributionSwitchPP.tpl'));
+      } elseif($formType == 'DirectDebit') {
+        $form->setDefaults(array('sepa_active' => 1));
 
-        /* Tell the template to load the $formType (i.e. 'SDD') subform from templates/CRM/Contribute/Form/AdditionalInfo/SDD.tpl
-         * instead of displaying the main Contribution form. */
-        $form->assign('showAdditionalInfo', 1);
-
-        /* The SDD pane template needs to include the CreditCard template for the recur handling JS;
-         * but we don't want the actual Credit Card billing block => disable it. */
-        CRM_Core_Region::instance('billing-block')->update('default', array('disabled' => true));
+        /* There is no way (yet) to prevent the billing address fields from being added for all PPs -- so we need to drop them explicitly. */
+        $form->assign('billingDetailsFields', null);
       }
     } else { /* Not a new PP contribution. (I.e. editing existing PP contribution; or adding/editing non-PP contribution.) */
       if (isset($form->_values)) { // Deal with weird recursive partial invocation...

@@ -4,6 +4,48 @@ require_once 'packages/array_column/array_column.php';
 class CRM_Sepa_Upgrade extends CRM_Sepa_SensitiveUpgrader {
   protected static function tasks() {
     return array(
+      'payment type' => array(
+        'title' => "Changing `payment_type` for SEPA Payment Processor Type and Payment Processors to 'Direct Debit'",
+        'check' => function () {
+          return CRM_Core_DAO::singleValueQuery("
+            SELECT
+              EXISTS (SELECT * FROM `civicrm_payment_processor_type` WHERE `name` = 'sepa_dd' AND `payment_type` != 2)
+              OR EXISTS (
+                SELECT *
+                FROM `civicrm_payment_processor`
+                WHERE `payment_processor_type_id` = (SELECT `id` FROM `civicrm_payment_processor_type` WHERE `name` = 'sepa_dd')
+                  AND `payment_type` != 2
+              )
+          ");
+        },
+        'action' => function () {
+          $messages = array();
+
+          $dao = CRM_Core_DAO::executeQuery("
+            UPDATE `civicrm_payment_processor_type`
+            SET `payment_type` = 2
+            WHERE `name` = 'sepa_dd'
+              AND `payment_type` != 2
+          ");
+          $rows = $dao->affectedRows();
+          if ($rows) {
+            $messages[] = "Changed `payment_type` for SEPA Payment Processor Type to 'Direct Debit'.";
+          }
+
+          $dao = CRM_Core_DAO::executeQuery("
+            UPDATE `civicrm_payment_processor`
+            SET `payment_type` = 2
+            WHERE `payment_processor_type_id` = (SELECT `id` FROM `civicrm_payment_processor_type` WHERE `name` = 'sepa_dd')
+              AND `payment_type` != 2
+          ");
+          $rows = $dao->affectedRows();
+          if ($rows) {
+            $messages[] = "Changed `payment_type` for $rows SEPA Payment Processor entries to 'Direct Debit'.";
+          }
+
+          return $messages;
+        } /* action() */
+      ), /* payment type */
     );
   } /* tasks() */
 

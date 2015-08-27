@@ -36,6 +36,73 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
     return self::$_singleton[$processorName];
   }
 
+  protected function supportsBackOffice() {
+    return TRUE;
+  }
+
+  /* Note: This doesn't seem to actually work in CiviCRM 4.6...
+   * (We still need to set the template variable explicitly in the buildForm hook.) */
+  protected function supportsFutureRecurStartDate() {
+    return TRUE;
+  }
+
+  public function getPaymentTypeLabel() {
+    return 'SEPA Mandate';
+  }
+
+  /**
+   * Get array of fields that should be displayed on the payment form.
+   *
+   * @return array
+   */
+  public function getPaymentFormFields() {
+    return array_merge(
+      isset($GLOBALS['sepa_context']['back_office']) /* Only display the checkbox on back-office forms. (For online contribution pages, the initial mandate status is decided by the creditor setting instead.) */
+        ? array('sepa_active')
+        : array(),
+      array(
+        'bank_iban',
+        'bank_bic',
+      )
+    );
+  }
+
+  /**
+   * Return an array of all the details about the fields potentially required for payment fields.
+   *
+   * Only those determined by getPaymentFormFields will actually be assigned to the form
+   *
+   * @return array
+   *   field metadata
+   */
+  public function getPaymentFormFieldsMetadata() {
+    return array(
+      'sepa_active' => array(
+        'htmlType' => 'checkbox',
+        'name' => 'sepa_active',
+        'title' => ts('Active mandate'),
+        'cc_field' => true,
+        'is_required' => false,
+      ),
+      'bank_iban' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_iban',
+        'title' => ts('IBAN'),
+        'cc_field' => true,
+        'attributes' => array('size' => 34, 'maxlength' => 34, /* 'autocomplete' => 'off' */ ),
+        'is_required' => true,
+      ),
+      'bank_bic' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_bic',
+        'title' => ts('BIC'),
+        'cc_field' => true,
+        'attributes' => array('size' => 11, 'maxlength' => 11, /* 'autocomplete' => 'off' */ ),
+        'is_required' => false,
+      ),
+    );
+  }
+
   /**
    * Submit a payment using Advanced Integration Method
    *
@@ -81,7 +148,7 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       $GLOBALS['sepa_context']['receive_date'] = $params['receive_date'];
     }
 
-    if (isset($params['hidden_processor'])) { /* Seems to be the best indication for an actual Online Contribution (through Contribution Page) vs. a back-office Contribution. */
+    if (!isset($GLOBALS['sepa_context']['back_office'])) {
       $mandateActive = $creditor['mandate_active']; /* Online => use PP default. */
     } else {
       $mandateActive = CRM_Utils_Array::value('sepa_active', $params); /* Back-office => selected in form. */
@@ -124,43 +191,5 @@ class CRM_Core_Payment_SEPA_DD extends CRM_Core_Payment {
       $errors .= '<p>' . ts('Creditor ID is not set in the Administer CiviCRM &raquo; Payment Processor.') . '</p>';
     }
     return strlen($errors) ? $errors : NULL;
-  }
-
-  function buildForm(&$form) {
-    $form->_paymentFields = array(); //remove existing fields (bank account, branch, bla)
-    //TODO input:[name="is_recur"]')[0].checked = true;
-
-    //e.g. IBAN can have maxlength of 34 digits
-    $form->_paymentFields['bank_iban'] = array(
-        'htmlType' => 'text',
-        'name' => 'bank_iban',
-        'title' => ts('IBAN'),
-        'cc_field' => TRUE,
-        'attributes' => array('size' => 34, 'maxlength' => 34, /* 'autocomplete' => 'off' */ ),
-        'is_required' => TRUE,
-        );
-
-    //e.g. SWIFT-BIC can have maxlength of 11 digits
-    $form->_paymentFields['bank_bic'] = array(
-        'htmlType' => 'text',
-        'name' => 'bank_bic',
-        'title' => ts('BIC'),
-        'cc_field' => TRUE,
-        'attributes' => array('size' => 11, 'maxlength' => 11, /* 'autocomplete' => 'off' */ ),
-        'is_required' => FALSE,
-        );
-
-    foreach ($form->_paymentFields as $name => $field) {
-      if (isset($field['cc_field']) &&
-          $field['cc_field']
-         ) {
-        $form->add($field['htmlType'], $field['name'], $field['title'], $field['attributes'], $field['is_required']
-            );
-      }
-    }
-
-    CRM_Core_Region::instance('billing-block')->update('default', array('disabled' => TRUE));
-    CRM_Core_Region::instance('billing-block')->add(array('template' => 'CRM/Sepa/Mandate.tpl',
-          'weight' => -1));
   }
 }
