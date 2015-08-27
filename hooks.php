@@ -32,10 +32,8 @@ function sepa_civicrm_validateForm ( $formName, &$fields, &$files, &$form, &$err
   ) {
     // check whether this is a SDD contribution, in which case we need to build
     // the context for the mandate logic to pickup up some values
-    if (isset($fields['payment_processor_id'])) {
-      $paymentProcessorId = $fields['payment_processor_id']; /* Back-office Contribution form sets this one... */
-    } elseif (isset($fields['payment_processor'])) {
-      $paymentProcessorId = $fields['payment_processor']; /* Online Contribution Page sets that one... */
+    if (isset($form->_paymentProcessor)) {
+      $paymentProcessorId = $form->_paymentProcessor['id'];
     } else {
       return; /* "Normal" back-office Contribution not using a PP. */
     }
