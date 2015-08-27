@@ -235,9 +235,6 @@ function sepa_civicrm_buildForm ( $formName, &$form ){
              * (Many of them are mandatory, and thus really in the way when processing the submitted form.) */
             foreach ($form->_paymentFields as $fieldName => $field) {
               $form->removeElement($fieldName);
-              if ($field['htmlType'] == 'chainSelect') {
-                $form->addChainSelect($fieldName); /* Work around the "chainSelect" code not coping with a missing 'target' field... */
-              }
             }
 
             /* Fields we actually want processed and passed to the PP. */
