@@ -89,14 +89,6 @@
 </div> <!--crm-accordion-wrapper (Creditor) -->
 {/foreach}
 
-<script type="text/javascript">
-  {literal}
-    cj(function() {
-      cj().crmAccordions();
-    });
-  {/literal}
-</script>
-
 {literal}
 <script type="text/template" id="detail">
 <tr class="detail">
