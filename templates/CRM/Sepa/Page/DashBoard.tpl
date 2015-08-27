@@ -135,7 +135,7 @@
     }
     function show_contribs(data) {
       _.extend(data,$tr.data());
-      $tr.after(_.template($("#detail").html(),data));
+      $tr.after(_.template($("#detail").html(), {imports: data}));
     }
     if ($tr.hasClass('status_Pending')) {
       CRM.api(
