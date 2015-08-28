@@ -669,7 +669,11 @@ function sepa_civicrm_managed(&$entities) {
    * before we let the automatic "managed" entity handling touch them.
    *
    * This is important, as otherwise some entities might not yet be under the "managed" regime,
-   * in which case the automatic handling would create duplicates. */
+   * in which case the automatic handling would create duplicates.
+   *
+   * Note that this only pertains to the "old" upgrade mechanism for Ssepa 0.3.
+   * Further upgrades (using the new mechanism) shouldn't need such trickery,
+   * as everything should be properly "managed" by now. */
   if (!isset($GLOBALS['sepaFreshInstall'])) {
     $messages = CRM_Sepa_Upgrade::run();
     if (!empty($messages)) {
