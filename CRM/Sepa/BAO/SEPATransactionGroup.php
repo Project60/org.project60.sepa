@@ -70,17 +70,17 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
-        c.id,
+        c.id AS contribution_id,
         civicrm_contact.display_name,
         a.street_address,
         a.postal_code,
         a.city,
-        invoice_id,
-        currency,
-        total_amount,
-        receive_date,
-        contribution_recur_id,
-        contribution_status_id,
+        c.invoice_id,
+        c.currency,
+        c.total_amount,
+        c.receive_date,
+        c.contribution_recur_id,
+        c.contribution_status_id,
         mandate.*
       FROM civicrm_contribution AS c
       JOIN civicrm_sdd_contribution_txgroup AS g ON g.contribution_id=c.id
@@ -91,7 +91,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
       LEFT JOIN civicrm_address a ON c.contact_id = a.contact_id AND a.is_primary = 1
       WHERE g.txgroup_id = %1
-        AND contribution_status_id != 3
+        AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
     "; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);

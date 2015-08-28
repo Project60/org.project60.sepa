@@ -45,7 +45,7 @@
   <item>
     <path>civicrm/sepa/pmandate</path>
     <page_callback>CRM_Sepa_Page_PackageMandate</page_callback>
-    <title>Packages of mandates</title>
+    <title>Find packages</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>

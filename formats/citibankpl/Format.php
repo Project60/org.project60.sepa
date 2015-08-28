@@ -26,8 +26,6 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
 
   public function getMandatePackage($result) {
 
-      $test = ''; //todo usunąć po zakończeniu testów
-
       $template = CRM_Core_Smarty::singleton();
       $fileFormat = $this->getFileFormat(__CLASS__);
 
@@ -42,7 +40,6 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
       foreach ($result['values'][0]['api.SepaMandateFileRow.get']['values'] as $item) {
         $mandate_ids[$item['mandate_id']] = $item['mandate_id'];
       }
-      //$test .= print_r($mandate_ids, true);
 
       $mandateCounts = count($mandate_ids);
 
@@ -57,15 +54,14 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
 
       $detailsRow = array();
       $result_mandates = civicrm_api3('SepaMandate', 'get', $params);
-      //$test .= print_r($result_mandates, true);
       if (array_key_exists('values', $result_mandates) && count($result_mandates['values'] > 0)) {
           foreach ($result_mandates['values'] as $id => $item) {
               $detailsRow[] = array(
                   'reference' => $item['reference'],
                   'display_name' => $item[$apiChainContact]['values'][0]['display_name'],
                   'address' => $item[$apiChainContact]['values'][0]['street_address'], // todo poprawić, bo jest niepełny!
-                  'bank_name' => $item['bic'], // todo poprawić!?
-                  'account' => $item['bic'].'-'.$item['iban'], // todo numer rachunku w standardzie NRB poprzedzony numerem banku i myślnikiem;
+                  'bank_name' => $item['bic'], // todo poprawić!? uzyć do tego BIC Extension
+                  'account' => substr($item['iban'], 4, 8).'-'.substr($item['iban'], 2),
               );
           }
       }
@@ -81,7 +77,7 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
       $details = $template->fetch('../formats/'.$fileFormat.'/mandate-details.tpl');
       $footer = $template->fetch('../formats/'.$fileFormat.'/mandate-footer.tpl');
 
-      return $test.$header.$details.$footer;
+      return $header.$details.$footer;
 
   }
 

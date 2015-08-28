@@ -1,5 +1,6 @@
 {crmScript ext=org.project60.sepa file=js/angular/angular.min.js}
 {crmScript ext=org.project60.sepa file=js/angularControllerMandates.js}
+{crmScript ext=org.project60.sepa file=js/list.js}
 {crmStyle ext=org.project60.sepa file=css/List.css}
 
 <div ng-app="ListMandateApp">
