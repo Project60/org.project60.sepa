@@ -1,1 +1,1 @@
-"{$filename}",{$createDate},{$createTime},{$fileNumber},"Fundacja???","{$client}",
+"{$filename}",{$createDate},{$createTime},{$fileNumber},"TODO Client Name","{$creditor_identifier}",

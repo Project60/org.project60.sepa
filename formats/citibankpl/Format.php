@@ -35,6 +35,7 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
       $createTime = date("H.i.s", $createTimestamp);
       preg_match("/^([0-9]+).*/", $filename, $matches);
       $fileNumber = $matches[1];
+      $creditor_identifier = $result['values'][0]['api.SepaCreditor.get']['values'][0]['identifier'];
 
       $mandate_ids = array();
       foreach ($result['values'][0]['api.SepaMandateFileRow.get']['values'] as $item) {
@@ -52,15 +53,33 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
           ),
       );
 
+      $bic_exists = false;
+      $apiChainBic = 'api.Bic.findbyiban';
+      $query = "SELECT count(id) AS test
+              FROM civicrm_extension
+              WHERE full_name = 'org.project60.bic' AND is_active = 1";
+      $ext_test = CRM_Core_DAO::executeQuery($query);
+      $ext_test->fetch();
+      if ($ext_test->test == 1) {
+          $bic_exists = true;
+          $params[$apiChainBic] = array(
+              'iban' => '$value.iban'
+          );
+      }
+
       $detailsRow = array();
       $result_mandates = civicrm_api3('SepaMandate', 'get', $params);
       if (array_key_exists('values', $result_mandates) && count($result_mandates['values'] > 0)) {
           foreach ($result_mandates['values'] as $id => $item) {
+              $bank_name = $item['bic'];
+              if ($bic_exists && array_key_exists('title', $item[$apiChainBic]) && $item[$apiChainBic]['title'] != '') {
+                  $bank_name = $item[$apiChainBic]['title'];
+              }
               $detailsRow[] = array(
                   'reference' => $item['reference'],
                   'display_name' => $item[$apiChainContact]['values'][0]['display_name'],
                   'address' => $item[$apiChainContact]['values'][0]['street_address'], // todo poprawić, bo jest niepełny!
-                  'bank_name' => $item['bic'], // todo poprawić!? uzyć do tego BIC Extension
+                  'bank_name' => $bank_name,
                   'account' => substr($item['iban'], 4, 8).'-'.substr($item['iban'], 2),
               );
           }
@@ -69,7 +88,7 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
       $template->assign('createDate', $createDate);
       $template->assign('createTime', $createTime);
       $template->assign('fileNumber', $fileNumber);
-      $template->assign('client', self::CLIENT_SHORTCUT);
+      $template->assign('creditor_identifier', $creditor_identifier);
       $template->assign('details', $detailsRow);
       $template->assign('mandateCounts', $mandateCounts);
 
