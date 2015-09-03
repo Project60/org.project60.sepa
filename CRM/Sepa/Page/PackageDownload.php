@@ -36,8 +36,6 @@ class CRM_Sepa_Page_PackageDownload extends CRM_Core_Page {
                 ),
             );
             $result = civicrm_api3('SepaMandateFile', 'get', $params);
-            //Civi\Dev\Tools::p($result, '$result');
-            //CRM_Utils_System::civiExit();
             if ($result['count'] == 1 && $result['values'][0][$apiChainRow]['count'] > 0) {
                 $sepa_file_format_id = $result['values'][0][$apiChainCreditor]['values'][0]['sepa_file_format_id'];
                 $fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $sepa_file_format_id, 'value', 'Integer', 'name');
