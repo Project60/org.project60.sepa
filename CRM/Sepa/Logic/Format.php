@@ -2,6 +2,12 @@
 
 abstract class CRM_Sepa_Logic_Format {
 
+  /** @var string Charset used in output files. */
+  public static $out_charset = 'UTF-8';
+
+  /** @var bool Determine whether format provides creating additional packages of mandates. */
+  public static $create_package = false;
+
   /**
    * Load class based on format name.
    *

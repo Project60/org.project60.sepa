@@ -26,7 +26,7 @@ class CRM_Sepa_Form_Package extends CRM_Core_Form {
         $this->defaultCreditor = CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
 
         $result = civicrm_api3('SepaCreditor', 'get');
-        if (array_key_exists('values', $result) && count($result['values'] > 0)) {
+        if (array_key_exists('values', $result) && count($result['values']) > 0) {
             foreach ($result['values'] as $item) {
                 $this->creditors[$item['id']] = $item['name'];
                 $this->sepaFileFormats[$item['id']] = $item['sepa_file_format_id'];
@@ -79,25 +79,28 @@ class CRM_Sepa_Form_Package extends CRM_Core_Form {
         $pf = new $classFormat();
         $filename = $pf->getNewPackageFilename();
 
-        $params_row = array();
-        foreach ($ids as $id) {
-            $params_row[] = array(
-                'mandate_file_id' => '$value.id',
-                'mandate_id' => $id,
+        if ($pf::$create_package) {
+            $params_row = array();
+            foreach ($ids as $id) {
+                $params_row[] = array(
+                    'mandate_file_id' => '$value.id',
+                    'mandate_id' => $id,
+                );
+            }
+            $params = array(
+                'creditor_id' => $creditor_id,
+                'contact_id' => $contact_id,
+                'filename' => $filename,
+                'create_date' => date('Y-m-d H:i:s'),
+                'api.SepaMandateFileRow.create' => $params_row,
             );
+            $result = civicrm_api3('SepaMandateFile', 'create', $params);
+            $this->assign('result', $result);
+            $this->assign('filename', $filename);
+            $this->assign('filelink', CRM_Utils_System::url('civicrm/sepa/dpackage', "pid=".$result['id']));
         }
-        $params = array(
-            'creditor_id' => $creditor_id,
-            'contact_id' => $contact_id,
-            'filename' => $filename,
-            'create_date' => date('Y-m-d H:i:s'),
-            'api.SepaMandateFileRow.create' => $params_row,
-        );
-        $result = civicrm_api3('SepaMandateFile', 'create', $params);
 
-        $this->assign('result', $result);
-        $this->assign('filename', $filename);
-        $this->assign('filelink', CRM_Utils_System::url('civicrm/sepa/dpackage', "pid=".$result['id']));
+        $this->assign('create_package', $pf::$create_package);
         $this->assign('processState', 'post');
     }
 }

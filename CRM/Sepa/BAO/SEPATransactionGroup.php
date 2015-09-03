@@ -130,7 +130,17 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("total",$this->total );
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
-    return $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl');
+
+    CRM_Sepa_Logic_Format::loadFormatClass($this->fileFormat);
+    $format_class = 'CRM_Sepa_Logic_Format_'.$this->fileFormat;
+    $format = new $format_class();
+    if ($format::$out_charset != 'UTF-8') {
+      $output = iconv('UTF-8', $format::$out_charset, $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl'));
+    } else {
+      $output = $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl');
+    }
+    return $output;
+
   }
 
 

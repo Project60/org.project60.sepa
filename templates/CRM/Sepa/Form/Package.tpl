@@ -22,13 +22,17 @@
             {/if}
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
         {elseif $processState eq 'post'}
-            {if $result.is_error eq 0}
-                <p>
-                    {ts}New package was created with name <strong>{$filename}</strong>.{/ts}<br>
-                    <a href="{$filelink}" download="{$filename}" class="button">Download {$filename}</a>
-                </p>
+            {if $create_package eq true}
+                {if $result.is_error eq 0}
+                    <p>
+                        {ts}New package was created with name <strong>{$filename}</strong>.{/ts}<br>
+                        <a href="{$filelink}" download="{$filename}" class="button">Download {$filename}</a>
+                    </p>
+                {else}
+                    <p>{ts}Error occured! New package did not created.{/ts}</p>
+                {/if}
             {else}
-                <p>{ts}Error occured! New package did not created.{/ts}</p>
+                <p>{ts}Package did not create! The format does not provide creating packages of mandates.{/ts}</p>
             {/if}
         {/if}
     </div>

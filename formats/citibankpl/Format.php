@@ -8,6 +8,10 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
   /** Client shortcut given by creditor */
   const CLIENT_SHORTCUT = 'CLNT';
 
+  public static $out_charset = 'CP852';
+
+  public static $create_package = true;
+
   public function getDDFilePrefix() {
     return 'CITIBANK-';
   }
@@ -69,7 +73,7 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
 
       $detailsRow = array();
       $result_mandates = civicrm_api3('SepaMandate', 'get', $params);
-      if (array_key_exists('values', $result_mandates) && count($result_mandates['values'] > 0)) {
+      if (array_key_exists('values', $result_mandates) && count($result_mandates['values']) > 0) {
           foreach ($result_mandates['values'] as $id => $item) {
               $bank_name = $item['bic'];
               if ($bic_exists && array_key_exists('title', $item[$apiChainBic]) && $item[$apiChainBic]['title'] != '') {
@@ -78,7 +82,7 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
               $detailsRow[] = array(
                   'reference' => $item['reference'],
                   'display_name' => $item[$apiChainContact]['values'][0]['display_name'],
-                  'address' => $item[$apiChainContact]['values'][0]['street_address'], // todo poprawić, bo jest niepełny!
+                  'address' => $item[$apiChainContact]['values'][0]['street_address'].', '.$item[$apiChainContact]['values'][0]['postal_code'].' '.$item[$apiChainContact]['values'][0]['city'],
                   'bank_name' => $bank_name,
                   'account' => substr($item['iban'], 4, 8).'-'.substr($item['iban'], 2),
               );
@@ -96,7 +100,7 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
       $details = $template->fetch('../formats/'.$fileFormat.'/mandate-details.tpl');
       $footer = $template->fetch('../formats/'.$fileFormat.'/mandate-footer.tpl');
 
-      return $header.$details.$footer;
+      return iconv('UTF-8', self::$out_charset, $header.$details.$footer);
 
   }
 
