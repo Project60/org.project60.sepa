@@ -95,7 +95,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       	$create_contribution['payment_instrument_id'] = 
       		(int) CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name');
       	if (empty($create_contribution['status'])) 
-      		$create_contribution['status'] = 'INIT'; // set default status
+      		$create_contribution['status'] = 'OOFF'; // set default status
       	if (empty($create_contribution['total_amount'])) 
       		$create_contribution['total_amount'] = $create_contribution['amount']; // copy from amount
 
