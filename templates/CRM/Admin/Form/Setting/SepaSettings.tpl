@@ -310,7 +310,7 @@
           var ret = [];
           if (result.values) {
             cj.each(result.values, function(k, v) {
-              ret.push({value: v.contact_id, label: v.display_name});
+              ret.push({value: v.contact_id, label: "[" + v.contact_id + "] " + v.display_name});
             })
           }
           response(ret);
@@ -418,7 +418,7 @@
           CRM.api('Contact', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': data['creditor_id']}, 
             {success: function(data2) {
                 if (data2['is_error'] == 0) {
-                  cj('#addcreditor_creditor_id').val(data2['display_name']);
+                  cj('#addcreditor_creditor_id').val("[" + data2['id'] + "] " + data2['display_name']);
                 }
             }
           });
