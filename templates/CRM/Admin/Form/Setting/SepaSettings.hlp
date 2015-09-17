@@ -94,3 +94,10 @@
     <p>{ts}Be aware that an active <code>defer_collection_date</code> hook can further defer the collection date.{/ts}</p>
     <p>{ts}Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook.{/ts}</p> 
 {/htxt}
+
+{htxt id='id-hide-bic'}
+    <p>{ts}Currently this SDD extension requires not only the IBAN but also the BIC (bank code).{/ts}</p>
+    <p>{ts}If you have the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> installed, the BIC can be derived automatically from the IBAN in most cases.{/ts}</p>
+    <p>{ts}If you enable this option, the BIC will be hidden unless this lookup fails. Then the donor would be required to enter the BIC after all.{/ts}</p>
+    <p>{ts}REMARK: This option only has an effect, if the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> is installed.{/ts}</p> 
+{/htxt}

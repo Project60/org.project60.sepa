@@ -176,7 +176,7 @@
   <div>
   <br/><br/><br/><br/>
     <fieldset>
-        <h2>Default Batching Settings</h2>
+        <h2>{ts}Default Batching Settings{/ts}</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-cycle-days">
               <td class="label">{$form.cycledays.label} <a onclick='CRM.help("{ts}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
@@ -221,7 +221,7 @@
               </td>
             </tr>
        </table>
-       <h2>System Settings</h2>
+       <h2>{ts}System Settings{/ts}</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-batching_default_creditor">
               <td class="label">{$form.batching_default_creditor.label} <a onclick='CRM.help("{ts}Default Creditor{/ts}", {literal}{"id":"id-defaultcreditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td>
@@ -251,6 +251,15 @@
               <td class="label">{$form.exclude_weekends.label} <a onclick='CRM.help("{ts}Exclude Weekends{/ts}", {literal}{"id":"id-exclude-weekends","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
               <td>
                 {$form.exclude_weekends.html}
+              </td>
+            </tr>
+       </table>
+       <h2>{ts}Payment Processor Settings{/ts}</h2>
+        <table class="form-layout">
+            <tr class="crm-pp-form-block-hide-bic">
+              <td class="label">{$form.pp_hide_bic.label} <a onclick='CRM.help("{ts}Hide BIC{/ts}", {literal}{"id":"id-hide-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td></td></td></td></td>
+              <td>
+                {$form.pp_hide_bic.html}
               </td>
             </tr>
        </table>
