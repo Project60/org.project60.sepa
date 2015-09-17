@@ -261,7 +261,7 @@ return array(
     'is_contact' => 0,
     'description' => 'Exclude weekends',
     'help_text' => 'Exclude weekends',
-  )
+  ),
   'pp_hide_bic' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
