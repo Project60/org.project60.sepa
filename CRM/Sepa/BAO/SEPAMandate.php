@@ -506,6 +506,39 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $lock->release();
     return TRUE;    
   }
+
+  /**
+   * Method returns number of mandates which are not packaged into file for creditor.
+   * @return int
+   */
+  static function countNotPackaged() {
+    $query = "
+      SELECT COUNT(m.id) AS count_not_packaged
+      FROM civicrm_sdd_mandate m
+        LEFT JOIN civicrm_sdd_mandate_file_row mfr ON m.id = mfr.mandate_id
+      WHERE mfr.mandate_id IS NULL";
+    $sql = CRM_Core_DAO::executeQuery($query);
+    $sql->fetch();
+    return (int)$sql->count_not_packaged;
+  }
+
+
+  /**
+   * Method returns id of mandates which are not packaged into file for creditor.
+   * @return array
+   */
+  static function getNotPackaged() {
+    $ids = array();
+    $query = "
+      SELECT m.id
+      FROM civicrm_sdd_mandate m
+        LEFT JOIN civicrm_sdd_mandate_file_row mfr ON m.id = mfr.mandate_id
+      WHERE mfr.mandate_id IS NULL";
+    $sql = CRM_Core_DAO::executeQuery($query);
+    while ($sql->fetch()) {
+      $ids[$sql->id] = $sql->id;
+    }
+    return $ids;
+  }
+
 }
-
-

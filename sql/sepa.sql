@@ -140,4 +140,34 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_contribution_txgroup` (
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate_file` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `creditor_id` int(10) unsigned NOT NULL,
+  `contact_id` int(10) unsigned NOT NULL,
+  `filename` varchar(255) NOT NULL COMMENT 'Filename generated for creditor',
+  `create_date` datetime NOT NULL,
+  `submission_date` datetime DEFAULT NULL,
+  `status` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_civicrm_sdd_mandate__civicrm_contact1_idx` (`contact_id`),
+  KEY `fk_civicrm_sdd_mandate__civicrm_sdd_creditor1_idx` (`creditor_id`),
+  CONSTRAINT `fk_civicrm_sdd_mandate_file_civicrm_contact` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_civicrm_sdd_mandate_file_civicrm_sdd_creditor` FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_sdd_creditor` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate_file_row` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `mandate_file_id` int(10) unsigned NOT NULL,
+  `mandate_id` int(10) unsigned NOT NULL,
+  `response_date` datetime DEFAULT NULL COMMENT 'DateTime when creditor responsed to uploaded file with mandates.',
+  `response_filename` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Filename from creditor',
+  `response_status` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Status response',
+  `response_comment` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Optional response comment',
+  PRIMARY KEY (`id`),
+  KEY `fk_civicrm_sdd_mandate_group_civicrm_sdd_mandate1_idx` (`mandate_id`),
+  KEY `fk_civicrm_sdd_mandate_file_civicrm_sdd_mandate_1_idx` (`mandate_file_id`),
+  CONSTRAINT `fk_civicrm_sdd_mandate_file_row_civicrm_sdd_mandate` FOREIGN KEY (`mandate_id`) REFERENCES `civicrm_sdd_mandate` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_civicrm_sdd_mandate_file_row_civicrm_sdd_mandate_file` FOREIGN KEY (`mandate_file_id`) REFERENCES `civicrm_sdd_mandate_file` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 

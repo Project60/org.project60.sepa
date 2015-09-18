@@ -174,6 +174,8 @@ $dao['EventInCart'] = 'CRM_Event_Cart_DAO_EventInCart';
 $dao['PledgePayment'] = 'CRM_Pledge_DAO_PledgePayment';
 
 $dao['SepaMandate'] = 'CRM_Sepa_DAO_SEPAMandate';
+$dao['SepaMandateFile'] = 'CRM_Sepa_DAO_SEPAMandateFile';
+$dao['SepaMandateFileRow'] = 'CRM_Sepa_DAO_SEPAMandateFileRow';
 $dao['SepaCreditor'] = 'CRM_Sepa_DAO_SEPACreditor';
 $dao['SepaSddFile'] = 'CRM_Sepa_DAO_SEPASddFile';
 $dao['SepaTransactionGroup'] = 'CRM_Sepa_DAO_SEPATransactionGroup';
