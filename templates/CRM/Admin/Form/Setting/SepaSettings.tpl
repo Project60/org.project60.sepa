@@ -480,9 +480,8 @@
       return;
     }
 
-    var reIBAN = /^[A-Z0-9]+$/;
-    if(!reIBAN.test(updatedCreditorInfo['iban'])) {
-      CRM.alert("{/literal}{ts}IBAN is not correct{/ts}", "{ts}Error{/ts}{literal}", "error");
+    if(!IBAN.isValid(updatedCreditorInfo['iban'])) {
+      CRM.alert("{/literal}{ts}IBAN \"" + updatedCreditorInfo['iban'] + "\" is invalid{/ts}", "{ts}Error{/ts}{literal}", "error");
       return;
     }
 

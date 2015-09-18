@@ -45,6 +45,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('custom_RCUR_notice',     ts('RCUR notice days')),
                          array('custom_FRST_notice',     ts('FRST notice days')),
                          array('custom_update_lock_timeout', ts('Update lock timeout')));
+       CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'packages/iban.js/iban.js');
     }
 
     function domainToString($raw) {
