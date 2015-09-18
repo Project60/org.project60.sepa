@@ -83,12 +83,12 @@ tr:nth-child(odd) {
     padding-top:5px;
 }
 
-#bGetMandates {
+#bGetList {
     display: block;
 }
 
-#ListMandateCtrl {
-    position: relative;;
+#ListCtrl {
+    position: relative;
 }
 
 #loadingHeader {

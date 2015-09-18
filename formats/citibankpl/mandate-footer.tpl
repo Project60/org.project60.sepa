@@ -1,2 +1,1 @@
-{* TODO mandate-footer *}
-mandate-footer
+{$mandateCounts}

@@ -67,7 +67,7 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     if (count(array_unique($fileFormats)) > 1) {
       throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
     } else {
-      $fileFormatName = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat(reset($fileFormats));
+      $fileFormatName = CRM_Sepa_Logic_Format::sanitizeFileFormat(reset($fileFormats));
     }
     $template->assign("file",$this->toArray());
     $template->assign("total",$total );

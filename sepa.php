@@ -408,6 +408,16 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
       'table' => 'civicrm_sepa_mandate',
   );
   $entityTypes[] = array(
+      'name' => 'SepaMandateFile',
+      'class' => 'CRM_Sepa_DAO_SEPAMandateFile',
+      'table' => 'civicrm_sepa_mandate_file',
+  );
+  $entityTypes[] = array(
+      'name' => 'SepaMandateFileRow',
+      'class' => 'CRM_Sepa_DAO_SEPAMandateFileRow',
+      'table' => 'civicrm_sepa_mandate_file_row',
+  );
+  $entityTypes[] = array(
       'name' => 'SepaCreditor',
       'class' => 'CRM_Sepa_DAO_SEPACreditor',
       'table' => 'civicrm_sepa_creditor',
@@ -468,9 +478,35 @@ function sepa_civicrm_navigationMenu(&$params) {
     CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$contributions_menu_id], $sepa_dashboard_menu);
     // add sepa mandates menu entry
     $sepa_mandate_menu = array (
-        'label' => ts('CiviSEPA Mandates', array('domain' => 'org.project60.sepa')),
+        'label' => ts('Find Mandates', array('domain' => 'org.project60.sepa')),
         'name' => 'Dashboard',
         'url' => 'civicrm/sepa/lmandate',
+        'permission' => 'administer CiviCRM',
+        'operator' => NULL,
+        'separator' => 0,
+        'parentID' => $contributions_menu_id,
+        'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
+        'active' => 1
+    );
+    CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$contributions_menu_id], $sepa_mandate_menu);
+    // add sepa mandates menu entry
+    $sepa_mandate_menu = array (
+      'label' => ts('New Package', array('domain' => 'org.project60.sepa')),
+      'name' => 'Packages',
+      'url' => 'civicrm/sepa/package',
+      'permission' => 'administer CiviCRM',
+      'operator' => NULL,
+      'separator' => 0,
+      'parentID' => $contributions_menu_id,
+      'navID' => CRM_Utils_SepaMenuTools::createUniqueNavID($params),
+      'active' => 1
+    );
+    CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$contributions_menu_id], $sepa_mandate_menu);
+    // add sepa mandates menu entry
+    $sepa_mandate_menu = array (
+        'label' => ts('Find Packages', array('domain' => 'org.project60.sepa')),
+        'name' => 'Packages',
+        'url' => 'civicrm/sepa/pmandate',
         'permission' => 'administer CiviCRM',
         'operator' => NULL,
         'separator' => 0,

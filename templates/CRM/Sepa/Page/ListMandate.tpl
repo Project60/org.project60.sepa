@@ -1,10 +1,10 @@
 {crmScript ext=org.project60.sepa file=js/angular/angular.min.js}
-{crmScript ext=org.project60.sepa file=js/ListMandate.js}
-{crmScript ext=org.project60.sepa file=js/angularController.js}
-{crmStyle ext=org.project60.sepa file=css/ListMandate.css}
+{crmScript ext=org.project60.sepa file=js/angularControllerMandates.js}
+{crmScript ext=org.project60.sepa file=js/list.js}
+{crmStyle ext=org.project60.sepa file=css/List.css}
 
 <div ng-app="ListMandateApp">
-    <div ng-controller="ListMandateCtrl" id="ListMandateCtrl">
+    <div ng-controller="ListMandateCtrl" id="ListCtrl">
         <div class="searchFields">
             <div id='divSelectGroup' class="queryField">
                 <label for="thisStatus" class="calloutRow">{ts}Status{/ts}</label>
@@ -21,7 +21,7 @@
                     <option value="COMPLETE">COMPLETE</option>
                 </select>
             </div>
-            <button id='bGetMandates' class='button' type='button' ng-click='getMandates()'>
+            <button id='bGetList' class='button' type='button' ng-click='getList()'>
                 {ts}Find{/ts}
             </button>
         </div>
