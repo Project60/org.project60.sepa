@@ -18,14 +18,14 @@
 {capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
 
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
-<div class="crm-section {$form.cycle_day.name}-section" hidden="1">
+<div id="sdd-cycle-day-section" class="crm-section {$form.cycle_day.name}-section">
 	<div class="label">{$form.cycle_day.label}</div>
 	<div class="content">{$form.cycle_day.html}</div>
 	<div class="clear"></div>
 </div>
 
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
-<div class="crm-section {$form.start_date.name}-section" hidden="1">
+<div id="sdd-start-date-section" class="crm-section {$form.start_date.name}-section">
 	<div class="label">{$form.start_date.label}</div>
 	<div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
 	<div class="clear"></div>
@@ -35,7 +35,7 @@
 <!-- TWEAK THE FORM: -->
 
 <!-- create a better dropdown for intervals -->
-<select class="form-select" id="frequency_combined" onChange="sepa_copy_combined()" disabled="disabled" hidden="1">
+<select id="frequency_combined" class="form-select" onChange="sepa_copy_combined()" disabled="disabled">
 	<option value="1">{ts}monthly{/ts}</option>
 	<option value="3">{ts}quarterly{/ts}</option>
 	<option value="6">{ts}semi-annually{/ts}</option>
@@ -43,7 +43,7 @@
 </select>
 
 <!-- Additional Elements -->
-<span id="currency_indicator" hidden="1"><b>EUR</b></span>
+<span id="currency_indicator"><b>EUR</b></span>
 
 <!-- JS Disclaimer -->
 <noscript>
@@ -56,11 +56,16 @@
 // translated captions
 var label_months = "{ts}monthly{/ts}";
 var label_years = "{ts}yearly{/ts}";
-var earliest_ooff_date = new Date({$earliest_ooff_date[0]}, {$earliest_ooff_date[1]} - 1, {$earliest_ooff_date[2]});
-var earliest_rcur_date = new Date({$earliest_rcur_date[0]}, {$earliest_rcur_date[1]} - 1, {$earliest_rcur_date[2]});
+var earliest_ooff_date = new Date(parseInt({$earliest_ooff_date[0]}, 10), parseInt({$earliest_ooff_date[1]}, 10) - 1, parseInt({$earliest_ooff_date[2]}, 10));
+var earliest_rcur_date = new Date(parseInt({$earliest_rcur_date[0]}, 10), parseInt({$earliest_rcur_date[1]}, 10) - 1, parseInt({$earliest_rcur_date[2]}, 10));
 var currently_set_date = new Date("{$form.start_date.value}");
 
 {literal}
+// now, hide all the elements that should not show
+cj("#sdd-cycle-day-section").hide();
+cj("#sdd-start-date-section").hide();
+cj("#frequency_combined").hide();
+cj("#currency_indicator").hide();
 
 if (cj("#frequency_interval").length) {
 	// this is an custom interval page -> replace dropdown altogether
@@ -69,8 +74,9 @@ if (cj("#frequency_interval").length) {
 	cj("#frequency_combined").show();
 	cj("#frequency_combined").insertBefore(cj("#frequency_interval"));
 
-} else {
+} else if (cj("#frequency_unit").length) {
 	// this is a period only page, just update the labels
+	cj("#frequency_combined").remove(); // not needed
 	var options = cj("#frequency_unit > option");
 	for (var i = 0; i < options.length; i++) {
 		var option = cj(options[i]);
@@ -83,6 +89,9 @@ if (cj("#frequency_interval").length) {
 			option.remove();
 		}
 	}
+} else {
+	// this contribution page does NOT feature recurring contributions
+	cj("#frequency_combined").remove();
 }
 
 // fix invertal label
@@ -180,8 +189,8 @@ var sepa_lookup_bic_error_message = "{ts}Bank unknown, please enter BIC.{/ts}";
 {literal}
 
 cj(function() {
-	cj("#bank_account_number").parent().append('&nbsp;<img id="bic_busy" height="12" src="' + busy_icon_url + '" hidden="1"/>');
-
+	cj("#bank_account_number").parent().append('&nbsp;<img id="bic_busy" height="12" src="' + busy_icon_url + '"/>');
+	cj("#bic_busy").hide();
 	// call it once
 	sepa_lookup_bic();
 });
