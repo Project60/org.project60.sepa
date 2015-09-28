@@ -303,7 +303,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       }
     }
 
-    $this->assign('mandate_type', isset($_REQUEST['mandate_type']) ? $_REQUEST['mandate_type'] : 'RCUR');
+    // FIXME: Create "default" setting for mandate type (see SEPA-332)
+    //$this->assign('mandate_type', isset($_REQUEST['mandate_type']) ? $_REQUEST['mandate_type'] : 'RCUR');
   }
 
 
