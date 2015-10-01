@@ -116,12 +116,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // do not use array_merge() because it discards the original indizes
         $country_ids = array('' => ts('- select -')) + $filtered;
 
-        $exw = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
-        if($exw){
-          $exw = array('checked' => 'checked');
-        }else{
-          $exw = array();
-        }
+        // look up some values
+        $excld_we = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
+        $hide_bic = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_bic');
 
         // add creditor form elements
         $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact"));
@@ -133,9 +130,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_iban',         ts("IBAN"));
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor"), "", array('value' =>'0'));
-        $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends"), "", $exw);
-        $this->addElement('hidden',     'edit_creditor_id', '', array('id' => 'edit_creditor_id'));
-        $this->addElement('hidden',     'add_creditor_id', '', array('id' => 'add_creditor_id'));
+        $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends"), "", ($excld_we?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'pp_hide_bic',              ts("Hide BIC in PP"),   "", ($hide_bic?array('checked'=>'checked'):array()));
+        $this->addElement('hidden',     'edit_creditor_id',         '', array('id' => 'edit_creditor_id'));
+        $this->addElement('hidden',     'add_creditor_id',          '', array('id' => 'add_creditor_id'));
 
         // add custom form elements and validation rules
         $index = 0;
@@ -198,6 +196,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         CRM_Core_BAO_Setting::setItem($allow_mandate_modification, 'SEPA Direct Debit Preferences', 'allow_mandate_modification');
 
         CRM_Core_BAO_Setting::setItem((isset($values['exclude_weekends']) ? "1" : "0"), 'SEPA Direct Debit Preferences', 'exclude_weekends');
+        CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_bic'])      ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_bic');
 
         $session = CRM_Core_Session::singleton();
         $session->setStatus(ts("Settings successfully saved"));

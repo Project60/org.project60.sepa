@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: CiviSEPA\n"
-"POT-Creation-Date: 2015-07-24 08:49+0200\n"
+"POT-Creation-Date: 2015-09-17 11:09+0200\n"
 "Language-Team: CiviCRM Translators <civicrm-translators@lists.civicrm.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -121,6 +121,10 @@ msgstr ""
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Exclude Weekends"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Hide BIC in PP"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
@@ -995,6 +999,31 @@ msgid ""
 "have to implement that hook."
 msgstr ""
 
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"Currently this SDD extension requires not only the IBAN but also the BIC "
+"(bank code)."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"If you have the <a href=\"https://github.com/Project60/org.project60.bic"
+"\">Little BIC Extension</a> installed, the BIC can be derived automatically "
+"from the IBAN in most cases."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"If you enable this option, the BIC will be hidden unless this lookup fails. "
+"Then the donor would be required to enter the BIC after all."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"REMARK: This option only has an effect, if the <a href=\"https://github.com/"
+"Project60/org.project60.bic\">Little BIC Extension</a> is installed."
+msgstr ""
+
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Actions"
 msgstr ""
@@ -1063,6 +1092,22 @@ msgstr ""
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Default Batching Settings"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "System Settings"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Payment Processor Settings"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Hide BIC"
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -1357,6 +1402,10 @@ msgstr ""
 
 #: templates/CRM/Core/Payment/SEPA/SDD.tpl
 msgid "yearly"
+msgstr ""
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "Bank unknown, please enter BIC."
 msgstr ""
 
 #: templates/CRM/Sepa/Form/SepaMandate.tpl

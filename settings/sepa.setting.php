@@ -261,5 +261,18 @@ return array(
     'is_contact' => 0,
     'description' => 'Exclude weekends',
     'help_text' => 'Exclude weekends',
+  ),
+  'pp_hide_bic' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'pp_hide_bic',
+    'type' => 'Integer',
+    'html_type' => 'Select',
+    'default' => 0,
+    'add' => '4.3',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Hide BIC in payment processor form if possible',
+    'help_text' => 'Requires Little BIC Extension to be installed',
   )
  );

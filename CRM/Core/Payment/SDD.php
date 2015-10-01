@@ -120,6 +120,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $form->assign('earliest_rcur_date', $earliest_rcur_date);
     $form->assign('earliest_ooff_date', $earliest_ooff_date);
 
+    $form->assign('sepa_hide_bic', CRM_Sepa_Logic_Settings::getSetting("pp_hide_bic"));
+
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
   }

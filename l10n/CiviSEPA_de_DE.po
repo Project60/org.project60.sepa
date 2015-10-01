@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2015-07-24 08:49+0200\n"
+"POT-Creation-Date: 2015-09-17 11:09+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -123,6 +123,10 @@ msgstr "ist Test-Gläubiger"
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Exclude Weekends"
 msgstr "Wochenenden ausschließen"
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Hide BIC in PP"
+msgstr "BIC Verstecken"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Please give a comma separated list of valid days."
@@ -924,6 +928,22 @@ msgstr "Beachten Sie, dass ein aktiver <code>defer_collection_date</code> Hook d
 msgid "Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook."
 msgstr "Fall Sie kompliziertere Regeln für Banktage bzw. erlaubte Einzugstage haben, werden Sie diesen Hook implementieren (lassen) müssen."
 
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "Currently this SDD extension requires not only the IBAN but also the BIC (bank code)."
+msgstr "Derzeit benötigt die SDD Extension nicht nur die IBAN sondern auch die BIC (Bank-Code)."
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "If you have the <a href=\"https://github.com/Project60/org.project60.bic\">Little BIC Extension</a> installed, the BIC can be derived automatically from the IBAN in most cases."
+msgstr "Wenn Sie die <a href=\"https://github.com/Project60/org.project60.bic\">Little BIC Extension</a> installiert haben, kann die BIC automatisch anhand der IBAN ermittelt werden."
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "If you enable this option, the BIC will be hidden unless this lookup fails. Then the donor would be required to enter the BIC after all."
+msgstr "Wenn Sie diese Option aktivieren, wird das Feld für die BIC im Formular versteckt. Falls das automatische Ermitteln der BIC fehlschlägt, wird das Feld wieder angezeigt und der Spender müsste die BIC dennoch manuell eingeben."
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "REMARK: This option only has an effect, if the <a href=\"https://github.com/Project60/org.project60.bic\">Little BIC Extension</a> is installed."
+msgstr "ANMERKUNG: Dies funktioniert nur, falls die <a href=\"https://github.com/Project60/org.project60.bic\">Little BIC Extension</a> installiert ist."
+
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Actions"
 msgstr "Aktionen"
@@ -993,6 +1013,22 @@ msgstr "Speichern"
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel"
 msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Default Batching Settings"
+msgstr "Standardeinstellungen Gruppierung"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "System Settings"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Payment Processor Settings"
+msgstr "Einstellungen Zahlungsprozessor"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Hide BIC"
+msgstr "BIC Verstecken"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Creditor deleted"
@@ -1285,6 +1321,10 @@ msgstr "DIESE SEITE FUNKTIONIERT NICHT ZUVERLÄSSIG OHNE JAVASCRIPT. BITTE AKTIV
 #: templates/CRM/Core/Payment/SEPA/SDD.tpl
 msgid "yearly"
 msgstr "jährlich"
+
+#: templates/CRM/Core/Payment/SEPA/SDD.tpl
+msgid "Bank unknown, please enter BIC."
+msgstr "Bank konnte nicht identifiziert werden, bitte BIC eingeben."
 
 #: templates/CRM/Sepa/Form/SepaMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
@@ -1969,9 +2009,6 @@ msgstr ""
 
 #~ msgid "invalid IBAN"
 #~ msgstr "unzulässige IBAN"
-
-#~ msgid "invalid BIC"
-#~ msgstr "unzulässige BIC"
 
 #~ msgid "%1 is a required field."
 #~ msgstr "%1 ist ein Pflichtfeld"
