@@ -253,9 +253,7 @@ function sepa_lookup_bic() {
 }
 
 // initially hide the bic (if hiding enabled)
-cj(function() {
- sepa_show_bic();
-});
+sepa_show_bic();
 {/literal}
 </script>
 {/if}
