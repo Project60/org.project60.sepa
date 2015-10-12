@@ -25,6 +25,7 @@
  * This function will close a transaction group,
  * and perform the necessary logical changes to the mandates contained
  */
+
 function civicrm_api3_sepa_alternative_batching_close($params) {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
@@ -129,9 +130,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
   } else {
     $creditors = array();
     foreach ($creditor_query['values'] as $creditor) {
-      if ($creditor['mandate_active']) {
         $creditors[] = $creditor['id'];
-      }
     }
   }
 
