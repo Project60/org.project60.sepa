@@ -17,6 +17,9 @@
 /**
  * back office mandate manipulation form
  *
+ * @todo this implementation should use the CiviCRM Form pattern 
+ *        and should be refactored
+ *
  * @package CiviCRM_SEPA
  *
  */
