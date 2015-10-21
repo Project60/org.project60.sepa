@@ -17,6 +17,9 @@
 /**
  * back office mandate creation form
  *
+ * @todo this implementation should use the CiviCRM Form pattern 
+ *        and should be refactored
+ *
  * @package CiviCRM_SEPA
  *
  */
@@ -177,9 +180,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       CRM_Sepa_BAO_SEPAMandate::terminateMandate($_REQUEST['replace'], $_REQUEST['replace_date'], $_REQUEST['replace_reason']);
     }
 
-    // extract the reference id from the create mandate reply
-    $this->assign("reference", $mandate['values'][$mandate['id']]['reference']);
-    $this->assign("mandate_url", CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}"));
+    // if we get here, everything went o.k.
+    $reference   = $mandate['values'][$mandate['id']]['reference'];
+    $mandate_url = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}");
+    CRM_Core_Session::setStatus(ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", array(1 => $reference, 2 => $mandate_url, 3 => $type)), ts("Success"), 'info');
+
+    // go back to the contact's contributions
+    $contact_url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contribution_data['contact_id']}&selectedChild=contribute");
+    CRM_Utils_System::redirect($contact_url);
   }
 
 
