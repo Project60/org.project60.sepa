@@ -342,7 +342,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign('bic', $mandate['bic']);
     $this->assign('financial_type_id', $contribution['financial_type_id']);
     $this->assign('mandate_type', $mandate['type']);
-    $this->assign('source', $mandate['source']);
+    $this->assign('source', CRM_Utils_Array::value('source', $mandate));
     $this->assign('creditor_id', $mandate['creditor_id']);
     if (isset($contribution['campaign_id'])) $this->assign('campaign_id', $contribution['campaign_id']);
     if (isset($contribution['contribution_campaign_id'])) $this->assign('campaign_id', $contribution['contribution_campaign_id']);
