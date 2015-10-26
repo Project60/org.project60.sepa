@@ -26,25 +26,25 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
        parent::__construct();
 
        $this->config_fields = array(
-                         array('cycledays',             ts('Cycle Day(s)')),
-                         array('batching.OOFF.horizon',  ts('OOFF horizon')),
-                         array('batching.OOFF.notice',   ts('OOFF notice days')),
-                         array('batching.RCUR.horizon',  ts('RCUR horizon')),
-                         array('batching.RCUR.grace',    ts('RCUR grace')),
-                         array('batching.RCUR.notice',   ts('RCUR notice days')),
-                         array('batching.FRST.notice',   ts('FRST notice days')),
-                         array('batching.UPDATE.lock.timeout', ts('Update lock timeout')),
-                         array('custom_txmsg', ts('Transaction Message'), array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'custom_txmsg'))));
+                         array('cycledays',             ts('Cycle Day(s)'), array('size' => 6)),
+                         array('batching.OOFF.horizon',  ts('One-off horizon'), array('size' => 2)),
+                         array('batching.OOFF.notice',   ts('One-off&nbsp;notice&nbsp;days'), array('size' => 2)),
+                         array('batching.RCUR.horizon',  ts('Recurring horizon'), array('size' => 2)),
+                         array('batching.RCUR.grace',    ts('Recurring grace'), array('size' => 2)),
+                         array('batching.RCUR.notice',   ts('Recurring&nbsp;notice&nbsp;days (follow-up)'), array('size' => 2)),
+                         array('batching.FRST.notice',   ts('Recurring&nbsp;notice&nbsp;days (initial)'), array('size' => 2)),
+                         array('batching.UPDATE.lock.timeout', ts('Update lock timeout'), array('size' => 2)),
+                         array('custom_txmsg', ts('Transaction Message'), array('size' => 60, 'placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'custom_txmsg'))));
 
       $this->custom_fields = array(
-                         array('custom_cycledays',      ts('Cycle Day(s)')),
-                         array('custom_OOFF_horizon',    ts('OOFF horizon')),
-                         array('custom_OOFF_notice',     ts('OOFF notice days')),
-                         array('custom_RCUR_horizon',    ts('RCUR horizon')),
-                         array('custom_RCUR_grace',      ts('RCUR grace')),
-                         array('custom_RCUR_notice',     ts('RCUR notice days')),
-                         array('custom_FRST_notice',     ts('FRST notice days')),
-                         array('custom_update_lock_timeout', ts('Update lock timeout')));
+                         array('custom_cycledays',      ts('Cycle Day(s)'), array('size' => 6)),
+                         array('custom_OOFF_horizon',    ts('One-off horizon'), array('size' => 2)),
+                         array('custom_OOFF_notice',     ts('One-off&nbsp;notice&nbsp;days'), array('size' => 2)),
+                         array('custom_RCUR_horizon',    ts('Recurring horizon'), array('size' => 2)),
+                         array('custom_RCUR_grace',      ts('Recurring grace'), array('size' => 2)),
+                         array('custom_RCUR_notice',     ts('Recurring&nbsp;notice&nbsp;days (follow-up)'), array('size' => 2)),
+                         array('custom_FRST_notice',     ts('Recurring&nbsp;notice&nbsp;days (initial)'), array('size' => 2)),
+                         array('custom_update_lock_timeout', ts('Update lock timeout'), array('size' => 2)));
     }
 
     function domainToString($raw) {
@@ -124,10 +124,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact"));
         $this->addElement('text',       'addcreditor_name',         ts("Name"));
         $this->addElement('text',       'addcreditor_id',           ts("Identifier"));
-        $this->addElement('text',       'addcreditor_address',      ts("Address"));
+        $this->addElement('text',       'addcreditor_address',      ts("Address"), array('size' => 60));
         $this->addElement('select',     'addcreditor_country_id',   ts("Country"), $country_ids);
         $this->addElement('text',       'addcreditor_bic',          ts("BIC"));
-        $this->addElement('text',       'addcreditor_iban',         ts("IBAN"));
+        $this->addElement('text',       'addcreditor_iban',         ts("IBAN"), array('size' => 30));
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor"), "", array('value' =>'0'));
         $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends"), "", ($excld_we?array('checked'=>'checked'):array()));
@@ -138,7 +138,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add custom form elements and validation rules
         $index = 0;
         foreach ($this->custom_fields as $key => $value) {
-            $this->addElement('text', $this->domainToString($value[0]), $value[1], array('placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]))));
+            if (isset($value[2])) {
+              $properties = $value[2];
+            } else {
+              $properties = array();
+            }
+            $properties['placeholder'] = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]));
+            $this->addElement('text', $this->domainToString($value[0]), $value[1], $properties);
             $elementName = $this->domainToString($value[0]);
             if (!in_array($elementName, array('custom_cycledays', 'custom_txmsg'))) {
               // integer only rules, except for cycledays (list)
