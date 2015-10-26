@@ -13,9 +13,24 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{literal}
+<style>
+div.sdd-settings {
+  padding: 10px;
+}
+div.sdd-add-creditor {
+  display:none; 
+  background-color: #e6e6bb; 
+  border: 2px dotted #f00;
+  margin: 5px;
+  padding: 10px;
+}
+</style>
+{/literal}
+
 <div class="crm-block crm-form-block crm-alternative_batching-form-block">
-  <div>
-      <h2>Creditors</h2>
+  <div class="sdd-settings">
+      <h2>{ts}Creditors{/ts}</h2>
       {if $creditors}
       <table class="form-layout">
           <tr class="crm-creditor-block">
@@ -49,9 +64,9 @@
       <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); cj(this).hide(); resetValues();">
         <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Add{/ts}</span>
       </a><br/>
-      <div id="addcreditor" style="display:none;">
-     <h2>Add/Edit Creditor</h2>
-     <h3>Creditor Information</h3>
+      <div id="addcreditor" class="sdd-add-creditor" >
+     <h2>{ts}Add/Edit Creditor{/ts}</h2>
+     <h3>{ts}Creditor Information{/ts}</h3>
      <table id="creditorinfo" class="form-layout">
          <tr>
            <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
@@ -118,7 +133,7 @@
        </table>
        {$form.add_creditor_id.html}
        {$form.edit_creditor_id.html}
-     <h3>Custom Batching Settings</h3>
+     <h3>{ts}Custom Batching Settings (for this creditor){/ts}</h3>
      <table id="custombatching" class="form-layout">
             <tr class="crm-custom-form-block-cycle-days">
               <td class="label">{$form.custom_cycledays.label} <a onclick='CRM.help("{ts}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td></td></td></td>
@@ -163,6 +178,7 @@
               </td>
             </tr>
        </table>
+       <br/>
        <div>
           <a class="save button" title="Save" onclick="updateCreditor();">
             <span>{ts}Save{/ts}</span>
@@ -171,10 +187,11 @@
             <span>{ts}Cancel{/ts}</span>
           </a><br/>
        </div>
+       <br/>
    </div>
    </div>
-  <div>
-  <br/><br/><br/><br/>
+  <br/><br/>
+  <div class="sdd-settings">
     <fieldset>
         <h2>{ts}Default Batching Settings{/ts}</h2>
         <table class="form-layout">
@@ -221,6 +238,7 @@
               </td>
             </tr>
        </table>
+       <br/>
        <h2>{ts}System Settings{/ts}</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-batching_default_creditor">
@@ -254,6 +272,7 @@
               </td>
             </tr>
        </table>
+       <br/>
        <h2>{ts}Payment Processor Settings{/ts}</h2>
         <table class="form-layout">
             <tr class="crm-pp-form-block-hide-bic">
@@ -263,6 +282,7 @@
               </td>
             </tr>
        </table>
+       <br/>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div> 
   </div>
   </fieldset>
