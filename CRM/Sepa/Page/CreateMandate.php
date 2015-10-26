@@ -451,8 +451,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       if (!$this->_check_date('start_date'))
         $errors['start_date'] = ts("Incorrect date format");
       if (isset($_REQUEST['end_date']) && strlen($_REQUEST['end_date'])) {
-        if (!$this->_check_date('end_date'))
-          $errors['end_date'] = ts("Incorrect date format");        
+        if (!$this->_check_date('end_date')) {
+          $errors['end_date'] = ts("Incorrect date format");
+        } else {
+          // check if end_date AFTER start_date (#341)
+          if (!isset($errors['start_date']) && ($_REQUEST['end_date'] < $_REQUEST['start_date']))
+            $errors['end_date'] = ts("End date cannot be earlier than start date.");
+        }
       }
     }
 
