@@ -17,6 +17,9 @@
 /**
  * back office mandate creation form
  *
+ * @todo this implementation should use the CiviCRM Form pattern 
+ *        and should be refactored
+ *
  * @package CiviCRM_SEPA
  *
  */
@@ -67,7 +70,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       if (isset($_REQUEST['replace_reason'])) {
         $this->assign('replace_reason', $_REQUEST['replace_reason']);
       }
-
     } else {
       // error -> no parameters set
       die(ts("This page cannot be called w/o parameters."));
@@ -118,9 +120,11 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     }
 
     if (isset($contribution['is_error']) && $contribution['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't create contribution for contact #%s"), $cid), ts('Error'), 'error');
-      $this->assign("error_title", ts("Couldn't create contribution"));
-      $this->assign("error_message", $contribution['error_message']);
+      $this->processError(
+        sprintf(ts("Couldn't create contribution for contact #%s"), $_REQUEST['contact_id']),
+        ts("Couldn't create contribution"),
+        $contribution['error_message'],
+        $_REQUEST['contact_id']);
       return;
     }
 
@@ -166,9 +170,11 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     $mandate = civicrm_api('SepaMandate', 'create', $mandate_data);
     if (isset($mandate['is_error']) && $mandate['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't create %s mandate for contact #%s"), $type, $cid), ts('Error'), 'error');
-      $this->assign("error_title", ts("Couldn't create mandate"));
-      $this->assign("error_message", $mandate['error_message']);
+      $this->processError(
+        sprintf(ts("Couldn't create %s mandate for contact #%s"), $type, $_REQUEST['contact_id']),
+        ts("Couldn't create mandate"),
+        $mandate['error_message'],
+        $_REQUEST['contact_id']);
       return;
     }
 
@@ -177,9 +183,15 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       CRM_Sepa_BAO_SEPAMandate::terminateMandate($_REQUEST['replace'], $_REQUEST['replace_date'], $_REQUEST['replace_reason']);
     }
 
-    // extract the reference id from the create mandate reply
-    $this->assign("reference", $mandate['values'][$mandate['id']]['reference']);
-    $this->assign("mandate_url", CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}"));
+    // if we get here, everything went o.k.
+    $reference   = $mandate['values'][$mandate['id']]['reference'];
+    $mandate_url = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}");
+    CRM_Core_Session::setStatus(ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", array(1 => $reference, 2 => $mandate_url, 3 => $type)), ts("Success"), 'info');
+
+    if (!$this->isPopup()) {
+      $contact_url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contribution_data['contact_id']}&selectedChild=contribute");
+      CRM_Utils_System::redirect($contact_url);
+    }
   }
 
 
@@ -471,5 +483,26 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         return true;
       }
     }
+  }
+
+  /**
+   * test if this page is called as a popup
+   */
+  protected function isPopup() {
+    return CRM_Utils_Array::value('snippet', $_REQUEST);
+  }
+
+  /**
+   * report error data
+   */
+  protected function processError($status, $title, $message, $contact_id) {
+    CRM_Core_Session::setStatus($status . "<br/>" . $message, ts('Error'), 'error');
+    $this->assign("error_title",   $title);
+    $this->assign("error_message", $message);
+
+    if (!$this->isPopup()) {
+      $contact_url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact_id}&selectedChild=contribute");
+      CRM_Utils_System::redirect($contact_url);
+    }   
   }
 }

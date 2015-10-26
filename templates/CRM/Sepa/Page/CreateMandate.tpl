@@ -185,6 +185,10 @@
 </form>
 
 {else}
+	{* if this is a popup - close it *}
+	<script type="text/javascript">
+	cj(".ui-dialog > [id^=crm-ajax-dialog-]").dialog("destroy");
+	</script>
 	{if $error_message}
 		<h2>{ts}Error!{/ts} {$error_title}</h2>
 		<p>{$error_message}</p>
@@ -203,7 +207,11 @@
 
 
 <script type="text/javascript">
+{if $creditor2cycledays}
 var creditor2cycledays = {$creditor2cycledays};
+{else}
+var creditor2cycledays = [];
+{/if}
 {literal}
 // logic for the bank account selector
 cj("#account").change(change_bank_account);
