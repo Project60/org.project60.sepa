@@ -200,7 +200,7 @@ function sepa_clear_bank() {
   cj("#bic_busy").hide();
 }
 
-function sepa_show_bic(show_bic, message="") {
+function sepa_show_bic(show_bic, message) {
 	if (sepa_hide_bic_enabled) {
 		if (show_bic) {
 			cj("#bank_identification_number").parent().parent().show();
@@ -232,11 +232,11 @@ function sepa_lookup_bic() {
         cj("#bank_identification_number").attr('value', data['bic']);
         cj("#bank_name").val(data['title']);
         cj("#bic_busy").hide();
-        sepa_show_bic(false);
+        sepa_show_bic(false, "");
       } else {
       	sepa_clear_bank();
         //sepa_show_bic(true, sepa_lookup_bic_error_message);
-        sepa_show_bic(true);
+        sepa_show_bic(true, "");
         cj("#bank_identification_number").attr('value', '');
       }
     }, error: function(result, settings) {
@@ -254,7 +254,7 @@ function sepa_lookup_bic() {
 
 // initially hide the bic (if hiding enabled)
 cj(function(){
-	sepa_show_bic();	
+	sepa_show_bic(false, "");	
 });
 {/literal}
 </script>
