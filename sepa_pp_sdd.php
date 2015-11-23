@@ -74,6 +74,14 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			));
 		}
 
+	} elseif ($formName == "CRM_Contribute_Form_Contribution_Main") {						  // PAYMENT PROCESS MAIN PAGE
+		$mendForm = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_improve_frequency');
+		if ($mendForm) {
+			// inject improved form logic
+			CRM_Core_Region::instance('page-body')->add(array(
+			  'template' => 'CRM/Contribute/Form/ContributionMain.sepa.tpl'));
+		}
+
 	} elseif ($formName == "CRM_Contribute_Form_Contribution_Confirm") {					// PAYMENT PROCESS CONFIRMATION PAGE
 		// only for our SDD payment processors:
 		$pp = civicrm_api("PaymentProcessor", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
