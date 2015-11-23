@@ -8,12 +8,13 @@
     <author>B. Endres</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate>2015-11-23</releaseDate>
-  <version>1.2.1</version>
-  <develStage>stable</develStage>
+  <releaseDate></releaseDate>
+  <version>1.2.2</version>
+  <develStage>dev</develStage>
   <compatibility>
     <ver>4.4</ver>
     <ver>4.5</ver>
+    <ver>4.6</ver>
   </compatibility>
   <urls>
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
