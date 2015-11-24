@@ -68,8 +68,16 @@ function _sdd_update_elements() {
 cj(function() {
 	// add event handler for IBAN entered
 	cj("#bank_account_number").change(sepa_process_iban);
+
+  // add event handler for rcur checkbox
+  cj("#is_recur").change(_sdd_update_elements);
+
+  // ... but also update SDD elements now
+  _sdd_update_elements();
 });
 
+
+// IBAN changed handler
 function sepa_process_iban() {
 	var reSpaceAndMinus = new RegExp('[\\s-]', 'g');
 	var sanitized_iban = cj("#bank_account_number").val();
