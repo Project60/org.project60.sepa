@@ -547,4 +547,43 @@ class CRM_Sepa_Logic_Batching {
     return $return_date;
   }
 
+  /**
+   * Get a string representation of the recurring contribution cycle day.
+   * For monthly payments, this would be the cycle day, 
+   * while for annual payments this would be the cycle day and the month.
+   */
+  public static function getCycleDay($rcontribution) {
+    $cycle_day = $rcontribution['cycle_day'];
+    $interval  = $rcontribution['frequency_interval'];
+    $unit      = $rcontribution['frequency_unit'];
+    error_log("$unit $interval");
+    if ($unit == 'year' || ($unit == 'month' && !($interval % 12))) {
+      // this is an annual payment      
+      $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, strtotime('now'));
+      $date = strtotime($date);
+      return ts("%1%3 %2", array(
+        1 => date('j', $date),
+        2 => date('F', $date),
+        3 => date('S', $date),
+        ));
+
+    } elseif ($unit == 'week') {
+      // FIXME: weekly not supported yet
+      return '';
+
+    } else {
+      // this is a x-monthly payment
+      return ts("%1.", array(1=>$cycle_day));
+    }
+  }
+
+  /**
+   * Get a string representation of the recurring contribution cycle,
+   * e.g. 'weekly' or 'annually'
+   */
+  public static function getCycle($rcontribution) {
+    $interval  = $rcontribution['frequency_interval'];
+    $unit      = $rcontribution['frequency_unit'];
+    return CRM_Utils_SepaOptionGroupTools::getFrequencyText($interval, $unit, TRUE);
+  }
 }

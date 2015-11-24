@@ -115,6 +115,12 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$mandate      = civicrm_api3('SepaMandate',  'getsingle', array('reference' => $mandate_reference));
 			$creditor     = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $mandate['creditor_id']));
 			$contribution = civicrm_api3('Contribution', 'getsingle', array('trxn_id' => $mandate_reference));
+			$rcontribution = array(
+				'cycle_day'              => $form->_params["cycle_day"],
+				'frequency_interval'     => $form->_params["frequency_interval"],
+				'frequency_unit'         => $form->_params["frequency_unit"],
+				'mandate_first_executed' => $contribution['receive_date']);
+			
 			$form->assign('mandate_reference',          $mandate_reference);
 			$form->assign("bank_account_number",        $mandate["iban"]);
 			$form->assign("bank_identification_number", $mandate["bic"]);
@@ -123,6 +129,8 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$form->assign("frequency_unit",             $form->_params["frequency_unit"]);
 			$form->assign("creditor_id",                $creditor['identifier']);
 			$form->assign("collection_date",            $contribution['receive_date']);
+			$form->assign("cycle",                      CRM_Sepa_Logic_Batching::getCycle($rcontribution));
+			$form->assign("cycle_day",                  CRM_Sepa_Logic_Batching::getCycleDay($rcontribution));
 		}
 
 		CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
