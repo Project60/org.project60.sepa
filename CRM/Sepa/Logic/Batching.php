@@ -556,7 +556,6 @@ class CRM_Sepa_Logic_Batching {
     $cycle_day = $rcontribution['cycle_day'];
     $interval  = $rcontribution['frequency_interval'];
     $unit      = $rcontribution['frequency_unit'];
-    error_log("$unit $interval");
     if ($unit == 'year' || ($unit == 'month' && !($interval % 12))) {
       // this is an annual payment      
       $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, strtotime('now'));
