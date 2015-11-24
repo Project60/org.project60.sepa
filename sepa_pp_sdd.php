@@ -118,8 +118,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$rcontribution = array(
 				'cycle_day'              => $form->_params["cycle_day"],
 				'frequency_interval'     => $form->_params["frequency_interval"],
-				'frequency_unit'         => $form->_params["frequency_unit"],
-				'mandate_first_executed' => $contribution['receive_date']);
+				'frequency_unit'         => $form->_params["frequency_unit"]);
 			
 			$form->assign('mandate_reference',          $mandate_reference);
 			$form->assign("bank_account_number",        $mandate["iban"]);
