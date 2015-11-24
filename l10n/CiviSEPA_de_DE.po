@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2015-11-24 11:33+0100\n"
+"POT-Creation-Date: 2015-11-24 14:12+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -457,8 +457,8 @@ msgid "View Contact Summary for this Contact."
 msgstr ""
 
 #: CRM/Sepa/Logic/Batching.php
-msgid "%1%3 %2"
-msgstr "%1. %2"
+msgid "%B %E%f"
+msgstr "%E. %B"
 
 #: CRM/Sepa/Logic/Batching.php
 msgid "%1."
@@ -1986,6 +1986,9 @@ msgstr ""
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Done"
 msgstr ""
+
+#~ msgid "%1%3 %2"
+#~ msgstr "%1. %2"
 
 #~ msgid "OOFF notice days"
 #~ msgstr "OOFF Frist"
