@@ -560,20 +560,20 @@ class CRM_Sepa_Logic_Batching {
    * For monthly payments, this would be the cycle day, 
    * while for annual payments this would be the cycle day and the month.
    */
-  public static function getCycleDay($rcontribution) {
+  public static function getCycleDay($rcontribution, $creditor_id) {
     $cycle_day = $rcontribution['cycle_day'];
     $interval  = $rcontribution['frequency_interval'];
     $unit      = $rcontribution['frequency_unit'];
     if ($unit == 'year' || ($unit == 'month' && !($interval % 12))) {
       // this is an annual payment      
-      $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, strtotime('now'));
-      $date = strtotime($date);
-      return ts("%1%3 %2", array(
-        1 => date('j', $date),
-        2 => date('F', $date),
-        3 => date('S', $date),
-        ));
-
+      if (!empty($rcontribution['mandate_first_executed'])) {
+        $date = $rcontribution['mandate_first_executed'];
+      } else {
+        $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor_id);
+        $now = strtotime("now +$rcur_notice days");
+        $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
+      }
+      return CRM_Utils_Date::customFormat($date, ts("%B %E%f"));
     } elseif ($unit == 'week') {
       // FIXME: weekly not supported yet
       return '';

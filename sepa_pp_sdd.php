@@ -130,7 +130,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$form->assign("creditor_id",                $creditor['identifier']);
 			$form->assign("collection_date",            $contribution['receive_date']);
 			$form->assign("cycle",                      CRM_Sepa_Logic_Batching::getCycle($rcontribution));
-			$form->assign("cycle_day",                  CRM_Sepa_Logic_Batching::getCycleDay($rcontribution));
+			$form->assign("cycle_day",                  CRM_Sepa_Logic_Batching::getCycleDay($rcontribution, $creditor['id']));
 		}
 
 		CRM_Core_Region::instance('contribution-thankyou-billing-block')->add(array(
