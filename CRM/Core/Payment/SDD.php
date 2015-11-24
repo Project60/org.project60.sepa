@@ -272,9 +272,9 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         $rcontribution = civicrm_api('ContributionRecur', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
         if (empty($contribution['is_error']) && empty($rcontribution['is_error'])) {
           // we need to set the receive date to the correct collection date, otherwise it will be created again (w/o)
-          $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $mandate['creditor_id']);
+          $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $mandate['creditor_id']);
           $now = strtotime(date('Y-m-d', strtotime("now +$rcur_notice days")));        // round to full day
-          $collection_date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now);
+          $collection_date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
 
           // fix contribution
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
