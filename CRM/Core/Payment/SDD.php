@@ -124,6 +124,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
+    CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/sdd_fields.js');
   }
 
 
