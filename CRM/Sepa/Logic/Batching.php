@@ -165,13 +165,13 @@ class CRM_Sepa_Logic_Batching {
             //  to allow compatibility in with OOFF groups in the syncGroups function
             $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution['id'];
           } else {
-            // in case of an error, we will unset 'mandate_entity_id', so it cannot be 
+            // in case of an error, we will unset 'mandate_entity_id', so it cannot be
             //  interpreted as the contribution instance ID (see above)
             unset($mandates_by_nextdate[$collection_date][$index]['mandate_entity_id']);
 
             // log the error
             error_log("org.project60.sepa: batching:updateRCUR/createContrib ".$contribution['error_message']);
-            
+
             // TODO: Error handling?
           }
           unset($existing_contributions_by_recur_id[$recur_id]);
