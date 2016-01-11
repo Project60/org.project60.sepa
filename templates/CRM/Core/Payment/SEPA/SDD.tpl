@@ -225,24 +225,27 @@ function sepa_lookup_bic() {
 		cj("#bank_identification_number").attr('value', '');
 	}
 	cj("#bic_busy").show();
+	cj("div.payment_processor-section").trigger("sdd_biclookup", "started");
   CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
     {success: function(data) {
     	if ('bic' in data) {
-        // use the following to urldecode the link url
         cj("#bank_identification_number").attr('value', data['bic']);
         cj("#bank_name").val(data['title']);
         cj("#bic_busy").hide();
+        cj("div.payment_processor-section").trigger("sdd_biclookup", "success");
         sepa_show_bic(false, "");
       } else {
       	sepa_clear_bank();
         //sepa_show_bic(true, sepa_lookup_bic_error_message);
         sepa_show_bic(true, "");
         cj("#bank_identification_number").attr('value', '');
+        cj("div.payment_processor-section").trigger("sdd_biclookup", "failed");
       }
     }, error: function(result, settings) {
 			// we suppress the message box here
 			// and log the error via console
       cj("#bic_busy").hide();
+      cj("div.payment_processor-section").trigger("sdd_biclookup", "failed");
 			if (result.is_error) {
 				console.log(result.error_message);
 				sepa_clear_bank();
