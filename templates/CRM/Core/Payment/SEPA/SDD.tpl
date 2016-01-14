@@ -192,7 +192,7 @@ var sepa_lookup_bic_timeout = 1000;
 
 cj(function() {
 	cj("#bank_account_number").parent().append('&nbsp;<img id="bic_busy" height="12" src="' + busy_icon_url + '"/>');
-	cj("#bank_account_number").on("input click keydown", function() {
+	cj("#bank_account_number").on("input click keydown blur", function() {
 		// set the timer to look up BIC when user stops typing
 		if (sepa_lookup_bic_timerID) {
 			// clear any existing lookup timers
