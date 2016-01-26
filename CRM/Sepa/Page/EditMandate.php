@@ -122,9 +122,10 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $contribution['financial_type'] = $financial_types[$contribution['financial_type_id']];
     if (isset($contribution['amount']) && $contribution['amount']) {
       // this is a recurring contribution
-      $contribution['link'] = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
-      $contribution['currency'] = $contribution['currency'];
-      $contribution['cycle'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($contribution['frequency_interval'], $contribution['frequency_unit'], true);
+      $contribution['link']      = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "&reset=1&id=".$contribution['id']."&cid=".$contact2['id']);
+      $contribution['currency']  = $contribution['currency'];
+      $contribution['cycle']     = CRM_Utils_SepaOptionGroupTools::getFrequencyText($contribution['frequency_interval'], $contribution['frequency_unit'], true);
+      $contribution['cycle_day'] = CRM_Sepa_Logic_Batching::getCycleDay($contribution, $mandate['creditor_id']);
       if (isset($contribution['end_date']) && $contribution['end_date']) {
         $contribution['default_end_date'] = date('Y-m-d', strtotime($contribution['end_date']));
       } else {
