@@ -65,19 +65,22 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
     $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
-    $this->fileFormat = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($this->fileFormat);
+    $this->fileFormat = CRM_Sepa_Logic_Format::sanitizeFileFormat($this->fileFormat);
     $template->assign("fileFormat", $this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
-        c.id,
+        c.id AS contribution_id,
         civicrm_contact.display_name,
-        invoice_id,
-        currency,
-        total_amount,
-        receive_date,
-        contribution_recur_id,
-        contribution_status_id,
+        a.street_address,
+        a.postal_code,
+        a.city,
+        c.invoice_id,
+        c.currency,
+        c.total_amount,
+        c.receive_date,
+        c.contribution_recur_id,
+        c.contribution_status_id,
         mandate.*
       FROM civicrm_contribution AS c
       JOIN civicrm_sdd_contribution_txgroup AS g ON g.contribution_id=c.id
@@ -86,8 +89,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = c.id)
       )
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
+      LEFT JOIN civicrm_address a ON c.contact_id = a.contact_id AND a.is_primary = 1
       WHERE g.txgroup_id = %1
-        AND contribution_status_id != 3
+        AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
     "; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -126,7 +130,17 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("total",$this->total );
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
-    return $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl');
+
+    CRM_Sepa_Logic_Format::loadFormatClass($this->fileFormat);
+    $format_class = 'CRM_Sepa_Logic_Format_'.$this->fileFormat;
+    $format = new $format_class();
+    $template->assign('settings', $format::$settings);
+    $details = $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl');
+    if ($format::$out_charset != 'UTF-8') {
+      $details = iconv('UTF-8', $format::$out_charset, $details);
+    }
+    return $details;
+
   }
 
 
@@ -148,8 +162,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $fileFormatName = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'name');
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
-      $fileFormatName = CRM_Utils_SepaOptionGroupTools::sanitizeFileFormat($fileFormatName);
-      self::loadFormatClass($fileFormatName);
+      $fileFormatName = CRM_Sepa_Logic_Format::sanitizeFileFormat($fileFormatName);
+      CRM_Sepa_Logic_Format::loadFormatClass($fileFormatName);
       $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
       $format = new $format_class();
 
@@ -356,22 +370,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         }
       }
     }
-    return $deleted_contributions;
-  }
 
-  static function loadFormatClass($fileFormat) {
-    $s = DIRECTORY_SEPARATOR;
-    $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}formats{$s}".$fileFormat;
-    $file = $directory."{$s}Format.php";
-    if (file_exists($directory)) {
-      if (file_exists($file)) {
-        require $file;
-      } else {
-        throw new Exception('File with class format does not exist.');
-      }
-    } else {
-      throw new Exception('Directory for file format does not exist.');
-    }
+    return $deleted_contributions;
   }
 
 }
