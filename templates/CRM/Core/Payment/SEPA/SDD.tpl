@@ -97,10 +97,21 @@ function sepa_process_iban() {
 var busy_icon_url = "{$config->resourceBase}i/loading.gif";
 var sepa_hide_bic_enabled = parseInt("{$sepa_hide_bic}");
 var sepa_lookup_bic_error_message = "{ts}Bank unknown, please enter BIC.{/ts}";
+var sepa_lookup_bic_timerID = 0;
+var sepa_lookup_bic_timeout = 1000;
 {literal}
 
 cj(function() {
 	cj("#bank_account_number").parent().append('&nbsp;<img id="bic_busy" height="12" src="' + busy_icon_url + '"/>');
+	cj("#bank_account_number").on("input click keydown blur", function() {
+		// set the timer to look up BIC when user stops typing
+		if (sepa_lookup_bic_timerID) {
+			// clear any existing lookup timers
+			clearTimeout(sepa_lookup_bic_timerID);
+			sepa_lookup_bic_timerID = 0;
+		}
+		sepa_lookup_bic_timerID = window.setTimeout(sepa_lookup_bic, sepa_lookup_bic_timeout);
+	});
 	cj("#bic_busy").hide();
 	// call it once
 	sepa_lookup_bic();
@@ -129,6 +140,12 @@ function sepa_show_bic(show_bic, message) {
 }
 
 function sepa_lookup_bic() {
+	if (sepa_lookup_bic_timerID) {
+		// clear any existing lookup timers
+		clearTimeout(sepa_lookup_bic_timerID);
+		sepa_lookup_bic_timerID = 0;
+	}
+
 	var iban_partial = cj("#bank_account_number").val();
 	if (iban_partial.length == 0) return;
 	if (sepa_hide_bic_enabled) {
@@ -136,24 +153,27 @@ function sepa_lookup_bic() {
 		cj("#bank_identification_number").attr('value', '');
 	}
 	cj("#bic_busy").show();
+	cj("div.payment_processor-section").trigger("sdd_biclookup", "started");
   CRM.api('Bic', 'findbyiban', {'q': 'civicrm/ajax/rest', 'iban': iban_partial},
     {success: function(data) {
     	if ('bic' in data) {
-        // use the following to urldecode the link url
         cj("#bank_identification_number").attr('value', data['bic']);
         cj("#bank_name").val(data['title']);
         cj("#bic_busy").hide();
+        cj("div.payment_processor-section").trigger("sdd_biclookup", "success");
         sepa_show_bic(false, "");
       } else {
       	sepa_clear_bank();
         //sepa_show_bic(true, sepa_lookup_bic_error_message);
         sepa_show_bic(true, "");
         cj("#bank_identification_number").attr('value', '');
+        cj("div.payment_processor-section").trigger("sdd_biclookup", "failed");
       }
     }, error: function(result, settings) {
 			// we suppress the message box here
 			// and log the error via console
       cj("#bic_busy").hide();
+      cj("div.payment_processor-section").trigger("sdd_biclookup", "failed");
 			if (result.is_error) {
 				console.log(result.error_message);
 				sepa_clear_bank();
