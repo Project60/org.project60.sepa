@@ -152,9 +152,15 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   function doDirectPayment(&$params) {
     $original_parameters = $params;
 
+    // get contact ID (see SEPA-359)
+    $contact_id = $this->getVar('_contactID');
+    if (empty($contact_id)) {
+      $contact_id = $this->getForm()->getVar('_contactID');
+    }
+
     // prepare the creation of an incomplete mandate
     $params['creditor_id']   = $this->_creditorId;
-    $params['contact_id']    = $this->getVar('_contactID');
+    $params['contact_id']    = $contact_id;
     $params['source']        = $params['description'];
     $params['iban']          = $params['bank_account_number'];
     $params['bic']           = $params['bank_identification_number'];
