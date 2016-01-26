@@ -321,7 +321,8 @@ class CRM_Sepa_Logic_Batching {
         mandate.entity_id AS mandate_entity_id,
         mandate.creation_date AS mandate_creation_date,
         mandate.validation_date AS mandate_validation_date,
-        rcontribution.end_date AS end_date
+        rcontribution.end_date AS end_date,
+        rcontribution.currency AS currency
       FROM civicrm_sdd_mandate AS mandate
       INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id
       WHERE mandate.type = 'RCUR'
@@ -330,7 +331,15 @@ class CRM_Sepa_Logic_Batching {
     $results = CRM_Core_DAO::executeQuery($sql_query);
     $mandates_to_end = array();
     while ($results->fetch()) {
-      array_push($mandates_to_end, array('mandate_id'=>$results->mandate_id, 'recur_id'=>$results->mandate_entity_id, 'creation_date'=>$results->mandate_creation_date, 'validation_date'=>$results->mandate_validation_date, 'date'=>$results->mandate_date));
+      array_push($mandates_to_end, array(
+          'mandate_id' => $results->mandate_id,
+          'recur_id' => $results->mandate_entity_id,
+          'creation_date' => $results->mandate_creation_date,
+          'validation_date' => $results->mandate_validation_date,
+          'date' => $results->mandate_date,
+          'currency' => $results->currency,
+        )
+      );
     }
 
     // then, end them one by one
@@ -351,7 +360,7 @@ class CRM_Sepa_Logic_Batching {
         'id'                      => $mandate_to_end['recur_id'],
         'contribution_status_id'  => $contribution_status_closed,
         'modified_date'           => date('YmdHis'),
-        'currency'                => 'EUR',
+        'currency'                => $mandate_to_end['currency'],
         'version'                 => 3));
       if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
         $lock->release();

@@ -122,7 +122,7 @@
             {if $can_modify}{if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
                 <td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_adjust_amount();">{ts}Adjust Amount{/ts}</td>
                 <td>
-                    {ts}Change amount to:{/ts}&nbsp;<input type="text" name="adjust_amount" id="adjust_amount" size="12" value="{$contribution.amount}" />&nbsp;EUR
+                    {ts}Change amount to:{/ts}&nbsp;<input type="text" name="adjust_amount" id="adjust_amount" size="12" value="{$contribution.amount}" />&nbsp;{$contribution.currency}
                 </td>
             </tr>{/if}{/if}{/if}
 
