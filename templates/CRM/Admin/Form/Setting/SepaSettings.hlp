@@ -101,3 +101,7 @@
     <p>{ts}If you enable this option, the BIC will be hidden unless this lookup fails. Then the donor would be required to enter the BIC after all.{/ts}</p>
     <p>{ts}REMARK: This option only has an effect, if the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> is installed.{/ts}</p> 
 {/htxt}
+
+{htxt id='id-improve-frequency'}
+    <p>{ts}The CiviCRM built-in dropdown for recurring contributions is rather ugly. Enabeling this option would will replace the eyesore frequency unit / interval fields with a nice dropdown.{/ts}</p>
+{/htxt}
