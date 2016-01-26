@@ -94,7 +94,7 @@
         {/if}
         {ts}Close and Submit{/ts}</a>
       {else}
-        <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}.xml" class="button button_export">{ts}Download Again{/ts}</a>
+        <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.filename}" class="button button_export">{ts}Download Again{/ts}</a>
         {if $closed_status_id eq $group.status_id}
           {if $group.collection_date|strtotime lt $smarty.now}
             <a id="mark_received_{$group_id}" onClick="mark_received({$group_id});" class="button button_export">{ts}Mark Received{/ts}</a>
