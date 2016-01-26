@@ -274,5 +274,18 @@ return array(
     'is_contact' => 0,
     'description' => 'Hide BIC in payment processor form if possible',
     'help_text' => 'Requires Little BIC Extension to be installed',
+  ),
+  'pp_improve_frequency' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'pp_improve_frequency',
+    'type' => 'Integer',
+    'html_type' => 'Select',
+    'default' => 0,
+    'add' => '4.3',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "Modify a contribution page's frequency selector",
+    'help_text' => "Replaces the contribution page's recurring donation frequency selector with a nicer version",
   )
  );

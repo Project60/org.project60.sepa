@@ -1,6 +1,18 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
+Version 1.2.1
+=============
+- Hide BIC in payment processor form if it can be looked up using "Little BIC Extension" (https://github.com/Project60/org.project60.sepa/issues/326)
+- Improved mandate creation wrap-up (https://github.com/Project60/org.project60.sepa/issues/340)
+- More details when setting creditor contact (https://github.com/Project60/sepa_dd/issues/306)
+- Improved settings page (https://github.com/Project60/org.project60.sepa/issues/339)
+- Prevent creation of pointless mandates (https://github.com/Project60/org.project60.sepa/issues/341)
+- FIX: Don't ignore mandates with is_active=0 (https://github.com/Project60/org.project60.sepa/issues/334)
+- FIX: Payment interval button appears on OOFF payment processor page (https://github.com/Project60/org.project60.sepa/issues/328)
+- FIX: OOFF status for SepaMandate.createfull (https://github.com/Project60/sepa_dd/issues/327)
+
+
 Version 1.2
 ===========
 - UI can set transaction message (https://github.com/Project60/org.project60.sepa/issues/278)
