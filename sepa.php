@@ -531,6 +531,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     $result = CRM_Core_DAO::executeQuery($query, $params);
     if ($result->fetch()) {
       CRM_Core_Error::fatal(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"), $result->id));
+      die(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"), $result->id));
     }
   }
 
