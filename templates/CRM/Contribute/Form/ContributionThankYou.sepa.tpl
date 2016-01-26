@@ -13,39 +13,13 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
-{* calculate a more user friendly display of the interval *}
-{if $is_recur}
-  {if $frequency_unit eq 'month'}
-    {if $frequency_interval eq 1}
-      {capture assign=frequency_words}{ts}monthly{/ts}{/capture}
-    {elseif $frequency_interval eq 3}
-      {capture assign=frequency_words}{ts}quarterly{/ts}{/capture}
-    {elseif $frequency_interval eq 6}
-      {capture assign=frequency_words}{ts}semi-annually{/ts}{/capture}
-    {elseif $frequency_interval eq 12}
-      {capture assign=frequency_words}{ts}annually{/ts}{/capture}
-    {else}
-      {capture assign=frequency_words}{ts 1=$frequency_interval}every %1 months{/ts}{/capture}
-    {/if}
-  {elseif $frequency_unit eq 'year'}
-    {if $frequency_interval eq 1}
-      {capture assign=frequency_words}{ts}annually{/ts}{/capture}
-    {else}
-      {capture assign=frequency_words}{ts 1=$frequency_interval}every %1 years{/ts}{/capture}
-    {/if}
-  {else}
-    {capture assign=frequency_words}{ts}on an irregular basis{/ts}{/capture}
-  {/if}
-{/if}
-
-
 <!-- a new, nicer payment info -->
 <div id="sepa-thank-amount-display" class="display-block">
   <p id="sepa-confirm-text-amount">{ts}Total Amount{/ts}: <strong>{$amount|crmMoney:$currencyID}</strong></p>
   <p id="sepa-confirm-text-date">{ts}Date{/ts}: <strong>{$receive_date|crmDate}</strong></p>
   <p id="sepa-confirm-text-reference">{ts}Payment Reference{/ts}: <strong>{$trxn_id}</strong></p>
   {if $is_recur}
-  <p id="sepa-confirm-text-recur"><strong>{ts 1=$frequency_words}The amount will be debited %1.{/ts}</strong></p>
+  <p id="sepa-confirm-text-recur"><strong>{ts 1=$cycle}The amount will be debited %1.{/ts}</strong></p>
   {/if}
 </div>
 
@@ -84,11 +58,11 @@
     {if $is_recur}
       <tr id="sepa-thankyou-collectionday">
         <td>{ts}Collection Day{/ts}</td>
-        <td class="content">{$collection_day}.</td>
+        <td class="content">{$cycle_day}</td>
       </tr>
       <tr id="sepa-thankyou-frequency">
         <td>{ts}Collection Frequency{/ts}</td>
-        <td class="content">{$frequency_words}</td>
+        <td class="content">{$cycle}</td>
       </tr>
       <tr id="sepa-thankyou-date">
         <td>{ts}First Collection Date{/ts}</td>
