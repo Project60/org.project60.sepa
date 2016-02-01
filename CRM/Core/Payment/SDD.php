@@ -155,7 +155,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     // prepare the creation of an incomplete mandate
     $params['creditor_id']   = $this->_creditorId;
     $params['contact_id']    = $this->getVar('_contactID');
-    $params['source']        = $params['description'];
+    $params['source']        = substr($params['description'],0,64);
     $params['iban']          = $params['bank_account_number'];
     $params['bic']           = $params['bank_identification_number'];
     $params['creation_date'] = date('YmdHis');
