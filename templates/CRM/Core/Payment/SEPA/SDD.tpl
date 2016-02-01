@@ -14,22 +14,26 @@
 +-------------------------------------------------------*}
 
 {* check for the org.project60.bic extension *}
-{crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'}
+{*crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'*}
 {capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
 
+{if $config->civiVersion lt '4.6'}
+{* add these fields manually for 4.4/4.5 *}
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 <div id="sdd-cycle-day-section" class="crm-section {$form.cycle_day.name}-section" style="display: none;">
-	<div class="label">{$form.cycle_day.label}</div>
-	<div class="content">{$form.cycle_day.html}</div>
-	<div class="clear"></div>
+  <div class="label">{$form.cycle_day.label}</div>
+  <div class="content">{$form.cycle_day.html}</div>
+  <div class="clear"></div>
 </div>
 
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 <div id="sdd-start-date-section" class="crm-section {$form.start_date.name}-section" style="display: none;">
-	<div class="label">{$form.start_date.label}</div>
-	<div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
-	<div class="clear"></div>
+  <div class="label">{$form.start_date.label}</div>
+  <div class="content">{$form.start_date.html}</div>
+  <div class="clear"></div>
 </div>
+{/if}
+
 
 <!-- JS Magic -->
 <script type="text/javascript">

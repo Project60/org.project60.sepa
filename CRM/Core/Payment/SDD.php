@@ -67,49 +67,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $test = '';
     }
 
-    // we don't need the default stuff:
-    $form->_paymentFields = array();
-
-    $form->add( 'text', 
-                'bank_account_number', 
-                ts('IBAN'), 
-                array('size' => 34, 'maxlength' => 34,), 
-                TRUE);
-
-    $form->add( 'text', 
-                'bank_identification_number', 
-                ts('BIC'), 
-                array('size' => 11, 'maxlength' => 11), 
-                TRUE);
-
-    $form->add( 'text', 
-                'bank_name', 
-                ts('Bank Name'), 
-                array('size' => 20, 'maxlength' => 64), 
-                FALSE);
-
-    $form->add( 'text', 
-                'account_holder', 
-                ts('Account Holder'), 
-                array('size' => 20, 'maxlength' => 64), 
-                FALSE);
-
-    $form->add( 'select', 
-                'cycle_day', 
-                ts('Collection Day'), 
-                CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
-                FALSE);
-
-    $form->addDate('start_date', 
-                ts('start date'), 
-                TRUE, 
-                array());
-
-    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
-    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
-    $form->addRule('bank_account_number', ts('This is not a correct IBAN.'), 'sepa_iban_valid');
-    $form->addRule('bank_identification_number',  ts('This is not a correct BIC.'),  'sepa_bic_valid');
-
+    // apply "hack" for old payment forms
+    if (version_compare(CRM_Utils_System::version(), '4.6', '<')) {
+      $this->fixOldDirectDebitForm($form);
+    }
 
     $rcur_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $this->_creditorId);
     $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
@@ -334,4 +295,191 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       }
     }
   }
+
+
+
+
+  /***********************************************
+   *            CiviCRM >= 4.6.10                *
+   ***********************************************/
+
+  /**
+   * Override CRM_Core_Payment function
+   */
+  public function getPaymentTypeName() {
+    return 'direct_debit';
+  }
+
+  /**
+   * Override CRM_Core_Payment function
+   */
+  public function getPaymentTypeLabel() {
+    return 'Direct Debit';
+  }
+
+  /**
+   * Override CRM_Core_Payment function
+   */
+  public function getPaymentFormFields() {
+    error_log("getPaymentFormFields");
+    return array(
+      'account_holder',
+      'bank_account_number',
+      'bank_identification_number',
+      'bank_name',
+      'cycle_day',
+      'start_date'
+    );
+  }
+
+  /**
+   * Return an array of all the details about the fields potentially required for payment fields.
+   *
+   * Only those determined by getPaymentFormFields will actually be assigned to the form
+   *
+   * @return array
+   *   field metadata
+   */
+  public function getPaymentFormFieldsMetadata() {
+    error_log("getPaymentFormFieldsMetadata");
+    error_log(print_r(CRM_Core_SelectValues::date('creditCard'),1));
+    return array(
+      'account_holder' => array(
+        'htmlType' => 'text',
+        'name' => 'account_holder',
+        'title' => ts('Account Holder'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 34,
+          'autocomplete' => 'on',
+        ),
+        'is_required' => FALSE,
+      ),
+      //e.g. IBAN can have maxlength of 34 digits
+      'bank_account_number' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_account_number',
+        'title' => ts('IBAN'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 34,
+          'autocomplete' => 'off',
+        ),
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
+            'rule_name' => 'nopunctuation',
+            'rule_parameters' => NULL,
+          ),
+        ),
+        'is_required' => TRUE,
+      ),
+      //e.g. SWIFT-BIC can have maxlength of 11 digits
+      'bank_identification_number' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_identification_number',
+        'title' => ts('BIC'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 11,
+          'autocomplete' => 'off',
+        ),
+        'is_required' => TRUE,
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
+            'rule_name' => 'nopunctuation',
+            'rule_parameters' => NULL,
+          ),
+        ),
+      ),
+      'bank_name' => array(
+        'htmlType' => 'text',
+        'name' => 'bank_name',
+        'title' => ts('Bank Name'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 20,
+          'maxlength' => 64,
+          'autocomplete' => 'off',
+        ),
+        'is_required' => FALSE,
+      ),
+      'cycle_day' => array(
+        'htmlType' => 'select',
+        'name' => 'cycle_day',
+        'title' => ts('Collection Day'),
+        'cc_field' => TRUE,
+        'attributes' => CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
+        'is_required' => FALSE,
+      ),
+      'start_date' => array(
+        'htmlType' => 'date',
+        'name' => 'start_date',
+        'title' => ts('Start Date'),
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'style' => 'display: none;'
+        ),
+        'is_required' => TRUE,
+        'rules' => array(),
+      ),
+    );
+  }
+
+  /***********************************************
+   *             CiviCRM < 4.6.10                *
+   ***********************************************/
+
+  public function fixOldDirectDebitForm(&$form) {
+    error_log("OLD");
+    // we don't need the default stuff:
+    $form->_paymentFields = array();
+
+    $form->add( 'text', 
+                'bank_account_number', 
+                ts('IBAN'), 
+                array('size' => 34, 'maxlength' => 34,), 
+                TRUE);
+
+    $form->add( 'text', 
+                'bank_identification_number', 
+                ts('BIC'), 
+                array('size' => 11, 'maxlength' => 11), 
+                TRUE);
+
+    $form->add( 'text', 
+                'bank_name', 
+                ts('Bank Name'), 
+                array('size' => 20, 'maxlength' => 64), 
+                FALSE);
+
+    $form->add( 'text', 
+                'account_holder', 
+                ts('Account Holder'), 
+                array('size' => 20, 'maxlength' => 64), 
+                FALSE);
+
+    $form->add( 'select', 
+                'cycle_day', 
+                ts('Collection Day'), 
+                CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
+                FALSE);
+
+    $form->addDate('start_date', 
+                ts('start date'), 
+                TRUE, 
+                array());
+
+    // TODO: RULES
+    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
+    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
+    $form->addRule('bank_account_number', ts('This is not a correct IBAN.'), 'sepa_iban_valid');
+    $form->addRule('bank_identification_number',  ts('This is not a correct BIC.'),  'sepa_bic_valid');
+  }  
 }
+
+
