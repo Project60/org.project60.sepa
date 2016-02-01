@@ -19,7 +19,7 @@
     <li>
       <a title="{ts}show active groups{/ts}" class="search button" href="{$show_open_url}">
         <span>
-          <div class="icon search-icon"></div>
+          <div class="icon inform-icon"></div>
           {ts}show active groups{/ts}
         </span>
       </a>
@@ -28,7 +28,7 @@
     <li>
       <a title="{ts}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
         <span>
-          <div class="icon search-icon"></div>
+          <div class="icon inform-icon"></div>
           {ts}show closed groups{/ts}
         </span>
       </a>
@@ -36,7 +36,7 @@
     <li>
       <a title="{ts}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
         <span>
-          <div class="icon refresh-icon"></div>
+          <div class="icon refresh-icon ui-icon-refresh"></div>
           {ts}update one-off{/ts}
         </span>
       </a>
@@ -44,7 +44,7 @@
     <li>
       <a title="{ts}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
         <span>
-          <div class="icon refresh-icon"></div>
+          <div class="icon refresh-icon ui-icon-refresh"></div>
           {ts}update recurring{/ts}
         </span>
       </a>
