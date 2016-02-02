@@ -22,7 +22,6 @@
  */
 
 class CRM_Core_Payment_SDD extends CRM_Core_Payment {
-
   protected $_mode = NULL;
   protected $_params = array();
   static private $_singleton = NULL;
@@ -60,27 +59,33 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
 
   function buildForm(&$form) {
-    // check if we're in test mode
-    if ($this->_mode == 'test') {
-      $test = ' Test';
-    } else {
-      $test = '';
-    }
+
+    // add rules
+    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
+    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');    
 
     // apply "hack" for old payment forms
     if (version_compare(CRM_Utils_System::version(), '4.6', '<')) {
       $this->fixOldDirectDebitForm($form);
     }
 
-    $rcur_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $this->_creditorId);
+    // BUFFER DAYS
+    $buffer_days      = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
+    $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $this->_creditorId);
     $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
-    $timestamp_rcur = strtotime("now + $rcur_notice_days days");
-    $timestamp_ooff = strtotime("now + $ooff_notice_days days");
-    $earliest_rcur_date = array(date('Y', $timestamp_rcur), date('m', $timestamp_rcur), date('d', $timestamp_rcur));
-    $earliest_ooff_date = array(date('Y', $timestamp_ooff), date('m', $timestamp_ooff), date('d', $timestamp_ooff));
-    $form->assign('earliest_rcur_date', $earliest_rcur_date);
-    $form->assign('earliest_ooff_date', $earliest_ooff_date);
+    $earliest_rcur_date = strtotime("now + $ooff_notice_days days + $buffer_days days");
+    $earliest_ooff_date = strtotime("now + $ooff_notice_days days");
 
+    // find the next cycle day
+    $cycle_days = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId);
+    $earliest_cycle_day = $earliest_rcur_date;
+    while (!in_array(date('d', $earliest_cycle_day), $cycle_days)) {
+      $earliest_cycle_day = strtotime("+ 1 day", $earliest_cycle_day);
+    }    
+
+    $form->assign('earliest_rcur_date', date('Y-m-d', $earliest_rcur_date));
+    $form->assign('earliest_ooff_date', date('Y-m-d', $earliest_ooff_date));
+    $form->assign('earliest_cycle_day', date('d', $earliest_cycle_day));
     $form->assign('sepa_hide_bic', CRM_Sepa_Logic_Settings::getSetting("pp_hide_bic"));
 
     CRM_Core_Region::instance('billing-block')->add(
@@ -116,7 +121,10 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     // get contact ID (see SEPA-359)
     $contact_id = $this->getVar('_contactID');
     if (empty($contact_id)) {
-      $contact_id = $this->getForm()->getVar('_contactID');
+      $form = $this->getForm();
+      if (!empty($form) && is_object($form)) {
+        $contact_id = $this->getForm()->getVar('_contactID');
+      }
     }
 
     // prepare the creation of an incomplete mandate
@@ -321,14 +329,13 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    * Override CRM_Core_Payment function
    */
   public function getPaymentFormFields() {
-    error_log("getPaymentFormFields");
     return array(
+      'cycle_day',
+      'start_date',
       'account_holder',
       'bank_account_number',
       'bank_identification_number',
       'bank_name',
-      'cycle_day',
-      'start_date'
     );
   }
 
@@ -341,8 +348,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    *   field metadata
    */
   public function getPaymentFormFieldsMetadata() {
-    error_log("getPaymentFormFieldsMetadata");
-    error_log(print_r(CRM_Core_SelectValues::date('creditCard'),1));
     return array(
       'account_holder' => array(
         'htmlType' => 'text',
@@ -363,14 +368,14 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         'title' => ts('IBAN'),
         'cc_field' => TRUE,
         'attributes' => array(
-          'size' => 20,
+          'size' => 34,
           'maxlength' => 34,
           'autocomplete' => 'off',
         ),
         'rules' => array(
           array(
-            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
-            'rule_name' => 'nopunctuation',
+            'rule_message' => ts('This is not a correct IBAN.'),
+            'rule_name' => 'sepa_iban_valid',
             'rule_parameters' => NULL,
           ),
         ),
@@ -390,8 +395,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         'is_required' => TRUE,
         'rules' => array(
           array(
-            'rule_message' => ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
-            'rule_name' => 'nopunctuation',
+            'rule_message' => ts('This is not a correct BIC.'),
+            'rule_name' => 'sepa_bic_valid',
             'rule_parameters' => NULL,
           ),
         ),
@@ -402,7 +407,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         'title' => ts('Bank Name'),
         'cc_field' => TRUE,
         'attributes' => array(
-          'size' => 20,
+          'size' => 34,
           'maxlength' => 64,
           'autocomplete' => 'off',
         ),
@@ -417,13 +422,11 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         'is_required' => FALSE,
       ),
       'start_date' => array(
-        'htmlType' => 'date',
+        'htmlType' => 'text',
         'name' => 'start_date',
         'title' => ts('Start Date'),
         'cc_field' => TRUE,
-        'attributes' => array(
-          'style' => 'display: none;'
-        ),
+        'attributes' => array(),
         'is_required' => TRUE,
         'rules' => array(),
       ),
@@ -435,7 +438,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    ***********************************************/
 
   public function fixOldDirectDebitForm(&$form) {
-    error_log("OLD");
     // we don't need the default stuff:
     $form->_paymentFields = array();
 
@@ -474,12 +476,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
                 TRUE, 
                 array());
 
-    // TODO: RULES
-    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
-    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
+    // add rules
     $form->addRule('bank_account_number', ts('This is not a correct IBAN.'), 'sepa_iban_valid');
     $form->addRule('bank_identification_number',  ts('This is not a correct BIC.'),  'sepa_bic_valid');
   }  
 }
-
-

@@ -287,5 +287,18 @@ return array(
     'is_contact' => 0,
     'description' => "Modify a contribution page's frequency selector",
     'help_text' => "Replaces the contribution page's recurring donation frequency selector with a nicer version",
+  ),
+  'pp_buffer_days' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'pp_buffer_days',
+    'type' => 'Integer',
+    'html_type' => 'Select',
+    'default' => 0,
+    'add' => '4.3',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "Contribution page buffer (in days) before debit needs to be collected",
+    'help_text' => "Contribution page buffer (in days) before debit needs to be collected",
   )
  );

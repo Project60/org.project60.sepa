@@ -281,10 +281,16 @@ div.sdd-add-creditor {
               {$form.pp_hide_bic.html}
             </td>
           </tr>
-          <tr class="crm-pp-form-block-hide-bic">
+          <tr class="crm-pp-form-block-improve-frequency">
             <td class="label">{$form.pp_improve_frequency.label} <a onclick='CRM.help("{ts}Improve frequency dropdown{/ts}", {literal}{"id":"id-improve-frequency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
             <td>
               {$form.pp_improve_frequency.html}
+            </td>
+          </tr>
+          <tr class="crm-pp-form-block-buffer-days">
+            <td class="label">{$form.pp_buffer_days.label} <a onclick='CRM.help("{ts}Recurring Buffer Days{/ts}", {literal}{"id":"id-buffer-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+            <td>
+              {$form.pp_buffer_days.html}
             </td>
           </tr>
        </table>

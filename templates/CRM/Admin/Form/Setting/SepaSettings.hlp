@@ -105,3 +105,7 @@
 {htxt id='id-improve-frequency'}
     <p>{ts}The CiviCRM built-in dropdown for recurring contributions is rather ugly. Enabeling this option would will replace the eyesore frequency unit / interval fields with a nice dropdown.{/ts}</p>
 {/htxt}
+
+{htxt id='id-buffer-days'}
+    <p>{ts}Define the number of days that the donation page leaves you to submit recurring donations in time.{/ts}</p>
+{/htxt}
