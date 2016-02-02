@@ -38,7 +38,7 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
         'dao' => 'CRM_Contact_DAO_Contact',
         'fields' => array(
           'sort_name' => array(
-            'title' => ts('Contact Name'),
+            'title' => ts('Contact Name', array('domain' => 'org.project60.sepa')),
             'required' => TRUE,
             'default' => TRUE,
             'no_repeat' => TRUE,
@@ -48,7 +48,7 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
             'required' => TRUE,
           ),
           'first_name' => array(
-            'title' => ts('First Name'),
+            'title' => ts('First Name', array('domain' => 'org.project60.sepa')),
             'no_repeat' => TRUE,
           ),
           'id' => array(
@@ -56,7 +56,7 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
             'required' => TRUE,
           ),
           'last_name' => array(
-            'title' => ts('Last Name'),
+            'title' => ts('Last Name', array('domain' => 'org.project60.sepa')),
             'no_repeat' => TRUE,
           ),
           'id' => array(
@@ -66,7 +66,7 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
         ),
         'filters' => array(
           'sort_name' => array(
-            'title' => ts('Contact Name'),
+            'title' => ts('Contact Name', array('domain' => 'org.project60.sepa')),
             'operator' => 'like',
           ),
           'id' => array(
@@ -83,7 +83,7 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
-          'join_date' => array('title' => ts('Join Date'),
+          'join_date' => array('title' => ts('Join Date', array('domain' => 'org.project60.sepa')),
             'default' => TRUE,
           ),
           'source' => array('title' => 'Source'),
@@ -93,12 +93,12 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'owner_membership_id' => array(
-            'title' => ts('Membership Owner ID'),
+            'title' => ts('Membership Owner ID', array('domain' => 'org.project60.sepa')),
             'operatorType' => CRM_Report_Form::OP_INT,
           ),
           'tid' => array(
             'name' => 'membership_type_id',
-            'title' => ts('Membership Types'),
+            'title' => ts('Membership Types', array('domain' => 'org.project60.sepa')),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Member_PseudoConstant::membershipType(),
@@ -111,14 +111,14 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
         'alias' => 'mem_status',
         'fields' => array(
           'name' => array(
-            'title' => ts('Status'),
+            'title' => ts('Status', array('domain' => 'org.project60.sepa')),
             'default' => TRUE,
           ),
         ),
         'filters' => array(
           'sid' => array(
             'name' => 'id',
-            'title' => ts('Status'),
+            'title' => ts('Status', array('domain' => 'org.project60.sepa')),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'),
@@ -132,8 +132,8 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-          'state_province_id' => array('title' => ts('State/Province')),
-          'country_id' => array('title' => ts('Country')),
+          'state_province_id' => array('title' => ts('State/Province', array('domain' => 'org.project60.sepa'))),
+          'country_id' => array('title' => ts('Country', array('domain' => 'org.project60.sepa'))),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -149,7 +149,7 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
   }
 
   function preProcess() {
-    $this->assign('reportTitle', ts('Membership Detail Report'));
+    $this->assign('reportTitle', ts('Membership Detail Report', array('domain' => 'org.project60.sepa')));
     parent::preProcess();
   }
 
@@ -332,7 +332,7 @@ class CRM_Sepa_Form_Report_SEPAMandate extends CRM_Report_Form {
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.", array('domain' => 'org.project60.sepa'));
         $entryFound = TRUE;
       }
 

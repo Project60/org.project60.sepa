@@ -581,14 +581,14 @@ class CRM_Sepa_Logic_Batching {
         $now = strtotime("now +$rcur_notice days");
         $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
       }
-      return CRM_Utils_Date::customFormat($date, ts("%B %E%f"));
+      return CRM_Utils_Date::customFormat($date, ts("%B %E%f", array('domain' => 'org.project60.sepa')));
     } elseif ($unit == 'week') {
       // FIXME: weekly not supported yet
       return '';
 
     } else {
       // this is a x-monthly payment
-      return ts("%1.", array(1=>$cycle_day));
+      return ts("%1.", array(1=>$cycle_day, 'domain' => 'org.project60.sepa'));
     }
   }
 

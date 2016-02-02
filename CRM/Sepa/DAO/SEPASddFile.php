@@ -191,26 +191,26 @@ class CRM_Sepa_DAO_SEPASddFile extends CRM_Core_DAO
         'reference' => array(
           'name' => 'reference',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Reference') ,
+          'title' => ts('Reference', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
         ) ,
         'filename' => array(
           'name' => 'filename',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Filename') ,
+          'title' => ts('Filename', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
         ) ,
         'latest_submission_date' => array(
           'name' => 'latest_submission_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Latest Submission Date') ,
+          'title' => ts('Latest Submission Date', array('domain' => 'org.project60.sepa')) ,
         ) ,
         'created_date' => array(
           'name' => 'created_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Created Date') ,
+          'title' => ts('Created Date', array('domain' => 'org.project60.sepa')) ,
         ) ,
         'created_id' => array(
           'name' => 'created_id',
@@ -225,12 +225,12 @@ class CRM_Sepa_DAO_SEPASddFile extends CRM_Core_DAO
         'comments' => array(
           'name' => 'comments',
           'type' => CRM_Utils_Type::T_TEXT,
-          'title' => ts('Comments') ,
+          'title' => ts('Comments', array('domain' => 'org.project60.sepa')) ,
         ) ,
         'tag' => array(
           'name' => 'tag',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Tag') ,
+          'title' => ts('Tag', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
         ) ,

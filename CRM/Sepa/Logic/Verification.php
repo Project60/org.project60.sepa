@@ -30,13 +30,13 @@ class CRM_Sepa_Logic_Verification {
     // We only accept uppecase characters and numerals (machine format)
     // see https://github.com/Project60/org.project60.sepa/issues/246
     if (!preg_match("/^[A-Z0-9]+$/", $iban)) {
-      return ts("IBAN is not correct");
+      return ts("IBAN is not correct", array('domain' => 'org.project60.sepa'));
     }
 
     if (verify_iban($iban)) {
       return NULL;
     } else {
-      return ts("IBAN is not correct");
+      return ts("IBAN is not correct", array('domain' => 'org.project60.sepa'));
     }
   }
 
@@ -62,7 +62,7 @@ class CRM_Sepa_Logic_Verification {
     if (preg_match("/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/", $bic)) {
       return NULL;
     } else {
-      return ts("BIC is not correct");
+      return ts("BIC is not correct", array('domain' => 'org.project60.sepa'));
     }
   }
 

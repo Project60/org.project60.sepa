@@ -72,7 +72,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       }
     } else {
       // error -> no parameters set
-      die(ts("This page cannot be called w/o parameters."));
+      die(ts("This page cannot be called w/o parameters.", array('domain' => 'org.project60.sepa')));
     }
     parent::run();
   }
@@ -121,8 +121,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     if (isset($contribution['is_error']) && $contribution['is_error']) {
       $this->processError(
-        sprintf(ts("Couldn't create contribution for contact #%s"), $_REQUEST['contact_id']),
-        ts("Couldn't create contribution"),
+        sprintf(ts("Couldn't create contribution for contact #%s", array('domain' => 'org.project60.sepa')), $_REQUEST['contact_id']),
+        ts("Couldn't create contribution", array('domain' => 'org.project60.sepa')),
         $contribution['error_message'],
         $_REQUEST['contact_id']);
       return;
@@ -142,7 +142,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $create_note_result = civicrm_api('Note', 'create', $create_note);
       if (isset($create_note_result['is_error']) && $create_note_result['is_error']) {
         // don't consider this a fatal error...
-        CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s"), $contribution['id']), ts('Error'), 'alert');
+        CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s", array('domain' => 'org.project60.sepa')), $contribution['id']), ts('Error'), 'alert');
         error_log("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
       }
     }
