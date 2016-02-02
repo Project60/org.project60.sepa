@@ -507,6 +507,7 @@ function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissi
   $permissions['sepa_alternative_batching']['received'] = array('edit contributions');
   $permissions['sepa_logic']['received'] = array('edit contributions');
   $permissions['sepa_transaction_group']['toaccgroup'] = array('edit contributions');
+  $permissions['sepa_mandate']['get'] = array('access CiviContribute');
 }
 
 
