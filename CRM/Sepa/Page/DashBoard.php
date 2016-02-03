@@ -88,7 +88,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         "order_by"      => (($status=='open')?'latest_submission_date':'file.created_date'),
         ));
     if (isset($result['is_error']) && $result['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't read transaction groups. Error was: '%s'"), $result['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't read transaction groups. Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     } else {
       $groups = array();
       foreach ($result["values"] as $id => $group) {
@@ -146,7 +146,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       $result = civicrm_api("SepaAlternativeBatching", "update", $parameters);
 
     } else {
-      CRM_Core_Session::setStatus(sprintf(ts("Unknown batcher mode '%s'. No batching triggered."), $mode), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Unknown batcher mode '%s'. No batching triggered.", array('domain' => 'org.project60.sepa')), $mode), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     }
   }
 }

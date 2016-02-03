@@ -31,7 +31,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
   function run() {
 
     if (!isset($_REQUEST['mid'])) {
-      die(ts("This page needs a mandate id ('mid') parameter."));
+      die(ts("This page needs a mandate id ('mid') parameter.", array('domain' => 'org.project60.sepa')));
     } else {
       $mandate_id = (int) $_REQUEST['mid'];
     }
@@ -53,15 +53,15 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         $this->adjustAmount($mandate_id);
 
       } else {
-        CRM_Core_Session::setStatus(sprintf(ts("Unkown action '%s'. Ignored."), $_REQUEST['action']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Unkown action '%s'. Ignored.", array('domain' => 'org.project60.sepa')), $_REQUEST['action']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       }
     } 
 
     // first, load the mandate
     $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
     if (isset($mandate['is_error']) && $mandate['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
-      die(sprintf(ts("Cannot find mandate [%s]."), $mandate_id));
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+      die(sprintf(ts("Cannot find mandate [%s].", array('domain' => 'org.project60.sepa')), $mandate_id));
     }
 
     // load the contribution
@@ -69,13 +69,13 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $contribution_type = ($mandate['entity_table']=='civicrm_contribution')?'Contribution':'ContributionRecur';
     $contribution = civicrm_api($contribution_type, "getsingle", array('id'=>$contribution_id, 'version'=>3));
     if (isset($contribution['is_error']) && $contribution['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $contribution['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     }
 
     // load the mandate's contact
     $contact1 = civicrm_api("Contact", "getsingle", array('id'=>$mandate['contact_id'], 'version'=>3));
     if (isset($contact1['is_error']) && $contact1['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $contact1, $contact1['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contact1, $contact1['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     }
 
     // load the contribtion's contact
@@ -84,7 +84,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     } else {
       $contact2 = civicrm_api("Contact", "getsingle", array('id'=>$contribution['contact_id'], 'version'=>3));
       if (isset($contact2['is_error']) && $contact2['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $contact2, $contact2['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contact2, $contact2['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       }      
     }
 
@@ -92,7 +92,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     if (!empty($mandate['creditor_id'])) {
       $creditor = civicrm_api("SepaCreditor", "getsingle", array('id'=>$mandate['creditor_id'], 'version'=>3));
       if (!empty($creditor['is_error'])) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot read creditor [%s]. Error was: '%s'"), $mandate['creditor_id'], $creditor['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read creditor [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate['creditor_id'], $creditor['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       } else {
         $mandate['creditor_name'] = $creditor['name'];
       }
@@ -107,7 +107,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     if (isset($campaign_id)) {
       $campaign = civicrm_api("Campaign", "getsingle", array('id'=>$campaign_id, 'version'=>3));
       if (isset($campaign['is_error'])) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'"), $campaign, $campaign['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $campaign, $campaign['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       } else {
         $contribution['campaign'] = $campaign['title'];
       }
@@ -171,12 +171,12 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     // first, load the mandate
     $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
     if (isset($mandate['is_error']) && $mandate['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       return;
     }
     
     if ( !($mandate['status']=="INIT" || $mandate['status']=="OOFF" || $mandate['status']=="FRST") ) {
-      CRM_Core_Session::setStatus(sprintf(ts("Mandate [%s] is already in use! It cannot be deleted."), $mandate_id), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Mandate [%s] is already in use! It cannot be deleted.", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       return;
     }
 
@@ -184,8 +184,8 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     // TODO: move the following into API or BAO
     $delete = civicrm_api('SepaMandate', "delete", array('id' => $mandate['id'], 'version'=>3));
     if (isset($delete['is_error']) && $delete['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Error deleting mandate: '%s'"), 
-        $delete['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Error deleting mandate: '%s'", array('domain' => 'org.project60.sepa')), 
+        $delete['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       return;
     }
 
@@ -197,8 +197,8 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $cquery = civicrm_api('Contribution', "get", 
         array('contribution_recur_id' => $mandate['entity_id'], 'version'=>3, 'option.limit' => 999));
       if (isset($cquery['is_error']) && $cquery['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot find contributions. Error was: '%s'"), 
-          $cquery['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot find contributions. Error was: '%s'", array('domain' => 'org.project60.sepa')), 
+          $cquery['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
         return;
       }
 
@@ -206,7 +206,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         $delete = civicrm_api('Contribution', "delete", 
           array('id' => $contribution['id'], 'version'=>3));
         if (isset($delete['is_error']) && $delete['is_error']) {
-          CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'"), $contribution['id'], $delete['error_message']), ts('Error'), 'error');
+          CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'", array('domain' => 'org.project60.sepa')), $contribution['id'], $delete['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
           return;
         }
         array_push($contributions, $contribution['id']);
@@ -215,8 +215,8 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $delete = civicrm_api('ContributionRecur', "delete", 
         array('id' => $mandate['entity_id'], 'version'=>3));
       if (isset($delete['is_error']) && $delete['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Error deleting recurring contribution: '%s'"), 
-          $delete['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Error deleting recurring contribution: '%s'", array('domain' => 'org.project60.sepa')), 
+          $delete['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
         return;
       }
       $rcontribution_count = 1;
@@ -225,7 +225,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $delete = civicrm_api('Contribution', "delete", 
         array('id' => $mandate['entity_id'], 'version'=>3));
       if (isset($delete['is_error']) && $delete['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'"), $mandate['entity_id'], $delete['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Error deleting contribution [%s]: '%s'", array('domain' => 'org.project60.sepa')), $mandate['entity_id'], $delete['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
         return;
       }
       array_push($contributions, $mandate['entity_id']);
@@ -237,7 +237,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id IN ($contribution_id_list);");
     }
 
-    CRM_Core_Session::setStatus(sprintf(ts("Succesfully deleted mandate [%s] and %s associated contribution(s)"), $mandate_id, (count($contributions)+$rcontribution_count)), ts('Mandate deleted'), 'info');
+    CRM_Core_Session::setStatus(sprintf(ts("Succesfully deleted mandate [%s] and %s associated contribution(s)", array('domain' => 'org.project60.sepa')), $mandate_id, (count($contributions)+$rcontribution_count)), ts('Mandate deleted', array('domain' => 'org.project60.sepa')), 'info');
   }
 
 
@@ -250,7 +250,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date);
       }
     } else {
-      CRM_Core_Session::setStatus(sprintf(ts("You need to provide an end date.")), ts('Error'), 'error');      
+      CRM_Core_Session::setStatus(sprintf(ts("You need to provide an end date.", array('domain' => 'org.project60.sepa'))), ts('Error', array('domain' => 'org.project60.sepa')), 'error');      
     }
   }
 
@@ -260,7 +260,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     if ($cancel_reason) {
       CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, date("Y-m-d"), $cancel_reason);
     } else {
-      CRM_Core_Session::setStatus(sprintf(ts("You need to provide a cancel reason.")), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("You need to provide a cancel reason.", array('domain' => 'org.project60.sepa'))), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     }
   }
 
@@ -270,13 +270,13 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $adjusted_amount = (float) $_REQUEST['adjust_amount'];
       if ($adjusted_amount > 0) {
         if (CRM_Sepa_BAO_SEPAMandate::adjustAmount($mandate_id, $adjusted_amount)) {
-          CRM_Core_Session::setStatus(sprintf(ts("The amount of this mandate was modified. You should send out a new prenotification to the debtor.")), ts('Advice'), 'info');
+          CRM_Core_Session::setStatus(sprintf(ts("The amount of this mandate was modified. You should send out a new prenotification to the debtor.", array('domain' => 'org.project60.sepa'))), ts('Advice', array('domain' => 'org.project60.sepa')), 'info');
         }
       } else {
-        CRM_Core_Session::setStatus(sprintf(ts("Invalid amount. Mandate not modified.")), ts('Error'), 'error');  
+        CRM_Core_Session::setStatus(sprintf(ts("Invalid amount. Mandate not modified.", array('domain' => 'org.project60.sepa'))), ts('Error', array('domain' => 'org.project60.sepa')), 'error');  
       }
     } else {
-      CRM_Core_Session::setStatus(sprintf(ts("Modifying an existing mandate is currently not allowed. You can change this on the SEPA settings page.")), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Modifying an existing mandate is currently not allowed. You can change this on the SEPA settings page.", array('domain' => 'org.project60.sepa'))), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     }
   }
 }

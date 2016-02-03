@@ -35,7 +35,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
       // load the group
       $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$group_id, 'version'=>3));
       if (isset($txgroup['is_error']) && $txgroup['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot read SEPA transaction group [%s]. Error was: '%s'"), $group_id, $txgroup['error_message']), ts("Error"), "error");
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read SEPA transaction group [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $group_id, $txgroup['error_message']), ts("Error", array('domain' => 'org.project60.sepa')), "error");
       }
 
       // load the group's contributions

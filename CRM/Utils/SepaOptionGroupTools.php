@@ -45,7 +45,7 @@ class CRM_Utils_SepaOptionGroupTools {
       $message = sprintf("Option group '%s' does not exist. Error was: %s", $params['name'], $result['error_message']);
       error_log("org.project60.sepa_dd: ".$message);
       if($warning) {
-        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
       }
       return;
     }
@@ -62,7 +62,7 @@ class CRM_Utils_SepaOptionGroupTools {
       $message = sprintf("Could not retrieve values of group '%d'. Error was: %s", $oid, $result['error_message']);
       error_log("org.project60.sepa_dd: ".$message);
       if($warning) {
-        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
       }
       return;
     }
@@ -87,14 +87,14 @@ class CRM_Utils_SepaOptionGroupTools {
               $message = sprintf("Could not reset option value [%d] ('%s'). Error was: %s", $f['id'], $c, $result['error_message']);
               error_log("org.project60.sepa_dd: ".$message);
               if($warning) {
-                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
               }
               // FIXME: why not try again? return;
             } else {
               $message = sprintf("Label '%s' of option group 'recur_frequency_units' reset to '%s'", $c, $c);
               error_log("org.project60.sepa_dd: ".$message);
               if($warning) {
-                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning'), 'warn');
+                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
               }
             }
           }
@@ -113,16 +113,16 @@ class CRM_Utils_SepaOptionGroupTools {
   public static function getFrequencyText($interval, $unit, $ts=false) {
     if ($unit == 'month') {
       if ($interval == 1) {
-        return $ts?ts('monthly'):'monthly';
+        return $ts?ts('monthly', array('domain' => 'org.project60.sepa')):'monthly';
       } elseif ($interval == 3) {
-        return $ts?ts('quarterly'):'quarterly';
+        return $ts?ts('quarterly', array('domain' => 'org.project60.sepa')):'quarterly';
       } elseif ($interval == 6) {
-          return $ts?ts('semi-annually'):'semi-annually';
+          return $ts?ts('semi-annually', array('domain' => 'org.project60.sepa')):'semi-annually';
       } elseif ($interval == 12) {
-        return $ts?ts('annually'):'annually';
+        return $ts?ts('annually', array('domain' => 'org.project60.sepa')):'annually';
       } else {
         if ($ts) {
-          return sprintf(ts("every %1 months"), $interval);
+          return sprintf(ts("every %1 months", array('domain' => 'org.project60.sepa')), $interval);
         } else {
           return sprintf("every %1 months", $interval);
         }
@@ -132,13 +132,13 @@ class CRM_Utils_SepaOptionGroupTools {
         return $ts?ts('annually'):'annually';
       } else {
         if ($ts) {
-          return sprintf(ts("every %1 years"), $interval);
+          return sprintf(ts("every %1 years", array('domain' => 'org.project60.sepa')), $interval);
         } else {
           return sprintf("every %1 years", $interval);
         }
       }
     } else {
-      return $ts?ts('on an irregular basis'):'on an irregular basis';
+      return $ts?ts('on an irregular basis', array('domain' => 'org.project60.sepa')):'on an irregular basis';
     }
   }
 }
