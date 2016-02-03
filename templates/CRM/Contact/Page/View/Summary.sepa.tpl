@@ -15,11 +15,11 @@
 
 <script type="text/javascript">
 var contribution_snippet_changed  = false;
-var contribution_extra_button     = '<a id="sepa_payment_extra_button" class="button" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contactId"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Record SEPA Contribution{/ts}</span></a>';
-var sepa_edit_mandate_html        = "{ts}edit mandate{/ts}";
-var sepa_edit_mandate_title       = "{ts}edit sepa mandate{/ts}";
+var contribution_extra_button     = '<a id="sepa_payment_extra_button" class="button" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contactId"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Record SEPA Contribution{/ts}</span></a>';
+var sepa_edit_mandate_html        = "{ts domain="org.project60.sepa"}edit mandate{/ts}";
+var sepa_edit_mandate_title       = "{ts domain="org.project60.sepa"}edit sepa mandate{/ts}";
 var sepa_edit_mandate_href        = '{crmURL p="civicrm/sepa/xmandate" q="mid=___mandate_id___"}'.replace('&amp;', '&');
-var contribution_tab_selector_44x = "#{ts}Contributions{/ts} > div.crm-container-snippet";
+var contribution_tab_selector_44x = "#{ts domain="org.project60.sepa"}Contributions{/ts} > div.crm-container-snippet";
 
 // listen to DOM changes
 cj("#mainTabContainer").bind("DOMSubtreeModified", sepa_modify_summary_tab_contribution);

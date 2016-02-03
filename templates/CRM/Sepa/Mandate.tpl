@@ -15,7 +15,7 @@
 <div id="payment_information">
 <fieldset class="billing_mode-group direct_debit_info-group">
 <legend>
-{ts}Direct Debit Information{/ts}
+{ts domain="org.project60.sepa"}Direct Debit Information{/ts}
 </legend>
 
 <div class="crm-section {$form.bank_iban.name}-section">

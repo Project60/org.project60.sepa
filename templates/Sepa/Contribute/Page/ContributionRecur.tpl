@@ -16,37 +16,37 @@
 {assign var="fcid" value=$sepa.first_contribution_id}
 {assign var="mid" value=$sepa.id}
 
-<h3>{ts}Sepa Mandate{/ts} {$sepa.id}</h3>
+<h3>{ts domain="org.project60.sepa"}Sepa Mandate{/ts} {$sepa.id}</h3>
 <div class="crm-container">
     <div class="crm-block crm-content-block crm-sdd-mandate">
         <table class="crm-info-panel">
-            <tr><td class="label">{ts}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
-            <tr><td class="label">{ts}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>
-            <tr><td class="label">{ts}BIC{/ts}</td><td>{$sepa.bic}</td></tr>
-            <tr><td class="label">{ts}Status{/ts}</td><td>{$sepa.status}</td></tr>
-            <tr><td class="label">{ts}Source{/ts}</td><td>{$sepa.source}</td></tr>
-            <tr><td class="label">{ts}Creation date{/ts}</td><td>{$sepa.creation_date}</td></tr>
-            <tr><td class="label">{ts}Signature date{/ts}</td><td>{$sepa.date}</td></tr>
-            <tr><td class="label">{ts}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
-            <tr><td class="label">{ts}1st contribution{/ts}</td><td><a href="{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=view&id=$fcid&cid=$cid"}">{$sepa.first_contribution_id}</a></td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}BIC{/ts}</td><td>{$sepa.bic}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}Status{/ts}</td><td>{$sepa.status}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}Source{/ts}</td><td>{$sepa.source}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}Creation date{/ts}</td><td>{$sepa.creation_date}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}Signature date{/ts}</td><td>{$sepa.date}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
+            <tr><td class="label">{ts domain="org.project60.sepa"}1st contribution{/ts}</td><td><a href="{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=view&id=$fcid&cid=$cid"}">{$sepa.first_contribution_id}</a></td></tr>
         </table>
     </div>
 </div>    
  
 <div class="crm-submit-buttons">
-    <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Clone{/ts}</span></a-->
+    <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Clone{/ts}</span></a-->
 
-    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Mandate Options{/ts}</span></a>
+    <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts domain="org.project60.sepa"}Mandate Options{/ts}</span></a>
 </div>
 
 <!--div class="crm-submit-buttons">
     <form action="{crmURL p='civicrm/sepa/pdf' q="reset=1&id=$mid"}" amethod="post">
         <input type="hidden" name="id" value="{$sepa.id}"/>
         <input type="hidden" name="reset" value="1"/>
-        <a class="button" href="{crmURL p='civicrm/contact/view' q="action=browse&selectedChild=contribute&cid=$contactId"}"><span><div class="icon ui-icon-close"></div>{ts}Done{/ts}</span></a>
+        <a class="button" href="{crmURL p='civicrm/contact/view' q="action=browse&selectedChild=contribute&cid=$contactId"}"><span><div class="icon ui-icon-close"></div>{ts domain="org.project60.sepa"}Done{/ts}</span></a>
 
         {assign var="crid" value=$recur.id}
-        <a class="button" href="{crmURL p='civicrm/contribute/updaterecur' q="reset=1&crid=$crid&cid=$contactId&context=contribution"}"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
+        <a class="button" href="{crmURL p='civicrm/contribute/updaterecur' q="reset=1&crid=$crid&cid=$contactId&context=contribution"}"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts domain="org.project60.sepa"}Edit{/ts}</span></a>
         <button name="pdfaction" value="print" class="ui-button ui-button-text-icon-primary">
             <span class="ui-button-icon-primary ui-icon ui-icon-print"></span>
             <span class="ui-button-text">Print</span>
@@ -63,7 +63,7 @@
 {crmAPI var='result' entity='Note' action='get' q='civicrm/ajax/rest' entity_id=$recur.id entity_table='civicrm_contribution_recur'}
 <table hidden="1">
 {foreach from=$result.values item=Note}
-<tr name="note_added"><td class="label">{ts}Note{/ts}</td><td>{$Note.note}</td></tr>
+<tr name="note_added"><td class="label">{ts domain="org.project60.sepa"}Note{/ts}</td><td>{$Note.note}</td></tr>
 {/foreach}
 </table>
 

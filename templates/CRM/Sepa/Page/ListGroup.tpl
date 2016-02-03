@@ -13,15 +13,15 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
-<h3>{ts}Contributions for transaction group{/ts} '{$reference}'</h3>
+<h3>{ts domain="org.project60.sepa"}Contributions for transaction group{/ts} '{$reference}'</h3>
 <table>
 	<thead>
-		<th>{ts}ID{/ts}</th>
-		<th>{ts}Amount{/ts}</th>
+		<th>{ts domain="org.project60.sepa"}ID{/ts}</th>
+		<th>{ts domain="org.project60.sepa"}Amount{/ts}</th>
 		<th>&nbsp;</th>
-		<th>{ts}Contact{/ts}</th>
-		<th>{ts}Financial Type{/ts}</th>
-		<th>{ts}Campaign{/ts}</th>
+		<th>{ts domain="org.project60.sepa"}Contact{/ts}</th>
+		<th>{ts domain="org.project60.sepa"}Financial Type{/ts}</th>
+		<th>{ts domain="org.project60.sepa"}Campaign{/ts}</th>
 	</thead>
 	<tbody>
 		{foreach from=$contributions item=contribution}
@@ -37,19 +37,19 @@
 	</tbody>
 	<tfoot>
         <tr class="columnfooter">
-            <td>{$total_count} {ts}Contributions{/ts}</td>
+            <td>{$total_count} {ts domain="org.project60.sepa"}Contributions{/ts}</td>
             <td align="right">{$total_amount_str}</td>
             <td/>
-            <td>{$different_contacts} {ts}Contacts{/ts}</td>
-            <td>{$different_types} {ts}Financial Types{/ts}</td>
-            <td>{$different_campaigns} {ts}Campaigns{/ts}</td>
+            <td>{$different_contacts} {ts domain="org.project60.sepa"}Contacts{/ts}</td>
+            <td>{$different_types} {ts domain="org.project60.sepa"}Financial Types{/ts}</td>
+            <td>{$different_campaigns} {ts domain="org.project60.sepa"}Campaigns{/ts}</td>
         </tr>
     </tfoot>
 </table>
 
 {if $txgroup.status_id neq 1}
 {* only show button if group is closed *}
-<a class="button" onClick="create_accounting_batch({$group_id});">{ts}Create Accounting Batch{/ts}</a>
+<a class="button" onClick="create_accounting_batch({$group_id});">{ts domain="org.project60.sepa"}Create Accounting Batch{/ts}</a>
 {/if}
 
 <script type="text/javascript">

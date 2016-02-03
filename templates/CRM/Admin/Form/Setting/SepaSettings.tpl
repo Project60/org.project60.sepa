@@ -30,14 +30,14 @@ div.sdd-add-creditor {
 
 <div class="crm-block crm-form-block crm-alternative_batching-form-block">
   <div class="sdd-settings">
-      <h2>{ts}Creditors{/ts}</h2>
+      <h2>{ts domain="org.project60.sepa"}Creditors{/ts}</h2>
       {if $creditors}
       <table class="form-layout">
           <tr class="crm-creditor-block">
-            <th>{ts}Name{/ts}</th>
-            <th>{ts}IBAN{/ts}</th>
-            <th>{ts}BIC{/ts}</th>
-            <th>{ts}Actions{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}Name{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}IBAN{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}BIC{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}Actions{/ts}</th>
           </tr>
         {foreach item=creditor from=$creditors}
           <tr class="crm-creditor-block">
@@ -46,86 +46,86 @@ div.sdd-add-creditor {
             <td>{$creditor.bic}</td>
             <td>
               <a class="add button" title="Copy" onclick="fetchCreditor({$creditor.id}, true);">
-                <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Copy{/ts}</span>
+                <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Copy{/ts}</span>
               </a>
               <a class="edit button" title="Edit" onclick="fetchCreditor({$creditor.id}, false); cj('a.add').hide();">
-                <span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
+                <span><div class="icon edit-icon ui-icon-pencil"></div>{ts domain="org.project60.sepa"}Edit{/ts}</span>
               </a>
               <a class="delete button" title="Delete" onclick="deletecreditor({$creditor.id});">
-                <span><div class="icon delete-icon ui-icon-trash"></div>{ts}Delete{/ts}</span>
+                <span><div class="icon delete-icon ui-icon-trash"></div>{ts domain="org.project60.sepa"}Delete{/ts}</span>
               </a>
             </td>
           </tr>
         {/foreach}
       </table>
       {else}
-        <p style="text-align: center;">{ts}No creditors found{/ts}</p>
+        <p style="text-align: center;">{ts domain="org.project60.sepa"}No creditors found{/ts}</p>
       {/if}
       <a class="add button" title="Add" onclick="cj('#addcreditor').toggle(500); cj(this).hide(); resetValues();">
-        <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Add{/ts}</span>
+        <span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add{/ts}</span>
       </a><br/>
       <div id="addcreditor" class="sdd-add-creditor" >
-     <h2>{ts}Add/Edit Creditor{/ts}</h2>
-     <h3>{ts}Creditor Information{/ts}</h3>
+     <h2>{ts domain="org.project60.sepa"}Add/Edit Creditor{/ts}</h2>
+     <h3>{ts domain="org.project60.sepa"}Creditor Information{/ts}</h3>
      <table id="creditorinfo" class="form-layout">
          <tr>
-           <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
+           <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>
      </div></td>
            <td>
              {$form.addcreditor_name.html}
            </td>
          </tr>
          <tr>
-            <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+            <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
              <td>
                {$form.is_test_creditor.html}
              </td>
          </tr>
             <tr>
-              <td class="label">{$form.addcreditor_creditor_id.label} <a onclick='CRM.help("{ts}Creditor Contact{/ts}", {literal}{"id":"id-contact","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a>
+              <td class="label">{$form.addcreditor_creditor_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Contact{/ts}", {literal}{"id":"id-contact","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>
         </div></td>
               <td>
                 {$form.addcreditor_creditor_id.html}
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.addcreditor_address.label} <a onclick='CRM.help("{ts}Creditor Address{/ts}", {literal}{"id":"id-address","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.addcreditor_address.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Address{/ts}", {literal}{"id":"id-address","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.addcreditor_address.html}
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.addcreditor_country_id.label} <a onclick='CRM.help("{ts}Creditor Country{/ts}", {literal}{"id":"id-country","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.addcreditor_country_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Country{/ts}", {literal}{"id":"id-country","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.addcreditor_country_id.html}
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.addcreditor_id.label} <a onclick='CRM.help("{ts}Creditor Identifier{/ts}", {literal}{"id":"id-id","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.addcreditor_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Identifier{/ts}", {literal}{"id":"id-id","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.addcreditor_id.html}
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.addcreditor_iban.label} <a onclick='CRM.help("{ts}IBAN{/ts}", {literal}{"id":"id-iban","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.addcreditor_iban.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}IBAN{/ts}", {literal}{"id":"id-iban","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.addcreditor_iban.html}
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.addcreditor_bic.label} <a onclick='CRM.help("{ts}BIC{/ts}", {literal}{"id":"id-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.addcreditor_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}BIC{/ts}", {literal}{"id":"id-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.addcreditor_bic.html}
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.addcreditor_pain_version.label} <a onclick='CRM.help("{ts}PAIN Version{/ts}", {literal}{"id":"id-pain","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.addcreditor_pain_version.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}PAIN Version{/ts}", {literal}{"id":"id-pain","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.addcreditor_pain_version.html}
               </td>
             </tr>
             <tr>
-              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_txmsg.html}
               </td>
@@ -133,46 +133,46 @@ div.sdd-add-creditor {
        </table>
        {$form.add_creditor_id.html}
        {$form.edit_creditor_id.html}
-     <h3>{ts}Custom Batching Settings (for this creditor){/ts}</h3>
+     <h3>{ts domain="org.project60.sepa"}Custom Batching Settings (for this creditor){/ts}</h3>
      <table id="custombatching" class="form-layout">
             <tr class="crm-custom-form-block-cycle-days">
-              <td class="label">{$form.custom_cycledays.label} <a onclick='CRM.help("{ts}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_cycledays.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_cycledays.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-ooff-horizon-days">
-              <td class="label">{$form.custom_OOFF_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_OOFF_horizon.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_OOFF_horizon.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-ooff-notice-days">
-              <td class="label">{$form.custom_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_OOFF_notice.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_OOFF_notice.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-rcur-horizon-days">
-              <td class="label">{$form.custom_RCUR_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_RCUR_horizon.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_RCUR_horizon.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-rcur-grace-days">
-              <td class="label">{$form.custom_RCUR_grace.label} <a onclick='CRM.help("{ts}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_RCUR_grace.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_RCUR_grace.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-rcur-notice-days">
-              <td class="label">{$form.custom_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_RCUR_notice.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_RCUR_notice.html}
               </td>
             </tr>
             <tr class="crm-custom-form-block-frst-notice-days">
-              <td class="label">{$form.custom_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_FRST_notice.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_FRST_notice.html}
               </td>
@@ -181,10 +181,10 @@ div.sdd-add-creditor {
        <br/>
        <div>
           <a class="save button" title="Save" onclick="updateCreditor();">
-            <span>{ts}Save{/ts}</span>
+            <span>{ts domain="org.project60.sepa"}Save{/ts}</span>
           </a>
           <a class="cancel button" title="Cancel" onclick="resetValues(); cj('#addcreditor').hide(500); cj('a.add').show(); return;">
-            <span>{ts}Cancel{/ts}</span>
+            <span>{ts domain="org.project60.sepa"}Cancel{/ts}</span>
           </a><br/>
        </div>
        <br/>
@@ -193,102 +193,102 @@ div.sdd-add-creditor {
   <br/><br/>
   <div class="sdd-settings">
     <fieldset>
-        <h2>{ts}Default Batching Settings{/ts}</h2>
+        <h2>{ts domain="org.project60.sepa"}Default Batching Settings{/ts}</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-cycle-days">
-              <td class="label">{$form.cycledays.label} <a onclick='CRM.help("{ts}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.cycledays.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Cycle Day(s){/ts}", {literal}{"id":"id-cycle-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.cycledays.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-ooff-horizon-days">
-              <td class="label">{$form.batching_OOFF_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_OOFF_horizon.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Horizon{/ts}", {literal}{"id":"id-ooff-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_OOFF_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-ooff-notice-days">
-              <td class="label">{$form.batching_OOFF_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_OOFF_notice.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_OOFF_notice.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-horizon-days">
-              <td class="label">{$form.batching_RCUR_horizon.label} <a onclick='CRM.help("{ts}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_RCUR_horizon.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Horizon{/ts}", {literal}{"id":"id-rcur-horizon","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_RCUR_horizon.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-grace-days">
-              <td class="label">{$form.batching_RCUR_grace.label} <a onclick='CRM.help("{ts}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_RCUR_grace.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Grace Period{/ts}", {literal}{"id":"id-rcur-grace","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_RCUR_grace.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-rcur-notice-days">
-              <td class="label">{$form.batching_RCUR_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_RCUR_notice.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_RCUR_notice.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-frst-notice-days">
-              <td class="label">{$form.batching_FRST_notice.label} <a onclick='CRM.help("{ts}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_FRST_notice.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Batching Notice Days{/ts}", {literal}{"id":"id-notice","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_FRST_notice.html}
               </td>
             </tr>
        </table>
        <br/>
-       <h2>{ts}System Settings{/ts}</h2>
+       <h2>{ts domain="org.project60.sepa"}System Settings{/ts}</h2>
         <table class="form-layout">
             <tr class="crm-alternative_batching-form-block-batching_default_creditor">
-              <td class="label">{$form.batching_default_creditor.label} <a onclick='CRM.help("{ts}Default Creditor{/ts}", {literal}{"id":"id-defaultcreditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_default_creditor.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Default Creditor{/ts}", {literal}{"id":"id-defaultcreditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_default_creditor.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-allow_mandate_modification">
-              <td class="label">{$form.allow_mandate_modification.label} <a onclick='CRM.help("{ts}Mandate Modifications{/ts}", {literal}{"id":"id-mandatemodifications","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.allow_mandate_modification.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Mandate Modifications{/ts}", {literal}{"id":"id-mandatemodifications","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.allow_mandate_modification.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-custom-txmsg">
-              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.custom_txmsg.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-update-lock_timeout">
-              <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.batching_UPDATE_lock_timeout.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Update lock timeout{/ts}", {literal}{"id":"id-lock","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.batching_UPDATE_lock_timeout.html}
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-exclude-weekends">
-              <td class="label">{$form.exclude_weekends.label} <a onclick='CRM.help("{ts}Exclude Weekends{/ts}", {literal}{"id":"id-exclude-weekends","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.exclude_weekends.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Exclude Weekends{/ts}", {literal}{"id":"id-exclude-weekends","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.exclude_weekends.html}
               </td>
             </tr>
        </table>
        <br/>
-       <h2>{ts}Payment Processor Settings{/ts}</h2>
+       <h2>{ts domain="org.project60.sepa"}Payment Processor Settings{/ts}</h2>
         <table class="form-layout">
           <tr class="crm-pp-form-block-hide-bic">
-            <td class="label">{$form.pp_hide_bic.label} <a onclick='CRM.help("{ts}Hide BIC{/ts}", {literal}{"id":"id-hide-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+            <td class="label">{$form.pp_hide_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Hide BIC{/ts}", {literal}{"id":"id-hide-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
             <td>
               {$form.pp_hide_bic.html}
             </td>
           </tr>
           <tr class="crm-pp-form-block-improve-frequency">
-            <td class="label">{$form.pp_improve_frequency.label} <a onclick='CRM.help("{ts}Improve frequency dropdown{/ts}", {literal}{"id":"id-improve-frequency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+            <td class="label">{$form.pp_improve_frequency.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Improve frequency dropdown{/ts}", {literal}{"id":"id-improve-frequency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
             <td>
               {$form.pp_improve_frequency.html}
             </td>
           </tr>
           <tr class="crm-pp-form-block-buffer-days">
-            <td class="label">{$form.pp_buffer_days.label} <a onclick='CRM.help("{ts}Recurring Buffer Days{/ts}", {literal}{"id":"id-buffer-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+            <td class="label">{$form.pp_buffer_days.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Recurring Buffer Days{/ts}", {literal}{"id":"id-buffer-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
             <td>
               {$form.pp_buffer_days.html}
             </td>
@@ -398,7 +398,7 @@ div.sdd-add-creditor {
                               }
                           });
 
-                          CRM.alert("{/literal}{ts}Creditor deleted{/ts}", "{ts}Success{/ts}{literal}", "success");
+                          CRM.alert("{/literal}{ts domain="org.project60.sepa"}Creditor deleted{/ts}", "{ts domain="org.project60.sepa"}Success{/ts}{literal}", "success");
                           location.reload();
                         }
                       }
@@ -410,7 +410,7 @@ div.sdd-add-creditor {
             resetValues();
         },
         {
-          message: {/literal}"{ts}Are you sure you want to delete this creditor?{/ts}"{literal}
+          message: {/literal}"{ts domain="org.project60.sepa"}Are you sure you want to delete this creditor?{/ts}"{literal}
         }
     );
   }
@@ -517,13 +517,13 @@ div.sdd-add-creditor {
     }
     
     if(updatedCreditorInfo['creditor_id'] === undefined) {
-      CRM.alert("{/literal}{ts}You must provide a valid contact to save this creditor{/ts}", "{ts}Error{/ts}{literal}", "error");
+      CRM.alert("{/literal}{ts domain="org.project60.sepa"}You must provide a valid contact to save this creditor{/ts}", "{ts domain="org.project60.sepa"}Error{/ts}{literal}", "error");
       return;
     }
 
     var reIBAN = /^[A-Z0-9]+$/;
     if(!reIBAN.test(updatedCreditorInfo['iban'])) {
-      CRM.alert("{/literal}{ts}IBAN is not correct{/ts}", "{ts}Error{/ts}{literal}", "error");
+      CRM.alert("{/literal}{ts domain="org.project60.sepa"}IBAN is not correct{/ts}", "{ts domain="org.project60.sepa"}Error{/ts}{literal}", "error");
       return;
     }
 
@@ -566,7 +566,7 @@ div.sdd-add-creditor {
                     CRM.api('Setting', 'create', param, {success: function(data) {
 			 if(once) {
                            once = !once;
-			   CRM.alert("{/literal}{ts}Creditor updated{/ts}", "{ts}Success{/ts}{literal}", "success");
+			   CRM.alert("{/literal}{ts domain="org.project60.sepa"}Creditor updated{/ts}", "{ts domain="org.project60.sepa"}Success{/ts}{literal}", "success");
                            resetValues();
                            location.reload();
 			 }

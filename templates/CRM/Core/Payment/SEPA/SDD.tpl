@@ -105,7 +105,7 @@ function sepa_process_iban() {
 <script type="text/javascript">
 var busy_icon_url = "{$config->resourceBase}i/loading.gif";
 var sepa_hide_bic_enabled = parseInt("{$sepa_hide_bic}");
-var sepa_lookup_bic_error_message = "{ts}Bank unknown, please enter BIC.{/ts}";
+var sepa_lookup_bic_error_message = "{ts domain="org.project60.sepa"}Bank unknown, please enter BIC.{/ts}";
 var sepa_lookup_bic_timerID = 0;
 var sepa_lookup_bic_timeout = 1000;
 {literal}

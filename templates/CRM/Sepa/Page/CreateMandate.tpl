@@ -33,7 +33,7 @@
 	<input type="hidden" name="contact_id" value="{$contact_id}" />
 	<table>
 		<tr>	<!-- CREDITOR -->
-			<td>{ts}Creditor{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Creditor{/ts}:</td>
 			<td>
 				<select name="creditor_id" onChange='sepa_update_cycledays();' >
 					{foreach from=$creditors item=name key=id}
@@ -43,15 +43,15 @@
 			</td>
 		</tr>
 		<tr>	<!-- CONTACT -->
-			<td>{ts}Contact{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Contact{/ts}:</td>
 			<td><input disabled name="contact" type="text" size="40" value="{$display_name}"/></td>
 		</tr>
 		<tr>	<!-- AMOUNT -->
-			<td>{ts}Amount{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Amount{/ts}:</td>
 			<td><input name="total_amount" type="number" size="6" step="0.01" value="{$total_amount}" />&nbsp;EUR</td>
 		</tr>
 		<tr>	<!-- FINANCIAL TYPE -->
-			<td>{ts}Financial Type{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Financial Type{/ts}:</td>
 			<td>
 				<select name="financial_type_id">
 					{foreach from=$financial_types item=name key=id}
@@ -61,7 +61,7 @@
 			</td>
 		</tr>
 		<tr>	<!-- CAMPAIGN -->
-			<td>{ts}Campaign{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Campaign{/ts}:</td>
 			<td>
 				<select name="campaign_id">
 					{foreach from=$campaigns item=name key=id}
@@ -71,16 +71,16 @@
 			</td>
 		</tr>
 		<tr>	<!-- MANDATE REFERENCE -->
-			<td>{ts}Mandate Reference{/ts}:</td>
-			<td><input name="reference" type="text" size="34" value="{$reference}" placeholder="{ts}not required, will be generated{/ts}"/></td>
+			<td>{ts domain="org.project60.sepa"}Mandate Reference{/ts}:</td>
+			<td><input name="reference" type="text" size="34" value="{$reference}" placeholder="{ts domain="org.project60.sepa"}not required, will be generated{/ts}"/></td>
 		</tr>
 		<tr>	<!-- SOURCE -->
-			<td>{ts}Source{/ts}:</td>
-			<td><input name="source" type="text" value="{$source}" placeholder="{ts}not required{/ts}"/></td>
+			<td>{ts domain="org.project60.sepa"}Source{/ts}:</td>
+			<td><input name="source" type="text" value="{$source}" placeholder="{ts domain="org.project60.sepa"}not required{/ts}"/></td>
 		</tr>
 		<tr>	<!-- NOTE -->
-			<td id="mandate_note_label">{ts}Note{/ts}:</td>
-			<td><input name="note" type="text" size="32" value="{$note}" placeholder="{ts}not required{/ts}"/></td>
+			<td id="mandate_note_label">{ts domain="org.project60.sepa"}Note{/ts}:</td>
+			<td><input name="note" type="text" size="32" value="{$note}" placeholder="{ts domain="org.project60.sepa"}not required{/ts}"/></td>
 		</tr>
 
 		<tr><td colspan="4"><hr></td></tr>
@@ -115,17 +115,17 @@
 	</table>
 
 	{if $replace}
-	<h3>{ts}Replacing Mandate{/ts}&nbsp;[{$replace}]</h3>
+	<h3>{ts domain="org.project60.sepa"}Replacing Mandate{/ts}&nbsp;[{$replace}]</h3>
 	<input type="hidden" name="replace" value="{$replace}" />
 	<table class="create_mandate">
 		<tr>	<!-- REPLACE::DATE -->
-			<td>{ts}Replacement Date{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Replacement Date{/ts}:</td>
 			<td>
 				<input id="replace_date" name="replace_date" type="text" value="{$replace_date}"/>
 			</td>
 		</tr>
 		<tr>	<!-- REPLACE::REASON -->
-			<td>{ts}Replacement Reason{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Replacement Reason{/ts}:</td>
 			<td>
 				<input name="replace_reason" type="text" value="{$replace_reason}"/>
 			</td>
@@ -133,12 +133,12 @@
 	</table>
 	{/if}
 
-	<h3>{ts}Mandate Type{/ts}</h3>
+	<h3>{ts domain="org.project60.sepa"}Mandate Type{/ts}</h3>
 	<table class="create_mandate">
 		{if not $replace}
 		<tr>	<!-- ONE OFF -->
-			<td style="vertical-align: top;"><input name="mandate_type" id='mtype_OOFF' type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts}One Time{/ts}</input></td>
-			<td>{ts}Earliest execution date{/ts}:</td>
+			<td style="vertical-align: top;"><input name="mandate_type" id='mtype_OOFF' type='radio' value="OOFF" {if $mandate_type eq "OOFF" or not $mandate_type}checked{/if}>{ts domain="org.project60.sepa"}One Time{/ts}</input></td>
+			<td>{ts domain="org.project60.sepa"}Earliest execution date{/ts}:</td>
 			<td>
 				<input id="date" name="date" type="text" value="{$date}" onChange='cj("#mtype_OOFF").prop("checked",true);'/>
 			</td>
@@ -149,39 +149,39 @@
 		{/if}
 
 		<tr>	<!-- RECURRING -->
-			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" id='mtype_RCUR' type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts}Recurring{/ts}</input></td>
-			<td>{ts}Start Date{/ts}:</td>
+			<td style="vertical-align: top;" rowspan="4"><input name="mandate_type" id='mtype_RCUR' type='radio' value="RCUR" {if $mandate_type eq "RCUR"}checked{/if}>{ts domain="org.project60.sepa"}Recurring{/ts}</input></td>
+			<td>{ts domain="org.project60.sepa"}Start Date{/ts}:</td>
 			<td>
 				<input id="start_date" name="start_date" type="text" value="{$start_date}" onChange='cj("#mtype_RCUR").prop("checked",true);' />
 			<td></td>
 		</tr>
 		<tr>
-			<td>{ts}Collection Date{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Collection Date{/ts}:</td>
 			<td>
 				<select id="default_element_cycle_day" name="cycle_day" onChange='cj("#mtype_RCUR").prop("checked",true);' />
 			</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td>{ts}Interval{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}Interval{/ts}:</td>
 			<td>
 				<select class="form-select" id="default_frequency_interval" name="interval" onChange='cj("#mtype_RCUR").prop("checked",true);'>
-					<option value="1">{ts}monthly{/ts}</option>
-					<option value="3">{ts}quarterly{/ts}</option>
-					<option value="6">{ts}semi-annually{/ts}</option>
-					<option value="12">{ts}annually{/ts}</option>
+					<option value="1">{ts domain="org.project60.sepa"}monthly{/ts}</option>
+					<option value="3">{ts domain="org.project60.sepa"}quarterly{/ts}</option>
+					<option value="6">{ts domain="org.project60.sepa"}semi-annually{/ts}</option>
+					<option value="12">{ts domain="org.project60.sepa"}annually{/ts}</option>
 				</select>
 			</td>
 			<td></td>
 		</tr>
 		<tr>
-			<td>{ts}End Date{/ts}:</td>
+			<td>{ts domain="org.project60.sepa"}End Date{/ts}:</td>
 			<td>
 				<input id="end_date" name="end_date" type="text" value="{$end_date}" onChange='cj("#mtype_RCUR").prop("checked",true);' />
 			<td></td>
 		</tr>
 	</table>
-	<input type="submit" value="{ts}create{/ts}" />
+	<input type="submit" value="{ts domain="org.project60.sepa"}create{/ts}" />
 </form>
 
 {else}
@@ -190,18 +190,18 @@
 	cj(".ui-dialog > [id^=crm-ajax-dialog-]").dialog("destroy");
 	</script>
 	{if $error_message}
-		<h2>{ts}Error!{/ts} {$error_title}</h2>
+		<h2>{ts domain="org.project60.sepa"}Error!{/ts} {$error_title}</h2>
 		<p>{$error_message}</p>
 	{else}
-		<h2>{ts}Mandate successfully created.{/ts}<br/>
-		{ts}Reference is{/ts}: <font face="Courier New, monospace">{$reference}</font></h2>
+		<h2>{ts domain="org.project60.sepa"}Mandate successfully created.{/ts}<br/>
+		{ts domain="org.project60.sepa"}Reference is{/ts}: <font face="Courier New, monospace">{$reference}</font></h2>
 	{/if}
 	<br/><br/>
-	<a href="{$back_url}" class="view button" title="{ts}back to contact{/ts}">
-		<span><div class="icon preview-icon"></div>{ts}view contact{/ts}</span>
+	<a href="{$back_url}" class="view button" title="{ts domain="org.project60.sepa"}back to contact{/ts}">
+		<span><div class="icon preview-icon"></div>{ts domain="org.project60.sepa"}view contact{/ts}</span>
 	</a>
-	<a href="{$mandate_url}" class="view button" title="{ts}view mandate{/ts}">
-		<span><div class="icon preview-icon"></div>{ts}view mandate{/ts}</span>
+	<a href="{$mandate_url}" class="view button" title="{ts domain="org.project60.sepa"}view mandate{/ts}">
+		<span><div class="icon preview-icon"></div>{ts domain="org.project60.sepa"}view mandate{/ts}</span>
 	</a>
 {/if}
 
