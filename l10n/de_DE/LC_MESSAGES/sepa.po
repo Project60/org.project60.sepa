@@ -393,7 +393,7 @@ msgstr "Erstellungsdatum"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "First Contribution (to be deprecated)"
-msgstr ""
+msgstr "Ersteinzug"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "validation date"
@@ -454,7 +454,7 @@ msgstr "Mitgliedschaftsreport (Detail)"
 
 #: CRM/Sepa/Form/Report/SEPAMandate.php
 msgid "View Contact Summary for this Contact."
-msgstr ""
+msgstr "Übersicht für diesen Kontakt anzeigen."
 
 #: CRM/Sepa/Logic/Batching.php
 msgid "%B %E%f"
@@ -487,7 +487,7 @@ msgstr "Diese Seite kann nicht ohne Parameter aufgerufen werden."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create contribution for contact #%s"
-msgstr ""
+msgstr "Zuwendung für Kontakt #%s konnte nicht angelegt werden."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create contribution"
@@ -528,7 +528,7 @@ msgstr "Liste der Kampagnen konnte nicht geladen werden"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "enter new account"
-msgstr ""
+msgstr "neues Konto"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't find any creditors."
@@ -557,7 +557,7 @@ msgstr "'%s' ist ein Pflichtfeld."
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "Amount"
-msgstr ""
+msgstr "Betrag"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Cannot parse amount"
@@ -593,7 +593,7 @@ msgstr "Die Gruppen konnten nicht geladen werden. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/DashBoard.php
 msgid "Unknown batcher mode '%s'. No batching triggered."
-msgstr ""
+msgstr "Unbekannter Batcher-Modus '%s'. Batching wurde nicht ausgeführt."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "This page needs a mandate id ('mid') parameter."
@@ -601,7 +601,7 @@ msgstr "Diese Seite benötigt eine Mandats-ID ('mid')."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Unkown action '%s'. Ignored."
-msgstr ""
+msgstr "Unbekannte Aktion '%s' wurde ignoriert."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Cannot find mandate [%s]."
@@ -697,7 +697,7 @@ msgstr "SEPA Zahlungsinformationen"
 
 #: CRM/Utils/SepaOptionGroupTools.php
 msgid "Warning"
-msgstr ""
+msgstr "Warnung"
 
 #: CRM/Utils/SepaOptionGroupTools.php
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
@@ -780,7 +780,7 @@ msgstr "Diese Zuwendung kann nicht gelöscht werden, da sie Teil des SEPA-Mandat
 
 #: sepa.php
 msgid "CiviSEPA Dashboard"
-msgstr ""
+msgstr "CiviSEPA Dashboard"
 
 #: sepa.php
 msgid "CiviSEPA Settings"
@@ -810,13 +810,13 @@ msgstr "Der eingestellte Gläubiger bestimmt nicht nur die verwendete Gläubiger
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Creditor"
-msgstr ""
+msgstr "Kreditor"
 
 #: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Help"
-msgstr ""
+msgstr "Hilfe"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid "This is the name of the contact to which this creditor is associated to."
@@ -976,20 +976,20 @@ msgstr "Aktionen"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Copy"
-msgstr ""
+msgstr "Kopieren"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "No creditors found"
@@ -997,7 +997,7 @@ msgstr "Keine Gläubiger gefunden."
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Add"
-msgstr ""
+msgstr "Hinzufügen"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Add/Edit Creditor"
@@ -1029,7 +1029,7 @@ msgstr "SEPA Gläubiger-Identifikationsnummer"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Custom Batching Settings (for this creditor)"
-msgstr ""
+msgstr "Batching-Einstellungen (für diesen Creditor)"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Batching Horizon"
@@ -1050,7 +1050,7 @@ msgstr "Speichern"
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Default Batching Settings"
@@ -1058,7 +1058,7 @@ msgstr "Standardeinstellungen Gruppierung"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "System Settings"
-msgstr ""
+msgstr "Systemeinstellungen"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Payment Processor Settings"
@@ -1202,7 +1202,7 @@ msgstr "Wiederkehrende Zuwendung"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Installments"
-msgstr ""
+msgstr "Raten"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "(ongoing)"
@@ -1211,14 +1211,13 @@ msgstr "(laufend)"
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Interval"
-msgstr ""
+msgstr "Turnus"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Non-deductible Amount"
 msgstr "Nichtabsetzbarer Betrag"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
-#, fuzzy
 msgid "Fee Amount"
 msgstr "Gebühren"
 
@@ -1309,11 +1308,11 @@ msgstr "Kontakt ansehen"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Premium Information"
-msgstr ""
+msgstr "Prämieninformationen"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Premium"
-msgstr ""
+msgstr "Prämie"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Option"
@@ -1342,12 +1341,12 @@ msgstr ""
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Honor Roll Name"
@@ -1355,11 +1354,11 @@ msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Personal Note"
-msgstr ""
+msgstr "Persönliche Notiz"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Billing Address"
-msgstr ""
+msgstr "Rechnungsadresse"
 
 #: templates/CRM/Core/Payment/SEPA/SDD.tpl
 msgid "Bank unknown, please enter BIC."
@@ -1373,7 +1372,7 @@ msgstr "SEPA-Mandat"
 
 #: templates/CRM/Sepa/Mandate.tpl
 msgid "Direct Debit Information"
-msgstr ""
+msgstr "Lastschriftinformationen"
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "Group '%s' <b>is now closed</b> and cannot be changed any more."
@@ -1467,15 +1466,15 @@ msgstr "Jetzt noch nicht"
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "not required, will be generated"
-msgstr ""
+msgstr "nicht benötigt, wird automatisch erzeugt"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "not required"
-msgstr ""
+msgstr "nicht benötigt"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Replacing Mandate"
@@ -1491,7 +1490,7 @@ msgstr "Änderungsgrund"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Mandate Type"
-msgstr ""
+msgstr "Mandatstyp"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "One Time"
@@ -1529,7 +1528,7 @@ msgstr "SEPA Mandat wurde erfolgreich erstellt."
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Reference is"
-msgstr ""
+msgstr "Referenz"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "back to contact"
