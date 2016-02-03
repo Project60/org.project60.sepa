@@ -29,11 +29,12 @@
         <table id="resultTable" class="selector row-highlight">
             <thead>
             <tr>
-                <th>{ts}ID{/ts}</th>
-                <th>{ts}Contact{/ts}</th>
-                <th>{ts}Reference{/ts}</th>
-                <th>{ts}IBAN / BIC{/ts}</th>
+                <th><a ng-click="sort('id')">{ts}ID{/ts}</a></th>
+                <th><a ng-click="sort('contact.display_name')">{ts}Contact{/ts}</a></th>
+                <th><a ng-click="sort('reference')">{ts}Reference{/ts}</></th>
+                <th><a ng-click="sort('iban')">{ts}IBAN / BIC{/ts}</></th>
                 <th><a ng-click="sort('status')">{ts}Status{/ts}</a></th>
+                <th>&nbsp;</th>
             </tr>
             </thead>
             <tbody id="resultTableBody">
@@ -47,6 +48,7 @@
                 <td id="reference">[[mandate.reference]]</td>
                 <td id="iban">[[mandate.iban]]<br>[[mandate.bic]]</td>
                 <td id="status">[[mandate.status]]</td>
+                <td id="action"><a href="{crmURL p="civicrm/sepa/xmandate" q="mid=[[mandate.id]]"}" class="action-item crm-hover-button">Edit</a></td>
             </tr>
             </tbody>
         </table>
