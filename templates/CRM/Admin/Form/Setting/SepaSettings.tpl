@@ -101,6 +101,12 @@ div.sdd-add-creditor {
               </td>
             </tr>
             <tr>
+              <td class="label">{$form.addcreditor_currency.label} <a onclick='CRM.help("{ts}Currency{/ts}", {literal}{"id":"id-currency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.addcreditor_currency.html}
+              </td>
+            </tr>
+            <tr>
               <td class="label">{$form.addcreditor_id.label} <a onclick='CRM.help("{ts}Creditor Identifier{/ts}", {literal}{"id":"id-id","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.addcreditor_id.html}
@@ -443,6 +449,7 @@ div.sdd-add-creditor {
           cj('#addcreditor_name').val(data['name']);
           cj('#addcreditor_address').val(data['address']);
           cj('#addcreditor_country_id').val(data['country_id']);
+          cj('#addcreditor_currency').val(data['currency']);
           cj('#addcreditor_id').val(data['identifier']);
           cj('#addcreditor_iban').val(data['iban']);
           cj('#addcreditor_bic').val(data['bic']);
@@ -478,6 +485,7 @@ div.sdd-add-creditor {
     map["addcreditor_name"]         = "name";
     map["addcreditor_address"]      = "address";
     map["addcreditor_country_id"]   = "country_id";
+    map["addcreditor_currency"]     = "currency";
     map["addcreditor_id"]           = "identifier";
     map["addcreditor_iban"]         = "iban";
     map["addcreditor_bic"]          = "bic";

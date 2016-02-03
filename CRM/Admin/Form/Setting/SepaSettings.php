@@ -116,6 +116,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // do not use array_merge() because it discards the original indizes
         $country_ids = array('' => ts('- select -')) + $filtered;
 
+        $config->defaultCurrency;
+        $currencies_enabled = CRM_Core_OptionGroup::values('currencies_enabled');
+        $currencies_dict = array('' => ts('- select -'));
+        foreach ((array)$currencies_enabled as $k => $v) {
+          $currencies_dict[$k] = $k;
+        }
+
         // look up some values
         $excld_we = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
         $hide_bic = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_bic');
@@ -127,6 +134,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_id',           ts("Identifier"));
         $this->addElement('text',       'addcreditor_address',      ts("Address"), array('size' => 60));
         $this->addElement('select',     'addcreditor_country_id',   ts("Country"), $country_ids);
+        $this->addElement('select',     'addcreditor_currency',     ts("Currency"), $currencies_dict);
         $this->addElement('text',       'addcreditor_bic',          ts("BIC"));
         $this->addElement('text',       'addcreditor_iban',         ts("IBAN"), array('size' => 30));
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));

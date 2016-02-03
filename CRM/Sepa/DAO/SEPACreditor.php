@@ -304,6 +304,14 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
             'optionGroupName' => 'sepa_file_format',
           )
         ) ,
+        'currency' => array(
+          'name' => 'currency',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency') ,
+          'maxlength' => 3,
+          'size' => CRM_Utils_Type::FOUR,
+          'default' => 'EUR',
+        ) ,
       );
     }
     return self::$_fields;
@@ -333,6 +341,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'tag' => 'tag',
         'mandate_active' => 'mandate_active',
         'sepa_file_format_id' => 'sepa_file_format_id',
+        'currency' => 'currency',
       );
     }
     return self::$_fieldKeys;
