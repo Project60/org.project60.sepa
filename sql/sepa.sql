@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `tag` varchar(64) NULL   COMMENT 'Place this creditor\'s transaction groups in an XML file tagged with this value.',
      `mandate_active` tinyint    COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.',
      `sepa_file_format_id` int unsigned    COMMENT 'Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.',
-     `currency` varchar(3) NOT NULL DEFAULT 'EUR' COMMENT '3 character string symbol of currency'
+     `currency` varchar(3) NOT NULL DEFAULT 'EUR' COMMENT '3 character string symbol of currency. Required by external extension.'
 ,
     PRIMARY KEY ( `id` )
 
