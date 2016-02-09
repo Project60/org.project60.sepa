@@ -26,6 +26,7 @@ require_once 'CRM/Core/Page.php';
 class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
   function run() {
+    CRM_Utils_System::setTitle(ts('Close SEPA Group', array('domain' => 'org.project60.sepa')));
     if (isset($_REQUEST['group_id'])) {
         if (isset($_REQUEST['status']) && ($_REQUEST['status'] == "missed" || $_REQUEST['status'] == "invalid" || $_REQUEST['status'] == "closed")) {
           $this->assign('status', $_REQUEST['status']);

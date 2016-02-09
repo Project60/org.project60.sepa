@@ -27,6 +27,7 @@ require_once 'CRM/Core/Page.php';
 class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
 
   function run() {
+    CRM_Utils_System::setTitle(ts('SEPA Group Contributions', array('domain' => 'org.project60.sepa')));
     if (isset($_REQUEST['group_id'])) {
       // get some values
       $group_id = (int) $_REQUEST['group_id'];

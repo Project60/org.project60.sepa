@@ -26,6 +26,7 @@ require_once 'CRM/Core/Page.php';
 class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
   function run() {
+    CRM_Utils_System::setTitle(ts('CiviSEPA Dashboard', array('domain' => 'org.project60.sepa')));
     // get requested group status
     if (isset($_REQUEST['status'])) {
       if ($_REQUEST['status'] != 'open' && $_REQUEST['status'] != 'closed') {

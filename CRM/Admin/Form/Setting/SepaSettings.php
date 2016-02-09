@@ -135,7 +135,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends", array('domain' => 'org.project60.sepa')), "", ($excld_we?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'pp_hide_bic',              ts("Hide BIC in PP", array('domain' => 'org.project60.sepa')),   "", ($hide_bic?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'pp_improve_frequency',     ts("Improve payment processor form", array('domain' => 'org.project60.sepa')),   "", ($mendForm?array('checked'=>'checked'):array()));
-        $this->addElement('text',       'pp_buffer_days',           ts("Recurring buffer days", array('domain' => 'org.project60.sepa')), array('size' => 1, 'value' => $bffrdays));
+        $this->addElement('text',       'pp_buffer_days',           ts("Recurring Buffer Days", array('domain' => 'org.project60.sepa')), array('size' => 1, 'value' => $bffrdays));
         $this->addElement('hidden',     'edit_creditor_id',         '', array('id' => 'edit_creditor_id'));
         $this->addElement('hidden',     'add_creditor_id',          '', array('id' => 'add_creditor_id'));
 

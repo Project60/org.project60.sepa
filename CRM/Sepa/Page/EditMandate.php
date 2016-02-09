@@ -29,6 +29,7 @@ require_once 'CRM/Core/Page.php';
 class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
   function run() {
+    CRM_Utils_System::setTitle(ts('Edit SEPA Mandate', array('domain' => 'org.project60.sepa')));
 
     if (!isset($_REQUEST['mid'])) {
       die(ts("This page needs a mandate id ('mid') parameter.", array('domain' => 'org.project60.sepa')));

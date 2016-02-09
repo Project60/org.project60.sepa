@@ -31,6 +31,7 @@ require_once 'packages/php-iban-1.4.0/php-iban.php';
 class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
   function run() {
+    CRM_Utils_System::setTitle(ts('Create SEPA Mandate', array('domain' => 'org.project60.sepa')));
     if (isset($_REQUEST['mandate_type'])) {
       $contact_id = $_REQUEST['contact_id'];
       $this->assign("back_url", CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=${contact_id}&selectedChild=contribute"));

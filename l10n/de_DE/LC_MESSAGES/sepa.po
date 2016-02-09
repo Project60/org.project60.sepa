@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2015-11-24 14:12+0100\n"
+"POT-Creation-Date: 2016-02-09 11:51+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -11,11 +11,6 @@ msgstr ""
 "X-Poedit-Language: German\n"
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-SourceCharset: utf-8\n"
-
-#: xml/Menu/sepa.xml
-msgctxt "menu"
-msgid "CiviSEPA settings"
-msgstr "CiviSEPA Einstellungen"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -138,8 +133,17 @@ msgid "Improve payment processor form"
 msgstr "Spendenseite verbessern"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Recurring Buffer Days"
+msgstr "Pufferzeit Dauereinzüge"
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Please give a comma separated list of valid days."
 msgstr "Bitte geben Sie einen Monatstag, oder eine durch Kommas getrennte Liste von Tagen an."
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Please enter the number of days"
+msgstr "Bitte geben Sie eine ganze Zahl an."
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -160,25 +164,13 @@ msgid "SEPA Direct Debit"
 msgstr "SEPA Einzug"
 
 #: CRM/Core/Payment/SDD.php
-#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
-msgid "Bank Name"
-msgstr "Bankname"
+msgid "Couldn't create SEPA mandate. Error was: "
+msgstr "Das SEPA Mandat konnte nicht erstellt werden. Der Fehler war:"
 
 #: CRM/Core/Payment/SDD.php
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 msgid "Account Holder"
 msgstr "Kontoinhaber"
-
-#: CRM/Core/Payment/SDD.php
-#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
-#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Collection Day"
-msgstr "Einzugstag"
-
-#: CRM/Core/Payment/SDD.php
-msgid "start date"
-msgstr "Stardatum"
 
 #: CRM/Core/Payment/SDD.php
 msgid "This is not a correct IBAN."
@@ -189,8 +181,21 @@ msgid "This is not a correct BIC."
 msgstr "Das ist keine gültige BIC."
 
 #: CRM/Core/Payment/SDD.php
-msgid "Couldn't create SEPA mandate. Error was: "
-msgstr "Das SEPA Mandat konnte nicht erstellt werden. Der Fehler war:"
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+msgid "Bank Name"
+msgstr "Bankname"
+
+#: CRM/Core/Payment/SDD.php
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Collection Day"
+msgstr "Einzugstag"
+
+#: CRM/Core/Payment/SDD.php templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Start Date"
+msgstr "Startdatum"
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot close mandate [%s], batching in progress!"
@@ -486,6 +491,14 @@ msgstr "IBAN ist nicht korrekt."
 msgid "BIC is not correct"
 msgstr "BIC ist nicht korrekt."
 
+#: CRM/Sepa/Page/CloseGroup.php
+msgid "Close SEPA Group"
+msgstr "SEPA Gruppe schließen"
+
+#: CRM/Sepa/Page/CreateMandate.php
+msgid "Create SEPA Mandate"
+msgstr "SEPA Mandat Erstellen"
+
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "This page cannot be called w/o parameters."
 msgstr "Diese Seite kann nicht ohne Parameter aufgerufen werden."
@@ -592,6 +605,10 @@ msgstr "Enddatum kann nicht vor dem Startdatum liegen."
 msgid "replace reason"
 msgstr "Änderungsgrund"
 
+#: CRM/Sepa/Page/DashBoard.php sepa.php
+msgid "CiviSEPA Dashboard"
+msgstr "CiviSEPA Dashboard"
+
 #: CRM/Sepa/Page/DashBoard.php
 msgid "Couldn't read transaction groups. Error was: '%s'"
 msgstr "Die Gruppen konnten nicht geladen werden. Fehler ist: '%s'"
@@ -599,6 +616,14 @@ msgstr "Die Gruppen konnten nicht geladen werden. Fehler ist: '%s'"
 #: CRM/Sepa/Page/DashBoard.php
 msgid "Unknown batcher mode '%s'. No batching triggered."
 msgstr "Unbekannter Batcher-Modus '%s'. Batching wurde nicht ausgeführt."
+
+#: CRM/Sepa/Page/DeleteGroup.php
+msgid "Delete SEPA Group"
+msgstr "SEPA Gruppe löschen"
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "Edit SEPA Mandate"
+msgstr "SEPA Mandat Bearbeiten"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "This page needs a mandate id ('mid') parameter."
@@ -671,6 +696,10 @@ msgstr "Ungültiger Betrag. Mandat wurde nicht geändert."
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Modifying an existing mandate is currently not allowed. You can change this on the SEPA settings page."
 msgstr "Das Ändern eines bestehenden Mandats ist nicht aktiviert. Sie können das auf der SEPA Einstellungsseite ändern."
+
+#: CRM/Sepa/Page/ListGroup.php
+msgid "SEPA Group Contributions"
+msgstr "Zuwendungen der SEPA Gruppe"
 
 #: CRM/Sepa/Page/ListGroup.php
 msgid "Cannot read SEPA transaction group [%s]. Error was: '%s'"
@@ -782,10 +811,6 @@ msgstr "SEPA Mandate"
 #: sepa.php
 msgid "You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"
 msgstr "Diese Zuwendung kann nicht gelöscht werden, da sie Teil des SEPA-Mandates [%s] ist. Bitte löschen Sie das Mandat, das wird die Zuwendung entsprechend mit entfernen."
-
-#: sepa.php
-msgid "CiviSEPA Dashboard"
-msgstr "CiviSEPA Dashboard"
 
 #: sepa.php
 msgid "CiviSEPA Settings"
@@ -970,6 +995,10 @@ msgstr "ANMERKUNG: Dies funktioniert nur, falls die <a href=\"https://github.com
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid "The CiviCRM built-in dropdown for recurring contributions is rather ugly. Enabeling this option would will replace the eyesore frequency unit / interval fields with a nice dropdown."
 msgstr "Das eingebaute CiviCRM Auswahlfeld für den Turnus ist nicht besonders ansehnlich. Wenn Sie diese Aktion aktivieren wird das Auswahlfeld durch eine schönere Version ersetzt."
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "Define the number of days that the donation page leaves you to submit recurring donations in time."
+msgstr "Anzahl der Tage die als Puffer zwischen der Spende auf der Spendenseite und dem zwingenden Einzugstermin liegen sollen."
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Creditors"
@@ -1396,6 +1425,10 @@ msgid "You might now want to try the following:"
 msgstr "So sollten nun folgendes versuchen, um das Problem zu beheben:"
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Make sure your bank does support your XML PAIN format. If it doesn't, change the generated format on the <a href=\"%1\">settings page</a>. Then dowload the file again."
+msgstr "Stellen Sie sicher dass Ihre Bank auch des ausgewählte XML PAIN Format unterstützt. Falls nicht können Sie das Format bei den <a href=\"%1\">SEPA Einstellungen</a> ändern. Danach versuchen Sie es dann einfach erneut."
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "Find out why exactly it was rejected. Oftentimes there are BICs and IBANs that are formally correct, but the accounts do not exist. In this case, banks usually would let you know which data exactly they reject. Fix this then in your mandates, update the groups, and try again."
 msgstr "Finden Sie heraus, warum die Bank die Datei zurückgewiesen hat. Oft enthält sie BICs und IBANs die zwar formell korrekt sind, aber die entsprechenden Konten existieren gar nicht. In diesem Fall müsste die Bank Ihnen aber mitteilen können, welche Mandate betroffen sind. Sie können dann diese Mandate korrigieren und die Gruppe nach einem Update erneut schließen und verschicken."
 
@@ -1437,7 +1470,7 @@ msgstr "Unten das Ergebnis anklicken"
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "<b>Do it now! No money will be transferred until the file has been submitted successfully.</b>"
-msgstr "<b>Mach das jetzt sofort! Es wird kein Geld eingezogen die Datei nicht erfolgreich von der Bank angenommen wurde.</b>"
+msgstr "<b>Mach das jetzt sofort! Es wird kein Geld eingezogen wenn die Datei nicht erfolgreich von der Bank angenommen wurde.</b>"
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "This is a test group. You can not close it."
@@ -1508,11 +1541,6 @@ msgstr "Frühester Einzugstermin"
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Recurring"
 msgstr "Dauereinzug"
-
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Start Date"
-msgstr "Startdatum"
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
@@ -1991,6 +2019,14 @@ msgstr "Erstzuwendung"
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Done"
 msgstr "Fertig"
+
+#~ msgctxt "menu"
+
+#~ msgid "CiviSEPA settings"
+#~ msgstr "CiviSEPA Einstellungen"
+
+#~ msgid "start date"
+#~ msgstr "Stardatum"
 
 #~ msgid "%1%3 %2"
 #~ msgstr "%1. %2"

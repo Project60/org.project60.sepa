@@ -26,7 +26,7 @@
 			<p>{ts domain="org.project60.sepa"}Sorry to hear that the bank has rejected your payment XML file.{/ts}</p>
 			<p>{ts domain="org.project60.sepa"}You might now want to try the following:{/ts}</p>
 			<ul>
-				<li>{ts domain="org.project60.sepa"}Make sure your bank does support your XML PAIN format. If it doesn't, change the generated format on the <a href="{$settings_url}">settings page</a>. Then dowload the file again.{/ts}</li>
+				<li>{ts domain="org.project60.sepa" 1=$settings_url}Make sure your bank does support your XML PAIN format. If it doesn't, change the generated format on the <a href="%1">settings page</a>. Then dowload the file again.{/ts}</li>
 				<li>{ts domain="org.project60.sepa"}Find out why exactly it was rejected. Oftentimes there are BICs and IBANs that are formally correct, but the accounts do not exist. In this case, banks usually would let you know which data exactly they reject. Fix this then in your mandates, update the groups, and try again.{/ts}</li>
 				<li>{ts domain="org.project60.sepa"}In the unlikely event that the file is formally wrong, try a SEPA validation tool on the internet to check the generated XML file. Contact us, if the system really generates incorrect XML files.{/ts}</li>
 			</ul>

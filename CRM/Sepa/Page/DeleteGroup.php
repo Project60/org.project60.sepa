@@ -26,6 +26,7 @@ require_once 'CRM/Core/Page.php';
 class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
 
   function run() {
+    CRM_Utils_System::setTitle(ts('Delete SEPA Group', array('domain' => 'org.project60.sepa')));
     if (empty($_REQUEST['group_id'])) {
     	$this->assign('status', 'error');
 
