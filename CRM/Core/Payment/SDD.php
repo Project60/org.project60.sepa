@@ -65,7 +65,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');    
 
     // apply "hack" for old payment forms
-    if (version_compare(CRM_Utils_System::version(), '4.6', '<')) {
+    if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
+      $form->assign('pre4-6-10', 1);
       $this->fixOldDirectDebitForm($form);
     }
 
@@ -329,14 +330,18 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    * Override CRM_Core_Payment function
    */
   public function getPaymentFormFields() {
-    return array(
-      'cycle_day',
-      'start_date',
-      'account_holder',
-      'bank_account_number',
-      'bank_identification_number',
-      'bank_name',
-    );
+    if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
+      return parent::getPaymentFormFields();
+    } else {
+      return array(
+        'cycle_day',
+        'start_date',
+        'account_holder',
+        'bank_account_number',
+        'bank_identification_number',
+        'bank_name',
+      );      
+    }
   }
 
   /**
@@ -348,89 +353,93 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    *   field metadata
    */
   public function getPaymentFormFieldsMetadata() {
-    return array(
-      'account_holder' => array(
-        'htmlType' => 'text',
-        'name' => 'account_holder',
-        'title' => ts('Account Holder', array('domain' => 'org.project60.sepa')),
-        'cc_field' => TRUE,
-        'attributes' => array(
-          'size' => 20,
-          'maxlength' => 34,
-          'autocomplete' => 'on',
+    if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
+      return parent::getPaymentFormFieldsMetadata();
+    } else {
+      return array(
+        'account_holder' => array(
+          'htmlType' => 'text',
+          'name' => 'account_holder',
+          'title' => ts('Account Holder', array('domain' => 'org.project60.sepa')),
+          'cc_field' => TRUE,
+          'attributes' => array(
+            'size' => 20,
+            'maxlength' => 34,
+            'autocomplete' => 'on',
+          ),
+          'is_required' => FALSE,
         ),
-        'is_required' => FALSE,
-      ),
-      //e.g. IBAN can have maxlength of 34 digits
-      'bank_account_number' => array(
-        'htmlType' => 'text',
-        'name' => 'bank_account_number',
-        'title' => ts('IBAN', array('domain' => 'org.project60.sepa')),
-        'cc_field' => TRUE,
-        'attributes' => array(
-          'size' => 34,
-          'maxlength' => 34,
-          'autocomplete' => 'off',
+        //e.g. IBAN can have maxlength of 34 digits
+        'bank_account_number' => array(
+          'htmlType' => 'text',
+          'name' => 'bank_account_number',
+          'title' => ts('IBAN', array('domain' => 'org.project60.sepa')),
+          'cc_field' => TRUE,
+          'attributes' => array(
+            'size' => 34,
+            'maxlength' => 34,
+            'autocomplete' => 'off',
+          ),
+          'rules' => array(
+            array(
+              'rule_message' => ts('This is not a correct IBAN.', array('domain' => 'org.project60.sepa')),
+              'rule_name' => 'sepa_iban_valid',
+              'rule_parameters' => NULL,
+            ),
+          ),
+          'is_required' => TRUE,
         ),
-        'rules' => array(
-          array(
-            'rule_message' => ts('This is not a correct IBAN.', array('domain' => 'org.project60.sepa')),
-            'rule_name' => 'sepa_iban_valid',
-            'rule_parameters' => NULL,
+        //e.g. SWIFT-BIC can have maxlength of 11 digits
+        'bank_identification_number' => array(
+          'htmlType' => 'text',
+          'name' => 'bank_identification_number',
+          'title' => ts('BIC', array('domain' => 'org.project60.sepa')),
+          'cc_field' => TRUE,
+          'attributes' => array(
+            'size' => 20,
+            'maxlength' => 11,
+            'autocomplete' => 'off',
+          ),
+          'is_required' => TRUE,
+          'rules' => array(
+            array(
+              'rule_message' => ts('This is not a correct BIC.', array('domain' => 'org.project60.sepa')),
+              'rule_name' => 'sepa_bic_valid',
+              'rule_parameters' => NULL,
+            ),
           ),
         ),
-        'is_required' => TRUE,
-      ),
-      //e.g. SWIFT-BIC can have maxlength of 11 digits
-      'bank_identification_number' => array(
-        'htmlType' => 'text',
-        'name' => 'bank_identification_number',
-        'title' => ts('BIC', array('domain' => 'org.project60.sepa')),
-        'cc_field' => TRUE,
-        'attributes' => array(
-          'size' => 20,
-          'maxlength' => 11,
-          'autocomplete' => 'off',
-        ),
-        'is_required' => TRUE,
-        'rules' => array(
-          array(
-            'rule_message' => ts('This is not a correct BIC.', array('domain' => 'org.project60.sepa')),
-            'rule_name' => 'sepa_bic_valid',
-            'rule_parameters' => NULL,
+        'bank_name' => array(
+          'htmlType' => 'text',
+          'name' => 'bank_name',
+          'title' => ts('Bank Name', array('domain' => 'org.project60.sepa')),
+          'cc_field' => TRUE,
+          'attributes' => array(
+            'size' => 34,
+            'maxlength' => 64,
+            'autocomplete' => 'off',
           ),
+          'is_required' => FALSE,
         ),
-      ),
-      'bank_name' => array(
-        'htmlType' => 'text',
-        'name' => 'bank_name',
-        'title' => ts('Bank Name', array('domain' => 'org.project60.sepa')),
-        'cc_field' => TRUE,
-        'attributes' => array(
-          'size' => 34,
-          'maxlength' => 64,
-          'autocomplete' => 'off',
+        'cycle_day' => array(
+          'htmlType' => 'select',
+          'name' => 'cycle_day',
+          'title' => ts('Collection Day', array('domain' => 'org.project60.sepa')),
+          'cc_field' => TRUE,
+          'attributes' => CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
+          'is_required' => FALSE,
         ),
-        'is_required' => FALSE,
-      ),
-      'cycle_day' => array(
-        'htmlType' => 'select',
-        'name' => 'cycle_day',
-        'title' => ts('Collection Day', array('domain' => 'org.project60.sepa')),
-        'cc_field' => TRUE,
-        'attributes' => CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
-        'is_required' => FALSE,
-      ),
-      'start_date' => array(
-        'htmlType' => 'text',
-        'name' => 'start_date',
-        'title' => ts('Start Date', array('domain' => 'org.project60.sepa')),
-        'cc_field' => TRUE,
-        'attributes' => array(),
-        'is_required' => TRUE,
-        'rules' => array(),
-      ),
-    );
+        'start_date' => array(
+          'htmlType' => 'text',
+          'name' => 'start_date',
+          'title' => ts('Start Date', array('domain' => 'org.project60.sepa')),
+          'cc_field' => TRUE,
+          'attributes' => array(),
+          'is_required' => TRUE,
+          'rules' => array(),
+        ),
+      );
+    }
   }
 
   /***********************************************
