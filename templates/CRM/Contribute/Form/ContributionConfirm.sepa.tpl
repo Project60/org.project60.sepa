@@ -25,13 +25,13 @@
     {elseif $frequency_interval eq 12}
       {capture assign=frequency_words}{ts domain="org.project60.sepa"}annually{/ts}{/capture}
     {else}
-      {capture assign=frequency_words}{ts 1=$frequency_interval}every %1 months{/ts}{/capture}
+      {capture assign=frequency_words}{ts 1=$frequency_interval domain="org.project60.sepa"}every %1 months{/ts}{/capture}
     {/if}
   {elseif $frequency_unit eq 'year'}
     {if $frequency_interval eq 1}
       {capture assign=frequency_words}{ts domain="org.project60.sepa"}annually{/ts}{/capture}
     {else}
-      {capture assign=frequency_words}{ts 1=$frequency_interval}every %1 years{/ts}{/capture}
+      {capture assign=frequency_words}{ts 1=$frequency_interval domain="org.project60.sepa"}every %1 years{/ts}{/capture}
     {/if}
   {else}
     {capture assign=frequency_words}{ts domain="org.project60.sepa"}on an irregular basis{/ts}{/capture}
@@ -44,7 +44,7 @@
 <div id="sepa-new-amount-display" class="display-block">
   <p id="sepa-confirm-text-amount">{ts domain="org.project60.sepa"}Total Amount{/ts}: <strong>{$amount|crmMoney:$currencyID}</strong></p>
   {if $is_recur}
-  <p id="sepa-confirm-text-recur"><strong>{ts 1=$frequency_words}I want to contribute this amount %1.{/ts}</strong></p>
+  <p id="sepa-confirm-text-recur"><strong>{ts 1=$frequency_words domain="org.project60.sepa"}I want to contribute this amount %1.{/ts}</strong></p>
   {/if}
 
   {if $bank_account_number}

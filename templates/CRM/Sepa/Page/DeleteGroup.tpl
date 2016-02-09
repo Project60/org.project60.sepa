@@ -19,7 +19,7 @@ things
 {/capture}
 
 {* General statement describing the group *}
-<h3>{ts 1=$txgroup.reference}Deleting SEPA transaction group '%1'{/ts}</h3>
+<h3>{ts 1=$txgroup.reference domain="org.project60.sepa"}Deleting SEPA transaction group '%1'{/ts}</h3>
 
 
 {if $status eq 'unconfirmed'}
@@ -29,7 +29,7 @@ things
 <input type="hidden" name="confirmed" value="no">
 
 <p>
-	{ts 1=$type_label 2=$txgroup.status_label}This %1 transaction group is currently in status '<b>%2</b>'.{/ts}
+	{ts 1=$type_label 2=$txgroup.status_label domain="org.project60.sepa"}This %1 transaction group is currently in status '<b>%2</b>'.{/ts}
 	{if $txgroup.status_name neq 'Open'}
 		{if $txgroup.status_name eq 'Closed'}
 			{ts domain="org.project60.sepa"}This means, that is has already been submitted to the bank.{/ts}
@@ -46,7 +46,7 @@ things
 
 {* General statement describing the contents of the group *}
 <p>
-	{ts 1=$stats.total 2=$entity_label}The group has a total of %1 associated %2.{/ts}
+	{ts 1=$stats.total 2=$entity_label domain="org.project60.sepa"}The group has a total of %1 associated %2.{/ts}
 	{if $stats.total eq $stats.open}
 		{ts domain="org.project60.sepa"}None of them have been processed yet, so they could be deleted.{/ts}
 	{elseif $stats.total eq $stats.busy}
@@ -54,21 +54,21 @@ things
 	{elseif $stats.total eq $stats.other}
 		{ts domain="org.project60.sepa"}All of them have already been fully processed.{/ts}
 	{else}
-		{ts 1=$stats.open 2=$stats.busy 3=$stats.other 4=$entity_label}%1 of them have not been processed yet, and could be deleted. However, there are %2 %4 that have already been sent to the bank for collection, and another %3 that have been fully processed.{/ts}
+		{ts 1=$stats.open 2=$stats.busy 3=$stats.other 4=$entity_label domain="org.project60.sepa"}%1 of them have not been processed yet, and could be deleted. However, there are %2 %4 that have already been sent to the bank for collection, and another %3 that have been fully processed.{/ts}
 	{/if}
-	{ts 1=$entity_label}What do you want to do with the associated %1?{/ts}
+	{ts 1=$entity_label domain="org.project60.sepa"}What do you want to do with the associated %1?{/ts}
 </p>
 
 {* Options on how to proceed with the contents (mandates/contributions) *}
 <p>
 	<input id="delete_contents_NO" name="delete_contents" value="no" class="form-radio" type="radio">
-	<label for="delete_contents_NO">{ts 1=$entity_label}don't delete any %1{/ts}</label>
+	<label for="delete_contents_NO">{ts 1=$entity_label domain="org.project60.sepa"}don't delete any %1{/ts}</label>
 	</input>
 	<input id="delete_contents_ALL" name="delete_contents" value="all" class="form-radio" type="radio">
-	<label for="delete_contents_ALL">{ts 1=$entity_label}delete all %1{/ts}</label>
+	<label for="delete_contents_ALL">{ts 1=$entity_label domain="org.project60.sepa"}delete all %1{/ts}</label>
 	</input>
 	<input id="delete_contents_OPEN" name="delete_contents" value="open" class="form-radio" type="radio">
-	<label for="delete_contents_OPEN">{ts 1=$entity_label}delete pending %1{/ts}</label>
+	<label for="delete_contents_OPEN">{ts 1=$entity_label domain="org.project60.sepa"}delete pending %1{/ts}</label>
 	</input>
 </p>
 
@@ -254,12 +254,12 @@ function leaveForm(object) {
 {elseif $status eq 'done'}
 {if $error}
 <p class="status message">
-	{ts 1=$txgroup.reference}SEPA transaction group '%1' could not be deleted succesfully.{/ts}<br/>
+	{ts 1=$txgroup.reference domain="org.project60.sepa"}SEPA transaction group '%1' could not be deleted succesfully.{/ts}<br/>
 	{ts domain="org.project60.sepa"}Error was:{/ts} {$error}
 </p>
 {elseif $deleted_error}
 <p class="status message">
-	{ts 1=$txgroup.reference}SEPA transaction group '%1' was deleted, but the following problems were encountered:{/ts}
+	{ts 1=$txgroup.reference domain="org.project60.sepa"}SEPA transaction group '%1' was deleted, but the following problems were encountered:{/ts}
 	<table>
 		<thead>
 			<td>{ts domain="org.project60.sepa"}contribution ID{/ts}</td>
@@ -272,12 +272,12 @@ function leaveForm(object) {
 		</tr>
 	{/foreach}
 	</table>
-	{ts 1=$deleted_ok|@count 2=$entity_label}%1 %2 have been deleted along with the group.{/ts}
+	{ts 1=$deleted_ok|@count 2=$entity_label domain="org.project60.sepa"}%1 %2 have been deleted along with the group.{/ts}
 </p>
 {else}
 <p>
-	{ts 1=$txgroup.reference}SEPA transaction group '%1' has been succesfully deleted.{/ts}
-	{ts 1=$deleted_ok|@count 2=$entity_label}%1 %2 have been deleted along with the group.{/ts}
+	{ts 1=$txgroup.reference domain="org.project60.sepa"}SEPA transaction group '%1' has been succesfully deleted.{/ts}
+	{ts 1=$deleted_ok|@count 2=$entity_label domain="org.project60.sepa"}%1 %2 have been deleted along with the group.{/ts}
 </p>
 {/if}
 <div class="crm-submit-buttons">
@@ -295,7 +295,7 @@ function leaveForm(object) {
 	{if not $smarty.request.group_id}
 	{ts domain="org.project60.sepa"}No group_id given!{/ts}
 	{else}
-	{ts 1=$smarty.request.group_id}Transaction group [%1] couldn't be loaded.{/ts}
+	{ts 1=$smarty.request.group_id domain="org.project60.sepa"}Transaction group [%1] couldn't be loaded.{/ts}
 	{/if}
 </p>
 <div class="crm-submit-buttons">

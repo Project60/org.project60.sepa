@@ -19,7 +19,7 @@
   <p id="sepa-confirm-text-date">{ts domain="org.project60.sepa"}Date{/ts}: <strong>{$receive_date|crmDate}</strong></p>
   <p id="sepa-confirm-text-reference">{ts domain="org.project60.sepa"}Payment Reference{/ts}: <strong>{$trxn_id}</strong></p>
   {if $is_recur}
-  <p id="sepa-confirm-text-recur"><strong>{ts 1=$cycle}The amount will be debited %1.{/ts}</strong></p>
+  <p id="sepa-confirm-text-recur"><strong>{ts 1=$cycle domain="org.project60.sepa" domain="org.project60.sepa"}The amount will be debited %1.{/ts}</strong></p>
   {/if}
 </div>
 
