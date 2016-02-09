@@ -156,7 +156,7 @@ function sepa_lookup_bic() {
 	}
 
 	var iban_partial = cj("#bank_account_number").val();
-	if (iban_partial.length == 0) return;
+	if (iban_partial == undefined || iban_partial.length == 0) return;
 	if (sepa_hide_bic_enabled) {
 		// if it's hidden, we should clear it at this point
 		cj("#bank_identification_number").attr('value', '');
