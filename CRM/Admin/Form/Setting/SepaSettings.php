@@ -116,11 +116,18 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // do not use array_merge() because it discards the original indizes
         $country_ids = array('' => ts('- select -')) + $filtered;
 
-        $config->defaultCurrency;
-        $currencies_enabled = CRM_Core_OptionGroup::values('currencies_enabled');
-        $currencies_dict = array('' => ts('- select -'));
-        foreach ((array)$currencies_enabled as $k => $v) {
-          $currencies_dict[$k] = $k;
+        $query = "SELECT count(id) AS test
+                  FROM civicrm_extension
+                  WHERE full_name = 'pl.infozmiana.sepamandatebatch' AND is_active = 1";
+        $extensionEnabled = CRM_Core_DAO::singleValueQuery($query);
+        $this->assign('extension_enabled', $extensionEnabled);
+
+        if ($extensionEnabled) {
+          $currencies_enabled = CRM_Core_OptionGroup::values('currencies_enabled');
+          $currencies_dict = array('' => ts('- select -'));
+          foreach ((array)$currencies_enabled as $k => $v) {
+            $currencies_dict[$k] = $k;
+          }
         }
 
         // look up some values
@@ -134,7 +141,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_id',           ts("Identifier"));
         $this->addElement('text',       'addcreditor_address',      ts("Address"), array('size' => 60));
         $this->addElement('select',     'addcreditor_country_id',   ts("Country"), $country_ids);
-        $this->addElement('select',     'addcreditor_currency',     ts("Currency"), $currencies_dict);
+        if ($extensionEnabled) {
+          $this->addElement('select',     'addcreditor_currency',     ts("Currency"), $currencies_dict);
+        }
         $this->addElement('text',       'addcreditor_bic',          ts("BIC"));
         $this->addElement('text',       'addcreditor_iban',         ts("IBAN"), array('size' => 30));
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version"), array('' => ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
