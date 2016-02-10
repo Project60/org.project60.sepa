@@ -66,7 +66,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     // apply "hack" for old payment forms
     if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
-      $form->assign('pre4-6-10', 1);
+      $form->assign('pre4_6_10', 1);
       $this->fixOldDirectDebitForm($form);
     }
 

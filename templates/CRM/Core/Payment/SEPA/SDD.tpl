@@ -17,7 +17,7 @@
 {crmAPI var='bic_extension_check' entity='Extension' action='get' status='installed' q='civicrm/ajax/rest'}
 {assign var='bic_extension_installed' value=$bic_extension_check.count}
 
-{if $pre4-6-10}
+{if $pre4_6_10}
 {* add these fields manually for 4.4.x - 4.6.9 *}
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 <div id="sdd-cycle-day-section" class="crm-section {$form.cycle_day.name}-section" style="display: none;">
