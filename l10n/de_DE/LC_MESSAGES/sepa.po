@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2016-02-09 11:51+0100\n"
+"POT-Creation-Date: 2016-02-11 18:05+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -127,6 +127,10 @@ msgstr "Wochenenden ausschließen"
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Hide BIC in PP"
 msgstr "BIC Verstecken"
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Hide Billing in PP"
+msgstr "Rechnungsadresse Verstecken"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Improve payment processor form"
@@ -977,6 +981,14 @@ msgid "Also, if your bank has a more complicated set of bank holidays, you might
 msgstr "Fall Sie kompliziertere Regeln für Banktage bzw. erlaubte Einzugstage haben, werden Sie diesen Hook implementieren (lassen) müssen."
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "Hides the otherwise mandatory billing block from the payment processor page."
+msgstr "Versteckt die sonst verpflichtende Eingabe einer Rechnungsadresse auf der Zuwendungsseite."
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "This feature is only available from CiviCRM 4.6.10+"
+msgstr "Diese Funktion ist erst ab CiviCRM 4.6.10 erforderlich."
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid "Currently this SDD extension requires not only the IBAN but also the BIC (bank code)."
 msgstr "Derzeit benötigt die SDD Extension nicht nur die IBAN sondern auch die BIC (Bank-Code)."
 
@@ -1097,6 +1109,10 @@ msgstr "Systemeinstellungen"
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Payment Processor Settings"
 msgstr "Einstellungen Zahlungsprozessor"
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Hide Billing"
+msgstr "Rechnungsadresse Verstecken"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Hide BIC"

@@ -275,6 +275,12 @@ div.sdd-add-creditor {
        <br/>
        <h2>{ts domain="org.project60.sepa"}Payment Processor Settings{/ts}</h2>
         <table class="form-layout">
+          <tr class="crm-pp-form-block-hide-billing">
+            <td class="label">{$form.pp_hide_billing.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Hide Billing{/ts}", {literal}{"id":"id-hide-billing","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+            <td>
+              {$form.pp_hide_billing.html}
+            </td>
+          </tr>
           <tr class="crm-pp-form-block-hide-bic">
             <td class="label">{$form.pp_hide_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Hide BIC{/ts}", {literal}{"id":"id-hide-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
             <td>

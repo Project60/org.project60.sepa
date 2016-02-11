@@ -119,6 +119,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // look up some values
         $excld_we = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
         $hide_bic = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_bic');
+        $hide_bil = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_billing');
         $bffrdays = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_buffer_days');
         $mendForm = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_improve_frequency');
 
@@ -134,6 +135,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor", array('domain' => 'org.project60.sepa')), "", array('value' =>'0'));
         $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends", array('domain' => 'org.project60.sepa')), "", ($excld_we?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'pp_hide_bic',              ts("Hide BIC in PP", array('domain' => 'org.project60.sepa')),   "", ($hide_bic?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'pp_hide_billing',          ts("Hide Billing in PP", array('domain' => 'org.project60.sepa')),   "", ($hide_bil?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'pp_improve_frequency',     ts("Improve payment processor form", array('domain' => 'org.project60.sepa')),   "", ($mendForm?array('checked'=>'checked'):array()));
         $this->addElement('text',       'pp_buffer_days',           ts("Recurring Buffer Days", array('domain' => 'org.project60.sepa')), array('size' => 1, 'value' => $bffrdays));
         $this->addElement('hidden',     'edit_creditor_id',         '', array('id' => 'edit_creditor_id'));
@@ -208,6 +210,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         CRM_Core_BAO_Setting::setItem((isset($values['exclude_weekends'])     ? "1" : "0"), 'SEPA Direct Debit Preferences', 'exclude_weekends');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_bic'])          ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_bic');
+        CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_billing'])      ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_billing');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_improve_frequency']) ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_improve_frequency');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_buffer_days'])       ? (int) $values['pp_buffer_days'] : "0"), 'SEPA Direct Debit Preferences', 'pp_buffer_days');
 

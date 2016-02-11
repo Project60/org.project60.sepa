@@ -41,8 +41,21 @@ cj(function(){
 });
 </script>
 {/literal}
-
 {/if}
+
+{if $sepa_hide_billing}
+{literal}
+<script type="text/javascript">
+  // If disabled remove the billing group, so no billing address is created
+  cj(function(){
+    cj("#billingcheckbox").remove();
+    cj("label[for='billingcheckbox']").remove();
+    cj("fieldset.billing_name_address-group").remove();
+  });
+</script>
+{/literal}
+{/if}
+
 
 
 <!-- JS Magic -->

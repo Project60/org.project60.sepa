@@ -88,6 +88,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $form->assign('earliest_ooff_date', date('Y-m-d', $earliest_ooff_date));
     $form->assign('earliest_cycle_day', date('d', $earliest_cycle_day));
     $form->assign('sepa_hide_bic', CRM_Sepa_Logic_Settings::getSetting("pp_hide_bic"));
+    $form->assign('sepa_hide_billing', CRM_Sepa_Logic_Settings::getSetting("pp_hide_billing"));
 
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
@@ -324,6 +325,31 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    */
   public function getPaymentTypeLabel() {
     return 'Direct Debit';
+  }
+
+  /**
+   * Override custom PI validation 
+   *  to make billing information NOT mandatory (see SEPA-372)
+   *
+   * @author N. Bochan
+   */
+  public function validatePaymentInstrument($values, &$errors) {
+    // first: call parent's implementation
+    parent::validatePaymentInstrument($values, $errors);
+
+    // if this feature is not active, we do nothing:
+    $pp_hide_billing = CRM_Sepa_Logic_Settings::getSetting("pp_hide_billing");
+    if (empty($pp_hide_billing)) return;
+
+    // now: by removing all the errors on the billing fields, we
+    //   effectively render the billing block "not mandatory"
+    if (isset($errors)) {
+      foreach ($errors as $fieldname => $error_message) {
+        if (substr($fieldname, 0, 8) == 'billing_') {
+          unset($errors[$fieldname]);
+        }
+      }
+    }
   }
 
   /**

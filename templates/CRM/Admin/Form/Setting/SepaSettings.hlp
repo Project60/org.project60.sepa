@@ -95,6 +95,10 @@
     <p>{ts domain="org.project60.sepa"}Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook.{/ts}</p> 
 {/htxt}
 
+{htxt id='id-hide-billing'}
+    <p>{ts domain="org.project60.sepa"}Hides the otherwise mandatory billing block from the payment processor page.{/ts}</p>
+{/htxt}
+
 {htxt id='id-hide-bic'}
     <p>{ts domain="org.project60.sepa"}Currently this SDD extension requires not only the IBAN but also the BIC (bank code).{/ts}</p>
     <p>{ts domain="org.project60.sepa"}If you have the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> installed, the BIC can be derived automatically from the IBAN in most cases.{/ts}</p>
