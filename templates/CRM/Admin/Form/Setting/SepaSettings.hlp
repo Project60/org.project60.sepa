@@ -97,6 +97,7 @@
 
 {htxt id='id-hide-billing'}
     <p>{ts domain="org.project60.sepa"}Hides the otherwise mandatory billing block from the payment processor page.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}This feature is only available from CiviCRM 4.6.10+{/ts}</p>
 {/htxt}
 
 {htxt id='id-hide-bic'}
