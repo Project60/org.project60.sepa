@@ -161,7 +161,10 @@ class CRM_Sepa_Logic_Batching {
             );
           $contribution = civicrm_api('Contribution', 'create', $contribution_data);
           if (empty($contribution['is_error'])) {
-            // Success! 'mandate_entity_id' will now be overwritten with the contribution instance ID
+            // Success! Call the post_create hook
+            CRM_Utils_SepaCustomisationHooks::installment_created($mandate['mandate_id'], $recur_id, $contribution['id']);
+
+            // 'mandate_entity_id' will now be overwritten with the contribution instance ID
             //  to allow compatibility in with OOFF groups in the syncGroups function
             $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution['id'];
           } else {

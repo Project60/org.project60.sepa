@@ -297,6 +297,9 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
             $contribution_bao->contribution_page_id,
             $rcontribution_bao);
 
+          // also, call the installemnt hook (this is the first installment)
+          CRM_Utils_SepaCustomisationHooks::installment_created($mandate['id'], $rcontribution['id'], $contribution['id']);
+
         } else {
           // something went wrong, delete partial
           error_log("org.project60.sepa: deleting partial mandate " . $mandate['reference']);
