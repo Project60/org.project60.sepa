@@ -116,13 +116,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // do not use array_merge() because it discards the original indizes
         $country_ids = array('' => ts('- select -')) + $filtered;
 
-        $query = "SELECT count(id) AS test
-                  FROM civicrm_extension
-                  WHERE full_name = 'pl.infozmiana.sepamandatebatch' AND is_active = 1";
-        $extensionEnabled = CRM_Core_DAO::singleValueQuery($query);
-        $this->assign('extension_enabled', $extensionEnabled);
-
-        if ($extensionEnabled) {
+        $multi_currency = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'multi_currency');
+        $this->assign('multi_currency', $multi_currency);
+        if ($multi_currency) {
           $currencies_enabled = CRM_Core_OptionGroup::values('currencies_enabled');
           $currencies_dict = array('' => ts('- select -'));
           foreach ((array)$currencies_enabled as $k => $v) {
@@ -141,7 +137,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_id',           ts("Identifier"));
         $this->addElement('text',       'addcreditor_address',      ts("Address"), array('size' => 60));
         $this->addElement('select',     'addcreditor_country_id',   ts("Country"), $country_ids);
-        if ($extensionEnabled) {
+        if ($multi_currency) {
           $this->addElement('select',     'addcreditor_currency',     ts("Currency"), $currencies_dict);
         }
         $this->addElement('text',       'addcreditor_bic',          ts("BIC"));
@@ -198,6 +194,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add general config options
         $amm_options = CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')?array('checked'=>'checked'):array();
         $this->addElement('checkbox', 'allow_mandate_modification', ts("Mandate Modifications"), NULL, $amm_options);
+        $this->addElement('checkbox', 'multi_currency_field', ts("Multi currency mode (not only EUR)"), NULL, $multi_currency ? array('checked'=>'checked') : array());
 
         parent::buildQuickForm();
     }
@@ -223,6 +220,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         CRM_Core_BAO_Setting::setItem((isset($values['exclude_weekends'])     ? "1" : "0"), 'SEPA Direct Debit Preferences', 'exclude_weekends');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_bic'])          ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_bic');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_improve_frequency']) ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_improve_frequency');
+        CRM_Core_BAO_Setting::setItem((isset($values['multi_currency_field']) ? 1 : 0), 'SEPA Direct Debit Preferences', 'multi_currency');
 
         $session = CRM_Core_Session::singleton();
         $session->setStatus(ts("Settings successfully saved"));
