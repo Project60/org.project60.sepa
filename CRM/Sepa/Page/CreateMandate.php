@@ -315,8 +315,10 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       }
     }
 
-    // FIXME: Create "default" setting for mandate type (see SEPA-332)
-    //$this->assign('mandate_type', isset($_REQUEST['mandate_type']) ? $_REQUEST['mandate_type'] : 'RCUR');
+    $default_mandate_type = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'default_mandate_type');
+    if ($default_mandate_type && in_array($default_mandate_type, array('OOFF', 'RCUR'))) {
+      $this->assign('mandate_type', isset($_REQUEST['mandate_type']) ? $_REQUEST['mandate_type'] : $default_mandate_type);
+    }
   }
 
 
