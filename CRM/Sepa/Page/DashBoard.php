@@ -103,6 +103,8 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60*60*24);
         if ($group['status']=='closed') {
           $group['submit'] = 'closed';
+        } elseif ($group['type'] == 'OOFF') {
+          $group['submit'] = 'soon';
         } else {
           if ($remaining_days <= -1) {
             $group['submit'] = 'missed';
