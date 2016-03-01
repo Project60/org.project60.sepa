@@ -109,12 +109,41 @@
   {/foreach}
 </table>
 
+<table>
+  <caption>Legend</caption>
+  <tr>
+    <th>Status</th>
+    <th>Description</th>
+  </tr>
+  <tr class="submit_missed">
+    <td>Missed</td>
+    <td>Submission date is older than now.</td>
+  </tr>
+  <tr class="submit_urgently">
+    <td>Urgently</td>
+    <td>Submission date is current, you have to close group and upload file to creditor today.</td>
+  </tr>
+  <tr class="submit_soon">
+    <td>Soon</td>
+    <td>Submission date during the nearest 6 days.</td>
+  </tr>
+  <tr class="submit_later">
+    <td>Later</td>
+    <td>Submission date is greater than 6 days.</td>
+  </tr>
+  <tr class="submit_closed">
+    <td>Closed</td>
+    <td>The group is closed and uploaded to creditor, submission date is in the past.</td>
+  </tr>
+</table>
+
 {literal}
 <style>
-  tr.submit_missed {background-color:#000000; color:#FA583F;}
-  tr.submit_urgently {background-color:#FA583F;}
-  tr.submit_soon {background-color:#FAB83F;}
-  tr.submit_closed {background-color:#f0f8ff;}
+  tr.submit_missed {color: #EE0000;}
+  tr.submit_urgently {color: #ac6700;}
+  tr.submit_soon {color: #0165FF;}
+  tr.submit_later {color: #008300;}
+  tr.submit_closed {color: inherit;}
 </style>
 {/literal}
 
