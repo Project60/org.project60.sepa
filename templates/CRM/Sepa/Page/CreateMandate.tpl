@@ -187,7 +187,9 @@
 {else}
 	{* if this is a popup - close it *}
 	<script type="text/javascript">
-	cj(".ui-dialog > [id^=crm-ajax-dialog-]").dialog("destroy");
+		var tab_id = cj("#tab_contribute").attr('aria-controls');
+		cj("#"+tab_id).crmSnippet("refresh");
+		cj(".ui-dialog > [id^=crm-ajax-dialog-]").dialog("destroy");
 	</script>
 	{if $error_message}
 		<h2>{ts}Error!{/ts} {$error_title}</h2>
