@@ -247,6 +247,12 @@ div.sdd-add-creditor {
                 {$form.batching_default_creditor.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-default_mandate_type">
+              <td class="label">{$form.default_mandate_type.label} <a onclick='CRM.help("{ts}Default Mandate Type{/ts}", {literal}{"id":"id-defaultmandatetype","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.default_mandate_type.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-allow_mandate_modification">
               <td class="label">{$form.allow_mandate_modification.label} <a onclick='CRM.help("{ts}Mandate Modifications{/ts}", {literal}{"id":"id-mandatemodifications","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
