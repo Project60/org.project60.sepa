@@ -342,17 +342,25 @@ function sepa_civicrm_managed(&$entities) {
 }
 
 
-function sepa_civicrm_summaryActions( &$actions, $contactID ) {
-  // add "create SEPA mandate action"
-  $actions['sepa_contribution'] = array(
-      'title'           => ts("Record SEPA Contribution"),
-      'weight'          => 5,
-      'ref'             => 'new-sepa-contribution',
-      'key'             => 'sepa_contribution',
-      'component'       => 'CiviContribute',
-      'href'            => CRM_Utils_System::url('civicrm/sepa/cmandate', "cid=$contactID"),
-      'permissions'     => array('access CiviContribute', 'edit contributions')
+/**
+ * Implementation of hook_civicrm_links
+ *
+ * @param $op
+ * @param $objectName
+ * @param $objectId
+ * @param $links
+ * @param $mask
+ * @param $values
+ */
+function sepa_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
+  if ($op == 'contact.selector.actions') {
+    $links[] = array(
+      'name' => 'Record SEPA Contribution',
+      'url' => CRM_Utils_System::url('civicrm/sepa/cmandate', "cid=$objectId"),
+      'title' => 'Record SEPA Contribution',
+      'ref' => 'record-sepa-contribution',
     );
+  }
 }
 
 
