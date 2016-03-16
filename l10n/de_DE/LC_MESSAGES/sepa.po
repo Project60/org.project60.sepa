@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2016-02-11 18:05+0100\n"
+"POT-Creation-Date: 2016-03-16 07:46+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -86,7 +86,7 @@ msgstr "Adresse"
 msgid "Country"
 msgstr "Land"
 
-#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php sepa.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -98,7 +98,7 @@ msgstr "Land"
 msgid "BIC"
 msgstr "BIC"
 
-#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php sepa.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -350,14 +350,14 @@ msgid "SEPA File Format"
 msgstr "SEPA Dateiformat (PAIN)"
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php
-#: CRM/Sepa/DAO/SEPATransactionGroup.php
+#: CRM/Sepa/DAO/SEPATransactionGroup.php sepa.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Reference"
 msgstr "Mandatsreferenz"
 
-#: CRM/Sepa/DAO/SEPAMandate.php
+#: CRM/Sepa/DAO/SEPAMandate.php sepa.php
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
@@ -388,18 +388,18 @@ msgstr "Gläubiger-ID"
 msgid "Contact ID"
 msgstr "Kontakt ID"
 
-#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPATransactionGroup.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPATransactionGroup.php sepa.php
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Type"
-msgstr ""
+msgstr "Art"
 
-#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Report/SEPAMandate.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Report/SEPAMandate.php sepa.php
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "creation date"
@@ -572,7 +572,7 @@ msgstr "Konnte die anhängigen Zuwendungen nicht lesen"
 msgid "'%s' is a required field."
 msgstr "'%s' ist ein Pflichtfeld."
 
-#: CRM/Sepa/Page/CreateMandate.php
+#: CRM/Sepa/Page/CreateMandate.php sepa.php
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
@@ -827,6 +827,40 @@ msgstr "Diese Zuwendung hat kein SEPA-Mandat und kann daher nicht einem SEPA Zah
 #: sepa.php
 msgid "This contribution has a mandate, its payment instrument has to be '%s'"
 msgstr "Diese Zuwendung hat ein SEPA Mandat, daher muss das Zahlungsinstrument '%s' sein."
+
+#: sepa.php
+msgid "Most Recent SEPA Mandate"
+msgstr "Letztes SEPA Mandat"
+
+#: sepa.php
+msgid "Signature Date"
+msgstr "Unterschriftsdatum"
+
+#: sepa.php
+msgid "Currency"
+msgstr "Währung"
+
+#: sepa.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
+msgid "First Collection Date"
+msgstr "Erster Einzugstermin"
+
+#: sepa.php
+msgid "Cycle Day"
+msgstr "Monatstag"
+
+#: sepa.php
+msgid "Interval Multiplier"
+msgstr "Intervallänge"
+
+#: sepa.php
+msgid "Interval Unit"
+msgstr "Intervalleinheit"
+
+#: sepa.php templates/CRM/Contribute/Form/ContributionView.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Interval"
+msgstr "Turnus"
 
 #: sepa_pp_sdd.php
 msgid "Payment processor for the 'Single European Payement Area' (SEPA)."
@@ -1214,11 +1248,6 @@ msgstr "Einzugsturnus"
 
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
-msgid "First Collection Date"
-msgstr "Erster Einzugstermin"
-
-#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
-#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 msgid "Earliest Collection Date"
 msgstr "Frühester Einzugstermin"
 
@@ -1257,11 +1286,6 @@ msgstr "Raten"
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "(ongoing)"
 msgstr "(laufend)"
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "Interval"
-msgstr "Turnus"
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Non-deductible Amount"
@@ -2137,9 +2161,6 @@ msgstr "Fertig"
 
 #~ msgid "I swear I have sucessfully submitted it"
 #~ msgstr "Ich schwöre, ich habe alle Punkte erfolgreich durchgeführt!"
-
-#~ msgid "Cycle Day"
-#~ msgstr "Monatstag"
 
 #~ msgid ""
 #~ "<b>It is vital that you <i>immediately</i> do the following:</b>\n"
