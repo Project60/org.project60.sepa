@@ -34,6 +34,8 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           ),
           'id' => array(
             'title' => ts('Mandate ID'),
+            'required' => TRUE,
+            'no_display' => TRUE,
           ),
           'mandate_type' => array(
             'name'  => 'type',
@@ -62,6 +64,16 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           'validation_date' => array(
             'title' => ts('Validation Date'),
             'default' => TRUE,
+          ),
+          'amount' => array(
+            'dbAlias' => 'amount',
+            'title'   => ts('Amount'),
+            'type'    => CRM_Utils_Type::T_FLOAT,
+          ),
+          'status_id' => array(
+            'dbAlias' => 'status_id',
+            'title'   => ts('Contribution Status'),
+            'type'    => CRM_Utils_Type::T_INT,
           ),
         ),
         'filters' => array(
@@ -101,6 +113,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           //     'PARTIAL'  => ts('Partial', array('domain' => 'org.project60.sepa')),
           //   ),
           // ),
+
           'iban' => array(
             'name' => 'iban',
             'type' => CRM_Utils_Type::T_STRING,
@@ -134,6 +147,19 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
           ),
+          'amount' => array(
+            'dbAlias' => 'amount',
+            'title' => ts('Amount'),
+            'type'  => CRM_Utils_Type::T_FLOAT,
+            'operatorType' => CRM_Report_Form::OP_FLOAT,
+          ),
+          'status_id' => array(
+            'dbAlias' => 'status_id',
+            'title' => ts('Contribution Status'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('contribution_status'),
+          ),
         ),
         'order_bys' => array(
           'reference' => array(
@@ -142,6 +168,10 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           'mandate_type' => array(
             'name'  => 'type',
             'title' => ts('Type')
+          ),
+          'bic' => array(
+            'name'  => 'bic',
+            'title' => ts('BIC')
           ),
           'status' => array(
             'title' => ts('Status')
@@ -206,15 +236,23 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
+          // add amount from either OOFF or RCUR
+          if ($fieldName == 'amount') {
+            $select[] = "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.total_amount, civicrm_contribution_recur.amount) AS amount";
+            $this->_columnHeaders['amount']['title'] = $field['title'];
+            $this->_columnHeaders['amount']['type']  = CRM_Utils_Array::value('type', $field);
+            continue;
+          }
+
+          // add status from either OOFF or RCUR
+          if ($fieldName == 'status_id') {
+            $select[] = "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.contribution_status_id, civicrm_contribution_recur.contribution_status_id) AS status_id";
+            $this->_columnHeaders['status_id']['title'] = $field['title'];
+            $this->_columnHeaders['status_id']['type']  = CRM_Utils_Array::value('type', $field);
+            continue;
+          }
+
+          if (CRM_Utils_Array::value('required', $field) || CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -232,7 +270,14 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
          FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
                INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                           ON {$this->_aliases['civicrm_contact']}.id =
-                             {$this->_aliases['civicrm_sdd_mandate']}.contact_id";
+                             {$this->_aliases['civicrm_sdd_mandate']}.contact_id
+               LEFT JOIN civicrm_contribution 
+                          ON 'civicrm_contribution' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
+                          AND civicrm_contribution.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
+               LEFT JOIN civicrm_contribution_recur 
+                          ON 'civicrm_contribution_recur' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
+                          AND civicrm_contribution_recur.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
+         ";
   }
 
   function where() {
@@ -241,13 +286,43 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Utils_Type::T_DATE) {
+
+          if ($fieldName == 'status_id') {
+            $base_clause = $this->whereClause($field,
+                CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+              );
+
+            // since either OOFF or RCUR is always NULL, we can just use OR...
+            $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.contribution_status_id', $base_clause);
+            $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.contribution_status_id', $base_clause);
+            $clause = "( $ooff_clause OR $rcur_clause )";
+          }
+
+          elseif ($fieldName == 'amount') {
+            $base_clause = $this->whereClause($field,
+                CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+              );
+
+            // since either OOFF or RCUR is always NULL, we can just use OR...
+            $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.total_amount', $base_clause);
+            $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.amount', $base_clause);
+            $clause = "( $ooff_clause OR $rcur_clause )";
+          }
+
+          elseif (CRM_Utils_Array::value('operatorType', $field) & CRM_Utils_Type::T_DATE) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
             $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
             $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
           }
+
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
@@ -279,14 +354,6 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     }
   }
 
-  // function groupBy() {
-  //   $this->_groupBy = '';// " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  // }
-
-  // function orderBy() {
-  //   $this->_orderBy = '';// " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  // }
-
   function postProcess() {
 
     $this->beginPostProcess();
@@ -303,6 +370,8 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
   }
 
   function alterDisplay(&$rows) {
+    $contribution_status = CRM_Core_OptionGroup::values('contribution_status');
+
     // custom code to alter rows
     $entryFound = FALSE;
     $checkList = array();
@@ -326,18 +395,21 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         }
       }
 
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
+      // alter contribution status
+      if (array_key_exists('status_id', $row)) {
+        $rows[$rowNum]['status_id'] = $contribution_status[$row['status_id']];
       }
 
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
-        $entryFound = TRUE;
+      // alter amount
+      if (array_key_exists('amount', $row)) {
+        $rows[$rowNum]['amount'] = CRM_Utils_Money::format($row['amount'], 'EUR');
+      }
+
+      // add mandate link
+      if (array_key_exists('civicrm_sdd_mandate_reference', $row) && array_key_exists('civicrm_sdd_mandate_id', $row)) {
+        $url = CRM_Utils_System::url("civicrm/sepa/xmandate", 'mid=' . $row['civicrm_sdd_mandate_id'], $this->_absoluteUrl );
+        $rows[$rowNum]['civicrm_sdd_mandate_reference_link'] = $url;
+        $rows[$rowNum]['civicrm_sdd_mandate_reference_hover'] = ts("View Mandate Options.");
       }
 
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
