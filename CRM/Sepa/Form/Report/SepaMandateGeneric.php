@@ -19,15 +19,8 @@
  */
 class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
-
-  protected $_summary = NULL;
-
-  protected $_customGroupExtends = NULL;//array('Contribution');
+  protected $_customGroupExtends = NULL;//array('Contact');
   protected $_customGroupGroupBy = FALSE; 
-
 
   function __construct() {
     $this->_columns = array(
@@ -36,11 +29,14 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         'fields' => array(
           'reference' => array(
             'title' => ts('Mandate Reference'),
-            'required' => TRUE,
             'default' => TRUE,
             'no_repeat' => TRUE,
           ),
-          'type' => array(
+          'id' => array(
+            'title' => ts('Mandate ID'),
+          ),
+          'mandate_type' => array(
+            'name'  => 'type',
             'title' => ts('Type')
           ),
           'status' => array(
@@ -69,19 +65,78 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
+          'reference' => array(
+            'name' => 'reference',
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_STRING,
+            'title' => ts('Mandate Reference'),
+          ),
+          'mandate_type' => array(
+            'name' => 'type',
+            'title' => ts('Type'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => array(
+              ''         => ts('Any', array('domain' => 'org.project60.sepa')),
+              'OOFF'     => ts('One-off', array('domain' => 'org.project60.sepa')),
+              'RCUR'     => ts('Recurring', array('domain' => 'org.project60.sepa')),
+            ),
+          ),
+
+          // TODO: use combined status
+          // 'status' => array(
+          //   'name' => 'status',
+          //   'title' => ts('Status'),
+          //   'type' => CRM_Utils_Type::T_STRING,
+          //   'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          //   'options' => array(
+          //     'INIT'     => ts('Initialised', array('domain' => 'org.project60.sepa')),
+          //     'OOFF'     => ts('One-off ready', array('domain' => 'org.project60.sepa')),
+          //     'SENT'     => ts('One-off sent', array('domain' => 'org.project60.sepa')),
+          //     'FRST'     => ts('Recurring first', array('domain' => 'org.project60.sepa')),
+          //     'RCUR'     => ts('Recurring followup', array('domain' => 'org.project60.sepa')),
+          //     'INVALID'  => ts('Invalid', array('domain' => 'org.project60.sepa')),
+          //     'COMPLETE' => ts('Complete', array('domain' => 'org.project60.sepa')),
+          //     'ONHOLD'   => ts('On Hold', array('domain' => 'org.project60.sepa')),
+          //     'PARTIAL'  => ts('Partial', array('domain' => 'org.project60.sepa')),
+          //   ),
+          // ),
+          'iban' => array(
+            'name' => 'iban',
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_STRING,
+            'title' => ts('IBAN'),
+          ),
+          'bic' => array(
+            'name' => 'bic',
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_STRING,
+            'title' => ts('BIC'),
+          ),
+          'source' => array(
+            'name' => 'source',
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_STRING,
+            'title' => ts('Source'),
+          ),
           'date' => array(
+            'title' => ts('Signature Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'creation_date' => array(
+            'title' => ts('Creation Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'validation_date' => array(
+            'title' => ts('Validation Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'mandate-fields',
       ),
-
 
 
       'civicrm_contact' => array(
@@ -89,25 +144,8 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         'fields' => array(
           'sort_name' => array(
             'title' => ts('Contact Name'),
-            'required' => TRUE,
+            // 'required' => TRUE,
             'default' => TRUE,
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-            'no_repeat' => TRUE,
           ),
           'id' => array(
             'no_display' => TRUE,
@@ -120,40 +158,18 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'operator' => 'like',
           ),
           'id' => array(
-            'no_display' => TRUE,
+            'title' => ts('Contact ID'),
+            'type' => CRM_Utils_Type::T_INT,
           ),
         ),
         'grouping' => 'contact-fields',
       ),
 
-
-      'civicrm_address' => array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'fields' => array(
-          'street_address' => NULL,
-          'city' => NULL,
-          'postal_code' => NULL,
-          'state_province_id' => array('title' => ts('State/Province')),
-          'country_id' => array('title' => ts('Country')),
-        ),
-        'grouping' => 'contact-fields',
-      ),
-
-
-      'civicrm_email' => array(
-        'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array('email' => NULL),
-        'grouping' => 'contact-fields',
-      ),
     );
+
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
-  }
-
-  function preProcess() {
-    $this->assign('reportTitle', ts('SEPA Mandate Report (generic)'));
-    parent::preProcess();
   }
 
   function select() {
@@ -184,33 +200,11 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
   function from() {
     $this->_from = NULL;
-
     $this->_from = "
-         FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-               INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
+         FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
+               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                           ON {$this->_aliases['civicrm_contact']}.id =
-                             {$this->_aliases['civicrm_membership']}.contact_id AND {$this->_aliases['civicrm_membership']}.is_test = 0
-               LEFT  JOIN civicrm_membership_status {$this->_aliases['civicrm_membership_status']}
-                          ON {$this->_aliases['civicrm_membership_status']}.id =
-                             {$this->_aliases['civicrm_membership']}.status_id ";
-
-
-    //used when address field is selected
-    if ($this->_addressField) {
-      $this->_from .= "
-             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                       ON {$this->_aliases['civicrm_contact']}.id =
-                          {$this->_aliases['civicrm_address']}.contact_id AND
-                          {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-    //used when email field is selected
-    if ($this->_emailField) {
-      $this->_from .= "
-              LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                        ON {$this->_aliases['civicrm_contact']}.id =
-                           {$this->_aliases['civicrm_email']}.contact_id AND
-                           {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
+                             {$this->_aliases['civicrm_sdd_mandate']}.contact_id";
   }
 
   function where() {
@@ -257,20 +251,19 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
+  // function groupBy() {
+  //   $this->_groupBy = '';// " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
+  // }
 
-  function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
+  // function orderBy() {
+  //   $this->_orderBy = '';// " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
+  // }
 
   function postProcess() {
 
     $this->beginPostProcess();
 
     // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
     $sql = $this->buildQuery(TRUE);
 
     $rows = array();
@@ -303,13 +296,6 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             $checkList[$colName][] = $colVal;
           }
         }
-      }
-
-      if (array_key_exists('civicrm_membership_membership_type_id', $row)) {
-        if ($value = $row['civicrm_membership_membership_type_id']) {
-          $rows[$rowNum]['civicrm_membership_membership_type_id'] = CRM_Member_PseudoConstant::membershipType($value, FALSE);
-        }
-        $entryFound = TRUE;
       }
 
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
