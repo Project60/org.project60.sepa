@@ -135,6 +135,27 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
+        'order_bys' => array(
+          'reference' => array(
+            'title' => ts('Mandate Reference'),
+          ),
+          'mandate_type' => array(
+            'name'  => 'type',
+            'title' => ts('Type')
+          ),
+          'status' => array(
+            'title' => ts('Status')
+          ),
+          'date' => array(
+            'title' => ts('Signature Date'),
+          ),
+          'creation_date' => array(
+            'title' => ts('Creation Date'),
+          ),
+          'validation_date' => array(
+            'title' => ts('Validation Date'),
+          ),
+        ),
         'grouping' => 'mandate-fields',
       ),
 
@@ -162,9 +183,16 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+          ),
+          'id' => array(
+            'title' => ts('Contact ID'),
+          ),
+        ),
         'grouping' => 'contact-fields',
       ),
-
     );
 
     $this->_groupFilter = TRUE;
