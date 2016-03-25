@@ -53,8 +53,8 @@ class CRM_Sepa_Logic_Group {
       UPDATE civicrm_sdd_mandate AS mandate
       SET status='SENT'
       WHERE 
-        mandate.entity_id IN (SELECT contribution_id 
-                              FROM civicrm_sdd_contribution_txgroup 
+        mandate.entity_table = 'civicrm_contribution' AND mandate.entity_id IN (SELECT contribution_id
+                              FROM civicrm_sdd_contribution_txgroup
                               WHERE txgroup_id=$txgroup_id);";
       CRM_Core_DAO::executeQuery($sql);    
 
@@ -81,7 +81,7 @@ class CRM_Sepa_Logic_Group {
       UPDATE civicrm_sdd_mandate AS mandate
       SET status='RCUR'
       WHERE 
-        mandate.entity_id IN (SELECT civicrm_contribution_recur.id 
+        mandate.entity_table = 'civicrm_contribution_recur' AND mandate.entity_id IN (SELECT civicrm_contribution_recur.id
                               FROM civicrm_sdd_contribution_txgroup
                               LEFT JOIN civicrm_contribution ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
                               LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
