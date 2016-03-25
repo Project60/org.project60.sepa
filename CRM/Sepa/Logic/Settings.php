@@ -62,7 +62,7 @@ class CRM_Sepa_Logic_Settings {
 
     // fallback is "Thanks."
     if (empty($transaction_message)) {
-      $transaction_message = ts("Thank you");
+      $transaction_message = ts("Thank you", array('domain' => 'org.project60.sepa'));
     }
 
     // make sure that it doesn't contain any special characters

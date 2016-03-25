@@ -14,7 +14,7 @@
 
 <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="sepa">
       <div class="crm-accordion-header">
-        {ts}Sepa Mandate{/ts}
+        {ts domain="org.project60.sepa"}Sepa Mandate{/ts}
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >

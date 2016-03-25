@@ -50,7 +50,7 @@
           <td>{$form.sdd_amount.html} {$form.sdd_curr.html}</td>
         </tr>
         <tr id="crmf-sdd_frequency">
-          <td class="label"><label for="sdd_frequency">{ts}Debit frequency{/ts}</label></td>
+          <td class="label"><label for="sdd_frequency">{ts domain="org.project60.sepa"}Debit frequency{/ts}</label></td>
           <td>
             {$form.sdd_frequency.0.html} 
             <br/>

@@ -228,7 +228,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'reference' => array(
           'name' => 'reference',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Reference') ,
+          'title' => ts('Reference', array('domain' => 'org.project60.sepa')) ,
           'required' => true,
           'maxlength' => 35,
           'size' => CRM_Utils_Type::BIG,
@@ -240,14 +240,14 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'source' => array(
           'name' => 'source',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Source') ,
+          'title' => ts('Source', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Entity Table') ,
+          'title' => ts('Entity Table', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
         ) ,
@@ -260,25 +260,25 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'date' => array(
           'name' => 'date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('Mandate signature date') ,
+          'title' => ts('Mandate signature date', array('domain' => 'org.project60.sepa')) ,
           'required' => true,
         ) ,
         'creditor_id' => array(
           'name' => 'creditor_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Creditor ID') ,
+          'title' => ts('Creditor ID', array('domain' => 'org.project60.sepa')) ,
           'FKClassName' => 'CRM_Sepa_DAO_SEPACreditor',
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Contact ID') ,
+          'title' => ts('Contact ID', array('domain' => 'org.project60.sepa')) ,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'iban' => array(
           'name' => 'iban',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Iban') ,
+          'title' => ts('Iban', array('domain' => 'org.project60.sepa')) ,
           'required' => false,
           'maxlength' => 42,
           'size' => CRM_Utils_Type::BIG,
@@ -286,14 +286,14 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'bic' => array(
           'name' => 'bic',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Bic') ,
+          'title' => ts('Bic', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 11,
           'size' => CRM_Utils_Type::TWELVE,
         ) ,
         'type' => array(
           'name' => 'type',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Type') ,
+          'title' => ts('Type', array('domain' => 'org.project60.sepa')) ,
           'required' => true,
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
@@ -302,7 +302,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'status' => array(
           'name' => 'status',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Status') ,
+          'title' => ts('Status', array('domain' => 'org.project60.sepa')) ,
           'required' => true,
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
@@ -311,7 +311,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'creation_date' => array(
           'name' => 'creation_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('creation date') ,
+          'title' => ts('creation date', array('domain' => 'org.project60.sepa')) ,
           'export' => true,
           'where' => 'civicrm_sdd_mandate.creation_date',
           'headerPattern' => '',
@@ -320,13 +320,13 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'first_contribution_id' => array(
           'name' => 'first_contribution_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('First Contribution (to be deprecated)') ,
+          'title' => ts('First Contribution (to be deprecated)', array('domain' => 'org.project60.sepa')) ,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'validation_date' => array(
           'name' => 'validation_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          'title' => ts('validation date') ,
+          'title' => ts('validation date', array('domain' => 'org.project60.sepa')) ,
         ) ,
       );
     }

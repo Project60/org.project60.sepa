@@ -15,22 +15,22 @@
 
 {* create a better dropdown for intervals *}
 <select id="frequency_combined" class="form-select" onChange="_frequency_copy_combined()" disabled="disabled">
-  <option value="1">{ts}monthly{/ts}</option>
-  <option value="3">{ts}quarterly{/ts}</option>
-  <option value="6">{ts}semi-annually{/ts}</option>
-  <option value="12">{ts}annually{/ts}</option>
+  <option value="1">{ts domain="org.project60.sepa"}monthly{/ts}</option>
+  <option value="3">{ts domain="org.project60.sepa"}quarterly{/ts}</option>
+  <option value="6">{ts domain="org.project60.sepa"}semi-annually{/ts}</option>
+  <option value="12">{ts domain="org.project60.sepa"}annually{/ts}</option>
 </select>
 
 {* JS Disclaimer *}
 <noscript>
 <br/><br/>
-<span style="color:#ff0000; font-size:150%; font-style:bold;">{ts}THIS PAGE PAGE DOES NOT WORK PROPERLY WITHOUT JAVASCRIPT. PLEASE ENABLE JAVASCRIPT IN YOUR BROWSER{/ts}</span>
+<span style="color:#ff0000; font-size:150%; font-style:bold;">{ts domain="org.project60.sepa"}THIS PAGE PAGE DOES NOT WORK PROPERLY WITHOUT JAVASCRIPT. PLEASE ENABLE JAVASCRIPT IN YOUR BROWSER{/ts}</span>
 </noscript>
 
 <!-- JS Magic -->
 <script type="text/javascript">
-var label_months = "{ts}monthly{/ts}";
-var label_years = "{ts}yearly{/ts}";
+var label_months = "{ts domain="org.project60.sepa"}monthly{/ts}";
+var label_years = "{ts domain="org.project60.sepa"}yearly{/ts}";
 
 {literal}
 

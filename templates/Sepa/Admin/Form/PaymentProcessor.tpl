@@ -15,7 +15,7 @@
 {$form.creditor_id.html}
 <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="sepa">
       <div class="crm-accordion-header">
-        {ts}Sepa Creditor{/ts}
+        {ts domain="org.project60.sepa"}Sepa Creditor{/ts}
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >

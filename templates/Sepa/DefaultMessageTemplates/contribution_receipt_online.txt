@@ -8,21 +8,21 @@
 ===========================================================
 {else}
 
-{ts}Please print this receipt for your records.{/ts}
+{ts domain="org.project60.sepa"}Please print this receipt for your records.{/ts}
 {/if}
 
 {if $amount}
 ===========================================================
-{ts}Contribution Information{/ts}
+{ts domain="org.project60.sepa"}Contribution Information{/ts}
 
 ===========================================================
 {if $lineItem and $priceSetID and !$is_quick_config}
 {foreach from=$lineItem item=value key=priceset}
 ---------------------------------------------------------
-{capture assign=ts_item}{ts}Item{/ts}{/capture}
-{capture assign=ts_qty}{ts}Qty{/ts}{/capture}
-{capture assign=ts_each}{ts}Each{/ts}{/capture}
-{capture assign=ts_total}{ts}Total{/ts}{/capture}
+{capture assign=ts_item}{ts domain="org.project60.sepa"}Item{/ts}{/capture}
+{capture assign=ts_qty}{ts domain="org.project60.sepa"}Qty{/ts}{/capture}
+{capture assign=ts_each}{ts domain="org.project60.sepa"}Each{/ts}{/capture}
+{capture assign=ts_total}{ts domain="org.project60.sepa"}Total{/ts}{/capture}
 {$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {$ts_total|string_format:"%10s"}
 ----------------------------------------------------------
 {foreach from=$value item=line}
@@ -30,31 +30,31 @@
 {/foreach}
 {/foreach}
 
-{ts}Total Amount{/ts}: {$amount|crmMoney:$currency}
+{ts domain="org.project60.sepa"}Total Amount{/ts}: {$amount|crmMoney:$currency}
 {else}
-{ts}Amount{/ts}: {$amount|crmMoney:$currency} {if $amount_level } - {$amount_level} {/if}
+{ts domain="org.project60.sepa"}Amount{/ts}: {$amount|crmMoney:$currency} {if $amount_level } - {$amount_level} {/if}
 {/if}
 {/if}
 {if $receive_date}
 
-{ts}Date{/ts}: {$receive_date|crmDate}
+{ts domain="org.project60.sepa"}Date{/ts}: {$receive_date|crmDate}
 {/if}
 {if $is_monetary and $trxn_id}
-{ts}Transaction #{/ts}: {$trxn_id}
+{ts domain="org.project60.sepa"}Transaction #{/ts}: {$trxn_id}
 {/if}
 
 {if $is_recur and ($contributeMode eq 'notify' or $contributeMode eq 'directIPN')}
-{ts}This is a recurring contribution. You can cancel future contributions at:{/ts}
+{ts domain="org.project60.sepa"}This is a recurring contribution. You can cancel future contributions at:{/ts}
 
 {$cancelSubscriptionUrl}
 
 {if $updateSubscriptionBillingUrl}
-{ts}You can update billing details for this recurring contribution at:{/ts}
+{ts domain="org.project60.sepa"}You can update billing details for this recurring contribution at:{/ts}
 
 {$updateSubscriptionBillingUrl}
 
 {/if}
-{ts}You can update recurring contribution amount or change the number of installments for this recurring contribution at:{/ts}
+{ts domain="org.project60.sepa"}You can update recurring contribution amount or change the number of installments for this recurring contribution at:{/ts}
 
 {$updateSubscriptionUrl}
 
@@ -66,25 +66,25 @@
 ===========================================================
 {$honor_prefix} {$honor_first_name} {$honor_last_name}
 {if $honor_email}
-{ts}Honoree Email{/ts}: {$honor_email}
+{ts domain="org.project60.sepa"}Honoree Email{/ts}: {$honor_email}
 {/if}
 
 {/if}
 {if $pcpBlock}
 ===========================================================
-{ts}Personal Campaign Page{/ts}
+{ts domain="org.project60.sepa"}Personal Campaign Page{/ts}
 
 ===========================================================
-{ts}Display In Honor Roll{/ts}: {if $pcp_display_in_roll}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
+{ts domain="org.project60.sepa"}Display In Honor Roll{/ts}: {if $pcp_display_in_roll}{ts domain="org.project60.sepa"}Yes{/ts}{else}{ts domain="org.project60.sepa"}No{/ts}{/if}
 
-{if $pcp_roll_nickname}{ts}Nickname{/ts}: {$pcp_roll_nickname}{/if}
+{if $pcp_roll_nickname}{ts domain="org.project60.sepa"}Nickname{/ts}: {$pcp_roll_nickname}{/if}
 
-{if $pcp_personal_note}{ts}Personal Note{/ts}: {$pcp_personal_note}{/if}
+{if $pcp_personal_note}{ts domain="org.project60.sepa"}Personal Note{/ts}: {$pcp_personal_note}{/if}
 
 {/if}
 {if $onBehalfProfile}
 ===========================================================
-{ts}On Behalf Of{/ts}
+{ts domain="org.project60.sepa"}On Behalf Of{/ts}
 
 ===========================================================
 {foreach from=$onBehalfProfile item=onBehalfValue key=onBehalfName}
@@ -95,13 +95,13 @@
 {if !( $contributeMode eq 'notify' OR $contributeMode eq 'directIPN' ) and $is_monetary}
 {if $is_pay_later}
 ===========================================================
-{ts}Registered Email{/ts}
+{ts domain="org.project60.sepa"}Registered Email{/ts}
 
 ===========================================================
 {$email}
 {elseif $amount GT 0}
 ===========================================================
-{ts}Billing Name and Address{/ts}
+{ts domain="org.project60.sepa"}Billing Name and Address{/ts}
 
 ===========================================================
 {$billingName}
@@ -113,52 +113,52 @@
 {if $contributeMode eq 'direct' AND !$is_pay_later AND $amount GT 0}
 {if $bank_account_number}{* DIRECT DEBIT PAYMENT *}
 ===========================================================
-{ts}Direct Debit Payment{/ts}
+{ts domain="org.project60.sepa"}Direct Debit Payment{/ts}
 
 ===========================================================
 {if $account_holder}
-{ts}Account Holder{/ts}: {$account_holder}
+{ts domain="org.project60.sepa"}Account Holder{/ts}: {$account_holder}
 {/if}
-{ts}Mandate Reference{/ts}: {$trxn_id}
-{ts}Bank Account Number{/ts}: {$bank_account_number}
+{ts domain="org.project60.sepa"}Mandate Reference{/ts}: {$trxn_id}
+{ts domain="org.project60.sepa"}Bank Account Number{/ts}: {$bank_account_number}
 {if $account_holder}
-{ts}BIC{/ts}: {$bank_identification_number}
+{ts domain="org.project60.sepa"}BIC{/ts}: {$bank_identification_number}
 {/if}
 {if $bank_name}
-{ts}Bank Name{/ts}: {$bank_name}
+{ts domain="org.project60.sepa"}Bank Name{/ts}: {$bank_name}
 {/if}
 {else}
 ===========================================================
-{ts}Credit Card Information{/ts}
+{ts domain="org.project60.sepa"}Credit Card Information{/ts}
 
 ===========================================================
 {$credit_card_type}
 {$credit_card_number}
-{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}
+{ts domain="org.project60.sepa"}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}
 {/if}
 {/if}
 
 {if $selectPremium }
 ===========================================================
-{ts}Premium Information{/ts}
+{ts domain="org.project60.sepa"}Premium Information{/ts}
 
 ===========================================================
 {$product_name}
 {if $option}
-{ts}Option{/ts}: {$option}
+{ts domain="org.project60.sepa"}Option{/ts}: {$option}
 {/if}
 {if $sku}
-{ts}SKU{/ts}: {$sku}
+{ts domain="org.project60.sepa"}SKU{/ts}: {$sku}
 {/if}
 {if $start_date}
-{ts}Start Date{/ts}: {$start_date|crmDate}
+{ts domain="org.project60.sepa"}Start Date{/ts}: {$start_date|crmDate}
 {/if}
 {if $end_date}
-{ts}End Date{/ts}: {$end_date|crmDate}
+{ts domain="org.project60.sepa"}End Date{/ts}: {$end_date|crmDate}
 {/if}
 {if $contact_email OR $contact_phone}
 
-{ts}For information about this premium, contact:{/ts}
+{ts domain="org.project60.sepa"}For information about this premium, contact:{/ts}
 
 {if $contact_email}
   {$contact_email}
@@ -169,7 +169,7 @@
 {/if}
 {if $is_deductible AND $price}
 
-{ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}{/if}
+{ts 1=$price|crmMoney:$currency domain="org.project60.sepa"}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}{/if}
 {/if}
 
 {if $customPre}

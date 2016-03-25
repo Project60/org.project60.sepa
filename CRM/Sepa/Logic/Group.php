@@ -120,7 +120,7 @@ class CRM_Sepa_Logic_Group {
           'version'                 => 3));
     if (isset($result['is_error']) && $result['is_error']) {
       $lock->release();
-      sprintf(ts("Cannot close transaction group! Error was: '%s'"), $result['error_message']);
+      sprintf(ts("Cannot close transaction group! Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']);
     } 
 
     $lock->release();

@@ -15,7 +15,7 @@
 
 
 {htxt id='id-template-help'}
-    <p>{ts}Select the template that should be used to create this prenotification file.{/ts}</p>
-    <p>{ts}The default template can be found and edited at "Communications" -> "Message Templates" -> "System Workflow Messages"{/ts}</p>
-    <p>{ts}The templates listed here are all user templates that begin with the prefix 'SEPA'.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}Select the template that should be used to create this prenotification file.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}The default template can be found and edited at "Communications" -> "Message Templates" -> "System Workflow Messages"{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}The templates listed here are all user templates that begin with the prefix 'SEPA'.{/ts}</p>
 {/htxt}

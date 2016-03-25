@@ -193,7 +193,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
             'status_id'               => $group_status_id_closed)
         );
       if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
-        return sprintf(ts("Cannot create file! Error was: '%s'"), $sepa_file['error_message']);
+        return sprintf(ts("Cannot create file! Error was: '%s'", array('domain' => 'org.project60.sepa')), $sepa_file['error_message']);
       } else {
 
         // update the txgroup object
@@ -202,7 +202,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
                 'sdd_file_id'             => $sepa_file['id'],
                 'version'                 => 3));
           if (isset($result['is_error']) && $result['is_error']) {
-            sprintf(ts("Cannot update transaction group! Error was: '%s'"), $result['error_message']);
+            sprintf(ts("Cannot update transaction group! Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']);
           } 
 
 

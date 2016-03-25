@@ -31,7 +31,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
   function getMessage ($id) {
      $msg = civicrm_api('MessageTemplate','getSingle',array("version"=>3,"id"=>$id));
      if (array_key_exists("is_error",$msg)) {
-       return CRM_Core_Error::fatal(sprintf(ts("The selected message template does not exist (%d)"), $id));
+       return CRM_Core_Error::fatal(sprintf(ts("The selected message template does not exist (%d)", array('domain' => 'org.project60.sepa')), $id));
      };
 
     return $msg;
@@ -165,7 +165,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $params['toName']  = $params['toEmail'];
 
       if (empty ($params['toEmail'])){
-        CRM_Core_Session::setStatus(sprintf(ts("Error sending %s: Contact doesn't have an email."), $fileName));
+        CRM_Core_Session::setStatus(sprintf(ts("Error sending %s: Contact doesn't have an email.", array('domain' => 'org.project60.sepa')), $fileName));
         return false;
       }
       $params['subject'] = "SEPA " . $fileName;
@@ -182,7 +182,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $params['text'] = "this is the mandate, please return signed";
       $params['html'] = $this->getTemplate()->fetch("string:".$mail["msg_html"]);
       CRM_Utils_Mail::send($params);
-//      CRM_Core_Session::setStatus(ts("Mail sent"));
+//      CRM_Core_Session::setStatus(ts("Mail sent", array('domain' => 'org.project60.sepa')));
     }  else {
       CRM_Utils_PDF_Utils::html2pdf( $this->html, $fileName, false, null );
     }
@@ -227,8 +227,8 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
    * @author endres@systopia.de
    */
   static function installMessageTemplate() {
-    $default_templates = array( "sepa_mandate"     => ts("SEPA default email template."),
-                                "sepa_mandate_pdf" => ts("SEPA default PDF template."));
+    $default_templates = array( "sepa_mandate"     => ts("SEPA default email template.", array('domain' => 'org.project60.sepa')),
+                                "sepa_mandate_pdf" => ts("SEPA default PDF template.", array('domain' => 'org.project60.sepa')));
 
     foreach ($default_templates as $template_name => $template_title) {
       // find the template's entry in the option group
@@ -263,7 +263,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
               'version'     => 3,
               'workflow_id' => $template_entry['id'],
               'msg_title'   => $template_title,
-              'msg_subject' => ts("SEPA Direct Debit Payment Information"),
+              'msg_subject' => ts("SEPA Direct Debit Payment Information", array('domain' => 'org.project60.sepa')),
               'is_reserved' => 0,
               'msg_html'    => file_get_contents($filepath),
               'msg_text'    => 'N/A'

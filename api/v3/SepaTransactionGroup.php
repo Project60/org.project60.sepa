@@ -292,14 +292,14 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   $type_id = (int) CRM_Core_OptionGroup::getValue('batch_type', 'SEPA DD Transaction Batch', 'name');
   if (!$type_id) {
     // create SEPA type entry if not exists
-    $value_spec = array('name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch'), 'is_active' => 1);
+    $value_spec = array('name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch', array('domain' => 'org.project60.sepa')), 'is_active' => 1);
     $group_spec = array('name' => 'batch_type');
     $action = CRM_Core_Action::ADD;
     $type_id = CRM_Core_OptionValue::addOptionValue($value_spec, $group_spec, $action)->value;
   }
 
   // then, finally, create the accounting group
-  $description = sprintf(ts('This group corresponds to <a href="%s">SEPA transaction group [%s]</a>'),
+  $description = sprintf(ts('This group corresponds to <a href="%s">SEPA transaction group [%s]</a>', array('domain' => 'org.project60.sepa')),
       CRM_Utils_System::url('civicrm/sepa/listgroup', "group_id=$txgroup_id"), $txgroup_id); 
 
   $batch = array( 'title'                 => $name,

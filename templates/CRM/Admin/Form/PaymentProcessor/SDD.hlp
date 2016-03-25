@@ -15,6 +15,6 @@
 
 
 {htxt id='id-creditor-help'}
-    <p>{ts}Select the creditor, that should be used for this payment processor.{/ts}</p>
-    <p>{ts}The creditor object not only determines the creditor ID, but also the account and the SEPA file format to be used.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}Select the creditor, that should be used for this payment processor.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}The creditor object not only determines the creditor ID, but also the account and the SEPA file format to be used.{/ts}</p>
 {/htxt}

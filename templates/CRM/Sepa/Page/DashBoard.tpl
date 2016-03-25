@@ -17,35 +17,35 @@
   <ul id="actions">
     {if $status eq 'closed'}
     <li>
-      <a title="{ts}show active groups{/ts}" class="search button" href="{$show_open_url}">
+      <a title="{ts domain="org.project60.sepa"}show active groups{/ts}" class="search button" href="{$show_open_url}">
         <span>
           <div class="icon inform-icon"></div>
-          {ts}show active groups{/ts}
+          {ts domain="org.project60.sepa"}show active groups{/ts}
         </span>
       </a>
     </li>
     {else}
     <li>
-      <a title="{ts}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
+      <a title="{ts domain="org.project60.sepa"}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
         <span>
           <div class="icon inform-icon"></div>
-          {ts}show closed groups{/ts}
+          {ts domain="org.project60.sepa"}show closed groups{/ts}
         </span>
       </a>
     <li>
     <li>
-      <a title="{ts}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
+      <a title="{ts domain="org.project60.sepa"}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
         <span>
           <div class="icon refresh-icon ui-icon-refresh"></div>
-          {ts}update one-off{/ts}
+          {ts domain="org.project60.sepa"}update one-off{/ts}
         </span>
       </a>
     </li>
     <li>
-      <a title="{ts}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
+      <a title="{ts domain="org.project60.sepa"}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
         <span>
           <div class="icon refresh-icon ui-icon-refresh"></div>
-          {ts}update recurring{/ts}
+          {ts domain="org.project60.sepa"}update recurring{/ts}
         </span>
       </a>
     </li>
@@ -56,13 +56,13 @@
 
 <table>
   <tr>
-    <th>{ts}Group Name{/ts}</th>
-    <th>{ts}Status{/ts}</th>
-    <th>{ts}Type{/ts}</th>
-    <th>{ts}Submission{/ts}</th>
-    <th>{ts}Collection{/ts}</th>
-    <th>{ts}Transactions{/ts}</th>
-    <th>{ts}Total{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Group Name{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Type{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Submission{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Collection{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Transactions{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Total{/ts}</th>
     <th></th>
   </tr>
   {foreach from=$groups item=group}
@@ -85,24 +85,24 @@
     <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
     <td style="white-space:nowrap;">{$group.total|crmMoney:$group.currency}</td>
     <td>
-      <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts}Contributions{/ts}</a>
+      <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Contributions{/ts}</a>
       {if $group.status == 'open'}
         {if $group.submit == 'missed'}
         <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id&status=missed"}" class="button button_close">
         {else}
         <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">
         {/if}
-        {ts}Close and Submit{/ts}</a>
+        {ts domain="org.project60.sepa"}Close and Submit{/ts}</a>
       {else}
-        <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.filename}" class="button button_export">{ts}Download Again{/ts}</a>
+        <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.filename}" class="button button_export">{ts domain="org.project60.sepa"}Download Again{/ts}</a>
         {if $closed_status_id eq $group.status_id}
           {if $group.collection_date|strtotime lt $smarty.now}
-            <a id="mark_received_{$group_id}" onClick="mark_received({$group_id});" class="button button_export">{ts}Mark Received{/ts}</a>
+            <a id="mark_received_{$group_id}" onClick="mark_received({$group_id});" class="button button_export">{ts domain="org.project60.sepa"}Mark Received{/ts}</a>
           {/if}
         {/if}
       {/if}
       {if $can_delete eq yes}
-      <a href="{crmURL p="civicrm/sepa/deletegroup" q="group_id=$group_id"}" class="button button_view">{ts}Delete{/ts}</a>
+      <a href="{crmURL p="civicrm/sepa/deletegroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Delete{/ts}</a>
       {/if}
     </td>
   </tr>
@@ -148,7 +148,7 @@
 {/literal}
 
 <script type="text/javascript">
-var received_confirmation_message = "{ts}Do you really want to mark this groups as 'payment received'?{/ts}";
+var received_confirmation_message = "{ts domain="org.project60.sepa"}Do you really want to mark this groups as 'payment received'?{/ts}";
 
 {literal}
 function mark_received(group_id) {

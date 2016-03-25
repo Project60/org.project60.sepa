@@ -29,7 +29,7 @@
     {if $is_pay_later}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {else}
-     <p>{ts}Please print this confirmation for your records.{/ts}</p>
+     <p>{ts domain="org.project60.sepa"}Please print this confirmation for your records.{/ts}</p>
     {/if}
 
    </td>
@@ -42,7 +42,7 @@
 
       <tr>
        <th {$headerStyle}>
-        {ts}Contribution Information{/ts}
+        {ts domain="org.project60.sepa"}Contribution Information{/ts}
        </th>
       </tr>
 
@@ -53,10 +53,10 @@
          <td colspan="2" {$valueStyle}>
           <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
            <tr>
-            <th>{ts}Item{/ts}</th>
-            <th>{ts}Qty{/ts}</th>
-            <th>{ts}Each{/ts}</th>
-            <th>{ts}Total{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}Item{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}Qty{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}Each{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}Total{/ts}</th>
            </tr>
            {foreach from=$value item=line}
             <tr>
@@ -80,7 +80,7 @@
        {/foreach}
        <tr>
         <td {$labelStyle}>
-         {ts}Total Amount{/ts}
+         {ts domain="org.project60.sepa"}Total Amount{/ts}
         </td>
         <td {$valueStyle}>
          {$amount|crmMoney:$currency}
@@ -91,7 +91,7 @@
 
        <tr>
         <td {$labelStyle}>
-         {ts}Amount{/ts}
+         {ts domain="org.project60.sepa"}Amount{/ts}
         </td>
         <td {$valueStyle}>
          {$amount|crmMoney:$currency} {if $amount_level} - {$amount_level}{/if}
@@ -106,7 +106,7 @@
      {if $receive_date}
       <tr>
        <td {$labelStyle}>
-        {ts}Date{/ts}
+        {ts domain="org.project60.sepa"}Date{/ts}
        </td>
        <td {$valueStyle}>
         {$receive_date|crmDate}
@@ -117,7 +117,7 @@
      {if $is_monetary and $trxn_id}
       <tr>
        <td {$labelStyle}>
-        {ts}Transaction #{/ts}
+        {ts domain="org.project60.sepa"}Transaction #{/ts}
        </td>
        <td {$valueStyle}>
         {$trxn_id}
@@ -129,19 +129,19 @@
       {if $contributeMode eq 'notify' or $contributeMode eq 'directIPN'}
        <tr>
         <td  colspan="2" {$labelStyle}>
-         {ts 1=$cancelSubscriptionUrl}This is a recurring contribution. You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
+         {ts 1=$cancelSubscriptionUrl domain="org.project60.sepa"}This is a recurring contribution. You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
         </td>
         {if $updateSubscriptionBillingUrl}
          <tr>
          </tr>
          <td colspan="2" {$labelStyle}>
-          {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+          {ts 1=$updateSubscriptionBillingUrl domain="org.project60.sepa"}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
          </td>
         {/if}
        <tr>
        </tr>
         <td colspan="2" {$labelStyle}>
-         {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+         {ts 1=$updateSubscriptionUrl domain="org.project60.sepa"}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
         </td>
        </tr>
       {/if}
@@ -161,7 +161,7 @@
       {if $honor_email}
        <tr>
         <td {$labelStyle}>
-         {ts}Honoree Email{/ts}
+         {ts domain="org.project60.sepa"}Honoree Email{/ts}
         </td>
         <td {$valueStyle}>
          {$honor_email}
@@ -173,21 +173,21 @@
      {if $pcpBlock}
       <tr>
        <th {$headerStyle}>
-        {ts}Personal Campaign Page{/ts}
+        {ts domain="org.project60.sepa"}Personal Campaign Page{/ts}
        </th>
       </tr>
       <tr>
        <td {$labelStyle}>
-        {ts}Display In Honor Roll{/ts}
+        {ts domain="org.project60.sepa"}Display In Honor Roll{/ts}
        </td>
        <td {$valueStyle}>
-        {if $pcp_display_in_roll}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
+        {if $pcp_display_in_roll}{ts domain="org.project60.sepa"}Yes{/ts}{else}{ts domain="org.project60.sepa"}No{/ts}{/if}
        </td>
       </tr>
       {if $pcp_roll_nickname}
        <tr>
         <td {$labelStyle}>
-         {ts}Nickname{/ts}
+         {ts domain="org.project60.sepa"}Nickname{/ts}
         </td>
         <td {$valueStyle}>
          {$pcp_roll_nickname}
@@ -197,7 +197,7 @@
       {if $pcp_personal_note}
        <tr>
         <td {$labelStyle}>
-         {ts}Personal Note{/ts}
+         {ts domain="org.project60.sepa"}Personal Note{/ts}
         </td>
         <td {$valueStyle}>
          {$pcp_personal_note}
@@ -237,7 +237,7 @@
       {if $is_pay_later}
        <tr>
         <th {$headerStyle}>
-         {ts}Registered Email{/ts}
+         {ts domain="org.project60.sepa"}Registered Email{/ts}
         </th>
        </tr>
        <tr>
@@ -248,7 +248,7 @@
       {elseif $amount GT 0}
        <tr>
         <th {$headerStyle}>
-         {ts}Billing Name and Address{/ts}
+         {ts domain="org.project60.sepa"}Billing Name and Address{/ts}
         </th>
        </tr>
        <tr>
@@ -266,32 +266,32 @@
       {* DIRECT DEBIT PAYMENT *}
       <tr>
        <th {$headerStyle}>
-        {ts}Direct Debit Payment{/ts}
+        {ts domain="org.project60.sepa"}Direct Debit Payment{/ts}
        </th>
       </tr>
       {if $account_holder}
       <tr>
-       <td {$labelStyle}>{ts}Account Holder{/ts}</td>
+       <td {$labelStyle}>{ts domain="org.project60.sepa"}Account Holder{/ts}</td>
        <td {$valueStyle}>{$account_holder}</td>
       </tr>
       {/if}
       <tr>
-       <td {$labelStyle}>{ts}Mandate Reference{/ts}</td>
+       <td {$labelStyle}>{ts domain="org.project60.sepa"}Mandate Reference{/ts}</td>
        <td {$valueStyle}>{$trxn_id}</td>
       </tr>
       <tr>
-       <td {$labelStyle}>{ts}Bank Account Number{/ts}</td>
+       <td {$labelStyle}>{ts domain="org.project60.sepa"}Bank Account Number{/ts}</td>
        <td {$valueStyle}>{$bank_account_number}</td>
       </tr>
       {if $bank_identification_number}
       <tr>
-       <td {$labelStyle}>{ts}BIC{/ts}</td>
+       <td {$labelStyle}>{ts domain="org.project60.sepa"}BIC{/ts}</td>
        <td {$valueStyle}>{$bank_identification_number}</td>
       </tr>
       {/if}
       {if $bank_name}
       <tr>
-       <td {$labelStyle}>{ts}Bank Name{/ts}</td>
+       <td {$labelStyle}>{ts domain="org.project60.sepa"}Bank Name{/ts}</td>
        <td {$valueStyle}>{$bank_name}</td>
       </tr>
       {/if}
@@ -299,14 +299,14 @@
       {* CREDIT CARD PAYMENT *}
       <tr>
        <th {$headerStyle}>
-        {ts}Credit Card Information{/ts}
+        {ts domain="org.project60.sepa"}Credit Card Information{/ts}
        </th>
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
         {$credit_card_type}<br />
         {$credit_card_number}<br />
-        {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}<br />
+        {ts domain="org.project60.sepa"}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}<br />
        </td>
       </tr>
       {/if}
@@ -315,7 +315,7 @@
      {if $selectPremium}
       <tr>
        <th {$headerStyle}>
-        {ts}Premium Information{/ts}
+        {ts domain="org.project60.sepa"}Premium Information{/ts}
        </th>
       </tr>
       <tr>
@@ -326,7 +326,7 @@
       {if $option}
        <tr>
         <td {$labelStyle}>
-         {ts}Option{/ts}
+         {ts domain="org.project60.sepa"}Option{/ts}
         </td>
         <td {$valueStyle}>
          {$option}
@@ -336,7 +336,7 @@
       {if $sku}
        <tr>
         <td {$labelStyle}>
-         {ts}SKU{/ts}
+         {ts domain="org.project60.sepa"}SKU{/ts}
         </td>
         <td {$valueStyle}>
          {$sku}
@@ -346,7 +346,7 @@
       {if $start_date}
        <tr>
         <td {$labelStyle}>
-         {ts}Start Date{/ts}
+         {ts domain="org.project60.sepa"}Start Date{/ts}
         </td>
         <td {$valueStyle}>
          {$start_date|crmDate}
@@ -356,7 +356,7 @@
       {if $end_date}
        <tr>
         <td {$labelStyle}>
-         {ts}End Date{/ts}
+         {ts domain="org.project60.sepa"}End Date{/ts}
         </td>
         <td {$valueStyle}>
          {$end_date|crmDate}
@@ -366,7 +366,7 @@
       {if $contact_email OR $contact_phone}
        <tr>
         <td colspan="2" {$valueStyle}>
-         <p>{ts}For information about this premium, contact:{/ts}</p>
+         <p>{ts domain="org.project60.sepa"}For information about this premium, contact:{/ts}</p>
          {if $contact_email}
           <p>{$contact_email}</p>
          {/if}
@@ -379,7 +379,7 @@
       {if $is_deductible AND $price}
         <tr>
          <td colspan="2" {$valueStyle}>
-          <p>{ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
+          <p>{ts 1=$price|crmMoney:$currency domain="org.project60.sepa"}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
          </td>
         </tr>
       {/if}
