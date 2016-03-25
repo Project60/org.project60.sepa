@@ -35,7 +35,7 @@
 		<tr>	<!-- CREDITOR -->
 			<td>{ts}Creditor{/ts}:</td>
 			<td>
-				<select name="creditor_id" onChange='sepa_update_cycledays();' >
+				<select name="creditor_id" onChange='change_creditor();' >
 					{foreach from=$creditors item=name key=id}
 					<option value="{$id}" {if $id eq $creditor_id}selected{/if}>{$name}</option>
 					{/foreach}
@@ -48,7 +48,7 @@
 		</tr>
 		<tr>	<!-- AMOUNT -->
 			<td>{ts}Amount{/ts}:</td>
-			<td><input name="total_amount" type="number" size="6" step="0.01" value="{$total_amount}" />&nbsp;EUR</td>
+			<td><input name="total_amount" type="number" size="6" step="0.01" value="{$total_amount}" />&nbsp;<span id="creditor_currency">EUR</span></td>
 		</tr>
 		<tr>	<!-- FINANCIAL TYPE -->
 			<td>{ts}Financial Type{/ts}:</td>
@@ -207,11 +207,8 @@
 
 
 <script type="text/javascript">
-{if $creditor2cycledays}
-var creditor2cycledays = {$creditor2cycledays};
-{else}
-var creditor2cycledays = [];
-{/if}
+var creditor2cycledays = {if $creditor2cycledays}{$creditor2cycledays}{else}[]{/if};
+var creditor_currency = {if $creditor_currency}{$creditor_currency}{else}[]{/if};
 {literal}
 // logic for the bank account selector
 cj("#account").change(change_bank_account);
@@ -238,7 +235,15 @@ function sepa_update_cycledays() {
 		cj('#default_element_cycle_day').append('<option value="' + value + '" ' + is_selected + '>' + label + '.</option>');
 	}
 }
+function change_currency() {
+	cj("#creditor_currency").text(creditor_currency[cj("[name='creditor_id']").val()]);
+}
+function change_creditor() {
+	sepa_update_cycledays();
+	change_currency();
+}
 sepa_update_cycledays();
+change_currency();
 {/literal}
 
 // Validation handling

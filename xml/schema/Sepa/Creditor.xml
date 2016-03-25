@@ -151,4 +151,16 @@
     </pseudoconstant>
     <add>4.4</add>
   </field>
+
+  <field>
+    <name>currency</name>
+    <title>3 character string symbol of currency</title>
+    <type>varchar</type>
+    <required>true</required>
+    <length>3</length>
+    <default>"EUR"</default>
+    <comment>3 character string symbol of currency</comment>
+    <add>4.6</add>
+  </field>
+
 </table>

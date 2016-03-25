@@ -48,6 +48,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         civicrm_contribution.id                 AS contribution_id,
         civicrm_contribution.total_amount       AS contribution_amount,
         civicrm_contribution.financial_type_id  AS contribution_financial_type_id,
+        civicrm_contribution.currency           AS contribution_currency,
         civicrm_campaign.title                  AS contribution_campaign
       FROM   
         civicrm_sdd_txgroup
@@ -70,6 +71,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
       $contact_base_link = CRM_Utils_System::url('civicrm/contact/view', '&reset=1&cid=');
       $contribution_base_link = CRM_Utils_System::url('civicrm/contact/view/contribution', '&reset=1&id=_cid_&cid=_id_&action=view');
 
+      $currency = '';
       $contributions = array();
       $result = CRM_Core_DAO::executeQuery($sql);
       while ($result->fetch()) {
@@ -81,7 +83,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
           'contribution_link'         => str_replace('_id_', $result->contact_id, str_replace('_cid_', $result->contribution_id, $contribution_base_link)),
           'contribution_id'           => $result->contribution_id,
           'contribution_amount'       => $result->contribution_amount,
-          'contribution_amount_str'   => CRM_Utils_Money::format($result->contribution_amount, 'EUR'),
+          'contribution_amount_str'   => CRM_Utils_Money::format($result->contribution_amount, $result->contribution_currency),
           'financial_type'            => $financial_types[$result->contribution_financial_type_id],
           'campaign'                  => $result->contribution_campaign,
         );
@@ -92,6 +94,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         $total_contacts[$result->contact_id] = 1;
         $total_campaigns[$result->contribution_campaign] = 1;
         $reference = $result->reference;
+        $currency = $result->contribution_currency;
       }
     }
 
@@ -100,7 +103,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
     $this->assign("group_id", $group_id);
     $this->assign("total_count", $total_count);
     $this->assign("total_amount", $total_amount);
-    $this->assign("total_amount_str", CRM_Utils_Money::format($total_amount, 'EUR'));
+    $this->assign("total_amount_str", CRM_Utils_Money::format($total_amount, $currency));
     $this->assign("contributions", $contributions);
     $this->assign("different_campaigns", count($total_campaigns));
     $this->assign("different_types", count($total_types));
