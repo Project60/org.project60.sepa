@@ -209,8 +209,8 @@ function sepa_pp_install() {
 		$payment_processor_data = array(
 		    "version"                   => 3,
 		    "name"                      => "SEPA_Direct_Debit",
-		    "title"                     => ts("SEPA Direct Debit"),
-		    "description"               => ts("Payment processor for the 'Single European Payement Area' (SEPA)."),
+		    "title"                     => ts("SEPA Direct Debit", array('domain' => 'org.project60.sepa')),
+		    "description"               => ts("Payment processor for the 'Single European Payement Area' (SEPA).", array('domain' => 'org.project60.sepa')),
 		    "is_active"                 => 1,
 		    "user_name_label"           => "SEPA Creditor identifier",
 		    "class_name"                => "Payment_SDD",

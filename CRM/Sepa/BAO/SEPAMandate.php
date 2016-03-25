@@ -193,7 +193,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     // use a lock, in case somebody is batching just now
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot close mandate [%s], batching in progress!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot close mandate [%s], batching in progress!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       return FALSE;
     }
 
@@ -201,7 +201,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if ($mandate==NULL || $mandate_id != $mandate['id']) {
       $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
       if (isset($mandate['is_error'])) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
         $lock->release();
         return FALSE;
       }      
@@ -231,7 +231,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       WHERE contribution_id = $contribution_id 
       AND status_id <> $group_status_id_open;");
     if ($is_in_closed_group) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot close mandate [%s], it's alread batched in a non-open group!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot close mandate [%s], it's alread batched in a non-open group!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $lock->release();
       return FALSE;
     }
@@ -244,7 +244,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       'status'    => 'INVALID',
     ));
     if (!empty($result['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot properly end mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $result['error_message']), ts('Error'), 'warn');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot properly end mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'warn');
     }
 
     // then: cancel the associated contribution
@@ -257,7 +257,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       'cancel_date'               => date('YmdHis', strtotime($new_end_date_str))
     ));
     if (!empty($result['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot properly end mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $result['error_message']), ts('Error'), 'warn');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot properly end mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'warn');
     }
 
     // finally: remove contribution from any open SEPA groups
@@ -278,14 +278,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     // use a lock, in case somebody is batching just now
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot terminate mandate [%s], batching in progress!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot terminate mandate [%s], batching in progress!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       return FALSE;
     }
 
      // first, load the mandate
     $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
     if (isset($mandate['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $lock->release();
       return FALSE;
     }
@@ -294,7 +294,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if ( $mandate['type']=="OOFF" ) {
       return CRM_Sepa_BAO_SEPAMandate::terminateOOFFMandate($mandate_id, $new_end_date_str, $cancel_reason, $mandate);
     } elseif ( $mandate['type']!="RCUR" ) {
-      CRM_Core_Session::setStatus(ts("You can only modify the end date of recurring contribution mandates.", array('domain' => 'org.project60.sepa')), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts("You can only modify the end date of recurring contribution mandates.", array('domain' => 'org.project60.sepa')), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $lock->release();
       return FALSE;
     }
@@ -303,7 +303,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $contribution_id = $mandate['entity_id'];
     $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
     if (isset($contribution['is_error']) && $contribution['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $contribution['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $lock->release();
       return FALSE;
     }
@@ -313,7 +313,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $new_end_date = strtotime($new_end_date_str);
 
     if ($new_end_date < $today) {
-      CRM_Core_Session::setStatus(sprintf(ts("You cannot set an end date in the past.", array('domain' => 'org.project60.sepa')), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("You cannot set an end date in the past.", array('domain' => 'org.project60.sepa')), $contribution_id, $contribution['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $lock->release();
       return FALSE;
     }
@@ -332,7 +332,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     $result = civicrm_api("ContributionRecur", "create", $query);
     if (isset($result['is_error']) && $result['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $result['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $lock->release();
       return FALSE;
     }
@@ -349,7 +349,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         'note'          => $cancel_reason,
         'privacy'       => 0));
       if (isset($note_result['is_error']) && $note_result['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot set cancel reason for mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $note_result['error_message']), ts('Error'), 'warn');
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot set cancel reason for mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $note_result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'warn');
       }
     }
 
@@ -371,7 +371,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     foreach ($obsolete_ids as $obsolete_id) {
       $delete_result = civicrm_api("Contribution", "delete", array('id'=>$obsolete_id, 'version'=>3));
       if (isset($delete_result['is_error']) && $delete_result['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot delete scheduled contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $obsolete_id, $delete_result['error_message']), ts('Error'), 'warn');
+        CRM_Core_Session::setStatus(sprintf(ts("Cannot delete scheduled contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $obsolete_id, $delete_result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'warn');
       } else {
         array_push($deleted_ids, $obsolete_id);
       }
@@ -386,7 +386,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if ($new_end_date<=$today) {
       $close_result = civicrm_api("SepaAlternativeBatching", "closeended", array('version'=>3));
       if (isset($close_result['is_error']) && $close_result['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Closing Mandate failed. Error was: '%s'", array('domain' => 'org.project60.sepa')), $close_result['error_message']), ts('Error'), 'warn');
+        CRM_Core_Session::setStatus(sprintf(ts("Closing Mandate failed. Error was: '%s'", array('domain' => 'org.project60.sepa')), $close_result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'warn');
       }
     }
 
@@ -438,7 +438,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $contribution_id = $mandate['entity_id'];
     $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
     if (isset($contribution['is_error']) && $contribution['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $lock->release();
       return FALSE;
     }

@@ -307,7 +307,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'currency' => array(
           'name' => 'currency',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Currency') ,
+          'title' => ts('Currency', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
           'default' => 'EUR',

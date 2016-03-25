@@ -254,7 +254,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'entity_id' => array(
           'name' => 'entity_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Entity ID') ,
+          'title' => ts('Entity ID', array('domain' => 'org.project60.sepa')) ,
           'required' => true,
         ) ,
         'date' => array(

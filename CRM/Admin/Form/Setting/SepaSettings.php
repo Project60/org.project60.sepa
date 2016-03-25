@@ -120,7 +120,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->assign('multi_currency', $multi_currency);
         if ($multi_currency) {
           $currencies_enabled = CRM_Core_OptionGroup::values('currencies_enabled');
-          $currencies_dict = array('' => ts('- select -'));
+          $currencies_dict = array('' => ts('- select -', array('domain' => 'org.project60.sepa')));
           foreach ((array)$currencies_enabled as $k => $v) {
             $currencies_dict[$k] = $k;
           }

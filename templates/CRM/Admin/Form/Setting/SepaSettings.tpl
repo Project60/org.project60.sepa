@@ -102,7 +102,7 @@ div.sdd-add-creditor {
             </tr>
             {if $multi_currency}
               <tr>
-                <td class="label">{$form.addcreditor_currency.label} <a onclick='CRM.help("{ts}Currency{/ts}", {literal}{"id":"id-currency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+                <td class="label">{$form.addcreditor_currency.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Currency{/ts}", {literal}{"id":"id-currency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
                 <td>
                   {$form.addcreditor_currency.html}
                 </td>
@@ -256,7 +256,7 @@ div.sdd-add-creditor {
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-default_mandate_type">
-              <td class="label">{$form.default_mandate_type.label} <a onclick='CRM.help("{ts}Default Mandate Type{/ts}", {literal}{"id":"id-defaultmandatetype","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.default_mandate_type.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Default Mandate Type{/ts}", {literal}{"id":"id-defaultmandatetype","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.default_mandate_type.html}
               </td>
@@ -286,7 +286,7 @@ div.sdd-add-creditor {
               </td>
             </tr>
             <tr class="crm-alternative_batching-form-block-multi-currency">
-              <td class="label">{$form.multi_currency_field.label} <a onclick='CRM.help("{ts}Exclude Weekends{/ts}", {literal}{"id":"id-multi-currency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td class="label">{$form.multi_currency_field.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Exclude Weekends{/ts}", {literal}{"id":"id-multi-currency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
                 {$form.multi_currency_field.html}
               </td>

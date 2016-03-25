@@ -25,10 +25,10 @@ abstract class CRM_Sepa_Logic_Format {
       if (file_exists($file)) {
         require_once $file;
       } else {
-        throw new Exception(ts('File with class format does not exist.'));
+        throw new Exception(ts('File with class format does not exist.', array('domain' => 'org.project60.sepa')));
       }
     } else {
-      throw new Exception(ts('Directory for file format does not exist.'));
+      throw new Exception(ts('Directory for file format does not exist.', array('domain' => 'org.project60.sepa')));
     }
   }
 

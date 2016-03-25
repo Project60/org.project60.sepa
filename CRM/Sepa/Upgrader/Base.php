@@ -178,6 +178,7 @@ class CRM_Sepa_Upgrader_Base {
         $title = ts('Upgrade %1 to revision %2', array(
           1 => $this->extensionName,
           2 => $revision,
+          'domain' => 'org.project60.sepa',
         ));
 
         // note: don't use addTask() because it sets weight=-1

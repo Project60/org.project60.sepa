@@ -7,9 +7,9 @@
     <div ng-controller="ListMandateCtrl" id="ListMandateCtrl">
         <div class="searchFields">
             <div id='divSelectGroup' class="queryField">
-                <label for="thisStatus" class="calloutRow">{ts}Status{/ts}</label>
+                <label for="thisStatus" class="calloutRow">{ts domain="org.project60.sepa"}Status{/ts}</label>
                 <select class="filterField" id="thisStatus" name="field_status">
-                    <option value="">{ts}- select -{/ts}</option>
+                    <option value="">{ts domain="org.project60.sepa"}- select -{/ts}</option>
                     <option value="INIT">INIT</option>
                     <option value="OOFF">OOFF</option>
                     <option value="FRST">FRST</option>
@@ -22,18 +22,18 @@
                 </select>
             </div>
             <button id='bGetMandates' class='button' type='button' ng-click='getMandates()'>
-                {ts}Find{/ts}
+                {ts domain="org.project60.sepa"}Find{/ts}
             </button>
         </div>
         <div id="loadingHeader"></div>
         <table id="resultTable" class="selector row-highlight">
             <thead>
             <tr>
-                <th><a ng-click="sort('id')">{ts}ID{/ts}</a></th>
-                <th><a ng-click="sort('contact.display_name')">{ts}Contact{/ts}</a></th>
-                <th><a ng-click="sort('reference')">{ts}Reference{/ts}</></th>
-                <th><a ng-click="sort('iban')">{ts}IBAN / BIC{/ts}</></th>
-                <th><a ng-click="sort('status')">{ts}Status{/ts}</a></th>
+                <th><a ng-click="sort('id')">{ts domain="org.project60.sepa"}ID{/ts}</a></th>
+                <th><a ng-click="sort('contact.display_name')">{ts domain="org.project60.sepa"}Contact{/ts}</a></th>
+                <th><a ng-click="sort('reference')">{ts domain="org.project60.sepa"}Reference{/ts}</></th>
+                <th><a ng-click="sort('iban')">{ts domain="org.project60.sepa"}IBAN / BIC{/ts}</></th>
+                <th><a ng-click="sort('status')">{ts domain="org.project60.sepa"}Status{/ts}</a></th>
                 <th>&nbsp;</th>
             </tr>
             </thead>

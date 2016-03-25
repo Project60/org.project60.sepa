@@ -237,13 +237,13 @@ function sepa_civicrm_options() {
               'value' => 3,
             ),
             'citibankpl' => array(
-              'label' => ts('CitiBank PL direct debit'),
+              'label' => ts('CitiBank PL direct debit', array('domain' => 'org.project60.sepa')),
               'is_default' => 0,
               'is_reserved' => 1,
               'value' => 4,
             ),
             'bphpl' => array(
-              'label' => ts('Bank BPH PL direct debit'),
+              'label' => ts('Bank BPH PL direct debit', array('domain' => 'org.project60.sepa')),
               'is_default' => 0,
               'is_reserved' => 1,
               'value' => 5,
@@ -565,8 +565,8 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     );
     $result = CRM_Core_DAO::executeQuery($query, $params);
     if ($result->fetch()) {
-      CRM_Core_Error::fatal(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"), $result->id));
-      die(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!"), $result->id));
+      CRM_Core_Error::fatal(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!", array('domain' => 'org.project60.sepa')), $result->id));
+      die(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!", array('domain' => 'org.project60.sepa')), $result->id));
     }
   }
 

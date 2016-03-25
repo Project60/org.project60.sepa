@@ -214,7 +214,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     // first, try to load contact
     $contact = civicrm_api('Contact', 'getsingle', array('version' => 3, 'id' => $contact_id));
     if (isset($contact['is_error']) && $contact['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s", array('domain' => 'org.project60.sepa')), $contact_id), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s", array('domain' => 'org.project60.sepa')), $contact_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       $this->assign("display_name", "ERROR");
       return;
     }
@@ -225,7 +225,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     // look up campaigns
     $campaign_query = civicrm_api('Campaign', 'get', array('version'=>3, 'is_active'=>1, 'option.limit' => 9999, 'option.sort'=>'title'));
     $campaigns = array();
-    $campaigns[''] = ts("No Campaign");
+    $campaigns[''] = ts("No Campaign", array('domain' => 'org.project60.sepa'));
     if (isset($campaign_query['is_error']) && $campaign_query['is_error']) {
       CRM_Core_Session::setStatus(ts("Couldn't load campaign list.", array('domain' => 'org.project60.sepa')), ts('Error'), 'error');
     } else {
