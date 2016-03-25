@@ -196,6 +196,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('checkbox', 'allow_mandate_modification', ts("Mandate Modifications"), NULL, $amm_options);
         $this->addElement('checkbox', 'multi_currency_field', ts("Multi currency mode (not only EUR)"), NULL, $multi_currency ? array('checked'=>'checked') : array());
 
+        $mandate_types = array(
+          'OOFF' => ts('One Time (OOFF)'),
+          'RCUR' => ts('Recurring (RCUR)'),
+        );
+        $default_mandate_element = $this->addElement('select', 'default_mandate_type', ts("Default Mandate Type"), $mandate_types);
+        $default_mandate_element->setSelected(CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'default_mandate_type'));
+
         parent::buildQuickForm();
     }
 
@@ -212,6 +219,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // save general config options:
         // default creditor
         CRM_Core_BAO_Setting::setItem($values['batching_default_creditor'], 'SEPA Direct Debit Preferences', 'batching_default_creditor');
+        CRM_Core_BAO_Setting::setItem($values['default_mandate_type'], 'SEPA Direct Debit Preferences', 'default_mandate_type');
 
         // mandate modification
         $allow_mandate_modification = empty($values['allow_mandate_modification'])?'0':'1';
