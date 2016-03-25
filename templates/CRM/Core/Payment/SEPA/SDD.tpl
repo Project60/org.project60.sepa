@@ -17,8 +17,8 @@
 {crmAPI var='bic_extension_check' entity='Extension' action='get' status='installed' q='civicrm/ajax/rest'}
 {assign var='bic_extension_installed' value=$bic_extension_check.count}
 
-{if $config->civiVersion lt '4.6'}
-{* add these fields manually for 4.4/4.5 *}
+{if $pre4_6_10}
+{* add these fields manually for 4.4.x - 4.6.9 *}
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 <div id="sdd-cycle-day-section" class="crm-section {$form.cycle_day.name}-section" style="display: none;">
   <div class="label">{$form.cycle_day.label}</div>
@@ -35,14 +35,27 @@
 
 {literal}
 <script type="text/javascript">
-// in 4.4/4.5 we could still ignore this
+// in 4.4.x - 4.6.9 we could still ignore this (not mandatory)
 cj(function(){
   cj("fieldset.billing_name_address-group").hide();
 });
 </script>
 {/literal}
-
 {/if}
+
+{if $sepa_hide_billing}
+{literal}
+<script type="text/javascript">
+  // If disabled remove the billing group, so no billing address is created
+  cj(function(){
+    cj("#billingcheckbox").remove();
+    cj("label[for='billingcheckbox']").remove();
+    cj("fieldset.billing_name_address-group").remove();
+  });
+</script>
+{/literal}
+{/if}
+
 
 
 <!-- JS Magic -->
@@ -156,7 +169,7 @@ function sepa_lookup_bic() {
 	}
 
 	var iban_partial = cj("#bank_account_number").val();
-	if (iban_partial.length == 0) return;
+	if (iban_partial == undefined || iban_partial.length == 0) return;
 	if (sepa_hide_bic_enabled) {
 		// if it's hidden, we should clear it at this point
 		cj("#bank_identification_number").attr('value', '');
