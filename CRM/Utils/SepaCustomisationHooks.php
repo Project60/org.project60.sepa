@@ -109,4 +109,29 @@ class CRM_Utils_SepaCustomisationHooks {
       return CRM_Utils_Hook::singleton()->invoke(2, $collection_date, $creditor_id, self::$null, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
     }
   }
+
+
+  /**
+   * This hook is called by the batching alogrithm:
+   *  whenever a new installment has been created for a given RCUR mandate
+   *  this hook is called so you can modify the resulting contribution,
+   *  e.g. connect it to a membership, or copy custom fields
+   *
+   * be aware the newly created contribution is still 'Pending', it might NOT be
+   * issued to the bank.
+   *
+   * @param array  $mandate_id             the CiviSEPA mandate entity
+   * @param array  $contribution_recur_id  the recurring contribution connected to the mandate
+   * @param array  $contribution_id        the newly created contribution
+   *
+   * @access public
+   */
+  static function installment_created($mandate_id, $contribution_recur_id, $contribution_id) {
+    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
+    {
+      return CRM_Utils_Hook::singleton()->invoke(3, $mandate_id, $contribution_recur_id, $contribution_id, self::$null, self::$null, 'civicrm_installment_created');
+    }else{
+      return CRM_Utils_Hook::singleton()->invoke(3, $mandate_id, $contribution_recur_id, $contribution_id, self::$null, self::$null, self::$null, 'civicrm_installment_created');
+    }
+  }
 }
