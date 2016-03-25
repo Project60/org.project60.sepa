@@ -22,7 +22,20 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
   protected $_customGroupExtends = NULL;//array('Contact');
   protected $_customGroupGroupBy = FALSE; 
 
+  /**
+   * generic constructor
+   */
   function __construct() {
+    $this->_initColumns();
+    $this->_groupFilter = TRUE;
+    $this->_tagFilter = TRUE;
+    parent::__construct();
+  }
+
+  /**
+   * internal function to init the configuration array (_columns)
+   */
+  protected function _initColumns() {
     $this->_columns = array(
       'civicrm_sdd_mandate' => array(
         'dao' => 'CRM_Sepa_DAO_SEPAMandate',
@@ -212,12 +225,9 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-    );
-
-    $this->_groupFilter = TRUE;
-    $this->_tagFilter = TRUE;
-    parent::__construct();
+    );    
   }
+
 
   function select() {
     $select = $this->_columnHeaders = array();
@@ -269,83 +279,105 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
          ";
   }
 
+  /**
+   * internal function to generate where clauses
+   */
+  protected function _getWhereClause($fieldName, $field) {
+    $clause = NULL;
+    if ($fieldName == 'status_id') {
+      if (!empty($this->_params["{$fieldName}_value"])) {
+        $base_clause = $this->whereClause($field,
+            CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
+            CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+            CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+            CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          );
+
+        // since either OOFF or RCUR is always NULL, we can just use OR...
+        $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.contribution_status_id', $base_clause);
+        $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.contribution_status_id', $base_clause);
+        $clause = "( $ooff_clause OR $rcur_clause )";              
+      }
+    }
+
+    elseif ($fieldName == 'status') {
+      if (!empty($this->_params["{$fieldName}_value"])) {
+        $mandate_status_values = array();
+        foreach ($this->_params["{$fieldName}_value"] as $status_value) {
+          $more_mandate_status_values = CRM_Sepa_Logic_Status::translateToMandateStatus($status_value);
+          $mandate_status_values = array_merge($mandate_status_values, $more_mandate_status_values);
+        }
+
+        $mandate_status_list = '"' . implode('","', $mandate_status_values) . '"';
+        $clause = "( `status` IN ($mandate_status_list) )";
+      }
+    }
+
+    elseif ($fieldName == 'amount') {
+      if (!empty($this->_params["{$fieldName}_value"])) {
+        $base_clause = $this->whereClause($field,
+            CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
+            CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+            CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+            CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          );
+
+        // since either OOFF or RCUR is always NULL, we can just use OR...
+        $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.total_amount', $base_clause);
+        $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.amount', $base_clause);
+        $clause = "( $ooff_clause OR $rcur_clause )";
+      }
+    }
+
+    elseif (CRM_Utils_Array::value('operatorType', $field) & CRM_Utils_Type::T_DATE) {
+      $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
+      $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
+      $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+
+      $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+    }
+
+    else {
+      $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+      if ($op) {
+        $clause = $this->whereClause($field,
+          $op,
+          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+        );
+      }
+    }
+
+    return $clause;
+  }
+
+  /**
+   * internal function to generate where clauses
+   */
+  protected function _extendWhereClause(&$clauses) {
+    // Nothin to do here
+  }
+
+
+  /**
+   * build generic WHERE clause
+   */
   function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if ($fieldName == 'status_id') {
-            if (!empty($this->_params["{$fieldName}_value"])) {
-              $base_clause = $this->whereClause($field,
-                  CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-                );
-
-              // since either OOFF or RCUR is always NULL, we can just use OR...
-              $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.contribution_status_id', $base_clause);
-              $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.contribution_status_id', $base_clause);
-              $clause = "( $ooff_clause OR $rcur_clause )";              
-            }
-          }
-
-          elseif ($fieldName == 'status') {
-            if (!empty($this->_params["{$fieldName}_value"])) {
-              $mandate_status_values = array();
-              foreach ($this->_params["{$fieldName}_value"] as $status_value) {
-                $more_mandate_status_values = CRM_Sepa_Logic_Status::translateToMandateStatus($status_value);
-                $mandate_status_values = array_merge($mandate_status_values, $more_mandate_status_values);
-              }
-
-              $mandate_status_list = '"' . implode('","', $mandate_status_values) . '"';
-              $clause = "( `status` IN ($mandate_status_list) )";
-            }
-          }
-
-          elseif ($fieldName == 'amount') {
-            if (!empty($this->_params["{$fieldName}_value"])) {
-              $base_clause = $this->whereClause($field,
-                  CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-                );
-
-              // since either OOFF or RCUR is always NULL, we can just use OR...
-              $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.total_amount', $base_clause);
-              $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.amount', $base_clause);
-              $clause = "( $ooff_clause OR $rcur_clause )";
-            }
-          }
-
-          elseif (CRM_Utils_Array::value('operatorType', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-          }
-
-          else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-
+          $clause = $this->_getWhereClause($fieldName, $field);
           if (!empty($clause)) {
             $clauses[] = $clause;
           }
         }
       }
     }
+
+    // add some more if needed
+    $this->_extendWhereClause($clauses);
 
     if (empty($clauses)) {
       $this->_where = "WHERE ( 1 ) ";

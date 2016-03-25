@@ -6,15 +6,15 @@
 return array (
   0 => 
   array (
-    'name' => 'CRM_Sepa_Form_Report_SepaMandateGeneric',
+    'name' => 'CRM_Sepa_Form_Report_SepaMandateOOFF',
     'entity' => 'ReportTemplate',
     'params' => 
     array (
       'version' => 3,
-      'label' => 'SEPA Mandates (generic)',
-      'description' => 'Generic SEPA Mandate Report (org.project60.sepa)',
-      'class_name' => 'CRM_Sepa_Form_Report_SepaMandateGeneric',
-      'report_url' => 'org.project60.sepa/sepamandategeneric',
+      'label' => 'SEPA Mandates (One-Off)',
+      'description' => 'SEPA One-Off Mandate Report (org.project60.sepa)',
+      'class_name' => 'CRM_Sepa_Form_Report_SepaMandateOOFF',
+      'report_url' => 'org.project60.sepa/sepamandateooff',
       'component' => 'CiviContribute',
     ),
   ),
