@@ -241,12 +241,21 @@ function sepa_pp_install() {
 			}
 		}
 	}
+
+	// make sure, to put back the class name for formerly disabled processors
+	$sepa_pp_query = CRM_Core_DAO::executeQuery("SELECT civicrm_payment_processor.id AS id FROM civicrm_payment_processor LEFT JOIN civicrm_payment_processor_type ON civicrm_payment_processor.payment_processor_type_id = civicrm_payment_processor_type.id WHERE civicrm_payment_processor_type.class_name = 'Payment_SDD'");
+	while ($sepa_pp_query->fetch()) {
+		CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET class_name ='Payment_SDD' WHERE id = {$sepa_pp_query->id}");
+	}
 }
 
 /**
  * Will disable the SEPA payment processor
  */
 function sepa_pp_disable() {
+	// set all existing SDD instances to Payment_Dummy
+	CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET class_name ='Payment_Dummy' WHERE class_name ='Payment_SDD'");
+
 	// get payment processor...
 	$sdd_pp = civicrm_api('PaymentProcessorType', 'getsingle', array('name'=>'SEPA_Direct_Debit', 'version' => 3));
 	if (empty($sdd_pp['is_error'])) {
