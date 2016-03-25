@@ -108,32 +108,33 @@
   </tr>
   {/foreach}
 </table>
-
+  
+<br/>
 <table>
-  <caption>Legend</caption>
+  <caption>{ts domain="org.project60.sepa"}Legend{/ts}</caption>
   <tr>
-    <th>Status</th>
-    <th>Description</th>
+    <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Description{/ts}</th>
   </tr>
   <tr class="submit_missed">
-    <td>Missed</td>
-    <td>Submission date is older than now.</td>
+    <td>{ts domain="org.project60.sepa"}Missed{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission deadline has passed!{/ts}</td>
   </tr>
   <tr class="submit_urgently">
-    <td>Urgently</td>
-    <td>Submission date is current, you have to close group and upload file to creditor today.</td>
+    <td>{ts domain="org.project60.sepa"}Urgent{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission deadline is today, you should close the group and upload the file now.{/ts}</td>
   </tr>
   <tr class="submit_soon">
-    <td>Soon</td>
-    <td>Submission date during the nearest 6 days.</td>
+    <td>{ts domain="org.project60.sepa"}Soon{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission deadline is soon (within 6 days){/ts}</td>
   </tr>
   <tr class="submit_later">
-    <td>Later</td>
-    <td>Submission date is greater than 6 days.</td>
+    <td>{ts domain="org.project60.sepa"}Later{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission deadline is more than 6 days ahead.{/ts}</td>
   </tr>
   <tr class="submit_closed">
-    <td>Closed</td>
-    <td>The group is closed and uploaded to creditor, submission date is in the past.</td>
+    <td>{ts domain="org.project60.sepa"}Closed{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}This group is already closed.{/ts}</td>
   </tr>
 </table>
 

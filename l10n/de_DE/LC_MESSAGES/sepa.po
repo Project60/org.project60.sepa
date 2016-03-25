@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2016-03-25 19:09+0100\n"
+"POT-Creation-Date: 2016-03-25 19:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -1518,6 +1518,54 @@ msgid "Mark Received"
 msgstr "Zahlung Erhalten"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Legend"
+msgstr "Farb-Legende"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Description"
+msgstr "Beschreibung"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Missed"
+msgstr "Verpasst"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Submission deadline has passed!"
+msgstr "Sie haben die Übertragungsfrist versäumt."
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Urgent"
+msgstr "Dringend"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Submission deadline is today, you should close the group and upload the file now."
+msgstr "Diese Gruppe muss heute Übertragen werden, Sie sollten jetzt sofort die Gruppe schließen und hochladen."
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Soon"
+msgstr "Bald"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Submission deadline is soon (within 6 days)"
+msgstr "Diese Gruppe muss innerhalb der nächsten 6 Tage übertragen werden."
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Later"
+msgstr "Noch nicht"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Submission deadline is more than 6 days ahead."
+msgstr "Die Übertragungsfrist für diese Gruppe ist noch über 6 Tag hin."
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Closed"
+msgstr "Geschlossen"
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "This group is already closed."
+msgstr "Diese Gruppe wurde bereits geschlossen."
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Do you really want to mark this groups as 'payment received'?"
 msgstr "Haben Sie die Zahlung für diese Gruppe wirklich bereits erhalten?"
 
@@ -1970,9 +2018,6 @@ msgstr "Fertig"
 
 #~ msgid "Contribution Status"
 #~ msgstr "Zuwendungstatus"
-
-#~ msgid "Pay Later"
-#~ msgstr "Später Zahlen"
 
 #~ msgid "Incomplete Transaction"
 #~ msgstr "Unvollständige Transaktion"
