@@ -14,8 +14,8 @@
 +-------------------------------------------------------*}
 
 {* check for the org.project60.bic extension *}
-{crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'}
-{capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
+{crmAPI var='bic_extension_check' entity='Extension' action='get' status='installed' q='civicrm/ajax/rest'}
+{assign var='bic_extension_installed' value=$bic_extension_check.count}
 
 {literal}
 <style>

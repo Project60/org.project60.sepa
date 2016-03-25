@@ -14,58 +14,67 @@
 +-------------------------------------------------------*}
 
 {* check for the org.project60.bic extension *}
-{crmAPI var='bic_extension_check' entity='Bic' action='findbyiban' q='civicrm/ajax/rest' bic='TEST'}
-{capture assign=bic_extension_installed}{if $bic_extension_check.is_error eq 0}1{/if}{/capture}
+{crmAPI var='bic_extension_check' entity='Extension' action='get' status='installed' q='civicrm/ajax/rest'}
+{assign var='bic_extension_installed' value=$bic_extension_check.count}
 
+{if $config->civiVersion lt '4.6'}
+{* add these fields manually for 4.4/4.5 *}
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 <div id="sdd-cycle-day-section" class="crm-section {$form.cycle_day.name}-section" style="display: none;">
-	<div class="label">{$form.cycle_day.label}</div>
-	<div class="content">{$form.cycle_day.html}</div>
-	<div class="clear"></div>
+  <div class="label">{$form.cycle_day.label}</div>
+  <div class="content">{$form.cycle_day.html}</div>
+  <div class="clear"></div>
 </div>
 
 <!-- this field is hidden by default, so people wouldn't worry about it. Feel free to show via a customisation extension -->
 <div id="sdd-start-date-section" class="crm-section {$form.start_date.name}-section" style="display: none;">
-	<div class="label">{$form.start_date.label}</div>
-	<div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
-	<div class="clear"></div>
+  <div class="label">{$form.start_date.label}</div>
+  <div class="content">{$form.start_date.html}</div>
+  <div class="clear"></div>
 </div>
+
+{literal}
+<script type="text/javascript">
+// in 4.4/4.5 we could still ignore this
+cj(function(){
+  cj("fieldset.billing_name_address-group").hide();
+});
+</script>
+{/literal}
+
+{/if}
+
 
 <!-- JS Magic -->
 <script type="text/javascript">
 // translated captions
-var earliest_ooff_date = new Date(parseInt({$earliest_ooff_date[0]}, 10), parseInt({$earliest_ooff_date[1]}, 10) - 1, parseInt({$earliest_ooff_date[2]}, 10));
-var earliest_rcur_date = new Date(parseInt({$earliest_rcur_date[0]}, 10), parseInt({$earliest_rcur_date[1]}, 10) - 1, parseInt({$earliest_rcur_date[2]}, 10));
-var currently_set_date = new Date("{$form.start_date.value}");
+var earliest_ooff_date = '{$earliest_ooff_date}';
+var earliest_rcur_date = '{$earliest_rcur_date}';
+var earliest_cycle_day = '{$earliest_cycle_day}';
 
 {literal}
 
 // change elements according to recur status
 function _sdd_update_elements() {
 	var is_recur = cj("#is_recur").prop('checked');
-
-	// the cycle day field is hidden by default, so people wouldn't have to
-	// care about it:
-	// cj("#cycle_day").parent().parent().attr('hidden', !is_recur);
-	var start_date_display = cj('.start_date-section .content input:nth-child(2)');
+  var start_date = cj("#start_date");
 	if (is_recur) {
-		cj(start_date_display).datepicker("option", "minDate", earliest_rcur_date);
-		if (currently_set_date > earliest_rcur_date) {
-			cj(start_date_display).datepicker("setDate", currently_set_date);
-		} else {
-			cj(start_date_display).datepicker("setDate", earliest_rcur_date);
-		}
+    if (start_date.val() < earliest_rcur_date) {
+      start_date.val(earliest_rcur_date);
+    }
 	} else {
-		cj(start_date_display).datepicker("option", "minDate", earliest_ooff_date);
-		if (currently_set_date > earliest_ooff_date) {
-			cj(start_date_display).datepicker("setDate", currently_set_date);
-		} else {
-			cj(start_date_display).datepicker("setDate", earliest_ooff_date);
-		}
+    if (start_date.val() < earliest_ooff_date) {
+      start_date.val(earliest_ooff_date);
+    }
 	}
 }
 
 cj(function() {
+  // set cycle_day, and hide start_date/cycle_day
+  cj("#cycle_day").val(earliest_cycle_day);
+  cj("#start_date").parent().parent().hide();
+  cj("#cycle_day").parent().parent().hide();
+
 	// add event handler for IBAN entered
 	cj("#bank_account_number").change(sepa_process_iban);
 
