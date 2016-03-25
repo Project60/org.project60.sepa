@@ -21,21 +21,7 @@
 <div class="crm-container">
     <div class="crm-block crm-content-block crm-sdd-mandate">
         <table class="crm-info-panel">
-            <tr><td class="label">{ts}Status{/ts}</td><td><b>
-            	{if $sepa.status eq 'INIT'}
-            		{ts}Not activated{/ts}
-            	{elseif $sepa.status eq 'FRST' or $sepa.status eq 'OOFF'}
-            		{ts}Ready{/ts}
-            	{elseif $sepa.status eq 'RCUR' or $sepa.status eq 'SENT'}
-            		{ts}In Use{/ts}
-            	{elseif $sepa.status eq 'COMPLETE'}
-            		{ts}Completed{/ts}
-            	{elseif $sepa.status eq 'INVALID'}
-            		{ts}Error{/ts}
-            	{elseif $sepa.status eq 'ONHOLD'}
-            		{ts}Suspended{/ts}
-            	{/if}
-            </b></td></tr>
+            <tr><td class="label">{ts}Status{/ts}</td><td><b>{$sepa.status_text}</b> ({$sepa.status})</td></tr>
             <tr><td class="label">{ts}Contact{/ts}</td><td><a href="{$contact1.link}"><div class="icon crm-icon {$contact1.contact_type}-icon"></div>{$contact1.display_name}</a></td></tr>
             <tr><td class="label">{ts}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
             <tr><td class="label">{ts}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>

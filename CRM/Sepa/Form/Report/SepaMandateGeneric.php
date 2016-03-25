@@ -42,8 +42,8 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'title' => ts('Type')
           ),
           'status' => array(
-            'title' => ts('Status')
-          ),
+            'title' => ts('Mandate Status')
+          ),          
           'iban' => array(
             'title' => ts('IBAN')
           ),
@@ -95,24 +95,13 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             ),
           ),
 
-          // TODO: use combined status
-          // 'status' => array(
-          //   'name' => 'status',
-          //   'title' => ts('Status'),
-          //   'type' => CRM_Utils_Type::T_STRING,
-          //   'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          //   'options' => array(
-          //     'INIT'     => ts('Initialised', array('domain' => 'org.project60.sepa')),
-          //     'OOFF'     => ts('One-off ready', array('domain' => 'org.project60.sepa')),
-          //     'SENT'     => ts('One-off sent', array('domain' => 'org.project60.sepa')),
-          //     'FRST'     => ts('Recurring first', array('domain' => 'org.project60.sepa')),
-          //     'RCUR'     => ts('Recurring followup', array('domain' => 'org.project60.sepa')),
-          //     'INVALID'  => ts('Invalid', array('domain' => 'org.project60.sepa')),
-          //     'COMPLETE' => ts('Complete', array('domain' => 'org.project60.sepa')),
-          //     'ONHOLD'   => ts('On Hold', array('domain' => 'org.project60.sepa')),
-          //     'PARTIAL'  => ts('Partial', array('domain' => 'org.project60.sepa')),
-          //   ),
-          // ),
+          'status' => array(
+            'name' => 'status',
+            'title' => ts('Status'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Sepa_Logic_Status::getStatusSelectorOptions(TRUE),
+          ),
 
           'iban' => array(
             'name' => 'iban',
@@ -286,33 +275,49 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-
           if ($fieldName == 'status_id') {
-            $base_clause = $this->whereClause($field,
-                CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
+            if (!empty($this->_params["{$fieldName}_value"])) {
+              $base_clause = $this->whereClause($field,
+                  CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                );
 
-            // since either OOFF or RCUR is always NULL, we can just use OR...
-            $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.contribution_status_id', $base_clause);
-            $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.contribution_status_id', $base_clause);
-            $clause = "( $ooff_clause OR $rcur_clause )";
+              // since either OOFF or RCUR is always NULL, we can just use OR...
+              $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.contribution_status_id', $base_clause);
+              $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.contribution_status_id', $base_clause);
+              $clause = "( $ooff_clause OR $rcur_clause )";              
+            }
+          }
+
+          elseif ($fieldName == 'status') {
+            if (!empty($this->_params["{$fieldName}_value"])) {
+              $mandate_status_values = array();
+              foreach ($this->_params["{$fieldName}_value"] as $status_value) {
+                $more_mandate_status_values = CRM_Sepa_Logic_Status::translateToMandateStatus($status_value);
+                $mandate_status_values = array_merge($mandate_status_values, $more_mandate_status_values);
+              }
+
+              $mandate_status_list = '"' . implode('","', $mandate_status_values) . '"';
+              $clause = "( `status` IN ($mandate_status_list) )";
+            }
           }
 
           elseif ($fieldName == 'amount') {
-            $base_clause = $this->whereClause($field,
-                CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
+            if (!empty($this->_params["{$fieldName}_value"])) {
+              $base_clause = $this->whereClause($field,
+                  CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                );
 
-            // since either OOFF or RCUR is always NULL, we can just use OR...
-            $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.total_amount', $base_clause);
-            $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.amount', $base_clause);
-            $clause = "( $ooff_clause OR $rcur_clause )";
+              // since either OOFF or RCUR is always NULL, we can just use OR...
+              $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.total_amount', $base_clause);
+              $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.amount', $base_clause);
+              $clause = "( $ooff_clause OR $rcur_clause )";
+            }
           }
 
           elseif (CRM_Utils_Array::value('operatorType', $field) & CRM_Utils_Type::T_DATE) {
@@ -395,6 +400,11 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         }
       }
 
+      // alter mandate status
+      if (array_key_exists("civicrm_sdd_mandate_status", $row)) {
+        $rows[$rowNum]["civicrm_sdd_mandate_status"] = CRM_Sepa_Logic_Status::translateMandateStatus($row["civicrm_sdd_mandate_status"], TRUE);
+      }
+
       // alter contribution status
       if (array_key_exists('status_id', $row)) {
         $rows[$rowNum]['status_id'] = $contribution_status[$row['status_id']];
@@ -412,14 +422,12 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_sdd_mandate_reference_hover'] = ts("View Mandate Options.");
       }
 
+      // add contact link
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
         $rows[$rowNum]['civicrm_contact_sort_name'] &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
-          'reset=1&cid=' . $row['civicrm_contact_id'],
-          $this->_absoluteUrl
-        );
+        $url = CRM_Utils_System::url("civicrm/contact/view", 'reset=1&cid=' . $row['civicrm_contact_id'], $this->_absoluteUrl);
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;

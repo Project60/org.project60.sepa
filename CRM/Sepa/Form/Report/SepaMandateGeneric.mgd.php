@@ -11,7 +11,7 @@ return array (
     'params' => 
     array (
       'version' => 3,
-      'label' => 'SepaMandateGeneric',
+      'label' => 'SEPA Mandates (generic)',
       'description' => 'SepaMandateGeneric (org.project60.sepa)',
       'class_name' => 'CRM_Sepa_Form_Report_SepaMandateGeneric',
       'report_url' => 'org.project60.sepa/sepamandategeneric',
