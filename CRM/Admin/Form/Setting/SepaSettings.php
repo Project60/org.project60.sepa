@@ -90,15 +90,23 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         }
 
         // country drop down field
-        $config = CRM_Core_Config::singleton();
         $i18n = CRM_Core_I18n::singleton();
 
-        $climit = array();
         $cnames = array();
         $ciso = array();
         $filtered = array();
 
-        $climit = $config->countryLimit();
+        $versionFile = dirname(__FILE__).'/../../../../../../../all/modules/civicrm/civicrm-version.php';
+        if (file_exists($versionFile)) {
+          require_once $versionFile;
+          $civicrm_version = civicrmVersion();
+          if (strpos($civicrm_version['version'], '4.7') === 0) {
+            $climit = CRM_Core_BAO_Country::countryLimit();
+          } else {
+            $config = CRM_Core_Config::singleton();
+            $climit = $config->countryLimit();
+          }
+        }
         CRM_Core_PseudoConstant::populate($cnames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
         CRM_Core_PseudoConstant::populate($ciso, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
 
