@@ -28,17 +28,164 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
     // remove filter for type (always OOFF)
     unset($this->_columns['civicrm_sdd_mandate']['fields']['mandate_type']);
     unset($this->_columns['civicrm_sdd_mandate']['filters']['mandate_type']);
+
+    // remove contribution status ID (will be added as separate column)
+    unset($this->_columns['civicrm_sdd_mandate']['fields']['status_id']);
+    unset($this->_columns['civicrm_sdd_mandate']['filters']['status_id']);
+
+    // remove contribution amount (will be added as separate column)
+    unset($this->_columns['civicrm_sdd_mandate']['fields']['amount']);
+    unset($this->_columns['civicrm_sdd_mandate']['filters']['amount']);
+
+    $this->_columns['civicrm_contribution'] = array(
+      'dao' => 'CRM_Contribute_DAO_Contribution',
+      'fields' => array(
+        'contribution_id' => array(
+          'name' => 'id',
+          'no_display' => TRUE,
+          'required' => TRUE,
+        ),
+        'list_contri_id' => array(
+          'name' => 'id',
+          'title' => ts('Contribution ID'),
+        ),
+        'financial_type_id' => array(
+          'title' => ts('Financial Type'),
+          'default' => TRUE,
+        ),
+        'campaign_id' => array(
+          'title' => ts('Campaign'),
+        ),
+        'contribution_status_id' => array(
+          'title' => ts('Contribution Status'),
+        ),
+        'cancel_reason' => array(
+          'title' => ts('Cancel Reason'),
+        ),
+        'contribution_page_id' => array(
+          'title' => ts('Contribution Page'),
+        ),
+        'source' => array(
+          'title' => ts('Source'),
+        ),
+        'currency' => array(
+          'required' => TRUE,
+          'no_display' => TRUE,
+        ),
+        'trxn_id' => NULL,
+        'receive_date' => array('default' => TRUE),
+        'receipt_date' => NULL,
+        'total_amount' => array(
+          'title' => ts('Amount'),
+          // 'required' => TRUE,
+          'statistics' => array('sum' => ts('Amount')),
+        ),
+        'fee_amount' => NULL,
+        'net_amount' => NULL,
+      ),
+      'filters' => array(
+        'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+        'financial_type_id' => array(
+          'title' => ts('Financial Type'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => CRM_Contribute_PseudoConstant::financialType(),
+          'type' => CRM_Utils_Type::T_INT,
+        ),
+        'campaign_id' => array(
+          'title' => ts('Campaign'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => CRM_Campaign_BAO_Campaign::getCampaigns(),
+          'type' => CRM_Utils_Type::T_INT,
+        ),
+        'contribution_page_id' => array(
+          'title' => ts('Contribution Page'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => CRM_Contribute_PseudoConstant::contributionPage(),
+          'type' => CRM_Utils_Type::T_INT,
+        ),
+        'contribution_status_id' => array(
+          'title' => ts('Contribution Status'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+          'default' => array(1),
+          'type' => CRM_Utils_Type::T_INT,
+        ),
+        'cancel_reason' => array(
+          'name' => 'cancel_reason',
+          'type' => CRM_Utils_Type::T_STRING,
+          'operatorType' => CRM_Report_Form::OP_STRING,
+          'title' => ts('Cancel Reason'),
+        ),
+        'total_amount' => array('title' => ts('Contribution Amount')),
+      ),
+      'order_bys' => array(
+        'financial_type_id' => array('title' => ts('Financial Type')),
+        'contribution_status_id' => array('title' => ts('Contribution Status')),
+        'receive_date' => array('title' => ts('Receive Date')),
+      ),
+      'grouping' => 'contri-fields',
+    );
   }
+
+  /**
+   * override FROM clause
+   */
+  function from() {
+    $this->_from = NULL;
+    $this->_from = "
+         FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
+               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+                          ON {$this->_aliases['civicrm_contact']}.id =
+                             {$this->_aliases['civicrm_sdd_mandate']}.contact_id
+               LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                          ON 'civicrm_contribution' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
+                          AND {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
+         ";
+  }
+
 
   /**
    * internal function to generate where clauses
    */
   protected function _extendWhereClause(&$clauses) {
-    $clauses[] = "( type = 'OOFF' )";
+    $clauses[] = "( {$this->_aliases['civicrm_sdd_mandate']}.type = 'OOFF' )";
   }
 
-  // function alterDisplay(&$rows) {
-  //   parent::alterDisplay($rows);
-  //   // TODO: further alterations
-  // }
+  /**
+   * Prep data for display
+   */
+  function alterDisplay(&$rows) {
+    // first, let the generic code work through the data
+    parent::alterDisplay($rows);
+
+    // now, prep contribution specific data
+    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
+    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
+
+    foreach ($rows as $rowNum => $row) {
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
+      }
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
+      }
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_page_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];
+      }
+
+      // alter amount
+      if (array_key_exists('civicrm_contribution_total_amount', $row)) {
+        $rows[$rowNum]['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_total_amount'], 'EUR');
+      }
+
+      // convert campaign_id to campaign title
+      if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
+        if ($value = $row['civicrm_contribution_campaign_id']) {
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = CRM_Utils_Array::value($value, $campaigns, '');
+        }
+      }
+    }
+  }
 }

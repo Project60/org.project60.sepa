@@ -107,7 +107,6 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
               'RCUR'     => ts('Recurring', array('domain' => 'org.project60.sepa')),
             ),
           ),
-
           'status' => array(
             'name' => 'status',
             'title' => ts('Status'),
@@ -115,7 +114,6 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Sepa_Logic_Status::getStatusSelectorOptions(TRUE),
           ),
-
           'iban' => array(
             'name' => 'iban',
             'type' => CRM_Utils_Type::T_STRING,
