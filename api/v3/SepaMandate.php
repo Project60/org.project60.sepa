@@ -171,6 +171,9 @@ function _civicrm_api3_sepa_mandate_adddefaultcreditor(&$params) {
 }
 
 
+/**
+ * this function is used by the FindMandate UI (angular based)
+ */
 function civicrm_api3_sepa_mandate_getlist($params) {
 
     $results = civicrm_api3('SepaMandate', 'get', array(
