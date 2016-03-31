@@ -77,11 +77,16 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
         'receipt_date' => NULL,
         'total_amount' => array(
           'title' => ts('Amount'),
-          // 'required' => TRUE,
-          'statistics' => array('sum' => ts('Amount')),
+          'type'    => CRM_Utils_Type::T_FLOAT,
         ),
-        'fee_amount' => NULL,
-        'net_amount' => NULL,
+        'fee_amount' => array(
+          'title' => ts('Fee Amount'),
+          'type'    => CRM_Utils_Type::T_FLOAT,
+        ),
+        'net_amount' => array(
+          'title' => ts('Net Amount'),
+          'type'    => CRM_Utils_Type::T_FLOAT,
+        ),
       ),
       'filters' => array(
         'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
@@ -177,7 +182,13 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
 
       // alter amount
       if (array_key_exists('civicrm_contribution_total_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_total_amount'], 'EUR');
+        $rows[$rowNum]['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_total_amount'], $row['civicrm_contribution_currency']);
+      }
+      if (array_key_exists('civicrm_contribution_net_amount', $row)) {
+        $rows[$rowNum]['civicrm_contribution_net_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_net_amount'], $row['civicrm_contribution_currency']);
+      }
+      if (array_key_exists('civicrm_contribution_fee_amount', $row)) {
+        $rows[$rowNum]['civicrm_contribution_fee_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_fee_amount'], $row['civicrm_contribution_currency']);
       }
 
       // convert campaign_id to campaign title

@@ -68,15 +68,12 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           ),
           'date' => array(
             'title' => ts('Signature Date'),
-            'default' => TRUE,
           ),
           'creation_date' => array(
             'title' => ts('Creation Date'),
-            'default' => TRUE,
           ),
           'validation_date' => array(
             'title' => ts('Validation Date'),
-            'default' => TRUE,
           ),
           'amount' => array(
             'dbAlias' => 'amount',
@@ -226,33 +223,18 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     );    
   }
 
-
+  /**
+   * generate select clause
+   */
   function select() {
     $select = $this->_columnHeaders = array();
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          // add amount from either OOFF or RCUR
-          if ($fieldName == 'amount') {
-            $select[] = "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.total_amount, civicrm_contribution_recur.amount) AS amount";
-            $this->_columnHeaders['amount']['title'] = $field['title'];
-            $this->_columnHeaders['amount']['type']  = CRM_Utils_Array::value('type', $field);
-            continue;
-          }
-
-          // add status from either OOFF or RCUR
-          if ($fieldName == 'status_id') {
-            $select[] = "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.contribution_status_id, civicrm_contribution_recur.contribution_status_id) AS status_id";
-            $this->_columnHeaders['status_id']['title'] = $field['title'];
-            $this->_columnHeaders['status_id']['type']  = CRM_Utils_Array::value('type', $field);
-            continue;
-          }
-
-          if (CRM_Utils_Array::value('required', $field) || CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
-            $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+          $select_clause = $this->_getSelectClause($fieldName, $field, $tableName);
+          if ($select_clause) {
+            $select[] = $select_clause;
           }
         }
       }
@@ -260,6 +242,35 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
+
+  /**
+   * get individual select clauses
+   */
+  function _getSelectClause($fieldName, $field, $tableName) {
+    // add amount from either OOFF or RCUR
+    if ($fieldName == 'amount') {
+      $this->_columnHeaders['amount']['title'] = $field['title'];
+      $this->_columnHeaders['amount']['type']  = CRM_Utils_Array::value('type', $field);
+      return "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.total_amount, civicrm_contribution_recur.amount) AS amount";
+    }
+
+    // add status from either OOFF or RCUR
+    if ($fieldName == 'status_id') {
+      $this->_columnHeaders['status_id']['title'] = $field['title'];
+      $this->_columnHeaders['status_id']['type']  = CRM_Utils_Array::value('type', $field);
+      return "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.contribution_status_id, civicrm_contribution_recur.contribution_status_id) AS status_id";
+    }
+
+    // Fallback: generic selector
+    if (CRM_Utils_Array::value('required', $field) || CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+      return "{$field['dbAlias']} as {$tableName}_{$fieldName}";
+    }
+
+    return NULL;
+  }
+
 
   function from() {
     $this->_from = NULL;
