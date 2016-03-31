@@ -51,20 +51,38 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         'contribution_status_id' => array(
           'title' => ts('Status'),
         ),
-        // 'cancel_reason' => array(
-        //   'title' => ts('Cancel Reason'),
-        // ),
+        'start_date' => array(
+          'title' => ts('Start Date'),
+        ),
+        'end_date' => array(
+          'title' => ts('End Date'),
+        ),
+        'cancel_reasons' => array(
+          'title' => ts('Cancel Reason(s)'),
+        ),
         'currency' => array(
           'required' => TRUE,
           'no_display' => TRUE,
         ),
-        'trxn_id' => NULL,
+        'trxn_id' => array(
+          'title' => ts('Transaction ID'),
+        ),
         'installment_amount' => array(
           'dbAlias' => 'amount',
           'title' => ts('Installment Amount'),
         ),
       ),
       'filters' => array(
+        'start_date' => array(
+          'title' => ts('Start Date'),
+          'operatorType' => CRM_Report_Form::OP_DATE,
+          'type' => CRM_Utils_Type::T_DATE,
+        ),
+        'end_date' => array(
+          'title' => ts('End Date'),
+          'operatorType' => CRM_Report_Form::OP_DATE,
+          'type' => CRM_Utils_Type::T_DATE,
+        ),
         'financial_type_id' => array(
           'title' => ts('Financial Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -83,12 +101,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
         ),
-        // 'cancel_reason' => array(
-        //   'name' => 'cancel_reason',
-        //   'type' => CRM_Utils_Type::T_STRING,
-        //   'operatorType' => CRM_Report_Form::OP_STRING,
-        //   'title' => ts('Cancel Reason'),
-        // ),
+        'cancel_reasons' => array(
+          'dbAlias' => 'cancel_reasons',
+          'type' => CRM_Utils_Type::T_STRING,
+          'operatorType' => CRM_Report_Form::OP_STRING,
+          'title' => ts('Cancel Reason(s)'),
+        ),
         'installment_amount' => array(
           'dbAlias' => 'amount',
           'title' => ts('Installment Amount'),
@@ -111,7 +129,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Total Amount Collected'),
         ),
         'total_count_collected' => array(
-          'title' => ts('Collected Contribution'),
+          'title' => ts('Collected Contributions'),
         ),
         'total_count_failed' => array(
           'title' => ts('Failed/Cancelled Contributions'),
@@ -161,6 +179,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       $this->_columnHeaders['total_count_failed']['title'] = $field['title'];
       $this->_columnHeaders['total_count_failed']['type']  = CRM_Utils_Array::value('type', $field);
       return "SUM(IF({$this->_aliases['civicrm_contribution']}.contribution_status_id IN (3,4),1, 0)) AS total_count_failed";
+    }
+
+    if ($fieldName == 'cancel_reasons') {
+      $this->_columnHeaders['cancel_reasons']['title'] = $field['title'];
+      $this->_columnHeaders['cancel_reasons']['type']  = CRM_Utils_Array::value('type', $field);
+      return "GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||') AS cancel_reasons";
     }
 
     return parent::_getSelectClause($fieldName, $field, $tableName);
@@ -241,6 +265,21 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       return $clause;
     }
 
+    if ($fieldName == 'cancel_reasons') {
+      $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+      if ($op) {
+        $clause = $this->whereClause($field,
+          $op,
+          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+        );
+      }
+      $subquery = "(SELECT GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||') FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id IN (3,4))";
+      $clause = preg_replace('/cancel_reasons/', $subquery, $clause);
+      return $clause;
+    }
+
     // nothing special? process with parent implementation
     return parent::_extendWhereClause($fieldName, $field);
   }
@@ -282,6 +321,11 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       }
       if (array_key_exists('total_amount_collected', $row)) {
         $rows[$rowNum]['total_amount_collected'] = CRM_Utils_Money::format($row['total_amount_collected'], $row['civicrm_contribution_recur_currency']);
+      }
+
+      // expand concat cancel_reasons
+      if (array_key_exists('cancel_reasons', $row)) {
+        $rows[$rowNum]['cancel_reasons'] = preg_replace('#\|{2}#', "\n<br/>", $row['cancel_reasons']);
       }
 
       // convert campaign_id to campaign title

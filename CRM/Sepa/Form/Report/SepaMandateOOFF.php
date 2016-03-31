@@ -112,7 +112,6 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
-          'default' => array(1),
           'type' => CRM_Utils_Type::T_INT,
         ),
         'cancel_reason' => array(
