@@ -106,7 +106,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           ),
           'status' => array(
             'name' => 'status',
-            'title' => ts('Status'),
+            'title' => ts('Mandate Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Sepa_Logic_Status::getStatusSelectorOptions(TRUE),
