@@ -129,10 +129,10 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Total Amount Collected'),
         ),
         'total_count_collected' => array(
-          'title' => ts('Collected Contributions'),
+          'title' => ts('Collected Contribution Count'),
         ),
         'total_count_failed' => array(
-          'title' => ts('Failed/Cancelled Contributions'),
+          'title' => ts('Failed/Cancelled Contribution Count'),
         ),
       ),
       'filters' => array(
