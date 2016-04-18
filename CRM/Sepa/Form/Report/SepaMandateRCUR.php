@@ -37,6 +37,9 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     unset($this->_columns['civicrm_sdd_mandate']['fields']['amount']);
     unset($this->_columns['civicrm_sdd_mandate']['filters']['amount']);
 
+    // cycle days
+    $cycle_days = range(0,31);
+    unset($cycle_days[0]);
 
     $this->_columns['civicrm_contribution_recur'] = array(
       'dao' => 'CRM_Contribute_BAO_ContributionRecur',
@@ -47,6 +50,9 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         ),
         'campaign_id' => array(
           'title' => ts('Campaign'),
+        ),
+        'cycle_day' => array(
+          'title' => ts('Cycle Day'),
         ),
         'contribution_status_id' => array(
           'title' => ts('Contribution Status'),
@@ -87,6 +93,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Financial Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::financialType(),
+          'type' => CRM_Utils_Type::T_INT,
+        ),
+        'cycle_day' => array(
+          'title' => ts('Cycle Days'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => $cycle_days,
           'type' => CRM_Utils_Type::T_INT,
         ),
         'campaign_id' => array(
