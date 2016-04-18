@@ -55,7 +55,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Cycle Day'),
         ),
         'contribution_status_id' => array(
-          'title' => ts('Contribution Status'),
+          'title' => ts('Recurring Contribution Status'),
         ),
         'start_date' => array(
           'title' => ts('Start Date'),
@@ -108,7 +108,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'type' => CRM_Utils_Type::T_INT,
         ),
         'contribution_status_id' => array(
-          'title' => ts('Contribution Status'),
+          'title' => ts('Recurring Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
@@ -128,7 +128,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       ),
       'order_bys' => array(
         'financial_type_id' => array('title' => ts('Financial Type')),
-        'contribution_status_id' => array('title' => ts('Contribution Status')),
+        'contribution_status_id' => array('title' => ts('Recurring Contribution Status')),
       ),
       'grouping' => 'rcontri-fields',
     );
