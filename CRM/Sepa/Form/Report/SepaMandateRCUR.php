@@ -141,10 +141,13 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Total Amount Collected'),
         ),
         'total_count_collected' => array(
-          'title' => ts('Collected Contribution Count'),
+          'title' => ts('Total Count of Collected Contributions'),
         ),
         'total_count_failed' => array(
-          'title' => ts('Failed/Cancelled Contribution Count'),
+          'title' => ts('Total Count of Failed/Cancelled Contribution'),
+        ),
+        'contribution_count' => array(
+          'title' => ts('Matching Contribution Count'),
         ),
       ),
       'filters' => array(
@@ -156,15 +159,33 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         ),
         'total_count_collected' => array(
           'dbAlias' => 'total_count_collected',
-          'title'   => ts('Collected Contribution'),
+          'title'   => ts('Total Count of Collected Contributions'),
           'type'    => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_INT,
         ),
         'total_count_failed' => array(
           'dbAlias' => 'total_count_failed',
-          'title'   => ts('Failed/Cancelled Contribution'),
+          'title'   => ts('Total Count of Failed/Cancelled Contribution'),
           'type'    => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_INT,
+        ),
+      ),
+      'order_bys' => array(
+        'contribution_count' => array(
+          'dbAlias' => 'contribution_count',
+          'title' => ts('Matching Contribution Count'),
+          ),
+        'total_amount_collected' => array(
+          'dbAlias' => 'total_amount_collected',
+          'title' => ts('Total Amount Collected')
+        ),
+        'total_count_collected' => array(
+          'dbAlias' => 'total_count_collected',
+          'title' => ts('Total Count of Collected Contributions')
+        ),
+        'total_count_failed' => array(
+          'dbAlias' => 'total_count_failed',
+          'title' => ts('Total Count of Failed/Cancelled Contribution')
         ),
       ),
     );
@@ -178,19 +199,25 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     if ($fieldName == 'total_amount_collected') {
       $this->_columnHeaders['total_amount_collected']['title'] = $field['title'];
       $this->_columnHeaders['total_amount_collected']['type']  = CRM_Utils_Array::value('type', $field);
-      return "SUM(IF({$this->_aliases['civicrm_contribution']}.contribution_status_id IN (1),{$this->_aliases['civicrm_contribution']}.total_amount, 0)) AS total_amount_collected";
+      return "(SELECT/*NO_ROW_COUNT*/ SUM(total_amount) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (1) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_amount_collected";
     }
 
     if ($fieldName == 'total_count_collected') {
       $this->_columnHeaders['total_count_collected']['title'] = $field['title'];
       $this->_columnHeaders['total_count_collected']['type']  = CRM_Utils_Array::value('type', $field);
-      return "SUM(IF({$this->_aliases['civicrm_contribution']}.contribution_status_id IN (1),1, 0)) AS total_count_collected";
+      return "(SELECT/*NO_ROW_COUNT*/ COUNT(id) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (1) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_count_collected";
     }
 
     if ($fieldName == 'total_count_failed') {
       $this->_columnHeaders['total_count_failed']['title'] = $field['title'];
       $this->_columnHeaders['total_count_failed']['type']  = CRM_Utils_Array::value('type', $field);
-      return "SUM(IF({$this->_aliases['civicrm_contribution']}.contribution_status_id IN (3,4),1, 0)) AS total_count_failed";
+      return "(SELECT/*NO_ROW_COUNT*/ COUNT(id) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (3,4) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_count_failed";
+    }
+
+    if ($fieldName == 'contribution_count') {
+      $this->_columnHeaders['contribution_count']['title'] = $field['title'];
+      $this->_columnHeaders['contribution_count']['type']  = CRM_Utils_Array::value('type', $field);
+      return "COUNT({$this->_aliases['civicrm_contribution']}.id) AS contribution_count";
     }
 
     if ($fieldName == 'cancel_reasons') {
