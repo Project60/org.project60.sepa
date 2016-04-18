@@ -281,7 +281,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     }
 
     // nothing special? process with parent implementation
-    return parent::_extendWhereClause($fieldName, $field);
+    return parent::_getWhereClause($fieldName, $field);
   }
 
   /**
