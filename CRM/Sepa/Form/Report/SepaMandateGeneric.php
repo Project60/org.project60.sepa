@@ -171,7 +171,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'title' => ts('BIC')
           ),
           'status' => array(
-            'title' => ts('Status')
+            'title' => ts('Mandate Status')
           ),
           'date' => array(
             'title' => ts('Signature Date'),

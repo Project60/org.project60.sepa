@@ -49,7 +49,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Campaign'),
         ),
         'contribution_status_id' => array(
-          'title' => ts('Status'),
+          'title' => ts('Contribution Status'),
         ),
         'start_date' => array(
           'title' => ts('Start Date'),
