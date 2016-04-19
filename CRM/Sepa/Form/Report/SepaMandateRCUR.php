@@ -56,7 +56,8 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         'cycle_day' => array(
           'title' => ts('Cycle Day'),
         ),
-        'contribution_status_id' => array(
+        'recurring_contribution_status_id' => array(
+          'name'  => 'recurring_contribution_status_id',
           'title' => ts('Recurring Contribution Status'),
         ),
         'start_date' => array(
@@ -69,6 +70,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Cancel Reason(s)'),
         ),
         'currency' => array(
+          'title' => ts('Currency'),
           'required' => TRUE,
           'no_display' => TRUE,
         ),
@@ -109,7 +111,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'options' => CRM_Campaign_BAO_Campaign::getCampaigns(),
           'type' => CRM_Utils_Type::T_INT,
         ),
-        'contribution_status_id' => array(
+        'recurring_contribution_status_id' => array(
           'title' => ts('Recurring Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
@@ -130,7 +132,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       ),
       'order_bys' => array(
         'financial_type_id' => array('title' => ts('Financial Type')),
-        'contribution_status_id' => array('title' => ts('Recurring Contribution Status')),
+        'recurring_contribution_status_id' => array('title' => ts('Recurring Contribution Status')),
       ),
       'grouping' => 'rcontri-fields',
     );
@@ -141,6 +143,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       'fields' => array(
         'total_amount_collected' => array(
           'title' => ts('Total Amount Collected'),
+        ),
+        // 'contribution_status_id' => array(
+        //   'title' => ts('Contribution Status'),
+        // ),
+        'receive_date' => array(
+          'title' => ts('Contribution Collection Date'),
         ),
         'total_count_collected' => array(
           'title' => ts('Total Count of Collected Contributions'),
@@ -153,6 +161,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         ),
       ),
       'filters' => array(
+        'contribution_status_id' => array(
+          'title' => ts('Contribution Status'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+          'type' => CRM_Utils_Type::T_INT,
+        ),
         'total_amount_collected' => array(
           'dbAlias' => 'total_amount_collected',
           'title'   => ts('Total Amount Collected'),
@@ -170,6 +184,11 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title'   => ts('Total Count of Failed/Cancelled Contribution'),
           'type'    => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_INT,
+        ),
+        'receive_date' => array(
+          'title' => ts('Contribution Collection Date'),
+          'operatorType' => CRM_Report_Form::OP_DATE,
+          'type' => CRM_Utils_Type::T_DATE,
         ),
       ),
       'order_bys' => array(
@@ -354,6 +373,9 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       }
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_page_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_page_id'] = $contributionPages[$value];
+      }
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
       }
 
       // alter amount

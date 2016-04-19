@@ -69,11 +69,15 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Source'),
         ),
         'currency' => array(
+          'title' => ts('Currency'),
           'required' => TRUE,
           'no_display' => TRUE,
         ),
         'trxn_id' => NULL,
-        'receive_date' => array('default' => TRUE),
+        'receive_date' => array(
+          'title'   => ts('Contribution Collection Date'),
+          'default' => TRUE
+          ),
         'receipt_date' => NULL,
         'total_amount' => array(
           'title' => ts('Amount'),
@@ -89,7 +93,10 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
         ),
       ),
       'filters' => array(
-        'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+        'receive_date' => array(
+          'title' => ts('Contribution Collection Date'),
+          'operatorType' => CRM_Report_Form::OP_DATE
+        ),
         'financial_type_id' => array(
           'title' => ts('Financial Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
