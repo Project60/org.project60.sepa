@@ -43,6 +43,15 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       $cycle_days[(string) $i] = (string) $i;  
     }
 
+    // cycle intervals
+    $cycle_intervals = array(
+      "'1 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('1',  'month', TRUE),
+      "'3 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('3',  'month', TRUE),
+      "'4 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('4',  'month', TRUE),
+      "'6 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('6',  'month', TRUE),
+      "'12 month'" => CRM_Utils_SepaOptionGroupTools::getFrequencyText('12', 'month', TRUE),
+      );
+
     $this->_columns['civicrm_contribution_recur'] = array(
       'dao' => 'CRM_Contribute_BAO_ContributionRecur',
       'fields' => array(
@@ -81,6 +90,9 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'dbAlias' => 'amount',
           'title' => ts('Installment Amount'),
         ),
+        'cycle_interval' => array(
+          'title' => ts('Cycle Interval'),
+        ),
       ),
       'filters' => array(
         'start_date' => array(
@@ -98,6 +110,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::financialType(),
           'type' => CRM_Utils_Type::T_INT,
+        ),
+        'cycle_interval' => array(
+          'dbAlias' => 'cycle_interval',
+          'title' => ts('Cycle Interval'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => $cycle_intervals,
         ),
         'cycle_day' => array(
           'title' => ts('Cycle Days'),
@@ -241,6 +259,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       return "GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||') AS cancel_reasons";
     }
 
+    if ($fieldName == 'cycle_interval') {
+      $this->_columnHeaders['cycle_interval']['title'] = $field['title'];
+      $this->_columnHeaders['cycle_interval']['type']  = CRM_Utils_Array::value('type', $field);
+      return "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval, CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit)) AS cycle_interval";
+    }
+
     return parent::_getSelectClause($fieldName, $field, $tableName);
   }
 
@@ -274,6 +298,20 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
    * internal function to generate where clauses
    */
   protected function _getWhereClause($fieldName, $field) {
+    if ($fieldName == 'cycle_interval') {
+      $cycle_intervals = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
+      if (in_array("'12 month'", $cycle_intervals)) {
+        $cycle_intervals[] = "'1 year'"; // the database could have both: '1 year' and '12 month'...
+      }
+      $clause = $this->whereClause($field, CRM_Utils_Array::value("{$fieldName}_op", $this->_params), $cycle_intervals,
+          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+        );
+      $subquery = "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval, CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit))";
+      $clause = preg_replace('/cycle_interval/', $subquery, $clause);
+      return $clause;
+    }
+
     if ($fieldName == 'total_amount_collected') {
       $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
       if ($op) {
@@ -378,6 +416,12 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       }
       if (array_key_exists('total_amount_collected', $row)) {
         $rows[$rowNum]['total_amount_collected'] = CRM_Utils_Money::format($row['total_amount_collected'], $row['civicrm_contribution_recur_currency']);
+      }
+
+      // alter frequency
+      if (array_key_exists('cycle_interval', $row)) {
+        list($interval, $unit) = split(' ', $row['cycle_interval']);
+        $rows[$rowNum]['cycle_interval'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($interval, $unit, TRUE);
       }
 
       // expand concat cancel_reasons
