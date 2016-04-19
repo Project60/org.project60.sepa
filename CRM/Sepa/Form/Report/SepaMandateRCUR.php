@@ -144,12 +144,6 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         'total_amount_collected' => array(
           'title' => ts('Total Amount Collected'),
         ),
-        // 'contribution_status_id' => array(
-        //   'title' => ts('Contribution Status'),
-        // ),
-        'receive_date' => array(
-          'title' => ts('Contribution Collection Date'),
-        ),
         'total_count_collected' => array(
           'title' => ts('Total Count of Collected Contributions'),
         ),
