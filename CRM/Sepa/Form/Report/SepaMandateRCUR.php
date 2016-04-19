@@ -38,8 +38,10 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     unset($this->_columns['civicrm_sdd_mandate']['filters']['amount']);
 
     // cycle days
-    $cycle_days = range(0,31);
-    unset($cycle_days[0]);
+    $cycle_days = array();
+    for ($i=1; $i <= 31; $i++) {
+      $cycle_days[(string) $i] = (string) $i;  
+    }
 
     $this->_columns['civicrm_contribution_recur'] = array(
       'dao' => 'CRM_Contribute_BAO_ContributionRecur',
