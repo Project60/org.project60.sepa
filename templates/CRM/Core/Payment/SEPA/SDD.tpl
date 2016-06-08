@@ -14,7 +14,7 @@
 +-------------------------------------------------------*}
 
 {* check for the org.project60.bic extension *}
-{crmAPI var='bic_extension_check' entity='Extension' action='get' status='installed' q='civicrm/ajax/rest'}
+{crmAPI var='bic_extension_check' entity='Extension' action='get' key='org.project60.bic' status='installed' q='civicrm/ajax/rest'}
 {assign var='bic_extension_installed' value=$bic_extension_check.count}
 
 {if $pre4_6_10}
