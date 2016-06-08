@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: org.project60.sepa\n"
-"POT-Creation-Date: 2016-02-11 18:05+0100\n"
+"POT-Creation-Date: 2016-03-16 07:46+0100\n"
 "Language-Team: CiviCRM Translators <civicrm-translators@lists.civicrm.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -85,7 +85,7 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
-#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php sepa.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -97,7 +97,7 @@ msgstr ""
 msgid "BIC"
 msgstr ""
 
-#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php sepa.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -351,14 +351,14 @@ msgid "SEPA File Format"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php
-#: CRM/Sepa/DAO/SEPATransactionGroup.php
+#: CRM/Sepa/DAO/SEPATransactionGroup.php sepa.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Reference"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php
+#: CRM/Sepa/DAO/SEPAMandate.php sepa.php
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
@@ -389,12 +389,12 @@ msgstr ""
 msgid "Contact ID"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPATransactionGroup.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPATransactionGroup.php sepa.php
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Type"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Report/SEPAMandate.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Report/SEPAMandate.php sepa.php
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
@@ -573,7 +573,7 @@ msgstr ""
 msgid "'%s' is a required field."
 msgstr ""
 
-#: CRM/Sepa/Page/CreateMandate.php
+#: CRM/Sepa/Page/CreateMandate.php sepa.php
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
@@ -838,6 +838,40 @@ msgstr ""
 
 #: sepa.php
 msgid "This contribution has a mandate, its payment instrument has to be '%s'"
+msgstr ""
+
+#: sepa.php
+msgid "Most Recent SEPA Mandate"
+msgstr ""
+
+#: sepa.php
+msgid "Signature Date"
+msgstr ""
+
+#: sepa.php
+msgid "Currency"
+msgstr ""
+
+#: sepa.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
+msgid "First Collection Date"
+msgstr ""
+
+#: sepa.php
+msgid "Cycle Day"
+msgstr ""
+
+#: sepa.php
+msgid "Interval Multiplier"
+msgstr ""
+
+#: sepa.php
+msgid "Interval Unit"
+msgstr ""
+
+#: sepa.php templates/CRM/Contribute/Form/ContributionView.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Interval"
 msgstr ""
 
 #: sepa_pp_sdd.php
@@ -1302,11 +1336,6 @@ msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
-msgid "First Collection Date"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
-#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 msgid "Earliest Collection Date"
 msgstr ""
 
@@ -1344,11 +1373,6 @@ msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "(ongoing)"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "Interval"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionView.tpl
