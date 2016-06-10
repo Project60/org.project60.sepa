@@ -11,8 +11,8 @@ return array (
     'params' => 
     array (
       'version' => 3,
-      'label' => ts('SEPA Mandates (generic)'),
-      'description' => ts('Generic SEPA Mandate Report (org.project60.sepa)'),
+      'label' => ts('SEPA Mandates (generic)', array('domain' => 'org.project60.sepa')),
+      'description' => ts('Generic SEPA Mandate Report (org.project60.sepa)', array('domain' => 'org.project60.sepa')),
       'class_name' => 'CRM_Sepa_Form_Report_SepaMandateGeneric',
       'report_url' => 'org.project60.sepa/sepamandategeneric',
       'component' => 'CiviContribute',
