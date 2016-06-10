@@ -19,6 +19,18 @@ Version 1.3
 - FIX: permission problem (https://github.com/Project60/org.project60.sepa/issues/253)
 
 
+Version 1.2.2
+=============
+- Extension now uses correct translation domain (https://github.com/Project60/org.project60.sepa/issues/277)
+- Greatly improved payment processor (https://github.com/Project60/sepa_dd/issues/333, https://github.com/Project60/org.project60.sepa/issues/342, https://github.com/Project60/org.project60.sepa/issues/344, https://github.com/Project60/org.project60.sepa/issues/348, https://github.com/Project60/org.project60.sepa/issues/359, https://github.com/Project60/org.project60.sepa/issues/367, https://github.com/Project60/org.project60.sepa/issues/372)
+- Added hook for creating SEPA follow-up contributions (installments) (https://github.com/Project60/org.project60.sepa/issues/374)
+- UI improvements (https://github.com/Project60/org.project60.sepa/issues/349)
+- FIX: missed first collection deferred for a whole cycle (https://github.com/Project60/org.project60.sepa/issues/309)
+- FIX: under certain circumstances, bad SEPA groups were created (https://github.com/Project60/org.project60.sepa/issues/355)
+- FIX: problems when trying to change FRST contributions (https://github.com/Project60/org.project60.sepa/issues/357)
+- FIX: respect cancelled contributions when closing SEPA group (https://github.com/Project60/org.project60.sepa/issues/368)
+
+
 Version 1.2.1
 =============
 - Hide BIC in payment processor form if it can be looked up using "Little BIC Extension" (https://github.com/Project60/org.project60.sepa/issues/326)
