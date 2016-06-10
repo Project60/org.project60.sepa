@@ -605,3 +605,81 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     }
   }
 }
+
+
+/**
+ * Insert "Last Mandate" tokens
+ */
+function sepa_civicrm_tokens(&$tokens) {
+  $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
+  $tokens[$prefix] = array(
+    "$prefix.reference"          => ts('Reference', array('domain' => 'org.project60.sepa')),
+    "$prefix.source"             => ts('Source', array('domain' => 'org.project60.sepa')),
+    "$prefix.type"               => ts('Type', array('domain' => 'org.project60.sepa')),
+    "$prefix.status"             => ts('Status', array('domain' => 'org.project60.sepa')),
+    "$prefix.date"               => ts('Signature Date', array('domain' => 'org.project60.sepa')),
+    "$prefix.iban"               => ts('IBAN', array('domain' => 'org.project60.sepa')),
+    "$prefix.bic"                => ts('BIC', array('domain' => 'org.project60.sepa')),
+    
+    "$prefix.amount"             => ts('Amount', array('domain' => 'org.project60.sepa')),
+    "$prefix.currency"           => ts('Currency', array('domain' => 'org.project60.sepa')),
+    "$prefix.first_collection"   => ts('First Collection Date', array('domain' => 'org.project60.sepa')),
+    "$prefix.cycle_day"          => ts('Cycle Day', array('domain' => 'org.project60.sepa')),
+    "$prefix.frequency_interval" => ts('Interval Multiplier', array('domain' => 'org.project60.sepa')),
+    "$prefix.frequency_unit"     => ts('Interval Unit', array('domain' => 'org.project60.sepa')),
+    "$prefix.frequency"          => ts('Interval', array('domain' => 'org.project60.sepa')),
+  );    
+}
+
+/**
+ * Fill "Last Mandate" tokens
+ */
+function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
+  $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
+
+  // FIND most recent SEPA Mandates (per contact)
+  $contact_id_list = implode(',', $cids);
+  $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id IN ($contact_id_list) GROUP BY contact_id;";
+  $result = CRM_Core_DAO::executeQuery($query);
+  while ($result->fetch()) {
+    // load the mandate
+    $mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $result->mandate_id));
+
+    // make sure there is an array
+    if (!isset($values[$result->contact_id])) {
+      $values[$result->contact_id] = array();
+    }
+
+    // copy the mandate values
+    $values[$result->contact_id]["$prefix.reference"] = $mandate['reference'];
+    $values[$result->contact_id]["$prefix.source"]    = $mandate['source'];
+    $values[$result->contact_id]["$prefix.type"]      = $mandate['type'];
+    $values[$result->contact_id]["$prefix.status"]    = $mandate['status'];
+    $values[$result->contact_id]["$prefix.date"]      = $mandate['date'];
+    $values[$result->contact_id]["$prefix.iban"]      = $mandate['iban'];
+    $values[$result->contact_id]["$prefix.bic"]       = $mandate['bic'];
+
+    // load and copy the contribution information
+    if ($mandate['entity_table'] == 'civicrm_contribution') {
+      $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['entity_id']));
+      $values[$result->contact_id]["$prefix.amount"]           = $contribution['total_amount'];
+      $values[$result->contact_id]["$prefix.currency"]         = $contribution['currency'];
+      $values[$result->contact_id]["$prefix.first_collection"] = $contribution['receive_date'];
+
+    } elseif ($mandate['entity_table'] == 'civicrm_contribution_recur') {
+      $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
+      $values[$result->contact_id]["$prefix.amount"]             = $rcontribution['amount'];
+      $values[$result->contact_id]["$prefix.currency"]           = $rcontribution['currency'];
+      $values[$result->contact_id]["$prefix.cycle_day"]          = $rcontribution['cycle_day'];
+      $values[$result->contact_id]["$prefix.frequency_interval"] = $rcontribution['frequency_interval'];
+      $values[$result->contact_id]["$prefix.frequency_unit"]     = $rcontribution['frequency_unit'];
+      $values[$result->contact_id]["$prefix.frequency"]          = CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], true);
+
+      // load first contribution
+      if (!empty($mandate['first_contribution_id'])) {
+        $fcontribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['first_contribution_id']));
+        $values[$result->contact_id]["$prefix.first_collection"] = $fcontribution['receive_date'];
+      }
+    }
+  }
+}
