@@ -117,6 +117,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
 
     // prepare the data
+    $mandate['status_text'] = CRM_Sepa_Logic_Status::translateMandateStatus($mandate['status'], TRUE);
     $financial_types = CRM_Contribute_PseudoConstant::financialType();
     $contact1['link'] = CRM_Utils_System::url('civicrm/contact/view', "&reset=1&cid=".$contact1['id']);
     $contact2['link'] = CRM_Utils_System::url('civicrm/contact/view', "&reset=1&cid=".$contact2['id']);
