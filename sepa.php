@@ -582,6 +582,9 @@ function sepa_civicrm_tokens(&$tokens) {
  * Fill "Last Mandate" tokens
  */
 function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
+  // make sure there are cids, because otherwise we'd produce invalid SQL (see https://github.com/Project60/org.project60.sepa/issues/399)
+  if (empty($cids)) return;
+
   $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
 
   // FIND most recent SEPA Mandates (per contact)
