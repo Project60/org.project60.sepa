@@ -67,6 +67,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
     $this->fileFormat = CRM_Sepa_Logic_Format::sanitizeFileFormat($this->fileFormat);
     $template->assign("fileFormat", $this->fileFormat);
+    CRM_Sepa_Logic_Format::loadFormatClass($this->fileFormat);
+    $format_class = 'CRM_Sepa_Logic_Format_'.$this->fileFormat;
+    $format = new $format_class();
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
@@ -93,7 +96,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       WHERE g.txgroup_id = %1
         AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
-    "; //and not cancelled
+        ".$format::$generatexml_sql_where; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
 
     setlocale(LC_CTYPE, 'en_US.utf8');
@@ -131,9 +134,6 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
 
-    CRM_Sepa_Logic_Format::loadFormatClass($this->fileFormat);
-    $format_class = 'CRM_Sepa_Logic_Format_'.$this->fileFormat;
-    $format = new $format_class();
     $template->assign('settings', $format::$settings);
     $details = $template->fetch('../formats/'.$this->fileFormat.'/transaction-details.tpl');
     if ($format::$out_charset != 'UTF-8') {

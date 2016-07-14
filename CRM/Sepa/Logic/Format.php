@@ -5,10 +5,11 @@ abstract class CRM_Sepa_Logic_Format {
   /** @var string Charset used in output files. */
   public static $out_charset = 'UTF-8';
 
-
   /** @var array Settings per format */
   public static $settings = array();
 
+  /** @var string Additional conditions used for generateXML */
+  public static $generatexml_sql_where = '';
 
   /**
    * Load class based on format name.
