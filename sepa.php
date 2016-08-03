@@ -582,8 +582,20 @@ function sepa_civicrm_tokens(&$tokens) {
  * Fill "Last Mandate" tokens
  */
 function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
-  // make sure there are cids, because otherwise we'd produce invalid SQL (see https://github.com/Project60/org.project60.sepa/issues/399)
-  if (empty($cids)) return;
+  // this could be only one ID, or (potentially) even a comma separated list of IDs
+  if (!is_array($cids)) {
+    $contained_ids = explode(',', $cids);  // also works on scalars (int)
+    $cids = array(); // make $cids into an array
+    foreach ($contained_ids as $cid_string) {
+      $cid = (int) $cid_string;
+      if ($cid) {
+        $cids[] = $cid;
+      }
+    }
+  }
+
+  // make sure there are cids, because otherwise we'd generate invalid SQL (see https://github.com/Project60/org.project60.sepa/issues/399)
+  if (empty($cids) || !is_array($cids)) return;
 
   $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
 
