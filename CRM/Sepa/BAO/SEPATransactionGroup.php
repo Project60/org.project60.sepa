@@ -112,7 +112,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
       // create an individual EndToEndId
       $end2endID = $t['id']; // that's the old default
-      CRM_Utils_SepaCustomisationHooks::modify_end2end_id(&$end2endID, $t, $creditor);
+      CRM_Utils_SepaCustomisationHooks::modify_endtoendid($end2endID, $t, $creditor);
       $t["end2endID"] = $end2endID;
 
       $r[]=$t;

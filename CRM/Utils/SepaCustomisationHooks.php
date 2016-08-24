@@ -82,12 +82,12 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @access public
    */
-  static function modify_end2end_id(&$end2endID, $contribution, $creditor) {
+  static function modify_endtoendid(&$end2endID, $contribution, $creditor) {
     if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
     {
-      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, 'civicrm_modify_end2end_id');
+      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, 'civicrm_modify_endtoendid');
     }else{
-      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_end2end_id');
+      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_endtoendid');
     }
   }
 

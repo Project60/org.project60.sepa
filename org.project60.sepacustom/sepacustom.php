@@ -115,8 +115,9 @@ function sepacustom_civicrm_modify_txmessage(&$txmessage, $info, $creditor) {
  *
  * If you want to create your own ID you have to make sure it's really unique for
  * each transactions, otherwise it'll be rejected by the bank.
+ * It will also have to create the SAME ID every time it's called for the same transaction.
  */ 
-function sepacustom_modify_end2end_id(&$end2endID, $contribution, $creditor) {
+function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $creditor) {
   $end2endID = "PREFIX{$end2endID}SUFFIX";
 }
 
