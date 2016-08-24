@@ -106,6 +106,20 @@ function sepacustom_civicrm_modify_txmessage(&$txmessage, $info, $creditor) {
 }
 
 
+/**
+ * This hook lets you customize the EndToEndId used when submitting 
+ *  a collection file to the bank
+ * 
+ * The variable end2endID already contains a uniqe ID (contribution ID),
+ * but you can add a custom prefix or suffix. 
+ *
+ * If you want to create your own ID you have to make sure it's really unique for
+ * each transactions, otherwise it'll be rejected by the bank.
+ */ 
+function sepacustom_modify_end2end_id(&$end2endID, $contribution, $creditor) {
+  $end2endID = "PREFIX{$end2endID}SUFFIX";
+}
+
 
 
 
