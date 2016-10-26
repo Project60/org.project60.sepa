@@ -73,3 +73,21 @@
 	{/if}
 	</p>
 </div>
+
+
+<script type="text/javascript">
+// this message will only show on some browsers
+var dontleave = "{ts domain="org.project60.sepa"}It's very important to select one of the options below.{/ts}";
+
+{literal}
+// add a message if the user wants to close the page without selecting an option
+window.onbeforeunload = function(e) {
+  return dontleave;
+};
+
+// if using the buttons, user is allowed to leave :)
+cj("a.button").click(function() {
+	window.onbeforeunload = null;
+});
+{/literal}
+</script>
