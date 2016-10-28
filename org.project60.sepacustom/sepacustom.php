@@ -21,13 +21,13 @@ require_once 'sepacustom.civix.php';
 /**
  * This hook lets you modify the parameters of a to-be-created mandate.
  *
- * In particular, we use this to generate our custom mandate reference:
+ * As an example, we use this pattern to generate our custom mandate reference:
  *   P60-00C00000099D20150115N1
- *                            \__ counter to allow multiple mandates per contact/date
+ *                            \__ counter to allow multiple mandates per contact and date
  *                   \_______\___ date
  *          \_______\____________ contact ID
  *       \_\_____________________ inteval, 00=OOFF, 04=quarterly, 02=monthly, etc.
- *   \__\________________________ identifier, no
+ *   \__\________________________ identifier string
  */ 
 function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
 
@@ -105,6 +105,21 @@ function sepacustom_civicrm_modify_txmessage(&$txmessage, $info, $creditor) {
     $txmessage = "This is a customized message.";
 }
 
+
+/**
+ * This hook lets you customize the EndToEndId used when submitting 
+ *  a collection file to the bank
+ * 
+ * The variable end2endID already contains a uniqe ID (contribution ID),
+ * but you can add a custom prefix or suffix. 
+ *
+ * If you want to create your own ID you have to make sure it's really unique for
+ * each transactions, otherwise it'll be rejected by the bank.
+ * It will also have to create the SAME ID every time it's called for the same transaction.
+ */ 
+function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $creditor) {
+  $end2endID = "PREFIX{$end2endID}SUFFIX";
+}
 
 
 
