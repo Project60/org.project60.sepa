@@ -69,7 +69,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
-        c.id,
+        c.id AS cid,
         civicrm_contact.display_name,
         invoice_id,
         currency,
@@ -96,6 +96,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
  
     while ($contrib->fetch()) {
       $t=$contrib->toArray();
+      $t['id'] = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
       $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
       
       // try to convert the name into a more acceptable format
