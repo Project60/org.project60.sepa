@@ -221,7 +221,7 @@ function sepa_civicrm_options() {
           'values' => array(
             'pain.008.001.02' => array(
               'label' => ts('pain.008.001.02 (ISO 20022/official SEPA guidelines)', array('domain' => 'org.project60.sepa')),
-              'is_default' => 1,
+              'is_default' => 0,
               'is_reserved' => 1,
               'value' => 1,
             ),
@@ -236,6 +236,12 @@ function sepa_civicrm_options() {
               'is_default' => 0,
               'is_reserved' => 1,
               'value' => 3,
+            ),
+            'pain.008.001.02 EBICS-3.0' => array(
+              'label' => ts('pain.008.001.02 (CDD EBICS-3.0)', array('domain' => 'org.project60.sepa')),
+              'is_default' => 1,
+              'is_reserved' => 1,
+              'value' => 4,
             ),
           ),
         ),
