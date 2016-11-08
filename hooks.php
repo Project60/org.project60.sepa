@@ -161,7 +161,7 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
   );
   $entityTypes[] = array(
       'name' => 'SepaTransactionGroup',
-      'class' => 'CRM_Sepa_BAO_SEPATransactionGroup',
+      'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
       'table' => 'civicrm_sepa_txgroup',
   );
   $entityTypes[] = array(
