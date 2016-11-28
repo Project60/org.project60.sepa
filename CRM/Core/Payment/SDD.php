@@ -89,6 +89,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $form->assign('earliest_cycle_day', date('d', $earliest_cycle_day));
     $form->assign('sepa_hide_bic', CRM_Sepa_Logic_Settings::getSetting("pp_hide_bic"));
     $form->assign('sepa_hide_billing', CRM_Sepa_Logic_Settings::getSetting("pp_hide_billing"));
+    $form->assign('bic_extension_installed', CRM_Sepa_Logic_Settings::isLittleBicExtensionAccessible());
 
     CRM_Core_Region::instance('billing-block')->add(
       array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
