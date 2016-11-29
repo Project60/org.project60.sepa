@@ -1,6 +1,16 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
+Version 1.2.4
+=============
+- Compatibility with CiviCRM 4.7 (https://github.com/Project60/org.project60.sepa/issues/351, https://github.com/Project60/org.project60.sepa/issues/352, https://github.com/Project60/org.project60.sepa/issues/401)
+- Added SEPA 3.0 PAIN file support (https://github.com/Project60/org.project60.sepa/issues/408)
+- Add a warning when about to forget to close the group (https://github.com/Project60/org.project60.sepa/issues/407)
+- Added a hook for the EndToEndId (https://github.com/Project60/org.project60.sepa/issues/402)
+- Improved error handling when trying to delete SEPA contributions (https://github.com/Project60/org.project60.sepa/issues/393)
+- FIX: EndToEndId not unique (https://github.com/Project60/org.project60.sepa/issues/385)
+
+
 Version 1.2.3
 =============
 - Mandate reports (https://github.com/Project60/org.project60.sepa/issues/358)
