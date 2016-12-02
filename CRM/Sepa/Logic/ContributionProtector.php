@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+require_once 'api/Wrapper.php';
+
 /**
  * This wrapper will prevent users from deleting contributions
  *   or recurring contributions that are connected to a mandate
