@@ -216,10 +216,14 @@ class CRM_Sepa_Logic_Settings {
   /**
    * Form rule to only allow empty value or a list of
    * valid days (e.g. 1 <= x <= 28)
+   *
+   * @param string $value
+   *
+   * @return bool
    */
   static function sepa_cycle_day_list($value) {
     if (!empty($value)) {
-      $days = split(',', $value);
+      $days = explode(',', $value);
       foreach ($days as $day) {
         if (!is_numeric($day) || $day < 1 || $day > 28) {
           return false;
