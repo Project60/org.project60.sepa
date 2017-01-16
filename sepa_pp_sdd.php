@@ -41,8 +41,8 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 			$test_pp_creditor = NULL;
 
 			if (!empty($pp_id)) {
-				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP',         'pp'.$pp_id);
-				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP Test',    'pp'.$pp_id);
+				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp'.$pp_id);
+				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp_test'.$pp_id);
 			}
 
 			// load settings from creditor
@@ -183,8 +183,8 @@ function sepa_pp_postProcess( $formName, &$form ) {
 
 			// save settings
 			// FIXME: we might consider saving this as a JSON object
-			CRM_Core_BAO_Setting::setItem($creditor_id,             'SEPA Direct Debit PP',         'pp'.$pp_id);
-			CRM_Core_BAO_Setting::setItem($test_creditor_id,        'SEPA Direct Debit PP Test',    'pp'.$pp_id);
+			CRM_Core_BAO_Setting::setItem($creditor_id,      'SEPA Direct Debit PP', 'pp'.$pp_id);
+			CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP', 'pp_test'.$pp_id);
 		}
 
 	} elseif ('CRM_Contribute_Form_Contribution_Confirm' == $formName) {
