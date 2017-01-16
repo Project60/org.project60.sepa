@@ -111,7 +111,7 @@
 
 {literal}
 <style>
-  tr.submit_missed {background-color:#000000; color:#FA583F;}
+  tr.submit_missed {background-color:#9D0000;}
   tr.submit_urgently {background-color:#FA583F;}
   tr.submit_soon {background-color:#FAB83F;}
   tr.submit_closed {background-color:#f0f8ff;}
