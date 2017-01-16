@@ -219,7 +219,7 @@ class CRM_Sepa_Logic_Settings {
    */
   static function sepa_cycle_day_list($value) {
     if (!empty($value)) {
-      $days = split(',', $value);
+      $days = explode(',', $value);
       foreach ($days as $day) {
         if (!is_numeric($day) || $day < 1 || $day > 28) {
           return false;
