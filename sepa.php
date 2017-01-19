@@ -593,6 +593,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
  */
 function sepa_civicrm_tokens(&$tokens) {
   $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
+  $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
   $tokens[$prefix] = array(
     "$prefix.reference"          => ts('Reference', array('domain' => 'org.project60.sepa')),
     "$prefix.source"             => ts('Source', array('domain' => 'org.project60.sepa')),
@@ -632,6 +633,7 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
   if (empty($cids) || !is_array($cids)) return;
 
   $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
+  $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
 
   // FIND most recent SEPA Mandates (per contact)
   $contact_id_list = implode(',', $cids);
