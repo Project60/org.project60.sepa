@@ -10,6 +10,7 @@ Version 1.2.4
 - Improved error handling when trying to delete SEPA contributions (https://github.com/Project60/org.project60.sepa/issues/393)
 - FIX: EndToEndId not unique (https://github.com/Project60/org.project60.sepa/issues/385)
 - FIX: Missed SEPA group colour scheme (https://github.com/Project60/org.project60.sepa/issues/417)
+- FIX: Using SEPA tokens in newsletters (https://github.com/Project60/org.project60.sepa/issues/419)
 
 
 Version 1.2.3
