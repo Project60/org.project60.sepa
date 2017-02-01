@@ -391,23 +391,51 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
   }
 }
 
+/**
+ * Implements hook_civicrm_apiWrappers to prevent people from deleting
+ *   contributions connected to SDD mandates.
+ */
+function sepa_civicrm_apiWrappers(&$wrappers, $apiRequest) {
+  // add a wrapper for Contact.getlist (used e.g. for AJAX lookups)
+  if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'delete') {
+    $wrappers[] = new CRM_Sepa_Logic_ContributionProtector();
+  }
+}
+
+/**
+ * Implements hook_civicrm_links to prevent people from deleting
+ *   contributions connected to SDD mandates.
+ */
+function sepa_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
+  if ($op == 'contribution.selector.row' && $objectName == 'Contribution') {
+    $links_copy = $links;
+    foreach ($links_copy as $index => $link) {
+      if ($link['bit'] == CRM_Core_Action::DELETE) {
+        $protected = CRM_Sepa_Logic_ContributionProtector::isProtected($objectId, 'civicrm_contribution');
+        if ($protected) {
+          // this is a protected contribution -> remove "DELETE" link
+          unset($links[$index]);
+        }
+      }
+    }
+  }
+}
+
 /** 
- * PREVENT the user to delete a (recurring) contribution when there's a mandate attached.
+ * LAST RESORT: prevent the user to delete a (recurring) contribution when there's a mandate attached.
  */
 function sepa_civicrm_pre($op, $objectName, $id, &$params) {
-  // FIXME: move this into validation?
-  // disallow the deletion of a (recurring) contribution if it is attached to mandates
   if ($op=='delete' && ($objectName=='Contribution' || $objectName=='ContributionRecur')) {
     if ($objectName=='Contribution') {
-      $table = 'civicrm_contribution';
+      $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution');
     } else {
-      $table = 'civicrm_contribution_recur';
+      $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution');
     }
 
-    $query = "SELECT id FROM civicrm_sdd_mandate WHERE entity_id=$id AND entity_table='$table';";
-    $result = CRM_Core_DAO::executeQuery($query);
-    if ($result->fetch()) {
-      die(sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!", array('domain' => 'org.project60.sepa')), $result->id));
+    if ($error) {
+      // Unfortunately, there is no other option at this point. 
+      //   Ideally, this would've been caught by the API, this is just a last resort
+      throw new CRM_Core_Exception($error);
     }
   }
 }
