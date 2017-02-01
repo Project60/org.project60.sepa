@@ -91,7 +91,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         // country drop down field
         $i18n = CRM_Core_I18n::singleton();
-
+        $climit = array();
         $cnames = array();
         $ciso = array();
         $filtered = array();
@@ -102,6 +102,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
           $config = CRM_Core_Config::singleton();
           $climit = $config->countryLimit();
         }
+
         CRM_Core_PseudoConstant::populate($cnames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
         CRM_Core_PseudoConstant::populate($ciso, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
 
