@@ -71,6 +71,26 @@ class CRM_Utils_SepaCustomisationHooks {
     }
   }
 
+  /**
+   * This hook is called when the PAIN.008 XML is being generated.
+   *
+   * You can implement this hook to generate a custom EndToEndId
+   *
+   * @param string $end2endID    the PAIN EndToEndId being used for this transaction
+   * @param array  $cinfo        some information on the mandate/contribution
+   * @param array  $creditor     the creditor involved
+   *
+   * @access public
+   */
+  static function modify_endtoendid(&$end2endID, $contribution, $creditor) {
+    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
+    {
+      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, 'civicrm_modify_endtoendid');
+    }else{
+      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_endtoendid');
+    }
+  }
+
 
   /**
    * This hook is called when a new mandate is created. It gives you the

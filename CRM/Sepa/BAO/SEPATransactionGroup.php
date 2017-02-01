@@ -115,6 +115,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       // create an individual transaction message
       $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor);
 
+      // create an individual EndToEndId
+      $end2endID = $t['id']; // that's the old default
+      CRM_Utils_SepaCustomisationHooks::modify_endtoendid($end2endID, $t, $creditor);
+      $t["end2endID"] = $end2endID;
+
       $r[]=$t;
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
