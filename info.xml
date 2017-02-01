@@ -19,9 +19,9 @@
   <urls>
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
     <url desc="Documentation">https://wiki.civicrm.org/confluence/display/CRM/CiviSEPA</url>
-    <url desc="Support">https://github.com/Project60/org.project60.sepa/issues/new</url>
+    <url desc="Support">https://github.com/Project60/org.project60.sepa/issues</url>
   </urls>
-  <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches. Special thanks to @scardinius for numerous contribtuions.</comments>
+  <comments>WARNING: This is the DEVELOPER version of this extension. If you want a production stable version please use the official relases (https://github.com/Project60/org.project60.sepa/releases/latest). This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches. Special thanks to @scardinius for numerous contribtuions.</comments>
   <civix>
     <namespace>CRM/Sepa</namespace>
   </civix>
