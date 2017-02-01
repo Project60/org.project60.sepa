@@ -3,20 +3,21 @@ sepa_dd (org.project60.sepa) release history
 
 Version 1.3
 ===========
-- Extension now uses correct translation domain (https://github.com/Project60/org.project60.sepa/issues/277)
 - Search mandates (https://github.com/Project60/org.project60.sepa/issues/313)
-- Greatly improved payment processor (https://github.com/Project60/sepa_dd/issues/333, https://github.com/Project60/org.project60.sepa/issues/342, https://github.com/Project60/org.project60.sepa/issues/344, https://github.com/Project60/org.project60.sepa/issues/348, https://github.com/Project60/org.project60.sepa/issues/359, https://github.com/Project60/org.project60.sepa/issues/367, https://github.com/Project60/org.project60.sepa/issues/372)
 - Multi-currency (https://github.com/Project60/org.project60.sepa/issues/371)
 - Default mandate type setting (https://github.com/Project60/org.project60.sepa/issues/332)
 - Improved dashboard colors (https://github.com/Project60/org.project60.sepa/pull/378)
-- Added hook for creating SEPA follow-up contributions (installments) (https://github.com/Project60/org.project60.sepa/issues/374)
-- FIX: respect cancelled contributions when closing SEPA group (https://github.com/Project60/org.project60.sepa/issues/368)
-- FIX: under certain circumstances, bad SEPA groups were created (https://github.com/Project60/org.project60.sepa/issues/355)
-- FIX: Closing unrelated mandates (https://github.com/Project60/org.project60.sepa/issues/383)
-- FIX: UI stuff (https://github.com/Project60/org.project60.sepa/issues/349, https://github.com/Project60/org.project60.sepa/pull/378, https://github.com/Project60/org.project60.sepa/pull/376)
-- FIX: problems when trying to change FRST contributions (https://github.com/Project60/org.project60.sepa/issues/357)
-- FIX: missed first collection deferred for a whole cycle (https://github.com/Project60/org.project60.sepa/issues/309)
-- FIX: permission problem (https://github.com/Project60/org.project60.sepa/issues/253)
+
+
+Version 1.2.4
+=============
+- Compatibility with CiviCRM 4.7 (https://github.com/Project60/org.project60.sepa/issues/351, https://github.com/Project60/org.project60.sepa/issues/352, https://github.com/Project60/org.project60.sepa/issues/401)
+- Added SEPA 3.0 PAIN file support (https://github.com/Project60/org.project60.sepa/issues/408)
+- Add a warning when about to forget to close the group (https://github.com/Project60/org.project60.sepa/issues/407)
+- Added a hook for the EndToEndId (https://github.com/Project60/org.project60.sepa/issues/402)
+- Improved error handling when trying to delete SEPA contributions (https://github.com/Project60/org.project60.sepa/issues/393)
+- FIX: EndToEndId not unique (https://github.com/Project60/org.project60.sepa/issues/385)
+- FIX: Missed SEPA group colour scheme (https://github.com/Project60/org.project60.sepa/issues/417)
 
 
 Version 1.2.3
