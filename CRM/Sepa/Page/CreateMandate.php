@@ -75,6 +75,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       // error -> no parameters set
       die(ts("This page cannot be called w/o parameters.", array('domain' => 'org.project60.sepa')));
     }
+
+    $this->assign('bic_extension_installed', CRM_Sepa_Logic_Settings::isLittleBicExtensionAccessible());
     parent::run();
   }
 
