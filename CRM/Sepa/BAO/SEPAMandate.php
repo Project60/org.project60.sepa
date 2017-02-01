@@ -340,17 +340,18 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     // set the cancel reason
     if ($cancel_reason) {
       // ..and create a note, since the contribution_recur does not have cancel_reason
-      $note_result = civicrm_api("Note", "create", array(
-        'version'       => 3,
-        'entity_table'  => 'civicrm_contribution_recur',
-        'entity_id'     => $contribution_id,
-        'modified_date' => date('YmdHis'),
-        'subject'       => 'cancel_reason',
-        'note'          => $cancel_reason,
-        'privacy'       => 0));
-      if (isset($note_result['is_error']) && $note_result['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot set cancel reason for mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $note_result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'warn');
-      }
+
+      // FIXME: this is a workaround due to CRM-14901, 
+      //   see https://github.com/Project60/org.project60.sepa/issues/401
+      $create_note_query = "
+      INSERT INTO civicrm_note (entity_table, entity_id, modified_date, subject, note, privacy)
+             VALUES('civicrm_contribution_recur', %1, %2, 'cancel_reason', %3, 0)";
+      $create_note_parameters = array(
+        1 => array($contribution_id, 'Integer'),
+        2 => array(date('YmdHis'), 'String'),
+        3 => array($cancel_reason, 'String'),
+      );
+      CRM_Core_DAO::executeQuery($create_note_query, $create_note_parameters);
     }
 
     // find already created contributions that are now obsolete...

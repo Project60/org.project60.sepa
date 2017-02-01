@@ -135,24 +135,27 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       return;
     }
 
-    // create a note, if requested
-    if ($_REQUEST['note']) {
-      // add note
-      $create_note = array(
-        'version'                   => 3,
-        'entity_table'              => $entity_table,
-        'entity_id'                 => $contribution['id'],
-        'note'                      => $_REQUEST['note'],
-        'privacy'                   => 0,
-      );
+    // FIXME: see https://github.com/Project60/org.project60.sepa/issues/401
+    //  BUT: probably unused...
+    
+    // // create a note, if requested
+    // if ($_REQUEST['note']) {
+    //   // add note
+    //   $create_note = array(
+    //     'version'                   => 3,
+    //     'entity_table'              => $entity_table,
+    //     'entity_id'                 => $contribution['id'],
+    //     'note'                      => $_REQUEST['note'],
+    //     'privacy'                   => 0,
+    //   );
 
-      $create_note_result = civicrm_api('Note', 'create', $create_note);
-      if (isset($create_note_result['is_error']) && $create_note_result['is_error']) {
-        // don't consider this a fatal error...
-        CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s", array('domain' => 'org.project60.sepa')), $contribution['id']), ts('Error', array('domain' => 'org.project60.sepa')), 'alert');
-        error_log("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
-      }
-    }
+    //   $create_note_result = civicrm_api('Note', 'create', $create_note);
+    //   if (isset($create_note_result['is_error']) && $create_note_result['is_error']) {
+    //     // don't consider this a fatal error...
+    //     CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s", array('domain' => 'org.project60.sepa')), $contribution['id']), ts('Error', array('domain' => 'org.project60.sepa')), 'alert');
+    //     error_log("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
+    //   }
+    // }
 
     // next, create mandate
     $mandate_data = array(
