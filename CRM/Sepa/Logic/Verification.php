@@ -41,6 +41,28 @@ class CRM_Sepa_Logic_Verification {
   }
 
   /**
+   * Generates an anonymised version of the given IBAN
+   *
+   * @param $iban  string, IBAN candidate
+   *
+   * @return string anonymised IBAN
+   */
+  static function anonymiseIBAN($iban, $placeholder='X') {
+    if (empty($iban)) {
+      return $iban;
+    }
+
+    // calculate the amount of unchanged characters at the beginning and the end.
+    //   while anonymising at least 2/3 of the string
+    $reveal_count = min(4, strlen($iban) / 3);
+    $anonymised_count = strlen($iban) - 2 * $reveal_count;
+
+    // compile anonymised string
+    return substr($iban, 0, $reveal_count) . str_repeat($placeholder, $anonymised_count) . substr($iban, (strlen($iban)-$reveal_count), $reveal_count);
+  }
+
+
+  /**
    * Form rule wrapper for ::verifyIBAN
    */
   static function rule_valid_IBAN($value) {

@@ -601,6 +601,7 @@ function sepa_civicrm_tokens(&$tokens) {
     "$prefix.status"             => ts('Status', array('domain' => 'org.project60.sepa')),
     "$prefix.date"               => ts('Signature Date', array('domain' => 'org.project60.sepa')),
     "$prefix.iban"               => ts('IBAN', array('domain' => 'org.project60.sepa')),
+    "$prefix.iban_anonymised"    => ts('IBAN (anonymised)', array('domain' => 'org.project60.sepa')),
     "$prefix.bic"                => ts('BIC', array('domain' => 'org.project60.sepa')),
     
     "$prefix.amount"             => ts('Amount', array('domain' => 'org.project60.sepa')),
@@ -649,13 +650,14 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
     }
 
     // copy the mandate values
-    $values[$result->contact_id]["$prefix.reference"] = $mandate['reference'];
-    $values[$result->contact_id]["$prefix.source"]    = $mandate['source'];
-    $values[$result->contact_id]["$prefix.type"]      = $mandate['type'];
-    $values[$result->contact_id]["$prefix.status"]    = $mandate['status'];
-    $values[$result->contact_id]["$prefix.date"]      = $mandate['date'];
-    $values[$result->contact_id]["$prefix.iban"]      = $mandate['iban'];
-    $values[$result->contact_id]["$prefix.bic"]       = $mandate['bic'];
+    $values[$result->contact_id]["$prefix.reference"]       = $mandate['reference'];
+    $values[$result->contact_id]["$prefix.source"]          = $mandate['source'];
+    $values[$result->contact_id]["$prefix.type"]            = $mandate['type'];
+    $values[$result->contact_id]["$prefix.status"]          = $mandate['status'];
+    $values[$result->contact_id]["$prefix.date"]            = $mandate['date'];
+    $values[$result->contact_id]["$prefix.iban"]            = $mandate['iban'];
+    $values[$result->contact_id]["$prefix.iban_anonymised"] = CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']);
+    $values[$result->contact_id]["$prefix.bic"]             = $mandate['bic'];
 
     // load and copy the contribution information
     if ($mandate['entity_table'] == 'civicrm_contribution') {
