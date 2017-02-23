@@ -403,11 +403,205 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
   }
 
 
+
+  /**
+   * Allows you to modifiy certain mandate parameters of an active mandate:
+   *  - amount 
+   *  - campaign_id
+   *  - financial type
+   *
+   * Changes will take effect out to all future contributions,
+   *  including already created ones in status 'Pending'
+   * 
+   * @throws Exception
+   * @return success as boolean
+   * @author endres -at- systopia.de 
+   */
+  static function modifyMandate($mandate_id, $changes) {
+    // use a lock, in case somebody is batching just now
+    $lock = CRM_Sepa_Logic_Settings::getLock();
+    if (empty($lock)) {
+      throw new Exception(ts("Cannot adjust mandate [%1], batching in progress!", 
+        array(1 => $mandate_id, 'domain' => 'org.project60.sepa')));
+    }
+
+    // load the mandate
+    $mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $mandate_id));
+    if ($mandate['type'] != 'RCUR') {
+      $lock->release();
+      throw new Exception(ts("You can only modify RCUR mandates.", array('domain' => 'org.project60.sepa')));
+    }
+    $contribution_rcur = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
+
+    // collect the changes
+    $changes_subjects = array();
+    $changes_details = array();
+
+    // BANK DETAIL CHANGES (applies to the MANDATE ENTITY)
+    $bank_data_changes = array();
+    if (!empty($changes['iban']) && $changes['iban'] != $mandate['iban']) {
+      $bank_data_changes['iban'] = $changes['iban'];
+      $changes_details[] = ts("IBAN changed from '%1' to '%2'", 
+        array(1 => $mandate['iban'], 2 => $changes['iban'], 'domain' => 'org.project60.sepa'));
+    }
+    if (!empty($changes['bic']) && $changes['bic'] != $mandate['bic']) {
+      $bank_data_changes['bic'] = $changes['bic'];
+      $changes_details[] = ts("BIC changed from '%1' to '%2'", 
+        array(1 => $mandate['bic'], 2 => $changes['bic'], 'domain' => 'org.project60.sepa'));
+    }
+    if (!empty($bank_data_changes)) {
+      $bank_data_changes['id'] = $mandate['id'];
+      $changes_subjects[] = ts("Bank details changed", array('domain' => 'org.project60.sepa'));
+      civicrm_api3('SepaMandate', 'create', $bank_data_changes);
+    }
+
+    // AMOUNT CHANGE (applied to the CONTRIBUTION)
+    $contribution_changes = array();
+    if (!empty($changes['amount']) && $changes['amount'] != $contribution_rcur['amount']) {
+      if ($changes['amount'] <= 0) {
+        $lock->release();
+        throw new Exception(ts("The amount has to be positive.", array('domain' => 'org.project60.sepa')));
+      }
+
+      // record the change
+      $contribution_changes['amount'] = $changes['amount'];
+      $change_variables = array('domain' => 'org.project60.sepa',
+        1 => CRM_Utils_Money::format($contribution_rcur['amount'], $contribution_rcur['currency']),
+        2 => CRM_Utils_Money::format($changes['amount'], $contribution_rcur['currency']));
+      if ($changes['amount'] > $contribution_rcur['amount']) {
+        $changes_subjects[] = ts("Amount increased");
+        $changes_details[] = ts("Amount increased from %1 to %2", $change_variables);
+      } else {
+        $changes_subjects[] = ts("Amount decreased", $change_variables);
+        $changes_details[] = ts("Amount decreased from %1 to %2", $change_variables);
+      }
+    }
+
+    // FINANCIAL TYPE CHANGE
+    if (!empty($changes['financial_type_id']) && $changes['financial_type_id'] != $contribution_rcur['financial_type_id']) {
+      $financial_types = CRM_Contribute_PseudoConstant::financialType();
+      if (empty($financial_types[$changes['financial_type_id']])) {
+        $lock->release();
+        throw new Exception(ts("Invalid financial type ID [%1] supplied.", array(1 => $changes['financial_type_id'], 'domain' => 'org.project60.sepa')));
+      }
+      $contribution_changes['financial_type_id'] = $changes['financial_type_id'];
+      $changes_subjects[] = ts("Financial type changed", array('domain' => 'org.project60.sepa'));
+      $changes_details[] = ts("Financial type changed from '%1' to '%2'.",
+        array(1 => $financial_types[$contribution_rcur['financial_type_id']],
+              2 => $financial_types[$changes['financial_type_id']],
+              'domain' => 'org.project60.sepa'));
+    }
+
+    // CAMPAIGN CHANGE    
+    if (!empty($changes['campaign_id']) && $changes['campaign_id'] != $contribution_rcur['campaign_id']) {
+      $contribution_changes['campaign_id'] = $changes['campaign_id'];
+      $old_campaign = civicrm_api3('Campaign', 'getsingle', array('id' => $contribution_rcur['campaign_id']));
+      $new_campaign = civicrm_api3('Campaign', 'getsingle', array('id' => $changes['campaign_id']));
+      $changes_subjects[] = ts("Campaign changed", array('domain' => 'org.project60.sepa'));
+      $changes_details[] = ts("Campaign changed from '%1' [%2] to '%3' [%4].",
+        array(1 => $old_campaign['title'],
+              2 => $contribution_rcur['campaign_id'],
+              3 => $new_campaign['title'],
+              4 => $changes['campaign_id'],
+              'domain' => 'org.project60.sepa'));
+    }
+
+    if (!empty($contribution_changes)) try {
+      // change the recurring contribution 
+      $contribution_changes['id'] = $contribution_rcur['id'];
+      $contribution_changes['currency'] = $contribution_rcur['currency'];
+      civicrm_api3('ContributionRecur', 'create', $contribution_changes);
+
+      // ...AND pending associated contributions
+      $contributions2update = civicrm_api3('Contribution', 'get', array(
+        'receive_date'           => array('>=' => date('YmdHis')),
+        'contribution_recur_id'  => $contribution_rcur['id'],
+        'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+        'return'                 => 'id',
+        'option.limit'           => 0
+        ));
+
+      // save details
+      $changes_details[] = ts("%1 pending contributions were adjusted as well.",
+          array(1 => $contributions2update['count'], 'domain' => 'org.project60.sepa'));
+
+      // amount is 'total_amount' for contributions
+      if (isset($contribution_changes['amount'])) {
+        $contribution_changes['total_amount'] = $contribution_changes['amount'];
+        unset($contribution_changes['amount']);
+      }
+
+      // now update all pending contributions
+      foreach ($contributions2update['values'] as $contribution) {
+        $contribution_changes['id'] = $contribution['id'];
+        civicrm_api3('Contribution', 'create', $contribution_changes);
+      }
+    } catch (Exception $e) {
+      $lock->release();
+      throw $e;
+    }
+
+
+
+    // finally: generate acitivity
+    if (!empty($changes_details)) try {
+      if (count($changes_subjects) == 1) {
+        self::generateModificationActivity($mandate, $changes_subjects[0], $changes_details);
+      } else {
+        $subject = ts("Multiple changes", array('domain' => 'org.project60.sepa'));
+        self::generateModificationActivity($mandate, $subject, $changes_details);
+      }
+    } catch (Exception $e) {
+      $lock->release();
+      throw $e;      
+    }
+
+    $lock->release();
+    return TRUE;    
+  }
+
+
+  /**
+   * Generate a new activity
+   */
+  public static function generateModificationActivity($mandate, $subject, $detail_lines) {
+    $activity_type_id = CRM_Core_OptionGroup::getValue('activity_type', 'sdd_update', 'name');
+    if (!$activity_type_id) {
+      // create activity type
+      $activity_type = civicrm_api3('OptionValue', 'create', array(
+        'label'           => ts('SEPA Mandate Updated', array('domain' => 'org.project60.sepa')),
+        'name'            => 'sdd_update',
+        'option_group_id' => 'activity_type',
+        ));
+      $activity_type_id = CRM_Core_OptionGroup::getValue('activity_type', 'sdd_update', 'name');
+    }
+
+    $prefix = "[{$mandate['id']}] ";
+    $mandate_link = CRM_Utils_System::url("civicrm/sepa/xmandate", 'reset=1&mid=' . $mandate['id'], TRUE);
+    $mandate_ref = "<a href='$mandate_link'>{$mandate['reference']}</a>";
+    $details = ts("The following changes have been applied to SDD mandate %1:", array(1 => $mandate_ref, 'domain' => 'org.project60.sepa'));
+    $details .= "<ul><li>";
+    $details .= implode("</li><li>", $detail_lines);
+    $details .= "</li></ul>";
+
+    civicrm_api3('Activity', 'create', array(
+      'source_record_id'   => $mandate['id'],
+      'activity_type_id'   => $activity_type_id,
+      'activity_date_time' => date('YmdHis'),
+      'details'            => $details,
+      'subject'            => $prefix.$subject,
+      'status_id'          => 2, // completed
+      'source_contact_id'  => CRM_Core_Session::getLoggedInContactID(),
+      'target_id'          => $mandate['contact_id']));
+  }
+
+
   /**
    * changes the amount of a SEPA mandate
    * 
    * @return success as boolean
    * @author endres -at- systopia.de 
+   * @deprecated in favour of modifyMandate
    */
   static function adjustAmount($mandate_id, $adjusted_amount) {
     $adjusted_amount = (float) $adjusted_amount;

@@ -126,6 +126,21 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 	return $mandate;
 }
 
+/**
+ * API specs for updating mandates
+ */
+function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
+  $params['type']['api.required'] = 1;
+  $params['amount']['api.required'] = 1;
+  $params['reference']['api.required'] = 0;
+  $params['status']['api.required'] = 0;
+  $params['start_date']['api.required'] = 0;
+  $params['date']['api.required'] = 0;
+  $params['financial_type_id']['api.required'] = 0;
+  $params['campaign_id']['api.required'] = 0;
+  $params['creditor_id']['api.required'] = 0;
+}
+
 
 /**
  * Deletes an existing Mandate
@@ -157,6 +172,56 @@ function civicrm_api3_sepa_mandate_delete($params) {
 function civicrm_api3_sepa_mandate_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+
+
+/**
+ * Modify/update mandates
+ *
+ * @see https://github.com/Project60/org.project60.sepa/issues/413
+ */
+function civicrm_api3_sepa_mandate_modify($params) {
+  if (!CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
+    return civicrm_api3_create_error("Mandate modification not allowed. Check your settings.");
+  }
+
+  // look up mandate ID if only reference is given
+  if (empty($params['mandate_id']) && !empty($params['reference'])) {
+    $mandate = civicrm_api3('SepaMandate', 'get', array('reference' => $params['reference'], 'return' => 'id'));
+    if ($mandate['id']) {
+      $params['mandate_id'] = $mandate['id'];
+    } else {
+      return civicrm_api3_create_error("Couldn't identify mandate with reference '{$params['reference']}'.");
+    }
+  }
+
+  // no mandate could be identified
+  if (empty($params['mandate_id'])) {
+    return civicrm_api3_create_error("You need to provide either 'mandate_id' or 'reference'.");
+  }
+
+  try {
+    $changes = CRM_Sepa_BAO_SEPAMandate::modifyMandate($params['mandate_id'], $params);
+    return civicrm_api3_create_success($changes);
+  } catch (Exception $e) {
+    return civicrm_api3_create_error($e->getMessage());
+  }
+}
+
+/**
+ * API specs for updating mandates
+ */
+function _civicrm_api3_sepa_mandate_modify_spec(&$params) {
+  $params['mandate_id']['api.required'] = 0;
+  $params['reference']['api.required'] = 0;
+  $params['amount']['api.required'] = 0;
+  $params['iban']['api.required'] = 0;
+  $params['bic']['api.required'] = 0;
+  $params['financial_type_id']['api.required'] = 0;
+  $params['campaign_id']['api.required'] = 0;
+}
+
+
+
 
 /**
  * will add the default creditor_id if no creditor_id is given, and the default creditor is valid
