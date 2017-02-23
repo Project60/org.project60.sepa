@@ -557,7 +557,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     $lock->release();
-    return TRUE;    
+    return $changes_details;
   }
 
 
@@ -565,6 +565,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    * Generate a new activity
    */
   public static function generateModificationActivity($mandate, $subject, $detail_lines) {
+    // get / create activity type
     $activity_type_id = CRM_Core_OptionGroup::getValue('activity_type', 'sdd_update', 'name');
     if (!$activity_type_id) {
       // create activity type
@@ -576,6 +577,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $activity_type_id = CRM_Core_OptionGroup::getValue('activity_type', 'sdd_update', 'name');
     }
 
+    // compile activity
     $prefix = "[{$mandate['id']}] ";
     $mandate_link = CRM_Utils_System::url("civicrm/sepa/xmandate", 'reset=1&mid=' . $mandate['id'], TRUE);
     $mandate_ref = "<a href='$mandate_link'>{$mandate['reference']}</a>";
@@ -584,6 +586,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $details .= implode("</li><li>", $detail_lines);
     $details .= "</li></ul>";
 
+    // create activity
     civicrm_api3('Activity', 'create', array(
       'source_record_id'   => $mandate['id'],
       'activity_type_id'   => $activity_type_id,
