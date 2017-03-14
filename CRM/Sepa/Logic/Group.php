@@ -99,12 +99,10 @@ class CRM_Sepa_Logic_Group {
     // step 3: update all the contributions to status 'in progress', and set the receive_date as collection
     //  remark: don't set receive_date to collection_date any more, it confuses the RCUR batcher (see https://github.com/Project60/sepa_dd/issues/190)
     CRM_Core_DAO::executeQuery("
-      UPDATE 
-        civicrm_contribution 
-      SET 
-        contribution_status_id = $status_inprogress
-      WHERE id IN 
-        (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);");
+      UPDATE civicrm_contribution
+      LEFT JOIN civicrm_sdd_contribution_txgroup ON contribution_id = civicrm_contribution.id
+      SET contribution_status_id = $status_inprogress
+      WHERE txgroup_id = $txgroup_id;");
 
     // step 4: create the sepa file
     $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
