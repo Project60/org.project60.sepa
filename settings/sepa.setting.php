@@ -262,6 +262,17 @@ return array(
     'description' => 'Exclude weekends',
     'help_text' => 'Exclude weekends',
   ),
+  'sdd_async_batching' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'sdd_async_batching',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Enables asychronous batching',
+  ),
   'sdd_skip_closed' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
