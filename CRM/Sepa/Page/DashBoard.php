@@ -50,6 +50,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
     if (isset($_REQUEST['update'])) {
       $this->callBatcher($_REQUEST['update']);
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
     }
 
     // generate status value list
@@ -129,8 +130,11 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
    * call the batching API
    */
   function callBatcher($mode) {
-    // TODO: if setting ...
-    CRM_Sepa_Logic_Queue_Update::launchUpdateRunner($mode);
+    $async_batching = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
+    if ($async_batching) {
+      // use the runner rather that the API (this doesn't return)
+      CRM_Sepa_Logic_Queue_Update::launchUpdateRunner($mode);
+    }
 
     if ($mode=="OOFF") {
       $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => $mode));

@@ -283,6 +283,12 @@ div.sdd-add-creditor {
                 {$form.sdd_no_draft_xml.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-async-batching">
+              <td class="label">{$form.sdd_async_batching.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Support Large Groups{/ts}", {literal}{"id":"id-async-batching","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.sdd_async_batching.html}
+              </td>
+            </tr>
        </table>
        <br/>
        <h2>{ts domain="org.project60.sepa"}Payment Processor Settings{/ts}</h2>
