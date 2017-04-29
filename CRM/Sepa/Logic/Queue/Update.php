@@ -29,7 +29,7 @@ class CRM_Sepa_Logic_Queue_Update {
   protected $limit       = NULL;
 
   /**
-   * Use CRM_Queue_Runner to do the upgrade
+   * Use CRM_Queue_Runner to do the SDD group update
    * This doesn't return, but redirects to the runner
    */
   public static function launchUpdateRunner($mode) {
