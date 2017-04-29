@@ -271,6 +271,24 @@ div.sdd-add-creditor {
                 {$form.exclude_weekends.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-skip-closed">
+              <td class="label">{$form.sdd_skip_closed.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Only Completed Contributions{/ts}", {literal}{"id":"id-skip-closed","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.sdd_skip_closed.html}
+              </td>
+            </tr>
+            <tr class="crm-alternative_batching-form-block-no-draft-xml">
+              <td class="label">{$form.sdd_no_draft_xml.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}No XML Draft Files{/ts}", {literal}{"id":"id-no-draft-xml","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.sdd_no_draft_xml.html}
+              </td>
+            </tr>
+            <tr class="crm-alternative_batching-form-block-async-batching">
+              <td class="label">{$form.sdd_async_batching.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Support Large Groups{/ts}", {literal}{"id":"id-async-batching","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.sdd_async_batching.html}
+              </td>
+            </tr>
        </table>
        <br/>
        <h2>{ts domain="org.project60.sepa"}Payment Processor Settings{/ts}</h2>

@@ -50,17 +50,18 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
     if (isset($_REQUEST['update'])) {
       $this->callBatcher($_REQUEST['update']);
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
     }
 
     // generate status value list
     $status_2_title = array();
     $status_list = array(
-      'open' => array(  
+      'open' => array(
             CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name'),
-            CRM_Core_OptionGroup::getValue('batch_status', 'Reopened', 'name')), 
+            CRM_Core_OptionGroup::getValue('batch_status', 'Reopened', 'name')),
       'closed' => array(
             CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'),
-            CRM_Core_OptionGroup::getValue('batch_status', 'Exported', 'name'), 
+            CRM_Core_OptionGroup::getValue('batch_status', 'Exported', 'name'),
             CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name')));
     foreach ($status_list as $title => $values) {
       foreach ($values as $value) {
@@ -83,8 +84,8 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
     // now read the details
     $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
-        "version"       => 3, 
-        "sequential"    => 1, 
+        "version"       => 3,
+        "sequential"    => 1,
         "status_ids"    => implode(',', $status_list[$status]),
         "order_by"      => (($status=='open')?'latest_submission_date':'file.created_date'),
         ));
@@ -125,26 +126,23 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     return "CRM/Sepa/Page/DashBoard.tpl";
   }
 
+  /**
+   * call the batching API
+   */
   function callBatcher($mode) {
+    $async_batching = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
+    if ($async_batching) {
+      // use the runner rather that the API (this doesn't return)
+      CRM_Sepa_Logic_Queue_Update::launchUpdateRunner($mode);
+    }
+
     if ($mode=="OOFF") {
-      $parameters = array(
-            "version"           => 3,
-            "type"              => $mode,
-          );
-      $result = civicrm_api("SepaAlternativeBatching", "update", $parameters);
+      $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => $mode));
 
     } elseif ($mode=="RCUR") {
       // perform for FRST _and_ RCUR
-      $parameters = array(
-            "version"           => 3,
-            "type"              => 'FRST',
-          );
-      $result = civicrm_api("SepaAlternativeBatching", "update", $parameters);
-      $parameters = array(
-            "version"           => 3,
-            "type"              => 'RCUR',
-          );
-      $result = civicrm_api("SepaAlternativeBatching", "update", $parameters);
+      $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => 'FRST'));
+      $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => 'RCUR'));
 
     } else {
       CRM_Core_Session::setStatus(sprintf(ts("Unknown batcher mode '%s'. No batching triggered.", array('domain' => 'org.project60.sepa')), $mode), ts('Error', array('domain' => 'org.project60.sepa')), 'error');

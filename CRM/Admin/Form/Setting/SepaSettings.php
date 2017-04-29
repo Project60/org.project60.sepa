@@ -122,6 +122,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $country_ids = array('' => ts('- select -', array('domain' => 'org.project60.sepa'))) + $filtered;
 
         // look up some values
+        $async_batch = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
+        $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
+        $no_draftxml = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_no_draft_xml');
         $excld_we = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
         $hide_bic = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_bic');
         $hide_bil = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_billing');
@@ -139,6 +142,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version", array('domain' => 'org.project60.sepa')), array('' => ts('- select -', array('domain' => 'org.project60.sepa'))) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor", array('domain' => 'org.project60.sepa')), "", array('value' =>'0'));
         $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends", array('domain' => 'org.project60.sepa')), "", ($excld_we?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'sdd_async_batching',       ts("Large Groups", array('domain' => 'org.project60.sepa')), "", ($async_batch?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'sdd_skip_closed',          ts("Only Completed Contributions", array('domain' => 'org.project60.sepa')), "", ($skip_closed?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'sdd_no_draft_xml',         ts("No XML drafts", array('domain' => 'org.project60.sepa')), "", ($no_draftxml?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'pp_hide_bic',              ts("Hide BIC in PP", array('domain' => 'org.project60.sepa')),   "", ($hide_bic?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'pp_hide_billing',          ts("Hide Billing in PP", array('domain' => 'org.project60.sepa')),   "", ($hide_bil?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'pp_improve_frequency',     ts("Improve payment processor form", array('domain' => 'org.project60.sepa')),   "", ($mendForm?array('checked'=>'checked'):array()));
@@ -214,6 +220,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         CRM_Core_BAO_Setting::setItem($allow_mandate_modification, 'SEPA Direct Debit Preferences', 'allow_mandate_modification');
 
         CRM_Core_BAO_Setting::setItem((isset($values['exclude_weekends'])     ? "1" : "0"), 'SEPA Direct Debit Preferences', 'exclude_weekends');
+        CRM_Core_BAO_Setting::setItem((isset($values['sdd_async_batching'])   ? "1" : "0"), 'SEPA Direct Debit Preferences', 'sdd_async_batching');
+        CRM_Core_BAO_Setting::setItem((isset($values['sdd_skip_closed'])      ? "1" : "0"), 'SEPA Direct Debit Preferences', 'sdd_skip_closed');
+        CRM_Core_BAO_Setting::setItem((isset($values['sdd_no_draft_xml'])     ? "1" : "0"), 'SEPA Direct Debit Preferences', 'sdd_no_draft_xml');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_bic'])          ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_bic');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_billing'])      ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_billing');
         CRM_Core_BAO_Setting::setItem((isset($values['pp_improve_frequency']) ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_improve_frequency');

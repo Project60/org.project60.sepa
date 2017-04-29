@@ -92,7 +92,7 @@
     <p>{ts domain="org.project60.sepa"}Some banks reject SDD groups with a collection date that doesn't happen to be a bank day, for example a week end.{/ts}</p>
     <p>{ts domain="org.project60.sepa"}If you activate this option, the collection date will be automatically deferred to the following Monday.{/ts}</p>
     <p>{ts domain="org.project60.sepa"}Be aware that an active <code>defer_collection_date</code> hook can further defer the collection date.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook.{/ts}</p> 
+    <p>{ts domain="org.project60.sepa"}Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook.{/ts}</p>
 {/htxt}
 
 {htxt id='id-hide-billing'}
@@ -104,7 +104,7 @@
     <p>{ts domain="org.project60.sepa"}Currently this SDD extension requires not only the IBAN but also the BIC (bank code).{/ts}</p>
     <p>{ts domain="org.project60.sepa"}If you have the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> installed, the BIC can be derived automatically from the IBAN in most cases.{/ts}</p>
     <p>{ts domain="org.project60.sepa"}If you enable this option, the BIC will be hidden unless this lookup fails. Then the donor would be required to enter the BIC after all.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}REMARK: This option only has an effect, if the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> is installed.{/ts}</p> 
+    <p>{ts domain="org.project60.sepa"}REMARK: This option only has an effect, if the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> is installed.{/ts}</p>
 {/htxt}
 
 {htxt id='id-improve-frequency'}
@@ -113,4 +113,19 @@
 
 {htxt id='id-buffer-days'}
     <p>{ts domain="org.project60.sepa"}Define the number of days that the donation page leaves you to submit recurring donations in time.{/ts}</p>
+{/htxt}
+
+{htxt id='id-skip-closed'}
+    <p>{ts domain="org.project60.sepa"}If you enable this option, SEPA groups will not be 'closed' and then later marked as 'received', but skip the 'closed' step.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}As a consequence contributions would skip status 'in Progress' as well and be put to 'Completed' right away.{/ts}</p>
+{/htxt}
+
+{htxt id='id-no-draft-xml'}
+    <p>{ts domain="org.project60.sepa"}If you enable this option, You cannot download an XML file before you actually closed the SEPA group.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}This should help prevent the problem of forgetting to close the group after upload - at the cost of you no being able to change the group if the bank rejects it.{/ts}</p>
+{/htxt}
+
+{htxt id='id-async-batching'}
+    <p>{ts domain="org.project60.sepa"}If you have large amounts of mandates or large SDD groups, you might be at risk of a timeout error during the batching/closing process.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}This option will activate a runner page with a progress bar for these critical processes. There shouldn't be any timeouts, but you have to keep that open until it's done.{/ts}</p>
 {/htxt}

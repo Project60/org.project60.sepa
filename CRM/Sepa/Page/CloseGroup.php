@@ -49,8 +49,13 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
           if (isset($creditor['is_error']) && $creditor['is_error']) {
             CRM_Core_Session::setStatus("Cannot load creditor.<br/>Error was: ".$creditor['error_message'], ts('Error', array('domain' => 'org.project60.sepa')), 'error');
           }else{
+              // check for test group
               $isTestGroup = isset($creditor['category']) && ($creditor['category'] == "TEST");
               $this->assign('is_test_group', $isTestGroup);
+
+              // check if this is allowed
+              $no_draftxml = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_no_draft_xml');
+              $this->assign('allow_xml', !$no_draftxml);
 
               if ($_REQUEST['status'] == "") {
                 // first adjust group's collection date if requested
@@ -74,22 +79,31 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
                   }
                 }
 
-                $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$group_id, 'override'=>True, 'version'=>3));
-                if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
-                  CRM_Core_Session::setStatus("Cannot load for group #".$group_id.".<br/>Error was: ".$xmlfile['error_message'], ts('Error', array('domain' => 'org.project60.sepa')), 'error');
-                }else{
-                  $file_id = $xmlfile['id'];
-                  $this->assign('file_link', CRM_Utils_System::url('civicrm/sepa/xml', "id=$file_id"));
-                  $this->assign('file_name', $xmlfile['filename']);
-                }
+                $this->createDownloadLink($group_id);
               }
 
               if ($_REQUEST['status'] == "closed" && !$isTestGroup) {
                 // CLOSE THE GROUP:
+                $async_batch = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
+                if ($async_batch) {
+                  // call the closing runner
+                  $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
+                  if ($skip_closed) {
+                    $target_contribution_status = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+                    $target_group_status = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name');
+                  } else {
+                    $target_contribution_status = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
+                    $target_group_status = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
+                  }
+                  // this call doesn't return (redirect to runner)
+                  CRM_Sepa_Logic_Queue_Close::launchCloseRunner(array($group_id), $target_group_status, $target_contribution_status);
+                }
+
                 $result = civicrm_api('SepaAlternativeBatching', 'close', array('version'=>3, 'txgroup_id'=>$group_id));
                 if ($result['is_error']) {
                   CRM_Core_Session::setStatus("Cannot close group #$group_id.<br/>Error was: ".$result['error_message'], ts('Error', array('domain' => 'org.project60.sepa')), 'error');
                 }
+                $this->createDownloadLink($group_id);
               }
           }
           
@@ -99,4 +113,17 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
     parent::run();
   }
 
+  /**
+   * generate an XML download link and assign to the template
+   */
+  protected function createDownloadLink($group_id) {
+    $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$group_id, 'override'=>True, 'version'=>3));
+    if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
+      CRM_Core_Session::setStatus("Cannot load for group #".$group_id.".<br/>Error was: ".$xmlfile['error_message'], ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+    }else{
+      $file_id = $xmlfile['id'];
+      $this->assign('file_link', CRM_Utils_System::url('civicrm/sepa/xml', "id=$file_id"));
+      $this->assign('file_name', $xmlfile['filename']);
+    }
+  }
 }
