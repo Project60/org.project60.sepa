@@ -258,5 +258,35 @@ class CRM_Sepa_Logic_Group {
     }
 
     $lock->release();
-  }  
+  }
+
+
+  /**
+   * Do some generic group cleanup:
+   * 1) remove stale entries from groups (i.e. contribution doesn't exist any more)
+   * 2) delete empty groups
+   */
+  public static function cleanup($mode) {
+    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
+    if (empty($group_status_id_open)) return;
+
+    // CLEANUP: remove nonexisting contributions from groups
+    CRM_Core_DAO::executeQuery("
+      DELETE FROM civicrm_sdd_contribution_txgroup
+      WHERE contribution_id NOT IN (SELECT id FROM civicrm_contribution);");
+
+    // CLEANUP: delete empty groups
+    $empty_group_query = CRM_Core_DAO::executeQuery("
+      SELECT id AS group_id
+      FROM civicrm_sdd_txgroup
+      WHERE type = '{$mode}'
+        AND status_id = {$group_status_id_open}
+        AND id NOT IN (SELECT txgroup_id FROM civicrm_sdd_contribution_txgroup);");
+    while ($empty_group_query->fetch()) {
+      // delete group
+      $group_id = $empty_group_query->group_id;
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id={$group_id};");
+      $result = civicrm_api3('SepaTransactionGroup', 'delete', array('id' => $group_id));
+    }
+  }
 }
