@@ -14,7 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-define('SDD_CLOSE_RUNNER_BATCH_SIZE', 500);
+define('SDD_CLOSE_RUNNER_BATCH_SIZE', 250);
 
 
 /**
@@ -55,7 +55,7 @@ class CRM_Sepa_Logic_Queue_Close {
 
       // count the contributions and create an appropriate amount of items
       $contribution_count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(contribution_id) FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id={$txgroup['id']}");
-      $contribution_count += 250; // security margin
+      $contribution_count += SDD_CLOSE_RUNNER_BATCH_SIZE; // security margin
       for ($offset=0; $offset <= $contribution_count; $offset+=SDD_CLOSE_RUNNER_BATCH_SIZE) {
         $queue->createItem(new CRM_Sepa_Logic_Queue_Close('update_contribution', $txgroup, $target_contribution_status, $offset));
       }
@@ -164,7 +164,7 @@ class CRM_Sepa_Logic_Queue_Close {
           civicrm_contribution.contribution_status_id AS contribution_status_id
         FROM civicrm_sdd_contribution_txgroup
         LEFT JOIN civicrm_contribution       ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
-        LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution'
+        LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution'
         WHERE civicrm_sdd_contribution_txgroup.txgroup_id = %1
           AND (civicrm_contribution.contribution_status_id = %2 OR civicrm_contribution.contribution_status_id = %3)
           LIMIT %4", array(
