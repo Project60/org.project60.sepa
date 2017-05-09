@@ -242,4 +242,69 @@ class CRM_Sepa_Logic_Settings {
       return FALSE;
     }
   }
+
+  /**
+   * Acquire async lock
+   *
+   * This is a mutex that can be kept over various processes,
+   * Caution: this is not completely thread-safe
+   *
+   * @param $name    lock name
+   * @param $timeout lock timeout in seconds
+   * @param $renew   TRUE if you want to renew the lock (make sure it's yours!)
+   * @return TRUE if lock could be acquired
+   */
+  public static function acquireAsyncLock($name, $timeout, $renew = FALSE) {
+    $now = time();
+    $locks = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    if (!is_array($locks)) {
+      // data invalid -> reset
+      $locks = array();
+    }
+    if (!$renew && !empty($locks[$name])) {
+      $lock_valid_until = $locks[$name];
+      if ($lock_valid_until > $now) {
+        // CURRENT LOCK STILL VALID
+        return FALSE;
+      }
+    }
+    // NO (VALID) LOCK
+    $locks[$name] = $now + $timeout;
+    CRM_Core_BAO_Setting::setItem($locks, 'SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    return TRUE;
+  }
+
+  /**
+   * Renew async lock (make sure it's yours!)
+   *
+   * This is a mutex that can be kept over various processes,
+   * Caution: this is not completely thread-safe
+   *
+   * @param $name    lock name
+   * @param $timeout lock timeout in seconds
+   */
+  public static function renewAsyncLock($name, $timeout) {
+    return self::acquireAsyncLock($name, $timeout, TRUE);
+  }
+
+  /**
+   * Release a async lock.
+   *  This method does NOT check whether you acquired the lock in the first place!!
+   *
+   * Caution: this is not completely thread-safe
+   *
+   * @return TRUE if lock could be acquired
+   */
+  public static function releaseAsyncLock($name) {
+    $locks = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    if (!is_array($locks)) {
+      // data invalid -> reset
+      $locks = array();
+    }
+    if (in_array($name, $locks)) {
+      unset($locks[$name]);
+    }
+    CRM_Core_BAO_Setting::setItem($locks, 'SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+  }
+
 }

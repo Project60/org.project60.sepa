@@ -15,6 +15,7 @@
 +--------------------------------------------------------*/
 
 define('SDD_UPDATE_RUNNER_BATCH_SIZE', 250);
+define('SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT', 600);
 
 
 /**
@@ -34,6 +35,12 @@ class CRM_Sepa_Logic_Queue_Update {
    * This doesn't return, but redirects to the runner
    */
   public static function launchUpdateRunner($mode) {
+    if (!CRM_Sepa_Logic_Settings::acquireAsyncLock('sdd_async_update_lock', SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT)) {
+      CRM_Core_Session::setStatus(ts("Cannot run update, another update is in progress!", array('domain' => 'org.project60.sepa')), ts('Error'), 'error');
+      $redirect_url = CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active');
+      CRM_Utils_System::redirect($redirect_url);
+      return; // shouldn't be necessary
+    }
     // create a queue
     $queue = CRM_Queue_Service::singleton()->create(array(
       'type'  => 'Sql',
@@ -102,6 +109,7 @@ class CRM_Sepa_Logic_Queue_Update {
     switch ($this->cmd) {
       case 'CLOSE':
         CRM_Sepa_Logic_Batching::closeEnded();
+        CRM_Sepa_Logic_Settings::renewAsyncLock('sdd_async_update_lock', SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT);
         break;
 
       case 'UPDATE':
@@ -110,10 +118,12 @@ class CRM_Sepa_Logic_Queue_Update {
         } else {
           CRM_Sepa_Logic_Batching::updateRCUR($this->creditor_id, $this->mode, 'now', $this->offset, $this->limit);
         }
+        CRM_Sepa_Logic_Settings::renewAsyncLock('sdd_async_update_lock', SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT);
         break;
 
       case 'CLEANUP':
         CRM_Sepa_Logic_Group::cleanup($this->mode);
+        CRM_Sepa_Logic_Settings::releaseAsyncLock('sdd_async_update_lock');
         break;
 
       default:
