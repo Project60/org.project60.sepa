@@ -46,7 +46,8 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     $this->assign("batch_recur", CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=RCUR'));
 
     // check permissions
-    $this->assign('can_delete', CRM_Core_Permission::check('administer CiviCRM'));
+    $this->assign('can_delete', CRM_Core_Permission::check('delete sepa groups'));
+    $this->assign('can_batch',  CRM_Core_Permission::check('batch sepa groups'));
 
     if (isset($_REQUEST['update'])) {
       $this->callBatcher($_REQUEST['update']);

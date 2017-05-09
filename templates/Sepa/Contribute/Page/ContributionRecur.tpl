@@ -31,13 +31,15 @@
             <tr><td class="label">{ts domain="org.project60.sepa"}1st contribution{/ts}</td><td><a href="{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=view&id=$fcid&cid=$cid"}">{$sepa.first_contribution_id}</a></td></tr>
         </table>
     </div>
-</div>    
- 
+</div>
+
+{if $can_edit_mandate}
 <div class="crm-submit-buttons">
     <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Clone{/ts}</span></a-->
 
     <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts domain="org.project60.sepa"}Mandate Options{/ts}</span></a>
 </div>
+{/if}
 
 <!--div class="crm-submit-buttons">
     <form action="{crmURL p='civicrm/sepa/pdf' q="reset=1&id=$mid"}" amethod="post">
