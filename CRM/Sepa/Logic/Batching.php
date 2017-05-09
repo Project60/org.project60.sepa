@@ -213,7 +213,7 @@ class CRM_Sepa_Logic_Batching {
     }
 
     // step 6: sync calculated group structure with existing (open) groups
-    self::syncGroups($mandates_by_nextdate, $existing_groups, $mode, 'RCUR', $rcur_notice, $creditor_id);
+    self::syncGroups($mandates_by_nextdate, $existing_groups, $mode, 'RCUR', $rcur_notice, $creditor_id, $offset!==NULL, $offset===0);
 
     $lock->release();
   }
@@ -315,7 +315,7 @@ class CRM_Sepa_Logic_Batching {
     }
 
     // step 4: sync calculated group structure with existing (open) groups
-    self::syncGroups($calculated_groups, $existing_groups, 'OOFF', 'OOFF', $ooff_notice, $creditor_id, ($offset===NULL));
+    self::syncGroups($calculated_groups, $existing_groups, 'OOFF', 'OOFF', $ooff_notice, $creditor_id, $offset!==NULL, $offset===0);
 
     $lock->release();
   }
@@ -403,9 +403,10 @@ class CRM_Sepa_Logic_Batching {
    * @param $type               SEPA type (RCUR, FRST)
    * @param $notice             notice days
    * @param $creditor_id        SDD creditor ID
-   * @param $groups_complete    are the calculated groups complete or just partial
+   * @param $partial_groups     Is this a partial update?
+   * @param $partial_first      Is this the first call in a partial update?
    */
-  protected static function syncGroups($calculated_groups, $existing_groups, $mode, $type, $notice, $creditor_id, $groups_complete = TRUE) {
+  protected static function syncGroups($calculated_groups, $existing_groups, $mode, $type, $notice, $creditor_id, $partial_groups=FALSE, $partial_first=FALSE) {
     $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
 
     foreach ($calculated_groups as $collection_date => $mandates) {
@@ -488,12 +489,12 @@ class CRM_Sepa_Logic_Batching {
 
       // remove all the unwanted entries from our group
       $entity_ids_list = implode(',', $entity_ids);
-      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id NOT IN ($entity_ids_list);");
+      if (!$partial_groups || $partial_first) {
+        CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id NOT IN ($entity_ids_list);");
+      }
 
       // remove all our entries from other groups, if necessary
-      if ($groups_complete) {
-        CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id!=$group_id AND contribution_id IN ($entity_ids_list);");
-      }
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id!=$group_id AND contribution_id IN ($entity_ids_list);");
 
       // now check which ones are already in our group...
       $existing = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id IN ($entity_ids_list);");
@@ -510,33 +511,9 @@ class CRM_Sepa_Logic_Batching {
       }
     }
 
-    // CLEANUP: remove nonexisting contributions from groups
-    CRM_Core_DAO::executeQuery("
-      DELETE FROM civicrm_sdd_contribution_txgroup
-      WHERE contribution_id NOT IN (SELECT id FROM civicrm_contribution);");
-
-    // CLEANUP: delete empty groups
-    $empty_group_query = CRM_Core_DAO::executeQuery("
-      SELECT id, sdd_file_id
-      FROM civicrm_sdd_txgroup
-      WHERE type = '$mode'
-        AND status_id = $group_status_id_open
-        AND id NOT IN (SELECT txgroup_id FROM civicrm_sdd_contribution_txgroup);");
-    while ($empty_group_query->fetch()) {
-      if (!in_array($empty_group_query->id, $existing_groups))
-        array_push($existing_groups, $empty_group_query->id);
-      if ($empty_group_query->sdd_file_id) {
-        error_log("org.project60.sepa: WARNING: txgroup ".$empty_group_query->id." should be deleted, but already has a file. Trouble ahead.");
-      }
-    }
-
-    // now, use the API to delete all these groups
-    foreach ($existing_groups as $group_id) {
-      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id;");
-      $result = civicrm_api('SepaTransactionGroup', 'delete', array('version' => 3, 'id' => $group_id));
-      if (isset($result['is_error']) && $result['is_error']) {
-        error_log("org.project60.sepa: Cannot delete txgroup ".$group_id.". Error was ".$result['error_message']);
-      }
+    if (!$partial_groups) {
+      // do some cleanup
+      CRM_Sepa_Logic_Group::cleanup($mode);
     }
   }
 
