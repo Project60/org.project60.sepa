@@ -49,6 +49,7 @@ class CRM_Sepa_Logic_Queue_Update {
     ));
 
     // first thing: close outdated groups
+    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('PREPARE', $mode));
     $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLOSE', $mode));
 
     // then iterate through all creditors
@@ -64,6 +65,8 @@ class CRM_Sepa_Logic_Queue_Update {
         $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLEANUP', $sdd_mode));
       }
     }
+
+    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('FINISH', $mode));
 
     // create a runner and launch it
     $runner = new CRM_Queue_Runner(array(
@@ -86,6 +89,10 @@ class CRM_Sepa_Logic_Queue_Update {
 
     // set title
     switch ($this->cmd) {
+      case 'PREPARE':
+        $this->title = ts("Preparing to clean up ended mandates", array('domain' => 'org.project60.sepa'));
+        break;
+
       case 'CLOSE':
         $this->title = ts("Cleaning up ended mandates", array('domain' => 'org.project60.sepa'));
         break;
@@ -100,6 +107,10 @@ class CRM_Sepa_Logic_Queue_Update {
           array(1 => $this->offset, 2 => $this->offset+$this->limit, 'domain' => 'org.project60.sepa'));
         break;
 
+      case 'FINISH':
+        $this->title = ts("Lock released", array('domain' => 'org.project60.sepa'));
+        break;
+
       default:
         $this->title = "Unknown";
       }
@@ -107,6 +118,10 @@ class CRM_Sepa_Logic_Queue_Update {
 
   public function run($context) {
     switch ($this->cmd) {
+      case 'PREPARE':
+        // nothing to do
+        break;
+
       case 'CLOSE':
         CRM_Sepa_Logic_Batching::closeEnded();
         CRM_Sepa_Logic_Settings::renewAsyncLock('sdd_async_update_lock', SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT);
@@ -123,7 +138,12 @@ class CRM_Sepa_Logic_Queue_Update {
 
       case 'CLEANUP':
         CRM_Sepa_Logic_Group::cleanup($this->mode);
+        break;
+
+      case 'FINISH':
+        error_log("RELEASE LOCK");
         CRM_Sepa_Logic_Settings::releaseAsyncLock('sdd_async_update_lock');
+        error_log("RELEASED LOCK");
         break;
 
       default:
