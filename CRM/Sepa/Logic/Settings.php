@@ -301,9 +301,7 @@ class CRM_Sepa_Logic_Settings {
       // data invalid -> reset
       $locks = array();
     }
-    if (in_array($name, $locks)) {
-      $locks[$name] = 0;
-    }
+    $locks[$name] = 0;
     CRM_Core_BAO_Setting::setItem($locks, 'SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
   }
 
