@@ -68,7 +68,7 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
       throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
     }
     $template->assign("file",$this->toArray());
-    $template->assign("total", number_format($total, 2, '.', ''); // SEPA-432: two-digit decimals
+    $template->assign("total", number_format($total, 2, '.', '')); // SEPA-432: two-digit decimals
     $template->assign("nbtransactions",$nbtransactions);
     $head = $template->fetch('CRM/Sepa/xml/file_header.tpl');
     $footer = $template->fetch('CRM/Sepa/xml/file_footer.tpl');
