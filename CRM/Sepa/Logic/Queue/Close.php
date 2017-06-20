@@ -272,7 +272,7 @@ class CRM_Sepa_Logic_Queue_Close {
     }
     if ($this->target_status_id == $status_inProgress) {
       // this status cannot be set via the API -> use SQL
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN {$contribution_id_list};");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN ({$contribution_id_list});");
 
     } else {
       // this should be status 'Completed', but it doesn't really matter
