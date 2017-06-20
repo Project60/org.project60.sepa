@@ -264,7 +264,12 @@ class CRM_Sepa_Logic_Queue_Close {
    * Update the status of all given contributions to $this->target_status_id
    */
   protected function updateContributionStatus($contributions) {
+    $contribution_id_list = implode(',', array_keys($contributions));
     $status_inProgress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
+    if (empty($contribution_id_list)) {
+      // this would cause SQL errors
+      return;
+    }
     if ($this->target_status_id == $status_inProgress) {
       // this status cannot be set via the API -> use SQL
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN {$contribution_id_list};");
