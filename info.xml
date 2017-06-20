@@ -8,8 +8,8 @@
     <author>B. Endres</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate>2017-04-29</releaseDate>
-  <version>1.2.5.gpdev-6c823f8</version>
+  <releaseDate>2017-06-20</releaseDate>
+  <version>1.2.5.gpdev-949c4dd</version>
   <develStage>dev</develStage>
   <compatibility>
     <ver>4.6</ver>
