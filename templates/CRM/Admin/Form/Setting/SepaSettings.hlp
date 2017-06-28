@@ -124,3 +124,8 @@
     <p>{ts domain="org.project60.sepa"}If you enable this option, You cannot download an XML file before you actually closed the SEPA group.{/ts}</p>
     <p>{ts domain="org.project60.sepa"}This should help prevent the problem of forgetting to close the group after upload - at the cost of you no being able to change the group if the bank rejects it.{/ts}</p>
 {/htxt}
+
+{htxt id='id-async-batching'}
+    <p>{ts domain="org.project60.sepa"}If you have large amounts of mandates or large SDD groups, you might be at risk of a timeout error during the batching/closing process.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}This option will activate a runner page with a progress bar for these critical processes. There shouldn't be any timeouts, but you have to keep that open until it's done.{/ts}</p>
+{/htxt}

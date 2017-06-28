@@ -22,10 +22,10 @@ class CRM_Sepa_Logic_Settings {
 
   /**
    * Get a SEPA setting.
-   * We have extended the system used in CRM_Core_BAO_Setting by 
+   * We have extended the system used in CRM_Core_BAO_Setting by
    * an override mechanism, so creditors can indivudally have
    * different values than the default
-   * 
+   *
    * @return string
    */
   static function getSetting($param_name, $creditor_id=NULL) {
@@ -75,7 +75,7 @@ class CRM_Sepa_Logic_Settings {
    * Get a SEPA setting as a list
    *
    * @see self::getSetting
-   * 
+   *
    * @return string
    */
   static function getListSetting($param_name, $default, $creditor_id=NULL) {
@@ -86,7 +86,7 @@ class CRM_Sepa_Logic_Settings {
       $list = split(',', $value);
     }
 
-    // make it into an associative array (for dropdown elements) 
+    // make it into an associative array (for dropdown elements)
     $result = array();
     foreach ($list as $item) {
       $result[$item] = $item;
@@ -97,10 +97,10 @@ class CRM_Sepa_Logic_Settings {
 
   /**
    * Set SEPA a setting.
-   * We have extended the system used in CRM_Core_BAO_Setting by 
+   * We have extended the system used in CRM_Core_BAO_Setting by
    * an override mechanism, so creditors can indivudally have
    * different values than the default
-   * 
+   *
    * @param string
    */
   static function setSetting($param_name, $value, $creditor_id=NULL) {
@@ -128,7 +128,7 @@ class CRM_Sepa_Logic_Settings {
    * This works for contribution and contribution_recur entities
    *
    * It simply checks, whether the contribution uses a SEPA payment instrument
-   *  
+   *
    * @param $contribution   an array with the attributes of the contribution
    *
    * @return true if the contribution is a SEPA contribution
@@ -156,7 +156,7 @@ class CRM_Sepa_Logic_Settings {
     $contribution_id = (int) $contribution_id;
     if (empty($contribution_id)) return $mandates;
     $sql_query = "
-    SELECT 
+    SELECT
       ooff.id AS ooff_id, ooff.type AS ooff_type, ooff.status AS ooff_status,
       rcur.id AS rcur_id, rcur.type AS rcur_type, rcur.status AS rcur_status
     FROM civicrm_contribution
@@ -168,14 +168,14 @@ class CRM_Sepa_Logic_Settings {
     while ($mandate_ids->fetch()) {
       if ($mandate_ids->ooff_id) {
         $mandates[$mandate_ids->ooff_id] = 'OOFF';
-      } 
+      }
       if ($mandate_ids->rcur_id) {
         if ($mandate_ids->rcur_status == 'FRST') {
           $mandates[$mandate_ids->rcur_id] = 'FRST';
         } else {
           $mandates[$mandate_ids->rcur_id] = 'RCUR';
         }
-      } 
+      }
     }
     return $mandates;
   }
@@ -183,10 +183,10 @@ class CRM_Sepa_Logic_Settings {
 
   /**
    * Get a batching lock
-   * 
-   * the lock is needed so that only one relevant process can access the 
+   *
+   * the lock is needed so that only one relevant process can access the
    * SEPA data structures at a time
-   * 
+   *
    * @return CRM_Utils_SepaSafeLock object, or NULL if acquisition timed out
    */
   static function getLock() {
@@ -198,7 +198,7 @@ class CRM_Sepa_Logic_Settings {
   /**
    * Reads the default creditor from the settings
    * Will only return a creditor if it exists and if it's active
-   * 
+   *
    * @return CRM_Sepa_BAO_SEPACreditor object or NULL
    */
   static function defaultCreditor() {
@@ -231,7 +231,7 @@ class CRM_Sepa_Logic_Settings {
 
   /**
    * Will check if the "Little BIC Extension" is accessible in the current user context
-   * 
+   *
    * @return bool TRUE if it is
    */
   public static function isLittleBicExtensionAccessible() {
@@ -242,4 +242,67 @@ class CRM_Sepa_Logic_Settings {
       return FALSE;
     }
   }
+
+  /**
+   * Acquire async lock
+   *
+   * This is a mutex that can be kept over various processes,
+   * Caution: this is not completely thread-safe
+   *
+   * @param $name    lock name
+   * @param $timeout lock timeout in seconds
+   * @param $renew   TRUE if you want to renew the lock (make sure it's yours!)
+   * @return TRUE if lock could be acquired
+   */
+  public static function acquireAsyncLock($name, $timeout, $renew = FALSE) {
+    $now = time();
+    $locks = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    if (!is_array($locks)) {
+      // data invalid -> reset
+      $locks = array();
+    }
+    if (!$renew && !empty($locks[$name])) {
+      $lock_valid_until = $locks[$name];
+      if ($lock_valid_until > $now) {
+        // CURRENT LOCK STILL VALID
+        return FALSE;
+      }
+    }
+    // NO (VALID) LOCK
+    $locks[$name] = $now + $timeout;
+    CRM_Core_BAO_Setting::setItem($locks, 'SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    return TRUE;
+  }
+
+  /**
+   * Renew async lock (make sure it's yours!)
+   *
+   * This is a mutex that can be kept over various processes,
+   * Caution: this is not completely thread-safe
+   *
+   * @param $name    lock name
+   * @param $timeout lock timeout in seconds
+   */
+  public static function renewAsyncLock($name, $timeout) {
+    return self::acquireAsyncLock($name, $timeout, TRUE);
+  }
+
+  /**
+   * Release a async lock.
+   *  This method does NOT check whether you acquired the lock in the first place!!
+   *
+   * Caution: this is not completely thread-safe
+   *
+   * @return TRUE if lock could be acquired
+   */
+  public static function releaseAsyncLock($name) {
+    $locks = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    if (!is_array($locks)) {
+      // data invalid -> reset
+      $locks = array();
+    }
+    $locks[$name] = 0;
+    CRM_Core_BAO_Setting::setItem($locks, 'SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+  }
+
 }

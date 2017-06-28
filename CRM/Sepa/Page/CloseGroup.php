@@ -84,6 +84,21 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
               if ($_REQUEST['status'] == "closed" && !$isTestGroup) {
                 // CLOSE THE GROUP:
+                $async_batch = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
+                if ($async_batch) {
+                  // call the closing runner
+                  $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
+                  if ($skip_closed) {
+                    $target_contribution_status = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+                    $target_group_status = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name');
+                  } else {
+                    $target_contribution_status = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
+                    $target_group_status = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
+                  }
+                  // this call doesn't return (redirect to runner)
+                  CRM_Sepa_Logic_Queue_Close::launchCloseRunner(array($group_id), $target_group_status, $target_contribution_status);
+                }
+
                 $result = civicrm_api('SepaAlternativeBatching', 'close', array('version'=>3, 'txgroup_id'=>$group_id));
                 if ($result['is_error']) {
                   CRM_Core_Session::setStatus("Cannot close group #$group_id.<br/>Error was: ".$result['error_message'], ts('Error', array('domain' => 'org.project60.sepa')), 'error');
