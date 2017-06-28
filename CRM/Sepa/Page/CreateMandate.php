@@ -236,7 +236,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // look up account in other SEPA mandates
     $known_accounts = array();
-    $query_sql = "SELECT DISTINCT iban, bic FROM civicrm_sdd_mandate WHERE contact_id=$contact_id AND (creation_date >= (NOW() - INTERVAL 60 DAY));";
+    $query_sql = "SELECT DISTINCT iban, bic FROM civicrm_sdd_mandate WHERE contact_id=$contact_id ORDER BY creation_date DESC;";
     $old_mandates = CRM_Core_DAO::executeQuery($query_sql);
     while ($old_mandates->fetch()) {
       $value = $old_mandates->iban.'/'.$old_mandates->bic;
