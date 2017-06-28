@@ -20,7 +20,12 @@
 			<font size="+1">{ts domain="org.project60.sepa"}Group '%s' <b>is now closed</b> and cannot be changed any more.{/ts}</font>
 			{/capture}
 			<p>{$group_text|sprintf:$txgroup.reference}</p>
-			<p>{ts domain="org.project60.sepa"}The money should be on its way{/ts}</p>
+			{if $allow_xml}
+				<p><font size="+0.5">{ts domain="org.project60.sepa"}The money should be on its way{/ts}</font></p>
+			{else}
+				<p><font size="+0.5">{ts domain="org.project60.sepa"}Download Link:{/ts}&nbsp;<a href="{$file_link}" download="{$file_name}">{$file_name}</a></font></p>
+			{/if}
+
 		{elseif $status eq "invalid"}
 			{capture assign=settings_url}{crmURL p="civicrm/admin/setting/sepa"}{/capture}
 			<p>{ts domain="org.project60.sepa"}Sorry to hear that the bank has rejected your payment XML file.{/ts}</p>
@@ -37,20 +42,33 @@
 			<p>{ts domain="org.project60.sepa"}As a workaround, we can adjust the collection date, so that you can still submit the file today. <strong>Today! <font color="red">NOW!</font></strong>{/ts}</p>
 			<p>{ts domain="org.project60.sepa"}However, the bank might still reject the file, since this is an illegal deviation from your announced collection date. Try to avoid this in the future!{/ts}</p>
 		{else}
-			<p><font size="+0.5">{ts domain="org.project60.sepa"}Download Link:{/ts}&nbsp;<a href="{$file_link}" download="{$file_name}">{$file_name}</a></font></p>
+			{if $allow_xml}
+				<p><font size="+0.5">{ts domain="org.project60.sepa"}Download Link:{/ts}&nbsp;<a href="{$file_link}" download="{$file_name}">{$file_name}</a></font></p>
 
-			<p id="closed_group_instruction_text">
-				{ts domain="org.project60.sepa"}<b>In order to collect these payments, you have to do the following:</b>{/ts}
-				<ol>
-					<li>{ts domain="org.project60.sepa"}Download the file via the above link{/ts}</li>
-					<li>{ts domain="org.project60.sepa"}Submit that file to your bank{/ts}</li>
-					<li>{ts domain="org.project60.sepa"}Select one of the options below{/ts}</li>
-				</ol>
-				{ts domain="org.project60.sepa"}<b>Do it now! No money will be transferred until the file has been submitted successfully.</b>{/ts}
-			</p>
-			{if $is_test_group}
-			<span style="color:#ff0000;font-size:150%;">{ts domain="org.project60.sepa"}This is a test group. You can not close it.{/ts}</span>
+				<p id="closed_group_instruction_text">
+					{ts domain="org.project60.sepa"}<b>In order to collect these payments, you have to do the following:</b>{/ts}
+					<ol>
+						<li>{ts domain="org.project60.sepa"}Download the file via the above link{/ts}</li>
+						<li>{ts domain="org.project60.sepa"}Submit that file to your bank{/ts}</li>
+						<li>{ts domain="org.project60.sepa"}Select one of the options below{/ts}</li>
+					</ol>
+					{ts domain="org.project60.sepa"}<b>Do it now! No money will be transferred until the file has been submitted successfully.</b>{/ts}
+				</p>
+			{else}
+				<p id="closed_group_instruction_text">
+					{ts domain="org.project60.sepa"}<b>In order to collect these payments, you have to do the following:</b>{/ts}
+					<ol>
+						<li>{ts domain="org.project60.sepa"}Close this group with the option below{/ts}</li>
+						<li>{ts domain="org.project60.sepa"}Download the XML file{/ts}</li>
+						<li>{ts domain="org.project60.sepa"}Submit that file to your bank{/ts}</li>
+					</ol>
+					{ts domain="org.project60.sepa"}<b>Do it now! No money will be transferred until the file has been submitted successfully.</b>{/ts}
+				</p>
 			{/if}
+
+				{if $is_test_group}
+				<span style="color:#ff0000;font-size:150%;">{ts domain="org.project60.sepa"}This is a test group. You can not close it.{/ts}</span>
+				{/if}
 			</p>
 		{/if}
 	</div>
@@ -64,8 +82,12 @@
 		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts domain="org.project60.sepa"}I can't submit it right now{/ts}</a>
 	{else}
 		{if not $is_test_group}
-		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=closed"}" class="button button_export">{ts domain="org.project60.sepa"}The file was submitted successfully{/ts}</a>
-		<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=invalid"}" class="button button_export">{ts domain="org.project60.sepa"}The file was rejected{/ts}</a>
+			{if $allow_xml}
+				<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=closed"}" class="button button_export">{ts domain="org.project60.sepa"}The file was submitted successfully{/ts}</a>
+				<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=invalid"}" class="button button_export">{ts domain="org.project60.sepa"}The file was rejected{/ts}</a>
+			{else}
+				<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=closed"}" class="button button_export">{ts domain="org.project60.sepa"}Close it now{/ts}</a>
+			{/if}
 		{/if}
 		{if not $smarty.request.adjust}
 		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts domain="org.project60.sepa"}I changed my mind{/ts}</a>

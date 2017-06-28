@@ -34,10 +34,16 @@ class CRM_Sepa_Logic_Group {
     }
 
     // step 1: gather data
-    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');  
-    $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');  
-    $status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');  
-    $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');  
+    $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
+    if ($skip_closed) {
+      $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name');
+    } else {
+      $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
+      $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
+    }
+    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
+    $status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
     if (isset($txgroup['is_error']) && $txgroup['is_error']) {
       $lock->release();
