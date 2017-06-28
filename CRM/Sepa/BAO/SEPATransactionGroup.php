@@ -128,7 +128,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $this->total += $contrib->total_amount;
       $this->nbtransactions++;
     }
-    $template->assign("total",$this->total );
+    $template->assign("total", number_format($this->total, 2, '.', '')); // SEPA-432: two-digit decimals
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
     return $template->fetch('CRM/Sepa/xml/TransactionGroup.tpl');
