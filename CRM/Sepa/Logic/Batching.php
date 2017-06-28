@@ -68,7 +68,7 @@ class CRM_Sepa_Logic_Batching {
         rcontribution.campaign_id AS rc_campaign_id,
         rcontribution.payment_instrument_id AS rc_payment_instrument_id
       FROM civicrm_sdd_mandate AS mandate
-      INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id
+      INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id AND mandate.entity_table = 'civicrm_contribution_recur'
       LEFT  JOIN civicrm_contribution       AS first_contribution  ON mandate.first_contribution_id = first_contribution.id
       WHERE mandate.type = 'RCUR'
         AND mandate.status = '$mode'
@@ -236,7 +236,7 @@ class CRM_Sepa_Logic_Batching {
         mandate.entity_id         AS mandate_entity_id,
         contribution.receive_date AS start_date
       FROM civicrm_sdd_mandate AS mandate
-      INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id
+      INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id AND mandate.entity_table = 'civicrm_contribution'
       WHERE contribution.receive_date <= DATE('$date_limit')
         AND mandate.type = 'OOFF'
         AND mandate.status = 'OOFF'
@@ -326,7 +326,7 @@ class CRM_Sepa_Logic_Batching {
         mandate.validation_date AS mandate_validation_date,
         rcontribution.end_date AS end_date
       FROM civicrm_sdd_mandate AS mandate
-      INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id
+      INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id AND mandate.entity_table = 'civicrm_contribution_recur'
       WHERE mandate.type = 'RCUR'
         AND mandate.status IN ('RCUR','FRST')
         AND end_date <= DATE(NOW());";

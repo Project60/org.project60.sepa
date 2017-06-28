@@ -52,11 +52,11 @@ class CRM_Sepa_Logic_Group {
       $sql = "
       UPDATE civicrm_sdd_mandate AS mandate
       SET status='SENT'
-      WHERE 
-        mandate.entity_id IN (SELECT contribution_id 
-                              FROM civicrm_sdd_contribution_txgroup 
-                              WHERE txgroup_id=$txgroup_id);";
-      CRM_Core_DAO::executeQuery($sql);    
+      WHERE mandate.entity_table = 'civicrm_contribution'
+        AND mandate.entity_id IN (SELECT contribution_id
+                                  FROM civicrm_sdd_contribution_txgroup
+                                  WHERE txgroup_id=$txgroup_id);";
+      CRM_Core_DAO::executeQuery($sql);
 
     } else if ($txgroup['type']=='FRST') {
       // SET first contributions
@@ -68,7 +68,7 @@ class CRM_Sepa_Logic_Group {
         civicrm_sdd_contribution_txgroup
       LEFT JOIN civicrm_contribution       ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
       LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
-      LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id
+      LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
       WHERE civicrm_sdd_contribution_txgroup.txgroup_id=$txgroup_id;";
 
       $rcontributions = CRM_Core_DAO::executeQuery($sql);
@@ -80,12 +80,12 @@ class CRM_Sepa_Logic_Group {
       $sql = "
       UPDATE civicrm_sdd_mandate AS mandate
       SET status='RCUR'
-      WHERE 
-        mandate.entity_id IN (SELECT civicrm_contribution_recur.id 
-                              FROM civicrm_sdd_contribution_txgroup
-                              LEFT JOIN civicrm_contribution ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
-                              LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
-                              WHERE civicrm_sdd_contribution_txgroup.txgroup_id=$txgroup_id);";
+      WHERE mandate.entity_table = 'contribution_recur_id'
+        AND mandate.entity_id IN (SELECT civicrm_contribution_recur.id
+                                  FROM civicrm_sdd_contribution_txgroup
+                                  LEFT JOIN civicrm_contribution ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
+                                  LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
+                                  WHERE civicrm_sdd_contribution_txgroup.txgroup_id=$txgroup_id);";
       CRM_Core_DAO::executeQuery($sql);
 
     } else if ($txgroup['type']=='RCUR') {
@@ -99,12 +99,10 @@ class CRM_Sepa_Logic_Group {
     // step 3: update all the contributions to status 'in progress', and set the receive_date as collection
     //  remark: don't set receive_date to collection_date any more, it confuses the RCUR batcher (see https://github.com/Project60/sepa_dd/issues/190)
     CRM_Core_DAO::executeQuery("
-      UPDATE 
-        civicrm_contribution 
-      SET 
-        contribution_status_id = $status_inprogress
-      WHERE id IN 
-        (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);");
+      UPDATE civicrm_contribution
+      LEFT JOIN civicrm_sdd_contribution_txgroup ON contribution_id = civicrm_contribution.id
+      SET contribution_status_id = $status_inprogress
+      WHERE txgroup_id = $txgroup_id;");
 
     // step 4: create the sepa file
     $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
