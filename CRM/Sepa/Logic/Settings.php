@@ -83,7 +83,7 @@ class CRM_Sepa_Logic_Settings {
     if (empty($value)) {
       $list = $default;
     } else {
-      $list = split(',', $value);
+      $list = explode(',', $value);
     }
 
     // make it into an associative array (for dropdown elements) 
