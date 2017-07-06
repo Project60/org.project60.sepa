@@ -217,7 +217,7 @@ class CRM_Sepa_Logic_Queue_Close {
       $this->updateMandateStatus($contributions, 'SENT', 'OOFF');
     } elseif ($this->txgroup['type'] == 'FRST') {
       // TODO: GET $collection_date
-      CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($collection_date, NULL, array_keys($contributions));
+      CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate(NULL, array_keys($contributions));
       $this->updateMandateStatus($contributions, 'RCUR', 'FRST');
     }
   }

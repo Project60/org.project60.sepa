@@ -28,7 +28,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
    * the recurring contributions in question can be identified either
    * by $txgroup_id (i.e. the whole group) or as list of individual recurring contributions
    */
-  public static function advanceNextCollectionDate($last_collection_date, $txgroup_id, $contribution_id_list = NULL) {
+  public static function advanceNextCollectionDate($txgroup_id, $contribution_id_list = NULL) {
     // PREPARE: generate the right identification snippets
     $txgroup_id = (int) $txgroup_id;
     if (!empty($txgroup_id)) {
@@ -43,9 +43,30 @@ class CRM_Sepa_Logic_NextCollectionDate {
       return;
     }
 
+    // PREPARE: extract theoretical collection day from contribution
+    //          (they should all have the same date, but it might be delayed)
+    //          FIXME: is there a better way?
+    $info_query = CRM_Core_DAO::executeQuery("
+      SELECT
+        civicrm_contribution.receive_date    AS receive_date,
+        civicrm_contribution_recur.cycle_day AS cycle_day
+      FROM civicrm_contribution_recur
+      {$joins}
+      WHERE {$where} LIMIT 1");
+    if (!$info_query->fetch() || empty($info_query->receive_date) || empty($info_query->cycle_day) || $info_query->cycle_day < 1 || $info_query->cycle_day > 31) {
+      // i.e. there's something wrong
+      error_log('org.project60.sepa: advanceNextCollectionDate failed - contribution data incomplete');
+      return;
+    }
+    $last_collection_date = strtotime($info_query->receive_date);
+    while (date('d', $last_collection_date) != $info_query->cycle_day) {
+      $last_collection_date = strtotime("-1 day", $last_collection_date);
+    }
+    $last_collection_date = date('YmdHis', $last_collection_date);
+
+
     // FIRST: set all to the last collection date, so we can rule out
     //  dropped/skipped instances with older dates
-    $last_collection_date = date('YmdHis', strtotime($last_collection_date));
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_contribution_recur
       {$joins}
