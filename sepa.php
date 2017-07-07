@@ -81,11 +81,6 @@ function sepa_civicrm_postProcess( $formName, &$form ) {
  * Implementation of hook_civicrm_config
  */
 function sepa_civicrm_config(&$config) {
-/*
-when civi 4.4, not sure how to make it compatible with both
-CRM_Core_DAO_AllCoreTables::$daoToClass["SepaMandate"] = "CRM_Sepa_DAO_SEPAMandate";
-CRM_Core_DAO_AllCoreTables::$daoToClass["SepaCreditor"] = "CRM_Sepa_DAO_SEPACreditor";
-*/ 
   _sepa_civix_civicrm_config($config);
 }
 
@@ -408,21 +403,57 @@ function sepa_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$valu
   }
 }
 
-/** 
- * LAST RESORT: prevent the user to delete a (recurring) contribution when there's a mandate attached.
+
+/**
+ * CiviCRM PRE event:
+ *  1) make sure the next collection date
+ *     is adjusted according to the change
+ *  2) prevent users from deleting contributions/recurring contributions
+ *     if they are part of a mandate
  */
 function sepa_civicrm_pre($op, $objectName, $id, &$params) {
+  // adjust next collection date
+  if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
+    if ($op == 'create' || $op == 'edit') {
+      if ($objectName == 'SepaMandate') {
+        CRM_Sepa_Logic_NextCollectionDate::processMandatePreEdit($op, $objectName, $id, $params);
+      } else {
+        CRM_Sepa_Logic_NextCollectionDate::processRecurPreEdit($op, $objectName, $id, $params);
+      }
+    }
+  }
+
+  /**
+   * prevent the user to delete a (recurring) contribution when there's a mandate attached.
+   * this is only a last resort, most UI actions leading to this should've been disabled
+   */
   if ($op=='delete' && ($objectName=='Contribution' || $objectName=='ContributionRecur')) {
     if ($objectName=='Contribution') {
       $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution');
     } else {
-      $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution');
+      $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution_recur');
     }
 
     if ($error) {
-      // Unfortunately, there is no other option at this point. 
+      // Unfortunately, there is no other option at this point.
       //   Ideally, this would've been caught by the API, this is just a last resort
       throw new CRM_Core_Exception($error);
+    }
+  }
+}
+
+/**
+ * CiviCRM POST event: make sure the next collection date
+ *   is adjusted according to the change
+ */
+function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
+    if ($op == 'create' || $op == 'edit') {
+      if ($objectName == 'SepaMandate') {
+        CRM_Sepa_Logic_NextCollectionDate::processMandatePostEdit($op, $objectName, $id, $params);
+      } else {
+        CRM_Sepa_Logic_NextCollectionDate::processRecurPostEdit($op, $objectName, $id, $params);
+      }
     }
   }
 }
