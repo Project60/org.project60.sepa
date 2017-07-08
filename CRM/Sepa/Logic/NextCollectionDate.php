@@ -72,13 +72,14 @@ class CRM_Sepa_Logic_NextCollectionDate {
         civicrm_contribution_recur.frequency_interval AS frequency_interval,
         civicrm_contribution_recur.frequency_unit     AS frequency_unit,
         civicrm_contribution_recur.start_date         AS start_date,
-        civicrm_sdd_mandate.mandate_first_executed    AS mandate_first_executed,
+        first_contribution.receive_date               AS mandate_first_executed,
         civicrm_contribution_recur.end_date           AS end_date,
         civicrm_sdd_mandate.status                    AS status,
         civicrm_contribution_recur.cancel_date        AS cancel_date
       FROM civicrm_contribution_recur
       LEFT JOIN civicrm_sdd_mandate ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id
                                     AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+      LEFT JOIN civicrm_contribution AS first_contribution  ON civicrm_sdd_mandate.first_contribution_id = first_contribution.id
       WHERE civicrm_contribution_recur.id = {$contribution_recur_id}");
     if ($query->fetch()) {
       $mode = $query->status;
@@ -105,6 +106,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
    * by $txgroup_id (i.e. the whole group) or as list of individual recurring contributions
    */
   public static function advanceNextCollectionDate($txgroup_id, $contribution_id_list = NULL) {
+    // error_log("ADVANCE $txgroup_id / " . json_encode($contribution_id_list));
     // PREPARE: generate the right identification snippets
     $txgroup_id = (int) $txgroup_id;
     if (!empty($txgroup_id)) {
@@ -122,13 +124,15 @@ class CRM_Sepa_Logic_NextCollectionDate {
     // PREPARE: extract theoretical collection day from contribution
     //          (they should all have the same date, but it might be delayed)
     //          FIXME: is there a better way?
-    $info_query = CRM_Core_DAO::executeQuery("
+    $info_query_sql = "
       SELECT
         civicrm_contribution.receive_date    AS receive_date,
         civicrm_contribution_recur.cycle_day AS cycle_day
       FROM civicrm_contribution_recur
       {$joins}
-      WHERE {$where} LIMIT 1");
+      WHERE {$where} LIMIT 1";
+    // error_log($info_query_sql);
+    $info_query = CRM_Core_DAO::executeQuery($info_query_sql);
     if (!$info_query->fetch() || empty($info_query->receive_date) || empty($info_query->cycle_day) || $info_query->cycle_day < 1 || $info_query->cycle_day > 31) {
       // i.e. there's something wrong
       error_log('org.project60.sepa: advanceNextCollectionDate failed - contribution data incomplete');
@@ -143,22 +147,25 @@ class CRM_Sepa_Logic_NextCollectionDate {
 
     // FIRST: set all to the last collection date, so we can rule out
     //  dropped/skipped instances with older dates
-    CRM_Core_DAO::executeQuery("
+    $update_query_sql = "
       UPDATE civicrm_contribution_recur
       {$joins}
       SET next_sched_contribution_date = '{$last_collection_date}'
-      WHERE {$where}");
-
+      WHERE {$where}";
+    // error_log($update_query_sql);
+    CRM_Core_DAO::executeQuery($update_query_sql);
 
     // SECONDLY: advance all values by one period
     $periods = array('month' => 'MONTH', 'year' => 'YEAR'); // TODO: more?
-    foreach ($period as $civi_unit => $sql_unit) {
-      CRM_Core_DAO::executeQuery("
+    foreach ($periods as $civi_unit => $sql_unit) {
+      $advance_query_sql = "
         UPDATE civicrm_contribution_recur
         {$joins}
-        SET next_sched_contribution_date = next_sched_contribution_date + INTERVAL frequency_interval {$sql_unit}
+        SET next_sched_contribution_date = (next_sched_contribution_date + INTERVAL frequency_interval {$sql_unit})
         WHERE {$where}
-          AND frequency_interval = '{$civi_unit}'");
+          AND frequency_unit = '{$civi_unit}'";
+      // error_log($advance_query_sql);
+      CRM_Core_DAO::executeQuery($advance_query_sql);
     }
 
     // THIRDLY: clear the next date again if it exceeds the current end date
@@ -198,6 +205,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
         }
       }
     } elseif ($op == 'create') {
+      self::$currently_edited_mandate_id = $objectId;
       $type = CRM_Utils_Array::value('type', self::$currently_edited_mandate_params);
       $update_required = ($type == 'RCUR');
     }
@@ -243,13 +251,18 @@ class CRM_Sepa_Logic_NextCollectionDate {
         // if the date is passed, no need to calculate
       }
     } elseif ($op == 'create') {
-      if (empty(self::$currently_edited_recurring_contribution_params['next_sched_contribution_date'])) {
-        // we want to calculate this for all RCUR mandates:
-        $type = CRM_Utils_Array::value('type', self::$currently_edited_recurring_contribution_params);
-        $update_required = ($type == 'RCUR');
-      } else {
-        // if the date is passed, no need to calculate
-      }
+      self::$currently_edited_recurring_contribution_id = $objectId;
+
+      // we won't deal with recurring contribution upon creation,
+      //  because there won't be a mandate connected to it yet
+
+      // if (empty(self::$currently_edited_recurring_contribution_params['next_sched_contribution_date'])) {
+      //   // we want to calculate this for all RCUR mandates:
+      //   $type = CRM_Utils_Array::value('type', self::$currently_edited_recurring_contribution_params);
+      //   $update_required = ($type == 'RCUR');
+      // } else {
+      //   // if the date is passed, no need to calculate
+      // }
     }
 
     if ($update_required) {

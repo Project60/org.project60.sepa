@@ -450,9 +450,9 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
     if ($op == 'create' || $op == 'edit') {
       if ($objectName == 'SepaMandate') {
-        CRM_Sepa_Logic_NextCollectionDate::processMandatePostEdit($op, $objectName, $id, $params);
+        CRM_Sepa_Logic_NextCollectionDate::processMandatePostEdit($op, $objectName, $objectId, $objectRef);
       } else {
-        CRM_Sepa_Logic_NextCollectionDate::processRecurPostEdit($op, $objectName, $id, $params);
+        CRM_Sepa_Logic_NextCollectionDate::processRecurPostEdit($op, $objectName, $objectId, $objectRef);
       }
     }
   }

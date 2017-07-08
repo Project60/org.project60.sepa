@@ -21,7 +21,7 @@
 <div class="crm-container">
     <div class="crm-block crm-content-block crm-sdd-mandate">
         <table class="crm-info-panel">
-            <tr><td class="label">{ts domain="org.project60.sepa"}Status{/ts}</td><td><b>{$sepa.status_text}</b> ({$sepa.status})</td></tr>            
+            <tr><td class="label">{ts domain="org.project60.sepa"}Status{/ts}</td><td><b>{$sepa.status_text}</b> ({$sepa.status})</td></tr>
             <tr><td class="label">{ts domain="org.project60.sepa"}Contact{/ts}</td><td><a href="{$contact1.link}"><div class="icon crm-icon {$contact1.contact_type}-icon"></div>{$contact1.display_name}</a></td></tr>
             <tr><td class="label">{ts domain="org.project60.sepa"}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
             <tr><td class="label">{ts domain="org.project60.sepa"}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>
@@ -51,6 +51,7 @@
 	            <tr><td class="label">{ts domain="org.project60.sepa"}Collection Day{/ts}</td><td>{$contribution.cycle_day}</td></tr>
                 <tr><td class="label">{ts domain="org.project60.sepa"}Start Date{/ts}</td><td>{$contribution.start_date}</td></tr>
                 <tr><td class="label">{ts domain="org.project60.sepa"}End Date{/ts}</td><td>{$contribution.end_date}</td></tr>
+                <tr><td class="label">{ts domain="org.project60.sepa"}Next Collection{/ts}</td><td>{$contribution.next_sched_contribution_date}</td></tr>
            	{else}
             	{* this is a simple contribution *}
                 <tr><td class="label">{ts domain="org.project60.sepa"}Date{/ts}</td><td>{$contribution.receive_date}</td></tr>
@@ -120,7 +121,7 @@
             <tr>
                 <td id='mandate_pdf_action' class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_create_pdf();">{ts domain="org.project60.sepa"}PDF Prenotification{/ts}</td>
                 <td>
-                    {ts domain="org.project60.sepa"}Will generate a Prenotification PDF with this mandate's data.{/ts}                    
+                    {ts domain="org.project60.sepa"}Will generate a Prenotification PDF with this mandate's data.{/ts}
                     <br/>
                     {if !empty($sepa_templates)}
                     {ts domain="org.project60.sepa"}Select the template to be used:{/ts}<a id='template_help' onclick='CRM.help("{ts domain="org.project60.sepa"}Template{/ts}", {literal}{"id":"id-template-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>
