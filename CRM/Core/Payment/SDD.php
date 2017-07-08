@@ -70,11 +70,11 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       $this->fixOldDirectDebitForm($form);
     }
 
-    // BUFFER DAYS
+    // BUFFER DAYS / TODO: MOVE TO SERVICE
     $buffer_days      = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
     $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $this->_creditorId);
     $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
-    $earliest_rcur_date = strtotime("now + $ooff_notice_days days + $buffer_days days");
+    $earliest_rcur_date = strtotime("now + $frst_notice_days days + $buffer_days days");
     $earliest_ooff_date = strtotime("now + $ooff_notice_days days");
 
     // find the next cycle day

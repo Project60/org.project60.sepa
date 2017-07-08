@@ -420,7 +420,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
 
       // alter frequency
       if (array_key_exists('cycle_interval', $row)) {
-        list($interval, $unit) = split(' ', $row['cycle_interval']);
+        list($interval, $unit) = explode(' ', $row['cycle_interval']);
         $rows[$rowNum]['cycle_interval'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($interval, $unit, TRUE);
       }
 
