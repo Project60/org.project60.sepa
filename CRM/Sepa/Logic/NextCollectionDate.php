@@ -28,12 +28,20 @@ class CRM_Sepa_Logic_NextCollectionDate {
   protected static $currently_edited_recurring_contribution_id = NULL;
   protected static $currently_edited_recurring_contribution_params = NULL;
 
+  protected $now;
+
+  function __construct() {
+    $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $creditor_id);
+    $rcur_notice  = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.notice", $creditor_id);
+    $this->now    = strtotime("+$rcur_notice days -$grace_period days");
+  }
+
 
   /**
    * update the next scheduled collection date for the SepaMandate
    * identified by either $contribution_recur_id or $mandate_id
    */
-  public static function updateNextCollectionDate($contribution_recur_id, $mandate_id) {
+  public function updateNextCollectionDate($contribution_recur_id, $mandate_id) {
     $contribution_recur_id = (int) $contribution_recur_id;
     $mandate_id = (int) $mandate_id;
 
@@ -49,7 +57,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
       return;
     }
 
-    $next_sched_contribution_date = self::calculateNextCollectionDate($contribution_recur_id);
+    $next_sched_contribution_date = $this->calculateNextCollectionDate($contribution_recur_id);
     if ($next_sched_contribution_date) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution_recur SET next_sched_contribution_date = '{$next_sched_contribution_date}' WHERE id = {$contribution_recur_id}");
     } else {
@@ -60,7 +68,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
   /**
    * Calculate the next collection date for the given mandate
    */
-  public static function calculateNextCollectionDate($contribution_recur_id) {
+  public function calculateNextCollectionDate($contribution_recur_id) {
     $contribution_recur_id = (int) $contribution_recur_id;
     if (!$contribution_recur_id) {
       return NULL;
@@ -92,10 +100,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
         'end_date'               => $query->end_date,
         'cancel_date'            => $query->cancel_date,
         );
-      $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $creditor_id);
-      $rcur_notice  = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.notice", $creditor_id);
-      $now          = strtotime("+$rcur_notice days -$grace_period days");
-      return CRM_Sepa_Logic_Batching::getNextExecutionDate($mandate, $now, ($mode=='FRST'));
+      return CRM_Sepa_Logic_Batching::getNextExecutionDate($mandate, $this->now, ($mode=='FRST'));
     }
   }
 
@@ -211,7 +216,8 @@ class CRM_Sepa_Logic_NextCollectionDate {
     }
 
     if ($update_required) {
-      self::updateNextCollectionDate(NULL, self::$currently_edited_mandate_id);
+      $updater = new CRM_Sepa_Logic_NextCollectionDate();
+      $updater->updateNextCollectionDate(NULL, self::$currently_edited_mandate_id);
     }
 
     // just to be safe
@@ -266,7 +272,8 @@ class CRM_Sepa_Logic_NextCollectionDate {
     }
 
     if ($update_required) {
-      self::updateNextCollectionDate(self::$currently_edited_recurring_contribution_id, NULL);
+      $updater = new CRM_Sepa_Logic_NextCollectionDate();
+      $updater->updateNextCollectionDate(self::$currently_edited_recurring_contribution_id, NULL);
     }
 
     // just to be safe

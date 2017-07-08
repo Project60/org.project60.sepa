@@ -302,9 +302,10 @@ function civicrm_api3_sepa_mandate_update_next_scheduled_date($params) {
 
   $recurring_contributions = CRM_Core_DAO::executeQuery($query);
   $counter = 0;
+  $updater = new CRM_Sepa_Logic_NextCollectionDate();
   while ($recurring_contributions->fetch()) {
     $counter++;
-    CRM_Sepa_Logic_NextCollectionDate::updateNextCollectionDate($recurring_contributions->civicrm_contribution_recur_id, NULL);
+    $updater->updateNextCollectionDate($recurring_contributions->civicrm_contribution_recur_id, NULL);
   }
 
   $null = NULL;
