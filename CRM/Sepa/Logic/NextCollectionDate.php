@@ -241,7 +241,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
       if (empty(self::$currently_edited_recurring_contribution_params['next_sched_contribution_date'])) {
         $type = CRM_Utils_Array::value('type', self::$currently_edited_recurring_contribution_params);
 
-        $relevant_changes = array('status', 'is_enabled', 'first_contribution_id', 'type', 'entity_id', 'type', 'creditor_id');
+        $relevant_changes = array('frequency_unit', 'frequency_interval', 'start_date', 'end_date', 'cancel_date', 'contribution_status_id', 'cycle_day');
         foreach ($relevant_changes as $critical_attribute) {
           if (array_key_exists($critical_attribute, self::$currently_edited_recurring_contribution_params)) {
             $update_required = TRUE;
