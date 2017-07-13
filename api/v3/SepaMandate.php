@@ -295,16 +295,23 @@ function civicrm_api3_sepa_mandate_update_next_scheduled_date($params) {
 
   $query = "
   SELECT
-    civicrm_contribution_recur.id AS civicrm_contribution_recur_id
+    civicrm_contribution_recur.id   AS civicrm_contribution_recur_id,
+    civicrm_sdd_mandate.creditor_id AS creditor_id
   FROM civicrm_contribution_recur
   LEFT JOIN civicrm_sdd_mandate ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
-  WHERE {$restrictions_sql}";
+  WHERE {$restrictions_sql}
+  ORDER BY civicrm_sdd_mandate.creditor_id";
 
   $recurring_contributions = CRM_Core_DAO::executeQuery($query);
   $counter = 0;
-  $updater = new CRM_Sepa_Logic_NextCollectionDate();
+  $updater = NULL;
   while ($recurring_contributions->fetch()) {
     $counter++;
+
+    if (!$updater || !$updater->usesCreditor($recurring_contributions->creditor_id)) {
+      $updater = new CRM_Sepa_Logic_NextCollectionDate($recurring_contributions->creditor_id);
+    }
+
     $updater->updateNextCollectionDate($recurring_contributions->civicrm_contribution_recur_id, NULL);
   }
 
