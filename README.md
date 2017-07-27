@@ -6,6 +6,7 @@ This branch is currently maintained by Xavier Dutoit (TTTP, xavier@tttp.eu) and 
 
 Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSEPA
 
+**Important:** Please download a [official release](https://github.com/Project60/org.project60.sepa/releases)!
 
 # What it can do
 
@@ -31,8 +32,8 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 
 If you need customised mandate references, exclude certain collection dates, or add a custom transaction message to the collection, you want to create a sepa customization extension implementing the following hooks:
 * `civicrm_create_mandate` - to generate custom mandate reference numbers
-* `civicrm_defer_collection_date` - to avoid days when your bank won't accept collections
-* `civicrm_modify_txmessage` - to customize the transaction message
+* `civicrm_defer_collection_date` - to avoid days when your bank won't accept collections. (Version 1.2+ can skip weekends w/o this hook)
+* `civicrm_modify_txmessage` - to customize the transaction message (Version 1.2+ can set a generic message w/o this hook)
 
 We added an example implementation for your convenience: [org.project60.sepacustom](https://github.com/Project60/sepa_dd/tree/master/org.project60.sepacustom)
 
