@@ -35,9 +35,9 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         $this->assign('txgid', $group_id);
         $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$group_id, 'version'=>3));
         if (empty($txgroup['is_error'])) {
-	        $txgroup['status_label'] = CRM_Core_OptionGroup::optionLabel('batch_status', $txgroup['status_id']);
-	        $txgroup['status_name'] = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'name');
-	        $this->assign('txgroup', $txgroup);        	
+          $txgroup['status_label'] = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'label');
+	        $txgroup['status_name']  = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'name');
+	        $this->assign('txgroup', $txgroup);
         } else {
         	$_REQUEST['confirmed'] = 'error'; // skip the parts below
         }
@@ -84,7 +84,7 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
 	        		} else {
 	        			array_push($deleted_error, $contribution_id);
 	        		}
-	        	}	        	
+	        	}
 				$this->assign('deleted_result', $result);
 				$this->assign('deleted_ok', $deleted_ok);
 				$this->assign('deleted_error', $deleted_error);
@@ -103,7 +103,7 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
 
   /**
    * gather some statistics about the contributions linked to this txgroup
-   * 
+   *
    * @return array(contribution_status_id->array(contribution_ids))
    */
   function contributionStats($group_id) {
