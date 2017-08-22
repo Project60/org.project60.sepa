@@ -1,6 +1,20 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
+Version 1.2.5
+=============
+- Support for big groups (https://github.com/Project60/org.project60.sepa/issues/430)
+- Close SEPA group before download option (https://github.com/Project60/org.project60.sepa/issues/428)
+- Option: Close SEPA group to status received (https://github.com/Project60/org.project60.sepa/issues/429)
+- Compatibility with CiviCRM 4.7.20+ (https://github.com/Project60/org.project60.sepa/issues/443, https://github.com/Project60/org.project60.sepa/issues/438)
+- Anonymised IBAN token  (https://github.com/Project60/org.project60.sepa/issues/421)
+- PHP7 compatibility (https://github.com/Project60/org.project60.sepa/issues/411)
+- FIX: Performance issues (https://github.com/Project60/org.project60.sepa/issues/426)
+- FIX: Cloning mandate doesn't copy IBAN/BIC (https://github.com/Project60/org.project60.sepa/issues/420)
+- FIX: Rounding problems (https://github.com/Project60/org.project60.sepa/issues/432)
+- FIX: SEPA Group cannot be deleted in CiviCRM 4.7 (https://github.com/Project60/org.project60.sepa/issues/442)
+
+
 Version 1.2.4
 =============
 - Compatibility with CiviCRM 4.7 (https://github.com/Project60/org.project60.sepa/issues/351, https://github.com/Project60/org.project60.sepa/issues/352, https://github.com/Project60/org.project60.sepa/issues/401)
