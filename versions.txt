@@ -9,6 +9,7 @@ Version 1.2.5
 - Compatibility with CiviCRM 4.7.20+ (https://github.com/Project60/org.project60.sepa/issues/443, https://github.com/Project60/org.project60.sepa/issues/438)
 - Anonymised IBAN token  (https://github.com/Project60/org.project60.sepa/issues/421)
 - PHP7 compatibility (https://github.com/Project60/org.project60.sepa/issues/411)
+- FIX: Payment processor start date calculation (https://github.com/Project60/org.project60.sepa/issues/435)
 - FIX: Performance issues (https://github.com/Project60/org.project60.sepa/issues/426)
 - FIX: Cloning mandate doesn't copy IBAN/BIC (https://github.com/Project60/org.project60.sepa/issues/420)
 - FIX: Rounding problems (https://github.com/Project60/org.project60.sepa/issues/432)
