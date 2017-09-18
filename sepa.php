@@ -487,7 +487,7 @@ function sepa_civicrm_navigationMenu(&$params) {
         'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
         'name' => 'Dashboard',
         'url' => $sepa_dashboard_url,
-        'permission' => 'administer CiviCRM',
+        'permission' => 'access CiviContribute',
         'operator' => NULL,
         'separator' => 2,
         'parentID' => $contributions_menu_id,
