@@ -83,10 +83,20 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 		}
 
 	} elseif ($formName == "CRM_Contribute_Form_Contribution_Confirm") {					// PAYMENT PROCESS CONFIRMATION PAGE
-		// only for our SDD payment processors:
-		$pp = civicrm_api("PaymentProcessor", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
-		if ($pp['class_name'] != "Payment_SDD") return;
+		// check if the PP is ours
+		$pp_id = CRM_Utils_Array::value('payment_processor', $form->_params);
+		if (empty($pp_id)) {
+			// there is no payment processor?
+			return;
+		} else {
+			$pp = civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $pp_id));
+			if (empty($pp['class_name']) || $pp['class_name']  != 'Payment_SDD') {
+				// this is not our processor
+				return;
+			}
+		}
 
+		// this IS our processor -> inject stuff
 		CRM_Core_Region::instance('page-body')->add(array(
 		  'template' => 'CRM/Contribute/Form/ContributionConfirm.sepa.tpl'));
 
@@ -114,10 +124,20 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 
 
 	} elseif ($formName == "CRM_Contribute_Form_Contribution_ThankYou") {					// PAYMENT PROCESS THANK YOU PAGE
-		// only for our SDD payment processors:
-		$pp = civicrm_api("PaymentProcessor", "getsingle", array("id"=>$form->_params["payment_processor"], "version"=>3));
-		if ($pp['class_name'] != "Payment_SDD") return;
+		// check if the PP is ours
+		$pp_id = CRM_Utils_Array::value('payment_processor', $form->_params);
+		if (empty($pp_id)) {
+			// there is no payment processor?
+			return;
+		} else {
+			$pp = civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $pp_id));
+			if (empty($pp['class_name']) || $pp['class_name']  != 'Payment_SDD') {
+				// this is not our processor
+				return;
+			}
+		}
 
+		// this IS ours
 		$mandate_reference = $form->getTemplate()->get_template_vars('trxn_id');
 		if ($mandate_reference) {
 			$mandate      = civicrm_api3('SepaMandate',  'getsingle', array('reference' => $mandate_reference));
@@ -128,7 +148,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 				'frequency_interval'     => CRM_Utils_Array::value('frequency_interval', $form->_params),
 				'frequency_unit'         => CRM_Utils_Array::value('frequency_unit', $form->_params),
 				'start_date'             => CRM_Utils_Array::value('start_date', $form->_params));
-			
+
 			$form->assign('mandate_reference',          $mandate_reference);
 			$form->assign("bank_account_number",        $mandate["iban"]);
 			$form->assign("bank_identification_number", $mandate["bic"]);
@@ -220,7 +240,7 @@ function sepa_pp_install() {
 		    "url_recur_test_default"    => "",
 		    "billing_mode"              => "1",
 		    "is_recur"                  => "1",
-		    "payment_type"              => CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT 
+		    "payment_type"              => CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
 		);
 		$result = civicrm_api('PaymentProcessorType', 'create', $payment_processor_data);
 		if (!empty($result['is_error'])) {
