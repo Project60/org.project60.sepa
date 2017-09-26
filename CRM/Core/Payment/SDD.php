@@ -80,13 +80,13 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     // find the next cycle day
     $cycle_days = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId);
     $earliest_cycle_day = $earliest_rcur_date;
-    while (!in_array(date('d', $earliest_cycle_day), $cycle_days)) {
+    while (!in_array(date('j', $earliest_cycle_day), $cycle_days)) {
       $earliest_cycle_day = strtotime("+ 1 day", $earliest_cycle_day);
     }    
 
     $form->assign('earliest_rcur_date', date('Y-m-d', $earliest_rcur_date));
     $form->assign('earliest_ooff_date', date('Y-m-d', $earliest_ooff_date));
-    $form->assign('earliest_cycle_day', date('d', $earliest_cycle_day));
+    $form->assign('earliest_cycle_day', date('j', $earliest_cycle_day));
     $form->assign('sepa_hide_bic', CRM_Sepa_Logic_Settings::getSetting("pp_hide_bic"));
     $form->assign('sepa_hide_billing', CRM_Sepa_Logic_Settings::getSetting("pp_hide_billing"));
     $form->assign('bic_extension_installed', CRM_Sepa_Logic_Settings::isLittleBicExtensionAccessible());
