@@ -24,13 +24,15 @@ class CRM_Utils_SepaOptionGroupTools {
    * SEPA-225 (https://github.com/Project60/sepa_dd/issues/225)
    *
    * The problem is, that in current CiviCRM versions, payment processors
-   * write recurring interval _labels_ into the frequency_unit field of 
+   * write recurring interval _labels_ into the frequency_unit field of
    * contribution_recur. This is very wrong, since this value is translated!
-   * 
+   *
    * As a workaround, we check the labels of recurring frequency units and reset them if necessary
    *
    * @param $reset    boolean  resets altered labels to standard values
    * @param $warning  boolean  displays a warning if a label has been reset
+   *
+   * @deprecated
    */
   public static function checkRecurringFrequencyUnits($reset = FALSE, $warning = TRUE) {
     // compare option group values
