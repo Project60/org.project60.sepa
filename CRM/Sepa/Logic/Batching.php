@@ -42,8 +42,8 @@ class CRM_Sepa_Logic_Batching {
     // (virtually) move ahead notice_days, but also go back grace days
     $now = strtotime("$now +$rcur_notice days -$grace_period days");
     $now = strtotime(date('Y-m-d', $now));        // round to full day
-    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
-    $payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', $mode, 'name');
+    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+    $payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $mode);
 
     if ($offset !== NULL && $limit!==NULL) {
       $batch_clause = "LIMIT {$limit} OFFSET {$offset}";
@@ -241,7 +241,7 @@ class CRM_Sepa_Logic_Batching {
 
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
     $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.notice', $creditor_id);
-    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
+    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $date_limit = date('Y-m-d', strtotime("$now +$horizon days"));
 
     // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
@@ -330,7 +330,7 @@ class CRM_Sepa_Logic_Batching {
       return "Batching in progress. Please try again later.";
     }
 
-    $contribution_status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $contribution_status_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
     // first, load all of the mandates, that have run out
     $sql_query = "
@@ -405,7 +405,7 @@ class CRM_Sepa_Logic_Batching {
    * @param $partial_first      Is this the first call in a partial update?
    */
   protected static function syncGroups($calculated_groups, $existing_groups, $mode, $type, $notice, $creditor_id, $partial_groups=FALSE, $partial_first=FALSE) {
-    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
+    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
     foreach ($calculated_groups as $collection_date => $mandates) {
       // check if we need to defer the collection date (e.g. due to bank holidays)

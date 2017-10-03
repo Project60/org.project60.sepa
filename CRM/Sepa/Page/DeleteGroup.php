@@ -35,8 +35,8 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         $this->assign('txgid', $group_id);
         $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$group_id, 'version'=>3));
         if (empty($txgroup['is_error'])) {
-          $txgroup['status_label'] = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'label');
-	        $txgroup['status_name']  = CRM_Core_OptionGroup::getValue('batch_status', $txgroup['status_id'], 'value', 'String', 'name');
+          $txgroup['status_label'] = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'status_id', $txgroup['status_id']);
+	        $txgroup['status_name']  = CRM_Core_PseudoConstant::getName('CRM_Batch_BAO_Batch', 'status_id', $txgroup['status_id']);
 	        $this->assign('txgroup', $txgroup);
         } else {
         	$_REQUEST['confirmed'] = 'error'; // skip the parts below
@@ -44,8 +44,8 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
 
         if (empty($_REQUEST['confirmed'])) {
         	// gather information to display
-    	    $PENDING = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-    	    $INPROGRESS = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
+    	    $PENDING = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    	    $INPROGRESS = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
 
         	$stats = array('busy' => 0, 'open' => 0, 'other' => 0, 'total' => 0);
         	$status2contributions = $this->contributionStats($group_id);
