@@ -30,11 +30,11 @@ class CRM_sepa_BaseTestCase extends CiviUnitTestCase {
    */
   function createMandate($mandate_parms = array(), $contrib_parms = array()) {
     // read the payment instrument ids  
-    $payment_instrument_OOFF = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name');
+    $payment_instrument_OOFF = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
     $this->assertNotEmpty($payment_instrument_OOFF, "Could not find the 'OOFF' payment instrument.");
-    $payment_instrument_RCUR = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name');
+    $payment_instrument_RCUR = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
     $this->assertNotEmpty($payment_instrument_RCUR, "Could not find the 'RCUR' payment instrument.");
-    $contribution_status_pending = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $this->assertNotEmpty($contribution_status_pending, "Could not find the 'Pending' contribution status.");
 
     $mode = empty($mandate_parms['type'])?'OOFF':$mandate_parms['type'];

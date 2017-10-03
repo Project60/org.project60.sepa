@@ -217,8 +217,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           $contribution_bao->get('id', $contribution['id']);
           $contribution_bao->is_pay_later = 0;
           $contribution_bao->receive_date = date('YmdHis', $collection_date);
-          $contribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-          $contribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'OOFF', 'name');
+          $contribution_bao->contribution_status_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+          $contribution_bao->payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
           $contribution_bao->save();
 
           // ...and connect it to the mandate
@@ -259,8 +259,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
           $contribution_bao->get('id', $contribution['id']);
           $contribution_bao->is_pay_later = 0;
-          $contribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-          $contribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+          $contribution_bao->contribution_status_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+          $contribution_bao->payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
           $contribution_bao->receive_date = date('YmdHis', strtotime($collection_date));
           $contribution_bao->save();
 
@@ -270,8 +270,8 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           $rcontribution_bao->start_date = date('YmdHis', strtotime($rcontribution_bao->start_date));
           $rcontribution_bao->create_date = date('YmdHis', strtotime($rcontribution_bao->create_date));
           $rcontribution_bao->modified_date = date('YmdHis', strtotime($rcontribution_bao->modified_date));
-          $rcontribution_bao->contribution_status_id = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-          $rcontribution_bao->payment_instrument_id = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+          $rcontribution_bao->contribution_status_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+          $rcontribution_bao->payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
           $rcontribution_bao->save();
 
           // ...and connect it to the mandate
