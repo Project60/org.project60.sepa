@@ -547,7 +547,7 @@ function sepa_civicrm_navigationMenu(&$params) {
  * Define SEPA permissions
  */
  function sepa_civicrm_permission(&$permissions) {
-  $prefix = ts('CiviSEPA', array('domain' => 'de.systopia.donrec')) . ': ';
+  $prefix = ts('CiviSEPA', array('domain' => 'org.project60.sepa')) . ': ';
   // mandate permissions
   $permissions['create sepa mandates'] = $prefix . ts('Create SEPA mandates', array('domain' => 'org.project60.sepa'));
   $permissions['view sepa mandates']   = $prefix . ts('View SEPA mandates', array('domain' => 'org.project60.sepa'));
