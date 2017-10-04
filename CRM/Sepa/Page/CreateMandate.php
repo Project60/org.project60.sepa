@@ -247,7 +247,12 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // look up account in CiviBanking (if enabled...)
     if (class_exists('CRM_Banking_BAO_BankAccountReference')) {
-      $iban_reference_type_id = CRM_Core_PseudoConstant::getKey('CRM_Banking_BAO_BankAccountReference', 'reference_type_id', 'IBAN');
+      $params = array(
+        'return' => "id",
+        'option_group_id' => "civicrm_banking.reference_types",
+        'value' => "IBAN",
+      );
+      $iban_reference_type_id = civicrm_api3('OptionValue', 'getvalue', $params);
     }
     if ($iban_reference_type_id) {
       $accounts = civicrm_api('BankingAccount', 'get', array('version' => 3, 'contact_id' => $contact_id));
