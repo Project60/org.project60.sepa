@@ -65,33 +65,17 @@ class CRM_Sepa_Logic_Group {
       CRM_Core_DAO::executeQuery($sql);
 
     } else if ($txgroup['type']=='FRST') {
-      // SET first contributions
-      $sql = "
-      SELECT
-        civicrm_sdd_mandate.id  AS mandate_id,
-        civicrm_contribution.id AS contribution_id
-      FROM
-        civicrm_sdd_contribution_txgroup
-      LEFT JOIN civicrm_contribution       ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
-      LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
-      LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
-      WHERE civicrm_sdd_contribution_txgroup.txgroup_id=$txgroup_id;";
-
-      $rcontributions = CRM_Core_DAO::executeQuery($sql);
-      while ($rcontributions->fetch()) {
-        CRM_Core_DAO::executeQuery('UPDATE civicrm_sdd_mandate SET `first_contribution_id`='.$rcontributions->contribution_id.' WHERE `id`='.$rcontributions->mandate_id.';');
-      }
-
-      // FRSTs get new status 'RCUR'
-      $sql = "
-      UPDATE civicrm_sdd_mandate AS mandate
-      SET status='RCUR'
-      WHERE mandate.entity_table = 'contribution_recur_id'
-        AND mandate.entity_id IN (SELECT civicrm_contribution_recur.id
-                                  FROM civicrm_sdd_contribution_txgroup
-                                  LEFT JOIN civicrm_contribution ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
-                                  LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
-                                  WHERE civicrm_sdd_contribution_txgroup.txgroup_id=$txgroup_id);";
+      // update first_contribution and status
+      $sql = "UPDATE civicrm_sdd_mandate
+              LEFT JOIN civicrm_contribution_recur       ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
+              LEFT JOIN civicrm_contribution             ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
+              LEFT JOIN civicrm_sdd_contribution_txgroup ON civicrm_sdd_contribution_txgroup.contribution_id = civicrm_contribution.id
+              SET
+                status                = 'RCUR',
+                first_contribution_id = civicrm_contribution.id
+              WHERE civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+                AND civicrm_sdd_mandate.status = 'FRST'
+                AND civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
       CRM_Core_DAO::executeQuery($sql);
 
     } else if ($txgroup['type']=='RCUR') {
