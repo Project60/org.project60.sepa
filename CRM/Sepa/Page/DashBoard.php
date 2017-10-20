@@ -57,12 +57,12 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     $status_2_title = array();
     $status_list = array(
       'open' => array(
-            CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name'),
-            CRM_Core_OptionGroup::getValue('batch_status', 'Reopened', 'name')),
+            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open'),
+            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Reopened')),
       'closed' => array(
-            CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'),
-            CRM_Core_OptionGroup::getValue('batch_status', 'Exported', 'name'),
-            CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name')));
+            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'),
+            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Exported'),
+            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received')));
     foreach ($status_list as $title => $values) {
       foreach ($values as $value) {
         if (empty($value)) {    // delete empty values (i.e. batch_status doesn't exist)
@@ -80,7 +80,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     foreach ($status_values as $status_value) {
       $status2label[$status_value['value']] = $status_value['label'];
     }
-    $this->assign('closed_status_id', CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'));
+    $this->assign('closed_status_id', CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'));
 
     // now read the details
     $result = civicrm_api("SepaTransactionGroup", "getdetail", array(

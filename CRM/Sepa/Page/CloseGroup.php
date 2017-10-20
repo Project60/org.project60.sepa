@@ -89,11 +89,11 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
                   // call the closing runner
                   $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
                   if ($skip_closed) {
-                    $target_contribution_status = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-                    $target_group_status = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name');
+                    $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+                    $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
                   } else {
-                    $target_contribution_status = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
-                    $target_group_status = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
+                    $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+                    $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
                   }
                   // this call doesn't return (redirect to runner)
                   CRM_Sepa_Logic_Queue_Close::launchCloseRunner(array($group_id), $target_group_status, $target_contribution_status);

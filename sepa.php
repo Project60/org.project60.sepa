@@ -579,7 +579,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
       // now compare requested with expected payment instrument
       $mandate_id = key($mandates);
       $mandate_pi = $mandates[$mandate_id];
-      $requested_pi = CRM_Core_OptionGroup::getValue('payment_instrument', $fields['payment_instrument_id'], 'value', 'String', 'name');
+      $requested_pi =  CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $fields['payment_instrument_id']);
       if ($requested_pi != $mandate_pi && !($requested_pi=='FRST' && $mandate_pi=='RCUR') ) {
         $errors['payment_instrument_id'] = sprintf(ts("This contribution has a mandate, its payment instrument has to be '%s'", array('domain' => 'org.project60.sepa')), $mandate_pi);
       }
