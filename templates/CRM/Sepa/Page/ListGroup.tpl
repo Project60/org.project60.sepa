@@ -19,7 +19,8 @@
 		<th>{ts domain="org.project60.sepa"}ID{/ts}</th>
 		<th>{ts domain="org.project60.sepa"}Amount{/ts}</th>
 		<th>&nbsp;</th>
-		<th>{ts domain="org.project60.sepa"}Contact{/ts}</th>
+                <th>{ts domain="org.project60.sepa"}Contact{/ts}</th>
+                <th>{ts domain="org.project60.sepa"}Name Account Holder{/ts}</th>
 		<th>{ts domain="org.project60.sepa"}Financial Type{/ts}</th>
 		<th>{ts domain="org.project60.sepa"}Campaign{/ts}</th>
 	</thead>
@@ -29,7 +30,8 @@
 			<td><a href="{$contribution.contribution_link}">[{$contribution.contribution_id}]</a></td>
 			<td style="text-align: right;"><a href="{$contribution.contribution_link}"><b>{$contribution.contribution_amount_str}</b></a></td>
 			<td>&nbsp;</td>
-			<td><a href="{$contribution.contact_link}"><div class="icon crm-icon {$contribution.contact_type}-icon"></div>{$contribution.contact_display_name}</a></td>
+                        <td><a href="{$contribution.contact_link}"><div class="icon crm-icon {$contribution.contact_type}-icon"></div>{$contribution.contact_display_name}</a></td>
+                        <td>{$contribution.account_holder}</td>
 			<td>{$contribution.financial_type}</td>
 			<td>{$contribution.campaign}</td>
 		</tr>
@@ -41,6 +43,7 @@
             <td align="right">{$total_amount_str}</td>
             <td/>
             <td>{$different_contacts} {ts domain="org.project60.sepa"}Contacts{/ts}</td>
+            <td>&nbsp;</td>
             <td>{$different_types} {ts domain="org.project60.sepa"}Financial Types{/ts}</td>
             <td>{$different_campaigns} {ts domain="org.project60.sepa"}Campaigns{/ts}</td>
         </tr>
