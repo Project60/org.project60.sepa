@@ -108,7 +108,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $contribution_data['source'] = $_REQUEST['source'];
       $contribution = civicrm_api('Contribution', 'create', $contribution_data);
     } else if ($type=='RCUR') {
-      $initial_status = 'FRST';
+      $initial_status = 'RCUR';
       $entity_table = 'civicrm_contribution_recur';
       $contribution_data['amount']              = number_format($_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['start_date']          = $_REQUEST['start_date'];
