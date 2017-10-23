@@ -70,7 +70,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $query="
       SELECT
         c.id AS cid,
-        civicrm_contact.display_name,
+        COALESCE(mandate.account_holder, civicrm_contact.display_name) AS display_name,
         invoice_id,
         currency,
         total_amount,

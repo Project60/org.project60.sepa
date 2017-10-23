@@ -164,6 +164,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'creation_date'             => date('YmdHis'),
         'validation_date'           => date('YmdHis'),
         'date'                      => date('YmdHis'),
+        'account_holder'            => $_REQUEST['account_holder'],
         'iban'                      => $_REQUEST['iban'],
         'bic'                       => $_REQUEST['bic'],
         'reference'                 => $_REQUEST['reference'],

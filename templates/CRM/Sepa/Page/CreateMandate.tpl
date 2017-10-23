@@ -81,6 +81,11 @@
 
 		<tr><td colspan="4"><hr></td></tr>
 
+		<tr>
+			<td>{ts domain="org.project60.sepa"}Name Account Holder{/ts}:</td>
+			<td><input name="account_holder" type="text" size="40" value="" "{ts domain="org.project60.sepa"}not required{/ts}"/></td>
+		</tr>
+
 		<tr>	<!-- bank account selector -->
 			<td>Bank Account:</td>
 			<td>
