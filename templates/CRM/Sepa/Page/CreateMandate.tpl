@@ -83,7 +83,7 @@
 
 		<tr>
 			<td>{ts domain="org.project60.sepa"}Name Account Holder{/ts}:</td>
-			<td><input name="account_holder" type="text" size="128" value="" "{ts domain="org.project60.sepa"}not required{/ts}"/></td>
+			<td><input name="account_holder" type="text" size="40" value="" "{ts domain="org.project60.sepa"}not required{/ts}"/></td>
 		</tr>
 
 		<tr>	<!-- bank account selector -->
