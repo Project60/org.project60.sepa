@@ -85,7 +85,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       	$create_contribution['payment_instrument_id'] = 
       		(int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
       	if (empty($create_contribution['status'])) 
-      		$create_contribution['status'] = 'FRST'; // set default status
+      		$create_contribution['status'] = 'RCUR'; // set default status
       	if (empty($create_contribution['is_pay_later'])) 
       		$create_contribution['is_pay_later'] = 1; // set default pay_later
 
