@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
      `date`                  datetime NOT NULL                     COMMENT 'signature date, by default now()',
      `creditor_id`           int unsigned                          COMMENT 'FK to ssd_creditor',
      `contact_id`            int unsigned                          COMMENT 'FK to Contact ID that owns that account',
+     `account_holder`        varchar(128) NULL                     COMMENT 'Name of the Iban Account Holder',
      `iban`                  varchar(42) NULL                      COMMENT 'Iban of the debtor',
      `bic`                   varchar(11)                           COMMENT 'BIC of the debtor',
      `type`                  varchar(4) NOT NULL DEFAULT 'RCUR'    COMMENT 'RCUR for recurrent (default), OOFF for one-shot',
