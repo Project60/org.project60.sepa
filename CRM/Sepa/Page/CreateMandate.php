@@ -414,13 +414,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       }
     }
 
-    // check BIC
+    // check BIC (can be empty now)
     if (!isset($_REQUEST['bic'])) {
       $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
     } else {
       $_REQUEST['bic'] = strtoupper($_REQUEST['bic']);
       if (strlen($_REQUEST['bic']) == 0) {
-        $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
+        // $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
       } else {
         $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($_REQUEST['bic']);
         if (!empty($bic_error)) {
