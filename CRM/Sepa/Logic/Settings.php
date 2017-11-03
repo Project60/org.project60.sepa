@@ -57,6 +57,26 @@ class CRM_Sepa_Logic_Settings {
     // get tx message from settings
     $transaction_message = self::getSetting('custom_txmsg', $creditor['id']);
 
+    $p = new \Civi\Token\TokenProcessor(\Civi\Core\Container::singleton()->get('dispatcher'), array(
+      'controller' => __CLASS__,
+      'smarty' => TRUE,
+    ));
+
+    // Fill the processor with a batch of data.
+    $p->addMessage('transaction_message', $transaction_message, 'text/plain');
+    $p->addRow()->context('contactId', $mandate["contact_id"])
+                ->context('entity_table', $mandate["entity_table"])
+                ->context('entity_id', $mandate["entity_id"]);
+
+    // Lookup/compose any tokens which are referenced in the message.
+    // e.g. SELECT id, display_name FROM civicrm_contact WHERE id IN (...contextual contact ids...);
+    $p->evaluate();
+
+    // Display mail-merge data.
+    foreach ($p->getRows() as $row) {
+      $transaction_message = $row->render('transaction_message');
+    }
+
     // run hook for further customisation
     CRM_Utils_SepaCustomisationHooks::modify_txmessage($transaction_message, $mandate, $creditor);
 
