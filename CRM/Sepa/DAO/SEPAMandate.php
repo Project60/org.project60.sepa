@@ -137,6 +137,12 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    */
   public $contact_id;
   /**
+   * Name Account Holder of the Iban
+   *
+   * @var string
+   */
+  public $account_holder;
+  /**
    * Iban of the debtor
    *
    * @var string
@@ -275,6 +281,14 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
           'title' => ts('Contact ID', array('domain' => 'org.project60.sepa')) ,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
+        'account_holder' => array(
+          'name' => 'account_holder',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Account Holder', array('domain' => 'org.project60.sepa')) ,
+          'required' => false,
+          'maxlength' => 128,
+          'size' => CRM_Utils_Type::BIG,
+        ) ,
         'iban' => array(
           'name' => 'iban',
           'type' => CRM_Utils_Type::T_STRING,
@@ -351,6 +365,7 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
         'date' => 'date',
         'creditor_id' => 'creditor_id',
         'contact_id' => 'contact_id',
+        'account_holder' => 'account_holder',
         'iban' => 'iban',
         'bic' => 'bic',
         'type' => 'type',

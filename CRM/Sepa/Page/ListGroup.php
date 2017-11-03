@@ -46,6 +46,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         civicrm_contact.display_name            AS contact_display_name,
         civicrm_contact.contact_type            AS contact_contact_type,
         civicrm_contact.id                      AS contact_id,
+        civicrm_sdd_mandate.account_holder      AS account_holder,
         civicrm_contribution.id                 AS contribution_id,
         civicrm_contribution.total_amount       AS contribution_amount,
         civicrm_contribution.financial_type_id  AS contribution_financial_type_id,
@@ -58,6 +59,8 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         civicrm_contribution               ON   civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
       LEFT JOIN 
         civicrm_contact                    ON   civicrm_contact.id = civicrm_contribution.contact_id
+      LEFT JOIN
+        civicrm_sdd_mandate                ON   civicrm_sdd_mandate.entity_id = COALESCE(civicrm_contribution.contribution_recur_id, civicrm_contribution.id)
       LEFT JOIN 
         civicrm_campaign                   ON   civicrm_campaign.id = civicrm_contribution.campaign_id
       WHERE       
@@ -79,6 +82,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
           'contact_type'              => $result->contact_contact_type,
           'contact_id'                => $result->contact_id,
           'contact_link'              => $contact_base_link.$result->contact_id,
+          'account_holder'            => $result->account_holder,
           'contribution_link'         => str_replace('_id_', $result->contact_id, str_replace('_cid_', $result->contribution_id, $contribution_base_link)),
           'contribution_id'           => $result->contribution_id,
           'contribution_amount'       => $result->contribution_amount,

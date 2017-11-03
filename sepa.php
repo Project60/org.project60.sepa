@@ -579,7 +579,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
       // now compare requested with expected payment instrument
       $mandate_id = key($mandates);
       $mandate_pi = $mandates[$mandate_id];
-      $requested_pi = CRM_Core_OptionGroup::getValue('payment_instrument', $fields['payment_instrument_id'], 'value', 'String', 'name');
+      $requested_pi =  CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $fields['payment_instrument_id']);
       if ($requested_pi != $mandate_pi && !($requested_pi=='FRST' && $mandate_pi=='RCUR') ) {
         $errors['payment_instrument_id'] = sprintf(ts("This contribution has a mandate, its payment instrument has to be '%s'", array('domain' => 'org.project60.sepa')), $mandate_pi);
       }
@@ -681,5 +681,44 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
         $values[$result->contact_id]["$prefix.first_collection"] = $fcontribution['receive_date'];
       }
     }
+  }
+}
+
+function sepa_civicrm_container(&$container) {
+  $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
+  $container->findDefinition('dispatcher')->addMethodCall('addListener',
+    array(\Civi\Token\Events::TOKEN_REGISTER, 'sepa_register_tokens')
+  );
+  $container->findDefinition('dispatcher')->addMethodCall('addListener',
+    array(\Civi\Token\Events::TOKEN_EVALUATE, 'sepa_evaluate_tokens')
+  );
+}
+
+function sepa_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e) {
+  $e->entity('sepa')
+    ->register('frequencyUnit', ts('Frequency Unit'))
+    ->register('frequencyInterval', ts('Frequency Interval'))
+    ->register('financialTypeId', ts('Financial Type Id'));
+}
+
+function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
+  foreach ($e->getRows() as $row) {
+    if ($row->context['entity_table'] == "civicrm_contribution_recur") {
+      $result = civicrm_api3('ContributionRecur', 'get', array(
+        'return' => array("frequency_unit", "frequency_interval", "financial_type_id"),
+        'id' => $row->context['entity_id'],
+      ));
+    } else {
+      $result = civicrm_api3('Contribution', 'get', array(
+        'return' => array("financial_type_id"),
+        'id' => $row->context['entity_id'],
+      ));
+    }
+
+    /** @var TokenRow $row */
+    $row->format('text/html');
+    $row->tokens('sepa', 'frequencyUnit', $result['values'][$result['id']]['frequency_unit']);
+    $row->tokens('sepa', 'frequencyInterval', $result['values'][$result['id']]['frequency_interval']);
+    $row->tokens('sepa', 'financialTypeId', $result['values'][$result['id']]['financial_type_id']);
   }
 }

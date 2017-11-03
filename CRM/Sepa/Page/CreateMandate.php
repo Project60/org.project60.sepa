@@ -87,8 +87,8 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
    */
   function createMandate($type) {
     // first create a contribution
-    $payment_instrument_id = CRM_Core_OptionGroup::getValue('payment_instrument', $type, 'name');
-    $contribution_status_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+    $payment_instrument_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $type);
+    $contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
     $contribution_data = array(
         'version'                   => 3,
@@ -108,7 +108,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $contribution_data['source'] = $_REQUEST['source'];
       $contribution = civicrm_api('Contribution', 'create', $contribution_data);
     } else if ($type=='RCUR') {
-      $initial_status = 'FRST';
+      $initial_status = 'RCUR';
       $entity_table = 'civicrm_contribution_recur';
       $contribution_data['amount']              = number_format($_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['start_date']          = $_REQUEST['start_date'];
@@ -164,6 +164,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'creation_date'             => date('YmdHis'),
         'validation_date'           => date('YmdHis'),
         'date'                      => date('YmdHis'),
+        'account_holder'            => $_REQUEST['account_holder'],
         'iban'                      => $_REQUEST['iban'],
         'bic'                       => $_REQUEST['bic'],
         'reference'                 => $_REQUEST['reference'],
@@ -246,14 +247,21 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
 
     // look up account in CiviBanking (if enabled...)
-    $iban_reference_type = CRM_Core_OptionGroup::getValue('civicrm_banking.reference_types', 'IBAN', 'value', 'String', 'id');
-    if ($iban_reference_type) {
+    if (class_exists('CRM_Banking_BAO_BankAccountReference')) {
+      $params = array(
+        'return' => "id",
+        'option_group_id' => "civicrm_banking.reference_types",
+        'value' => "IBAN",
+      );
+      $iban_reference_type_id = civicrm_api3('OptionValue', 'getvalue', $params);
+    }
+    if ($iban_reference_type_id) {
       $accounts = civicrm_api('BankingAccount', 'get', array('version' => 3, 'contact_id' => $contact_id));
       if (isset($accounts['is_error']) && $accounts['is_error']) {
         // this probably means, that CiviBanking is not installed...
       } else {
         foreach ($accounts['values'] as $account_id => $account) {
-          $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $iban_reference_type));
+          $account_ref = civicrm_api('BankingAccountReference', 'getsingle', array('version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $iban_reference_type_id));
           if (isset($account_ref['is_error']) && $account_ref['is_error']) {
             // this would also be an error, if no reference is set...
           } else {
@@ -406,13 +414,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       }
     }
 
-    // check BIC
+    // check BIC (can be empty now)
     if (!isset($_REQUEST['bic'])) {
       $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
     } else {
       $_REQUEST['bic'] = strtoupper($_REQUEST['bic']);
       if (strlen($_REQUEST['bic']) == 0) {
-        $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
+        // $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
       } else {
         $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($_REQUEST['bic']);
         if (!empty($bic_error)) {

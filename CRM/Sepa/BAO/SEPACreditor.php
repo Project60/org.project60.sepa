@@ -75,7 +75,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
       if (empty($mandate_data['validation_date'])) $mandate_data['validation_date'] = date('YmdHis');
       
       if ($mandate_data['type'] == 'RCUR') {
-        $mandate_data['status'] = 'FRST';
+        $mandate_data['status'] = 'RCUR';
       } elseif ($mandate_data['type'] == 'OOFF') {
         $mandate_data['status'] = 'OOFF';
       }
