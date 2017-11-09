@@ -435,6 +435,9 @@ class CRM_Sepa_Logic_Batching {
           $reference = "TXG-${creditor_id}-${mode}-${collection_date}--".$counter;
         }
 
+        // call the hook
+        CRM_Utils_SepaCustomisationHooks::modify_txgroup_reference($reference, $creditor_id, $mode, $collection_date);
+
         $group = civicrm_api('SepaTransactionGroup', 'create', array(
             'version'                 => 3,
             'reference'               => $reference,
