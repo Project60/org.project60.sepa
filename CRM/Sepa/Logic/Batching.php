@@ -165,6 +165,7 @@ class CRM_Sepa_Logic_Batching {
               "campaign_id"                         => $mandate['rc_campaign_id'],
               "is_test"                             => $mandate['rc_is_test'],
               "payment_instrument_id"               => $payment_instrument_id,
+              "skipRecentView"                      => 1, // don't add to recent items
             );
           $contribution = civicrm_api('Contribution', 'create', $contribution_data);
           if (empty($contribution['is_error'])) {
