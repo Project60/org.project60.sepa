@@ -49,6 +49,30 @@ class CRM_Utils_SepaCustomisationHooks {
     }
   }
 
+  /**
+   * This hook is called when a new transaction group is generated
+   *
+   * The default implementation is "TXG-${creditor_id}-${mode}-${collection_date}"
+   *
+   * Be aware the the reference has to be unique. You will have to use suffixes
+   *  if your preferred reference is already in use.
+   *
+   * @param $reference        string  currently proposed reference (max. 35 characters!)
+   * @param $collection_date  string  scheduled collection date
+   * @param $mode             string  SEPA mode (OOFF, RCUR, FRST)
+   * @param $creditor_id      string  SDD creditor ID
+   *
+   * @access public
+   */
+  static function modify_txgroup_reference(&$reference, $creditor_id, $mode, $collection_date) {
+    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
+    {
+      return CRM_Utils_Hook::singleton()->invoke(4, $reference, $creditor_id, $mode, $collection_date, self::$null, 'civicrm_modify_txgroup_reference');
+    }else{
+      return CRM_Utils_Hook::singleton()->invoke(4, $reference, $creditor_id, $mode, $collection_date, self::$null, self::$null, 'civicrm_modify_txgroup_reference');
+    }
+  }
+
 
   /**
    * This hook is called when the PAIN.008 XML is being generated.
