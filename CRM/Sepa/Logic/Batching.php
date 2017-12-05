@@ -195,14 +195,13 @@ class CRM_Sepa_Logic_Batching {
       error_log("org.project60.sepa: batching: contribution $contribution_id should be deleted...");
     }
 
-    // step 5: find all existing OPEN groups in the horizon
+    // step 5: find all existing OPEN groups
     $sql_query = "
       SELECT
         txgroup.collection_date AS collection_date,
         txgroup.id AS txgroup_id
       FROM civicrm_sdd_txgroup AS txgroup
-      WHERE txgroup.collection_date <= '$latest_date'
-        AND txgroup.type = '$mode'
+      WHERE txgroup.type = '$mode'
         AND txgroup.sdd_creditor_id = $creditor_id
         AND txgroup.status_id = $group_status_id_open;";
     $results = CRM_Core_DAO::executeQuery($sql_query);
@@ -303,8 +302,7 @@ class CRM_Sepa_Logic_Batching {
         txgroup.collection_date AS collection_date,
         txgroup.id AS txgroup_id
       FROM civicrm_sdd_txgroup AS txgroup
-      WHERE txgroup.collection_date <= '$latest_collection_date'
-        AND txgroup.sdd_creditor_id = $creditor_id
+      WHERE txgroup.sdd_creditor_id = $creditor_id
         AND txgroup.type = 'OOFF'
         AND txgroup.status_id = $group_status_id_open;";
     $results = CRM_Core_DAO::executeQuery($sql_query);
