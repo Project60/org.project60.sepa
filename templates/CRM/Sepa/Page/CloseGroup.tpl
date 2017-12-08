@@ -36,9 +36,10 @@
 				<li>{ts domain="org.project60.sepa"}In the unlikely event that the file is formally wrong, try a SEPA validation tool on the internet to check the generated XML file. Contact us, if the system really generates incorrect XML files.{/ts}</li>
 			</ul>
 		{elseif $status eq "missed"}
-			<p><span class="icon red-icon alert-icon"> </span>
-			{ts domain="org.project60.sepa"}<strong>You did not submit this SEPA group in time! It is possible that the bank will reject the payment requests.</strong>{/ts}
-			<span class="icon red-icon alert-icon"> </span></p>
+			<div class="status message" name="warnings">
+				<div class="icon ui-icon-alert"></div>
+				{ts domain="org.project60.sepa"}<strong>You did not submit this SEPA group in time! It is possible that the bank will reject the payment requests.</strong>{/ts}
+			</div>
 			<p>{ts domain="org.project60.sepa"}As a workaround, we can adjust the collection date, so that you can still submit the file today. <strong>Today! <font color="red">NOW!</font></strong>{/ts}</p>
 			<p>{ts domain="org.project60.sepa"}However, the bank might still reject the file, since this is an illegal deviation from your announced collection date. Try to avoid this in the future!{/ts}</p>
 		{else}
