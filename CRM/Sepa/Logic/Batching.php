@@ -118,6 +118,17 @@ class CRM_Sepa_Logic_Batching {
         $mandates_by_nextdate[$next_date] = array();
       array_push($mandates_by_nextdate[$next_date], $mandate);
     }
+    // apply any deferrals:
+    $collection_dates = array_keys($mandates_by_nextdate);
+    foreach ($collection_dates as $collection_date) {
+      $deferred_collection_date = $collection_date;
+      self::deferCollectionDate($deferred_collection_date, $creditor_id);
+      if ($deferred_collection_date != $collection_date) {
+        $mandates_by_nextdate[$deferred_collection_date] = $mandates_by_nextdate[$collection_date];
+        unset($mandates_by_nextdate[$collection_date]);
+      }
+    }
+
 
     // RCUR-STEP 3: find already created contributions
     $existing_contributions_by_recur_id = array();
@@ -409,18 +420,7 @@ class CRM_Sepa_Logic_Batching {
 
     foreach ($calculated_groups as $collection_date => $mandates) {
       // check if we need to defer the collection date (e.g. due to bank holidays)
-      $exclude_weekends = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
-      if ($exclude_weekends) {
-        // skip (western) week ends, if the option is activated.
-        $day_of_week = date('N', strtotime($collection_date));
-        if ($day_of_week > 5) {
-          // this is a weekend -> skip to Monday
-          $defer_days = 8 - $day_of_week;
-          $collection_date = date('Y-m-d', strtotime("+$defer_days day", strtotime($collection_date)));
-        }
-      }
-      // also run the hook, in case somebody has a
-      CRM_Utils_SepaCustomisationHooks::defer_collection_date($collection_date, $creditor_id);
+      self::deferCollectionDate($collection_date, $creditor_id);
 
       if (!isset($existing_groups[$collection_date])) {
         // this group does not yet exist -> create
@@ -616,5 +616,25 @@ class CRM_Sepa_Logic_Batching {
     $interval  = $rcontribution['frequency_interval'];
     $unit      = $rcontribution['frequency_unit'];
     return CRM_Utils_SepaOptionGroupTools::getFrequencyText($interval, $unit, TRUE);
+  }
+
+  /**
+   * Apply any (date-based) defers on the collection date
+   */
+  public static function deferCollectionDate(&$collection_date, $creditor_id) {
+    // first check if the weekends are to be excluded
+    $exclude_weekends = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
+    if ($exclude_weekends) {
+      // skip (western) week ends, if the option is activated.
+      $day_of_week = date('N', strtotime($collection_date));
+      if ($day_of_week > 5) {
+        // this is a weekend -> skip to Monday
+        $defer_days = 8 - $day_of_week;
+        $collection_date = date('Y-m-d', strtotime("+$defer_days day", strtotime($collection_date)));
+      }
+    }
+
+    // also run the hook, in case somebody has implemented special holidays
+    CRM_Utils_SepaCustomisationHooks::defer_collection_date($collection_date, $creditor_id);
   }
 }
