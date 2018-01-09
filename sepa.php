@@ -633,53 +633,57 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
   // make sure there are cids, because otherwise we'd generate invalid SQL (see https://github.com/Project60/org.project60.sepa/issues/399)
   if (empty($cids) || !is_array($cids)) return;
 
-  $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
-  $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+  try { // make sure this doesn't cause any troubles
+    $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
+    $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
 
-  // FIND most recent SEPA Mandates (per contact)
-  $contact_id_list = implode(',', $cids);
-  $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id IN ($contact_id_list) GROUP BY contact_id;";
-  $result = CRM_Core_DAO::executeQuery($query);
-  while ($result->fetch()) {
-    // load the mandate
-    $mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $result->mandate_id));
+    // FIND most recent SEPA Mandates (per contact)
+    $contact_id_list = implode(',', $cids);
+    $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id IN ($contact_id_list) GROUP BY contact_id;";
+    $result = CRM_Core_DAO::executeQuery($query);
+    while ($result->fetch()) {
+      // load the mandate
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $result->mandate_id));
 
-    // make sure there is an array
-    if (!isset($values[$result->contact_id])) {
-      $values[$result->contact_id] = array();
-    }
+      // make sure there is an array
+      if (!isset($values[$result->contact_id])) {
+        $values[$result->contact_id] = array();
+      }
 
-    // copy the mandate values
-    $values[$result->contact_id]["$prefix.reference"]       = $mandate['reference'];
-    $values[$result->contact_id]["$prefix.source"]          = $mandate['source'];
-    $values[$result->contact_id]["$prefix.type"]            = $mandate['type'];
-    $values[$result->contact_id]["$prefix.status"]          = $mandate['status'];
-    $values[$result->contact_id]["$prefix.date"]            = $mandate['date'];
-    $values[$result->contact_id]["$prefix.iban"]            = $mandate['iban'];
-    $values[$result->contact_id]["$prefix.iban_anonymised"] = CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']);
-    $values[$result->contact_id]["$prefix.bic"]             = $mandate['bic'];
+      // copy the mandate values
+      $values[$result->contact_id]["$prefix.reference"]       = $mandate['reference'];
+      $values[$result->contact_id]["$prefix.source"]          = $mandate['source'];
+      $values[$result->contact_id]["$prefix.type"]            = $mandate['type'];
+      $values[$result->contact_id]["$prefix.status"]          = $mandate['status'];
+      $values[$result->contact_id]["$prefix.date"]            = $mandate['date'];
+      $values[$result->contact_id]["$prefix.iban"]            = $mandate['iban'];
+      $values[$result->contact_id]["$prefix.iban_anonymised"] = CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']);
+      $values[$result->contact_id]["$prefix.bic"]             = $mandate['bic'];
 
-    // load and copy the contribution information
-    if ($mandate['entity_table'] == 'civicrm_contribution') {
-      $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['entity_id']));
-      $values[$result->contact_id]["$prefix.amount"]           = $contribution['total_amount'];
-      $values[$result->contact_id]["$prefix.currency"]         = $contribution['currency'];
-      $values[$result->contact_id]["$prefix.first_collection"] = $contribution['receive_date'];
+      // load and copy the contribution information
+      if ($mandate['entity_table'] == 'civicrm_contribution') {
+        $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['entity_id']));
+        $values[$result->contact_id]["$prefix.amount"]           = $contribution['total_amount'];
+        $values[$result->contact_id]["$prefix.currency"]         = $contribution['currency'];
+        $values[$result->contact_id]["$prefix.first_collection"] = $contribution['receive_date'];
 
-    } elseif ($mandate['entity_table'] == 'civicrm_contribution_recur') {
-      $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
-      $values[$result->contact_id]["$prefix.amount"]             = $rcontribution['amount'];
-      $values[$result->contact_id]["$prefix.currency"]           = $rcontribution['currency'];
-      $values[$result->contact_id]["$prefix.cycle_day"]          = $rcontribution['cycle_day'];
-      $values[$result->contact_id]["$prefix.frequency_interval"] = $rcontribution['frequency_interval'];
-      $values[$result->contact_id]["$prefix.frequency_unit"]     = $rcontribution['frequency_unit'];
-      $values[$result->contact_id]["$prefix.frequency"]          = CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], true);
+      } elseif ($mandate['entity_table'] == 'civicrm_contribution_recur') {
+        $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
+        $values[$result->contact_id]["$prefix.amount"]             = $rcontribution['amount'];
+        $values[$result->contact_id]["$prefix.currency"]           = $rcontribution['currency'];
+        $values[$result->contact_id]["$prefix.cycle_day"]          = $rcontribution['cycle_day'];
+        $values[$result->contact_id]["$prefix.frequency_interval"] = $rcontribution['frequency_interval'];
+        $values[$result->contact_id]["$prefix.frequency_unit"]     = $rcontribution['frequency_unit'];
+        $values[$result->contact_id]["$prefix.frequency"]          = CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], true);
 
-      // load first contribution
-      if (!empty($mandate['first_contribution_id'])) {
-        $fcontribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['first_contribution_id']));
-        $values[$result->contact_id]["$prefix.first_collection"] = $fcontribution['receive_date'];
+        // load first contribution
+        if (!empty($mandate['first_contribution_id'])) {
+          $fcontribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['first_contribution_id']));
+          $values[$result->contact_id]["$prefix.first_collection"] = $fcontribution['receive_date'];
+        }
       }
     }
+  } catch (Exception $e) {
+    // probably just a minor issue, see SEPA-461
   }
 }
