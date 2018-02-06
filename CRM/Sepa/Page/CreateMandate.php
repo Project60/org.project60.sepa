@@ -88,7 +88,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   function createMandate($type) {
     // first create a contribution
     $payment_instrument_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $type);
-    $contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
     $contribution_data = array(
         'version'                   => 3,
@@ -96,13 +95,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'campaign_id'               => $_REQUEST['campaign_id'],
         'financial_type_id'         => $_REQUEST['financial_type_id'],
         'payment_instrument_id'     => $payment_instrument_id,
-        'contribution_status_id'    => $contribution_status_id,
         'currency'                  => 'EUR',
       );
 
     if ($type=='OOFF') {
       $initial_status = 'OOFF';
       $entity_table = 'civicrm_contribution';
+      $contribution_data['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
       $contribution_data['total_amount'] = number_format($_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['receive_date'] = $_REQUEST['date'];
       $contribution_data['source'] = $_REQUEST['source'];
@@ -110,6 +109,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     } else if ($type=='RCUR') {
       $initial_status = 'FRST';
       $entity_table = 'civicrm_contribution_recur';
+      $contribution_data['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
       $contribution_data['amount']              = number_format($_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['start_date']          = $_REQUEST['start_date'];
       $contribution_data['end_date']            = $_REQUEST['end_date'];

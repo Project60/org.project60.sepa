@@ -43,6 +43,7 @@ class CRM_Sepa_Logic_Batching {
     $now = strtotime("$now +$rcur_notice days -$grace_period days");
     $now = strtotime(date('Y-m-d', $now));        // round to full day
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $mode);
 
     if ($offset !== NULL && $limit!==NULL) {
@@ -172,7 +173,7 @@ class CRM_Sepa_Logic_Batching {
               "contribution_recur_id"               => $recur_id,
               "source"                              => $mandate['mandate_source'],
               "financial_type_id"                   => $mandate['rc_financial_type_id'],
-              "contribution_status_id"              => $mandate['rc_contribution_status_id'],
+              "contribution_status_id"              => $contribution_status_pending,
               "campaign_id"                         => $mandate['rc_campaign_id'],
               "is_test"                             => $mandate['rc_is_test'],
               "payment_instrument_id"               => $payment_instrument_id,

@@ -82,7 +82,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 	if (empty($create_contribution['currency']))
 		$create_contribution['currency'] = 'EUR'; // set default currency
 	if (empty($create_contribution['contribution_status_id'])) 
-		$create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+		$create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
 
     if ($params['type']=='RCUR') {
     	$contribution_entity = 'ContributionRecur';
