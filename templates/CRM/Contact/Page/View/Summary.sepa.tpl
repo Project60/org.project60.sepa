@@ -15,7 +15,6 @@
 
 <script type="text/javascript">
 var contribution_snippet_changed  = false;
-var contribution_extra_button     = '<a id="sepa_payment_extra_button" class="button" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contactId"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Record SEPA Contribution{/ts}</span></a>';
 var sepa_edit_mandate_html        = "{ts domain="org.project60.sepa"}edit mandate{/ts}";
 var sepa_edit_mandate_title       = "{ts domain="org.project60.sepa"}edit sepa mandate{/ts}";
 var sepa_edit_mandate_href        = '{crmURL p="civicrm/sepa/xmandate" q="mid=___mandate_id___"}'.replace('&amp;', '&');
@@ -44,14 +43,6 @@ function sepa_modify_summary_tab_contribution() {
 
   if (contribution_tab.length > 0) {
     contribution_snippet_changed = true; // important to do this BEFORE changing the model
-    // add the extra button
-    var action_link = contribution_tab.find(".action-link");
-    if (action_link.length==0) {
-      contribution_tab.find(".view-content").prepend('<div class="action-link"></div>');
-      contribution_tab.find(".view-content > .action-link").prepend(contribution_extra_button);
-    } else {
-      action_link.prepend(contribution_extra_button);  
-    }    
 
     // modify the edit links for recurring contributons, if they are mandates
     var recurring_contribution_table_rows = contribution_tab.find("table.selector:last() > tbody > tr[id]");

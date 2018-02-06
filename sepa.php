@@ -15,6 +15,7 @@
 require_once 'sepa.civix.php';
 require_once 'sepa_pp_sdd.php';
 
+use CRM_Sepa_ExtensionUtil as E;
 
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contact_Page_View_Summary") {
@@ -32,7 +33,7 @@ function sepa_civicrm_pageRun( &$page ) {
     if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
       // This is an installment of a recurring contribution.
       $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution_recur', 'entity_id'=>$page->getTemplate()->get_template_vars('contribution_recur_id')));
-    } 
+    }
     else {
       // this is a OOFF contribtion
       $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution', 'entity_id'=>$page->getTemplate()->get_template_vars('id')));
@@ -44,12 +45,12 @@ function sepa_civicrm_pageRun( &$page ) {
       'template' => 'Sepa/Contribute/Form/ContributionView.tpl'
     ));
   }
-  
+
   elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
     // recurring contribuion view
 
     $recur = $page->getTemplate()->get_template_vars("recur");
-    
+
     // This is a one-off contribution => try to show mandate data.
     $template_vars = $page->getTemplate()->get_template_vars('recur');
     $payment_instrument_id = $template_vars['payment_instrument_id'];
@@ -85,7 +86,7 @@ function sepa_civicrm_config(&$config) {
 when civi 4.4, not sure how to make it compatible with both
 CRM_Core_DAO_AllCoreTables::$daoToClass["SepaMandate"] = "CRM_Sepa_DAO_SEPAMandate";
 CRM_Core_DAO_AllCoreTables::$daoToClass["SepaCreditor"] = "CRM_Sepa_DAO_SEPACreditor";
-*/ 
+*/
   _sepa_civix_civicrm_config($config);
 }
 
@@ -162,7 +163,7 @@ function sepa_civicrm_install_options($data) {
 function sepa_civicrm_options() {
   $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => 'payment_instrument'));
   if (!isset($result['id'])) {
-    die($result["error_message"]);    
+    die($result["error_message"]);
   }
   $gid= $result['id'];
 
@@ -189,10 +190,10 @@ function sepa_civicrm_options() {
               ),
           ),
        ),
-      
+
       // These will be used to mark a contribution with the correct type and will
       // greatly facilitate batching later on
-      
+
       'payment_instrument' => array(
           'values' => array(
               'FRST' => array(
@@ -272,7 +273,7 @@ function sepa_civicrm_uninstall() {
 function sepa_civicrm_enable() {
   //add/check the required option groups
   sepa_civicrm_install_options(sepa_civicrm_options());
-  
+
   // add all required message templates
   require_once 'CRM/Sepa/Page/SepaMandatePdf.php';
   CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
@@ -281,7 +282,7 @@ function sepa_civicrm_enable() {
   sepa_pp_install();
 
   // create a dummy creditor if no creditor exists
-  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');    
+  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
   if (empty($creditorCount)) {
     error_log("org.project60.sepa_dd: Trying to install dummy creditor.");
     // to create, we need to first find a default contact
@@ -300,14 +301,14 @@ function sepa_civicrm_enable() {
       error_log("org.project60.sepa_dd: Inserting dummy creditor into database.");
       // remark: we're within the enable hook, so we cannot use our own API/BAOs...
       $create_creditor_sql = "
-      INSERT INTO civicrm_sdd_creditor 
+      INSERT INTO civicrm_sdd_creditor
       (`creditor_id`,    `identifier`,      `name`,           `address`,                   `country_id`, `iban`,                   `bic`,      `mandate_prefix`, `mandate_active`, `sepa_file_format_id`, `category`)
       VALUES
       ($default_contact, 'TESTCREDITORDE', 'TEST CREDITOR', '221B Baker Street\nLondon', '1226',       'DE12500105170648489890', 'SEPATEST', 'TEST',           1,                1, 'TEST');";
       CRM_Core_DAO::executeQuery($create_creditor_sql);
     }
   }
-  
+
   return _sepa_civix_civicrm_enable();
 }
 
@@ -408,7 +409,7 @@ function sepa_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$valu
   }
 }
 
-/** 
+/**
  * LAST RESORT: prevent the user to delete a (recurring) contribution when there's a mandate attached.
  */
 function sepa_civicrm_pre($op, $objectName, $id, &$params) {
@@ -420,7 +421,7 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
     }
 
     if ($error) {
-      // Unfortunately, there is no other option at this point. 
+      // Unfortunately, there is no other option at this point.
       //   Ideally, this would've been caught by the API, this is just a last resort
       throw new CRM_Core_Exception($error);
     }
@@ -496,7 +497,7 @@ function sepa_civicrm_navigationMenu(&$params) {
     );
     CRM_Utils_SepaMenuTools::addNavigationMenuEntry($params[$contributions_menu_id], $sepa_dashboard_menu);
   }
-  
+
   //add menu entry for SEPA settings to Administer>CiviContribute menu
   $sepa_settings_url = 'civicrm/admin/setting/sepa';
   // now, by default we want to add it to the CiviContribute Administer menu -> find it
@@ -552,7 +553,7 @@ function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissi
  */
 function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$errors ) {
   if ($formName == 'CRM_Contribute_Form_Contribution') {
-    // we'll just focus on the payment_instrument_id 
+    // we'll just focus on the payment_instrument_id
     if (empty($fields['payment_instrument_id'])) return;
 
     // find the contribution id
@@ -562,7 +563,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     // find the attached mandate, if exists
     $mandates = CRM_Sepa_Logic_Settings::getMandateFor($contribution_id);
     if (empty($mandates)) {
-      // the contribution has no mandate, 
+      // the contribution has no mandate,
       //   so we should not allow the payment_instrument be set to an SDD one
       if (CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $fields['payment_instrument_id']))) {
         $errors['payment_instrument_id'] = ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.", array('domain' => 'org.project60.sepa'));
@@ -603,7 +604,7 @@ function sepa_civicrm_tokens(&$tokens) {
     "$prefix.iban"               => ts('IBAN', array('domain' => 'org.project60.sepa')),
     "$prefix.iban_anonymised"    => ts('IBAN (anonymised)', array('domain' => 'org.project60.sepa')),
     "$prefix.bic"                => ts('BIC', array('domain' => 'org.project60.sepa')),
-    
+
     "$prefix.amount"             => ts('Amount', array('domain' => 'org.project60.sepa')),
     "$prefix.currency"           => ts('Currency', array('domain' => 'org.project60.sepa')),
     "$prefix.first_collection"   => ts('First Collection Date', array('domain' => 'org.project60.sepa')),
@@ -611,7 +612,7 @@ function sepa_civicrm_tokens(&$tokens) {
     "$prefix.frequency_interval" => ts('Interval Multiplier', array('domain' => 'org.project60.sepa')),
     "$prefix.frequency_unit"     => ts('Interval Unit', array('domain' => 'org.project60.sepa')),
     "$prefix.frequency"          => ts('Interval', array('domain' => 'org.project60.sepa')),
-  );    
+  );
 }
 
 /**
@@ -686,4 +687,17 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
   } catch (Exception $e) {
     // probably just a minor issue, see SEPA-461
   }
+}
+
+/**
+ * Implements hook_civicrm_tabs()
+ *
+ * Will inject the SepaMandate tab
+ */
+function sepa_civicrm_tabs(&$tabs, $contactID) {
+  $tabs[] = array( 'id'     => 'sepa',
+                   'url'    => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$contactID}"),
+                   'title'  => E::ts('SEPA Mandates'),
+                   'count'  => CRM_Sepa_Page_MandateTab::getMandateCount($contactID),
+                   'weight' => 300);
 }

@@ -63,4 +63,10 @@
     <title>Delete transaction group</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/sepa/tab</path>
+    <page_callback>CRM_Sepa_Page_MandateTab</page_callback>
+    <title>SEPA Mandates</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
