@@ -20,6 +20,8 @@ var sepa_edit_mandate_html        = "{ts domain="org.project60.sepa"}edit mandat
 var sepa_edit_mandate_title       = "{ts domain="org.project60.sepa"}edit sepa mandate{/ts}";
 var sepa_edit_mandate_href        = '{crmURL p="civicrm/sepa/xmandate" q="mid=___mandate_id___"}'.replace('&amp;', '&');
 var contribution_tab_selector_44x = "#{ts domain="org.project60.sepa"}Contributions{/ts} > div.crm-container-snippet";
+var can_create_mandate            = {$can_create_mandate};
+var can_edit_mandate              = {$can_edit_mandate};
 
 // listen to DOM changes
 cj("#mainTabContainer").bind("DOMSubtreeModified", sepa_modify_summary_tab_contribution);
@@ -45,13 +47,15 @@ function sepa_modify_summary_tab_contribution() {
   if (contribution_tab.length > 0) {
     contribution_snippet_changed = true; // important to do this BEFORE changing the model
     // add the extra button
-    var action_link = contribution_tab.find(".action-link");
-    if (action_link.length==0) {
-      contribution_tab.find(".view-content").prepend('<div class="action-link"></div>');
-      contribution_tab.find(".view-content > .action-link").prepend(contribution_extra_button);
-    } else {
-      action_link.prepend(contribution_extra_button);  
-    }    
+    if (can_create_mandate) {
+      var action_link = contribution_tab.find(".action-link");
+      if (action_link.length==0) {
+        contribution_tab.find(".view-content").prepend('<div class="action-link"></div>');
+        contribution_tab.find(".view-content > .action-link").prepend(contribution_extra_button);
+      } else {
+        action_link.prepend(contribution_extra_button);
+      }
+    }
 
     // modify the edit links for recurring contributons, if they are mandates
     var recurring_contribution_table_rows = contribution_tab.find("table.selector:last() > tbody > tr[id]");
@@ -73,9 +77,13 @@ function sepa_modify_summary_tab_contribution() {
 
               // modify the edit option
               var edit_action = disable_action.prev();
-              edit_action.attr('href', sepa_edit_mandate_href.replace('___mandate_id___', mandate_id));
-              edit_action.html(sepa_edit_mandate_html);
-              edit_action.attr('title', sepa_edit_mandate_title);
+              if (can_edit_mandate) {
+                edit_action.attr('href', sepa_edit_mandate_href.replace('___mandate_id___', mandate_id));
+                edit_action.html(sepa_edit_mandate_html);
+                edit_action.attr('title', sepa_edit_mandate_title);
+              } else {
+                edit_action.hide();
+              }
             }
           }
         }

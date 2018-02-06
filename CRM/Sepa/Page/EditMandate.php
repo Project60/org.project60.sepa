@@ -128,6 +128,11 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $contribution['currency']  = $contribution['currency'];
       $contribution['cycle']     = CRM_Utils_SepaOptionGroupTools::getFrequencyText($contribution['frequency_interval'], $contribution['frequency_unit'], true);
       $contribution['cycle_day'] = CRM_Sepa_Logic_Batching::getCycleDay($contribution, $mandate['creditor_id']);
+      if (isset($contribution['next_sched_contribution_date'])) {
+        $contribution['next_sched_contribution_date'] = substr($contribution['next_sched_contribution_date'], 0, 10); // the date is enough
+      } else {
+        $contribution['next_sched_contribution_date'] = ts("None", array('domain' => 'org.project60.sepa'));
+      }
       if (isset($contribution['end_date']) && $contribution['end_date']) {
         $contribution['default_end_date'] = date('Y-m-d', strtotime($contribution['end_date']));
       } else {
@@ -161,7 +166,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $this->assign('contribution', $contribution);
     $this->assign('contact1', $contact1);
     $this->assign('contact2', $contact2);
-    $this->assign('can_delete', CRM_Core_Permission::check('administer CiviCRM'));
+    $this->assign('can_delete', CRM_Core_Permission::check('delete sepa groups'));
     $this->assign('can_modify', CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification'));
     $this->assign('sepa_templates', $tpl_ids);
 

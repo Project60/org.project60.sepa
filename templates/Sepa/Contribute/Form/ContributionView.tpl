@@ -29,9 +29,11 @@
     </table>
 </div>
 
+{if $can_edit_mandate}
 <div class="crm-submit-buttons" id="new_submit_buttons">
     <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts domain="org.project60.sepa"}Mandate Options{/ts}</span></a>
 </div>
+{/if}
 
 {literal}
 <script type="text/javascript">

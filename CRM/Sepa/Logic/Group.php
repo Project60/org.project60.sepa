@@ -86,13 +86,17 @@ class CRM_Sepa_Logic_Group {
       return "Group type '".$txgroup['type']."' not yet supported.";
     }
 
-    // step 3: update all the contributions to status 'in progress', and set the receive_date as collection
+    // step 3.1: update all the contributions to status 'in progress', and set the receive_date as collection
     //  remark: don't set receive_date to collection_date any more, it confuses the RCUR batcher (see https://github.com/Project60/sepa_dd/issues/190)
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_contribution
       LEFT JOIN civicrm_sdd_contribution_txgroup ON contribution_id = civicrm_contribution.id
       SET contribution_status_id = $status_inprogress
       WHERE txgroup_id = $txgroup_id;");
+
+    // step 3.2: update next_sched_contribution_date
+    // TODO: get $collection_date
+    CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
 
     // step 4: create the sepa file
     $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
@@ -226,7 +230,11 @@ class CRM_Sepa_Logic_Group {
       }
     }
 
-    // step 3: update group status
+    // step 3.1: update next_sched_contribution_date
+    // TODO: get $collection_date
+    CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
+
+    // step 3.2: update group status
     $result = civicrm_api('SepaTransactionGroup', 'create', array('id'=>$txgroup_id, 'status_id'=>$group_status_id_received, 'version'=>3));
     if (!empty($result['is_error'])) {
       $lock->release();
