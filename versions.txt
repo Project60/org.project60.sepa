@@ -20,6 +20,8 @@ Version 1.2.5
 - FIX: Remove old CRM-14114 workaround (https://github.com/Project60/org.project60.sepa/issues/452)
 - FIX: Batching algorithm multiplies groups (https://github.com/Project60/org.project60.sepa/issues/458)
 - FIX: Collection cycle violated (https://github.com/Project60/org.project60.sepa/issues/459)
+- FIX: Issues with deferred collection dates (https://github.com/Project60/org.project60.sepa/issues/460)
+- FIX: More robustness for SEPA tokens (https://github.com/Project60/org.project60.sepa/issues/461)
 
 
 Version 1.2.4
