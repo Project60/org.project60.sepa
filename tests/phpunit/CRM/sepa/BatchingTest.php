@@ -295,7 +295,7 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     // check whether the contribution has been marked as "in progress"
     $searchParams = array(
       "id" => 1,
-      "contribution_status_id" => (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name')
+      "contribution_status_id" => (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress')
     );
     $this->assertDBCompareValues("CRM_Contribute_DAO_Contribution", array("id" => 1), $searchParams);
   }
@@ -337,7 +337,7 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     // check txgroup attributes
     $searchParams = array(
       "id" => 1,
-      "status_id" => (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name')
+      "status_id" => (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received')
     );
     $this->assertDBCompareValues("CRM_Sepa_DAO_SEPATransactionGroup", array("id" => 1), $searchParams);
   }
@@ -416,7 +416,7 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
     // Check whether contribution has been flagged as ended
     $searchParams = array(
       "id" => 1,
-      "contribution_status_id" => (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')
+      "contribution_status_id" => (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')
     );
     $this->assertDBCompareValues("CRM_Contribute_DAO_ContributionRecur", array("id" => 1), $searchParams);
   }
@@ -564,9 +564,9 @@ class CRM_sepa_BatchingTest extends CRM_sepa_BaseTestCase {
    */
   public function testCorrectPaymentInstrumentSet() {
     // read the payment instrument ids  
-    $payment_instrument_FRST = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'FRST', 'name');
+    $payment_instrument_FRST = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
     $this->assertNotEmpty($payment_instrument_FRST, "Could not find the 'FRST' payment instrument.");
-    $payment_instrument_RCUR = (int) CRM_Core_OptionGroup::getValue('payment_instrument', 'RCUR', 'name');
+    $payment_instrument_RCUR = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
     $this->assertNotEmpty($payment_instrument_RCUR, "Could not find the 'RCUR' payment instrument.");
 
     // create a contact
