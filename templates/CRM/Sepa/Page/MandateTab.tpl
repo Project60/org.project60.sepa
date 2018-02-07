@@ -54,7 +54,9 @@
       <td>
         <span>
           <a href="{$rcur.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
-          <a href="{$rcur.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+          {if $rcur.edit_link}
+            <a href="{$rcur.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+          {/if}
         </span>
       </td>
     </tr>
@@ -92,7 +94,9 @@
       <td>
         <span>
           <a href="{$ooff.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
-          <a href="{$ooff.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+          {if $ooff.edit_link}
+            <a href="{$ooff.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+          {/if}
         </span>
       </td>
     </tr>
