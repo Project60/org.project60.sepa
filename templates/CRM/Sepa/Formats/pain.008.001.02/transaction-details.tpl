@@ -9,11 +9,7 @@
           <Cd>SEPA</Cd>
         </SvcLvl>
         <LclInstrm>
-{if $fileFormat == 'pain.008.003.02 COR1'}
-          <Cd>COR1</Cd>
-{else}
           <Cd>CORE</Cd>
-{/if}
         </LclInstrm>
         <SeqTp>{$group.type}</SeqTp>
       </PmtTpInf>
@@ -33,9 +29,7 @@
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
       <CdtrSchmeId>
-{if $fileFormat == 'pain.008.001.02'}{* legacy pain.008.001.02 format *}
         <Nm>{$creditor.name}</Nm>
-{/if}
         <Id>
           <PrvtId>
             <Othr>
