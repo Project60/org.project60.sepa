@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -62,7 +62,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     // add rules
     $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
-    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');    
+    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
 
     // apply "hack" for old payment forms
     if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
@@ -82,7 +82,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $earliest_cycle_day = $earliest_rcur_date;
     while (!in_array(date('j', $earliest_cycle_day), $cycle_days)) {
       $earliest_cycle_day = strtotime("+ 1 day", $earliest_cycle_day);
-    }    
+    }
 
     $form->assign('earliest_rcur_date', date('Y-m-d', $earliest_rcur_date));
     $form->assign('earliest_ooff_date', date('Y-m-d', $earliest_ooff_date));
@@ -110,7 +110,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   }
 
   /**
-   * This function collects all the information and 
+   * This function collects all the information and
    * "simulates" a payment processor by creating an incomplete mandate,
    * that will later be connected with the results of the rest of the
    * payment process
@@ -168,9 +168,9 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     // update the contribution, if existing (RCUR case)
     if (!empty($params['contributionID'])) {
-      $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contributionID'])); 
+      $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contributionID']));
       civicrm_api3('Contribution', 'create', array(
-        'id'           => $params['contributionID'], 
+        'id'           => $params['contributionID'],
         'contact_id'   => $contribution['contact_id'], // resubmit, leaving it out causes errors sometimes
         'receive_date' => $params['sepa_start_date'],
         'trxn_id'      => $params['trxn_id']));
@@ -178,7 +178,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
     if (!empty($params['contributionRecurID'])) {
       civicrm_api3('ContributionRecur', 'create', array(
-        'id'            => $params['contributionRecurID'], 
+        'id'            => $params['contributionRecurID'],
         'start_date'    => $params['sepa_start_date'],
         'cycle_day'     => $params['cycle_day'],
         'trxn_id'       => $params['trxn_id']));
@@ -194,7 +194,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    *
    * This function here should be called after the payment process was completed.
    * It will process all the PARTIAL mandates and connect them with created contributions.
-   */ 
+   */
   public static function processPartialMandates() {
     // load all the PARTIAL mandates
     $partial_mandates = civicrm_api3('SepaMandate', 'get', array('version'=>3, 'status'=>'PARTIAL', 'option.limit'=>9999));
@@ -212,7 +212,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
             $collection_date = $first_collection_date;
           }
 
-          // FOUND! Update the contribution... 
+          // FOUND! Update the contribution...
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
           $contribution_bao->get('id', $contribution['id']);
           $contribution_bao->is_pay_later = 0;
@@ -230,7 +230,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
             // this happens when the payment gets created AFTER the doDirectPayment method
             $mandate_update['contact_id'] = $contribution_bao->contact_id;
           }
-          
+
           // initialize according to the creditor settings
           CRM_Sepa_BAO_SEPACreditor::initialiseMandateData($mandate['creditor_id'], $mandate_update);
 
@@ -245,7 +245,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
 
       } elseif ($mandate['type']=='RCUR') {
         // in the RCUR case, we also need to find the contribution, and connect it
-        
+
         // load the contribution AND the associated recurring contribution
         $contribution =  civicrm_api('Contribution', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
         $rcontribution = civicrm_api('ContributionRecur', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
@@ -284,14 +284,14 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
             $mandate['contact_id']                 = $contribution['contact_id'];
           }
           //NO: $mandate_update['first_contribution_id'] = $contribution['id'];
-          
+
           // initialize according to the creditor settings
           CRM_Sepa_BAO_SEPACreditor::initialiseMandateData($mandate['creditor_id'], $mandate_update);
 
           // finally, write the changes to the mandate
           civicrm_api3('SepaMandate', 'create', $mandate_update);
 
-          // ...and trigger notification 
+          // ...and trigger notification
           // FIXME: WORKAROUND, see https://github.com/Project60/org.project60.sepa/issues/296)
           CRM_Contribute_BAO_ContributionPage::recurringNotify(
             CRM_Core_Payment::RECURRING_PAYMENT_START,
@@ -333,7 +333,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   }
 
   /**
-   * Override custom PI validation 
+   * Override custom PI validation
    *  to make billing information NOT mandatory (see SEPA-372)
    *
    * @author N. Bochan
@@ -371,7 +371,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         'bank_account_number',
         'bank_identification_number',
         'bank_name',
-      );      
+      );
     }
   }
 
@@ -481,43 +481,43 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     // we don't need the default stuff:
     $form->_paymentFields = array();
 
-    $form->add( 'text', 
-                'bank_account_number', 
-                ts('IBAN', array('domain' => 'org.project60.sepa')), 
-                array('size' => 34, 'maxlength' => 34,), 
+    $form->add( 'text',
+                'bank_account_number',
+                ts('IBAN', array('domain' => 'org.project60.sepa')),
+                array('size' => 34, 'maxlength' => 34,),
                 TRUE);
 
-    $form->add( 'text', 
-                'bank_identification_number', 
-                ts('BIC', array('domain' => 'org.project60.sepa')), 
-                array('size' => 11, 'maxlength' => 11), 
+    $form->add( 'text',
+                'bank_identification_number',
+                ts('BIC', array('domain' => 'org.project60.sepa')),
+                array('size' => 11, 'maxlength' => 11),
                 TRUE);
 
-    $form->add( 'text', 
-                'bank_name', 
-                ts('Bank Name', array('domain' => 'org.project60.sepa')), 
-                array('size' => 20, 'maxlength' => 64), 
+    $form->add( 'text',
+                'bank_name',
+                ts('Bank Name', array('domain' => 'org.project60.sepa')),
+                array('size' => 20, 'maxlength' => 64),
                 FALSE);
 
-    $form->add( 'text', 
-                'account_holder', 
-                ts('Account Holder', array('domain' => 'org.project60.sepa')), 
-                array('size' => 20, 'maxlength' => 64), 
+    $form->add( 'text',
+                'account_holder',
+                ts('Account Holder', array('domain' => 'org.project60.sepa')),
+                array('size' => 20, 'maxlength' => 64),
                 FALSE);
 
-    $form->add( 'select', 
-                'cycle_day', 
-                ts('Collection Day', array('domain' => 'org.project60.sepa')), 
+    $form->add( 'select',
+                'cycle_day',
+                ts('Collection Day', array('domain' => 'org.project60.sepa')),
                 CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
                 FALSE);
 
-    $form->addDate('start_date', 
-                ts('Start Date', array('domain' => 'org.project60.sepa')), 
-                TRUE, 
+    $form->addDate('start_date',
+                ts('Start Date', array('domain' => 'org.project60.sepa')),
+                TRUE,
                 array());
 
     // add rules
     $form->addRule('bank_account_number', ts('This is not a correct IBAN.', array('domain' => 'org.project60.sepa')), 'sepa_iban_valid');
     $form->addRule('bank_identification_number',  ts('This is not a correct BIC.', array('domain' => 'org.project60.sepa')),  'sepa_bic_valid');
-  }  
+  }
 }

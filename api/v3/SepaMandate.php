@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2017 TTTP / SYSTOPIA                |
+| Copyright (C) 2013-2018 TTTP / SYSTOPIA                |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -81,15 +81,15 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     }
 	if (empty($create_contribution['currency']))
 		$create_contribution['currency'] = 'EUR'; // set default currency
-	if (empty($create_contribution['contribution_status_id'])) 
+	if (empty($create_contribution['contribution_status_id']))
 		$create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
     if ($params['type']=='RCUR') {
     	$contribution_entity = 'ContributionRecur';
 	    $contribution_table  = 'civicrm_contribution_recur';
-      	$create_contribution['payment_instrument_id'] = 
+      	$create_contribution['payment_instrument_id'] =
       		(int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
-      	if (empty($create_contribution['status'])) 
+      	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'FRST'; // set default status
       	if (empty($create_contribution['is_pay_later']))
       		$create_contribution['is_pay_later'] = 1; // set default pay_later
@@ -97,9 +97,9 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     } elseif ($params['type']=='OOFF') {
 	 	$contribution_entity = 'Contribution';
 	    $contribution_table  = 'civicrm_contribution';
-      	$create_contribution['payment_instrument_id'] = 
+      	$create_contribution['payment_instrument_id'] =
       		(int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
-      	if (empty($create_contribution['status'])) 
+      	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'OOFF'; // set default status
       	if (empty($create_contribution['total_amount']))
       		$create_contribution['total_amount'] = $create_contribution['amount']; // copy from amount

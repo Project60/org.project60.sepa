@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -20,7 +20,7 @@
       <br/>
       <span class="description">
         Check this box to create an SDD mandate for this membership. You will be able to enter the debtor details.
-      </span>      
+      </span>
     </td>
   </tr>
   <tr id="selectSDDParams" {if $form.is_sdd.value eq 0}style="display: none; "{/if}>
@@ -52,13 +52,13 @@
         <tr id="crmf-sdd_frequency">
           <td class="label"><label for="sdd_frequency">{ts domain="org.project60.sepa"}Debit frequency{/ts}</label></td>
           <td>
-            {$form.sdd_frequency.0.html} 
+            {$form.sdd_frequency.0.html}
             <br/>
-            {$form.sdd_frequency.1.html} 
+            {$form.sdd_frequency.1.html}
             <br/>
-            {$form.sdd_frequency.3.html} 
+            {$form.sdd_frequency.3.html}
             <br/>
-            {$form.sdd_frequency.6.html} 
+            {$form.sdd_frequency.6.html}
             <br/>
             {$form.sdd_frequency.12.html}
           </td>
@@ -80,7 +80,7 @@
   <script>
     cj(function($) {
       $('#selectSDD').insertAfter('#contri');
-      $('#is_sdd').click(function(){ 
+      $('#is_sdd').click(function(){
         if ($(this).is(':checked')) $('#selectSDDParams').show();
         else $('#selectSDDParams').hide();
         });

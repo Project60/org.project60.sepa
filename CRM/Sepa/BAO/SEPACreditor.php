@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -49,7 +49,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
   /**
    * Will set the inital parameters 'status', 'validation_date' and 'date', 'is_enabled'
    * in the $mandate_data array with respect to the creditor settings
-   * 
+   *
    * Caution: will NOT modify the mandata on the database!
    */
   public static function initialiseMandateData($creditor_id, &$mandate_data) {
@@ -69,11 +69,11 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
 
     } else {
       // mandate is activated right away
-      $mandate_data['is_enabled'] = 1; 
+      $mandate_data['is_enabled'] = 1;
       if (empty($mandate_data['date']))            $mandate_data['date']            = date('YmdHis');
       if (empty($mandate_data['creation_date']))   $mandate_data['creation_date']   = date('YmdHis');
       if (empty($mandate_data['validation_date'])) $mandate_data['validation_date'] = date('YmdHis');
-      
+
       if ($mandate_data['type'] == 'RCUR') {
         $mandate_data['status'] = 'FRST';
       } elseif ($mandate_data['type'] == 'OOFF') {

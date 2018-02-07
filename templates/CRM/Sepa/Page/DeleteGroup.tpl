@@ -1,3 +1,18 @@
+{*-------------------------------------------------------+
+| Project 60 - SEPA direct debit                         |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
+| Author: B. Endres (endres -at- systopia.de)            |
+| http://www.systopia.de/                                |
++--------------------------------------------------------+
+| This program is released as free software under the    |
+| Affero GPL license. You can redistribute it and/or     |
+| modify it under the terms of this license which you    |
+| can read by viewing the included agpl.txt or online    |
+| at www.gnu.org/licenses/agpl.html. Removal of this     |
+| copyright header is strictly prohibited without        |
+| written permission from the original author(s).        |
++-------------------------------------------------------*}
+
 {capture assign=type_label}
 {if $txgroup.type eq "OOFF"}
 {ts domain="org.project60.sepa"}one-off direct debit payment{/ts}
@@ -204,7 +219,7 @@ things
 <div class="crm-submit-buttons">
 	<input id="ok_button" class="button button_close" type="button" value="{ts domain="org.project60.sepa"}Yes{/ts}" />
 	<input id="cancel_button" class="button button_close" type="button" value="{ts domain="org.project60.sepa"}No{/ts}" />
-</div> 
+</div>
 </form>
 
 
@@ -282,7 +297,7 @@ function leaveForm(object) {
 {/if}
 <div class="crm-submit-buttons">
 	<a id="back_button" class="button button_close" href="{crmURL p='civicrm/sepa'}"><span><div class="icon back-icon"></div>{ts domain="org.project60.sepa"}Back{/ts}</span></a>
-</div> 
+</div>
 
 
 
@@ -300,6 +315,6 @@ function leaveForm(object) {
 </p>
 <div class="crm-submit-buttons">
 	<a id="back_button" class="button button_close" href="{crmURL p='civicrm/sepa'}"><span><div class="icon back-icon"></div>{ts domain="org.project60.sepa"}Back{/ts}</span></a>
-</div> 
+</div>
 
 {/if}

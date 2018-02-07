@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -106,7 +106,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
                 $this->createDownloadLink($group_id);
               }
           }
-          
+
         }
     }
 

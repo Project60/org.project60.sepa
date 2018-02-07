@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -133,14 +133,14 @@ function mark_received(group_id) {
     CRM.api('SepaAlternativeBatching', 'received', {'q': 'civicrm/ajax/rest', 'txgroup_id': group_id},
       {success: function(data) {
         // reload page
-        location.reload();     
+        location.reload();
       },
        error: function(data) {
         // show error message
         cj("#busy_" + group_id).hide();
         alert(data.error_message.error_message);
       }}
-    );    
+    );
   }
 }
 </script>

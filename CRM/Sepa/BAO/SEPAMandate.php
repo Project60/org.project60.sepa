@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -36,7 +36,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   static function add(&$params) {
 
-    // handle 'normal' creation process inlcuding hooks    
+    // handle 'normal' creation process inlcuding hooks
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
 
@@ -63,12 +63,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $params['iban'] = strtoupper($params['iban']);           // create uppercase string
       $params['iban'] = str_replace(' ', '', $params['iban']); // strip spaces
       $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban']);
-      if ($iban_error) throw new CRM_Exception($iban_error . ':' . $params['iban']);      
+      if ($iban_error) throw new CRM_Exception($iban_error . ':' . $params['iban']);
     }
-    
+
     if (!empty($params['bic'])) {
       $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic']);
-      if ($bic_error) throw new CRM_Exception($bic_error . ':' . $params['bic']);      
+      if ($bic_error) throw new CRM_Exception($bic_error . ':' . $params['bic']);
     }
 
 
@@ -98,7 +98,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         return true;
     }
   }
-  
+
   /**
    * getContract() returns the contribution or recurring contribution this mandate uses as a contract
    */
@@ -123,7 +123,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
   }
 
   /**
-   * findContribution() locates a contribution created within the scope of the contract. 
+   * findContribution() locates a contribution created within the scope of the contract.
    *   MANDATE -> CONTRIBUTION_RECUR -> CONTRIBUTION
    * or
    *   MANDATE -> CONTRIBUTION
@@ -148,11 +148,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     return null;
   }
 
-  
+
   /**
    * Looks like an unused function, candidate for deprecation because of nasty code
-   * 
-   * @deprecated 
+   *
+   * @deprecated
    * @return type
    */
   public function getUnbatchedContributionIds() {
@@ -161,7 +161,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // 2. if it is a recurring one, get the contribs that match the pattern
     if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
-      $query = "SELECT        c.id AS id, b.id  AS batch_id 
+      $query = "SELECT        c.id AS id, b.id  AS batch_id
                 FROM          civicrm_contribution c
                 LEFT JOIN     civicrm_entity_batch eb ON ( c.id = eb.entity_id AND eb.entity_table = 'civicrm_contribution' )
                 LEFT JOIN     civicrm_batch b ON ( b.id = eb.batch_id )
@@ -185,9 +185,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   /**
    * gracefully terminates OOFF mandates
-   * 
+   *
    * @return success as boolean
-   * @author endres -at- systopia.de 
+   * @author endres -at- systopia.de
    */
   static function terminateOOFFMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL, $mandate=NULL) {
     // use a lock, in case somebody is batching just now
@@ -204,7 +204,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
         $lock->release();
         return FALSE;
-      }      
+      }
     }
 
     // check if it's really a OOFF mandate
@@ -225,10 +225,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $contribution_id = $mandate['entity_id'];
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $is_in_closed_group = CRM_Core_DAO::singleValueQuery("
-      SELECT COUNT(civicrm_sdd_contribution_txgroup.id) 
-      FROM civicrm_sdd_contribution_txgroup 
+      SELECT COUNT(civicrm_sdd_contribution_txgroup.id)
+      FROM civicrm_sdd_contribution_txgroup
       LEFT JOIN civicrm_sdd_txgroup ON civicrm_sdd_contribution_txgroup.txgroup_id = civicrm_sdd_txgroup.id
-      WHERE contribution_id = $contribution_id 
+      WHERE contribution_id = $contribution_id
       AND status_id <> $group_status_id_open;");
     if ($is_in_closed_group) {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot close mandate [%s], it's alread batched in a non-open group!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error'), 'error');
@@ -269,9 +269,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   /**
    * gracefully terminates RCUR mandates
-   * 
+   *
    * @return success as boolean
-   * @author endres -at- systopia.de 
+   * @author endres -at- systopia.de
    */
   static function terminateMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL) {
     $contribution_id_pending = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
@@ -289,7 +289,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $lock->release();
       return FALSE;
     }
-    
+
     // check the mandate type
     if ( $mandate['type']=="OOFF" ) {
       return CRM_Sepa_BAO_SEPAMandate::terminateOOFFMandate($mandate_id, $new_end_date_str, $cancel_reason, $mandate);
@@ -341,7 +341,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if ($cancel_reason) {
       // ..and create a note, since the contribution_recur does not have cancel_reason
 
-      // FIXME: this is a workaround due to CRM-14901, 
+      // FIXME: this is a workaround due to CRM-14901,
       //   see https://github.com/Project60/org.project60.sepa/issues/401
       $create_note_query = "
       INSERT INTO civicrm_note (entity_table, entity_id, modified_date, subject, note, privacy)
@@ -366,7 +366,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $obsolete_ids_query = CRM_Core_DAO::executeQuery($obsolete_query);
     while ($obsolete_ids_query->fetch()) {
       array_push($obsolete_ids, $obsolete_ids_query->id);
-    }    
+    }
 
     // ...and delete them:
     foreach ($obsolete_ids as $obsolete_id) {
@@ -392,8 +392,8 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     CRM_Core_Session::setStatus(ts("New end date set.", array('domain' => 'org.project60.sepa')), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'info');
-    CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed.", array('domain' => 'org.project60.sepa')), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'warn');    
-  
+    CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed.", array('domain' => 'org.project60.sepa')), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'warn');
+
     if (count($deleted_ids)) {
       CRM_Core_Session::setStatus(sprintf(ts("Successfully deleted %d now obsolete contributions.", array('domain' => 'org.project60.sepa')), count($deleted_ids)), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'info');
     }
@@ -405,9 +405,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   /**
    * changes the amount of a SEPA mandate
-   * 
+   *
    * @return success as boolean
-   * @author endres -at- systopia.de 
+   * @author endres -at- systopia.de
    */
   static function adjustAmount($mandate_id, $adjusted_amount) {
     $adjusted_amount = (float) $adjusted_amount;
@@ -427,7 +427,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $lock->release();
       return FALSE;
     }
-    
+
     // check the mandate type
     if ( $mandate['type']!="RCUR" ) {
       CRM_Core_Session::setStatus(ts("You can only adjust the amount of recurring contribution mandates.", array('domain' => 'org.project60.sepa')), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
@@ -490,7 +490,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     foreach ($contributions2adjust as $contribution2adjust_id) {
       $update_result = civicrm_api("Contribution", "create", array(
         'version'                => 3,
-        'id'                     => $contribution2adjust_id, 
+        'id'                     => $contribution2adjust_id,
         'total_amount'           => $adjusted_amount,
         'contribution_status_id' => $contribution_id_pending));
       if (!empty($update_result['is_error'])) {
@@ -499,13 +499,13 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         array_push($adjusted_ids, $contribution2adjust_id);
       }
     }
-  
+
     if (count($adjusted_ids)) {
       CRM_Core_Session::setStatus(sprintf(ts("Successfully updated %d generated contributions.", array('domain' => 'org.project60.sepa')), count($adjusted_ids)), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'info');
     }
 
     $lock->release();
-    return TRUE;    
+    return TRUE;
   }
 }
 

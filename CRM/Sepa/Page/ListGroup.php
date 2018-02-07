@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -50,17 +50,17 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         civicrm_contribution.total_amount       AS contribution_amount,
         civicrm_contribution.financial_type_id  AS contribution_financial_type_id,
         civicrm_campaign.title                  AS contribution_campaign
-      FROM   
+      FROM
         civicrm_sdd_txgroup
-      LEFT JOIN 
+      LEFT JOIN
         civicrm_sdd_contribution_txgroup   ON   civicrm_sdd_txgroup.id = civicrm_sdd_contribution_txgroup.txgroup_id
-      LEFT JOIN 
+      LEFT JOIN
         civicrm_contribution               ON   civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
-      LEFT JOIN 
+      LEFT JOIN
         civicrm_contact                    ON   civicrm_contact.id = civicrm_contribution.contact_id
-      LEFT JOIN 
+      LEFT JOIN
         civicrm_campaign                   ON   civicrm_campaign.id = civicrm_contribution.campaign_id
-      WHERE       
+      WHERE
         civicrm_sdd_txgroup.id = $group_id;";
 
       $total_amount = 0.0;

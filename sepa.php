@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 Project60                      |
+| Copyright (C) 2013-2018 Project60                      |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
 | Affero GPL license. You can redistribute it and/or     |
@@ -165,7 +165,7 @@ function sepa_civicrm_install_options($data) {
 function sepa_civicrm_options() {
   $result = civicrm_api('option_group', 'getsingle', array('version' => 3, 'name' => 'payment_instrument'));
   if (!isset($result['id'])) {
-    die($result["error_message"]);    
+    die($result["error_message"]);
   }
   $gid= $result['id'];
 
@@ -192,10 +192,10 @@ function sepa_civicrm_options() {
               ),
           ),
        ),
-      
+
       // These will be used to mark a contribution with the correct type and will
       // greatly facilitate batching later on
-      
+
       'payment_instrument' => array(
           'values' => array(
               'FRST' => array(
@@ -275,7 +275,7 @@ function sepa_civicrm_uninstall() {
 function sepa_civicrm_enable() {
   //add/check the required option groups
   sepa_civicrm_install_options(sepa_civicrm_options());
-  
+
   // add all required message templates
   require_once 'CRM/Sepa/Page/SepaMandatePdf.php';
   CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
@@ -284,7 +284,7 @@ function sepa_civicrm_enable() {
   sepa_pp_install();
 
   // create a dummy creditor if no creditor exists
-  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');    
+  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
   if (empty($creditorCount)) {
     error_log("org.project60.sepa_dd: Trying to install dummy creditor.");
     // to create, we need to first find a default contact
@@ -303,14 +303,14 @@ function sepa_civicrm_enable() {
       error_log("org.project60.sepa_dd: Inserting dummy creditor into database.");
       // remark: we're within the enable hook, so we cannot use our own API/BAOs...
       $create_creditor_sql = "
-      INSERT INTO civicrm_sdd_creditor 
+      INSERT INTO civicrm_sdd_creditor
       (`creditor_id`,    `identifier`,      `name`,           `address`,                   `country_id`, `iban`,                   `bic`,      `mandate_prefix`, `mandate_active`, `sepa_file_format_id`, `category`)
       VALUES
       ($default_contact, 'TESTCREDITORDE', 'TEST CREDITOR', '221B Baker Street\nLondon', '1226',       'DE12500105170648489890', 'SEPATEST', 'TEST',           1,                1, 'TEST');";
       CRM_Core_DAO::executeQuery($create_creditor_sql);
     }
   }
-  
+
   return _sepa_civix_civicrm_enable();
 }
 
@@ -662,7 +662,7 @@ function sepa_civicrm_tokens(&$tokens) {
     "$prefix.iban"               => ts('IBAN', array('domain' => 'org.project60.sepa')),
     "$prefix.iban_anonymised"    => ts('IBAN (anonymised)', array('domain' => 'org.project60.sepa')),
     "$prefix.bic"                => ts('BIC', array('domain' => 'org.project60.sepa')),
-    
+
     "$prefix.amount"             => ts('Amount', array('domain' => 'org.project60.sepa')),
     "$prefix.currency"           => ts('Currency', array('domain' => 'org.project60.sepa')),
     "$prefix.first_collection"   => ts('First Collection Date', array('domain' => 'org.project60.sepa')),
@@ -670,7 +670,7 @@ function sepa_civicrm_tokens(&$tokens) {
     "$prefix.frequency_interval" => ts('Interval Multiplier', array('domain' => 'org.project60.sepa')),
     "$prefix.frequency_unit"     => ts('Interval Unit', array('domain' => 'org.project60.sepa')),
     "$prefix.frequency"          => ts('Interval', array('domain' => 'org.project60.sepa')),
-  );    
+  );
 }
 
 /**
@@ -695,7 +695,7 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
   try { // make sure this doesn't cause any troubles
     $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
     $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
-    
+
     // No work needed if none of the tokens is used
     if (!in_array($prefix, array_keys($tokens))) return;
 

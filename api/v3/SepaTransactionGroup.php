@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -39,7 +39,7 @@ function civicrm_api3_sepa_transaction_group_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
@@ -107,24 +107,24 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
   }
 
   $sql="
-    SELECT 
-      txgroup.id, 
-      txgroup.reference, 
-      sdd_file_id                       AS file_id, 
-      txgroup.type, 
-      txgroup.collection_date, 
-      txgroup.latest_submission_date, 
-      txgroup.status_id, 
-      civicrm_sdd_file.created_date     AS file_created_date, 
-      count(*)                          AS nb_contrib, 
+    SELECT
+      txgroup.id,
+      txgroup.reference,
+      sdd_file_id                       AS file_id,
+      txgroup.type,
+      txgroup.collection_date,
+      txgroup.latest_submission_date,
+      txgroup.status_id,
+      civicrm_sdd_file.created_date     AS file_created_date,
+      count(*)                          AS nb_contrib,
       sum( contrib.total_amount)        AS total,
       civicrm_sdd_file.reference        AS file
-    FROM civicrm_sdd_txgroup as txgroup 
-    LEFT JOIN civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id = txgroup_contrib.txgroup_id 
-    LEFT JOIN civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id 
-    LEFT JOIN civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id 
-    WHERE $where 
-    GROUP BY txgroup.id 
+    FROM civicrm_sdd_txgroup as txgroup
+    LEFT JOIN civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id = txgroup_contrib.txgroup_id
+    LEFT JOIN civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id
+    LEFT JOIN civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id
+    WHERE $where
+    GROUP BY txgroup.id
     $orderby;";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
@@ -177,13 +177,13 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
     unset($new["contribution_id"]);
     $new["receive_date"] = $next_collectionDate;
     $new["contribution_status_id"]= 2;
-    $new["contribution_recur_id"] = $new["recur_id"];     
+    $new["contribution_recur_id"] = $new["recur_id"];
     unset($new["recur_id"]);
 
     /*
        CRM_Core_DAO::executeQuery("
-       UPDATE civicrm_contribution_recur 
-       SET next_sched_contribution = %1 
+       UPDATE civicrm_contribution_recur
+       SET next_sched_contribution = %1
        WHERE id = %2
        ", array(
        1 => array($next_collectionDate, 'String'),
@@ -191,8 +191,8 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
        )
        );
      */
-    $new["version"] =3;       
-    $new["sequential"] =1;       
+    $new["version"] =3;
+    $new["sequential"] =1;
 
 /*
 $total += $new["total_amount"];
@@ -229,13 +229,13 @@ continue;
 
 /**
  * This API call creates a corresponding accounting batch for a SEPA group
- * 
+ *
  * @param txgroup_id
  * @author endres -at- systopia.de
  */
 function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   // first, load the txgroup
-  $txgroup_id = $params['txgroup_id'];  
+  $txgroup_id = $params['txgroup_id'];
   $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id, 'version' => 3));
   if (isset($txgroup['is_error']) && $txgroup['is_error']) {
     return civicrm_api3_create_error("Cannot read transaction group ".$txgroup_id);
@@ -271,7 +271,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   while ($contributions_query->fetch()) {
     if ($contributions_query->financial_trxn_id) {
       array_push($transactions, $contributions_query->financial_trxn_id);
-      $total += $contributions_query->amount;      
+      $total += $contributions_query->amount;
     } else {
       array_push($contributions_missing_transaction, $contributions_query->contribution_id);
     }
@@ -297,7 +297,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
 
   // then, finally, create the accounting group
   $description = sprintf(ts('This group corresponds to <a href="%s">SEPA transaction group [%s]</a>', array('domain' => 'org.project60.sepa')),
-      CRM_Utils_System::url('civicrm/sepa/listgroup', "group_id=$txgroup_id"), $txgroup_id); 
+      CRM_Utils_System::url('civicrm/sepa/listgroup', "group_id=$txgroup_id"), $txgroup_id);
 
   $batch = array( 'title'                 => $name,
                   'description'           => $description,

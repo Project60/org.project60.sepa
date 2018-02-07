@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -51,7 +51,7 @@
   <td class="label">{$form.sepa_file_format_id.label}</td>
   <td>{$form.sepa_file_format_id.html}</td>
 </tr>
-          
+
 </table>
 </div>
 </div>

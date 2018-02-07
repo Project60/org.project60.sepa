@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -17,7 +17,7 @@
 /**
  * back office mandate creation form
  *
- * @todo this implementation should use the CiviCRM Form pattern 
+ * @todo this implementation should use the CiviCRM Form pattern
  *        and should be refactored
  *
  * @package CiviCRM_SEPA
@@ -133,7 +133,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // FIXME: see https://github.com/Project60/org.project60.sepa/issues/401
     //  BUT: probably unused...
-    
+
     // // create a note, if requested
     // if ($_REQUEST['note']) {
     //   // add note
@@ -226,7 +226,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $campaigns = array();
     $campaigns[''] = ts("No Campaign");
     if (isset($campaign_query['is_error']) && $campaign_query['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't load campaign list.", array('domain' => 'org.project60.sepa')), $cid), ts('Error', array('domain' => 'org.project60.sepa')), 'error');      
+      CRM_Core_Session::setStatus(sprintf(ts("Couldn't load campaign list.", array('domain' => 'org.project60.sepa')), $cid), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     } else {
       foreach ($campaign_query['values'] as $campaign_id => $campaign) {
         $campaigns[$campaign_id] = $campaign['title'];
@@ -240,7 +240,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $old_mandates = CRM_Core_DAO::executeQuery($query_sql);
     while ($old_mandates->fetch()) {
       $value = $old_mandates->iban.'/'.$old_mandates->bic;
-      array_push($known_accounts, 
+      array_push($known_accounts,
         array("name" => $old_mandates->iban, "value"=>$value));
     }
 
@@ -268,14 +268,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
             if (isset($account_data->BIC)) {
               // we have IBAN and BIC -> add:
               $value = $account_ref['reference'].'/'.$account_data->BIC;
-              array_push($known_accounts, 
+              array_push($known_accounts,
                 array("name" => $account_ref['reference'], "value"=>$value));
             }
           }
         }
       }
     }
-    
+
     // remove duplicate entries
     $known_account_names = array();
     foreach ($known_accounts as $index => $entry) {
@@ -301,7 +301,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       }
     }
     $this->assign('creditors', $creditors);
-    
+
     // add cycle_days per creditor
     $creditor2cycledays = array();
     foreach ($creditors as $creditor_id => $creditor_name) {
@@ -339,7 +339,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (isset($mandate['is_error']) && $mandate['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't load mandate #%s", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       return;
-    } 
+    }
 
     // prepare the form
     $this->prepareCreateForm($mandate['contact_id']);
@@ -357,7 +357,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (isset($contribution['is_error']) && $contribution['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't load associated (r)contribution #%s", array('domain' => 'org.project60.sepa')), $contribution), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       return;
-    } 
+    }
 
     // set all the relevant values
     $this->assign('iban', $mandate['iban']);
@@ -384,7 +384,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         // only set end date, if it's in the future (to prevent accidentally creating completed mandates)
         if (strtotime($contribution['end_date']) > strtotime("today") ) {
           $this->assign('end_date', date('Y-m-d', strtotime($contribution['end_date'])));
-        } 
+        }
       } else {
         $this->assign('end_date', '');
       }
@@ -449,7 +449,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         $errors['reference'] = ts("Reference has to be an upper case alphanumeric string between 4 and 35 characters long.", array('domain' => 'org.project60.sepa'));
       } else {
         // check if the reference is taken
-        $count = civicrm_api3('SepaMandate', 'getcount', array("reference" => $_REQUEST['reference']));        
+        $count = civicrm_api3('SepaMandate', 'getcount', array("reference" => $_REQUEST['reference']));
         if ($count > 0) {
           $errors['reference'] = ts("This reference is already in use.", array('domain' => 'org.project60.sepa'));
         }
@@ -518,6 +518,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (!$this->isPopup()) {
       $contact_url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact_id}&selectedChild=contribute");
       CRM_Utils_System::redirect($contact_url);
-    }   
+    }
   }
 }

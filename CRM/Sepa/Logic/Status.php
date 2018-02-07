@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2016 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -23,7 +23,7 @@
 class CRM_Sepa_Logic_Status {
 
   /**
-   * translate the DB status tags to a human readable one. 
+   * translate the DB status tags to a human readable one.
    *
    * @param $manadate_status  the status as in the DB
    * @param $localise         return the ts'ed version of the value
@@ -65,11 +65,11 @@ class CRM_Sepa_Logic_Status {
    * @param $mandate_type the mandate type ('RCUR' or 'OOFF').
    *
    * @return string|array  if the mandate type is given, it will only return on status as a string
-   *                        if it's empty, it will always return multiple statuses 
+   *                        if it's empty, it will always return multiple statuses
    */
   public static function translateToMandateStatus($status, $mandate_type = NULL) {
     switch ($status) {
-      
+
       case "Not activated":
         return ($mandate_type?'INIT':array('INIT'));
 
@@ -90,7 +90,7 @@ class CRM_Sepa_Logic_Status {
         } else {
           return array('SENT', 'RCUR');
         }
-      
+
       case "Completed":
         return ($mandate_type?'COMPLETE':array('COMPLETE'));
 
