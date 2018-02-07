@@ -695,6 +695,9 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
   try { // make sure this doesn't cause any troubles
     $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
     $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+    
+    // No work needed if none of the tokens is used
+    if (!in_array($prefix, array_keys($tokens))) return;
 
     // FIND most recent SEPA Mandates (per contact)
     $contact_id_list = implode(',', $cids);
