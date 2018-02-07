@@ -67,7 +67,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       );
 
       // add links
-      $ooff['view_link'] = CRM_Utils_System::url('civicrm/contact/view/contribution', "reset=1&id={$ooff_mandates->contact_id}&cid={$contact_id}&action=view&context=contribution");
+      $ooff['view_link'] = CRM_Utils_System::url('civicrm/contact/view/contribution', "reset=1&id={$ooff_mandates->contribution_id}&cid={$contact_id}&action=view&context=contribution");
       if (CRM_Core_Permission::check('edit sepa mandates')) {
         $ooff['edit_link'] = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$ooff_mandates->mandate_id}");
       }
