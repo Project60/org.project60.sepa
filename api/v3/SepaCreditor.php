@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -39,7 +39,7 @@ function civicrm_api3_sepa_creditor_create($params) {
 
 /**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */

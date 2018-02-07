@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -40,12 +40,12 @@ class CRM_Utils_SepaSafeLock {
   }
 
   /**
-   * Will acquire a lock with the given name, 
+   * Will acquire a lock with the given name,
    * if no other lock has been acquired by this process.
-   * 
+   *
    * If the same lock has been acquired before (and not been released),
    * in internal counter is increased. Therefore you can acquire the same
-   * lock multiple times, but you will then have to release them 
+   * lock multiple times, but you will then have to release them
    * the same amount of times
    *
    * @return a SafeLock instance or NULL if timed out
@@ -85,7 +85,7 @@ class CRM_Utils_SepaSafeLock {
   }
 
   /**
-   * Will release a lock with the given name, 
+   * Will release a lock with the given name,
    *  if it has been acquired before
    */
   public static function releaseLock($name) {
@@ -107,7 +107,7 @@ class CRM_Utils_SepaSafeLock {
   }
 
   /**
-   * Will release a lock with the given name, 
+   * Will release a lock with the given name,
    *  if it has been acquired before
    */
   public function release() {
@@ -127,7 +127,7 @@ class CRM_Utils_SepaSafeLock {
     } else {
       // lock has already been released!
       error_log("org.project60.sepa: This process cannot realease lock '$name', it has already been released before.");
-      throw new Exception("This process cannot realease lock '$name', it has already been released before.");   
+      throw new Exception("This process cannot realease lock '$name', it has already been released before.");
     }
   }
 }

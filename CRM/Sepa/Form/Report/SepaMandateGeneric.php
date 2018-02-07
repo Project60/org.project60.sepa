@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2016 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -20,7 +20,7 @@
 class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
   protected $_customGroupExtends = NULL;//array('Contact');
-  protected $_customGroupGroupBy = FALSE; 
+  protected $_customGroupGroupBy = FALSE;
 
   /**
    * generic constructor
@@ -56,7 +56,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
           ),
           'status' => array(
             'title' => ts('Mandate Status', array('domain' => 'org.project60.sepa')),
-          ),          
+          ),
           'iban' => array(
             'title' => ts('IBAN', array('domain' => 'org.project60.sepa')),
           ),
@@ -220,7 +220,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-    );    
+    );
   }
 
   /**
@@ -279,10 +279,10 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
                INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                           ON {$this->_aliases['civicrm_contact']}.id =
                              {$this->_aliases['civicrm_sdd_mandate']}.contact_id
-               LEFT JOIN civicrm_contribution 
+               LEFT JOIN civicrm_contribution
                           ON 'civicrm_contribution' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
                           AND civicrm_contribution.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
-               LEFT JOIN civicrm_contribution_recur 
+               LEFT JOIN civicrm_contribution_recur
                           ON 'civicrm_contribution_recur' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
                           AND civicrm_contribution_recur.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
          ";
@@ -305,7 +305,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         // since either OOFF or RCUR is always NULL, we can just use OR...
         $ooff_clause = preg_replace("#$fieldName#", 'civicrm_contribution.contribution_status_id', $base_clause);
         $rcur_clause = preg_replace("#$fieldName#", 'civicrm_contribution_recur.contribution_status_id', $base_clause);
-        $clause = "( $ooff_clause OR $rcur_clause )";              
+        $clause = "( $ooff_clause OR $rcur_clause )";
       }
     }
 

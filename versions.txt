@@ -1,6 +1,13 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
+Version 1.2.6
+=============
+- Permissions (https://github.com/Project60/org.project60.sepa/issues/243)
+- Set and expose next collection date (https://github.com/Project60/org.project60.sepa/issues/431)
+- ...
+
+
 Version 1.2.5
 =============
 - Support for big groups (https://github.com/Project60/org.project60.sepa/issues/430)

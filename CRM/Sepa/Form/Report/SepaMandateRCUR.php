@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2016 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -40,7 +40,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     // cycle days
     $cycle_days = array();
     for ($i=1; $i <= 31; $i++) {
-      $cycle_days[(string) $i] = (string) $i;  
+      $cycle_days[(string) $i] = (string) $i;
     }
 
     // cycle intervals
@@ -154,7 +154,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       ),
       'grouping' => 'rcontri-fields',
     );
-  
+
     // add aggregated contribution fields
     $this->_columns['civicrm_contribution'] = array(
       'dao' => 'CRM_Contribute_DAO_Contribution',

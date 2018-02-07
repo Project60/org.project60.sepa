@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -203,7 +203,7 @@ function sepa_lookup_bic() {
 
 // initially hide the bic (if hiding enabled)
 cj(function(){
-	sepa_show_bic(false, "");	
+	sepa_show_bic(false, "");
 });
 {/literal}
 </script>

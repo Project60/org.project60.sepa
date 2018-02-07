@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -61,7 +61,7 @@ class CRM_Utils_SepaMenuTools {
     $menu_item_search = array('url' => $menu_entry_attributes['url']);
     $menu_items = array();
     CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
-    
+
     if (empty($menu_items)) {
       // it's not already contained, so we want to add it to the menu
 
@@ -69,5 +69,5 @@ class CRM_Utils_SepaMenuTools {
       $parent_params['child'][] = array(
           'attributes' => $menu_entry_attributes);
     }
-  }  
+  }
 }

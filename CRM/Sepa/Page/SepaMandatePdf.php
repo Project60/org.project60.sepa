@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -49,7 +49,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     $contact['postal_greeting_display'] = $bao->postal_greeting_display;
     $contact['email_greeting_display']  = $bao->email_greeting_display;
     $contact['addressee_display']       = $bao->addressee_display;
-    
+
     if (empty($contact['is_error'])) {
       $this->assign($variable_name, $contact);
     }
@@ -64,7 +64,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     if (!isset($this->api)) $this->api = new civicrm_api3();
     $api = $this->api;
 
-    
+
     // LOAD INFORMATION and set tokens (smarty variables)
 
     // fix mandate. @X+: Why?

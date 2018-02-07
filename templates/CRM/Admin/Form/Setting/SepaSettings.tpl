@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: N. Bochan (bochan -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -19,8 +19,8 @@ div.sdd-settings {
   padding: 10px;
 }
 div.sdd-add-creditor {
-  display:none; 
-  background-color: #e6e6bb; 
+  display:none;
+  background-color: #e6e6bb;
   border: 2px dotted #f00;
   margin: 5px;
   padding: 10px;
@@ -319,7 +319,7 @@ div.sdd-add-creditor {
           </tr>
        </table>
        <br/>
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div> 
+      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </div>
   </fieldset>
 </div>
@@ -439,20 +439,20 @@ div.sdd-add-creditor {
     );
   }
 
-  
+
   // This function is needed due to the asynchronous call of success() in CRM.api().
   function createCallback(data, map, i, creditorId) {
     return function (data) {
       if (data['is_error'] == 0) {
         var result = "";
-        
+
         if (data['result'] != "undefined") {
           result = cj.parseJSON(data['result']);
-          customBatchingParams[i][2] = result;  
+          customBatchingParams[i][2] = result;
         }
 
         if (result[creditorId] != undefined) {
-          cj("#"+map[i][1]).val(result[creditorId]); 
+          cj("#"+map[i][1]).val(result[creditorId]);
         }else{
           cj("#"+map[i][1]).val("");
         }
@@ -480,7 +480,7 @@ div.sdd-add-creditor {
           cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
           cj('#addcreditor').show(500);
 
-          CRM.api('Contact', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': data['creditor_id']}, 
+          CRM.api('Contact', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': data['creditor_id']},
             {success: function(data2) {
                 if (data2['is_error'] == 0) {
                   cj('#addcreditor_creditor_id').val("[" + data2['id'] + "] " + data2['display_name']);
@@ -539,7 +539,7 @@ div.sdd-add-creditor {
     if (creditorId != "none") {
       stdObj.id = creditorId;
     }
-    
+
     if(updatedCreditorInfo['creditor_id'] === undefined) {
       CRM.alert("{/literal}{ts domain="org.project60.sepa"}You must provide a valid contact to save this creditor{/ts}", "{ts domain="org.project60.sepa"}Error{/ts}{literal}", "error");
       return;
@@ -559,7 +559,7 @@ div.sdd-add-creditor {
     CRM.api('SepaCreditor', 'create', updObj,
             {success: function(data) {
                 if (data['is_error'] == 0) {
-                  // check whether we updated an existing creditor 
+                  // check whether we updated an existing creditor
                   // or created a new one
                   var creditorId = cj('#edit_creditor_id').val();
                   if (creditorId == "none") {
@@ -580,7 +580,7 @@ div.sdd-add-creditor {
                     }
 
                     if (value != "") {
-                      param[name][creditorId] = value; 
+                      param[name][creditorId] = value;
                     }else{
                       delete param[name][creditorId];
                     }

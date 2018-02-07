@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: N. Bochan (bochan -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -16,7 +16,7 @@
 
 require_once 'CRM/Admin/Form/Setting.php';
 require_once 'CRM/Core/BAO/CustomField.php';
- 
+
 class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 {
     private $config_fields;
@@ -62,7 +62,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         foreach ($this->config_fields as $key => $value) {
             $fields[$this->domainToString($value[0])] = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($value[0]));
         }
-        return $fields; 
+        return $fields;
     }
 
     public function buildQuickForm( ) {
@@ -80,10 +80,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
             $elem = $this->addElement('text', $elementName, $value[1], (isset($value[2]) ? $value[2] : array()));
             if (!in_array($elementName, array('cycledays', 'custom_txmsg'))) {
                 // integer only rules, except for cycledays (list)
-              $this->addRule($this->domainToString($value[0]), 
+              $this->addRule($this->domainToString($value[0]),
                          sprintf(ts("Please enter the %s as number (integers only).", array('domain' => 'org.project60.sepa')), $value[1]),
                         'positiveInteger');
-              $this->addRule($this->domainToString($value[0]), 
+              $this->addRule($this->domainToString($value[0]),
                          sprintf(ts("Please enter the %s as number (integers only).", array('domain' => 'org.project60.sepa')), $value[1]),
                         'required');
             }
@@ -114,7 +114,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
             }
           }
         }
-        
+
         $i18n->localizeArray($filtered, array('context' => 'country'));
         asort($filtered);
 
@@ -165,7 +165,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
             $elementName = $this->domainToString($value[0]);
             if (!in_array($elementName, array('custom_cycledays', 'custom_txmsg'))) {
               // integer only rules, except for cycledays (list)
-              $this->addRule($elementName, 
+              $this->addRule($elementName,
                        sprintf(ts("Please enter the %s as number (integers only).", array('domain' => 'org.project60.sepa')), $value[1]),
                       'positiveInteger');
             }
@@ -208,7 +208,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         foreach ($this->config_fields as $key => $value) {
             if(array_key_exists($this->domainToString($value[0]), $values)) {
                 CRM_Core_BAO_Setting::setItem($values[$this->domainToString($value[0])], 'SEPA Direct Debit Preferences', $this->domainToString($value[0]));
-            }  
+            }
         }
 
         // save general config options:

@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -19,6 +19,8 @@ var sepa_edit_mandate_html        = "{ts domain="org.project60.sepa"}SEPA Mandat
 var sepa_edit_mandate_title       = "{ts domain="org.project60.sepa"}Edit SEPA Mandate{/ts}";
 var sepa_edit_mandate_href        = '{crmURL p="civicrm/sepa/xmandate" q="mid=___mandate_id___"}'.replace('&amp;', '&');
 var contribution_tab_selector_44x = "#{ts domain="org.project60.sepa"}Contributions{/ts} > div.crm-container-snippet";
+var can_create_mandate            = {$can_create_mandate};
+var can_edit_mandate              = {$can_edit_mandate};
 
 // listen to DOM changes
 cj("#mainTabContainer").bind("DOMSubtreeModified", sepa_modify_summary_tab_contribution);
@@ -67,9 +69,13 @@ function sepa_modify_summary_tab_contribution() {
 
               // modify the edit option
               var edit_action = disable_action.prev();
-              edit_action.attr('href', sepa_edit_mandate_href.replace('___mandate_id___', mandate_id));
-              edit_action.html(sepa_edit_mandate_html);
-              edit_action.attr('title', sepa_edit_mandate_title);
+              if (can_edit_mandate) {
+                edit_action.attr('href', sepa_edit_mandate_href.replace('___mandate_id___', mandate_id));
+                edit_action.html(sepa_edit_mandate_html);
+                edit_action.attr('title', sepa_edit_mandate_title);
+              } else {
+                edit_action.hide();
+              }
             }
           }
         }

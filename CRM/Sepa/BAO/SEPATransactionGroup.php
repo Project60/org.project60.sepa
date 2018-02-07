@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -54,8 +54,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     }
     if (empty ($this->id)) {
       CRM_Core_Error::fatal("missing id of the transaction group");
-    } 
-    $r=array(); 
+    }
+    $r=array();
     $this->total=0;
     $this->nbtransactions=0;
 
@@ -64,7 +64,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("group",$group );
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
-    $this->fileFormat = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'Integer', 'name');
+    $this->fileFormat = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
     $template->assign("fileFormat",$this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
@@ -93,12 +93,12 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     setlocale(LC_CTYPE, 'en_US.utf8');
     //dear dear, it might work, but seems to be highly dependant of the system running it, without any way to know what is available, or if the setting was done properly #phpeature
- 
+
     while ($contrib->fetch()) {
       $t=$contrib->toArray();
       $t['id'] = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
       $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
-      
+
       // try to convert the name into a more acceptable format
       if (function_exists("iconv")){
         $t["display_name"]=iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
@@ -137,10 +137,10 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
   /**
    * This method will create the SDD file for the given group
-   * 
+   *
    * @param txgroup_id  the transaction group for which the file should be created
    * @param override    if true, will override an already existing file and create a new one
-   * 
+   *
    * @return int id of the sepa file entity created, or an error message string
    */
   static function createFile($txgroup_id, $override = false) {
@@ -163,7 +163,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         }
       }
 
-      $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
+      $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
 
       // now that we found an available reference, create the file
       $sepa_file = civicrm_api('SepaSddFile', 'create', array(
@@ -181,26 +181,26 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
         // update the txgroup object
           $result = civicrm_api('SepaTransactionGroup', 'create', array(
-                'id'                      => $txgroup_id, 
+                'id'                      => $txgroup_id,
                 'sdd_file_id'             => $sepa_file['id'],
                 'version'                 => 3));
           if (isset($result['is_error']) && $result['is_error']) {
             sprintf(ts("Cannot update transaction group! Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']);
-          } 
+          }
 
 
         return $sepa_file['id'];
-      } 
+      }
     }
-  }  
+  }
 
   /**
-   * This method will adjust the collection date, 
+   * This method will adjust the collection date,
    *   so it can still be submitted by the give submission date
-   * 
+   *
    * @param txgroup_id              the transaction group for which the file should be created
    * @param latest_submission_date  the date when it should be submitted
-   * 
+   *
    * @return an update array with the txgroup or a string with an error message
    */
   static function adjustCollectionDate($txgroup_id, $latest_submission_date) {
@@ -219,7 +219,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $new_latest_submission_date = date('YmdHis', strtotime("$latest_submission_date"));
 
     $result = civicrm_api('SepaTransactionGroup', 'create', array(
-      'version'                => 3, 
+      'version'                => 3,
       'id'                     => $txgroup_id,
       'collection_date'        => $new_collection_date,
       'latest_submission_date' => $new_latest_submission_date));
@@ -240,16 +240,16 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
   /**
    * This method will delete a transaction group
    *
-   * If required, it could also delete all 
-   * 
+   * If required, it could also delete all
+   *
    * @param txgroup_id                 the transaction group that should be deleted
    * @param delete_contributions_mode  select what to do with the associated mandates (OOFF) or contributions (RCUR):
    *                                      'no'   -  don't touch them
    *                                      'open' -  delete only open ones
    *                                      'all'  -  delete them all
-   * 
+   *
    * @return an array (contribution_id => error message) that have been deleted or a string with an error message.
-   *            an error message of 'ok' means deletion succesfull 
+   *            an error message of 'ok' means deletion succesfull
    */
   static function deleteGroup($txgroup_id, $delete_contributions_mode = 'no') {
     // load the group
@@ -262,7 +262,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     if ($delete_contributions_mode == 'no') {
       $contributions_deleted = array();
     } elseif ($delete_contributions_mode == 'open') {
-      $status_id_pending = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+      $status_id_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
       $contributions_deleted = self::_deleteGroupContents($txgroup_id, $txgroup['type'], "civicrm_contribution.contribution_status_id = $status_id_pending");
     } elseif ($delete_contributions_mode == 'all') {
       $contributions_deleted = self::_deleteGroupContents($txgroup_id, $txgroup['type'], "TRUE");
@@ -317,7 +317,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
           $delete = civicrm_api('SepaMandate', 'delete', array('id' => $results->mandate_id, 'version' => 3));
           if (!empty($delete['is_error'])) {
             $deleted_contributions[$contribution_id] = $delete['error_message'];
-          }          
+          }
         }
       }
     }

@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -15,7 +15,7 @@
 
 <div class="crm-actions-ribbon">
   <ul id="actions">
-    {if $status eq 'closed'}
+  {if $status eq 'closed'}
     <li>
       <a title="{ts domain="org.project60.sepa"}show active groups{/ts}" class="search button" href="{$show_open_url}">
         <span>
@@ -24,7 +24,7 @@
         </span>
       </a>
     </li>
-    {else}
+  {else}
     <li>
       <a title="{ts domain="org.project60.sepa"}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
         <span>
@@ -33,6 +33,7 @@
         </span>
       </a>
     <li>
+    {if $can_batch}
     <li>
       <a title="{ts domain="org.project60.sepa"}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
         <span>
@@ -50,6 +51,7 @@
       </a>
     </li>
     {/if}
+  {/if}
   </ul>
   <div class="clear"></div>
 </div>
@@ -87,12 +89,14 @@
     <td>
       <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Contributions{/ts}</a>
       {if $group.status == 'open'}
-        {if $group.submit == 'missed'}
-        <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id&status=missed"}" class="button button_close">
-        {else}
-        <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">
+        {if $can_batch}
+          {if $group.submit == 'missed'}
+            <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id&status=missed"}" class="button button_close">
+          {else}
+            <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">
+          {/if}
+          {ts domain="org.project60.sepa"}Close and Submit{/ts}</a>
         {/if}
-        {ts domain="org.project60.sepa"}Close and Submit{/ts}</a>
       {else}
         <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}.xml" class="button button_export">{ts domain="org.project60.sepa"}Download Again{/ts}</a>
         {if $closed_status_id eq $group.status_id}
@@ -129,14 +133,14 @@ function mark_received(group_id) {
     CRM.api('SepaAlternativeBatching', 'received', {'q': 'civicrm/ajax/rest', 'txgroup_id': group_id},
       {success: function(data) {
         // reload page
-        location.reload();     
+        location.reload();
       },
        error: function(data) {
         // show error message
         cj("#busy_" + group_id).hide();
         alert(data.error_message.error_message);
       }}
-    );    
+    );
   }
 }
 </script>

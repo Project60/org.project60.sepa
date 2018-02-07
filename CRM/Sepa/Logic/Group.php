@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -36,14 +36,14 @@ class CRM_Sepa_Logic_Group {
     // step 1: gather data
     $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
     if ($skip_closed) {
-      $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-      $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name');
+      $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+      $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
     } else {
-      $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
-      $group_status_id_closed = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
+      $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+      $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
     }
-    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
-    $status_closed = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $status_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
     if (isset($txgroup['is_error']) && $txgroup['is_error']) {
       $lock->release();
@@ -86,13 +86,17 @@ class CRM_Sepa_Logic_Group {
       return "Group type '".$txgroup['type']."' not yet supported.";
     }
 
-    // step 3: update all the contributions to status 'in progress', and set the receive_date as collection
+    // step 3.1: update all the contributions to status 'in progress', and set the receive_date as collection
     //  remark: don't set receive_date to collection_date any more, it confuses the RCUR batcher (see https://github.com/Project60/sepa_dd/issues/190)
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_contribution
       LEFT JOIN civicrm_sdd_contribution_txgroup ON contribution_id = civicrm_contribution.id
       SET contribution_status_id = $status_inprogress
       WHERE txgroup_id = $txgroup_id;");
+
+    // step 3.2: update next_sched_contribution_date
+    // TODO: get $collection_date
+    CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
 
     // step 4: create the sepa file
     $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
@@ -133,12 +137,12 @@ class CRM_Sepa_Logic_Group {
     }
 
     // step 1: gather data
-    $group_status_id_open     = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
-    $group_status_id_closed   = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name');
-    $group_status_id_received = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Received', 'name');
-    $status_pending    = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-    $status_closed     = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-    $status_inprogress = (int) CRM_Core_OptionGroup::getValue('contribution_status', 'In Progress', 'name');
+    $group_status_id_open     = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+    $group_status_id_closed   = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
+    $group_status_id_received = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
+    $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $status_closed     = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
 
     if (empty($group_status_id_received))
       return civicrm_api3_create_error("Status 'Received' does not exist!");
@@ -226,7 +230,11 @@ class CRM_Sepa_Logic_Group {
       }
     }
 
-    // step 3: update group status
+    // step 3.1: update next_sched_contribution_date
+    // TODO: get $collection_date
+    CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
+
+    // step 3.2: update group status
     $result = civicrm_api('SepaTransactionGroup', 'create', array('id'=>$txgroup_id, 'status_id'=>$group_status_id_received, 'version'=>3));
     if (!empty($result['is_error'])) {
       $lock->release();
@@ -249,7 +257,7 @@ class CRM_Sepa_Logic_Group {
    * 2) delete empty groups
    */
   public static function cleanup($mode) {
-    $group_status_id_open = (int) CRM_Core_OptionGroup::getValue('batch_status', 'Open', 'name');
+    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     if (empty($group_status_id_open)) return;
 
     // CLEANUP: remove nonexisting contributions from groups

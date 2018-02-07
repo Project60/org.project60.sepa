@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -46,13 +46,13 @@ function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
 
 /*
  * This method will create the SDD file for the given group
- * 
+ *
  * @param txgroup_id  the transaction group for which the file should be created
  * @param override    if true, will override an already existing file and create a new one
  */
 function civicrm_api3_sepa_alternative_batching_createxml($params) {
   $override = (isset($params['override'])) ? $params['override'] : false;
-  
+
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
   if (is_numeric($result)) {
     // this was succesfull -> load the sepa file

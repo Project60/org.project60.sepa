@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 TTTP                           |
+| Copyright (C) 2013-2018 TTTP                           |
 | Author: X+                                             |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -30,7 +30,7 @@
   <td class="label">{$form.bank_bic.label}</td>
   <td>{$form.bank_bic.html}</td>
 </tr>
-          
+
 </table>
 </div>
 </div>
@@ -38,11 +38,11 @@
 {literal}
 <script>
 cj(function($) {
-  if ($('#paymentDetails_Information').length >0) { 
+  if ($('#paymentDetails_Information').length >0) {
     $('#sepa').insertAfter('#paymentDetails_Information');
   } else {
     $('#sepa').insertAfter('.form-layout');
-  } 
+  }
 });
 </script>
 {/literal}
