@@ -89,7 +89,6 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_contribution_recur.end_date                     AS end_date,
         civicrm_contribution_recur.next_sched_contribution_date AS next_collection_date,
         last.receive_date                                       AS last_collection_date,
-        last.contribution_status_id                             AS last_status_id,
         last.cancel_reason                                      AS last_cancel_reason,
         civicrm_sdd_mandate.status                              AS status,
         civicrm_sdd_mandate.reference                           AS reference,
@@ -115,11 +114,12 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
       GROUP BY civicrm_sdd_mandate.id";
 
+    $mandate_ids = array();
     $rcur_mandates = CRM_Core_DAO::executeQuery($rcur_query,
       array( 1 => array($contact_id, 'Integer')));
-
     while ($rcur_mandates->fetch()) {
       $rcur = array(
+        'mandate_id'           => $rcur_mandates->mandate_id,
         'start_date'           => $rcur_mandates->start_date,
         'cycle_day'            => $rcur_mandates->cycle_day,
         'status_raw'           => $rcur_mandates->status,
@@ -144,21 +144,41 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         $rcur['total_amount'] = $rcur_mandates->amount * 12.0 / $rcur_mandates->frequency_interval;
       }
 
-      // see if the last collection was fine
-      if (isset($rcur_mandates->last_status_id)
-         && !in_array($rcur_mandates->last_status_id, array(1,5))) {
-        // there's a problem with the last collection
-        $rcur['last_collection_issue'] = $rcur_mandates->last_status_id;
-      }
-
       // add links
       $rcur['view_link'] = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "reset=1&id={$rcur_mandates->rcur_id}&cid={$contact_id}&context=contribution");
       if (CRM_Core_Permission::check('edit sepa mandates')) {
         $rcur['edit_link'] = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$rcur_mandates->mandate_id}");
       }
 
-      $rcur_list[] = $rcur;
+      $rcur_list[$rcur_mandates->mandate_id] = $rcur;
     }
+
+    // add cancellation info
+    if (!empty($rcur_list)) {
+      $mandate_id_list = implode(',', array_keys($rcur_list));
+      $fail_sequence = "
+        SELECT
+         civicrm_sdd_mandate.id AS mandate_id,
+         GROUP_CONCAT(
+          IF(civicrm_contribution.contribution_status_id IN (1,2,5), '0', '1')
+          SEPARATOR '')        AS fail_sequence
+        FROM civicrm_sdd_mandate
+        LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
+        LEFT JOIN civicrm_contribution       ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
+        WHERE civicrm_sdd_mandate.id IN ({$mandate_id_list})
+          AND civicrm_sdd_mandate.type = 'RCUR'
+          AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+        GROUP BY civicrm_sdd_mandate.id
+        ORDER BY civicrm_contribution.receive_date;";
+      $fail_query = CRM_Core_DAO::executeQuery($fail_sequence);
+      while ($fail_query->fetch()) {
+        if (preg_match("#(?<last_fails>1+)$#", $fail_query->fail_sequence, $match)) {
+          $last_sequence = $match['last_fails'];
+          $rcur_list[$fail_query->mandate_id]['fail_sequence'] = strlen($last_sequence);
+        }
+      }
+    }
+
     $this->assign('rcurs', $rcur_list);
 
     parent::run();

@@ -414,16 +414,11 @@ function sepa_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$valu
 }
 
 /**
- * LAST RESORT: prevent the user to delete a (recurring) contribution when there's a mandate attached.
-=======
-
-/**
  * CiviCRM PRE event:
  *  1) make sure the next collection date
  *     is adjusted according to the change
  *  2) prevent users from deleting contributions/recurring contributions
  *     if they are part of a mandate
->>>>>>> origin/master
  */
 function sepa_civicrm_pre($op, $objectName, $id, &$params) {
   // adjust next collection date

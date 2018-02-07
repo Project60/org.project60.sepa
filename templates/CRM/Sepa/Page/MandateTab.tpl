@@ -14,7 +14,7 @@
 
 {* add new mandate button *}
 <div>
-  <a id="sepa_payment_extra_button" class="button" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add new SEPA Mandate{/ts}</span></a>
+  <a id="sepa_payment_extra_button" class="button crm-popup" href="{crmURL p="civicrm/sepa/cmandate" q="cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add new SEPA Mandate{/ts}</span></a>
   <br/>
   <br/>
 </div>
@@ -48,7 +48,9 @@
       <td>{$rcur.total_amount|crmMoney}</td>
       <td>
         {$rcur.last_collection_date|crmDate:$date_format}
-        {if $rcur.last_collection_issue}<div class="icon red-icon ui-icon-alert" title="{$rcur.last_cancel_reason}"/>{/if}
+        {foreach from=$rcur.fail_sequence item=fail}
+          <div class="icon red-icon ui-icon-alert" title="{$rcur.last_cancel_reason}"/>
+        {/foreach}
       <td>{$rcur.next_collection_date|crmDate:$date_format}</td>
       <td>{$rcur.end_date|crmDate:$date_format}</td>
       <td>
