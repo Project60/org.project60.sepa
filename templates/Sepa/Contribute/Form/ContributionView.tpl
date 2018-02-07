@@ -15,19 +15,29 @@
 <!-- Mandate -->
 {assign var="mid" value=$sepa.id}
 
-<h3>{ts domain="org.project60.sepa"}Sepa Mandate{/ts} {$sepa.id}</h3>
-<div class="crm-container">
-    <table class="crm-info-panel">
-      <tr><td class="label">{ts domain="org.project60.sepa"}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
-      <tr><td class="label">{ts domain="org.project60.sepa"}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>
-      <tr><td class="label">{ts domain="org.project60.sepa"}BIC{/ts}</td><td>{$sepa.bic}</td></tr>
-      <tr><td class="label">{ts domain="org.project60.sepa"}Status{/ts}</td><td>{$sepa.status}</td></tr>
-      <tr><td class="label">{ts domain="org.project60.sepa"}Source{/ts}</td><td>{$sepa.source}</td></tr>
-      <tr><td class="label">{ts domain="org.project60.sepa"}Creation date{/ts}</td><td>{$sepa.creation_date}</td></tr>
-      <tr><td class="label">{ts domain="org.project60.sepa"}Signature date{/ts}</td><td>{$sepa.date}</td></tr>
-      <tr><td class="label">{ts domain="org.project60.sepa"}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
-    </table>
+{* simulate custom field layout *}
+<table class="no-border"><tbody><tr><td>
+
+<div class="crm-accordion-wrapper">
+  <div class="crm-accordion-header">{ts domain="org.project60.sepa" 1=$sepa.id}Sepa Mandate [%1]{/ts}</div>
+  <div class="crm-accordion-body">
+    <div class="crm-container">
+      <table class="crm-info-panel">
+        <tr><td class="label">{ts domain="org.project60.sepa"}Reference{/ts}</td><td>{$sepa.reference}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}Grouped in{/ts}</td><td>{$sepa.tx_group}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}IBAN{/ts}</td><td>{$sepa.iban}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}BIC{/ts}</td><td>{$sepa.bic}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}Status{/ts}</td><td>{$sepa.status}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}Source{/ts}</td><td>{$sepa.source}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}Creation date{/ts}</td><td>{$sepa.creation_date}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}Signature date{/ts}</td><td>{$sepa.date}</td></tr>
+        <tr><td class="label">{ts domain="org.project60.sepa"}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
+      </table>
+    </div>
+  </div>
 </div>
+</td></tr></tbody></table>
+
 
 {if $can_edit_mandate}
 <div class="crm-submit-buttons" id="new_submit_buttons">

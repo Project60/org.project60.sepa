@@ -34,13 +34,40 @@ function sepa_civicrm_pageRun( &$page ) {
       if (!CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
         return;
 
+      $contribution_id = $page->getTemplate()->get_template_vars('id');
+      if (empty($contribution_id)) return;
+
       if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
         // This is an installment of a recurring contribution.
-        $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution_recur', 'entity_id'=>$page->getTemplate()->get_template_vars('contribution_recur_id')));
+        $contribution_recur_id = $page->getTemplate()->get_template_vars('contribution_recur_id');
+        if (empty($contribution_recur_id)) return;
+
+        $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
+          'entity_table' => 'civicrm_contribution_recur',
+          'entity_id'    => $contribution_recur_id));
       }
       else {
         // this is a OOFF contribtion
-        $mandate = civicrm_api3('SepaMandate', 'getsingle', array('entity_table'=>'civicrm_contribution', 'entity_id'=>$page->getTemplate()->get_template_vars('id')));
+        $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
+          'entity_table' => 'civicrm_contribution',
+          'entity_id'    => $contribution_id));
+      }
+
+      // add txgroup information
+      $txgroup_search = civicrm_api3('SepaContributionGroup', 'get', array(
+        'contribution_id' => $contribution_id
+      ));
+      if (empty($txgroup_search['id'])) {
+        $mandate['tx_group'] = ts('<i>None</i>', array('domain' => 'org.project60.sepa'));
+      } else {
+        $group = reset($txgroup_search['values']);
+        if (empty($group['txgroup_id'])) {
+          $mandate['tx_group'] = ts('<i>Error</i>', array('domain' => 'org.project60.sepa'));
+        } else {
+          $mandate['tx_group'] = civicrm_api3('SepaTransactionGroup', 'getvalue', array(
+            'return' => 'reference',
+            'id'     => $group['txgroup_id']));
+        }
       }
 
       $page->assign('sepa', $mandate);

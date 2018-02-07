@@ -16,7 +16,7 @@
 {assign var="fcid" value=$sepa.first_contribution_id}
 {assign var="mid" value=$sepa.id}
 
-<h3>{ts domain="org.project60.sepa"}Sepa Mandate{/ts} {$sepa.id}</h3>
+<h3>{ts domain="org.project60.sepa" 1=$sepa.id}Sepa Mandate [%1]{/ts}</h3>
 <div class="crm-container">
     <div class="crm-block crm-content-block crm-sdd-mandate">
         <table class="crm-info-panel">
@@ -35,8 +35,6 @@
 
 {if $can_edit_mandate}
 <div class="crm-submit-buttons">
-    <!--a href="{crmURL p='civicrm/sepa/cmandate' q="clone=$mid"}" class="button"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Clone{/ts}</span></a-->
-
     <a href="{crmURL p='civicrm/sepa/xmandate' q="mid=$mid"}" class="button"><span><div class="icon edit-icon ui-icon-pencil"></div>{ts domain="org.project60.sepa"}Mandate Options{/ts}</span></a>
 </div>
 {/if}
