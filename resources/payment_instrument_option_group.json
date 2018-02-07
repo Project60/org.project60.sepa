@@ -1,0 +1,24 @@
+{
+  "_lookup": ["name"],
+  "name": "payment_instrument",
+  "_values": [
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "SEPA DD First Transaction",
+      "name": "FRST",
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "SEPA DD Recurring Transaction",
+      "name": "RCUR",
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "SEPA DD One-off Transaction",
+      "name": "OOFF",
+    }
+  ]
+}

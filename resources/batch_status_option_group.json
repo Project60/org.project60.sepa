@@ -1,0 +1,12 @@
+{
+  "_lookup": ["name"],
+  "name": "batch_status",
+  "_values": [
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "Received",
+      "name": "Received",
+    }
+  ]
+}
