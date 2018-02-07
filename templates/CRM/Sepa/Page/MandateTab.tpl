@@ -41,7 +41,7 @@
     {foreach from=$rcurs item=rcur}
     <tr class="bmfsa-record {$rcur.class} {cycle values="odd-row,even-row"}"">
       <td>{$rcur.start_date|crmDate:$date_format}</td>
-      <td><span title="{if $rcur.cancel_reason}{$rcur.cancel_reason}{else}{$rcur.status_raw}{/if}">{$rcur.status}<span></td>
+      <td><span title="{if $rcur.cancel_reason}{$rcur.cancel_reason}{else}{$rcur.status_raw}{/if}">{$rcur.status}</span></td>
       <td>{$rcur.financial_type}{if $rcur.campaign}<br/>({$rcur.campaign}){/if}</td>
       <td>{$rcur.reference}</td>
       <td>{$rcur.amount|crmMoney}<br/>{$rcur.frequency}</td>
@@ -53,8 +53,8 @@
       <td>{$rcur.end_date|crmDate:$date_format}</td>
       <td>
         <span>
-          <a href="{$rcur.view_link}" class="action-item crm-hover-button" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
-          <a href="{$rcur.edit_link}" class="action-item crm-hover-button" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+          <a href="{$rcur.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
+          <a href="{$rcur.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
         </span>
       </td>
     </tr>
@@ -91,8 +91,8 @@
       <td>{$ooff.total_amount|crmMoney}</td>
       <td>
         <span>
-          <a href="{$ooff.view_link}" class="action-item crm-hover-button small-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
-          <a href="{$ooff.edit_link}" class="action-item crm-hover-button small-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+          <a href="{$ooff.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
+          <a href="{$ooff.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
         </span>
       </td>
     </tr>

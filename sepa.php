@@ -699,5 +699,5 @@ function sepa_civicrm_tabs(&$tabs, $contactID) {
                    'url'    => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$contactID}"),
                    'title'  => E::ts('SEPA Mandates'),
                    'count'  => CRM_Sepa_Page_MandateTab::getMandateCount($contactID),
-                   'weight' => 300);
+                   'weight' => 20);
 }
