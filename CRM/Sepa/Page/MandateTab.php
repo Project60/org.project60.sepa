@@ -34,14 +34,15 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
     $ooff_list = array();
     $ooff_query = "
       SELECT
-        civicrm_sdd_mandate.id            AS mandate_id,
-        civicrm_contribution.id           AS contribution_id,
-        civicrm_contribution.receive_date AS receive_date,
-        civicrm_sdd_mandate.status        AS status,
-        civicrm_sdd_mandate.reference     AS reference,
-        civicrm_financial_type.name       AS financial_type,
-        civicrm_campaign.title            AS campaign,
-        civicrm_contribution.total_amount AS total_amount
+        civicrm_sdd_mandate.id             AS mandate_id,
+        civicrm_contribution.id            AS contribution_id,
+        civicrm_contribution.receive_date  AS receive_date,
+        civicrm_sdd_mandate.status         AS status,
+        civicrm_sdd_mandate.reference      AS reference,
+        civicrm_financial_type.name        AS financial_type,
+        civicrm_campaign.title             AS campaign,
+        civicrm_contribution.total_amount  AS total_amount,
+        civicrm_contribution.cancel_reason AS cancel_reason
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution   ON civicrm_contribution.id = civicrm_sdd_mandate.entity_id
       LEFT JOIN civicrm_financial_type ON civicrm_financial_type.id = civicrm_contribution.financial_type_id
@@ -62,6 +63,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'financial_type' => $ooff_mandates->financial_type,
         'campaign'       => $ooff_mandates->campaign,
         'total_amount'   => $ooff_mandates->total_amount,
+        'cancel_reason'  => $ooff_mandates->cancel_reason,
       );
 
       // add links
@@ -85,8 +87,11 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_contribution_recur.end_date                     AS end_date,
         civicrm_contribution_recur.next_sched_contribution_date AS next_collection_date,
         last.receive_date                                       AS last_collection_date,
+        last.contribution_status_id                             AS last_status_id,
+        last.cancel_reason                                      AS last_cancel_reason,
         civicrm_sdd_mandate.status                              AS status,
         civicrm_sdd_mandate.reference                           AS reference,
+        cancel_reason.note                                      AS cancel_reason,
         civicrm_financial_type.name                             AS financial_type,
         civicrm_campaign.title                                  AS campaign,
         civicrm_sdd_mandate.reference                           AS reference,
@@ -100,6 +105,9 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       LEFT JOIN civicrm_contribution last  ON last.receive_date = (SELECT MAX(receive_date) FROM civicrm_contribution
                                                                    WHERE contribution_recur_id = civicrm_contribution_recur.id
                                                                      AND contribution_status_id != 2)
+      LEFT JOIN civicrm_note cancel_reason ON cancel_reason.entity_id = civicrm_contribution_recur.id
+                                            AND cancel_reason.entity_table = 'civicrm_contribution_recur'
+                                            AND cancel_reason.subject = 'cancel_reason'
       WHERE civicrm_sdd_mandate.contact_id = %1
         AND civicrm_sdd_mandate.type = 'RCUR'
         AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
@@ -120,6 +128,8 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'frequency'            => CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcur_mandates->frequency_interval, $rcur_mandates->frequency_unit, TRUE),
         'next_collection_date' => $rcur_mandates->next_collection_date,
         'last_collection_date' => $rcur_mandates->last_collection_date,
+        'cancel_reason'        => $rcur_mandates->cancel_reason,
+        'last_cancel_reason'   => $rcur_mandates->last_cancel_reason,
         'reference'            => $rcur_mandates->reference,
         'end_date'             => $rcur_mandates->end_date,
         'amount'               => $rcur_mandates->amount,
@@ -130,6 +140,13 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         $rcur['total_amount'] = $rcur_mandates->amount / $rcur_mandates->frequency_interval;
       } elseif ($rcur_mandates->frequency_unit == 'month') {
         $rcur['total_amount'] = $rcur_mandates->amount * 12.0 / $rcur_mandates->frequency_interval;
+      }
+
+      // see if the last collection was fine
+      if (isset($rcur_mandates->last_status_id)
+         && !in_array($rcur_mandates->last_status_id, array(1,5))) {
+        // there's a problem with the last collection
+        $rcur['last_collection_issue'] = $rcur_mandates->last_status_id;
       }
 
       // add links

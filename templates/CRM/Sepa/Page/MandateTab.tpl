@@ -28,7 +28,7 @@
       <td>{ts domain="org.project60.sepa"}Status{/ts}</td>
       <td>{ts domain="org.project60.sepa"}Type{/ts}</td>
       <td>{ts domain="org.project60.sepa"}Reference{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Frequency{/ts}</td>
+      <td>{ts domain="org.project60.sepa"}Installs{/ts}</td>
       <td>{ts domain="org.project60.sepa"}Annual Amount{/ts}</td>
       <td>{ts domain="org.project60.sepa"}Last Collection{/ts}</td>
       <td>{ts domain="org.project60.sepa"}Next Collection{/ts}</td>
@@ -41,12 +41,14 @@
     {foreach from=$rcurs item=rcur}
     <tr class="bmfsa-record {$rcur.class} {cycle values="odd-row,even-row"}"">
       <td>{$rcur.start_date|crmDate:$date_format}</td>
-      <td><span title="{$rcur.status_raw}">{$rcur.status}<span></td>
+      <td><span title="{if $rcur.cancel_reason}{$rcur.cancel_reason}{else}{$rcur.status_raw}{/if}">{$rcur.status}<span></td>
       <td>{$rcur.financial_type}{if $rcur.campaign}<br/>({$rcur.campaign}){/if}</td>
       <td>{$rcur.reference}</td>
       <td>{$rcur.amount|crmMoney}<br/>{$rcur.frequency}</td>
       <td>{$rcur.total_amount|crmMoney}</td>
-      <td>{$rcur.last_collection_date|crmDate:$date_format}</td>
+      <td>
+        {$rcur.last_collection_date|crmDate:$date_format}
+        {if $rcur.last_collection_issue}<div class="icon red-icon ui-icon-alert" title="{$rcur.last_cancel_reason}"/>{/if}
       <td>{$rcur.next_collection_date|crmDate:$date_format}</td>
       <td>{$rcur.end_date|crmDate:$date_format}</td>
       <td>
@@ -83,7 +85,7 @@
     {foreach from=$ooffs item=ooff}
     <tr class="bmfsa-record {$ooff.class} {cycle values="odd-row,even-row"}"">
       <td>{$ooff.receive_date|crmDate:$date_format}</td>
-      <td><span title="{$ooff.status_raw}">{$ooff.status}<span></td>
+      <td><span title="{if $ooff.cancel_reason}{$ooff.cancel_reason}{else}{$ooff.status_raw}{/if}">{$ooff.status}<span></td>
       <td>{$ooff.financial_type}{if $ooff.campaign}<br/>({$ooff.campaign}){/if}</td>
       <td>{$ooff.reference}</td>
       <td>{$ooff.total_amount|crmMoney}</td>
