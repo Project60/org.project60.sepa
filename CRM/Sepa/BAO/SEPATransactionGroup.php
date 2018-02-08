@@ -172,7 +172,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $sepa_file = civicrm_api('SepaSddFile', 'create', array(
             'version'                 => 3,
             'reference'               => $available_name,
-            'filename'                => $available_name.'.'.$fileFormatGrouping,
+            'filename'                => $fileFormatGrouping ? $available_name.'.'.$fileFormatGrouping : $available_name.'.xml',
             'latest_submission_date'  => $txgroup['latest_submission_date'],
             'created_date'            => date('YmdHis'),
             'created_id'              => CRM_Core_Session::singleton()->get('userID'),

@@ -40,10 +40,10 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    */
   public function postInstall() {
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
-    CRM_Sepa_CustomData::$customData->syncOptionGroup(__DIR__ . '/../../resources/batch_status_option_group.json');
-    CRM_Sepa_CustomData::$customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
-    CRM_Sepa_CustomData::$customData->syncOptionGroup(__DIR__ . '/../../resources/msg_tpl_workflow_contribution_option_group.json');
-    CRM_Sepa_CustomData::$customData->syncOptionGroup(__DIR__ . '/../../resources/payment_instrument_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/batch_status_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/msg_tpl_workflow_contribution_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/payment_instrument_option_group.json');
   }
 
   /**
@@ -72,7 +72,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   public function upgrade_1261() {
     $this->ctx->log->info('Adding new file formats');
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
-    CRM_Sepa_CustomData::$customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
     return TRUE;
   }
 }
