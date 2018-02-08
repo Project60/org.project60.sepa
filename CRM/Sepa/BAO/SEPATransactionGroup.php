@@ -65,11 +65,13 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
     $this->fileFormat = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
+    $this->fileFormat = CRM_Sepa_Logic_Format::sanitizeFileFormat($this->fileFormat);
     $template->assign("fileFormat",$this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
         c.id AS cid,
+        c.id AS contribution_id,
         civicrm_contact.display_name,
         invoice_id,
         currency,
@@ -77,6 +79,15 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         receive_date,
         contribution_recur_id,
         contribution_status_id,
+        a.street_address,
+        a.postal_code,
+        a.city,
+        c.invoice_id,
+        c.currency,
+        c.total_amount,
+        c.receive_date,
+        c.contribution_recur_id,
+        c.contribution_status_id,
         mandate.*
       FROM civicrm_contribution AS c
       JOIN civicrm_sdd_contribution_txgroup AS g ON g.contribution_id=c.id
@@ -85,8 +96,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = c.id)
       )
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
+      LEFT JOIN civicrm_address a ON c.contact_id = a.contact_id AND a.is_primary = 1
       WHERE g.txgroup_id = %1
-        AND contribution_status_id != 3
+        AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
     "; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -131,7 +143,16 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("total", number_format($this->total, 2, '.', '')); // SEPA-432: two-digit decimals
     $template->assign("nbtransactions",$this->nbtransactions);
     $template->assign("contributions",$r);
-    return $template->fetch('CRM/Sepa/Formats/'.$this->fileFormat.'/transaction-details.tpl');
+
+    CRM_Sepa_Logic_Format::loadFormatClass($this->fileFormat);
+    $format_class = 'CRM_Sepa_Logic_Format_'.$this->fileFormat;
+    $format = new $format_class();
+    $template->assign('settings', $format::$settings);
+    $details = $template->fetch('Sepa/Formats/'.$this->fileFormat.'/transaction-details.tpl');
+    if ($format::$out_charset != 'UTF-8') {
+      $details = iconv('UTF-8', $format::$out_charset, $details);
+    }
+    return $details;
   }
 
 

@@ -39,11 +39,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * so here to avoid order of operation problems.
    */
   public function postInstall() {
-    $customData = new CRM_Sepa_CustomData('org.project60.sepa');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/batch_status_option_group.json');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/msg_tpl_workflow_contribution_option_group.json');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/payment_instrument_option_group.json');
+    // TODO: anything?
   }
 
   /**
@@ -58,6 +54,12 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * Example: Run a simple query when a module is enabled.
    */
   public function enable() {
+    $customData = new CRM_Sepa_CustomData('org.project60.sepa');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/batch_status_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/msg_tpl_workflow_contribution_option_group.json');
+    $customData->syncOptionGroup(__DIR__ . '/../../resources/payment_instrument_option_group.json');
+
     // TODO: re-enable payment processor
     // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
   }

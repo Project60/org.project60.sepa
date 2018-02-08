@@ -56,6 +56,16 @@
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "Bank BPH PL direct debit",
+      "value": "5",
+      "name": "bphpl",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
     }
   ]
 }
