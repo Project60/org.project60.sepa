@@ -15,7 +15,16 @@
 
 class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
 
-  public static $out_charset = 'WINDOWS-1250';
+  /**
+   * Apply string encoding
+   *
+   * @param string $content
+   *
+   * @return mixed
+   */
+  public function characterEncode($content) {
+    return iconv('UTF-8', 'WINDOWS-1250', $content);
+  }
 
   public function improveContent($content) {
     return preg_replace('~(*BSR_ANYCRLF)\R~', "\r\n", $content);

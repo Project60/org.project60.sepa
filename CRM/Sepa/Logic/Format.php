@@ -15,10 +15,6 @@
 
 abstract class CRM_Sepa_Logic_Format {
 
-  /** @var string Charset used in output files. */
-  public static $out_charset = 'UTF-8';
-
-
   /** @var array Settings per format */
   public static $settings = array();
 
@@ -70,6 +66,17 @@ abstract class CRM_Sepa_Logic_Format {
     return $content;
   }
 
+  /**
+   * Apply string encoding
+   *
+   * @param string $content
+   *
+   * @return mixed
+   */
+  public function characterEncode($content) {
+    return $content;
+  }
+
 
   /**
    * Method returns prefix for transactional file.
@@ -90,5 +97,12 @@ abstract class CRM_Sepa_Logic_Format {
    */
   public function getFilename($variable_string) {
     return $variable_string.'.xml';
+  }
+
+  /**
+   * gives the option of setting extra variables to the template
+   */
+  public function assignSettings($template) {
+    // nothing to do here
   }
 }
