@@ -47,6 +47,11 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     return $dao;
   }
 
+  /**
+   * generate XML file
+   * Currenlty only one group per file is supported by this code
+   *  but potentially multiple groups could be in one file
+   */
   function generatexml($id) {
     $xml = "";
     $template = CRM_Core_Smarty::singleton();
@@ -58,24 +63,22 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     $total =0;
     $nbtransactions =0;
 
+    // TODO: properly implement multi-group
     $fileFormats = array();
     while ($txgroup->fetch()) {
       $xml .= $txgroup->generateXML();
       $total += $txgroup->total;
       $nbtransactions += $txgroup->nbtransactions;
-      $fileFormats[] = $txgroup->fileFormat;
     }
-    if (count(array_unique($fileFormats)) > 1) {
-      throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
-    } else {
-      $fileFormatName = reset($fileFormats);
-    }
+    // if (count(array_unique($fileFormats)) > 1) {
+    //   throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
+    // } else {
+    //   $fileFormatName = reset($fileFormats);
+    // }
     $template->assign("file", $this->toArray());
     $template->assign("total", number_format($total, 2, '.', '')); // SEPA-432: two-digit decimals
     $template->assign("nbtransactions", $nbtransactions);
-    $head = $template->fetch('CRM/Sepa/Formats/'.$fileFormatName.'/transaction-header.tpl');
-    $footer = $template->fetch('CRM/Sepa/Formats/'.$fileFormatName.'/transaction-footer.tpl');
-    return $head.$xml.$footer;
+    return $xml;
   }
 }
 

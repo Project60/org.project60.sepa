@@ -18,6 +18,7 @@ abstract class CRM_Sepa_Logic_Format {
   /** @var array Settings per format */
   public static $settings = array();
 
+  protected $fileFormatName = NULL;
 
   /**
    * Load class based on format name.
@@ -26,9 +27,11 @@ abstract class CRM_Sepa_Logic_Format {
    *
    * @throws Exception
    */
-  public static function loadFormatClass($fileFormat) {
+  public static function loadFormatClass($fileFormatName) {
+    $fileFormatName = self::sanitizeFileFormat($fileFormatName);
+
     $s = DIRECTORY_SEPARATOR;
-    $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}templates{$s}Sepa{$s}Formats{$s}".$fileFormat;
+    $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}templates{$s}Sepa{$s}Formats{$s}".$fileFormatName;
     $file = $directory."{$s}Format.php";
     if (file_exists($directory)) {
       if (file_exists($file)) {
@@ -39,8 +42,44 @@ abstract class CRM_Sepa_Logic_Format {
     } else {
       throw new Exception(ts('Directory for file format does not exist.'));
     }
+    $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
+    return new $format_class($fileFormatName);
   }
 
+  /**
+   * Constructor
+   */
+  protected function __construct($fileFormatName) {
+    $this->fileFormatName = $fileFormatName;
+  }
+
+  /**
+   * get file format string
+   */
+  public function getFileFormatName() {
+    require $this->fileFormatName;
+  }
+
+  /**
+   * get the header TPL file
+   */
+  public function getHeaderTpl() {
+    return "Sepa/Formats/{$this->fileFormatName}/transaction-header.tpl";
+  }
+
+  /**
+   * get the header TPL file
+   */
+  public function getDetailsTpl() {
+    return "Sepa/Formats/{$this->fileFormatName}/transaction-details.tpl";
+  }
+
+  /**
+   * get the header TPL file
+   */
+  public function getFooterTpl() {
+    return "Sepa/Formats/{$this->fileFormatName}/transaction-footer.tpl";
+  }
 
   /**
    * Sanitize file format name which is used in directory name.
@@ -103,6 +142,7 @@ abstract class CRM_Sepa_Logic_Format {
    * gives the option of setting extra variables to the template
    */
   public function assignSettings($template) {
+    $template->assign('fileFormat', $this->fileFormatName);
     // nothing to do here
   }
 }

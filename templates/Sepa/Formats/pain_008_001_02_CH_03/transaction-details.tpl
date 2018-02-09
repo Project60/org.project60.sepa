@@ -1,21 +1,21 @@
     <PmtInf>
       <PmtInfId>{$group.reference}</PmtInfId>
       <PmtMtd>DD</PmtMtd>
-      <BtchBookg>false</BtchBookg>
-      <NbOfTxs>{$nbtransactions}</NbOfTxs>
-      <CtrlSum>{$total}</CtrlSum>
       <PmtTpInf>
         <SvcLvl>
-          <Cd>SEPA</Cd>
+          <Prtry>CHTA</Prtry>
         </SvcLvl>
         <LclInstrm>
-          <Cd>COR1</Cd>
+          <Prtry>LSV+</Prtry>
         </LclInstrm>
-        <SeqTp>RCUR</SeqTp>
       </PmtTpInf>
       <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
       <Cdtr>
         <Nm>{$creditor.name}</Nm>
+        <PstlAdr>
+          <Ctry>CH</Ctry>
+          <AdrLine>{$creditor.address}</AdrLine>
+        </PstlAdr>
       </Cdtr>
       <CdtrAcct>
         <Id>
@@ -24,49 +24,47 @@
       </CdtrAcct>
       <CdtrAgt>
         <FinInstnId>
-          <BIC>{$creditor.bic}</BIC>
+          <ClrSysMmbId>
+            <MmbId>81232</MmbId>
+          </ClrSysMmbId>
+          <Othr>
+            <Id>010001456</Id>
+          </Othr>
         </FinInstnId>
       </CdtrAgt>
-      <ChrgBr>SLEV</ChrgBr>
       <CdtrSchmeId>
         <Id>
           <PrvtId>
             <Othr>
-              <Id>{$creditor.identifier}</Id>
+              <Id>ABC1W</Id>
               <SchmeNm>
-                <Prtry>SEPA</Prtry>
+                <Prtry>CHLS</Prtry>
               </SchmeNm>
             </Othr>
           </PrvtId>
         </Id>
       </CdtrSchmeId>
-
 {foreach from=$contributions item="contribution"}
       <DrctDbtTxInf>
         <PmtId>
-          <EndToEndId>{$contribution.id}</EndToEndId>
+          <InstrId>INSTRID-01-01</InstrId>
+          <EndToEndId>NOTPROVIDED</EndToEndId>
         </PmtId>
-        <InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</InstdAmt>
-        <DrctDbtTx>
-          <MndtRltdInf>
-            <MndtId>{$contribution.reference}</MndtId>
-            <DtOfSgntr>{$contribution.validation_date|crmDate:"%Y-%m-%d"}</DtOfSgntr>
-          </MndtRltdInf>
-        </DrctDbtTx>
+        <InstdAmt Ccy="CHF">{$contribution.total_amount}</InstdAmt>
         <DbtrAgt>
           <FinInstnId>
-            <BIC>{$contribution.bic}</BIC>
+            <ClrSysMmbId>
+              <MmbId>4835</MmbId>
+            </ClrSysMmbId>
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
           <Nm>{$contribution.display_name}</Nm>
-{if $contribution.ctry eq 'CH'}
           <PstlAdr>
             <Ctry>{$contribution.ctry}</Ctry>
             <AdrLine>{$contribution.street_address}</AdrLine>
             <AdrLine>{$contribution.postal_code} {$contribution.city}</AdrLine>
           </PstlAdr>
-{/if}
         </Dbtr>
         <DbtrAcct>
           <Id>
@@ -74,9 +72,17 @@
           </Id>
         </DbtrAcct>
         <RmtInf>
-          <Ustrd>{$contribution.message}</Ustrd>
+          <Strd>
+            <CdtrRefInf>
+              <Tp>
+                <CdOrPrtry>
+                  <Prtry>ESR</Prtry>
+                </CdOrPrtry>
+              </Tp>
+              <Ref>200002000000004443332000061</Ref>
+            </CdtrRefInf>
+          </Strd>
         </RmtInf>
       </DrctDbtTxInf>
 {/foreach}
-
     </PmtInf>

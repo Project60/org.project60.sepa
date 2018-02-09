@@ -64,9 +64,6 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("group",$group );
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
-    $this->fileFormat = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
-    $this->fileFormat = CRM_Sepa_Logic_Format::sanitizeFileFormat($this->fileFormat);
-    $template->assign("fileFormat",$this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
@@ -141,20 +138,19 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $this->nbtransactions++;
     }
     $template->assign("total", number_format($this->total, 2, '.', '')); // SEPA-432: two-digit decimals
-    $template->assign("nbtransactions",$this->nbtransactions);
-    $template->assign("contributions",$r);
+    $template->assign("nbtransactions", $this->nbtransactions);
+    $template->assign("contributions", $r);
 
     // load file format class
-    CRM_Sepa_Logic_Format::loadFormatClass($this->fileFormat);
-    $format_class = 'CRM_Sepa_Logic_Format_'.$this->fileFormat;
-    $format = new $format_class();
-    $format->assignSettings($template);
+    $fileFormatName = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
+    $fileFormat = CRM_Sepa_Logic_Format::loadFormatClass($fileFormatName);
+    $fileFormat->assignSettings($template);
 
     // render file
-    $content  = $template->fetch('Sepa/Formats/'.$this->fileFormat.'/transaction-header.tpl');
-    $content .= $template->fetch('Sepa/Formats/'.$this->fileFormat.'/transaction-details.tpl');
-    $content .= $template->fetch('Sepa/Formats/'.$this->fileFormat.'/transaction-footer.tpl');
-    return $format->characterEncode($content);
+    $content  = $template->fetch($fileFormat->getHeaderTpl());
+    $content .= $template->fetch($fileFormat->getDetailsTpl());
+    $content .= $template->fetch($fileFormat->getFooterTpl());
+    return $fileFormat->characterEncode($content);
   }
 
 

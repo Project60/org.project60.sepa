@@ -79,6 +79,17 @@
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "pain.008.001.02.CH.03 (CH-DD)",
+      "description": "SIX Interbank CH-DD",
+      "value": "8",
+      "name": "pain_008_001_02_CH_03",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
     }
   ]
 }
