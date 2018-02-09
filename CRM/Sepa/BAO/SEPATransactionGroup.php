@@ -107,16 +107,16 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     //dear dear, it might work, but seems to be highly dependant of the system running it, without any way to know what is available, or if the setting was done properly #phpeature
 
     while ($contrib->fetch()) {
-      $t=$contrib->toArray();
-      $t['id'] = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
-      $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
+      $t         = $contrib->toArray();
+      $t['id']   = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
+      $t["iban"] = str_replace(array(' ','-'), '', $t["iban"]);
+      $t['ctry'] = substr($t["iban"], 0, 2);
 
       // try to convert the name into a more acceptable format
       if (function_exists("iconv")){
-        $t["display_name"]=iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
+        $t["display_name"] = iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
         //french banks like utf8 as long as it's ascii7 only
       }
-
       // ...but to be sure, replace any remainig illegit characters with '?'
       $t["display_name"] = preg_replace("/[^ 0-9a-zA-Z':?,\-(+.)\/\"]/", '?', $t["display_name"]);
 
@@ -128,13 +128,13 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       CRM_Utils_SepaCustomisationHooks::modify_endtoendid($end2endID, $t, $creditor);
       $t["end2endID"] = $end2endID;
 
-      $r[]=$t;
+      $r[] = $t;
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
       } elseif ($contrib->creditor_id == null) { // it shouldn't happen.
         $contrib->creditor_id = $creditor_id;
       } elseif ($creditor_id != $contrib->creditor_id){
-        CRM_Core_Error::fatal("mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
+        CRM_Core_Error::fatal("Mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
         //to fix the mandate: update civicrm_sdd_mandate set creditor_id=1;
       }
       $this->total += $contrib->total_amount;

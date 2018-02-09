@@ -42,6 +42,7 @@
       "_translate": ["label"],
       "label": "pain.008.003.02 (CDD EBICS-3.0)",
       "value": "4",
+      "description": "Identical with 'pain.008.003.02 (COR1 EBICS-3.0)', don't re-enable.",
       "name": "pain.008.003.02 EBICS3",
       "filter": "0",
       "is_reserved": "1",
@@ -62,8 +63,19 @@
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "Bank BPH PL direct debit",
-      "value": "5",
+      "value": "6",
       "name": "bphpl",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "pain.008.003.02 (EBICS-3.0 RCUR/CH)",
+      "description": "EBIC-3.0 RCUR only, Support for CH",
+      "value": "7",
+      "name": "pain_008_003_02_rcur_ch",
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"
