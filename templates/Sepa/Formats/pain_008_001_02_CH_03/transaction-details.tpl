@@ -25,7 +25,7 @@
       <CdtrAgt>
         <FinInstnId>
           <ClrSysMmbId>
-            <MmbId>81232</MmbId>
+            <MmbId>09000</MmbId>
           </ClrSysMmbId>
           <Othr>
             <Id>010001456</Id>
@@ -36,9 +36,9 @@
         <Id>
           <PrvtId>
             <Othr>
-              <Id>ABC1W</Id>
+              <Id>RS-PID</Id>
               <SchmeNm>
-                <Prtry>CHLS</Prtry>
+                <Prtry>CHDD</Prtry>
               </SchmeNm>
             </Othr>
           </PrvtId>
@@ -48,13 +48,13 @@
       <DrctDbtTxInf>
         <PmtId>
           <InstrId>INSTRID-01-01</InstrId>
-          <EndToEndId>NOTPROVIDED</EndToEndId>
+          <EndToEndId>{$contribution.end2endID}</EndToEndId>
         </PmtId>
         <InstdAmt Ccy="CHF">{$contribution.total_amount}</InstdAmt>
         <DbtrAgt>
           <FinInstnId>
             <ClrSysMmbId>
-              <MmbId>4835</MmbId>
+              <MmbId>09000</MmbId>
             </ClrSysMmbId>
           </FinInstnId>
         </DbtrAgt>
