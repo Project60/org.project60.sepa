@@ -6,13 +6,13 @@
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "PDF Mandate",
-      "name": "sepa_mandate_pdf",
+      "name": "sepa_mandate_pdf"
     },
     {
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "Mail Sepa Mandate",
-      "name": "sepa_mandate",
+      "name": "sepa_mandate"
     }
   ]
 }

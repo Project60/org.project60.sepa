@@ -6,7 +6,7 @@
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "Received",
-      "name": "Received",
+      "name": "Received"
     }
   ]
 }

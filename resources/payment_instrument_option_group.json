@@ -6,19 +6,19 @@
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "SEPA DD First Transaction",
-      "name": "FRST",
+      "name": "FRST"
     },
     {
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "SEPA DD Recurring Transaction",
-      "name": "RCUR",
+      "name": "RCUR"
     },
     {
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "SEPA DD One-off Transaction",
-      "name": "OOFF",
+      "name": "OOFF"
     }
   ]
 }

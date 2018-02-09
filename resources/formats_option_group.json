@@ -30,7 +30,7 @@
     {
       "_lookup": ["value"],
       "_translate": ["label"],
-      "label": "pain.008.003.02 COR1 direct debit (CD1 EBICS-2.7)",
+      "label": "pain.008.003.02 (COR1 EBICS-3.0)",
       "value": "3",
       "name": "pain.008.003.02 COR1",
       "filter": "0",
@@ -40,12 +40,13 @@
     {
       "_lookup": ["value"],
       "_translate": ["label"],
-      "label": "pain.008.001.02 (CDD EBICS-3.0)",
+      "label": "pain.008.003.02 (CDD EBICS-3.0)",
       "value": "4",
-      "name": "pain.008.003.02 COR1",
+      "name": "pain.008.003.02 EBICS3",
       "filter": "0",
       "is_reserved": "1",
-      "is_active": "1"
+      "is_active": "0",
+      "_comment": "disabled, identical with ID 3"
     },
     {
       "_lookup": ["value"],
