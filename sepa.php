@@ -103,6 +103,9 @@ function sepa_civicrm_pageRun( &$page ) {
 }
 
 function sepa_civicrm_buildForm ( $formName, &$form ) {
+  // restrict payemnt instrument use if necessary
+  CRM_Sepa_Logic_PaymentInstruments::restrictPaymentInstrumentsInForm($formName, $form);
+
   // incorporate payment processor
   sepa_pp_buildForm($formName, $form);
 }
