@@ -71,5 +71,4 @@
         </RmtInf>
       </DrctDbtTxInf>
 {/foreach}
-
     </PmtInf>
