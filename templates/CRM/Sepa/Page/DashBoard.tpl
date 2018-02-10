@@ -113,12 +113,43 @@
   {/foreach}
 </table>
 
+{* legend by @scardinius *}
+<br/>
+<table>
+  <caption>{ts domain="org.project60.sepa"}Legend{/ts}</caption>
+  <tr>
+    <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Description{/ts}</th>
+  </tr>
+  <tr class="submit_missed">
+    <td>{ts domain="org.project60.sepa"}Missed{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission date has passed!{/ts}</td>
+  </tr>
+  <tr class="submit_urgently">
+    <td>{ts domain="org.project60.sepa"}Urgent{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission date is immanent, you have to close group and upload file to creditor today!{/ts}</td>
+  </tr>
+  <tr class="submit_soon">
+    <td>{ts domain="org.project60.sepa"}Soon{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission within 6 days or OOFF (submission not enforced){/ts}</td>
+  </tr>
+  <tr class="submit_later">
+    <td>{ts domain="org.project60.sepa"}Upcoming{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}Submission date more than 6 days from now{/ts}</td>
+  </tr>
+  <tr class="submit_closed">
+    <td>{ts domain="org.project60.sepa"}Closed{/ts}</td>
+    <td>{ts domain="org.project60.sepa"}The group is closed and uploaded to creditor, submission date is in the past.{/ts}</td>
+  </tr>
+</table>
+
 {literal}
 <style>
-  tr.submit_missed {background-color:#9D0000;}
-  tr.submit_urgently {background-color:#FA583F;}
-  tr.submit_soon {background-color:#FAB83F;}
-  tr.submit_closed {background-color:#f0f8ff;}
+  tr.submit_missed {background-color: #EE0000AA;}
+  tr.submit_urgently {background-color: #AC6700AA;}
+  tr.submit_soon {background-color: #0165FFAA;}
+  tr.submit_later {background-color: #008300AA;}
+  tr.submit_closed {background-color: #00830033;}
 </style>
 {/literal}
 

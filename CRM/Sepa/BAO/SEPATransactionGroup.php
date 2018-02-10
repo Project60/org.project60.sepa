@@ -64,12 +64,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign("group",$group );
     $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
     $template->assign("creditor",$creditor );
-    $this->fileFormat = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
-    $template->assign("fileFormat",$this->fileFormat);
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
         c.id AS cid,
+        c.id AS contribution_id,
         civicrm_contact.display_name,
         invoice_id,
         currency,
@@ -77,6 +76,15 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         receive_date,
         contribution_recur_id,
         contribution_status_id,
+        a.street_address,
+        a.postal_code,
+        a.city,
+        c.invoice_id,
+        c.currency,
+        c.total_amount,
+        c.receive_date,
+        c.contribution_recur_id,
+        c.contribution_status_id,
         mandate.*
       FROM civicrm_contribution AS c
       JOIN civicrm_sdd_contribution_txgroup AS g ON g.contribution_id=c.id
@@ -85,8 +93,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         (SELECT id FROM civicrm_sdd_mandate WHERE entity_table = 'civicrm_contribution' AND entity_id = c.id)
       )
       JOIN civicrm_contact ON c.contact_id = civicrm_contact.id
+      LEFT JOIN civicrm_address a ON c.contact_id = a.contact_id AND a.is_primary = 1
       WHERE g.txgroup_id = %1
-        AND contribution_status_id != 3
+        AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
     "; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -95,16 +104,16 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     //dear dear, it might work, but seems to be highly dependant of the system running it, without any way to know what is available, or if the setting was done properly #phpeature
 
     while ($contrib->fetch()) {
-      $t=$contrib->toArray();
-      $t['id'] = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
-      $t["iban"]=str_replace(array(' ','-'), '', $t["iban"]);
+      $t         = $contrib->toArray();
+      $t['id']   = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
+      $t["iban"] = str_replace(array(' ','-'), '', $t["iban"]);
+      $t['ctry'] = substr($t["iban"], 0, 2);
 
       // try to convert the name into a more acceptable format
       if (function_exists("iconv")){
-        $t["display_name"]=iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
+        $t["display_name"] = iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
         //french banks like utf8 as long as it's ascii7 only
       }
-
       // ...but to be sure, replace any remainig illegit characters with '?'
       $t["display_name"] = preg_replace("/[^ 0-9a-zA-Z':?,\-(+.)\/\"]/", '?', $t["display_name"]);
 
@@ -116,22 +125,32 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       CRM_Utils_SepaCustomisationHooks::modify_endtoendid($end2endID, $t, $creditor);
       $t["end2endID"] = $end2endID;
 
-      $r[]=$t;
+      $r[] = $t;
       if ($creditor_id == null) {
         $creditor_id = $contrib->creditor_id;
       } elseif ($contrib->creditor_id == null) { // it shouldn't happen.
         $contrib->creditor_id = $creditor_id;
       } elseif ($creditor_id != $contrib->creditor_id){
-        CRM_Core_Error::fatal("mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
+        CRM_Core_Error::fatal("Mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
         //to fix the mandate: update civicrm_sdd_mandate set creditor_id=1;
       }
       $this->total += $contrib->total_amount;
       $this->nbtransactions++;
     }
     $template->assign("total", number_format($this->total, 2, '.', '')); // SEPA-432: two-digit decimals
-    $template->assign("nbtransactions",$this->nbtransactions);
-    $template->assign("contributions",$r);
-    return $template->fetch('CRM/Sepa/xml/TransactionGroup.tpl');
+    $template->assign("nbtransactions", $this->nbtransactions);
+    $template->assign("contributions", $r);
+
+    // load file format class
+    $fileFormatName = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
+    $fileFormat = CRM_Sepa_Logic_Format::loadFormatClass($fileFormatName);
+    $fileFormat->assignSettings($template);
+
+    // render file
+    $content  = $template->fetch($fileFormat->getHeaderTpl());
+    $content .= $template->fetch($fileFormat->getDetailsTpl());
+    $content .= $template->fetch($fileFormat->getFooterTpl());
+    return $fileFormat->characterEncode($content);
   }
 
 
@@ -149,9 +168,12 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       return "Cannot find transaction group ".$txgroup_id;
     }
 
+    $creditor = civicrm_api ("SepaCreditor", "getsingle", array("sequential"=>1, "version"=>3, "id"=>$txgroup["sdd_creditor_id"]));
+    $fileFormatGrouping = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping');
+
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
       // find an available txgroup reference
-      $available_name = $name = "SDDXML-".$txgroup['reference'];
+      $available_name = $name = "SDD".strtoupper($fileFormatGrouping)."-".$txgroup['reference'];
       $counter = 1;
       $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
       while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
@@ -169,7 +191,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $sepa_file = civicrm_api('SepaSddFile', 'create', array(
             'version'                 => 3,
             'reference'               => $available_name,
-            'filename'                => $available_name.'.xml',
+            'filename'                => $fileFormatGrouping ? $available_name.'.'.$fileFormatGrouping : $available_name.'.xml',
             'latest_submission_date'  => $txgroup['latest_submission_date'],
             'created_date'            => date('YmdHis'),
             'created_id'              => CRM_Core_Session::singleton()->get('userID'),
