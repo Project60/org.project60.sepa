@@ -47,7 +47,7 @@
 {foreach from=$contributions item="contribution"}
       <DrctDbtTxInf>
         <PmtId>
-          <InstrId>INSTRID-01-01</InstrId>
+          <InstrId>INSTRID-{$contribution.end2endID}</InstrId>
           <EndToEndId>{$contribution.end2endID}</EndToEndId>
         </PmtId>
         <InstdAmt Ccy="CHF">{$contribution.total_amount}</InstdAmt>
