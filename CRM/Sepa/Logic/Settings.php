@@ -124,28 +124,6 @@ class CRM_Sepa_Logic_Settings {
   }
 
   /**
-   * Checks if a given contribution is a SEPA contribution.
-   * This works for contribution and contribution_recur entities
-   *
-   * It simply checks, whether the contribution uses a SEPA payment instrument
-   *
-   * @param $contribution   an array with the attributes of the contribution
-   *
-   * @return true if the contribution is a SEPA contribution
-   */
-  public static function isSDD($contribution) {
-    $payment_instrument_id = $contribution["payment_instrument_id"];
-    $name = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $payment_instrument_id);
-    switch ($name) {
-      case 'FRST' :
-      case 'RCUR' :
-      case 'OOFF' :
-        return true;
-    }
-    return false;
-  }
-
-  /**
     * Gets the mandate of the given contribution
     *
     * @param contribution_id  ID of the contribution

@@ -31,7 +31,7 @@ function sepa_civicrm_pageRun( &$page ) {
   } elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
     if (CRM_Core_Permission::check('view sepa mandates')) {
-      if (!CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
+      if (!CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
         return;
 
       $contribution_id = $page->getTemplate()->get_template_vars('id');
@@ -86,7 +86,7 @@ function sepa_civicrm_pageRun( &$page ) {
       // This is a one-off contribution => try to show mandate data.
       $template_vars = $page->getTemplate()->get_template_vars('recur');
       $payment_instrument_id = $template_vars['payment_instrument_id'];
-      if (!CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
+      if (!CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
         return;
 
       $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
@@ -103,6 +103,9 @@ function sepa_civicrm_pageRun( &$page ) {
 }
 
 function sepa_civicrm_buildForm ( $formName, &$form ) {
+  // restrict payemnt instrument use if necessary
+  CRM_Sepa_Logic_PaymentInstruments::restrictPaymentInstrumentsInForm($formName, $form);
+
   // incorporate payment processor
   sepa_pp_buildForm($formName, $form);
 }
@@ -498,7 +501,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     if (empty($mandates)) {
       // the contribution has no mandate,
       //   so we should not allow the payment_instrument be set to an SDD one
-      if (CRM_Sepa_Logic_Settings::isSDD(array('payment_instrument_id' => $fields['payment_instrument_id']))) {
+      if (CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $fields['payment_instrument_id']))) {
         $errors['payment_instrument_id'] = ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.", array('domain' => 'org.project60.sepa'));
       }
 
