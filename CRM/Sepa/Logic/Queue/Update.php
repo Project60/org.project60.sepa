@@ -141,9 +141,7 @@ class CRM_Sepa_Logic_Queue_Update {
         break;
 
       case 'FINISH':
-        error_log("RELEASE LOCK");
         CRM_Sepa_Logic_Settings::releaseAsyncLock('sdd_async_update_lock');
-        error_log("RELEASED LOCK");
         break;
 
       default:

@@ -149,7 +149,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     //   if (isset($create_note_result['is_error']) && $create_note_result['is_error']) {
     //     // don't consider this a fatal error...
     //     CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s", array('domain' => 'org.project60.sepa')), $contribution['id']), ts('Error', array('domain' => 'org.project60.sepa')), 'alert');
-    //     error_log("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
+    //     CRM_Core_Error::debug_log_message("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
     //   }
     // }
 

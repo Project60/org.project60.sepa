@@ -26,7 +26,6 @@ class CRM_Sepa_Logic_ContributionProtector implements API_Wrapper {
    * Make sure nobody deletes stuff
    */
   public function fromApiInput($apiRequest) {
-    // error_log(json_encode($apiRequest));
     if ($apiRequest['action'] == 'delete') {
       $error = FALSE;
       if ($apiRequest['entity'] == 'Contribution') {

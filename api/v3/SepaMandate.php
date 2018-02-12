@@ -125,7 +125,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     	// this didn't work, so we also have to roll back the created contribution
     	$delete = civicrm_api($contribution_entity, "delete", array('id'=>$contribution['id'], 'version'=>3));
     	if (!empty($delete['is_error'])) {
-    		error_log("org.project60.sepa: createfull couldn't roll back created contribution: ".$delete['error_message']);
+    		CRM_Core_Error::debug_log_message("org.project60.sepa: createfull couldn't roll back created contribution: ".$delete['error_message']);
     	}
     }
 	return $mandate;

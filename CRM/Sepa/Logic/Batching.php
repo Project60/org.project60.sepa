@@ -191,7 +191,7 @@ class CRM_Sepa_Logic_Batching {
             unset($mandates_by_nextdate[$collection_date][$index]['mandate_entity_id']);
 
             // log the error
-            error_log("org.project60.sepa: batching:updateRCUR/createContrib ".$contribution['error_message']);
+            CRM_Core_Error::debug_log_message("org.project60.sepa: batching:updateRCUR/createContrib ".$contribution['error_message']);
 
             // TODO: Error handling?
           }
@@ -203,7 +203,7 @@ class CRM_Sepa_Logic_Batching {
     // delete unused contributions:
     foreach ($existing_contributions_by_recur_id as $contribution_id) {
       // TODO: is this needed?
-      error_log("org.project60.sepa: batching: contribution $contribution_id should be deleted...");
+      CRM_Core_Error::debug_log_message("org.project60.sepa: batching: contribution $contribution_id should be deleted...");
     }
 
     // step 5: find all existing OPEN groups
@@ -448,13 +448,13 @@ class CRM_Sepa_Logic_Batching {
             ));
         if (!empty($group['is_error'])) {
           // TODO: Error handling
-          error_log("org.project60.sepa: batching:syncGroups/createGroup ".$group['error_message']);
+          CRM_Core_Error::debug_log_message("org.project60.sepa: batching:syncGroups/createGroup ".$group['error_message']);
         }
       } else {
         $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date], 'status_id' => $group_status_id_open));
         if (!empty($group['is_error'])) {
           // TODO: Error handling
-          error_log("org.project60.sepa: batching:syncGroups/getGroup ".$group['error_message']);
+          CRM_Core_Error::debug_log_message("org.project60.sepa: batching:syncGroups/getGroup ".$group['error_message']);
         }
         unset($existing_groups[$collection_date]);
       }
@@ -466,7 +466,7 @@ class CRM_Sepa_Logic_Batching {
         // remark: "mandate_entity_id" in this case means the contribution ID
         if (empty($mandate['mandate_entity_id'])) {
           // this shouldn't happen
-          error_log("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
+          CRM_Core_Error::debug_log_message("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
         } else {
           array_push($entity_ids, $mandate['mandate_entity_id']);
         }

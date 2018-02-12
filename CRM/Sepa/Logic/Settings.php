@@ -34,7 +34,7 @@ class CRM_Sepa_Logic_Settings {
     $stdvalue = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name);
     $exception = array('cycledays');
     if (($override == NULL && $stdvalue == NULL) || ($stdvalue == NULL && !in_array($param_name, $exception))) {
-        error_log("org.project60.sepa: get_parameter for unknown key: $param_name");
+        CRM_Core_Error::debug_log_message("org.project60.sepa: get_parameter for unknown key: $param_name");
         return NULL;
     }else if ($override == NULL) {
       return $stdvalue;

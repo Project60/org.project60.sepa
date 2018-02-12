@@ -165,7 +165,7 @@ function sepa_civicrm_enable() {
   // create a dummy creditor if no creditor exists
   $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
   if (empty($creditorCount)) {
-    error_log("org.project60.sepa_dd: Trying to install dummy creditor.");
+    CRM_Core_Error::debug_log_message("org.project60.sepa_dd: Trying to install dummy creditor.");
     // to create, we need to first find a default contact
     $default_contact = 0;
     $domains = civicrm_api('Domain', 'get', array('version'=>3));
@@ -177,9 +177,9 @@ function sepa_civicrm_enable() {
     }
 
     if (empty($default_contact)) {
-      error_log("org.project60.sepa_dd: Cannot install dummy creditor - no default contact found.");
+      CRM_Core_Error::debug_log_message("org.project60.sepa_dd: Cannot install dummy creditor - no default contact found.");
     } else {
-      error_log("org.project60.sepa_dd: Inserting dummy creditor into database.");
+      CRM_Core_Error::debug_log_message("org.project60.sepa_dd: Inserting dummy creditor into database.");
       // remark: we're within the enable hook, so we cannot use our own API/BAOs...
       $create_creditor_sql = "
       INSERT INTO civicrm_sdd_creditor
@@ -399,7 +399,7 @@ function sepa_civicrm_navigationMenu(&$params) {
     }
   }
   if (empty($contributions_menu_id)) {
-    error_log("org.project60.sepa_dd: Cannot find parent menu Contributions for $sepa_dashboard_url.");
+    CRM_Core_Error::debug_log_message("org.project60.sepa_dd: Cannot find parent menu Contributions for $sepa_dashboard_url.");
   } else {
     // add sepa dashboard menu entry
     $sepa_dashboard_menu = array (
@@ -434,7 +434,7 @@ function sepa_civicrm_navigationMenu(&$params) {
     }
   }
   if (empty($administer_menu_id)) {
-    error_log("org.project60.sepa_dd: Cannot find parent menu Administer/CiviContribute for $sepa_settings_url.");
+    CRM_Core_Error::debug_log_message("org.project60.sepa_dd: Cannot find parent menu Administer/CiviContribute for $sepa_settings_url.");
   } else {
     // add sepa dashboard menu entry
     $sepa_settings_menu = array (
@@ -510,7 +510,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
 
       // ..but first some sanity checks...
       if (count($mandates) != 1) {
-        error_log("org.project60.sepa_dd: contribution [$contribution_id] has more than one mandate.");
+        CRM_Core_Error::debug_log_message("org.project60.sepa_dd: contribution [$contribution_id] has more than one mandate.");
       }
 
       // now compare requested with expected payment instrument

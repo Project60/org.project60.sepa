@@ -245,9 +245,9 @@ function sepa_pp_install() {
 		$result = civicrm_api('PaymentProcessorType', 'create', $payment_processor_data);
 		if (!empty($result['is_error'])) {
 			// something went wrong here...
-			error_log("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' could not be created. Error was ".$result['error_message']);
+			CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' could not be created. Error was ".$result['error_message']);
 		} else {
-			error_log("org.project60.sepa_dd: created payment processor with name 'SEPA_Direct_Debit'");
+			CRM_Core_Error::debug_log_message("org.project60.sepa_dd: created payment processor with name 'SEPA_Direct_Debit'");
 		}
 
 
@@ -257,7 +257,7 @@ function sepa_pp_install() {
 			$result = civicrm_api('PaymentProcessorType', 'create', array('id'=>$sdd_pp['id'], 'is_active'=>1, 'version' => 3));
 			if (!empty($result['is_error'])) {
 				// something went wrong here...
-				error_log("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' created.");
+				CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' created.");
 			}
 		}
 	}
@@ -275,11 +275,11 @@ function sepa_pp_disable() {
 			$result = civicrm_api('PaymentProcessorType', 'create', array('id'=>$sdd_pp['id'], 'is_active'=>0, 'version' => 3));
 			if (!empty($result['is_error'])) {
 				// something went wrong here...
-				error_log("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' could not be disabled. Error was ".$result['error_message']);
+				CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' could not be disabled. Error was ".$result['error_message']);
 			}
 		}
 	} else {
 		// huh? payment processor does not exist (any more)?
-		error_log("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' has gone missing.");
+		CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' has gone missing.");
 	}
 }

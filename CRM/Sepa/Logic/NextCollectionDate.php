@@ -65,7 +65,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
 
     if (!$contribution_recur_id) {
       // error
-      error_log("org.project60.sepa: updateNextCollectionDate: couldn't identify recurring contribution.");
+      CRM_Core_Error::debug_log_message("org.project60.sepa: updateNextCollectionDate: couldn't identify recurring contribution.");
       return;
     }
 
@@ -123,7 +123,6 @@ class CRM_Sepa_Logic_NextCollectionDate {
    * by $txgroup_id (i.e. the whole group) or as list of individual recurring contributions
    */
   public static function advanceNextCollectionDate($txgroup_id, $contribution_id_list = NULL) {
-    // error_log("ADVANCE $txgroup_id / " . json_encode($contribution_id_list));
     // PREPARE: generate the right identification snippets
     $txgroup_id = (int) $txgroup_id;
     if (!empty($txgroup_id)) {
@@ -134,7 +133,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
       $joins = "LEFT JOIN civicrm_contribution ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id";
       $where = 'civicrm_contribution.id IN (' . implode(',', $contribution_id_list) . ')';
     } else {
-      error_log("org.project60.sepa: advanceNextCollectionDate failed - no identifier given.");
+      CRM_Core_Error::debug_log_message("org.project60.sepa: advanceNextCollectionDate failed - no identifier given.");
       return;
     }
 
@@ -148,11 +147,10 @@ class CRM_Sepa_Logic_NextCollectionDate {
       FROM civicrm_contribution_recur
       {$joins}
       WHERE {$where} LIMIT 1";
-    // error_log($info_query_sql);
     $info_query = CRM_Core_DAO::executeQuery($info_query_sql);
     if (!$info_query->fetch() || empty($info_query->receive_date) || empty($info_query->cycle_day) || $info_query->cycle_day < 1 || $info_query->cycle_day > 31) {
       // i.e. there's something wrong
-      error_log('org.project60.sepa: advanceNextCollectionDate failed - contribution data incomplete');
+      CRM_Core_Error::debug_log_message('org.project60.sepa: advanceNextCollectionDate failed - contribution data incomplete');
       return;
     }
     $last_collection_date = strtotime($info_query->receive_date);
@@ -169,7 +167,6 @@ class CRM_Sepa_Logic_NextCollectionDate {
       {$joins}
       SET next_sched_contribution_date = '{$last_collection_date}'
       WHERE {$where}";
-    // error_log($update_query_sql);
     CRM_Core_DAO::executeQuery($update_query_sql);
 
     // SECONDLY: advance all values by one period
@@ -181,7 +178,6 @@ class CRM_Sepa_Logic_NextCollectionDate {
         SET next_sched_contribution_date = (next_sched_contribution_date + INTERVAL frequency_interval {$sql_unit})
         WHERE {$where}
           AND frequency_unit = '{$civi_unit}'";
-      // error_log($advance_query_sql);
       CRM_Core_DAO::executeQuery($advance_query_sql);
     }
 

@@ -45,7 +45,7 @@ class CRM_Utils_SepaOptionGroupTools {
     $result = civicrm_api3('OptionGroup', 'getsingle', $params);
     if(!empty($result['is_error'])) {
       $message = sprintf("Option group '%s' does not exist. Error was: %s", $params['name'], $result['error_message']);
-      error_log("org.project60.sepa_dd: ".$message);
+      CRM_Core_Error::debug_log_message("org.project60.sepa_dd: ".$message);
       if($warning) {
         CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
       }
@@ -62,7 +62,7 @@ class CRM_Utils_SepaOptionGroupTools {
     $result = civicrm_api3('OptionValue', 'get', $params);
     if(!empty($result['is_error'])) {
       $message = sprintf("Could not retrieve values of group '%d'. Error was: %s", $oid, $result['error_message']);
-      error_log("org.project60.sepa_dd: ".$message);
+      CRM_Core_Error::debug_log_message("org.project60.sepa_dd: ".$message);
       if($warning) {
         CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
       }
@@ -74,7 +74,7 @@ class CRM_Utils_SepaOptionGroupTools {
     foreach($checkUnits as $c) {
       foreach($frequencyUnits as $f) {
         if($c == $f['name'] && ($f['label'] != $c || $f['value'] != $c)) {
-          error_log(sprintf("org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']", $c, $f['label']));
+          CRM_Core_Error::debug_log_message(sprintf("org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']", $c, $f['label']));
 
           if ($reset) {
             $params = array(
@@ -87,14 +87,14 @@ class CRM_Utils_SepaOptionGroupTools {
             $result = civicrm_api3('OptionValue', 'create', $params);
             if(!empty($result['is_error'])) {
               $message = sprintf("Could not reset option value [%d] ('%s'). Error was: %s", $f['id'], $c, $result['error_message']);
-              error_log("org.project60.sepa_dd: ".$message);
+              CRM_Core_Error::debug_log_message("org.project60.sepa_dd: ".$message);
               if($warning) {
                 CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
               }
               // FIXME: why not try again? return;
             } else {
               $message = sprintf("Label '%s' of option group 'recur_frequency_units' reset to '%s'", $c, $c);
-              error_log("org.project60.sepa_dd: ".$message);
+              CRM_Core_Error::debug_log_message("org.project60.sepa_dd: ".$message);
               if($warning) {
                 CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
               }

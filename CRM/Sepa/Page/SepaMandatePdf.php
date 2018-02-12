@@ -237,7 +237,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
                                         'option_group_name' => 'msg_tpl_workflow_contribution',
                                         'name'              => $template_name));
       if (!empty($template_entry['is_error'])) {
-        error_log("org.project60.sepa: OptionGroup 'msg_tpl_workflow_contribution' not properly populated. Reinstal extension. Error was: " . $template_entry['error_message']);
+        CRM_Core_Error::debug_log_message("org.project60.sepa: OptionGroup 'msg_tpl_workflow_contribution' not properly populated. Reinstal extension. Error was: " . $template_entry['error_message']);
         continue;
       }
 
@@ -247,16 +247,16 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
                                         'workflow_id'       => $template_entry['id']));
 
       if (!empty($template['is_error'])) {
-        error_log("org.project60.sepa: Error while checking template '$template_name': ".$template['error_message']);
+        CRM_Core_Error::debug_log_message("org.project60.sepa: Error while checking template '$template_name': ".$template['error_message']);
       } else if ($template['count'] > 1) {
-        error_log("org.project60.sepa: There's multiple templates installed for '$template_name'.");
+        CRM_Core_Error::debug_log_message("org.project60.sepa: There's multiple templates installed for '$template_name'.");
       } else if ($template['count'] == 1) {
-        error_log("org.project60.sepa: Template '$template_name' seems to be correctly installed. Not updated.");
+        CRM_Core_Error::debug_log_message("org.project60.sepa: Template '$template_name' seems to be correctly installed. Not updated.");
       } else {
         // template not yet installed, do it!
         $filepath = __DIR__ . "/../../../templates/Sepa/DefaultMessageTemplates/$template_name.html";
         if (!file_exists($filepath)) {
-          error_log("org.project60.sepa: Couldn't find default template date at '$filepath'");
+          CRM_Core_Error::debug_log_message("org.project60.sepa: Couldn't find default template date at '$filepath'");
           continue;
         }
         $result =  civicrm_api('MessageTemplate', 'create', array(
@@ -270,7 +270,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
               ));
 
         if (!empty($result['is_error'])) {
-          error_log("org.project60.sepa: There was an error trying to create template '$template_name': " . $result['error_message']);
+          CRM_Core_Error::debug_log_message("org.project60.sepa: There was an error trying to create template '$template_name': " . $result['error_message']);
         }
       }
     }

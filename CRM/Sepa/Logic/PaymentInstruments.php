@@ -149,7 +149,6 @@ class CRM_Sepa_Logic_PaymentInstruments {
       }
 
       // inject JS file
-      error_log("GO!");
       CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/form_adjustments/CRM/Contribute/Form/Contribution/manipulate_sdd_payment_instruments.js');
     }
   }

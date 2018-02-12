@@ -209,14 +209,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // check if it's really a OOFF mandate
     if ( $mandate['type']!="OOFF" ) {
-      error_log("org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!");
+      CRM_Core_Error::debug_log_message("org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!");
       $lock->release();
       return FALSE;
     }
 
     // check if it's not been SENT yet
     if ( $mandate['status']!='OOFF' && $mandate['status']!='INIT') {
-      error_log("org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!");
+      CRM_Core_Error::debug_log_message("org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!");
       $lock->release();
       return FALSE;
     }
