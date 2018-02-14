@@ -44,7 +44,7 @@
 		</tr>
 		<tr>	<!-- AMOUNT -->
 			<td>{ts domain="org.project60.sepa"}Amount{/ts}:</td>
-			<td><input name="total_amount" type="number" size="6" step="0.01" value="{$total_amount}" />&nbsp;EUR</td>
+			<td><input name="total_amount" type="number" size="6" step="0.01" value="{$total_amount}" /></td>
 		</tr>
 		<tr>	<!-- FINANCIAL TYPE -->
 			<td>{ts domain="org.project60.sepa"}Financial Type{/ts}:</td>

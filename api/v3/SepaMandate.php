@@ -72,7 +72,16 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
 function civicrm_api3_sepa_mandate_createfull($params) {
     // create the "contract" first: a contribution
     // TODO: sanity checks
-    _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
+
+    // get creditor
+    try {
+      _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
+      $creditor = civicrm_api('SepaCreditor', 'getsingle', array('id' => $params['creditor_id']));
+      error_log($creditor);
+    } catch (Exception $e) {
+      throw new Exception("Couldn't load creditor [{$params['creditor_id']}].");
+    }
+
     $create_contribution = $params; // copy array
     $create_contribution['version'] = 3;
     if (isset($create_contribution['contribution_contact_id'])) {
@@ -80,7 +89,8 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     	$create_contribution['contact_id'] = $create_contribution['contribution_contact_id'];
     }
 	if (empty($create_contribution['currency']))
-		$create_contribution['currency'] = 'EUR'; // set default currency
+		$create_contribution['currency'] = $creditor['currency'];
+
 	if (empty($create_contribution['contribution_status_id']))
 		$create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 

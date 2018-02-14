@@ -87,8 +87,11 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
    */
   function createMandate($type) {
     // first create a contribution
-    $payment_instrument_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $type);
+    $payment_instrument_id  = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $type);
     $contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+
+    // check creditor
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $_REQUEST['creditor_id']));
 
     $contribution_data = array(
         'version'                   => 3,
@@ -97,7 +100,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'financial_type_id'         => $_REQUEST['financial_type_id'],
         'payment_instrument_id'     => $payment_instrument_id,
         'contribution_status_id'    => $contribution_status_id,
-        'currency'                  => 'EUR',
+        'currency'                  => $creditor['currency'],
       );
 
     if ($type=='OOFF') {
@@ -130,28 +133,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         $_REQUEST['contact_id']);
       return;
     }
-
-    // FIXME: see https://github.com/Project60/org.project60.sepa/issues/401
-    //  BUT: probably unused...
-
-    // // create a note, if requested
-    // if ($_REQUEST['note']) {
-    //   // add note
-    //   $create_note = array(
-    //     'version'                   => 3,
-    //     'entity_table'              => $entity_table,
-    //     'entity_id'                 => $contribution['id'],
-    //     'note'                      => $_REQUEST['note'],
-    //     'privacy'                   => 0,
-    //   );
-
-    //   $create_note_result = civicrm_api('Note', 'create', $create_note);
-    //   if (isset($create_note_result['is_error']) && $create_note_result['is_error']) {
-    //     // don't consider this a fatal error...
-    //     CRM_Core_Session::setStatus(sprintf(ts("Couldn't create note for contribution #%s", array('domain' => 'org.project60.sepa')), $contribution['id']), ts('Error', array('domain' => 'org.project60.sepa')), 'alert');
-    //     CRM_Core_Error::debug_log_message("org.project60.sepa_dd: error creating note - ".$create_note_result['error_message']);
-    //   }
-    // }
 
     // next, create mandate
     $mandate_data = array(

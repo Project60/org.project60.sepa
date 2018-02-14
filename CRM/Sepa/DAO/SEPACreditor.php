@@ -129,6 +129,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $mandate_prefix;
   /**
+   * currency used by this creditor
+   *
+   * @var string
+   */
+  public $currency;
+  /**
    * Payment processor link (to be deprecated)
    *
    * @var int unsigned
@@ -249,6 +255,13 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'title' => ts('Bic', array('domain' => 'org.project60.sepa')) ,
           'maxlength' => 11,
           'size' => CRM_Utils_Type::TWELVE,
+        ) ,
+        'currency' => array(
+          'name' => 'currency',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Currency used by this creditor', array('domain' => 'org.project60.sepa')) ,
+          'maxlength' => 3,
+          'size' => CRM_Utils_Type::FOUR,
         ) ,
         'mandate_prefix' => array(
           'name' => 'mandate_prefix',

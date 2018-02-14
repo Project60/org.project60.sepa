@@ -42,6 +42,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_financial_type.name        AS financial_type,
         civicrm_campaign.title             AS campaign,
         civicrm_contribution.total_amount  AS total_amount,
+        civicrm_contribution.currency      AS currency,
         civicrm_contribution.cancel_reason AS cancel_reason
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution   ON civicrm_contribution.id = civicrm_sdd_mandate.entity_id
@@ -63,6 +64,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'financial_type' => $ooff_mandates->financial_type,
         'campaign'       => $ooff_mandates->campaign,
         'total_amount'   => $ooff_mandates->total_amount,
+        'currency'       => $ooff_mandates->currency,
         'cancel_reason'  => $ooff_mandates->cancel_reason,
       );
 
@@ -98,6 +100,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_sdd_mandate.reference                           AS reference,
         civicrm_contribution_recur.frequency_interval           AS frequency_interval,
         civicrm_contribution_recur.frequency_unit               AS frequency_unit,
+        civicrm_contribution_recur.currency                     AS currency,
         civicrm_contribution_recur.amount                       AS amount
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
@@ -134,6 +137,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'last_cancel_reason'   => $rcur_mandates->last_cancel_reason,
         'reference'            => $rcur_mandates->reference,
         'end_date'             => $rcur_mandates->end_date,
+        'currency'             => $rcur_mandates->currency,
         'amount'               => $rcur_mandates->amount,
       );
 

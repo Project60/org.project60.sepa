@@ -118,6 +118,7 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
       civicrm_sdd_file.created_date     AS file_created_date,
       count(*)                          AS nb_contrib,
       sum( contrib.total_amount)        AS total,
+      contrib.currency                  AS currency,
       civicrm_sdd_file.reference        AS file
     FROM civicrm_sdd_txgroup as txgroup
     LEFT JOIN civicrm_sdd_contribution_txgroup as txgroup_contrib on txgroup.id = txgroup_contrib.txgroup_id

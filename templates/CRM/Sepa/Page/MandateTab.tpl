@@ -44,8 +44,8 @@
       <td><span title="{if $rcur.cancel_reason}{$rcur.cancel_reason}{else}{$rcur.status_raw}{/if}">{$rcur.status}</span></td>
       <td>{$rcur.financial_type}{if $rcur.campaign}<br/>({$rcur.campaign}){/if}</td>
       <td>{$rcur.reference}</td>
-      <td>{$rcur.amount|crmMoney}<br/>{$rcur.frequency}</td>
-      <td>{$rcur.total_amount|crmMoney}</td>
+      <td>{$rcur.amount|crmMoney:$rcur.currency}<br/>{$rcur.frequency}</td>
+      <td>{$rcur.total_amount|crmMoney:$rcur.currency}</td>
       <td>
         {$rcur.last_collection_date|crmDate:$date_format}
         {foreach from=$rcur.fail_sequence item=fail}
@@ -92,7 +92,7 @@
       <td><span title="{if $ooff.cancel_reason}{$ooff.cancel_reason}{else}{$ooff.status_raw}{/if}">{$ooff.status}<span></td>
       <td>{$ooff.financial_type}{if $ooff.campaign}<br/>({$ooff.campaign}){/if}</td>
       <td>{$ooff.reference}</td>
-      <td>{$ooff.total_amount|crmMoney}</td>
+      <td>{$ooff.total_amount|crmMoney:$ooff.currency}</td>
       <td>
         <span>
           <a href="{$ooff.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
