@@ -57,7 +57,7 @@
       "name": "citibank-pl",
       "filter": "0",
       "is_reserved": "1",
-      "is_active": "1"
+      "is_active": "0"
     },
     {
       "_lookup": ["value"],
@@ -67,7 +67,7 @@
       "name": "bphpl",
       "filter": "0",
       "is_reserved": "1",
-      "is_active": "1"
+      "is_active": "0"
     },
     {
       "_lookup": ["value"],
@@ -87,6 +87,17 @@
       "description": "SIX Interbank CH-DD",
       "value": "8",
       "name": "pain_008_001_02_CH_03",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "0"
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "TA875 LSV",
+      "description": "LSV+ Züricher Kantonalbank (CH)",
+      "value": "9",
+      "name": "ta875",
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"

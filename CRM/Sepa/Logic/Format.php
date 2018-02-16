@@ -141,7 +141,7 @@ abstract class CRM_Sepa_Logic_Format {
   /**
    * gives the option of setting extra variables to the template
    */
-  public function assignSettings($template) {
+  public function assignExtraVariables($template) {
     $template->assign('fileFormat', $this->fileFormatName);
     // nothing to do here
   }

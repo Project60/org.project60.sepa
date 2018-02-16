@@ -1,0 +1,3 @@
+{foreach from=$contributions item="contribution"}
+8750P{$contribution.receive_date|replace:'-':''|truncate:8:""}{$ta875_BC_ZP}{$ta875_EDAT}{$ta875_BC_ZE}{$creditor.identifier|truncate:5:""}{TODO:COUNTER}{$creditor.identifier|truncate:5:""}{$contribution.currency}{"%010.2d"|sprintf:$contribution.total_amount}{$contribution.iban|truncate:34:" "}{"%-34.34s"|sprintf:$contribution.street_address}
+{/foreach}

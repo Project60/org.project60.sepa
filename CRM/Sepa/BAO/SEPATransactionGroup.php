@@ -144,7 +144,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     // load file format class
     $fileFormatName = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
     $fileFormat = CRM_Sepa_Logic_Format::loadFormatClass($fileFormatName);
-    $fileFormat->assignSettings($template);
+    $fileFormat->assignExtraVariables($template);
 
     // render file
     $content  = $template->fetch($fileFormat->getHeaderTpl());

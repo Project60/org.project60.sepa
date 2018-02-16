@@ -13,18 +13,16 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-class CRM_Sepa_Logic_Format_bphpl extends CRM_Sepa_Logic_Format {
+class CRM_Sepa_Logic_Format_ta875 extends CRM_Sepa_Logic_Format {
 
   /**
    * gives the option of setting extra variables to the template
    */
   public function assignExtraVariables($template) {
-    $template->assign('settings', array(
-      'nip' => '7251872505',
-      'zleceniodawca_nazwa' => 'Instytut Spraw Obywatelskich',
-      'zleceniodawca_adres1' => 'Pomorska 40',
-      'zleceniodawca_adres2' => '91-408 Łódź',
-    ));
+    // TODO: settings?
+    $template->assign('ta875_BC_ZP', '781  '); // 5 chars ' '-padded
+    $template->assign('ta875_EDAT', date('Ymd'));
+    $template->assign('ta875_BC_ZE', '8390 '); // 5 chars ' '-padded
   }
 
   public function getDDFilePrefix() {
@@ -32,6 +30,6 @@ class CRM_Sepa_Logic_Format_bphpl extends CRM_Sepa_Logic_Format {
   }
 
   public function getFilename($variable_string) {
-    return $variable_string.'.pld';
+    return $variable_string.'.LSV';
   }
 }
