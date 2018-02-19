@@ -13,12 +13,41 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-abstract class CRM_Sepa_Logic_Format {
+use CRM_Sepa_ExtensionUtil as E;
+
+class CRM_Sepa_Logic_Format {
 
   /** @var array Settings per format */
   public static $settings = array();
 
   protected $fileFormatName = NULL;
+
+  /**
+   * get the file format for the given creditor ID
+   */
+  public static function getFormatForCreditor($creditor_id) {
+    if (empty($creditor_id)) {
+      return new CRM_Sepa_Logic_Format();
+    }
+
+    try {
+      $creditor = civicrm_api3('SepaCreditor', 'getsingle', array(
+        'id'     => $creditor_id,
+        'return' => 'sepa_file_format_id'));
+    } catch (Exception $e) {
+      throw new Exception(E::ts("Creditor [%1] is missing!", array(1 => $creditor_id)));
+    }
+
+    try {
+      $file_format = civicrm_api3('OptionValue', 'getsingle', array(
+        'option_group_id' => 'sepa_file_format',
+        'value'           => $creditor['sepa_file_format_id']));
+    } catch (Exception $e) {
+      throw new Exception(E::ts("File format [%1] is missing!", array(1 => $creditor['sepa_file_format_id'])));
+    }
+
+    return self::loadFormatClass($file_format['name']);
+  }
 
   /**
    * Load class based on format name.
@@ -116,6 +145,14 @@ abstract class CRM_Sepa_Logic_Format {
     return $content;
   }
 
+  /**
+   * Get the propsed file reference. The final
+   * reference might have an '--1' like extension
+   * if there is conflicts.
+   */
+  public function getFileReference($txgroup) {
+    return $this->getDDFilePrefix() . $txgroup['reference'];
+  }
 
   /**
    * Method returns prefix for transactional file.
@@ -134,14 +171,14 @@ abstract class CRM_Sepa_Logic_Format {
    *
    * @return string
    */
-  public function getFilename($variable_string) {
-    return $variable_string.'.xml';
+  public function getFilename($file_reference) {
+    return $file_reference.'.xml';
   }
 
   /**
    * gives the option of setting extra variables to the template
    */
-  public function assignSettings($template) {
+  public function assignExtraVariables($template) {
     $template->assign('fileFormat', $this->fileFormatName);
     // nothing to do here
   }
