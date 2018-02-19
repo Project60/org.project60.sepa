@@ -168,12 +168,16 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       return "Cannot find transaction group ".$txgroup_id;
     }
 
+    // get file format
+    $format = CRM_Sepa_Logic_Format::getFormatForCreditor($txgroup['sdd_creditor_id']);
+
     $creditor = civicrm_api ("SepaCreditor", "getsingle", array("sequential"=>1, "version"=>3, "id"=>$txgroup["sdd_creditor_id"]));
-    $fileFormatGrouping = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping');
+    // TODO: grouping: $fileFormatGrouping = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping');
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
       // find an available txgroup reference
-      $available_name = $name = "SDD".strtoupper($fileFormatGrouping)."-".$txgroup['reference'];
+      // TODO: grouping: $available_name = $name = "SDD".strtoupper($fileFormatGrouping)."-".$txgroup['reference'];
+      $available_name = $name = $format->getFileReference($txgroup);
       $counter = 1;
       $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
       while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
@@ -191,7 +195,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $sepa_file = civicrm_api('SepaSddFile', 'create', array(
             'version'                 => 3,
             'reference'               => $available_name,
-            'filename'                => $fileFormatGrouping ? $available_name.'.'.$fileFormatGrouping : $available_name.'.xml',
+            /// TODO: grouping: 'filename'                => $fileFormatGrouping ? $available_name.'.'.$fileFormatGrouping : $available_name.'.xml',
+            'filename'                => $format->getFilename($available_name),
             'latest_submission_date'  => $txgroup['latest_submission_date'],
             'created_date'            => date('YmdHis'),
             'created_id'              => CRM_Core_Session::singleton()->get('userID'),

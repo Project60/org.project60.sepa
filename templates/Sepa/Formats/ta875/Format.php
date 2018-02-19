@@ -27,7 +27,7 @@ class CRM_Sepa_Logic_Format_ta875 extends CRM_Sepa_Logic_Format {
   }
 
   public function getDDFilePrefix() {
-    return 'BPH-';
+    return 'AVNC-';
   }
 
   public function getFilename($variable_string) {
