@@ -24,6 +24,7 @@ class CRM_Sepa_Logic_Format_ta875 extends CRM_Sepa_Logic_Format {
     $template->assign('ta875_EDAT',   date('Ymd'));
     $template->assign('ta875_BC_ZE',  '8390');    // max: 5 chars
     $template->assign('ta875_ESR_TN', '010092520');
+    $template->assign('ta875_LSV_ID', '900003');  // max: 6 chars
   }
 
   public function getDDFilePrefix() {
