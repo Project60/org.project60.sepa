@@ -57,19 +57,14 @@ class CRM_Sepa_Logic_Format {
    * @throws Exception
    */
   public static function loadFormatClass($fileFormatName) {
+    $s              = DIRECTORY_SEPARATOR;
     $fileFormatName = self::sanitizeFileFormat($fileFormatName);
 
-    $s = DIRECTORY_SEPARATOR;
-    $directory = dirname(__FILE__)."{$s}..{$s}..{$s}..{$s}templates{$s}Sepa{$s}Formats{$s}".$fileFormatName;
-    $file = $directory."{$s}Format.php";
-    if (file_exists($directory)) {
-      if (file_exists($file)) {
-        require_once $file;
-      } else {
-        throw new Exception(ts('File with class format does not exist.'));
-      }
+    $file = stream_resolve_include_path("templates{$s}Sepa{$s}Formats{$s}{$fileFormatName}{$s}Format.php");
+    if ($file && file_exists($file)) {
+      require_once $file;
     } else {
-      throw new Exception(ts('Directory for file format does not exist.'));
+      throw new Exception(ts("Class format file '{$file}' not found."));
     }
     $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
     return new $format_class($fileFormatName);
