@@ -71,6 +71,14 @@ class CRM_Sepa_Logic_Format {
   }
 
   /**
+   * Lets the format add extra information to each individual
+   *  transaction (contribution + extra data)
+   */
+  public function extendTransaction(&$txn, $creditor_id) {
+    // nothing to do here, but overwritten by some formats
+  }
+
+  /**
    * Constructor
    */
   protected function __construct($fileFormatName) {

@@ -61,9 +61,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     $group = civicrm_api ("SepaTransactionGroup","getsingle",array("sequential"=>1,"version"=>3,"id"=>$this->id));
     $creditor_id = $group["sdd_creditor_id"];
-    $template->assign("group",$group );
-    $creditor = civicrm_api ("SepaCreditor","getsingle",array("sequential"=>1,"version"=>3,"id"=>$creditor_id));
-    $template->assign("creditor",$creditor );
+    $creditor    = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
+    $format      = CRM_Sepa_Logic_Format::getFormatForCreditor($creditor_id);
+    $template->assign('group',    $group);
+    $template->assign('creditor', $creditor);
+
     $queryParams= array (1=>array($this->id, 'Positive'));
     $query="
       SELECT
@@ -124,6 +126,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $end2endID = $t['id']; // that's the old default
       CRM_Utils_SepaCustomisationHooks::modify_endtoendid($end2endID, $t, $creditor);
       $t["end2endID"] = $end2endID;
+
+      // let the format extend the transaction record
+      $format->extendTransaction($t, $creditor_id);
 
       $r[] = $t;
       if ($creditor_id == null) {
