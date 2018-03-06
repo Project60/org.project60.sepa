@@ -6,7 +6,7 @@
           <Prtry>CHDD</Prtry>
         </SvcLvl>
         <LclInstrm>
-          <Prtry>LSV+</Prtry>
+          <Prtry>DDCOR1</Prtry>
         </LclInstrm>
       </PmtTpInf>
       <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
