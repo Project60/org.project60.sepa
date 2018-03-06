@@ -3,7 +3,7 @@
       <PmtMtd>DD</PmtMtd>
       <PmtTpInf>
         <SvcLvl>
-          <Prtry>CHTA</Prtry>
+          <Prtry>CHDD</Prtry>
         </SvcLvl>
         <LclInstrm>
           <Prtry>LSV+</Prtry>
