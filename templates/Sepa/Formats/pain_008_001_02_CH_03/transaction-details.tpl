@@ -28,7 +28,7 @@
             <MmbId>09000</MmbId>
           </ClrSysMmbId>
           <Othr>
-            <Id>010001456</Id>
+            <Id>{$creditor.identifier}</Id>
           </Othr>
         </FinInstnId>
       </CdtrAgt>
