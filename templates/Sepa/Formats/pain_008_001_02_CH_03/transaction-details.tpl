@@ -36,7 +36,7 @@
         <Id>
           <PrvtId>
             <Othr>
-              <Id>RS-PID</Id>
+              <Id>{$creditor.identifier}</Id>
               <SchmeNm>
                 <Prtry>CHDD</Prtry>
               </SchmeNm>
