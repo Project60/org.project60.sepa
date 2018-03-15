@@ -68,68 +68,72 @@ div.sdd-add-creditor {
      <h2>{ts domain="org.project60.sepa"}Add/Edit Creditor{/ts}</h2>
      <h3>{ts domain="org.project60.sepa"}Creditor Information{/ts}</h3>
      <table id="creditorinfo" class="form-layout">
-         <tr>
-           <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>
-     </div></td>
-           <td>
-             {$form.addcreditor_name.html}
-           </td>
-         </tr>
-         <tr>
-            <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-             <td>
-               {$form.is_test_creditor.html}
-             </td>
-         </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_creditor_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Contact{/ts}", {literal}{"id":"id-contact","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>
-        </div></td>
-              <td>
-                {$form.addcreditor_creditor_id.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_address.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Address{/ts}", {literal}{"id":"id-address","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-              <td>
-                {$form.addcreditor_address.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_country_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Country{/ts}", {literal}{"id":"id-country","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-              <td>
-                {$form.addcreditor_country_id.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Identifier{/ts}", {literal}{"id":"id-id","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-              <td>
-                {$form.addcreditor_id.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_iban.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}IBAN{/ts}", {literal}{"id":"id-iban","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-              <td>
-                {$form.addcreditor_iban.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}BIC{/ts}", {literal}{"id":"id-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-              <td>
-                {$form.addcreditor_bic.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.addcreditor_pain_version.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}PAIN Version{/ts}", {literal}{"id":"id-pain","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-              <td>
-                {$form.addcreditor_pain_version.html}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-              <td>
-                {$form.custom_txmsg.html}
-              </td>
-            </tr>
+        <tr>
+         <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+         <td>
+           {$form.addcreditor_name.html}
+         </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.is_test_creditor.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Test Creditor{/ts}", {literal}{"id":"id-test-creditor","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.is_test_creditor.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_creditor_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Contact{/ts}", {literal}{"id":"id-contact","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_creditor_id.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_address.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Address{/ts}", {literal}{"id":"id-address","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_address.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_country_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Country{/ts}", {literal}{"id":"id-country","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_country_id.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_currency.label}</td>
+          <td>
+            {$form.addcreditor_currency.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_id.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Identifier{/ts}", {literal}{"id":"id-id","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_id.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_iban.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}IBAN{/ts}", {literal}{"id":"id-iban","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_iban.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}BIC{/ts}", {literal}{"id":"id-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_bic.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.addcreditor_pain_version.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}PAIN Version{/ts}", {literal}{"id":"id-pain","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_pain_version.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.custom_txmsg.html}
+          </td>
+        </tr>
        </table>
        {$form.add_creditor_id.html}
        {$form.edit_creditor_id.html}
@@ -508,6 +512,7 @@ div.sdd-add-creditor {
     map["addcreditor_name"]         = "name";
     map["addcreditor_address"]      = "address";
     map["addcreditor_country_id"]   = "country_id";
+    map["addcreditor_currency"]     = "currency";
     map["addcreditor_id"]           = "identifier";
     map["addcreditor_iban"]         = "iban";
     map["addcreditor_bic"]          = "bic";

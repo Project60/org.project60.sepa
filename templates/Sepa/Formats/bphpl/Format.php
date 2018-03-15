@@ -18,7 +18,7 @@ class CRM_Sepa_Logic_Format_bphpl extends CRM_Sepa_Logic_Format {
   /**
    * gives the option of setting extra variables to the template
    */
-  public function assignSettings($template) {
+  public function assignExtraVariables($template) {
     $template->assign('settings', array(
       'nip' => '7251872505',
       'zleceniodawca_nazwa' => 'Instytut Spraw Obywatelskich',

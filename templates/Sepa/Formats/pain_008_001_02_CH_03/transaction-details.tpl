@@ -3,10 +3,10 @@
       <PmtMtd>DD</PmtMtd>
       <PmtTpInf>
         <SvcLvl>
-          <Prtry>CHTA</Prtry>
+          <Prtry>CHDD</Prtry>
         </SvcLvl>
         <LclInstrm>
-          <Prtry>LSV+</Prtry>
+          <Prtry>DDCOR1</Prtry>
         </LclInstrm>
       </PmtTpInf>
       <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
@@ -28,7 +28,7 @@
             <MmbId>09000</MmbId>
           </ClrSysMmbId>
           <Othr>
-            <Id>010001456</Id>
+            <Id>{$creditor.identifier}</Id>
           </Othr>
         </FinInstnId>
       </CdtrAgt>
@@ -36,7 +36,7 @@
         <Id>
           <PrvtId>
             <Othr>
-              <Id>RS-PID</Id>
+              <Id>{$creditor.identifier}</Id>
               <SchmeNm>
                 <Prtry>CHDD</Prtry>
               </SchmeNm>
@@ -72,16 +72,7 @@
           </Id>
         </DbtrAcct>
         <RmtInf>
-          <Strd>
-            <CdtrRefInf>
-              <Tp>
-                <CdOrPrtry>
-                  <Prtry>ESR</Prtry>
-                </CdOrPrtry>
-              </Tp>
-              <Ref>200002000000004443332000061</Ref>
-            </CdtrRefInf>
-          </Strd>
+          <Ustrd>{$contribution.message}</Ustrd>
         </RmtInf>
       </DrctDbtTxInf>
 {/foreach}

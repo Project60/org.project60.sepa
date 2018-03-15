@@ -66,7 +66,6 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
 
 
   /**
-   * Example: Run a couple simple queries.
    *
    * @return TRUE on success
    * @throws Exception
@@ -75,6 +74,19 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $this->ctx->log->info('Adding new file formats');
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
+    return TRUE;
+  }
+
+  /**
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1400() {
+    // add currency
+    $this->ctx->log->info('Adding currency field');
+    $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `currency` varchar(3) COMMENT 'currency used by this creditor';");
+    $this->executeSql("UPDATE civicrm_sdd_creditor SET currency = 'EUR' WHERE currency IS NULL;");
     return TRUE;
   }
 }

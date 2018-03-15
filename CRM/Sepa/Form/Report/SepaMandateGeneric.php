@@ -453,7 +453,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
       // alter amount
       if (array_key_exists('amount', $row)) {
-        $rows[$rowNum]['amount'] = CRM_Utils_Money::format($row['amount'], 'EUR');
+        $rows[$rowNum]['amount'] = CRM_Utils_Money::format($row['amount']);
       }
 
       // add mandate link

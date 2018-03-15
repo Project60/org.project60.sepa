@@ -6,24 +6,24 @@
 
 CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
-     `creditor_id` int unsigned    COMMENT 'FK to Contact ID that owns that account',
-     `identifier` varchar(35)    COMMENT 'Provided by the bank. ISO country code+check digit+ZZZ+country specific identifier',
-     `name` varchar(255)    COMMENT 'by default creditor_id.display_name snapshot at creation',
-     `address` varchar(255)    COMMENT 'by default creditor_id.address (billing) at creation',
-     `country_id` int unsigned    COMMENT 'Which Country does this address belong to.',
-     `iban` varchar(42) NULL   COMMENT 'Iban of the creditor',
-     `bic` varchar(11)    COMMENT 'BIC of the creditor',
-     `mandate_prefix` varchar(4)    COMMENT 'prefix for mandate identifiers',
-     `payment_processor_id` int unsigned    ,
-     `category` varchar(4)    COMMENT 'Default value',
-     `tag` varchar(64) NULL   COMMENT 'Place this creditor\'s transaction groups in an XML file tagged with this value.',
-     `mandate_active` tinyint    COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.',
-     `sepa_file_format_id` int unsigned    COMMENT 'Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.'
-,
-    PRIMARY KEY ( `id` )
-
-,          CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,          CONSTRAINT FK_civicrm_sdd_creditor_country_id FOREIGN KEY (`country_id`) REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL
-)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+     `creditor_id`          int unsigned        COMMENT 'FK to Contact ID that owns that account',
+     `identifier`           varchar(35)         COMMENT 'Provided by the bank. ISO country code+check digit+ZZZ+country specific identifier',
+     `name`                 varchar(255)        COMMENT 'by default creditor_id.display_name snapshot at creation',
+     `address`              varchar(255)        COMMENT 'by default creditor_id.address (billing) at creation',
+     `country_id`           int unsigned        COMMENT 'Which Country does this address belong to.',
+     `iban`                 varchar(42) NULL    COMMENT 'Iban of the creditor',
+     `bic`                  varchar(11)         COMMENT 'BIC of the creditor',
+     `mandate_prefix`       varchar(4)          COMMENT 'prefix for mandate identifiers',
+     `currency`             varchar(3)          COMMENT 'currency used by this creditor',
+     `payment_processor_id` int unsigned        COMMENT 'used in payment_processor_id',
+     `category`             varchar(4)          COMMENT 'Default value',
+     `tag`                  varchar(64) NULL    COMMENT 'Place this creditor\'s transaction groups in an XML file tagged with this value.',
+     `mandate_active`       tinyint             COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.',
+     `sepa_file_format_id`  int unsigned        COMMENT 'Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.',
+    PRIMARY KEY ( `id` ),
+    CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,
+    CONSTRAINT FK_civicrm_sdd_creditor_country_id  FOREIGN KEY (`country_id`)  REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 
 -- /*******************************************************
@@ -43,14 +43,14 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
      `iban`                  varchar(42) NULL                      COMMENT 'Iban of the debtor',
      `bic`                   varchar(11)                           COMMENT 'BIC of the debtor',
      `type`                  varchar(4) NOT NULL DEFAULT 'RCUR'    COMMENT 'RCUR for recurrent (default), OOFF for one-shot',
-     `status`                varchar(8) NOT NULL  DEFAULT 'INIT'   COMMENT 'Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, ONHOLD, PARTIAL)',
+     `status`                varchar(8) NOT NULL DEFAULT 'INIT'    COMMENT 'Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, ONHOLD, PARTIAL)',
      `is_enabled`            tinyint NOT NULL  DEFAULT 1           COMMENT 'If the mandate has been validated',
      `creation_date`         datetime                              COMMENT 'by default now()',
      `first_contribution_id` int unsigned                          COMMENT 'FK to civicrm_contribution',
      `validation_date`       datetime,
 
      PRIMARY KEY (`id`),
-     UNIQUE INDEX `reference`      (reference), 
+     UNIQUE INDEX `reference`      (reference),
      INDEX        `index_entity`   (entity_table, entity_id),
      INDEX        `iban`           (iban),
 
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_contribution_txgroup` (
         txgroup_id
   )
 
-,          CONSTRAINT FK_civicrm_sdd_cGGoup_id FOREIGN KEY (`txgroup_id`) REFERENCES `civicrm_sdd_txgroup`(`id`) 
+,          CONSTRAINT FK_civicrm_sdd_cGGoup_id FOREIGN KEY (`txgroup_id`) REFERENCES `civicrm_sdd_txgroup`(`id`)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 

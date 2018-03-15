@@ -346,12 +346,13 @@ class CRM_Sepa_Logic_Batching {
     // first, load all of the mandates, that have run out
     $sql_query = "
       SELECT
-        mandate.id AS mandate_id,
-        mandate.date AS mandate_date,
-        mandate.entity_id AS mandate_entity_id,
-        mandate.creation_date AS mandate_creation_date,
+        mandate.id              AS mandate_id,
+        mandate.date            AS mandate_date,
+        mandate.entity_id       AS mandate_entity_id,
+        mandate.creation_date   AS mandate_creation_date,
         mandate.validation_date AS mandate_validation_date,
-        rcontribution.end_date AS end_date
+        rcontribution.currency  AS currency,
+        rcontribution.end_date  AS end_date
       FROM civicrm_sdd_mandate AS mandate
       INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id AND mandate.entity_table = 'civicrm_contribution_recur'
       WHERE mandate.type = 'RCUR'
@@ -360,7 +361,13 @@ class CRM_Sepa_Logic_Batching {
     $results = CRM_Core_DAO::executeQuery($sql_query);
     $mandates_to_end = array();
     while ($results->fetch()) {
-      array_push($mandates_to_end, array('mandate_id'=>$results->mandate_id, 'recur_id'=>$results->mandate_entity_id, 'creation_date'=>$results->mandate_creation_date, 'validation_date'=>$results->mandate_validation_date, 'date'=>$results->mandate_date));
+      $mandates_to_end[] = array(
+        'mandate_id'      => $results->mandate_id,
+        'recur_id'        => $results->mandate_entity_id,
+        'creation_date'   => $results->mandate_creation_date,
+        'validation_date' => $results->mandate_validation_date,
+        'date'            => $results->mandate_date,
+        'currency'        => $results->currency);
     }
 
     // then, end them one by one
@@ -381,7 +388,7 @@ class CRM_Sepa_Logic_Batching {
         'id'                      => $mandate_to_end['recur_id'],
         'contribution_status_id'  => $contribution_status_closed,
         'modified_date'           => date('YmdHis'),
-        'currency'                => 'EUR',
+        'currency'                => $mandate_to_end['currency'],
         'version'                 => 3));
       if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
         $lock->release();
