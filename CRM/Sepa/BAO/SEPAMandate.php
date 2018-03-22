@@ -275,6 +275,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   static function terminateMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL) {
     $contribution_id_pending = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $inProgress = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
     // use a lock, in case somebody is batching just now
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
@@ -360,10 +361,16 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $obsolete_query = "
     SELECT id
     FROM civicrm_contribution
-    WHERE receive_date > '$new_end_date_str'
-      AND contribution_recur_id = $contribution_id
-      AND contribution_status_id = $contribution_id_pending;";
-    $obsolete_ids_query = CRM_Core_DAO::executeQuery($obsolete_query);
+    WHERE receive_date > %1
+      AND contribution_recur_id = %2
+      AND contribution_status_id IN (%3, %4);";
+    $params = [
+      1 => [$new_end_date_str, 'String'],
+      2 => [$contribution_id, 'Integer'],
+      3 => [$contribution_id_pending, 'Integer'],
+      4 => [$inProgress, 'Integer'],
+    ];
+    $obsolete_ids_query = CRM_Core_DAO::executeQuery($obsolete_query, $params);
     while ($obsolete_ids_query->fetch()) {
       array_push($obsolete_ids, $obsolete_ids_query->id);
     }
