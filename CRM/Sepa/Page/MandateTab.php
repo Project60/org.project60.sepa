@@ -172,6 +172,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         WHERE civicrm_sdd_mandate.id IN ({$mandate_id_list})
           AND civicrm_sdd_mandate.type = 'RCUR'
           AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+          AND civicrm_contribution.id IS NOT NULL
         GROUP BY civicrm_sdd_mandate.id
         ORDER BY civicrm_contribution.receive_date;";
       $fail_query = CRM_Core_DAO::executeQuery($fail_sequence);
