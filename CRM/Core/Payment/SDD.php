@@ -254,6 +254,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
           $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $mandate['creditor_id']);
           $now = strtotime(date('Y-m-d', strtotime("now +$rcur_notice days")));        // round to full day
           $collection_date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
+          CRM_Sepa_Logic_Batching::deferCollectionDate($collection_date, $mandate['creditor_id']);
 
           // fix contribution
           $contribution_bao = new CRM_Contribute_BAO_Contribution();
