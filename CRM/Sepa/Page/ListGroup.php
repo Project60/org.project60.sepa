@@ -75,12 +75,13 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
       WHERE
         civicrm_sdd_txgroup.id = $group_id;";
 
-      $total_amount = 0.0;
-      $total_count = 0;
-      $total_campaigns = array();
-      $total_types = array();
-      $total_contacts = array();
-      $contact_base_link = CRM_Utils_System::url('civicrm/contact/view', '&reset=1&cid=');
+      $total_amount           = 0.0;
+      $total_count            = 0;
+      $total_campaigns        = array();
+      $total_types            = array();
+      $total_contacts         = array();
+      $status_stats           = array();
+      $contact_base_link      = CRM_Utils_System::url('civicrm/contact/view', '&reset=1&cid=');
       $contribution_base_link = CRM_Utils_System::url('civicrm/contact/view/contribution', '&reset=1&id=_cid_&cid=_id_&action=view');
 
       $contributions = array();
@@ -106,6 +107,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         $total_contacts[$result->contact_id] = 1;
         $total_campaigns[$result->contribution_campaign] = 1;
         $reference = $result->reference;
+        $status_stats[$result->contribution_status] = 1 + CRM_Utils_Array::value($result->contribution_status, $status_stats, 0);
       }
     }
 
@@ -119,6 +121,8 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
     $this->assign("different_campaigns", count($total_campaigns));
     $this->assign("different_types", count($total_types));
     $this->assign("different_contacts", count($total_contacts));
+    $this->assign("status_stats", $status_stats);
+
     parent::run();
   }
 

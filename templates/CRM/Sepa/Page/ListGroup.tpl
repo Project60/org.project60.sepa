@@ -41,6 +41,12 @@
         <tr class="columnfooter">
             <td>{$total_count} {ts domain="org.project60.sepa"}Contributions{/ts}</td>
             <td align="right">{$total_amount_str}</td>
+            <td align="right">
+              {foreach from=$status_stats key=status_name item=status_count}
+                {ts domain="org.project60.sepa" 1=$status_name 2=$status_count}%2 %1{/ts}
+                <br/>
+              {/foreach}
+            </td>
             <td/>
             <td>{$different_contacts} {ts domain="org.project60.sepa"}Contacts{/ts}</td>
             <td>{$different_types} {ts domain="org.project60.sepa"}Financial Types{/ts}</td>
