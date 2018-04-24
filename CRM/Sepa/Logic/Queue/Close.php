@@ -167,11 +167,14 @@ class CRM_Sepa_Logic_Queue_Close {
         LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution'
         WHERE civicrm_sdd_contribution_txgroup.txgroup_id = %1
           AND (civicrm_contribution.contribution_status_id = %2 OR civicrm_contribution.contribution_status_id = %3)
-          LIMIT %4", array(
+          AND (civicrm_contribution.contribution_status_id <> %4)
+          LIMIT %5", array(
             1 => array($this->txgroup['id'], 'Integer'),
             2 => array($status_pending, 'Integer'),
             3 => array($status_inProgress, 'Integer'),
-            4 => array(SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer')));
+            4 => array($this->target_status_id, 'Integer'),
+            5 => array(SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer'),
+          ));
 
     } elseif ($this->txgroup['type'] == 'RCUR' || $this->txgroup['type'] == 'FRST') {
       $query = CRM_Core_DAO::executeQuery("
@@ -186,11 +189,13 @@ class CRM_Sepa_Logic_Queue_Close {
         LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
         WHERE civicrm_sdd_contribution_txgroup.txgroup_id = %1
           AND (civicrm_contribution.contribution_status_id = %2 OR civicrm_contribution.contribution_status_id = %3)
-          LIMIT %4", array(
+          AND (civicrm_contribution.contribution_status_id <> %4)
+          LIMIT %5", array(
             1 => array($this->txgroup['id'], 'Integer'),
             2 => array($status_pending, 'Integer'),
             3 => array($status_inProgress, 'Integer'),
-            4 => array(SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer')));
+            4 => array($this->target_status_id, 'Integer'),
+            5 => array(SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer')));
 
     } else {
       throw new Exception("Illegal group type '{$this->txgroup['type']}'", 1);
