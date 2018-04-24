@@ -39,6 +39,15 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read SEPA transaction group [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $group_id, $txgroup['error_message']), ts("Error", array('domain' => 'org.project60.sepa')), "error");
       }
 
+      // get contribution status option group ID
+      $status_option_group_id = 99999;
+      $option_group = civicrm_api3('OptionGroup', 'get', array(
+        'name' => 'contribution_status',
+        'return' => 'id'));
+      if (!empty($option_group['id'])) {
+        $status_option_group_id = $option_group['id'];
+      }
+
       // load the group's contributions
       $sql = "
       SELECT
@@ -50,7 +59,8 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         civicrm_contribution.total_amount       AS contribution_amount,
         civicrm_contribution.currency           AS contribution_currency,
         civicrm_contribution.financial_type_id  AS contribution_financial_type_id,
-        civicrm_campaign.title                  AS contribution_campaign
+        civicrm_campaign.title                  AS contribution_campaign,
+        civicrm_option_value.label              AS contribution_status
       FROM
         civicrm_sdd_txgroup
       LEFT JOIN
@@ -61,6 +71,8 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         civicrm_contact                    ON   civicrm_contact.id = civicrm_contribution.contact_id
       LEFT JOIN
         civicrm_campaign                   ON   civicrm_campaign.id = civicrm_contribution.campaign_id
+      LEFT JOIN
+        civicrm_option_value               ON   civicrm_option_value.value = civicrm_contribution.contribution_status_id AND civicrm_option_value.option_group_id = {$status_option_group_id}
       WHERE
         civicrm_sdd_txgroup.id = $group_id;";
 
@@ -84,6 +96,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
           'contact_link'              => $contact_base_link.$result->contact_id,
           'contribution_link'         => str_replace('_id_', $result->contact_id, str_replace('_cid_', $result->contribution_id, $contribution_base_link)),
           'contribution_id'           => $result->contribution_id,
+          'contribution_status'       => $result->contribution_status,
           'contribution_amount'       => $result->contribution_amount,
           'contribution_amount_str'   => CRM_Utils_Money::format($result->contribution_amount, $result->contribution_currency),
           'financial_type'            => $financial_types[$result->contribution_financial_type_id],
