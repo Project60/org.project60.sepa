@@ -16,8 +16,33 @@
 
 require_once 'packages/php-iban-1.4.0/php-iban.php';
 
+use CRM_Sepa_ExtensionUtil as E;
+
 
 class CRM_Sepa_Logic_Verification {
+
+  /**
+   * Will format the given string
+   *
+   * @param $iban  string, IBAN candidate
+   * @param $type  creditor_type, SEPA or PSP
+   *
+   * @return formatted IBAN
+   */
+  public static function formatIBAN($iban, $type = 'SEPA') {
+    switch ($type) {
+      case 'SEPA':
+        $iban = trim($iban);
+        $iban = strtoupper($iban);
+        $iban = str_replace(' ', '', $iban);
+        return $iban;
+
+      default:
+      case 'PSP':
+        return trim($iban);
+    }
+  }
+
 
   /**
    * Verifies if the given IBAN is formally correct
@@ -26,18 +51,26 @@ class CRM_Sepa_Logic_Verification {
    *
    * @return NULL if given IBAN is valid, localized error message otherwise
    */
-  static function verifyIBAN($iban) {
-    // We only accept uppecase characters and numerals (machine format)
-    // see https://github.com/Project60/org.project60.sepa/issues/246
-    if (!preg_match("/^[A-Z0-9]+$/", $iban)) {
-      return ts("IBAN is not correct", array('domain' => 'org.project60.sepa'));
-    }
+  public static function verifyIBAN($iban, $type = 'SEPA') {
+    switch ($type) {
+      case 'SEPA':
+        // We only accept uppecase characters and numerals (machine format)
+        // see https://github.com/Project60/org.project60.sepa/issues/246
+        if (!preg_match("/^[A-Z0-9]+$/", $iban)) {
+          return E::ts("IBAN is not correct");
+        }
+        if (!verify_iban($iban)) {
+          return E::ts("IBAN is not correct");
+        }
 
-    if (verify_iban($iban)) {
-      return NULL;
-    } else {
-      return ts("IBAN is not correct", array('domain' => 'org.project60.sepa'));
+      default:
+      case 'PSP':
+        if (!preg_match("#^[a-zA-Z0-9_\/\-=+]+$#", $iban)) {
+          return E::ts("Invalid PSP Code");
+        }
     }
+    // all clear
+    return NULL;
   }
 
   /**
@@ -47,7 +80,7 @@ class CRM_Sepa_Logic_Verification {
    *
    * @return string anonymised IBAN
    */
-  static function anonymiseIBAN($iban, $placeholder='X') {
+  static function anonymiseIBAN($iban, $placeholder='X', $type = 'SEPA') {
     if (empty($iban)) {
       return $iban;
     }
@@ -74,18 +107,40 @@ class CRM_Sepa_Logic_Verification {
   }
 
   /**
+   * Form rule wrapper for ::verifyIBAN
+   */
+  static function rule_valid_PSP_Code($value) {
+    if (self::verifyIBAN($value, 'PSP')===NULL) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  /**
    * Verifies if the given BIC is formally correct
    *
    * @param bic  string, BIC candidate
    *
    * @return NULL if given BIC is valid, localized error message otherwise
    */
-  static function verifyBIC($bic) {
-    if (preg_match("/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/", $bic)) {
-      return NULL;
-    } else {
-      return ts("BIC is not correct", array('domain' => 'org.project60.sepa'));
-    }
+  static function verifyBIC($bic, $type = 'SEPA') {
+    switch ($type) {
+      case 'SEPA':
+        if (preg_match("/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/", $bic)) {
+          return NULL;
+        } else {
+          return E::ts("BIC is not correct");
+        }
+
+      default:
+      case 'PSP':
+        if (preg_match("/^[a-zA-Z0-9_\/\-=+]{1,11}$/", $bic)) {
+          return NULL;
+        } else {
+          return E::ts("PSP/BIC is not correct");
+        }
+      }
   }
 
   /**
@@ -93,6 +148,17 @@ class CRM_Sepa_Logic_Verification {
    */
   static function rule_valid_BIC($value) {
     if (self::verifyBIC($value)===NULL) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+   * Form rule wrapper for ::verifyBIC
+   */
+  static function rule_valid_PSP_BIC($value) {
+    if (self::verifyBIC($value, 'PSP')===NULL) {
       return 1;
     } else {
       return 0;

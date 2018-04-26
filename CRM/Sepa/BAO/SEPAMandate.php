@@ -38,6 +38,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // handle 'normal' creation process inlcuding hooks
     $hook = empty($params['id']) ? 'create' : 'edit';
+    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix,creditor_type'));
     CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
 
     // set default date to today
@@ -50,7 +51,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
       if (empty($params['reference'])) {
         // If no mandate reference was supplied by the caller nor the customisation hook, create a nice default one.
-        $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix'));
         $dao = new CRM_Core_DAO();
         $database = $dao->database();
         $next_id = CRM_Core_DAO::singleValueQuery("SELECT auto_increment FROM information_schema.tables WHERE table_schema='$database' and table_name='civicrm_sdd_mandate';");
@@ -62,12 +62,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if (!empty($params['iban'])) {
       $params['iban'] = strtoupper($params['iban']);           // create uppercase string
       $params['iban'] = str_replace(' ', '', $params['iban']); // strip spaces
-      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban']);
+      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type']);
       if ($iban_error) throw new CRM_Exception($iban_error . ':' . $params['iban']);
     }
 
     if (!empty($params['bic'])) {
-      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic']);
+      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type']);
       if ($bic_error) throw new CRM_Exception($bic_error . ':' . $params['bic']);
     }
 

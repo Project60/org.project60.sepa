@@ -38,6 +38,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('SEPA Direct Debit', array('domain' => 'org.project60.sepa'));
     $this->_creditorId = $paymentProcessor['user_name'];
+    $this->_creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $this->_creditorId));
   }
 
   /**
@@ -61,8 +62,13 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   function buildForm(&$form) {
 
     // add rules
-    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
-    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
+    if ($this->_creditor['creditor_type'] == 'SEPA') {
+      $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
+      $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
+    } else {
+      $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_PSP_Code', 'CRM_Sepa_Logic_Verification');
+      $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_PSP_BIC',  'CRM_Sepa_Logic_Verification');
+    }
 
     // apply "hack" for old payment forms
     if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
