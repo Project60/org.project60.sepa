@@ -124,6 +124,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         if (!isset($currencies['EUR'])) {
           $currencies['EUR'] = 'EUR';
         }
+        $creditor_types = array(
+          'SEPA' => ts('SEPA', array('domain' => 'org.project60.sepa')),
+          'PSP'  => ts('PSP', array('domain' => 'org.project60.sepa')));
 
         // look up some values
         $async_batch = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
@@ -144,6 +147,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('text',       'addcreditor_bic',          ts("BIC", array('domain' => 'org.project60.sepa')));
         $this->addElement('text',       'addcreditor_iban',         ts("IBAN", array('domain' => 'org.project60.sepa')), array('size' => 30));
         $this->addElement('select',     'addcreditor_currency',     ts("Currency", array('domain' => 'org.project60.sepa')), $currencies);
+        $this->addElement('select',     'addcreditor_type',         ts("Type", array('domain' => 'org.project60.sepa')), $creditor_types);
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version", array('domain' => 'org.project60.sepa')), array('' => ts('- select -', array('domain' => 'org.project60.sepa'))) + CRM_Core_OptionGroup::values('sepa_file_format'));
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor", array('domain' => 'org.project60.sepa')), "", array('value' =>'0'));
         $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends", array('domain' => 'org.project60.sepa')), "", ($excld_we?array('checked'=>'checked'):array()));

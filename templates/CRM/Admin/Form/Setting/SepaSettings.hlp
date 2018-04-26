@@ -144,3 +144,8 @@
     <p>{ts domain="org.project60.sepa"}If you have large amounts of mandates or large SDD groups, you might be at risk of a timeout error during the batching/closing process.{/ts}</p>
     <p>{ts domain="org.project60.sepa"}This option will activate a runner page with a progress bar for these critical processes. There shouldn't be any timeouts, but you have to keep that open until it's done.{/ts}</p>
 {/htxt}
+
+{htxt id='id-creditor-type'}
+    <p>{ts domain="org.project60.sepa"}Always use <code>SEPA</code> if you want to do SEPA style direct debit.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}<code>PSP</code> can help you to use this extension for other direct debit systems or payment service providers (PSP), but all SEPA style validations and tools are then disabled.{/ts}</p>
+{/htxt}
