@@ -76,6 +76,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       die(ts("This page cannot be called w/o parameters.", array('domain' => 'org.project60.sepa')));
     }
 
+    // add creditor info
+    $creditor_types = civicrm_api3('SepaCreditor', 'get', array(
+      'option.limit' => 0,
+      'sequential'   => 0,
+      'return'       => 'id,creditor_type'));
+    $this->assign('creditor_types', json_encode($creditor_types['values']));
+
+
     $this->assign('bic_extension_installed', CRM_Sepa_Logic_Settings::isLittleBicExtensionAccessible());
     parent::run();
   }
@@ -382,8 +390,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $errors = array();
 
     // load creditor
-    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'creditor_type'));
-
+    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $_REQUEST['creditor_id'], 'return' => 'creditor_type'));
 
     // check amount
     if (!isset($_REQUEST['total_amount'])) {

@@ -96,14 +96,14 @@
 		<tr>	<!-- IBAN -->
 			<td>IBAN:</td>
 			<td>
-				<input name="iban" type="text" size="32" value="{$iban}"/>
+				<input name="iban" type="text" size="32"  maxlength="35" value="{$iban}"/>
 				<a id="bic_lookup_btn" onClick="sepa_lookup_bic();" hidden="1">lookup BIC</a>
 			</td>
 		</tr>
 		<tr>	<!-- BIC -->
 			<td>BIC:</td>
 			<td>
-				<input name="bic" type="text" size="14" value="{$bic}"/>&nbsp;&nbsp;
+				<input name="bic" type="text" size="14" maxlength="11" value="{$bic}"/>&nbsp;&nbsp;
 				<img id="bic_busy" height="8" src="{$config->resourceBase}i/loading.gif" hidden="1" />
 				<font color="gray"><span id="bank_name"></span></font>
 			</td>
@@ -203,6 +203,7 @@
 
 
 <script type="text/javascript">
+var creditor_types = {$creditor_types};
 {if $creditor2cycledays}
 var creditor2cycledays = {$creditor2cycledays};
 {else}
@@ -263,16 +264,28 @@ cj('#replace_date').datepicker(dateOptions);
 
 // normalise IBAN upon change
 function sepa_iban_changed() {
-	// normalise IBAN
-	var reSpaceAndMinus = new RegExp('[\\s-]', 'g');
-	var sanitized_iban = cj("[name='iban']").val();
-	sanitized_iban = sanitized_iban.replace(reSpaceAndMinus, "");
-	sanitized_iban = sanitized_iban.toUpperCase();
-	cj("[name='iban']").val(sanitized_iban);
+	// get type first
+	var creditor_id = cj("[name='creditor_id']").val();
+	var creditor_type = creditor_types[creditor_id];
 
-	{/literal}{if $bic_extension_installed}
-	sepa_lookup_bic();
-	{/if}{literal}
+	// normalise SEPA IBAN
+	var sanitized_iban = cj("[name='iban']").val();
+	if (creditor_type == 'SEPA') {
+		var reSpaceAndMinus = new RegExp('[\\s-]', 'g');
+		sanitized_iban = sanitized_iban.replace(reSpaceAndMinus, "");
+		sanitized_iban = sanitized_iban.toUpperCase();
+		cj("[name='iban']").val(sanitized_iban);
+
+		{/literal}{if $bic_extension_installed}
+		sepa_lookup_bic();
+		{/if}{literal}
+
+	} else {
+		// non-SEPA: simply remove whitespacse
+		var whiteSpaces = new RegExp('[\\s]', 'g');
+		sanitized_iban = sanitized_iban.replace(whiteSpaces, "");
+		cj("[name='iban']").val(sanitized_iban);
+	}
 }
 cj("[name='iban']").change(sepa_iban_changed);
 {/literal}

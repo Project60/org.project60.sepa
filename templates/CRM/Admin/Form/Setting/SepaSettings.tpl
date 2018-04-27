@@ -621,6 +621,7 @@ div.sdd-add-creditor {
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
     cj('#add_creditor_id').val("");
+    cj('#addcreditor_type').val("SEPA");
   }
 </script>
 {/literal}
