@@ -130,6 +130,12 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         $contact_id = $this->getForm()->getVar('_contactID');
       }
     }
+    // try again if that doesn't work any more (SEPA-488)
+    if (empty($contact_id)) {
+      if (!empty($params['contactID'])) {
+        $contact_id = $params['contactID'];
+      }
+    }
 
     // prepare the creation of an incomplete mandate
     $params['creditor_id']   = $this->_creditorId;
