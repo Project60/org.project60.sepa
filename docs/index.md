@@ -1,7 +1,11 @@
 
-If you are in Europe and use CiviCRM to manage recurring contributions, you need this extension.
+If your organisation is in Europe and uses CiviCRM to manage recurring contributions, you will need this extension.
 
-# SEPA Direct Debit Module
+## Introduction to SEPA
+SEPA is EU regulation. It describes under what conditions organisations in the European Union can collect money from their contacts bank accounts through direct debit and on the basis of a mutual agreement (called a "mandate") between organisation and contact. 
+
+## CiviSEPA
+CiviSEPA is a CiviCRM extension that enables SEPA compliant direct debit actions with your constituents.
 
 This branch is currently maintained by Xavier Dutoit (TTTP, xavier@tttp.eu) and Björn Endres (SYSTOPIA, endres@systopia.de).
 
@@ -9,8 +13,7 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 
 **Important:** Please download a [official release](https://github.com/Project60/org.project60.sepa/releases)! Don't use the ``master`` branch unless you want bleeding edge and you know what you're doing.
 
-# What it can do
-
+## What it can do
 * OOFF and RCUR payments
 * SEPA dashboard gives you great status overview
 * payment processer for online donations and event registrations[*](https://github.com/Project60/org.project60.sepa/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+event+registration+)
@@ -23,15 +26,13 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 * integration with [CiviBanking](https://github.com/Project60/CiviBanking)
 
 
-# What it can not (yet) do
-
+## What it can not (yet) do
 * permission management
 * membership payments
 * automatic submission to the banks
 
 
-# Customisation
-
+## Customisation
 If you need customised mandate references, exclude certain collection dates, or add a custom transaction message to the collection, you want to create a sepa customization extension implementing the following hooks:
 
 * `civicrm_create_mandate` - to generate custom mandate reference numbers
@@ -39,4 +40,3 @@ If you need customised mandate references, exclude certain collection dates, or 
 * `civicrm_modify_txmessage` - to customize the transaction message (Version 1.2+ can set a generic message w/o this hook)
 
 We added an example implementation for your convenience: [org.project60.sepacustom](https://github.com/Project60/sepa_dd/tree/master/org.project60.sepacustom)
-

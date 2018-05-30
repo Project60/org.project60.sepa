@@ -2,10 +2,14 @@ site_name: CiviSEPA
 site_description: SEPA Direct Debit Extension
 repo_url: https://github.com/Project60/org.project60.sepa
 theme: material
+
 pages:
 - Introduction: index.md
-- Sepa Basics: sepa-basics.md
-- Things to Consider: consider.md
+- From a user perspective: user-perspective.md
+- A basic configuration that will work: config-example.md
+- Terminilogy: terminology.md
+- How To Guide: how-to.md
+
 markdown_extensions:
   - attr_list
   - admonition
