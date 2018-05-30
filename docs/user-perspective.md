@@ -1,1 +1,1 @@
-This is the basic configuration that will work.
+Betty's story

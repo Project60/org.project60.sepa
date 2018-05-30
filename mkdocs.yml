@@ -8,8 +8,7 @@ pages:
 - From a user perspective: user-perspective.md
 - A basic configuration that will work: config-example.md
 - Terminilogy: terminology.md
-- Sepa Basics: sepa-basics.md
-- Things to Consider: consider.md
+- How To Guide: how-to.md
 
 markdown_extensions:
   - attr_list

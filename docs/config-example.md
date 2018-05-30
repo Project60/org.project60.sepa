@@ -20,8 +20,15 @@ There are two ways in which you can collect money from donors or members with SE
 * the Recurring collection where you get permission to collect money from an account on a regular basis (for example monthly) until it is cancelled by the donor or member. 
 
 !!! Note
-    Although there are only One-off and Recurring collections, SEPA demands that for recurring collections 2 different _types_ are used when sending the collections to the bank. When a recurring collection is sent for the **first** time the type will be FRST.
-    Once the collection has been done succesfully for the first time all the **following** collections will be stamped as type RCUR. CiviSEPA will handle this for you, you just specificy that a new SEPA contribution is a recurring or one-off. When sending collections to the bank, the FRST collections and the RCUR collections will each have their own file.
+    Although there are only One-off and Recurring collections, SEPA demands that for recurring collections 2 different _types_ are used when sending the collections to the bank. 
+    
+    When a recurring collection is sent for the **first** time the type will be FRST.
+    
+    Once the collection has been done succesfully for the first time all the **following** collections will be stamped as type RCUR. 
+    
+    CiviSEPA will handle this for you, you just specificy that a new SEPA contribution is a recurring or one-off. When sending collections to the bank, the FRST collections and the RCUR collections will each have their own file.
+    
+    By the way, CiviSEPA uses the OOFF type for One-off collections.
     
 ## The example SEPA configuration
 You can find the CiviSEPA settings with **Administer>CiviContribute>CiviSEPA Settings**.
@@ -78,4 +85,6 @@ Once you have entered all the settings as mentioned above you hit the **Save** b
 Your form will now look like this: ![Screenshot](/img/saved-creditor.png). The creditor you have just created will be in the list.                                                                                                                                                                                                                                                          
                                                                                                                                                                                                                                                                                                                                                                                             
 !!! warning "Attention"
-    The **Default Batching Settings** you see below the list of creditors is just the default settings when you create a new creditor, they do NOT reflect the settings CiviSEPA will use. This seems a bit confusing, but CiviSEPA will use the settings in your creditor like you have just saved it. If you want to check or change them, you hit the **Edit** button next to your creditor. 
+    The **Default Batching Settings** you see below the list of creditors is just the default settings when you create a new creditor, they do NOT reflect the settings CiviSEPA will use. This seems a bit confusing, but CiviSEPA will use the settings in your creditor like you have just saved it. If you want to check or change them, you hit the **Edit** button next to your creditor.
+    
+    If you want to you can also first update the **Default Batching Settings** before you create the creditor, and then create a new creditor. This new creditor will then have those default batching settings. 
