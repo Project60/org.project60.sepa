@@ -43,7 +43,9 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_campaign.title             AS campaign,
         civicrm_contribution.total_amount  AS total_amount,
         civicrm_contribution.currency      AS currency,
-        civicrm_contribution.cancel_reason AS cancel_reason
+        civicrm_contribution.cancel_reason AS cancel_reason,
+        IF(civicrm_sdd_mandate.status IN ('INIT', 'OOFF'), 'sepa-active', 'sepa-inactive')           
+                                           AS class
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution   ON civicrm_contribution.id = civicrm_sdd_mandate.entity_id
       LEFT JOIN civicrm_financial_type ON civicrm_financial_type.id = civicrm_contribution.financial_type_id
@@ -66,6 +68,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'total_amount'   => $ooff_mandates->total_amount,
         'currency'       => $ooff_mandates->currency,
         'cancel_reason'  => $ooff_mandates->cancel_reason,
+        'class'          => $ooff_mandates->class,
       );
 
       // add links
