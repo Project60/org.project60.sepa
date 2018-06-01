@@ -118,3 +118,17 @@
 {ts domain="org.project60.sepa"}This contact has no recorded one-off mandates.{/ts}
 </div>
 {/if}
+
+
+<script type="application/javascript">
+  {literal}
+  // trigger reload of tab
+  cj(document).ready(function() {
+      cj(document).on('crmPopupClose', function(event) {
+          if(cj(event.target).attr('href').includes('civicrm/sepa/cmandate') || cj(event.target).attr('href').includes('civicrm/sepa/xmandate')) {
+              cj("#sepa_payment_extra_button").closest("div.crm-ajax-container").crmSnippet('refresh');
+          }
+      });
+  });
+  {/literal}
+</script>
