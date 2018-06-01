@@ -183,7 +183,10 @@
 {else}
 	{* if this is a popup - close it *}
 	<script type="text/javascript">
-	cj(".ui-dialog > [id^=crm-ajax-dialog-]").dialog("destroy");
+		// update tab
+		cj("#sepa_payment_extra_button").closest("div.crm-ajax-container").crmSnippet('refresh');
+		// ...then destroy
+		cj(".ui-dialog > [id^=crm-ajax-dialog-]").dialog("destroy");
 	</script>
 	{if $error_message}
 		<h2>{ts domain="org.project60.sepa"}Error!{/ts} {$error_title}</h2>
