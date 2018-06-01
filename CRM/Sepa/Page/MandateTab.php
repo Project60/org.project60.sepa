@@ -101,7 +101,9 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_contribution_recur.frequency_interval           AS frequency_interval,
         civicrm_contribution_recur.frequency_unit               AS frequency_unit,
         civicrm_contribution_recur.currency                     AS currency,
-        civicrm_contribution_recur.amount                       AS amount
+        civicrm_contribution_recur.amount                       AS amount,
+        IF(civicrm_sdd_mandate.status IN ('FRST', 'RCUR', 'INIT', 'OOFF'), 'sepa-active', 'sepa-inactive')           
+                                                                AS class
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
       LEFT JOIN civicrm_financial_type     ON civicrm_financial_type.id = civicrm_contribution_recur.financial_type_id
@@ -115,7 +117,8 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       WHERE civicrm_sdd_mandate.contact_id = %1
         AND civicrm_sdd_mandate.type = 'RCUR'
         AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
-      GROUP BY civicrm_sdd_mandate.id";
+      GROUP BY civicrm_sdd_mandate.id
+      ORDER BY civicrm_contribution_recur.start_date DESC, civicrm_sdd_mandate.id DESC;";
 
     $mandate_ids = array();
     $rcur_mandates = CRM_Core_DAO::executeQuery($rcur_query,
@@ -139,6 +142,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'end_date'             => $rcur_mandates->end_date,
         'currency'             => $rcur_mandates->currency,
         'amount'               => $rcur_mandates->amount,
+        'class'                => $rcur_mandates->class
       );
 
       // calculate annual amount
@@ -194,7 +198,10 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
    * for the given contact
    */
   public static function getMandateCount($contact_id) {
-    return CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_sdd_mandate WHERE contact_id = %1",
+    return CRM_Core_DAO::singleValueQuery("
+        SELECT COUNT(id) FROM civicrm_sdd_mandate 
+        WHERE contact_id = %1
+          AND status IN ('FRST', 'RCUR', 'OOFF', 'INIT');",
             array( 1 => array($contact_id, 'Integer')));
   }
 
