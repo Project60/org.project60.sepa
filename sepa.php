@@ -497,22 +497,24 @@ function sepa_civicrm_tokens(&$tokens) {
   $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
   $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
   $tokens[$prefix] = array(
-    "$prefix.reference"          => ts('Reference', array('domain' => 'org.project60.sepa')),
-    "$prefix.source"             => ts('Source', array('domain' => 'org.project60.sepa')),
-    "$prefix.type"               => ts('Type', array('domain' => 'org.project60.sepa')),
-    "$prefix.status"             => ts('Status', array('domain' => 'org.project60.sepa')),
-    "$prefix.date"               => ts('Signature Date', array('domain' => 'org.project60.sepa')),
-    "$prefix.iban"               => ts('IBAN', array('domain' => 'org.project60.sepa')),
-    "$prefix.iban_anonymised"    => ts('IBAN (anonymised)', array('domain' => 'org.project60.sepa')),
-    "$prefix.bic"                => ts('BIC', array('domain' => 'org.project60.sepa')),
-
-    "$prefix.amount"             => ts('Amount', array('domain' => 'org.project60.sepa')),
-    "$prefix.currency"           => ts('Currency', array('domain' => 'org.project60.sepa')),
-    "$prefix.first_collection"   => ts('First Collection Date', array('domain' => 'org.project60.sepa')),
-    "$prefix.cycle_day"          => ts('Cycle Day', array('domain' => 'org.project60.sepa')),
-    "$prefix.frequency_interval" => ts('Interval Multiplier', array('domain' => 'org.project60.sepa')),
-    "$prefix.frequency_unit"     => ts('Interval Unit', array('domain' => 'org.project60.sepa')),
-    "$prefix.frequency"          => ts('Interval', array('domain' => 'org.project60.sepa')),
+    "$prefix.reference"               => ts('Reference', array('domain' => 'org.project60.sepa')),
+    "$prefix.source"                  => ts('Source', array('domain' => 'org.project60.sepa')),
+    "$prefix.type"                    => ts('Type', array('domain' => 'org.project60.sepa')),
+    "$prefix.status"                  => ts('Status', array('domain' => 'org.project60.sepa')),
+    "$prefix.date"                    => ts('Signature Date (raw)', array('domain' => 'org.project60.sepa')),
+    "$prefix.date_text"               => ts('Signature Date', array('domain' => 'org.project60.sepa')),
+    "$prefix.iban"                    => ts('IBAN', array('domain' => 'org.project60.sepa')),
+    "$prefix.iban_anonymised"         => ts('IBAN (anonymised)', array('domain' => 'org.project60.sepa')),
+    "$prefix.bic"                     => ts('BIC', array('domain' => 'org.project60.sepa')),
+    "$prefix.amount"                  => ts('Amount (raw)', array('domain' => 'org.project60.sepa')),
+    "$prefix.amount_text"             => ts('Amount', array('domain' => 'org.project60.sepa')),
+    "$prefix.currency"                => ts('Currency', array('domain' => 'org.project60.sepa')),
+    "$prefix.first_collection"        => ts('First Collection Date (raw)', array('domain' => 'org.project60.sepa')),
+    "$prefix.first_collection_text"   => ts('First Collection Date', array('domain' => 'org.project60.sepa')),
+    "$prefix.cycle_day"               => ts('Cycle Day', array('domain' => 'org.project60.sepa')),
+    "$prefix.frequency_interval"      => ts('Interval Multiplier', array('domain' => 'org.project60.sepa')),
+    "$prefix.frequency_unit"          => ts('Interval Unit', array('domain' => 'org.project60.sepa')),
+    "$prefix.frequency"               => ts('Interval', array('domain' => 'org.project60.sepa')),
   );
 }
 
@@ -570,24 +572,41 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
         $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['entity_id']));
         $values[$result->contact_id]["$prefix.amount"]           = $contribution['total_amount'];
         $values[$result->contact_id]["$prefix.currency"]         = $contribution['currency'];
+        $values[$result->contact_id]["$prefix.amount_text"]      = CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']);
         $values[$result->contact_id]["$prefix.first_collection"] = $contribution['receive_date'];
 
       } elseif ($mandate['entity_table'] == 'civicrm_contribution_recur') {
         $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
         $values[$result->contact_id]["$prefix.amount"]             = $rcontribution['amount'];
         $values[$result->contact_id]["$prefix.currency"]           = $rcontribution['currency'];
+        $values[$result->contact_id]["$prefix.amount_text"]        = CRM_Utils_Money::format($rcontribution['amount'], $rcontribution['currency']);
         $values[$result->contact_id]["$prefix.cycle_day"]          = $rcontribution['cycle_day'];
         $values[$result->contact_id]["$prefix.frequency_interval"] = $rcontribution['frequency_interval'];
         $values[$result->contact_id]["$prefix.frequency_unit"]     = $rcontribution['frequency_unit'];
         $values[$result->contact_id]["$prefix.frequency"]          = CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], true);
 
-        // load first contribution
-        if (!empty($mandate['first_contribution_id'])) {
+        // first collection date
+        if (empty($mandate['first_contribution_id'])) {
+          // calculate
+          $calculator = new CRM_Sepa_Logic_NextCollectionDate($mandate['creditor_id']);
+          $values[$result->contact_id]["$prefix.first_collection"] = $calculator->calculateNextCollectionDate($mandate['entity_id']);
+
+        } else {
+          // use date of first contribution
           $fcontribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['first_contribution_id']));
           $values[$result->contact_id]["$prefix.first_collection"] = $fcontribution['receive_date'];
         }
       }
+
+      // format dates
+      if (!empty($values[$result->contact_id]["$prefix.first_collection"])) {
+        $values[$result->contact_id]["$prefix.first_collection_text"] = CRM_Utils_Date::customFormat($values[$result->contact_id]["$prefix.first_collection"]);
+      }
+      if (!empty($values[$result->contact_id]["$prefix.date"])) {
+        $values[$result->contact_id]["$prefix.date_text"] = CRM_Utils_Date::customFormat($values[$result->contact_id]["$prefix.date"]);
+      }
     }
+
   } catch (Exception $e) {
     // probably just a minor issue, see SEPA-461
   }
