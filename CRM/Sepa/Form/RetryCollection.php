@@ -24,6 +24,7 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
   public function buildQuickForm() {
+    $js_vars = array();
 
     // add form elements
     $this->add(
@@ -34,7 +35,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
       TRUE);
 
     $creditor_list = $this->getCreditorList();
-    $this->assign('creditor_list', $creditor_list);
+    $js_vars['creditor_list'] = $creditor_list;
     $this->add(
         'select',
         'creditor_list',
@@ -43,11 +44,13 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         TRUE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
+    $txgroup_list = $this->getGroupList();
+    $js_vars['txgroup_list'] = $txgroup_list;
     $this->add(
         'select',
         'txgroup_list',
         E::ts('SDD Groups'),
-        array(),
+        $txgroup_list,
         TRUE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
@@ -89,6 +92,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     ));
 
     // inject JS file
+    CRM_Core_Resources::singleton()->addVars('org.project60.sepa', $js_vars);
     CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/RetryCollection.js');
 
     parent::buildQuickForm();
@@ -107,13 +111,33 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
    * Get the presets for the date field
    */
   protected function getDateRangePresets() {
-    return array(
-        'last month'    => E::ts('This Month'),
-        'last month'    => E::ts('Last Month'),
-        'last 2 months' => E::ts('Last 2 Months'),
-        'last 3 months' => E::ts('Last 3 Months'),
-        'custom'        => E::ts('Custom Range'),
-    );
+    $presets = array();
+    // add "this month"
+    $presets[date('Ym01000000') . '-now'] = E::ts('This Month');
+
+    // add "last month"
+    $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 month'));
+    $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
+    $presets["{$from}-{$to}"] = E::ts('Last Month');
+
+    // add last two months
+    $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 2 month'));
+    $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
+    $presets["{$from}-{$to}"] = E::ts('Last Two Months');
+
+    // add "last week"
+    $from = date('YmdHis', strtotime('now - 7 days'));
+    $to   = date('YmdHis', strtotime('now'));
+    $presets["{$from}-{$to}"] = E::ts('Last 7 Days');
+
+    // add "last 2 weeks"
+    $from = date('YmdHis', strtotime('now - 14 days'));
+    $to   = date('YmdHis', strtotime('now'));
+    $presets["{$from}-{$to}"] = E::ts('Last 14 Days');
+
+    // finally: add custom option
+    $presets['custom'] = E::ts('Custom Range');
+    return $presets;
   }
 
   /*
@@ -128,5 +152,21 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
       $creditor_list[$creditor['id']] = $creditor['name'];
     }
     return $creditor_list;
+  }
+
+  /*
+   * Get the list of creditors
+   */
+  protected function getGroupList() {
+    $txgroup_list = array();
+    $txgroup_query = civicrm_api3('SepaTransactionGroup', 'get', array(
+        'option.limit' => 0,
+        'type'         => 'RCUR',
+        'status_id'    => array('IN' => array(1,2,3)), // TODO:
+        'return'       => 'reference,id'));
+    foreach ($txgroup_query['values'] as $txgroup) {
+      $txgroup_list[$txgroup['id']] = $txgroup['reference'];
+    }
+    return $txgroup_list;
   }
 }

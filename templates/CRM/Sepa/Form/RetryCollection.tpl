@@ -71,7 +71,7 @@
 
 <h3>{ts}Preview{/ts}</h3>
 
-<div style="text-align: center; font-size: large;">{ts}Will re-collect %1 failed debit contributions from %2 different contacts. The total amount is %3.{/ts}</div>
+<div id="separetry-text" style="text-align: center; font-size: large;"></div>
 
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}
