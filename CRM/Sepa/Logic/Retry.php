@@ -116,6 +116,18 @@ class CRM_Sepa_Logic_Retry {
       }
     }
 
+    // CONDITION: amount min
+    if (isset($params['amount_min'])) {
+      $amount_min = (float) $params['amount_min'];
+      $where_clauses[] = "contribution.total_amount >= {$amount_min}";
+    }
+
+    // CONDITION: amount max
+    if (isset($params['amount_max'])) {
+      $amount_max = (float) $params['amount_max'];
+      $where_clauses[] = "contribution.total_amount <= {$amount_max}";
+    }
+
     // CONDITION: creditor_list
     if (!empty($params['creditor_list'])) {
       $creditor_list = self::getIDList($params['creditor_list'], TRUE);
@@ -134,7 +146,10 @@ class CRM_Sepa_Logic_Retry {
 
     // CONDITION: cancel_reason_list
     if (!empty($params['cancel_reason_list'])) {
-      $cancel_reason_list = explode(',', $params['cancel_reason_list']);
+      $cancel_reason_list = $params['cancel_reason_list'];
+      if (!is_array($cancel_reason_list)) {
+        $cancel_reason_list = explode(',', $cancel_reason_list);
+      }
       $where_clauses[] = "contribution.cancel_reason IN " . CRM_Core_DAO::escapeStrings($cancel_reason_list);
     }
 
@@ -175,9 +190,11 @@ class CRM_Sepa_Logic_Retry {
    *
    * @param $string
    */
-  protected static function getIDList($string, $as_string = FALSE) {
+  protected static function getIDList($elements, $as_string = FALSE) {
     $result = array();
-    $elements = explode(',', $string);
+    if (!is_array($elements)) {
+      $elements = explode(',', $elements);
+    }
     foreach ($elements as $element) {
       $result[] = (int) $element;
     }

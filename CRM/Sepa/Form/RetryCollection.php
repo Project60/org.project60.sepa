@@ -74,13 +74,13 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         'text',
         'amount_min',
         E::ts('Installment Amount'),
-        array('size' => 8));
+        array('size' => 6, 'style' => 'text-align:center;'));
 
     $this->add(
         'text',
         'amount_max',
         E::ts('Installment Amount'),
-        array('size' => 8));
+        array('size' => 6, 'style' => 'text-align:center;'));
 
 
     $this->addButtons(array(
@@ -92,7 +92,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     ));
 
     // inject JS file
-    CRM_Core_Resources::singleton()->addVars('org.project60.sepa', $js_vars);
+    CRM_Core_Resources::singleton()->addVars('p60sdd', $js_vars);
     CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/RetryCollection.js');
 
     parent::buildQuickForm();

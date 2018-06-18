@@ -71,7 +71,9 @@
 
 <h3>{ts}Preview{/ts}</h3>
 
-<div id="separetry-text" style="text-align: center; font-size: large;"></div>
+<p>
+<div id="separetry-text" style="text-align: center; font-size: 1.6em;"></div>
+</p>
 
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}
