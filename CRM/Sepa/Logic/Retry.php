@@ -15,10 +15,126 @@
 +--------------------------------------------------------*/
 
 
+
 /**
  * Contains logic required for RETRY: attempt to collect failed debits another time
  */
 class CRM_Sepa_Logic_Retry {
+
+  /**
+   * Generate a new SEPA RTRY group
+   *
+   * @param $params array see SepaLogic.get_retry_stats API call
+   * @return string reference of the newly created group
+   */
+  public static function createRetryGroup($params) {
+    // make sure there is a collection date
+    if (empty($params['collection_date'])) {
+      // TODO: use notice period
+      $collection_date  = date('Y-m-d', strtotime("now +3 days"));
+    } else {
+      $collection_date = date('Y-m-d', $params['collection_date']);
+    }
+
+    // first: get some values
+    $group_status_id_open        = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+    $payment_instrument_id       = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
+    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+
+    // first: fetch contributions and group by creditor
+    $contributions_by_creditor = array();
+    $contributions_found = self::getRetryContributions($params);
+    foreach ($contributions_found as $contribution) {
+      $contributions_by_creditor[$contribution['creditor_id']][] = $contribution;
+    }
+
+    // create RTRY group(s)
+    foreach ($contributions_by_creditor as $creditor_id => $contributions) {
+      // get some info
+      $notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $creditor_id);
+
+      // create new group's reference
+      $reference = "TXG-{$creditor_id}-RTRY-{$collection_date}";
+      $counter = 0;
+      while (CRM_Sepa_Logic_Batching::referenceExists($reference)) {
+        $counter += 1;
+        $reference = "TXG-{$creditor_id}-RTRY-{$collection_date}--" . $counter;
+      }
+      CRM_Utils_SepaCustomisationHooks::modify_txgroup_reference($reference, $creditor_id, 'RTRY', $collection_date);
+
+      // create new group
+      $group = civicrm_api3('SepaTransactionGroup', 'create', array(
+          'reference'               => $reference,
+          'type'                    => 'RTRY',
+          'collection_date'         => $collection_date,
+          'latest_submission_date'  => date('Y-m-d', strtotime("-{$notice} days", strtotime($collection_date))),
+          'created_date'            => date('Y-m-d'),
+          'status_id'               => $group_status_id_open,
+          'sdd_creditor_id'         => $creditor_id,
+      ));
+
+      // create contributions
+      foreach ($contributions as $contribution_data) {
+        unset($contribution_data['id']);
+        $contribution_data['payment_instrument']     = $payment_instrument_id;
+        $contribution_data['contribution_status_id'] = $contribution_status_pending;
+        $contribution_data['receive_date']           = $collection_date;
+        $contribution = civicrm_api3('Contribution', 'create', $contribution_data);
+
+        // add contribution to tx_group
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES (%1, %2);",
+            array( 1 => array($group['id'],        'Integer'),
+                   2 => array($contribution['id'], 'Integer')));
+      }
+    }
+
+    return $group['id'];
+  }
+
+  /**
+   * Get the list of contributions to retry:
+   *  'contribution_count'  - number of contributions matched by the parameters
+   *  'total_amount'        - total amount of those contributions
+   *  'currency'            - common currency - empty if multiple involved
+   *  'contact_count'       - count of contacts involved
+   *  'creditor_list'       - list of creditor IDs involved
+   *  'txgroup_list '       - list of txgroups involved
+   *  'cancel_reason_list'  - list of cancel reasons involved
+   *  'frequencies'         - list of frequencies involved
+   *
+   * @param $params array see SepaLogic.get_retry_stats API call
+   */
+  public static function getRetryContributions($params) {
+    $contribution_query_sql = self::getQuery("
+      contribution.id                    AS contribution_id,
+      contribution.total_amount          AS total_amount,
+      contribution.currency              AS currency,
+      contribution.contact_id            AS contact_id,
+      mandate.creditor_id                AS creditor_id,
+      mandate.source                     AS source,
+      contribution.contribution_recur_id AS contribution_recur_id,
+      contribution.financial_type_id     AS financial_type_id,
+      contribution.campaign_id           AS campaign_id
+      ", $params);
+    CRM_Core_Error::debug_log_message($contribution_query_sql);
+    $contributions_raw = CRM_Core_DAO::executeQuery($contribution_query_sql);
+    $contributions = array();
+    while ($contributions_raw->fetch()) {
+      $contributions[] = array(
+          'id'                    => (int) $contributions_raw->contribution_id,
+          'total_amount'          => $contributions_raw->total_amount,
+          'currency'              => $contributions_raw->currency,
+          'contact_id'            => $contributions_raw->contact_id,
+          'source'                => $contributions_raw->source,
+          'creditor_id'           => $contributions_raw->creditor_id,
+          'financial_type_id'     => $contributions_raw->financial_type_id,
+          'contribution_recur_id' => $contributions_raw->contribution_recur_id,
+          'campaign_id'           => $contributions_raw->campaign_id,
+      );
+    }
+
+    return $contributions;
+  }
 
   /**
    * Calculate the some stats on selected cancelled contributions:
@@ -94,6 +210,7 @@ class CRM_Sepa_Logic_Retry {
     $where_clauses = array();
     $where_clauses[] = "contribution.is_test = 0";
     $where_clauses[] = "contact.is_deleted = 0";
+    $where_clauses[] = "txg.status_id IN (1,2,3)";
 //  TODO: enable  $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
 
     // CONDITION: date_from
@@ -117,13 +234,13 @@ class CRM_Sepa_Logic_Retry {
     }
 
     // CONDITION: amount min
-    if (isset($params['amount_min'])) {
+    if (isset($params['amount_min']) && $params['amount_min'] != '') {
       $amount_min = (float) $params['amount_min'];
       $where_clauses[] = "contribution.total_amount >= {$amount_min}";
     }
 
     // CONDITION: amount max
-    if (isset($params['amount_max'])) {
+    if (isset($params['amount_max']) && $params['amount_max'] != '') {
       $amount_max = (float) $params['amount_max'];
       $where_clauses[] = "contribution.total_amount <= {$amount_max}";
     }

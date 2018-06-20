@@ -41,7 +41,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         'creditor_list',
         E::ts('Creditor(s)'),
         $creditor_list,
-        TRUE,
+        FALSE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
     $txgroup_list = $this->getGroupList();
@@ -59,7 +59,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         'cancel_reason_list',
         E::ts('Cancel Reason'),
         array(),
-        TRUE,
+        FALSE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
     $this->add(
@@ -67,7 +67,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         'frequency_list',
         E::ts('Frequency'),
         array(),
-        TRUE,
+        FALSE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
     $this->add(
@@ -100,10 +100,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-//    $options = $this->getColorOptions();
-//    CRM_Core_Session::setStatus(E::ts('You picked color "%1"', array(
-//      1 => $options[$values['favorite_color']],
-//    )));
+    CRM_Sepa_Logic_Retry::createRetryGroup($values);
     parent::postProcess();
   }
 
@@ -161,8 +158,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $txgroup_list = array();
     $txgroup_query = civicrm_api3('SepaTransactionGroup', 'get', array(
         'option.limit' => 0,
-        'type'         => 'RCUR',
-        'status_id'    => array('IN' => array(1,2,3)), // TODO:
+        'type'         => array('IN' => array('RCUR', 'FRST')),
         'return'       => 'reference,id'));
     foreach ($txgroup_query['values'] as $txgroup) {
       $txgroup_list[$txgroup['id']] = $txgroup['reference'];

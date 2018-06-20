@@ -43,7 +43,25 @@ cj(document).ready(function() {
      * @param list        the list of labels for the items
      */
     function separetry_updateSelect(field_name, value, list) {
-        console.log("update field " + field_name + ", set to: " + value);
+        // remove old options
+        cj("#" + field_name + " option").remove();
+
+        // see if that's it already
+        if (!value) {
+            cj("#" + field_name).select2("val", []);
+            return;
+        }
+
+        // add new values
+        var values = value.split(',');
+        for (v in values) {
+            var val = values[v];
+            var label = list[parseInt(val)];
+            cj("#" + field_name).append(cj('<option>', {value: val, text: label}));
+        }
+
+        // and set
+        cj("#" + field_name).select2("val", values);
     }
 
     /**
@@ -78,6 +96,7 @@ cj(document).ready(function() {
 
           // update creditors
           separetry_updateSelect("creditor_list", result['creditor_list'], CRM.vars.p60sdd.creditor_list);
+          separetry_updateSelect("txgroup_list", result['txgroup_list'], CRM.vars.p60sdd.txgroup_list);
       });
     }
 

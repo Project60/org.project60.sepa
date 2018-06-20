@@ -176,7 +176,7 @@ class CRM_Sepa_Logic_Queue_Close {
             5 => array(SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer'),
           ));
 
-    } elseif ($this->txgroup['type'] == 'RCUR' || $this->txgroup['type'] == 'FRST') {
+    } elseif ($this->txgroup['type'] == 'RCUR' || $this->txgroup['type'] == 'FRST' || $this->txgroup['type'] == 'RTRY') {
       $query = CRM_Core_DAO::executeQuery("
         SELECT
           civicrm_sdd_mandate.id                      AS mandate_id,
@@ -226,7 +226,7 @@ class CRM_Sepa_Logic_Queue_Close {
     }
 
     // also update next collection date
-    if ($this->txgroup['type'] == 'FRST' || $this->txgroup['type'] == 'RCUR') {
+    if ($this->txgroup['type'] == 'FRST' || $this->txgroup['type'] == 'RCUR' || $this->txgroup['type'] == 'RTRY') {
       CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate(NULL, array_keys($contributions));
     }
   }
