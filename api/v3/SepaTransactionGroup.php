@@ -286,7 +286,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   }
 
   // get type id
-  $type_id = (int) CRM_Core_OptionGroup::getValue('batch_type', 'SEPA DD Transaction Batch', 'name');
+  $type_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'type_id', 'SEPA DD Transaction Batch');
   if (!$type_id) {
     // create SEPA type entry if not exists
     $value_spec = array('name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch', array('domain' => 'org.project60.sepa')), 'is_active' => 1);
@@ -307,10 +307,10 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
                   'modified_date'         => date('YmdHis'),
                   'status_id'             => $txgroup['status_id'],
                   'type_id'               => $type_id,
-                  'mode_id'               => (int) CRM_Core_OptionGroup::getValue('batch_mode', 'Automatic Batch', 'name'),
+                  'mode_id'               => (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'mode_id', 'Automatic Batch'),
                   'total'                 => $total,
                   'item_count'            => count($transactions),
-                  'payment_instrument_id' => (int) CRM_Core_OptionGroup::getValue('payment_instrument', $txgroup['type'], 'name'),
+                  'payment_instrument_id' => (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $txgroup['type']),
                   'exported_date'         => $sdd_file['created_date'],
                   'version'               => 3);
   $batch_create = civicrm_api('Batch', 'create', $batch);

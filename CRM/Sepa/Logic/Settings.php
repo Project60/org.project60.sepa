@@ -135,7 +135,7 @@ class CRM_Sepa_Logic_Settings {
    */
   public static function isSDD($contribution) {
     $payment_instrument_id = $contribution["payment_instrument_id"];
-    $name = CRM_Core_OptionGroup::getValue('payment_instrument', $payment_instrument_id, 'value', 'String', 'name');
+    $name = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $payment_instrument_id);
     switch ($name) {
       case 'FRST' :
       case 'RCUR' :
