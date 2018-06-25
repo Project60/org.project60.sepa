@@ -205,7 +205,7 @@ class CRM_Sepa_Logic_Retry {
    * @param $select_clause     string  SQL select clause
    * @param $params            array   query parameters
    */
-  protected function getQuery($select_clause, $params) {
+  protected static function getQuery($select_clause, $params) {
     // first: some general conditions
     $where_clauses = array();
     $where_clauses[] = "contribution.is_test = 0";

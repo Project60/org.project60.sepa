@@ -62,11 +62,13 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         FALSE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
+    $frequency_list = $this->getFrequencyList();
+    $js_vars['frequencies'] = $frequency_list;
     $this->add(
         'select',
-        'frequency_list',
+        'frequencies',
         E::ts('Frequency'),
-        array(),
+        $frequency_list,
         FALSE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
@@ -100,7 +102,13 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
+
+    // generate the new group
     CRM_Sepa_Logic_Retry::createRetryGroup($values);
+
+    // go to dashboard
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
+
     parent::postProcess();
   }
 
@@ -138,7 +146,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
   }
 
   /*
-   * Get the list of creditors
+   * Get the list of creitors
    */
   protected function getCreditorList() {
     $creditor_list = array();
@@ -164,5 +172,19 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
       $txgroup_list[$txgroup['id']] = $txgroup['reference'];
     }
     return $txgroup_list;
+  }
+
+  /*
+   * Get the list of creditors
+   */
+  protected function getFrequencyList() {
+    return array(
+        "1" => E::ts("annually"),
+        "2" => E::ts("semi-annually"),
+        "3" => E::ts("3-monthly"),
+        "4" => E::ts("quarterly"),
+        "6" => E::ts("bi-monthly"),
+        "12" => E::ts("monthly"),
+    );
   }
 }

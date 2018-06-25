@@ -43,8 +43,8 @@
 </div>
 
 <div class="crm-section">
-  <div class="label">{$form.frequency_list.label}</div>
-  <div class="content">{$form.frequency_list.html}</div>
+  <div class="label">{$form.frequencies.label}</div>
+  <div class="content">{$form.frequencies.html}</div>
   <div class="clear"></div>
 </div>
 
