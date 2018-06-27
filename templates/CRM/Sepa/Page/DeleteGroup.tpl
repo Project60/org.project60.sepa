@@ -25,11 +25,13 @@
 
 {capture assign=entity_label}
 {if $txgroup.type eq "OOFF"}
-{ts domain="org.project60.sepa"}mandates{/ts}
+	{ts domain="org.project60.sepa"}mandates{/ts}
 {elseif $txgroup.type eq "RCUR" or $txgroup.type eq "FRST"}
-{ts domain="org.project60.sepa"}contributions{/ts}
+	{ts domain="org.project60.sepa"}contributions{/ts}
+{elseif $txgroup.type eq "RTRY"}
+	{ts domain="org.project60.sepa"}retried contributions{/ts}
 {else}
-things
+	{ts domain="org.project60.sepa"}things{/ts}
 {/if}
 {/capture}
 
