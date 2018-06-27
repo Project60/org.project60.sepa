@@ -44,7 +44,7 @@ cj(document).ready(function() {
      */
     function separetry_updateSelect(field_name, value, list, mode) {
         if (!value) {
-            return;
+            value = '';
         }
 
         // save old values
@@ -64,14 +64,19 @@ cj(document).ready(function() {
             // add new values
             for (v in values) {
                 var val = values[v];
-                var label = list[parseInt(val)];
+                var label = 'Label Error';
+                if (val in list) {
+                    label = list[val];
+                } else {
+                    label = list[parseInt(val)];
+                }
                 cj("#" + field_name).append(cj('<option>', {value: val, text: label}));
             }
         }
 
 
         // calculate the intersection
-        if (mode == 'select') {
+        if (mode == 'select' || mode == 'replace') {
             var intersection = values.filter(value => -1 !== old_values.indexOf(value));
             cj("#" + field_name).select2("val", intersection);
         } else {
@@ -84,9 +89,12 @@ cj(document).ready(function() {
      */
     function separetry_updateForm(event) {
         // find out what triggered it:
-        var change_source = 'date_range';
+        var filter_triggered = false;
+        var change_source = '';
         if (event) {
             change_source = event.currentTarget.id;
+        } else {
+            change_source = 'date_range';
         }
 
         // compile the request
@@ -94,19 +102,23 @@ cj(document).ready(function() {
         switch (change_source) {
             case 'amount_max':
                 query['amount_max'] = cj("#amount_max").val();
+                filter_triggered = true;
             case 'amount_min':
                 query['amount_min'] = cj("#amount_min").val();
+                filter_triggered = true;
             case 'frequencies':
                 query['frequencies'] = cj("#frequencies").val();
+                filter_triggered = true;
             case 'cancel_reason_list':
                 query['cancel_reason_list'] = cj("#cancel_reason_list").val();
+                filter_triggered = true;
             case 'txgroup_list':
                 query['txgroup_list'] = cj("#txgroup_list").val();
             case 'creditor_list':
                 query['creditor_list'] = cj("#creditor_list").val();
             default:
                 query['date_from'] = separetry_getDate('from');
-                query['date_to'] = separetry_getDate('to');
+                query['date_to']   = separetry_getDate('to');
         }
         // call the API for some stats
         CRM.api3('SepaLogic', 'get_retry_stats', query).done(function(result) {
@@ -126,11 +138,40 @@ cj(document).ready(function() {
               cj("#separetry-text").text(ts("No SEPA collections match your criteria.", {domain: 'org.project60.sepa'}));
             }
 
-            separetry_updateSelect("creditor_list",      result['creditor_list'],      CRM.vars.p60sdd.creditor_list,  'select');
-            separetry_updateSelect("txgroup_list",       result['txgroup_list'],       CRM.vars.p60sdd.txgroup_list,   'replace');
-            separetry_updateSelect("cancel_reason_list", result['cancel_reason_list'], result['cancel_reason_list'],   'replace');
-            // separetry_updateSelect("frequencies",     result['frequencies'],        CRM.vars.p60sdd.frequencies, 'select');
-            // separetry_updateSelect("txgroup_list", result['txgroup_list'], CRM.vars.p60sdd.txgroup_list, 'options_only');
+            // rebuild cancel reason list
+            var cancel_reason_list = {};
+            if (result['cancel_reason_list']) {
+                var cancel_reason_values = result['cancel_reason_list'].split(',');
+                for (idx in cancel_reason_values) {
+                    cancel_reason_list[cancel_reason_values[idx]] = cancel_reason_values[idx];
+                }
+            }
+
+            // update fields
+            switch (change_source) {
+                case 'date_range':
+                    separetry_updateSelect("creditor_list",      result['creditor_list'],      CRM.vars.p60sdd.creditor_list,  'replace');
+                    separetry_updateSelect("txgroup_list",       result['txgroup_list'],       CRM.vars.p60sdd.txgroup_list,   'replace');
+                    separetry_updateSelect("cancel_reason_list", result['cancel_reason_list'], cancel_reason_list,             'replace');
+                    separetry_updateSelect("frequencies",        result['frequencies'],        CRM.vars.p60sdd.frequencies,    'select');
+                    break;
+                case 'creditor_list':
+                    separetry_updateSelect("txgroup_list",       result['txgroup_list'],       CRM.vars.p60sdd.txgroup_list,   'replace');
+                    separetry_updateSelect("cancel_reason_list", result['cancel_reason_list'], cancel_reason_list,             'replace');
+                    separetry_updateSelect("frequencies",        result['frequencies'],        CRM.vars.p60sdd.frequencies,    'select');
+                    break;
+                case 'txgroup_list':
+                    separetry_updateSelect("cancel_reason_list", result['cancel_reason_list'], cancel_reason_list,             'replace');
+                    separetry_updateSelect("frequencies",        result['frequencies'],        CRM.vars.p60sdd.frequencies,    'select');
+                    break;
+                default:
+                case 'amount_max':
+                case 'amount_min':
+                case 'frequencies':
+                case 'cancel_reason_list':
+                    // do nothing to the lists
+                    break;
+            }
       });
     }
 

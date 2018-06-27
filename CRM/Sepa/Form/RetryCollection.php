@@ -23,7 +23,10 @@ use CRM_Sepa_ExtensionUtil as E;
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/QuickForm+Reference
  */
 class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
+
   public function buildQuickForm() {
+    CRM_Utils_System::setTitle(E::ts("Retry Collection of Failed DDs"));
+
     $js_vars = array();
 
     // add form elements
@@ -84,6 +87,12 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         E::ts('Installment Amount'),
         array('size' => 6, 'style' => 'text-align:center;'));
 
+    $this->addDate(
+        'collection_date',
+        E::ts('Collection Date'),
+        TRUE,
+        array('formatType' => 'activityDate'));
+
 
     $this->addButtons(array(
       array(
@@ -103,6 +112,14 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
   public function postProcess() {
     $values = $this->exportValues();
 
+    // format some values
+    $values['collection_date'] = CRM_Utils_Date::processDate($values['collection_date'], null, null, 'YmdHis');
+
+    // process from-to dates
+    if ($values['date_range'] != 'custom') {
+      list($values['date_from'], $values['date_to']) = explode('-', $values['date_range']);
+    }
+
     // generate the new group
     CRM_Sepa_Logic_Retry::createRetryGroup($values);
 
@@ -120,28 +137,38 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     // add "this month"
     $presets[date('Ym01000000') . '-now'] = E::ts('This Month');
 
+    // add "last week"
+    $from = date('YmdHis', strtotime('now - 7 days'));
+    $presets["{$from}-now"] = E::ts('Last 7 Days');
+
+    // add "last 2 weeks"
+    $from = date('YmdHis', strtotime('now - 14 days'));
+    $presets["{$from}-now"] = E::ts('Last 14 Days');
+
+    // add "last 30 days"
+    $from = date('YmdHis', strtotime(date('YmdHis') . ' - 30 days'));
+    $presets["{$from}-now"] = E::ts('Last 30 Days');
+
+    // add "last 60 days"
+    $from = date('YmdHis', strtotime(date('YmdHis') . ' - 60 days'));
+    $presets["{$from}-now"] = E::ts('Last 60 Days');
+
+    // add "last 90 days"
+    $from = date('YmdHis', strtotime(date('YmdHis') . ' - 90 days'));
+    $presets["{$from}-now"] = E::ts('Last 90 Days');
+
     // add "last month"
     $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 month'));
     $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
-    $presets["{$from}-{$to}"] = E::ts('Last Month');
+    $presets["{$from}-{$to}"] = E::ts('Last Calendar Month');
 
     // add last two months
     $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 2 month'));
     $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
-    $presets["{$from}-{$to}"] = E::ts('Last Two Months');
-
-    // add "last week"
-    $from = date('YmdHis', strtotime('now - 7 days'));
-    $to   = date('YmdHis', strtotime('now'));
-    $presets["{$from}-{$to}"] = E::ts('Last 7 Days');
-
-    // add "last 2 weeks"
-    $from = date('YmdHis', strtotime('now - 14 days'));
-    $to   = date('YmdHis', strtotime('now'));
-    $presets["{$from}-{$to}"] = E::ts('Last 14 Days');
+    $presets["{$from}-{$to}"] = E::ts('Last Two Calendar Months');
 
     // finally: add custom option
-    $presets['custom'] = E::ts('Custom Range');
+    // TODO: implement: $presets['custom'] = E::ts('Custom Range');
     return $presets;
   }
 
@@ -181,9 +208,9 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     return array(
         "1" => E::ts("annually"),
         "2" => E::ts("semi-annually"),
-        "3" => E::ts("3-monthly"),
+//        "3" => E::ts("3-monthly"),
         "4" => E::ts("quarterly"),
-        "6" => E::ts("bi-monthly"),
+//        "6" => E::ts("bi-monthly"),
         "12" => E::ts("monthly"),
     );
   }

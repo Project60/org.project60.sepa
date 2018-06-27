@@ -44,6 +44,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     $this->assign("show_open_url", CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
     $this->assign("batch_ooff", CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=OOFF'));
     $this->assign("batch_recur", CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=RCUR'));
+    $this->assign("batch_retry", CRM_Utils_System::url('civicrm/sepa/retry', 'reset=1'));
 
     // check permissions
     $this->assign('can_delete', CRM_Core_Permission::check('delete sepa groups'));

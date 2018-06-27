@@ -33,7 +33,7 @@ class CRM_Sepa_Logic_Retry {
       // TODO: use notice period
       $collection_date  = date('Y-m-d', strtotime("now +3 days"));
     } else {
-      $collection_date = date('Y-m-d', $params['collection_date']);
+      $collection_date = date('Y-m-d', strtotime($params['collection_date']));
     }
 
     // first: get some values
@@ -206,12 +206,15 @@ class CRM_Sepa_Logic_Retry {
    * @param $params            array   query parameters
    */
   protected static function getQuery($select_clause, $params) {
+    CRM_Core_Error::debug_log_message("PARAMS: " . json_encode($params));
+
     // first: some general conditions
     $where_clauses = array();
     $where_clauses[] = "contribution.is_test = 0";
     $where_clauses[] = "contact.is_deleted = 0";
     $where_clauses[] = "txg.status_id IN (1,2,3)";
-//  TODO: enable  $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
+    $where_clauses[] = "mandate.type = 'RCUR'";
+    // TODO: enable  $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
 
     // CONDITION: date_from
     if (!empty($params['date_from'])) {
@@ -267,7 +270,7 @@ class CRM_Sepa_Logic_Retry {
       if (!is_array($cancel_reason_list)) {
         $cancel_reason_list = explode(',', $cancel_reason_list);
       }
-      $where_clauses[] = "contribution.cancel_reason IN " . CRM_Core_DAO::escapeStrings($cancel_reason_list);
+      $where_clauses[] = "contribution.cancel_reason IN (" . CRM_Core_DAO::escapeStrings($cancel_reason_list) . ")";
     }
 
     // CONDITION: frequencies

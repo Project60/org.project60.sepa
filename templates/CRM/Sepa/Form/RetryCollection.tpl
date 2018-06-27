@@ -65,7 +65,7 @@
 
 <div class="crm-section">
   <div class="label">{$form.collection_date.label}</div>
-  <div class="content">{$form.collection_date.html}</div>
+  <div class="content">{include file="CRM/common/jcalendar.tpl" elementName=collection_date}</div>
   <div class="clear"></div>
 </div>
 
