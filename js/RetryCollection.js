@@ -13,9 +13,6 @@
 +--------------------------------------------------------*/
 
 cj(document).ready(function() {
-  // TODO
-    console.log("Yo");
-
     /**
      * Extract the current date from the form
      * @param from_or_to should be 'from' or 'to'
@@ -123,7 +120,7 @@ cj(document).ready(function() {
         // call the API for some stats
         CRM.api3('SepaLogic', 'get_retry_stats', query).done(function(result) {
             // UPDATE FORM
-            console.log(result);
+            // console.log(result);
 
             // update the text
             if (result['contribution_count'] > 0) {
