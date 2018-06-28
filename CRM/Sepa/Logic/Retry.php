@@ -116,7 +116,7 @@ class CRM_Sepa_Logic_Retry {
       contribution.financial_type_id     AS financial_type_id,
       contribution.campaign_id           AS campaign_id
       ", $params);
-    CRM_Core_Error::debug_log_message($contribution_query_sql);
+    //CRM_Core_Error::debug_log_message($contribution_query_sql);
     $contributions_raw = CRM_Core_DAO::executeQuery($contribution_query_sql);
     $contributions = array();
     while ($contributions_raw->fetch()) {
@@ -150,7 +150,7 @@ class CRM_Sepa_Logic_Retry {
    * @param $params array see SepaLogic.get_retry_stats API call
    */
   public static function getStats($params) {
-    CRM_Core_Error::debug_log_message("getStats: " . json_encode($params));
+    //CRM_Core_Error::debug_log_message("getStats: " . json_encode($params));
     $stats_query_sql = self::getQuery("
       COUNT(contribution.id)                             AS contribution_count,
       SUM(contribution.total_amount)                     AS total_amount,
@@ -161,7 +161,7 @@ class CRM_Sepa_Logic_Retry {
       GROUP_CONCAT(DISTINCT(contribution.cancel_reason)) AS cancel_reason_list,
       GROUP_CONCAT(DISTINCT(CONCAT(rcontrib.frequency_interval, rcontrib.frequency_unit))) 
                                                          AS frequencies", $params);
-    CRM_Core_Error::debug_log_message($stats_query_sql);
+    //CRM_Core_Error::debug_log_message($stats_query_sql);
     $stats_raw = CRM_Core_DAO::executeQuery($stats_query_sql);
     $stats_raw->fetch();
     $stats = array(
@@ -206,15 +206,14 @@ class CRM_Sepa_Logic_Retry {
    * @param $params            array   query parameters
    */
   protected static function getQuery($select_clause, $params) {
-    CRM_Core_Error::debug_log_message("PARAMS: " . json_encode($params));
-
     // first: some general conditions
     $where_clauses = array();
     $where_clauses[] = "contribution.is_test = 0";
     $where_clauses[] = "contact.is_deleted = 0";
     $where_clauses[] = "txg.status_id IN (1,2,3)";
     $where_clauses[] = "mandate.type = 'RCUR'";
-    // TODO: enable  $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
+    $where_clauses[] = "mandate.status IN ('RCUR', 'FRST')";
+    $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
 
     // CONDITION: date_from
     if (!empty($params['date_from'])) {

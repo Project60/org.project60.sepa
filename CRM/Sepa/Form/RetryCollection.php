@@ -54,7 +54,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         'txgroup_list',
         E::ts('SDD Groups'),
         $txgroup_list,
-        TRUE,
+        FALSE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
     $this->add(
