@@ -99,7 +99,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       WHERE g.txgroup_id = %1
         AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
-    "; //and not cancelled
+      GROUP BY c.id"; //and not cancelled
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
 
     setlocale(LC_CTYPE, 'en_US.utf8');
