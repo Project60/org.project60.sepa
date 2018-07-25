@@ -206,11 +206,15 @@ class CRM_Sepa_Logic_Retry {
    * @param $params            array   query parameters
    */
   protected static function getQuery($select_clause, $params) {
-    // first: some general conditions
+    // get some IDs
+    $group_status_id_closed   = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
+    $group_status_id_received = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
+
+    // then: some general conditions
     $where_clauses = array();
     $where_clauses[] = "contribution.is_test = 0";
     $where_clauses[] = "contact.is_deleted = 0";
-    $where_clauses[] = "txg.status_id IN (1,2,3)";
+    $where_clauses[] = "txg.status_id IN ({$group_status_id_closed},{$group_status_id_received})";
     $where_clauses[] = "mandate.type = 'RCUR'";
     $where_clauses[] = "mandate.status IN ('RCUR', 'FRST')";
     $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
