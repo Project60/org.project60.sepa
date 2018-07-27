@@ -61,8 +61,6 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
       return;
     }
 
-    CRM_Core_Error::debug_log_message("createPendingMandate STEP 1");
-
     // CREATE OOFF CONTRIBUTION
     // load contribution
     $contribution = civicrm_api3('Contribution', 'getsingle', array(
@@ -88,8 +86,6 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
       );
     }
 
-    CRM_Core_Error::debug_log_message("createPendingMandate STEP 2");
-
     // create mandate
     $mandate = civicrm_api3('SepaMandate', 'create', array(
         'creditor_id'     => $creditor['id'],
@@ -110,8 +106,6 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
     // reset contribution to 'Pending'
     $ooff_payment = (int)CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstrumentID('OOFF');
     self::resetContribution($contribution_id, $ooff_payment);
-
-    CRM_Core_Error::debug_log_message("createPendingMandate STEP 3");
 
   }
 
@@ -137,8 +131,6 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
           1 => array($contribution_id,       'Integer')));
     }
 
-    CRM_Core_Error::debug_log_message("RESET 1");
-
     // delete all finacial transactions
     CRM_Core_DAO::executeQuery("
       DELETE FROM civicrm_financial_trxn
@@ -146,7 +138,5 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
                    FROM civicrm_entity_financial_trxn etx 
                    WHERE etx.entity_id = {$contribution_id}
                      AND etx.entity_table = 'civicrm_contribution');");
-
-    CRM_Core_Error::debug_log_message("RESET 2");
   }
 }

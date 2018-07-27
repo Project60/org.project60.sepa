@@ -130,7 +130,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
    * @param $contribution_id
    */
   public static function setContributionID($contribution_id) {
-    CRM_Core_Error::debug_log_message("createPendingMandate for {$contribution_id}??");
     if (!self::$_pending_mandate) {
       // nothing pending, nothing to do
       return;
