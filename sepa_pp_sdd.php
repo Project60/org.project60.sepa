@@ -191,33 +191,37 @@ function sepa_pp_buildForm ( $formName, &$form ) {
  * postProcess Hook for payment processor
  */
 function sepa_pp_postProcess( $formName, &$form ) {
-	if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
-		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
-		if ($pp['class_name'] = "Payment_SDD") {
-			$paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle',
-				array('name' => $form->_submitValues['name'], 'is_test' => 0));
+  if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
+    $pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
+    if ($pp['class_name'] = "Payment_SDD") {
+      $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle',
+          array('name' => $form->_submitValues['name'], 'is_test' => 0));
 
-			$creditor_id = $form->_submitValues['user_name'];
-			$test_creditor_id = $form->_submitValues['test_user_name'];
-			$pp_id = $paymentProcessor['id'];
+      $creditor_id = $form->_submitValues['user_name'];
+      $test_creditor_id = $form->_submitValues['test_user_name'];
+      $pp_id = $paymentProcessor['id'];
 
-			// save settings
-			// FIXME: we might consider saving this as a JSON object
-			CRM_Core_BAO_Setting::setItem($creditor_id,      'SEPA Direct Debit PP', 'pp'.$pp_id);
-			CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP', 'pp_test'.$pp_id);
-		}
-
-	} elseif ('CRM_Contribute_Form_Contribution_Confirm' == $formName) {
-		// post process the contributions created
-		CRM_Core_Payment_SDD::processPartialMandates();
-
-	} elseif ('CRM_Event_Form_Registration_Confirm' == $formName) {
-		// post process the contributions created
-		CRM_Core_Payment_SDD::processPartialMandates();
-	}
+      // save settings
+      // FIXME: we might consider saving this as a JSON object
+      CRM_Core_BAO_Setting::setItem($creditor_id,      'SEPA Direct Debit PP', 'pp'.$pp_id);
+      CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP', 'pp_test'.$pp_id);
+    }
+  }
 }
 
-
+/**
+ * Trigger a pending mandate creation, if there is one
+ *
+ * @param $op
+ * @param $objectName
+ * @param $objectId
+ * @param $objectRef
+ */
+function sepa_pp_post($op, $objectName, $objectId, &$objectRef) {
+  if ($objectName == 'Contribution' && ($op == 'create' || $op == 'edit')) {
+    CRM_Core_Payment_SDD::setContributionID($objectId);
+  }
+}
 
 /**
  * Will install the SEPA payment processor

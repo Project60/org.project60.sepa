@@ -17,6 +17,7 @@ require_once 'sepa_pp_sdd.php';
 
 use CRM_Sepa_ExtensionUtil as E;
 
+
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contact_Page_View_Summary") {
     // mods for summary view
@@ -267,6 +268,11 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
  *   contributions connected to SDD mandates.
  */
 function sepa_civicrm_apiWrappers(&$wrappers, $apiRequest) {
+  // add a wrapper for the payment processor
+  if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'completetransaction') {
+    $wrappers[] = new CRM_Core_Payment_SDDCompletion();
+  }
+
   // add a wrapper for Contact.getlist (used e.g. for AJAX lookups)
   if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'delete') {
     $wrappers[] = new CRM_Sepa_Logic_ContributionProtector();
@@ -331,10 +337,19 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
 }
 
 /**
+ * CiviCRM POST HOOK
+ *
+ * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post/
+ */
+/**
  * CiviCRM POST event: make sure the next collection date
  *   is adjusted according to the change
  */
 function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  // relay to payment processor
+  sepa_pp_post($op, $objectName, $objectId, $objectRef);
+
+  // also: make sure the next collection date is adjusted according to the change
   if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
     if ($op == 'create' || $op == 'edit') {
       if ($objectName == 'SepaMandate') {
