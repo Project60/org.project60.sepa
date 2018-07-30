@@ -54,8 +54,6 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
    * @param $contribution_id integer   the freshly created contribution
    */
   public static function createPendingMandate($contribution_id = NULL) {
-    CRM_Core_Error::debug_log_message("createPendingMandate: '{$contribution_id}'");
-
     // fall back to current ID
     if ($contribution_id == NULL) {
       $contribution_id = CRM_Core_Payment_SDD::getPendingContributionID();
@@ -134,11 +132,12 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
       ));
     } catch (Exception $ex) {
       // that's not good... but we can't leave it like this...
-      CRM_Core_Error::debug_log_message("SDD reset contribution via API failed, using SQL...");
+      $error_message = $ex->getMessage();
+      CRM_Core_Error::debug_log_message("SDD reset contribution via API failed ('{$error_message}'), using SQL...");
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id = %1, payment_instrument_id = %2 WHERE id = %3;", array(
           1 => array($status_pending,        'Integer'),
           2 => array($payment_instrument_id, 'Integer'),
-          1 => array($contribution_id,       'Integer')));
+          3 => array($contribution_id,       'Integer')));
     }
 
     CRM_Core_Error::debug_log_message("RESET 1");
