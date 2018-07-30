@@ -108,7 +108,7 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
     ));
 
     // reset contribution to 'Pending'
-    $ooff_payment = (int)CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstrumentID('OOFF');
+    $ooff_payment = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
     self::resetContribution($contribution_id, $ooff_payment);
 
     CRM_Core_Error::debug_log_message("createPendingMandate STEP 3");
