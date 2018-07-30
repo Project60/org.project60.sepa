@@ -129,14 +129,21 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   /**
    * @param $contribution_id
    */
-  public static function setContributionID($contribution_id) {
+  public static function processContribution($contribution_id) {
     CRM_Core_Error::debug_log_message("createPendingMandate for {$contribution_id}??");
     if (!self::$_pending_mandate) {
       // nothing pending, nothing to do
       return;
     }
 
+    // store contribution ID
     self::$_pending_mandate['contribution_id'] = $contribution_id;
+
+    if (self::$_pending_mandate['component'] == 'event') {
+      // event doesn't seem to use Contribution.completetransaction
+      //  so we'll do this right here
+      CRM_Core_Payment_SDDCompletion::createPendingMandate($contribution_id);
+    }
   }
 
   public static function releasePendingMandateData($contribution_id) {
