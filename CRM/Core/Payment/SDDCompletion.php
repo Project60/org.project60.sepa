@@ -61,7 +61,7 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
       $contribution_id = CRM_Core_Payment_SDD::getPendingContributionID();
     }
 
-    // get pending mandate data
+    // get pending mandate data (and mark as processed)
     $params = CRM_Core_Payment_SDD::releasePendingMandateData($contribution_id);
     if (!$params) {
       // nothing pending for us...
@@ -82,18 +82,15 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
         'return' => 'user_name'));
 
     // load creditor
-    if (!empty($creditor['user_name'])) {
-      $creditor = civicrm_api3('SepaCreditor', 'get', array(
-          'id'     => $payment_processor['user_name'],
-          'return' => 'id,currency',
-      ));
-    } else {
-      // this shouldn't happen - just a fallback
-      $creditor = array(
-          'id'       => 0,
-          'currency' => 'EUR'
-      );
+    $creditor_id = (int) CRM_Utils_Array::value('user_name', $payment_processor);
+    if (!$creditor_id) {
+      CRM_Core_Error::debug_log_message("SDD ERROR: No creditor found for PaymentProcessor [{$payment_processor['id']}].");
+      return;
     }
+    $creditor = civicrm_api3('SepaCreditor', 'get', array(
+        'id'     => $creditor_id,
+        'return' => 'id,currency',
+    ));
 
     CRM_Core_Error::debug_log_message("createPendingMandate STEP 2");
 
@@ -108,7 +105,7 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
         'entity_id'       => $contribution_id,
         'contact_id'      => $contribution['contact_id'],
         'campaign_id'     => CRM_Utils_Array::value('campaign_id', $contribution),
-        'currency'        => $creditor['currency'],
+        //'currency'        => CRM_Utils_Array::value('currency', $creditor, 'EUR'),
         'date'            => date('YmdHis'),
         'creation_date'   => date('YmdHis'),
         'validation_date' => date('YmdHis'),
