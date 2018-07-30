@@ -157,10 +157,11 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $from = date('YmdHis', strtotime(date('YmdHis') . ' - 90 days'));
     $presets["{$from}-now"] = E::ts('Last 90 Days');
 
-    // add "last month"
+    // DEFAULT: add "last month"
     $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 month'));
     $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
     $presets["{$from}-{$to}"] = E::ts('Last Calendar Month');
+    $this->setDefaults(array('date_range' => "{$from}-{$to}"));
 
     // add last two months
     $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 2 month'));
