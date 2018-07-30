@@ -191,6 +191,9 @@ function sepa_pp_buildForm ( $formName, &$form ) {
  * postProcess Hook for payment processor
  */
 function sepa_pp_postProcess( $formName, &$form ) {
+  // SDD: make sure mandate is created:
+  CRM_Core_Payment_SDDCompletion::createPendingMandate();
+
   if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
     $pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
     if ($pp['class_name'] = "Payment_SDD") {

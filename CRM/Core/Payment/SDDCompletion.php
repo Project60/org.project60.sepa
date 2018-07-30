@@ -53,7 +53,14 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
    *
    * @param $contribution_id integer   the freshly created contribution
    */
-  public static function createPendingMandate($contribution_id) {
+  public static function createPendingMandate($contribution_id = NULL) {
+    CRM_Core_Error::debug_log_message("createPendingMandate: '{$contribution_id}'");
+
+    // fall back to current ID
+    if ($contribution_id == NULL) {
+      $contribution_id = CRM_Core_Payment_SDD::getPendingContributionID();
+    }
+
     // get pending mandate data
     $params = CRM_Core_Payment_SDD::releasePendingMandateData($contribution_id);
     if (!$params) {
