@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2014 SYSTOPIA                       |
+| Copyright (C) 2013-2018 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -18,13 +18,19 @@
 /**
  * SEPA_Direct_Debit payment processor
  *
+ * REFACTORED, see SEPA-498
+ *
  * @package CiviCRM_SEPA
  */
 
 class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   protected $_mode = NULL;
   protected $_params = array();
+
   static private $_singleton = NULL;
+
+  /** params for pending mandate (after contribution is created) */
+  protected static $_pending_mandate = NULL;
 
   /**
    * Constructor
@@ -58,44 +64,6 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   }
 
 
-  function buildForm(&$form) {
-
-    // add rules
-    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
-    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');    
-
-    // apply "hack" for old payment forms
-    if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
-      $form->assign('pre4_6_10', 1);
-      $this->fixOldDirectDebitForm($form);
-    }
-
-    // BUFFER DAYS / TODO: MOVE TO SERVICE
-    $buffer_days      = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
-    $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $this->_creditorId);
-    $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
-    $earliest_rcur_date = strtotime("now + $frst_notice_days days + $buffer_days days");
-    $earliest_ooff_date = strtotime("now + $ooff_notice_days days");
-
-    // find the next cycle day
-    $cycle_days = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId);
-    $earliest_cycle_day = $earliest_rcur_date;
-    while (!in_array(date('j', $earliest_cycle_day), $cycle_days)) {
-      $earliest_cycle_day = strtotime("+ 1 day", $earliest_cycle_day);
-    }    
-
-    $form->assign('earliest_rcur_date', date('Y-m-d', $earliest_rcur_date));
-    $form->assign('earliest_ooff_date', date('Y-m-d', $earliest_ooff_date));
-    $form->assign('earliest_cycle_day', date('j', $earliest_cycle_day));
-    $form->assign('sepa_hide_bic', CRM_Sepa_Logic_Settings::getSetting("pp_hide_bic"));
-    $form->assign('sepa_hide_billing', CRM_Sepa_Logic_Settings::getSetting("pp_hide_billing"));
-    $form->assign('bic_extension_installed', CRM_Sepa_Logic_Settings::isLittleBicExtensionAccessible());
-
-    CRM_Core_Region::instance('billing-block')->add(
-      array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
-  }
-
-
   /**
    * This function checks to see if we have the right config values
    *
@@ -110,220 +78,122 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   }
 
   /**
-   * This function collects all the information and 
-   * "simulates" a payment processor by creating an incomplete mandate,
-   * that will later be connected with the results of the rest of the
-   * payment process
+   * perform SEPA "payment":
+   *  - make sure the IBAN is correct
+   *  - store parameters, so we can create the mandate in the POST hook
    *
-   * @param  array $params assoc array of input parameters for this transaction
+   * @param  array  $params assoc array of input parameters for this transaction
+   * @param  string $component context of this contribution
    *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException if IBAN or BIC don't check out
    * @return array the result in an nice formatted array (or an error object)
    */
-  function doDirectPayment(&$params) {
+  function doDirectPayment(&$params, $component = 'contribution') {
     $original_parameters = $params;
 
-    // get contact ID (see SEPA-359)
-    $contact_id = $this->getVar('_contactID');
-    if (empty($contact_id)) {
-      $form = $this->getForm();
-      if (!empty($form) && is_object($form)) {
-        $contact_id = $this->getForm()->getVar('_contactID');
-      }
-    }
-    // try again if that doesn't work any more (SEPA-488)
-    if (empty($contact_id)) {
-      if (!empty($params['contactID'])) {
-        $contact_id = $params['contactID'];
-      }
-    }
-
-    // prepare the creation of an incomplete mandate
-    $params['creditor_id']   = $this->_creditorId;
-    $params['contact_id']    = $contact_id;
-    $params['source']        = substr($params['description'],0,64);
-    $params['iban']          = $params['bank_account_number'];
-    $params['bic']           = $params['bank_identification_number'];
-    $params['creation_date'] = date('YmdHis');
-    $params['status']        = 'PARTIAL';
-
-    if (empty($params['is_recur'])) {
-      $params['type']          = 'OOFF';
-      $params['entity_table']  = 'civicrm_contribution';
-    } else {
-      $params['type']          = 'RCUR';
-      $params['entity_table']  = 'civicrm_contribution_recur';
-    }
-
-    // we don't have the associated entity id yet
-    // so we set MAX_INT as a dummy value
-    // remark: setting this to 0/NULL does not work
-    // due to complications with the api
-    $params['entity_id'] = pow(2,32)-1;
+    // extract SEPA data
+    $params['component'] = $component;
+    $params['iban']      = $params['bank_account_number'];
+    $params['bic']       = $params['bank_identification_number'];
 
     // Allow further manipulation of the arguments via custom hooks ..
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $original_parameters, $params);
 
-    // create the mandate
-    $params['version'] = 3;
-    $mandate = civicrm_api('SepaMandate', 'create', $params);
-    if (!empty($mandate['is_error'])) {
-      return CRM_Core_Error::createError(ts("Couldn't create SEPA mandate. Error was: ", array('domain' => 'org.project60.sepa')).$mandate['error_message']);
-    }
-    $params['trxn_id'] = $mandate['values'][$mandate['id']]['reference'];
-    $params['sepa_start_date'] = empty($params['start_date'])?date('YmdHis'):date('YmdHis', strtotime($params['start_date']));
-
-    // update the contribution, if existing (RCUR case)
-    if (!empty($params['contributionID'])) {
-      $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contributionID'])); 
-      civicrm_api3('Contribution', 'create', array(
-        'id'           => $params['contributionID'], 
-        'contact_id'   => $contribution['contact_id'], // resubmit, leaving it out causes errors sometimes
-        'receive_date' => $params['sepa_start_date'],
-        'trxn_id'      => $params['trxn_id']));
+    // verify IBAN
+    $bad_iban = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban']);
+    if ($bad_iban) {
+      throw new \Civi\Payment\Exception\PaymentProcessorException($bad_iban);
     }
 
-    if (!empty($params['contributionRecurID'])) {
-      civicrm_api3('ContributionRecur', 'create', array(
-        'id'            => $params['contributionRecurID'], 
-        'start_date'    => $params['sepa_start_date'],
-        'cycle_day'     => $params['cycle_day'],
-        'trxn_id'       => $params['trxn_id']));
+    // verify BIC
+    $bad_bic  = CRM_Sepa_Logic_Verification::verifyBIC($params['bic']);
+    if ($bad_iban) {
+      throw new \Civi\Payment\Exception\PaymentProcessorException($bad_bic);
     }
+
+    // make sure there's not an pending mandate
+    if (self::$_pending_mandate) {
+      throw new \Civi\Payment\Exception\PaymentProcessorException("SDD PaymentProcessor: workflow broken.");
+    }
+
+    // all good? let's prime the post-hook
+    self::$_pending_mandate = $params;
+//    $params['payment_status_id'] = 2;
 
     return $params;
   }
 
 
+
+
   /**
-   * This is the counterpart to the doDirectPayment method. This method creates
-   * partial mandates, where the subsequent payment processess produces a payment.
-   *
-   * This function here should be called after the payment process was completed.
-   * It will process all the PARTIAL mandates and connect them with created contributions.
-   */ 
-  public static function processPartialMandates() {
-    // load all the PARTIAL mandates
-    $partial_mandates = civicrm_api3('SepaMandate', 'get', array('version'=>3, 'status'=>'PARTIAL', 'option.limit'=>9999));
-    foreach ($partial_mandates['values'] as $mandate_id => $mandate) {
-      if ($mandate['type']=='OOFF') {
-        // in the OOFF case, we need to find the contribution, and connect it
-        $contribution = civicrm_api('Contribution', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
-        if (empty($contribution['is_error'])) {
-          // check collection date
-          $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $mandate['creditor_id']);
-          $first_collection_date = strtotime("+$ooff_notice days");
-          $collection_date = strtotime($contribution['receive_date']);
-          if ($collection_date < $first_collection_date) {
-            // adjust collection date to the earliest possible one
-            $collection_date = $first_collection_date;
-          }
-
-          // FOUND! Update the contribution... 
-          $contribution_bao = new CRM_Contribute_BAO_Contribution();
-          $contribution_bao->get('id', $contribution['id']);
-          $contribution_bao->is_pay_later = 0;
-          $contribution_bao->receive_date = date('YmdHis', $collection_date);
-          $contribution_bao->contribution_status_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-          $contribution_bao->payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
-          $contribution_bao->save();
-
-          // ...and connect it to the mandate
-          $mandate_update = array();
-          $mandate_update['id']        = $mandate['id'];
-          $mandate_update['entity_id'] = $contribution['id'];
-          $mandate_update['type']      = $mandate['type'];
-          if (empty($mandate['contact_id'])) {
-            // this happens when the payment gets created AFTER the doDirectPayment method
-            $mandate_update['contact_id'] = $contribution_bao->contact_id;
-          }
-          
-          // initialize according to the creditor settings
-          CRM_Sepa_BAO_SEPACreditor::initialiseMandateData($mandate['creditor_id'], $mandate_update);
-
-          // finally, write the changes to the mandate
-          civicrm_api3('SepaMandate', 'create', $mandate_update);
-
-        } else {
-          // if NOT FOUND or error, delete the partial mandate
-          civicrm_api3('SepaMandate', 'delete', array('id' => $mandate_id));
-        }
-
-
-      } elseif ($mandate['type']=='RCUR') {
-        // in the RCUR case, we also need to find the contribution, and connect it
-        
-        // load the contribution AND the associated recurring contribution
-        $contribution =  civicrm_api('Contribution', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
-        $rcontribution = civicrm_api('ContributionRecur', 'getsingle', array('version'=>3, 'trxn_id' => $mandate['reference']));
-        if (empty($contribution['is_error']) && empty($rcontribution['is_error'])) {
-          // we need to set the receive date to the correct collection date, otherwise it will be created again (w/o)
-          $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $mandate['creditor_id']);
-          $now = strtotime(date('Y-m-d', strtotime("now +$rcur_notice days")));        // round to full day
-          $collection_date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
-          CRM_Sepa_Logic_Batching::deferCollectionDate($collection_date, $mandate['creditor_id']);
-
-          // fix contribution
-          $contribution_bao = new CRM_Contribute_BAO_Contribution();
-          $contribution_bao->get('id', $contribution['id']);
-          $contribution_bao->is_pay_later = 0;
-          $contribution_bao->contribution_status_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-          $contribution_bao->payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
-          $contribution_bao->receive_date = date('YmdHis', strtotime($collection_date));
-          $contribution_bao->save();
-
-          // fix recurring contribution
-          $rcontribution_bao = new CRM_Contribute_BAO_ContributionRecur();
-          $rcontribution_bao->get('id', $rcontribution['id']);
-          $rcontribution_bao->start_date = date('YmdHis', strtotime($rcontribution_bao->start_date));
-          $rcontribution_bao->create_date = date('YmdHis', strtotime($rcontribution_bao->create_date));
-          $rcontribution_bao->modified_date = date('YmdHis', strtotime($rcontribution_bao->modified_date));
-          $rcontribution_bao->contribution_status_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-          $rcontribution_bao->payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
-          $rcontribution_bao->save();
-
-          // ...and connect it to the mandate
-          $mandate_update = array();
-          $mandate_update['id']                    = $mandate['id'];
-          $mandate_update['entity_id']             = $rcontribution['id'];
-          $mandate_update['type']                  = $mandate['type'];
-          if (empty($mandate['contact_id'])) {
-            $mandate_update['contact_id']          = $contribution['contact_id'];
-            $mandate['contact_id']                 = $contribution['contact_id'];
-          }
-          //NO: $mandate_update['first_contribution_id'] = $contribution['id'];
-          
-          // initialize according to the creditor settings
-          CRM_Sepa_BAO_SEPACreditor::initialiseMandateData($mandate['creditor_id'], $mandate_update);
-
-          // finally, write the changes to the mandate
-          civicrm_api3('SepaMandate', 'create', $mandate_update);
-
-          // ...and trigger notification 
-          // FIXME: WORKAROUND, see https://github.com/Project60/org.project60.sepa/issues/296)
-          CRM_Contribute_BAO_ContributionPage::recurringNotify(
-            CRM_Core_Payment::RECURRING_PAYMENT_START,
-            $mandate['contact_id'],
-            $contribution_bao->contribution_page_id,
-            $rcontribution_bao);
-
-          // also, call the installemnt hook (this is the first installment)
-          CRM_Utils_SepaCustomisationHooks::installment_created($mandate['id'], $rcontribution['id'], $contribution['id']);
-
-        } else {
-          // something went wrong, delete partial
-          error_log("org.project60.sepa: deleting partial mandate " . $mandate['reference']);
-          civicrm_api3('SepaMandate', 'delete', array('id' => $mandate_id));
-        }
-      }
+   * @param $contribution_id
+   */
+  public static function setContributionID($contribution_id) {
+    CRM_Core_Error::debug_log_message("createPendingMandate for {$contribution_id}??");
+    if (!self::$_pending_mandate) {
+      // nothing pending, nothing to do
+      return;
     }
+
+    self::$_pending_mandate['contribution_id'] = $contribution_id;
+  }
+
+  public static function releasePendingMandateData($contribution_id) {
+    if (!self::$_pending_mandate) {
+      // nothing pending, nothing to do
+      return NULL;
+    }
+
+    if (empty(self::$_pending_mandate['contribution_id']) || $contribution_id != self::$_pending_mandate['contribution_id']) {
+      // something's wrong here
+      CRM_Core_Error::debug_log_message("SDD PP workflow error");
+      return NULL;
+    }
+
+    // everything checks out: reset and return data
+    $params = self::$_pending_mandate;
+    self::$_pending_mandate = NULL;
+    return $params;
   }
 
 
 
 
   /***********************************************
-   *            CiviCRM >= 4.6.10                *
+   *            Form-building duty               *
    ***********************************************/
+
+  function buildForm(&$form) {
+
+    // add rules
+    $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
+    $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
+
+    // BUFFER DAYS / TODO: MOVE TO SERVICE
+    $buffer_days      = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
+    $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $this->_creditorId);
+    $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
+    $earliest_rcur_date = strtotime("now + $frst_notice_days days + $buffer_days days");
+    $earliest_ooff_date = strtotime("now + $ooff_notice_days days");
+
+    // find the next cycle day
+    $cycle_days = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId);
+    $earliest_cycle_day = $earliest_rcur_date;
+    while (!in_array(date('j', $earliest_cycle_day), $cycle_days)) {
+      $earliest_cycle_day = strtotime("+ 1 day", $earliest_cycle_day);
+    }
+
+    $form->assign('earliest_rcur_date', date('Y-m-d', $earliest_rcur_date));
+    $form->assign('earliest_ooff_date', date('Y-m-d', $earliest_ooff_date));
+    $form->assign('earliest_cycle_day', date('j', $earliest_cycle_day));
+    $form->assign('sepa_hide_bic', CRM_Sepa_Logic_Settings::getSetting("pp_hide_bic"));
+    $form->assign('sepa_hide_billing', CRM_Sepa_Logic_Settings::getSetting("pp_hide_billing"));
+    $form->assign('bic_extension_installed', CRM_Sepa_Logic_Settings::isLittleBicExtensionAccessible());
+
+    CRM_Core_Region::instance('billing-block')->add(
+        array('template' => 'CRM/Core/Payment/SEPA/SDD.tpl', 'weight' => -1));
+  }
 
   /**
    * Override CRM_Core_Payment function
@@ -340,7 +210,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
   }
 
   /**
-   * Override custom PI validation 
+   * Override custom PI validation
    *  to make billing information NOT mandatory (see SEPA-372)
    *
    * @author N. Bochan
@@ -378,7 +248,7 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
         'bank_account_number',
         'bank_identification_number',
         'bank_name',
-      );      
+      );
     }
   }
 
@@ -479,52 +349,4 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       );
     }
   }
-
-  /***********************************************
-   *             CiviCRM < 4.6.10                *
-   ***********************************************/
-
-  public function fixOldDirectDebitForm(&$form) {
-    // we don't need the default stuff:
-    $form->_paymentFields = array();
-
-    $form->add( 'text', 
-                'bank_account_number', 
-                ts('IBAN', array('domain' => 'org.project60.sepa')), 
-                array('size' => 34, 'maxlength' => 34,), 
-                TRUE);
-
-    $form->add( 'text', 
-                'bank_identification_number', 
-                ts('BIC', array('domain' => 'org.project60.sepa')), 
-                array('size' => 11, 'maxlength' => 11), 
-                TRUE);
-
-    $form->add( 'text', 
-                'bank_name', 
-                ts('Bank Name', array('domain' => 'org.project60.sepa')), 
-                array('size' => 20, 'maxlength' => 64), 
-                FALSE);
-
-    $form->add( 'text', 
-                'account_holder', 
-                ts('Account Holder', array('domain' => 'org.project60.sepa')), 
-                array('size' => 20, 'maxlength' => 64), 
-                FALSE);
-
-    $form->add( 'select', 
-                'cycle_day', 
-                ts('Collection Day', array('domain' => 'org.project60.sepa')), 
-                CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
-                FALSE);
-
-    $form->addDate('start_date', 
-                ts('Start Date', array('domain' => 'org.project60.sepa')), 
-                TRUE, 
-                array());
-
-    // add rules
-    $form->addRule('bank_account_number', ts('This is not a correct IBAN.', array('domain' => 'org.project60.sepa')), 'sepa_iban_valid');
-    $form->addRule('bank_identification_number',  ts('This is not a correct BIC.', array('domain' => 'org.project60.sepa')),  'sepa_bic_valid');
-  }  
 }
