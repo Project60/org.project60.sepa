@@ -32,18 +32,48 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'creditor_id',
       E::ts('Creditor'),
       $this->getCreditorList($creditors),
-      TRUE
+      TRUE,
+       array('class' => 'crm-select2')
     );
 
     // add contact field
+    // TODO
 
     // add financial type
+    $this->add(
+        'select',
+        'financial_type_id',
+        E::ts('Financial Type'),
+        $this->getFinancialTypeList(),
+        TRUE,
+        array('class' => 'crm-select2')
+    );
 
     // add campaign
+    $this->add(
+        'select',
+        'campaign_id',
+        E::ts('Campaign'),
+        $this->getCampaignList(),
+        FALSE,
+        array('class' => 'crm-select2')
+    );
 
     // add mandate reference
+    $this->add(
+        'text',
+        'reference',
+        E::ts('Reference'),
+        array('placeholder' => E::ts("not required, will be generated"), 'size' => '34')
+    );
 
     // add source field
+    $this->add(
+        'text',
+        'source',
+        E::ts('Source'),
+        array('placeholder' => E::ts("not required"), 'size' => '64')
+    );
 
     // add bank account field
 
@@ -56,9 +86,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'select',
         'type',
         E::ts('Mandate Type'),
-        array('OOFF' => E::ts("One-Off Collection (OOFF)"),
-              'RCUR' => E::ts("Recurring Collection (RCUR)")),
-        TRUE
+        $this->getTypeList(),
+        TRUE,
+        array('class' => 'crm-select2')
     );
 
     // add amount field
@@ -112,11 +142,83 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    *  - the currency
    */
   protected function getCreditors() {
-    $creditors = civicrm_api3('SepaCreditor', 'get', array());
-
     $default_creditor_id = CRM_Sepa_Logic_Settings::defaultCreditor();
+
+    $creditor_query = civicrm_api3('SepaCreditor', 'get', array());
+    $creditors = $creditor_query['values'];
+
     foreach ($creditors as &$creditor) {
-      
+      // add default flag
+      if ($creditor['id'] == $default_creditor_id) {
+        $creditor['is_default'] = 1;
+      } else {
+        $creditor['is_default'] = 0;
+      }
+
+      // add cycle days
+      $creditor['cycle_days'] = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor['id']);
     }
+
+    return $creditors;
+  }
+
+  /**
+   * Creates a neat dropdown list of the eligible creditors
+   * @param $creditors
+   * @return list of eligible creditors
+   */
+  protected function getCreditorList($creditors) {
+    $creditor_list = array();
+    foreach ($creditors as $creditor) {
+      $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['name']}";
+    }
+    return $creditor_list;
+  }
+
+  /**
+   * Get the list of eligible types
+   */
+  protected function getTypeList() {
+    // TODO: replace
+
+    // default:
+    return array(
+        'OOFF' => E::ts("One-Off Collection (OOFF)"),
+        'RCUR' => E::ts("Recurring Collection (RCUR)"));
+
+  }
+
+  /**
+   * Get the list of (active) financial types
+   */
+  protected function getFinancialTypeList() {
+    $list = array();
+    $query = civicrm_api3('FinancialType', 'get',array(
+        'is_active' => 1,
+        'return'    => 'id,name'
+    ));
+
+    foreach ($query['values'] as $value) {
+      $list[$value['id']] = $value['name'];
+    }
+
+    return $list;
+  }
+
+  /**
+   * Get the list of (active) financial types
+   */
+  protected function getCampaignList() {
+    $list = array('' => E::ts("- none -"));
+    $query = civicrm_api3('Campaign', 'get',array(
+        'is_active' => 1,
+        'return'    => 'id,title'
+    ));
+
+    foreach ($query['values'] as $value) {
+      $list[$value['id']] = $value['title'];
+    }
+
+    return $list;
   }
 }
