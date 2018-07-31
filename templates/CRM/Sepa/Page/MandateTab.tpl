@@ -22,7 +22,7 @@
 
 {* add new mandate button *}
 <div>
-  <a id="sepa_payment_extra_button" class="button crm-popup" href="{crmURL p="civicrm/sepa/cmandate" q="action=update&cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add new SEPA Mandate{/ts}</span></a>
+  <a id="sepa_payment_extra_button" class="button crm-popup" href="{crmURL p="civicrm/sepa/createmandate" q="action=update&cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add new SEPA Mandate{/ts}</span></a>
   <br/>
   <br/>
 </div>
@@ -125,7 +125,7 @@
   // trigger reload of tab
   cj(document).ready(function() {
       cj(document).on('crmPopupClose', function(event) {
-          if(cj(event.target).attr('href').includes('civicrm/sepa/cmandate') || cj(event.target).attr('href').includes('civicrm/sepa/xmandate')) {
+          if(cj(event.target).attr('href').includes('civicrm/sepa/createmandate') || cj(event.target).attr('href').includes('civicrm/sepa/xmandate')) {
               cj("#sepa_payment_extra_button").closest("div.crm-ajax-container").crmSnippet('refresh');
           }
       });
