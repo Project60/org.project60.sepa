@@ -219,7 +219,7 @@ function sepa_pp_postProcess( $formName, &$form ) {
  */
 function sepa_pp_post($op, $objectName, $objectId, &$objectRef) {
   if ($objectName == 'Contribution' && ($op == 'create' || $op == 'edit')) {
-    CRM_Core_Payment_SDD::setContributionID($objectId);
+    CRM_Core_Payment_SDD::processContribution($objectId);
   }
 }
 
