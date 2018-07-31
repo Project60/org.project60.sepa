@@ -53,8 +53,13 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
    *
    * @param $contribution_id integer   the freshly created contribution
    */
-  public static function createPendingMandate($contribution_id) {
-    // get pending mandate data
+  public static function createPendingMandate($contribution_id = NULL) {
+    // fall back to current ID
+    if ($contribution_id == NULL) {
+      $contribution_id = CRM_Core_Payment_SDD::getPendingContributionID();
+    }
+
+    // get pending mandate data (and mark as processed)
     $params = CRM_Core_Payment_SDD::releasePendingMandateData($contribution_id);
     if (!$params) {
       // nothing pending for us...
@@ -73,18 +78,15 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
         'return' => 'user_name'));
 
     // load creditor
-    if (!empty($creditor['user_name'])) {
-      $creditor = civicrm_api3('SepaCreditor', 'get', array(
-          'id'     => $payment_processor['user_name'],
-          'return' => 'id,currency',
-      ));
-    } else {
-      // this shouldn't happen - just a fallback
-      $creditor = array(
-          'id'       => 0,
-          'currency' => 'EUR'
-      );
+    $creditor_id = (int) CRM_Utils_Array::value('user_name', $payment_processor);
+    if (!$creditor_id) {
+      CRM_Core_Error::debug_log_message("SDD ERROR: No creditor found for PaymentProcessor [{$payment_processor['id']}].");
+      return;
     }
+    $creditor = civicrm_api3('SepaCreditor', 'get', array(
+        'id'     => $creditor_id,
+        'return' => 'id,currency',
+    ));
 
     // create mandate
     $mandate = civicrm_api3('SepaMandate', 'create', array(
@@ -97,7 +99,7 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
         'entity_id'       => $contribution_id,
         'contact_id'      => $contribution['contact_id'],
         'campaign_id'     => CRM_Utils_Array::value('campaign_id', $contribution),
-        'currency'        => $creditor['currency'],
+        //'currency'        => CRM_Utils_Array::value('currency', $creditor, 'EUR'),
         'date'            => date('YmdHis'),
         'creation_date'   => date('YmdHis'),
         'validation_date' => date('YmdHis'),
@@ -124,11 +126,12 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
       ));
     } catch (Exception $ex) {
       // that's not good... but we can't leave it like this...
-      CRM_Core_Error::debug_log_message("SDD reset contribution via API failed, using SQL...");
+      $error_message = $ex->getMessage();
+      CRM_Core_Error::debug_log_message("SDD reset contribution via API failed ('{$error_message}'), using SQL...");
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id = %1, payment_instrument_id = %2 WHERE id = %3;", array(
           1 => array($status_pending,        'Integer'),
           2 => array($payment_instrument_id, 'Integer'),
-          1 => array($contribution_id,       'Integer')));
+          3 => array($contribution_id,       'Integer')));
     }
 
     // delete all finacial transactions
