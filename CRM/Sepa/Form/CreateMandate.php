@@ -22,7 +22,15 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
+  /** @var $contact_id the contact ID to create the mandate for */
+  protected $contact_id;
+
   public function buildQuickForm() {
+    // get the contact_id
+    $this->contact_id = (int) CRM_Utils_Request::retrieve('cid', 'Positive');
+    if (empty($this->contact_id)) {
+      CRM_Core_Error::fatal("No contact ID (cid) given.");
+    }
 
     // add creditor field
     $creditors = $this->getCreditors();
@@ -75,11 +83,51 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         array('placeholder' => E::ts("not required"), 'size' => '64')
     );
 
-    // add bank account field
+    // add bank account selector
+    $this->add(
+        'select',
+        'bank_account_preset',
+        E::ts('Account'),
+        $this->getKnownBankAccounts(),
+        FALSE,
+        array('class' => 'crm-select2 huge')
+    );
 
     // add iban field
+    $this->add(
+        'text',
+        'iban',
+        E::ts('IBAN'),
+        array('placeholder' => E::ts("required"), 'size' => '32'),
+        TRUE
+    );
 
     // add bic field
+    $this->add(
+        'text',
+        'bic',
+        E::ts('BIC'),
+        array('placeholder' => E::ts("required"), 'size' => '14'),
+        TRUE
+    );
+
+    // add amount field
+    $this->addMoney(
+        'amount',
+        ts('Amount'),
+        TRUE,
+        array('class' => 'tiny')
+    );
+
+    // add currency field
+    $this->add(
+        'select',
+        'currency',
+        E::ts('Currency'),
+        $this->getCurrencyList(),
+        TRUE,
+        array('class' => 'tiny')
+    );
 
     // add type field
     $this->add(
@@ -91,23 +139,51 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         array('class' => 'crm-select2')
     );
 
-    // add amount field
-
-    // add currency field
 
     // add 'replaces' fields
 
     // add OOFF fields
     // add collection date
+    $this->addDate(
+        'ooff_date',
+        E::ts("Collection Date"),
+        FALSE,
+        array('formatType' => 'activityDate'));
 
     // add RCUR fields
     // add start date
+    $this->addDate(
+        'rcur_start_date',
+        E::ts("Start Date"),
+        FALSE,
+        array('formatType' => 'activityDate'));
+
     // add collection day
+    $this->add(
+        'select',
+        'cycle_day',
+        E::ts('Day of Month'),
+        range(1,31),
+        FALSE,
+        array()
+    );
+
     // add interval
+    $this->add(
+        'select',
+        'interval',
+        E::ts('Frequency'),
+        $this->getFrequencyList(),
+        FALSE,
+        array()
+    );
+
     // add end_date
-    // show next collection
-
-
+    $this->addDate(
+        'rcur_end_date',
+        E::ts("End Date"),
+        FALSE,
+        array('formatType' => 'activityDate'));
 
 
     $this->addButtons(array(
@@ -165,7 +241,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   /**
    * Creates a neat dropdown list of the eligible creditors
    * @param $creditors
-   * @return list of eligible creditors
+   * @return array of eligible creditors
    */
   protected function getCreditorList($creditors) {
     $creditor_list = array();
@@ -183,7 +259,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     // default:
     return array(
-        'OOFF' => E::ts("One-Off Collection (OOFF)"),
+        'OOFF' => E::ts("One-Off Debit (OOFF)"),
         'RCUR' => E::ts("Recurring Collection (RCUR)"));
 
   }
@@ -220,5 +296,102 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     }
 
     return $list;
+  }
+
+  /**
+   * Get a list of known bank accounts from:
+   *  - successful SEPA mandates
+   *  - known CiviBanking accounts
+   */
+  protected function getKnownBankAccounts() {
+    $known_accounts = array('' => E::ts("new account"));
+
+    // get data from SepaMandates
+    $mandates = civicrm_api3('SepaMandate', 'get', array(
+      'contact_id'   => $this->contact_id,
+      'status'       => array('IN' => array('RCUR', 'COMPLETE', 'SENT')),
+      'option.limit' => 0,
+      'return'       => 'iban,bic,reference',
+      'option.sort'  => 'id desc'
+    ));
+    CRM_Core_Error::debug_log_message("mada " . json_encode($mandates));
+    foreach ($mandates['values'] as $mandate) {
+      $key = "{$mandate['iban']}/{$mandate['bic']}";
+      if (!isset($known_accounts[$key])) {
+        $known_accounts[$key] = "{$mandate['iban']} ({$mandate['reference']})";
+      }
+    }
+
+    // get data from CiviBanking (if installed)
+    if (class_exists('CRM_Banking_BAO_BankAccountReference')) {
+      $iban_reference_type_id = civicrm_api3('OptionValue', 'getvalue', array(
+          'return'          => 'id',
+          'option_group_id' => 'civicrm_banking.reference_types',
+          'value'           => 'IBAN',
+      ));
+
+      if ($iban_reference_type_id) {
+        $accounts = civicrm_api3('BankingAccount', 'get', array(
+            'contact_id'   => $this->contact_id,
+            'option.limit' => 0,
+            'return'       => 'id,data_parsed',
+            'sequential'   => 0,
+        ));
+
+        $account_references = civicrm_api3('BankingAccountReference', 'get', array(
+            'ba_id'             => array('IN' => array_keys($accounts['values'])),
+            'reference_type_id' => $iban_reference_type_id,
+            'option.limit'      => 0,
+            'return'            => 'reference,ba_id',
+            'sequential'        => 1,
+            'option.sort'       => 'id desc'
+        ));
+
+        foreach ($account_references['values'] as $account_reference) {
+          $account = $accounts['values'][$account_reference['ba_id']];
+          $account_data = json_decode($account['data_parsed'], TRUE);
+          $bic = CRM_Utils_Array::value('BIC', $account_data, CRM_Utils_Array::value('bic', $account_data, ''));
+          $key = "{$account_reference['reference']}/{$bic}";
+          $account_already_in_list = FALSE;
+          if ($bic) {
+            $account_already_in_list = isset($known_accounts[$key]);
+          } else { // no BIC? we'll have to search
+            foreach ($known_accounts as $existing_key => $value) {
+              if ($key == substr($existing_key, 0, strlen($key))) {
+                $account_already_in_list = TRUE;
+                break;
+              }
+            }
+          }
+          if (!$account_already_in_list) {
+            $account_name = empty($account_data['name']) ? E::ts("CiviBanking") : "'{$account_data['name']}'";
+            $known_accounts[$key] = "{$account_reference['reference']} ({$account_name})";
+          }
+        }
+      }
+    }
+
+    return $known_accounts;
+  }
+
+  /**
+   * Get available currencies
+   */
+  protected function getCurrencyList() {
+    return CRM_Core_OptionGroup::values('currencies_enabled');
+  }
+
+  /**
+   * Get allowed frequencies
+   *
+   * @return array list of frequency to title
+   */
+  protected function getFrequencyList() {
+    return array(
+        '12' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(1, 'month', TRUE),
+        '4' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(3, 'month', TRUE),
+        '2' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(6, 'month', TRUE),
+        '1' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(12, 'month', TRUE)
+    );
   }
 }
