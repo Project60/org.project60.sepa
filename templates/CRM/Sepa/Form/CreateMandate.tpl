@@ -33,18 +33,6 @@
     <div class="clear"></div>
   </div>
 
-  <div class="crm-section">
-    <div class="label">{$form.reference.label}</div>
-    <div class="content">{$form.reference.html}</div>
-    <div class="clear"></div>
-  </div>
-
-  <div class="crm-section">
-    <div class="label">{$form.source.label}</div>
-    <div class="content">{$form.source.html}</div>
-    <div class="clear"></div>
-  </div>
-
   <hr/>
 
   <div class="crm-section">
@@ -115,14 +103,37 @@
     </div>
 
   </div>
+
+  <hr/>
+
+  <div class="crm-section">
+    <div class="label">{$form.reference.label}</div>
+    <div class="content">{$form.reference.html}</div>
+    <div class="clear"></div>
+  </div>
+
+  <div class="crm-section">
+    <div class="label">{$form.source.label}</div>
+    <div class="content">{$form.source.html}</div>
+    <div class="clear"></div>
+  </div>
+
 </div>
 
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 
-{literal}
 <script type="application/javascript">
+  var creditor_data = {$sdd_creditors};
+
+  {literal}
+
+  // logic to calculate text
+  function sdd_calculate_collection_description() {
+      // TODO
+  }
+
 
   // logic to hide OOFF/RCUR fields
   function sdd_change_type() {
@@ -152,6 +163,24 @@
     }
   });
 
+
+  // logic to update creditor-based stuff
+  function sdd_creditor_changed() {
+     var creditor_id = cj("#sdd-create-mandate").find("[name=creditor_id]").val();
+
+     // reset cycle days
+     cj("#sdd-create-mandate").find("[name=cycle_day] option").remove();
+     var cycle_days = creditor_data[creditor_id]['cycle_days'];
+     for (var day in cycle_days) {
+         cj("#sdd-create-mandate").find("[name=cycle_day]").append('<option val="' + day + '">' + day + '</option>');
+     }
+
+     // trigger update of calculations
+     sdd_calculate_collection_description();
+  }
+
+  cj("#sdd-create-mandate").find("[name=creditor_id]").change(sdd_creditor_changed);
+  sdd_creditor_changed();
 
 </script>
 {/literal}

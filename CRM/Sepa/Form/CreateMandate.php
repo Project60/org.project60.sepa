@@ -32,6 +32,13 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       CRM_Core_Error::fatal("No contact ID (cid) given.");
     }
 
+    // load the contact
+    $contact_name = civicrm_api3('Contact', 'getvalue', array(
+        'id'     => $this->contact_id,
+        'return' => 'display_name'));
+    CRM_Utils_System::setTitle(E::ts("Create SEPA Mandate for Contact [%1]: %2", array(
+        1 => $this->contact_id, 2 => $contact_name)));
+
     // add creditor field
     $creditors = $this->getCreditors();
     $this->assign('sdd_creditors', json_encode($creditors));
@@ -197,6 +204,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     parent::buildQuickForm();
   }
 
+
+
+
   public function postProcess() {
     $values = $this->exportValues();
 
@@ -259,9 +269,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     // default:
     return array(
+        'RCUR' => E::ts("Recurring Collection (RCUR)"),
         'OOFF' => E::ts("One-Off Debit (OOFF)"),
-        'RCUR' => E::ts("Recurring Collection (RCUR)"));
-
+    );
   }
 
   /**
@@ -270,8 +280,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   protected function getFinancialTypeList() {
     $list = array();
     $query = civicrm_api3('FinancialType', 'get',array(
-        'is_active' => 1,
-        'return'    => 'id,name'
+        'is_active'    => 1,
+        'option.limit' => 0,
+        'return'       => 'id,name'
     ));
 
     foreach ($query['values'] as $value) {
@@ -287,8 +298,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   protected function getCampaignList() {
     $list = array('' => E::ts("- none -"));
     $query = civicrm_api3('Campaign', 'get',array(
-        'is_active' => 1,
-        'return'    => 'id,title'
+        'is_active'    => 1,
+        'option.limit' => 0,
+        'return'       => 'id,title'
     ));
 
     foreach ($query['values'] as $value) {
