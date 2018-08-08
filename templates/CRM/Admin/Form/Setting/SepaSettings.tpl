@@ -481,6 +481,7 @@ div.sdd-add-creditor {
           cj('#addcreditor_iban').val(data['iban']);
           cj('#addcreditor_bic').val(data['bic']);
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
+          cj('#addcreditor_currency').val(data['currency']);
           cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
           cj('#addcreditor').show(500);
 
