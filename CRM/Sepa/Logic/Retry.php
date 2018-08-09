@@ -26,6 +26,7 @@ class CRM_Sepa_Logic_Retry {
    *
    * @param $params array see SepaLogic.get_retry_stats API call
    * @return string reference of the newly created group
+   * @throws Exception
    */
   public static function createRetryGroup($params) {
     // make sure there is a collection date
@@ -85,6 +86,9 @@ class CRM_Sepa_Logic_Retry {
         CRM_Core_DAO::executeQuery("INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES (%1, %2);",
             array( 1 => array($group['id'],        'Integer'),
                    2 => array($contribution['id'], 'Integer')));
+
+        // finally: call our installment_created Hook
+        CRM_Utils_SepaCustomisationHooks::installment_created($contribution_data['mandate_id'], $contribution_data['contribution_recur_id'], $contribution['id']);
       }
     }
 
@@ -103,6 +107,9 @@ class CRM_Sepa_Logic_Retry {
    *  'frequencies'         - list of frequencies involved
    *
    * @param $params array see SepaLogic.get_retry_stats API call
+   *
+   * @return array contribution_id => contribution_data
+   * @throws Exception
    */
   public static function getRetryContributions($params) {
     $contribution_query_sql = self::getQuery("
@@ -111,6 +118,7 @@ class CRM_Sepa_Logic_Retry {
       contribution.currency              AS currency,
       contribution.contact_id            AS contact_id,
       mandate.creditor_id                AS creditor_id,
+      mandate.id                         AS mandate_id,
       mandate.source                     AS source,
       contribution.contribution_recur_id AS contribution_recur_id,
       contribution.financial_type_id     AS financial_type_id,
@@ -127,6 +135,7 @@ class CRM_Sepa_Logic_Retry {
           'contact_id'            => $contributions_raw->contact_id,
           'source'                => $contributions_raw->source,
           'creditor_id'           => $contributions_raw->creditor_id,
+          'mandate_id'            => $contributions_raw->mandate_id,
           'financial_type_id'     => $contributions_raw->financial_type_id,
           'contribution_recur_id' => $contributions_raw->contribution_recur_id,
           'campaign_id'           => $contributions_raw->campaign_id,
