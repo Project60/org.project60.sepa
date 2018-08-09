@@ -51,9 +51,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
        array('class' => 'crm-select2')
     );
 
-    // add contact field
-    // TODO
-
     // add financial type
     $this->add(
         'select',
@@ -137,14 +134,14 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     );
 
     // add type field
-    $this->add(
-        'select',
-        'type',
-        E::ts('Mandate Type'),
-        $this->getTypeList(),
-        TRUE,
-        array('class' => 'crm-select2')
-    );
+//    $this->add(
+//        'select',
+//        'type',
+//        E::ts('Mandate Type'),
+//        $this->getTypeList(),
+//        TRUE,
+//        array('class' => 'crm-select2')
+//    );
 
 
     // add 'replaces' fields
@@ -205,6 +202,18 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   }
 
 
+  /**
+   * Set the defaults
+   *
+   * @return array|NULL|void
+   */
+  public function setDefaultValues() {
+    $defaults = parent::setDefaultValues();
+
+    // TODO: anything?
+
+    return $defaults;
+  }
 
 
   public function postProcess() {
@@ -243,6 +252,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
       // add cycle days
       $creditor['cycle_days'] = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor['id']);
+      $creditor['buffer_days'] = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
+      $creditor['ooff_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $creditor['id']);
+      $creditor['frst_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor['id']);
     }
 
     return $creditors;
@@ -261,18 +273,18 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     return $creditor_list;
   }
 
-  /**
-   * Get the list of eligible types
-   */
-  protected function getTypeList() {
-    // TODO: replace
-
-    // default:
-    return array(
-        'RCUR' => E::ts("Recurring Collection (RCUR)"),
-        'OOFF' => E::ts("One-Off Debit (OOFF)"),
-    );
-  }
+//  /**
+//   * Get the list of eligible types
+//   */
+//  protected function getTypeList() {
+//    // TODO: replace
+//
+//    // default:
+//    return array(
+//        'RCUR' => E::ts("Recurring Collection (RCUR)"),
+//        'OOFF' => E::ts("One-Off Debit (OOFF)"),
+//    );
+//  }
 
   /**
    * Get the list of (active) financial types
@@ -400,10 +412,11 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    */
   protected function getFrequencyList() {
     return array(
-        '12' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(1, 'month', TRUE),
-        '4' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(3, 'month', TRUE),
-        '2' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(6, 'month', TRUE),
-        '1' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(12, 'month', TRUE)
+        '0'  => E::ts("One-time only (OOFF)"),
+        '12' => CRM_Utils_SepaOptionGroupTools::getFrequencyText( 1, 'month', TRUE),
+        '4'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText( 3, 'month', TRUE),
+        '2'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText( 6, 'month', TRUE),
+        '1'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(12, 'month', TRUE),
     );
   }
 }
