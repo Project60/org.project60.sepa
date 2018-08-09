@@ -82,7 +82,10 @@
   <div id="sdd-ooff-data">
     <div class="crm-section">
       <div class="label">{$form.ooff_date.label}</div>
-      <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='ooff_date'}</div>
+      <div class="content">
+          {*$form.ooff_date.html*} {include file="CRM/common/jcalendar.tpl" elementName='ooff_date'}
+          <a id="sdd_ooff_earliest" class="sdd-earliest"></a>
+      </div>
       <div class="clear"></div>
     </div>
   </div>
@@ -91,7 +94,10 @@
   <div id="sdd-rcur-data">
     <div class="crm-section">
       <div class="label">{$form.rcur_start_date.label}</div>
-      <div class="content">{$form.rcur_start_date.html} {include file="CRM/common/jcalendar.tpl" elementName='rcur_start_date'}</div>
+      <div class="content">
+          {*$form.rcur_start_date.html*} {include file="CRM/common/jcalendar.tpl" elementName='rcur_start_date'}
+          <a id="sdd_rcur_earliest" class="sdd-earliest"></a>
+      </div>
       <div class="clear"></div>
     </div>
 
@@ -103,7 +109,7 @@
 
     <div class="crm-section">
       <div class="label">{$form.rcur_end_date.label}</div>
-      <div class="content">{$form.rcur_end_date.html} {include file="CRM/common/jcalendar.tpl" elementName='rcur_end_date'}</div>
+      <div class="content">{*$form.rcur_end_date.html*} {include file="CRM/common/jcalendar.tpl" elementName='rcur_end_date'}</div>
       <div class="clear"></div>
     </div>
   </div>
@@ -122,14 +128,19 @@
     <div class="clear"></div>
   </div>
 
+    <div class="crm-section" style="display: none;">
+        <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='sdd_converter'}</div>
+    </div>
 </div>
+
+
 
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 
 <script type="application/javascript">
-  var creditor_data = {$sdd_creditors};
+  let creditor_data = {$sdd_creditors};
 
   {literal}
 
@@ -150,24 +161,38 @@
    * PRs welcome :)
    **/
   function sdd_setDate(fieldname, date) {
-      var dp_element = cj("#sdd-create-mandate").find("[name^=" + fieldname + "].hasDatepicker");
-      dp_element.datepicker('setDate', date);
+    let dp_element = cj("#sdd-create-mandate").find("[name^=" + fieldname + "].hasDatepicker");
+    dp_element.datepicker('setDate', date);
 
-      // flash the field a little bit to indicate change
-      sdd_getF(fieldname).parent().fadeOut(50).fadeIn(50);
+    // flash the field a little bit to indicate change
+    sdd_getF(fieldname).parent().fadeOut(50).fadeIn(50);
+    sdd_recalculate_fields();
+  }
+
+  /**
+   * convert a Date object into a formatted string
+   *  using the sdd_converter element
+   */
+  function sdd_formatDate(date) {
+    cj("#sdd-create-mandate")
+        .find("[name^=sdd_converter].hasDatepicker")
+        .datepicker('setDate', date);
+    console.log(date);
+    console.log(sdd_getF('sdd_converter').val());
+    return sdd_getF('sdd_converter').val();
   }
 
 
   // logic to hide OOFF/RCUR fields
   function sdd_change_type() {
-      var interval = sdd_getF('interval').val();
-      if (parseInt(interval) > 0) {
-          cj("#sdd-create-mandate div#sdd-ooff-data").hide(100);
-          cj("#sdd-create-mandate div#sdd-rcur-data").show(100);
-      } else {
-          cj("#sdd-create-mandate div#sdd-ooff-data").show(100);
-          cj("#sdd-create-mandate div#sdd-rcur-data").hide(100);
-      }
+    let interval = sdd_getF('interval').val();
+    if (parseInt(interval) > 0) {
+      cj("#sdd-create-mandate div#sdd-ooff-data").hide(100);
+      cj("#sdd-create-mandate div#sdd-rcur-data").show(100);
+    } else {
+      cj("#sdd-create-mandate div#sdd-ooff-data").show(100);
+      cj("#sdd-create-mandate div#sdd-rcur-data").hide(100);
+    }
   }
   sdd_getF('interval').change(sdd_change_type);
   sdd_change_type();
@@ -175,9 +200,9 @@
 
   // logic to set bank accounts
   sdd_getF('bank_account_preset').change(function() {
-    var new_account = sdd_getF('bank_account_preset').val();
+    let new_account = sdd_getF('bank_account_preset').val();
     if (new_account.length > 0) {
-        var bits = new_account.split("/");
+        let bits = new_account.split("/");
         sdd_getF('iban').val(bits[0]);
         sdd_getF('bic').val(bits[1]);
     } else {
@@ -191,78 +216,106 @@
    * Update the form's start dates and descriptive texts
    */
   function sdd_recalculate_fields() {
-      var today = new Date();
-      var creditor_id = sdd_getF('creditor_id').val();
-      var creditor = creditor_data[creditor_id];
-      console.log(creditor);
+    let today = new Date();
+    let creditor_id = sdd_getF('creditor_id').val();
+    let creditor = creditor_data[creditor_id];
+    console.log(creditor);
 
-      // ADJUST OOFF START DATE
-      var ooff_earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + creditor['buffer_days'] + creditor['ooff_notice']);
-      var ooff_current_value = sdd_getF('ooff_date').val();
-      var ooff_new = null;
-      if (ooff_current_value.length > 0) {
-          // parse date and overwrite only if too early
-          var ooff_current = Date.parse(ooff_current_value);
-          if (ooff_earliest > ooff_current) {
-              sdd_setDate('ooff_date', ooff_earliest);
-          }
-      } else {
-          // no date set yet?
+    // ADJUST OOFF START DATE
+    let ooff_earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + creditor['buffer_days'] + creditor['ooff_notice']);
+    let ooff_current_value = sdd_getF('ooff_date').val();
+    let ooff_new = null;
+    if (ooff_current_value.length > 0) {
+      // parse date and overwrite only if too early
+      let ooff_current = Date.parse(ooff_current_value);
+      if (ooff_earliest > ooff_current) {
           sdd_setDate('ooff_date', ooff_earliest);
       }
+    } else {
+      // no date set yet?
+      sdd_setDate('ooff_date', ooff_earliest);
+    }
+    cj("#sdd_ooff_earliest")
+        .attr('date', ooff_earliest)
+        .text(ts("earliest: %1", {1: sdd_formatDate(ooff_earliest), domain: 'org.project60.sepa'}));
 
-      // ADJUST RCUR START DATE
-      var rcur_earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + creditor['buffer_days'] + creditor['frst_notice']);
-
-      // TODO: move to next cycle day
-
-      var rcur_current_value = sdd_getF('rcur_start_date').val();
-      var rcur_new = null;
-      if (rcur_current_value.length > 0) {
-          // parse date and overwrite only if too early
-          var rcur_current = Date.parse(rcur_current_value);
-          if (rcur_earliest > rcur_current) {
-              sdd_setDate('rcur_start_date', rcur_earliest);
-          }
-      } else {
-          // no date set yet?
+    // ADJUST RCUR START DATE
+    let rcur_earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + creditor['buffer_days'] + creditor['frst_notice']);
+    let cycle_day = parseInt(sdd_getF('cycle_day').val());
+    while (rcur_earliest.getDate() != cycle_day) { // move to next cycle day
+        rcur_earliest = new Date(rcur_earliest.getFullYear(), rcur_earliest.getMonth(), rcur_earliest.getDate() + 1);
+    }
+    let rcur_current_value = sdd_getF('rcur_start_date').val();
+    let rcur_new = null;
+    if (rcur_current_value.length > 0) {
+      // parse date and overwrite only if too early
+      let rcur_current = new Date(rcur_current_value);
+      if (rcur_earliest > rcur_current) {
           sdd_setDate('rcur_start_date', rcur_earliest);
       }
+    } else {
+      // no date set yet?
+      sdd_setDate('rcur_start_date', rcur_earliest);
+    }
+    cj("#sdd_rcur_earliest")
+      .attr('date', rcur_earliest)
+      .text(ts("earliest: %1", {1: sdd_formatDate(rcur_earliest), domain: 'org.project60.sepa'}));
 
-
-      // CALCULATE SUMMARY TEXT
-      var text = ts("<i>Missing Information</i>", {'domain':'org.project60.sepa'});
-      var amount = parseFloat(sdd_getF('amount').val()); // TODO:
-      var money_display = CRM.formatMoney(amount);
-      if (amount) {
-          if (type == 'OOFF') {
-              var text = ts("Will collect %1 on %2", {
-                  1: money_display,
-                  2: sdd_getF('ooff_date').val(),
-                  'domain':'org.project60.sepa'});
-          }
+    // CALCULATE SUMMARY TEXT
+    let text = ts("<i>Not enough information</i>", {'domain':'org.project60.sepa'});
+    let amount = parseFloat(sdd_getF('amount').val()); // TODO: parse
+    let frequency = parseInt(sdd_getF('interval').val());
+    let money_display = CRM.formatMoney(amount);
+    if (amount) {
+      if (frequency == 0) {
+          text = ts("Collects %1 on %2", {
+              1: money_display,
+              2: sdd_getF('ooff_date').val(),
+              'domain':'org.project60.sepa'});
+      } else {
+          let annual_display = CRM.formatMoney(amount * frequency);
+          text = ts("Collects %1 %2 on the %3., beginning %4. Annual amount is %5.", {
+              1: money_display,
+              2: sdd_getF('interval').find('option[value=' + frequency + ']').text(),
+              3: sdd_getF('cycle_day').val(),
+              4: sdd_getF('rcur_start_date').val(),
+              5: annual_display,
+              'domain':'org.project60.sepa'});
       }
-      // update text
-      cj("#sdd_summary_text").html(text);
+    }
+    // update text
+    cj("#sdd_summary_text").html(text);
   }
 
   // logic to update creditor-based stuff
   function sdd_creditor_changed() {
-     var creditor_id = cj("#sdd-create-mandate").find("[name=creditor_id]").val();
+    let creditor_id = sdd_getF('creditor_id').val();
 
-     // reset cycle days
-     cj("#sdd-create-mandate").find("[name=cycle_day] option").remove();
-     var cycle_days = creditor_data[creditor_id]['cycle_days'];
-     for (var day in cycle_days) {
-         cj("#sdd-create-mandate").find("[name=cycle_day]").append('<option val="' + day + '">' + day + '</option>');
-     }
+    // reset cycle days
+    sdd_getF('cycle_day').find('option').remove();
+    let cycle_days = creditor_data[creditor_id]['cycle_days'];
+    for (var day in cycle_days) {
+     sdd_getF('cycle_day').append('<option val="' + day + '">' + day + '</option>');
+    }
 
-     // trigger update of calculations
-      sdd_recalculate_fields();
+    // set currency
+    sdd_getF('currency').val(creditor_data[creditor_id]['currency']);
+
+    // trigger update of calculations
+    sdd_recalculate_fields();
   }
 
+  // attach earliest link handlers
+  cj("#sdd-create-mandate").find("a.sdd-earliest").click(function() {
+      if (cj(this).attr('id') == 'sdd_rcur_earliest') {
+          sdd_setDate('rcur_start_date', new Date(cj(this).attr('date')));
+      } else {
+          sdd_setDate('ooff_date', new Date(cj(this).attr('date')));
+      }
+  });
+
   // attach the update methods to the various change events
-  cj("#sdd-create-mandate").find("[name=type],[name=amount],[name=cycle_day]").change(sdd_recalculate_fields);
+  cj("#sdd-create-mandate").find("[name=interval],[name=amount],[name=cycle_day],[name^=ooff_date],[name^=rcur_start_date]").change(sdd_recalculate_fields);
   cj("#sdd-create-mandate").find("[name=creditor_id]").change(sdd_creditor_changed);
 
   // trigger the whole thing once

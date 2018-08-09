@@ -189,6 +189,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         FALSE,
         array('formatType' => 'activityDate'));
 
+    // finally, add a date field just as a converter
+    $this->addDate('sdd_converter', 'just for date conversion', FALSE, array('formatType' => 'activityDate'));
+
 
     $this->addButtons(array(
       array(
