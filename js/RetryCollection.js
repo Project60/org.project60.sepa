@@ -180,7 +180,7 @@ cj(document).ready(function() {
             // update the text
             if (result['contribution_count'] > 0) {
                 // TODO: multi-currency
-                cj("#separetry-text").html(ts("Will attempt to re-collect <strong>%1</strong> failed debit contributions from %2 different contacts. The total amount is <strong>%3</strong>.", {
+                cj("#separetry-text").html(ts("Will attempt to re-collect <strong>%1</strong> failed debit contributions from %2 different contacts.<br/>The total amount is <strong>%3</strong>.", {
                     domain: 'org.project60.sepa',
                     1: result['contribution_count'],
                     2: result['contact_count'],
