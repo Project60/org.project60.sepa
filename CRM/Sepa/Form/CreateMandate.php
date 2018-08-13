@@ -40,13 +40,12 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         1 => $this->contact_id, 2 => $contact_name)));
 
     // add creditor field
-    $creditors = $this->getCreditors();
-    $this->assign('sdd_creditors', json_encode($creditors));
+    $js_vars['creditor_data'] = $this->getCreditors();
     $this->add(
       'select',
       'creditor_id',
       E::ts('Creditor'),
-      $this->getCreditorList($creditors),
+      $this->getCreditorList($js_vars['creditor_data']),
       TRUE,
        array('class' => 'crm-select2')
     );
@@ -192,6 +191,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     // finally, add a date field just as a converter
     $this->addDate('sdd_converter', 'just for date conversion', FALSE, array('formatType' => 'activityDate'));
 
+
+    // inject JS logic
+    CRM_Core_Resources::singleton()->addVars('p60sdd', $js_vars);
+    CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/CreateMandate.js');
 
     $this->addButtons(array(
       array(
