@@ -75,6 +75,29 @@ cj(document).ready(function() {
         }
     })
 
+    /**
+     * Get the amount as given in the amount field
+     * This is tricky, because it should be able to deal with different separators
+     */
+    function sdd_getAmount() {
+        let raw_value = sdd_getF('amount').val();
+        if (raw_value.length > 0) {
+            // TODO: deal with currencies that have different separators, or more than two decimals
+            let cleaned_value = raw_value.replace(/[^0-9]/g, '.');
+            let value = parseFloat(cleaned_value);
+
+            // now write it back to the field
+            // (unfortunately, CRM.formatMoney adds thousands-separators)
+            sdd_getF('amount').val(value.toFixed(2));
+
+            return value;
+
+        } else {
+            sdd_getF('amount').val('');
+            return 0;
+        }
+    }
+    sdd_getF('amount').change(sdd_getAmount);
 
     /**
      * Update the form's start dates and descriptive texts
@@ -127,7 +150,7 @@ cj(document).ready(function() {
 
         // CALCULATE SUMMARY TEXT
         let text = ts("<i>Not enough information</i>", {'domain':'org.project60.sepa'});
-        let amount = parseFloat(sdd_getF('amount').val()); // TODO: parse
+        let amount = sdd_getAmount();
         let frequency = parseInt(sdd_getF('interval').val());
         let money_display = CRM.formatMoney(amount);
         if (amount) {
