@@ -73,6 +73,7 @@
 
 <p>
 <div id="separetry-text" style="text-align: center; font-size: 1.6em;"></div>
+<div id="separetry-busy" align="center" style="display: none;"><img src="{$config->resourceBase}i/loading-overlay.gif" width="32"/></div>
 </p>
 
 <div class="crm-submit-buttons">

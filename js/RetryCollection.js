@@ -12,6 +12,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+var sdd_current_query_id = '';
+
 cj(document).ready(function() {
     /**
      * Extract the current date from the form
@@ -113,6 +115,7 @@ cj(document).ready(function() {
 
         // these should always be there
         let query = {};
+        query['query_id']           = sdd_current_query_id = Date.now();
         query['date_from']          = separetry_getDate('from');
         query['date_to']            = separetry_getDate('to');
         query['creditor_list']      = cj("#creditor_list").val();
@@ -126,24 +129,14 @@ cj(document).ready(function() {
             query['amount_min']         = cj("#amount_min").val();
         }
 
+        // show busy indicator
+        cj("#separetry-text").hide();
+        cj("#separetry-busy").show();
+
         // call the API for some stats
         // console.log(query);
         CRM.api3('SepaLogic', 'get_retry_stats', query).done(function(result) {
             // UPDATE FORM
-            // console.log(result);
-
-            // update the text
-            if (result['contribution_count'] > 0) {
-              // TODO: multi-currency
-              cj("#separetry-text").html(ts("Will attempt to re-collect <strong>%1</strong> failed debit contributions from %2 different contacts. The total amount is <strong>%3</strong>.", {
-                  domain: 'org.project60.sepa',
-                  1: result['contribution_count'],
-                  2: result['contact_count'],
-                  3: CRM.formatMoney(result['total_amount'])
-              }));
-            } else {
-              cj("#separetry-text").text(ts("No SEPA collections match your criteria.", {domain: 'org.project60.sepa'}));
-            }
 
             // rebuild cancel reason list
             let cancel_reason_list = {};
@@ -177,6 +170,30 @@ cj(document).ready(function() {
                     // these are filters -> don't change
                     break;
             }
+
+            // check if this is the most recent query before resetting
+            if (sdd_current_query_id != result['query_id']) {
+                console.log("Result for query " + result['query_id'] + ' is obsolete. Ignored.');
+                return;
+            }
+
+            // update the text
+            if (result['contribution_count'] > 0) {
+                // TODO: multi-currency
+                cj("#separetry-text").html(ts("Will attempt to re-collect <strong>%1</strong> failed debit contributions from %2 different contacts. The total amount is <strong>%3</strong>.", {
+                    domain: 'org.project60.sepa',
+                    1: result['contribution_count'],
+                    2: result['contact_count'],
+                    3: CRM.formatMoney(result['total_amount'])
+                }));
+            } else {
+                cj("#separetry-text").text(ts("No SEPA collections match your criteria.", {domain: 'org.project60.sepa'}));
+            }
+
+            // finally: remove busy indicator
+            cj("#separetry-text").show();
+            cj("#separetry-busy").hide();
+            sdd_current_query_id = '';
       });
     }
 

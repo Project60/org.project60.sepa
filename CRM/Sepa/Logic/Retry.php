@@ -206,6 +206,11 @@ class CRM_Sepa_Logic_Retry {
     }
     $stats['frequencies'] = implode(',', $stats['frequencies']);
 
+    // copy query ID
+    if (isset($params['query_id'])) {
+      $stats['query_id'] = $params['query_id'];
+    }
+
     return $stats;
   }
 
