@@ -135,18 +135,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         array('class' => 'tiny')
     );
 
-    // add type field
-//    $this->add(
-//        'select',
-//        'type',
-//        E::ts('Mandate Type'),
-//        $this->getTypeList(),
-//        TRUE,
-//        array('class' => 'crm-select2')
-//    );
-
-
-    // add 'replaces' fields
+    // TODO: add 'replaces' fields
 
     // add OOFF fields
     // add collection date
@@ -224,11 +213,50 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     return $defaults;
   }
 
+  /**
+   * Validate input data
+   */
+  public function validate() {
+    parent::validate();
 
+    // TODO: verify with SEPA Creditor type
+
+    // validate IBAN
+    $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($this->_submitValues['iban']);
+    if ($iban_error) {
+      $this->_errors['iban'] = $iban_error;
+    }
+
+    // validate BIC
+    $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($this->_submitValues['bic']);
+    if ($bic_error) {
+      $this->_errors['bic'] = $bic_error;
+    }
+
+    // validate amount
+    if ($this->_submitValues['amount'] <= 0.0) {
+      $this->_errors['amount'] = E::ts("Amount has to be positive.");
+    }
+
+    // validate reference
+    if (strlen($this->_submitValues['reference']) > 0) {
+      // check if the reference is available
+      $in_use = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_sdd_mandate WHERE reference = %1",
+          array(1 => array($this->_submitValues['reference'], 'String')));
+      if ($in_use) {
+        $this->_errors['reference'] = E::ts("Already in use");
+      }
+    }
+
+    return (0 == count($this->_errors));
+  }
+
+
+  /**
+   * Create the mandate
+   */
   public function postProcess() {
     $values = $this->exportValues();
-
-    CRM_Core_Error::debug_log_message("MANDATE: " . json_encode($values));
 
     // create a new mandate
     $type = $values['interval'] ? 'RCUR' : 'OOFF';
@@ -276,106 +304,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           'error');
     }
 
-//    $reference   = $mandate['values'][$mandate['id']]['reference'];
-//    $mandate_url = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}");
-//    CRM_Core_Session::setStatus(ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", array(1 => $reference, 2 => $mandate_url, 3 => $type, 'domain' => 'org.project60.sepa')), ts("Success", array('domain' => 'org.project60.sepa')), 'info');
-
-    /*
-     *     // first create a contribution
-        $payment_instrument_id  = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $type);
-        $contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-
-        // check creditor
-        $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $_REQUEST['creditor_id']));
-
-        $contribution_data = array(
-            'version'                   => 3,
-            'contact_id'                => $_REQUEST['contact_id'],
-            'campaign_id'               => $_REQUEST['campaign_id'],
-            'financial_type_id'         => $_REQUEST['financial_type_id'],
-            'payment_instrument_id'     => $payment_instrument_id,
-            'contribution_status_id'    => $contribution_status_id,
-            'currency'                  => $creditor['currency'],
-          );
-
-        if ($type=='OOFF') {
-          $initial_status = 'OOFF';
-          $entity_table = 'civicrm_contribution';
-          $contribution_data['total_amount'] = number_format($_REQUEST['total_amount'], 2, '.', '');
-          $contribution_data['receive_date'] = $_REQUEST['date'];
-          $contribution_data['source'] = $_REQUEST['source'];
-          $contribution = civicrm_api('Contribution', 'create', $contribution_data);
-        } else if ($type=='RCUR') {
-          $initial_status = 'FRST';
-          $entity_table = 'civicrm_contribution_recur';
-          $contribution_data['amount']              = number_format($_REQUEST['total_amount'], 2, '.', '');
-          $contribution_data['start_date']          = $_REQUEST['start_date'];
-          $contribution_data['end_date']            = $_REQUEST['end_date'];
-          $contribution_data['create_date']         = date('YmdHis');
-          $contribution_data['modified_date']       = date('YmdHis');
-          $contribution_data['frequency_unit']      = 'month';
-          $contribution_data['frequency_interval']  = $_REQUEST['interval'];
-          $contribution_data['cycle_day']           = $_REQUEST['cycle_day'];
-          $contribution_data['is_email_receipt']    = 0;
-          $contribution = civicrm_api('ContributionRecur', 'create', $contribution_data);
-        }
-
-        if (isset($contribution['is_error']) && $contribution['is_error']) {
-          $this->processError(
-            sprintf(ts("Couldn't create contribution for contact #%s", array('domain' => 'org.project60.sepa')), $_REQUEST['contact_id']),
-            ts("Couldn't create contribution", array('domain' => 'org.project60.sepa')),
-            $contribution['error_message'],
-            $_REQUEST['contact_id']);
-          return;
-        }
-
-        // next, create mandate
-        $mandate_data = array(
-            'version'                   => 3,
-            'debug'                     => 1,
-            'contact_id'                => $_REQUEST['contact_id'],
-            'source'                    => $_REQUEST['source'],
-            'entity_table'              => $entity_table,
-            'entity_id'                 => $contribution['id'],
-            'creation_date'             => date('YmdHis'),
-            'validation_date'           => date('YmdHis'),
-            'date'                      => date('YmdHis'),
-            'iban'                      => $_REQUEST['iban'],
-            'bic'                       => $_REQUEST['bic'],
-            'reference'                 => $_REQUEST['reference'],
-            'status'                    => $initial_status,
-            'type'                      => $type,
-            'creditor_id'               => $_REQUEST['creditor_id'],
-            'is_enabled'                => 1,
-          );
-        // call the hook for mandate generation
-
-        $mandate = civicrm_api('SepaMandate', 'create', $mandate_data);
-        if (isset($mandate['is_error']) && $mandate['is_error']) {
-          $this->processError(
-            sprintf(ts("Couldn't create %s mandate for contact #%s", array('domain' => 'org.project60.sepa')), $type, $_REQUEST['contact_id']),
-            ts("Couldn't create mandate", array('domain' => 'org.project60.sepa')),
-            $mandate['error_message'],
-            $_REQUEST['contact_id']);
-          return;
-        }
-
-        // if we want to replace an old mandate:
-        if (isset($_REQUEST['replace'])) {
-          CRM_Sepa_BAO_SEPAMandate::terminateMandate($_REQUEST['replace'], $_REQUEST['replace_date'], $_REQUEST['replace_reason']);
-        }
-
-        // if we get here, everything went o.k.
-        $reference   = $mandate['values'][$mandate['id']]['reference'];
-        $mandate_url = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}");
-        CRM_Core_Session::setStatus(ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", array(1 => $reference, 2 => $mandate_url, 3 => $type, 'domain' => 'org.project60.sepa')), ts("Success", array('domain' => 'org.project60.sepa')), 'info');
-
-        if (!$this->isPopup()) {
-          $contact_url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contribution_data['contact_id']}&selectedChild=contribute");
-          CRM_Utils_System::redirect($contact_url);
-        }
-
-     */
     parent::postProcess();
   }
 
@@ -425,19 +353,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     }
     return $creditor_list;
   }
-
-//  /**
-//   * Get the list of eligible types
-//   */
-//  protected function getTypeList() {
-//    // TODO: replace
-//
-//    // default:
-//    return array(
-//        'RCUR' => E::ts("Recurring Collection (RCUR)"),
-//        'OOFF' => E::ts("One-Off Debit (OOFF)"),
-//    );
-//  }
 
   /**
    * Get the list of (active) financial types
