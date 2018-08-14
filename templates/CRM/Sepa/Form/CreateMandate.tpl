@@ -15,6 +15,9 @@
 
 <div id="sdd-create-mandate">
 
+  {* hidden fields *}
+  {$form.contact_id.html}
+
   <div class="crm-section">
     <div class="label">{$form.creditor_id.label}</div>
     <div class="content">{$form.creditor_id.html}</div>
@@ -67,16 +70,11 @@
     <div class="clear"></div>
   </div>
 
-  {*<div class="crm-section">*}
-    {*<div class="label">{$form.type.label}</div>*}
-    {*<div class="content">{$form.type.html}</div>*}
-    {*<div class="clear"></div>*}
-  {*</div>*}
-    <div class="crm-section">
-        <div class="label">{$form.interval.label}</div>
-        <div class="content">{$form.interval.html}</div>
-        <div class="clear"></div>
-    </div>
+  <div class="crm-section">
+      <div class="label">{$form.interval.label}</div>
+      <div class="content">{$form.interval.html}</div>
+      <div class="clear"></div>
+  </div>
 
 
   <div id="sdd-ooff-data">
@@ -132,7 +130,6 @@
         <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='sdd_converter'}</div>
     </div>
 </div>
-
 
 
 <div class="crm-submit-buttons">
