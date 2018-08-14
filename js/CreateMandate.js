@@ -41,8 +41,6 @@ cj(document).ready(function() {
         cj("#sdd-create-mandate")
             .find("[name^=sdd_converter].hasDatepicker")
             .datepicker('setDate', date);
-        console.log(date);
-        console.log(sdd_getF('sdd_converter').val());
         return sdd_getF('sdd_converter').val();
     }
 
@@ -106,7 +104,6 @@ cj(document).ready(function() {
         let today = new Date();
         let creditor_id = sdd_getF('creditor_id').val();
         let creditor = CRM.vars.p60sdd.creditor_data[creditor_id];
-        console.log(creditor);
 
         // ADJUST OOFF START DATE
         let ooff_earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + creditor['buffer_days'] + creditor['ooff_notice']);
