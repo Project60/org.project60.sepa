@@ -185,8 +185,14 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
 
     // inject JS logic
-    CRM_Core_Resources::singleton()->addVars('p60sdd', $js_vars);
     CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/CreateMandate.js');
+    if (function_exists('bic_civicrm_install')) {
+      $config = CRM_Core_Config::singleton();
+      $js_vars['busy_icon_url'] = $config->resourceBase . "i/loading.gif";
+      CRM_Core_Error::debug_log_message(json_encode($js_vars));
+      CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/LittleBicLookup.js');
+    }
+    CRM_Core_Resources::singleton()->addVars('p60sdd', $js_vars);
 
     $this->addButtons(array(
       array(
