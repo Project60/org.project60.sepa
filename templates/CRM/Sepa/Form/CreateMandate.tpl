@@ -18,6 +18,28 @@
   {* hidden fields *}
   {$form.contact_id.html}
 
+  {if $create_mode eq 'replace'}
+  <div style="background-color: paleturquoise; padding: 1em; border-radius: 1em;">
+    <div style="text-align: left; font-size: large;">
+      <span><strong>{ts 1=$replace_mandate_reference domain='org.project60.sepa'}Replacing mandate %1{/ts}</strong></span>
+    </div>
+
+    <div class="crm-section">
+      <div class="label">{$form.rpl_end_date.label}</div>
+      <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='rpl_end_date'}</div>
+      <div class="clear"></div>
+    </div>
+
+    <div class="crm-section">
+      <div class="label">{$form.rpl_cancel_reason.label}</div>
+      <div class="content">{$form.rpl_cancel_reason.html}</div>
+      <div class="clear"></div>
+    </div>
+  </div>
+
+  <hr/>
+  {/if}
+
   <div class="crm-section">
     <div class="label">{$form.creditor_id.label}</div>
     <div class="content">{$form.creditor_id.html}</div>
@@ -81,7 +103,7 @@
     <div class="crm-section">
       <div class="label">{$form.ooff_date.label}</div>
       <div class="content">
-          {*$form.ooff_date.html*} {include file="CRM/common/jcalendar.tpl" elementName='ooff_date'}
+          {include file="CRM/common/jcalendar.tpl" elementName='ooff_date'}
           <a id="sdd_ooff_earliest" class="sdd-earliest"></a>
       </div>
       <div class="clear"></div>
@@ -93,7 +115,7 @@
     <div class="crm-section">
       <div class="label">{$form.rcur_start_date.label}</div>
       <div class="content">
-          {*$form.rcur_start_date.html*} {include file="CRM/common/jcalendar.tpl" elementName='rcur_start_date'}
+          {include file="CRM/common/jcalendar.tpl" elementName='rcur_start_date'}
           <a id="sdd_rcur_earliest" class="sdd-earliest"></a>
       </div>
       <div class="clear"></div>
@@ -107,7 +129,7 @@
 
     <div class="crm-section">
       <div class="label">{$form.rcur_end_date.label}</div>
-      <div class="content">{*$form.rcur_end_date.html*} {include file="CRM/common/jcalendar.tpl" elementName='rcur_end_date'}</div>
+      <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='rcur_end_date'}</div>
       <div class="clear"></div>
     </div>
   </div>

@@ -22,22 +22,73 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
-  /** @var $contact_id the contact ID to create the mandate for */
-  protected $contact_id;
+  protected $create_mode = 'create'; // or 'clone' or 'replace'
+  protected $contact_id  = null;
+  protected $replace_id  = null;
+  protected $clone_id    = null;
+  protected $rpl_date    = null;
+  protected $rpl_reason  = null;
+  protected $old_mandate = null;
+  protected $old_contrib = null;
 
   public function buildQuickForm() {
-    // get the contact_id
-    $this->contact_id = (int) CRM_Utils_Request::retrieve('cid', 'Positive');
-    if (empty($this->contact_id)) {
-      CRM_Core_Error::fatal("No contact ID (cid) given.");
+    // get parameters
+    $this->contact_id  = (int) CRM_Utils_Request::retrieve('cid', 'Positive');
+    $this->replace_id  = (int) CRM_Utils_Request::retrieve('replace', 'Positive');
+    $this->clone_id    = (int) CRM_Utils_Request::retrieve('clone', 'Positive');
+    $this->rpl_reason  = CRM_Utils_Request::retrieve('replace_reason', 'String');
+    $this->rpl_date    = CRM_Utils_Request::retrieve('replace_date', 'String');
+
+    // prepare replace/clone
+    if ($this->replace_id || $this->clone_id) {
+      // set create_mode
+      if ($this->replace_id) {
+        $this->create_mode = 'replace';
+        $mandate_id = $this->replace_id;
+      } else {
+        $this->create_mode = 'clone';
+        $mandate_id = $this->clone_id;
+      }
+
+      // load mandate
+      $this->old_mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $mandate_id));
+      if ($this->old_mandate['type'] != 'RCUR') {
+        CRM_Core_Error::fatal(E::ts("You can only replace RCUR mandates"));
+      }
+      $this->contact_id = (int) $this->old_mandate['contact_id'];
+      $this->old_contrib = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $this->old_mandate['entity_id']));
     }
 
-    // load the contact
+    if (empty($this->contact_id)) {
+      CRM_Core_Error::fatal(E::ts("No contact ID (cid) given."));
+    }
+
+    // load the contact and set the title
     $contact_name = civicrm_api3('Contact', 'getvalue', array(
         'id'     => $this->contact_id,
         'return' => 'display_name'));
-    CRM_Utils_System::setTitle(E::ts("Create SEPA Mandate for Contact [%1]: %2", array(
-        1 => $this->contact_id, 2 => $contact_name)));
+    switch ($this->create_mode) {
+      case 'clone':
+        CRM_Utils_System::setTitle(E::ts("Clone SEPA Mandate for Contact [%1]: %2", array(
+            1 => $this->contact_id, 2 => $contact_name)));
+        break;
+
+      case 'replace':
+        CRM_Utils_System::setTitle(E::ts("Replace SEPA Mandate for Contact [%1]: %2", array(
+            1 => $this->contact_id, 2 => $contact_name)));
+        $this->assign('replace_mandate_reference', $this->old_mandate['reference']);
+        break;
+
+      default:
+      case 'create':
+        CRM_Utils_System::setTitle(E::ts("Create new SEPA Mandate for Contact [%1]: %2", array(
+            1 => $this->contact_id, 2 => $contact_name)));
+        break;
+
+    }
+
+    // assign the mode
+    $this->assign('create_mode', $this->create_mode);
 
     // add contact_id field
     $this->add('hidden', 'contact_id', $this->contact_id);
@@ -135,7 +186,26 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         array('class' => 'tiny')
     );
 
-    // TODO: add 'replaces' fields
+    // add 'replaces' fields
+    if ($this->create_mode == 'replace') {
+      // store ID of mandate to be replaced
+      $this->add('hidden', 'rpl_mandate_id', $this->replace_id);
+
+      // add the replace date
+      $this->addDate(
+          'rpl_end_date',
+          E::ts("Replacement Date"),
+          TRUE,
+          array('formatType' => 'activityDate'));
+
+      // add the replacement/cancel reason
+      $this->add(
+          'text',
+          'rpl_cancel_reason',
+          E::ts('Replacement Reason'),
+          array('placeholder' => E::ts("required"), 'class'=> 'huge'),
+          TRUE);
+    }
 
     // add OOFF fields
     // add collection date
@@ -209,12 +279,45 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   /**
    * Set the defaults
    *
-   * @return array|NULL|void
+   * @return array
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    // TODO: anything?
+    if ($this->old_mandate) {
+      // set all parameters to the mandate-to-be-replaced
+      $defaults['creditor_id']       = $this->old_mandate['creditor_id'];
+      $defaults['financial_type_id'] = $this->old_contrib['financial_type_id'];
+      $defaults['campaign_id']       = CRM_Utils_Array::value('campaign_id', $this->old_mandate, '');
+      $defaults['iban']              = $this->old_mandate['iban'];
+      $defaults['bic']               = $this->old_mandate['bic'];
+      $defaults['amount']            = $this->old_contrib['amount'];
+      $defaults['currency']          = $this->old_contrib['currency'];
+      $defaults['cycle_day']         = $this->old_contrib['cycle_day'];
+
+      // calculate and set interval
+      if ($this->old_contrib['frequency_unit'] == 'month') {
+        $defaults['interval'] = 12 / $this->old_contrib['frequency_interval'];
+      } elseif ($this->old_contrib['frequency_unit'] == 'year') {
+        $defaults['interval'] = $this->old_contrib['frequency_interval'];
+      } else {
+        $defaults['interval'] = 1;
+        CRM_Core_Session::setStatus(E::ts("Incompatible frequency unit '%1' in mandate.", array(
+            1 => $this->old_contrib['frequency_unit'])), E::ts("Warning"), 'warning');
+      }
+
+      // set start date for replace
+      if ($this->create_mode == 'replace' && !empty($this->rpl_date)) {
+        $formatted_date = CRM_Utils_Date::setDateDefaults($this->rpl_date, 'activityDateTime');
+        $defaults['rcur_start_date'] = $formatted_date[0];
+        $defaults['rpl_end_date'] = $formatted_date[0];
+      }
+
+      // also set the replacement reason
+      if (!empty($this->rpl_reason)) {
+        $defaults['rpl_cancel_reason'] = trim($this->rpl_reason);
+      }
+    }
 
     return $defaults;
   }
@@ -386,6 +489,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $query = civicrm_api3('Campaign', 'get',array(
         'is_active'    => 1,
         'option.limit' => 0,
+        'option.sort'  => 'title asc',
         'return'       => 'id,title'
     ));
 

@@ -111,6 +111,9 @@ cj(document).ready(function() {
   cj("#bic").parent().append('&nbsp;<img id="bic_busy" height="12" src="' + CRM.vars.p60sdd.busy_icon_url + '"/>&nbsp;<font color="gray"><span id="bank_name"></span></font>');
   cj("#iban").on("input click keydown blur", sdd_lookup_bic_trigger);
   cj("#bic_busy").hide();
+
   // call it once
-  sdd_lookup_bic();
+  if (cj("#bic").val().length < 5) {
+      sdd_lookup_bic();
+  }
 });
