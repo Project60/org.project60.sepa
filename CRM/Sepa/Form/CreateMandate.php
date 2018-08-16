@@ -56,6 +56,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         CRM_Core_Error::fatal(E::ts("You can only replace RCUR mandates"));
       }
       $this->contact_id = (int) $this->old_mandate['contact_id'];
+
       $this->old_contrib = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $this->old_mandate['entity_id']));
     }
 
@@ -91,7 +92,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $this->assign('create_mode', $this->create_mode);
 
     // add contact_id field
-    $this->add('hidden', 'contact_id', $this->contact_id);
+    $this->add('hidden', 'cid', $this->contact_id);
 
     // add creditor field
     $js_vars['creditor_data'] = $this->getCreditors();
@@ -187,25 +188,23 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     );
 
     // add 'replaces' fields
-    if ($this->create_mode == 'replace') {
-      // store ID of mandate to be replaced
-      $this->add('hidden', 'rpl_mandate_id', $this->replace_id);
+    // store ID of mandate to be replaced
+    $this->add('hidden', 'replace', $this->replace_id);
 
-      // add the replace date
-      $this->addDate(
-          'rpl_end_date',
-          E::ts("Replacement Date"),
-          TRUE,
-          array('formatType' => 'activityDate'));
+    // add the replace date
+    $this->addDate(
+        'rpl_end_date',
+        E::ts("Replacement Date"),
+        $this->replace_id,
+        array('formatType' => 'activityDate'));
 
-      // add the replacement/cancel reason
-      $this->add(
-          'text',
-          'rpl_cancel_reason',
-          E::ts('Replacement Reason'),
-          array('placeholder' => E::ts("required"), 'class'=> 'huge'),
-          TRUE);
-    }
+    // add the replacement/cancel reason
+    $this->add(
+        'text',
+        'rpl_cancel_reason',
+        E::ts('Replacement Reason'),
+        array('placeholder' => E::ts("required"), 'class'=> 'huge'),
+        $this->replace_id);
 
     // add OOFF fields
     // add collection date
@@ -288,7 +287,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       // set all parameters to the mandate-to-be-replaced
       $defaults['creditor_id']       = $this->old_mandate['creditor_id'];
       $defaults['financial_type_id'] = $this->old_contrib['financial_type_id'];
-      $defaults['campaign_id']       = CRM_Utils_Array::value('campaign_id', $this->old_mandate, '');
+      $defaults['campaign_id']       = CRM_Utils_Array::value('campaign_id', $this->old_contrib, '');
       $defaults['iban']              = $this->old_mandate['iban'];
       $defaults['bic']               = $this->old_mandate['bic'];
       $defaults['amount']            = $this->old_contrib['amount'];
@@ -306,17 +305,23 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
             1 => $this->old_contrib['frequency_unit'])), E::ts("Warning"), 'warning');
       }
 
-      // set start date for replace
-      if ($this->create_mode == 'replace' && !empty($this->rpl_date)) {
-        $formatted_date = CRM_Utils_Date::setDateDefaults($this->rpl_date, 'activityDateTime');
-        $defaults['rcur_start_date'] = $formatted_date[0];
-        $defaults['rpl_end_date'] = $formatted_date[0];
+      if ($this->create_mode == 'replace') {
+        // set start date for replace
+        if (!empty($this->rpl_date)) {
+          $formatted_date = CRM_Utils_Date::setDateDefaults($this->rpl_date, 'activityDateTime');
+          $defaults['rcur_start_date'] = $formatted_date[0];
+          $defaults['rpl_end_date'] = $formatted_date[0];
+        } else {
+          $formatted_date = CRM_Utils_Date::setDateDefaults(date('YmdHis'), 'activityDateTime');
+          $defaults['rpl_end_date'] = $formatted_date[0];
+        }
+
+        // also set the replacement reason
+        if (!empty($this->rpl_reason)) {
+          $defaults['rpl_cancel_reason'] = trim($this->rpl_reason);
+        }
       }
 
-      // also set the replacement reason
-      if (!empty($this->rpl_reason)) {
-        $defaults['rpl_cancel_reason'] = trim($this->rpl_reason);
-      }
     }
 
     return $defaults;
@@ -328,7 +333,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   public function validate() {
     parent::validate();
 
-    // TODO: verify with SEPA Creditor type
+    // TODO: check back with SEPA Creditor type
 
     // validate IBAN
     $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($this->_submitValues['iban']);
@@ -367,13 +372,15 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   public function postProcess() {
     $values = $this->exportValues();
 
+    CRM_Core_Error::debug_log_message("VALUES " . json_encode($values));
+
     // create a new mandate
     $type = $values['interval'] ? 'RCUR' : 'OOFF';
     $mandate_data = array(
         'type'                      => $type,
         'creation_date'             => date('YmdHis'),
         'creditor_id'               => $values['creditor_id'],
-        'contact_id'                => $values['contact_id'],
+        'contact_id'                => $values['cid'],
         'campaign_id'               => $values['campaign_id'],
         'financial_type_id'         => $values['financial_type_id'],
         'currency'                  => $values['currency'],
@@ -404,6 +411,23 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           E::ts("Success"),
           'info');
 
+      // terminate old mandate, of requested
+      if (!empty($values['replace'])) {
+        $rpl_mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $values['replace']));
+
+        CRM_Sepa_BAO_SEPAMandate::terminateMandate(
+            $values['replace'],
+            CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'),
+            $values['rpl_cancel_reason']);
+
+        /*CRM_Core_Session::setStatus(E::ts("Mandate <a href=\"%2\">%1</a> was scheduled to end on %3", array(
+            1 => $rpl_mandate['reference'],
+            2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$rpl_mandate['id']}"),
+            3 => CRM_Utils_Date::formatDate($values['rpl_end_date'], 'activityDate'))),
+            E::ts("Success"),
+            'info'); */
+      }
+
     } catch (Exception $ex) {
       // there was a problem: create error message
       CRM_Core_Session::setStatus(E::ts("Failed to create %1 mandate. Error was: %2", array(
@@ -411,6 +435,11 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           2 => $ex->getMessage())),
           E::ts("Error"),
           'error');
+    }
+
+    if (!CRM_Utils_Array::value('snippet', $_REQUEST)) {
+      // this is not a popup -> redirect
+      CRM_Utils_System::redirect(CRM_Core_Session::singleton()->readUserContext());
     }
 
     parent::postProcess();
@@ -516,7 +545,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'return'       => 'iban,bic,reference',
       'option.sort'  => 'id desc'
     ));
-    CRM_Core_Error::debug_log_message("mada " . json_encode($mandates));
+
     foreach ($mandates['values'] as $mandate) {
       $key = "{$mandate['iban']}/{$mandate['bic']}";
       if (!isset($known_accounts[$key])) {

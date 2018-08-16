@@ -16,12 +16,14 @@
 <div id="sdd-create-mandate">
 
   {* hidden fields *}
-  {$form.contact_id.html}
+  {$form.cid.html}
 
   {if $create_mode eq 'replace'}
   <div style="background-color: paleturquoise; padding: 1em; border-radius: 1em;">
+    {$form.replace.html}
+
     <div style="text-align: left; font-size: large;">
-      <span><strong>{ts 1=$replace_mandate_reference domain='org.project60.sepa'}Replacing mandate %1{/ts}</strong></span>
+      <span><strong>{ts 1=$replace_mandate_reference domain='org.project60.sepa'}You're replacing mandate %1{/ts}</strong></span>
     </div>
 
     <div class="crm-section">
