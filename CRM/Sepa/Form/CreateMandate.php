@@ -545,7 +545,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'return'       => 'iban,bic,reference',
       'option.sort'  => 'id desc'
     ));
-
     foreach ($mandates['values'] as $mandate) {
       $key = "{$mandate['iban']}/{$mandate['bic']}";
       if (!isset($known_accounts[$key])) {

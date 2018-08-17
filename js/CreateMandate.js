@@ -158,7 +158,7 @@ cj(document).ready(function() {
                     'domain':'org.project60.sepa'});
             } else {
                 let annual_display = CRM.formatMoney(amount * frequency);
-                text = ts("Collects %1 %2 on the %3., beginning %4. Annual amount is %5.", {
+                text = ts("Collects %1 %2 on the %3., beginning %4.<br/>Annual amount is %5.", {
                     1: money_display,
                     2: sdd_getF('interval').find('option[value=' + frequency + ']').text(),
                     3: sdd_getF('cycle_day').val(),
