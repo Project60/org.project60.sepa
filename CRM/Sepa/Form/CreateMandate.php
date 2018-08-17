@@ -569,7 +569,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         ));
 
         if (empty($accounts['values'])) {
-          $account_references = array();
+          $account_references = array('values' => array());
         } else {
           $account_references = civicrm_api3('BankingAccountReference', 'get', array(
               'ba_id'             => array('IN' => array_keys($accounts['values'])),

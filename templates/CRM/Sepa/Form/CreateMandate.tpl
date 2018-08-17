@@ -82,7 +82,7 @@
 
   <hr/>
 
-  <div style="text-align: center; font-size: large;">
+  <div style="text-align: center; font-size: large; padding: 1em;">
     <span id="sdd_summary_text"></span>
   </div>
 
