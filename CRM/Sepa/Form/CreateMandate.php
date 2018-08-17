@@ -568,14 +568,18 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
             'sequential'   => 0,
         ));
 
-        $account_references = civicrm_api3('BankingAccountReference', 'get', array(
-            'ba_id'             => array('IN' => array_keys($accounts['values'])),
-            'reference_type_id' => $iban_reference_type_id,
-            'option.limit'      => 0,
-            'return'            => 'reference,ba_id',
-            'sequential'        => 1,
-            'option.sort'       => 'id desc'
-        ));
+        if (empty($accounts['values'])) {
+          $account_references = array();
+        } else {
+          $account_references = civicrm_api3('BankingAccountReference', 'get', array(
+              'ba_id'             => array('IN' => array_keys($accounts['values'])),
+              'reference_type_id' => $iban_reference_type_id,
+              'option.limit'      => 0,
+              'return'            => 'reference,ba_id',
+              'sequential'        => 1,
+              'option.sort'       => 'id desc'
+          ));
+        }
 
         foreach ($account_references['values'] as $account_reference) {
           $account = $accounts['values'][$account_reference['ba_id']];
