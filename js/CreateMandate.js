@@ -183,7 +183,9 @@ cj(document).ready(function() {
         }
 
         // set currency
-        sdd_getF('currency').val(CRM.vars.p60sdd.creditor_data[creditor_id]['currency']);
+        sdd_getF('currency')
+            .val(CRM.vars.p60sdd.creditor_data[creditor_id]['currency'])
+            .fadeOut(50).fadeIn(50);
 
         // trigger update of calculations
         sdd_recalculate_fields();
