@@ -333,16 +333,26 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   public function validate() {
     parent::validate();
 
-    // TODO: check back with SEPA Creditor type
+    // load creditor, check mode
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $this->_submitValues['creditor_id']));
+    $creditor_mode = empty($creditor['creditor_type']) ? 'SEPA' : $creditor['creditor_type'];
 
     // validate IBAN
-    $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($this->_submitValues['iban']);
+    if ($creditor_mode == 'SEPA') {
+      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($this->_submitValues['iban']);
+    } else {
+      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($this->_submitValues['iban'], $creditor_mode);
+    }
     if ($iban_error) {
       $this->_errors['iban'] = $iban_error;
     }
 
     // validate BIC
-    $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($this->_submitValues['bic']);
+    if ($creditor_mode == 'SEPA') {
+      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($this->_submitValues['bic']);
+    } else {
+      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($this->_submitValues['bic'], $creditor_mode);
+    }
     if ($bic_error) {
       $this->_errors['bic'] = $bic_error;
     }
