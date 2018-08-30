@@ -187,6 +187,16 @@ cj(document).ready(function() {
             .val(CRM.vars.p60sdd.creditor_data[creditor_id]['currency'])
             .fadeOut(50).fadeIn(50);
 
+        // if creditor type is not SEPA (or empty): hide bic
+        if (!('creditor_type' in CRM.vars.p60sdd.creditor_data[creditor_id])
+           || CRM.vars.p60sdd.creditor_data[creditor_id]['creditor_type'] == 'SEPA') {
+            // this is a SEPA creditor
+            sdd_getF('bic').parent().parent().show(100);
+        } else {
+            // this is NOT a SEPA creditor
+            sdd_getF('bic').parent().parent().hide(100);
+        }
+
         // trigger update of calculations
         sdd_recalculate_fields();
     }
