@@ -196,7 +196,9 @@ cj(document).ready(function() {
 
         } else {
             // this is NOT a SEPA creditor
-            sdd_getF('bic').parent().parent().hide(100);
+            sdd_getF('bic')
+                .value('')
+                .parent().parent().hide(100);
             cj("#sdd-create-mandate").find("label[for=iban]").contents().first()[0].textContent = ts("Account Reference", {'domain': 'org.project60.sepa'});
         }
 

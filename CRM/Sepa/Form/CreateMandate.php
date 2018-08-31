@@ -397,7 +397,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'financial_type_id'         => $values['financial_type_id'],
         'currency'                  => $values['currency'],
         'iban'                      => $values['iban'],
-        'bic'                       => $values['bic'],
+        'bic'                       => empty($values['bic']) ? 'NOTPROVIDED' : $values['bic'],
         'cycle_day'                 => $values['cycle_day'],
         'amount'                    => $values['amount'],
         'frequency_interval'        => $type == 'RCUR' ? 12 / $values['interval'] : 0,
