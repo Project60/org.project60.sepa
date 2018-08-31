@@ -174,6 +174,7 @@ cj(document).ready(function() {
     // logic to update creditor-based stuff
     function sdd_creditor_changed() {
         let creditor_id = sdd_getF('creditor_id').val();
+        let creditor = CRM.vars.p60sdd.creditor_data[creditor_id];
 
         // reset cycle days
         sdd_getF('cycle_day').find('option').remove();
@@ -181,6 +182,14 @@ cj(document).ready(function() {
         for (var day in cycle_days) {
             sdd_getF('cycle_day').append('<option val="' + day + '">' + day + '</option>');
         }
+
+        // calculate best (next possible) cycle day
+        let today = new Date();
+        let best_cycle_date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + creditor['buffer_days'] + creditor['frst_notice']);
+        while (!(best_cycle_date.getDate() in cycle_days)) {
+            best_cycle_date = new Date(best_cycle_date.getFullYear(), best_cycle_date.getMonth(), best_cycle_date.getDate() + 1);
+        }
+        sdd_getF('cycle_day').val(best_cycle_date.getDate());
 
         // set currency
         sdd_getF('currency')
