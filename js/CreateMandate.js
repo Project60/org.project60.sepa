@@ -192,9 +192,12 @@ cj(document).ready(function() {
            || CRM.vars.p60sdd.creditor_data[creditor_id]['creditor_type'] == 'SEPA') {
             // this is a SEPA creditor
             sdd_getF('bic').parent().parent().show(100);
+            cj("#sdd-create-mandate").find("label[for=iban]").contents().first()[0].textContent = ts("IBAN", {'domain': 'org.project60.sepa'});
+
         } else {
             // this is NOT a SEPA creditor
             sdd_getF('bic').parent().parent().hide(100);
+            cj("#sdd-create-mandate").find("label[for=iban]").contents().first()[0].textContent = ts("Account Reference", {'domain': 'org.project60.sepa'});
         }
 
         // trigger update of calculations
