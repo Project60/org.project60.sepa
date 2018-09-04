@@ -41,7 +41,9 @@ cj(document).ready(function() {
         cj("#sdd-create-mandate")
             .find("[name^=sdd_converter].hasDatepicker")
             .datepicker('setDate', date);
-        return sdd_getF('sdd_converter').val();
+
+        return cj("#sdd-create-mandate")
+            .find("[name^=sdd_converter_display]").val();
     }
 
 
