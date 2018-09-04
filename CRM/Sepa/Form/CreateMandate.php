@@ -455,7 +455,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     if (strstr($user_context, 'civicrm/contribute/search')) {
       // I'm not even sure where this is coming from... but replace
       $session->popUserContext();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$values['cid']}"));
+      $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$values['cid']}&selectedChild=sepa"));
     }
     // this is not a popup -> redirect
     if (!CRM_Utils_Array::value('snippet', $_REQUEST)) {
