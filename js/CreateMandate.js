@@ -216,6 +216,15 @@ cj(document).ready(function() {
         sdd_recalculate_fields();
     }
 
+    /**
+     * Set the amount picker back to "new account",
+     *  e.g. after manually editing iban or bic
+     */
+    function sdd_reset_account_picker() {
+        // reset the picker without triggering change event
+        sdd_getF('bank_account_preset').select2('val', '');
+    }
+
     // attach earliest link handlers
     cj("#sdd-create-mandate").find("a.sdd-earliest").click(function() {
         if (cj(this).attr('id') == 'sdd_rcur_earliest') {
@@ -228,6 +237,7 @@ cj(document).ready(function() {
     // attach the update methods to the various change events
     cj("#sdd-create-mandate").find("[name=interval],[name=amount],[name=cycle_day],[name^=ooff_date],[name^=rcur_start_date]").change(sdd_recalculate_fields);
     cj("#sdd-create-mandate").find("[name=creditor_id]").change(sdd_creditor_changed);
+    cj("#sdd-create-mandate").find("[name=iban],[name=bic]").change(sdd_reset_account_picker);
 
     // trigger the whole thing once
     sdd_creditor_changed();
