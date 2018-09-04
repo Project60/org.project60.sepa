@@ -25,6 +25,7 @@
     <div style="text-align: left; font-size: large;">
       <span><strong>{ts 1=$replace_mandate_reference domain='org.project60.sepa'}You're replacing mandate %1{/ts}</strong></span>
     </div>
+    <br/>
 
     <div class="crm-section">
       <div class="label">{$form.rpl_end_date.label}</div>
