@@ -154,17 +154,19 @@ cj(document).ready(function() {
         let money_display = CRM.formatMoney(amount);
         if (amount) {
             if (frequency == 0) {
+                let my_start_date = new Date(sdd_getF('ooff_date').val());
                 text = ts("Collects %1 on %2", {
                     1: money_display,
-                    2: sdd_getF('ooff_date').val(),
+                    2: sdd_formatDate(my_start_date),
                     'domain':'org.project60.sepa'});
             } else {
                 let annual_display = CRM.formatMoney(amount * frequency);
+                let my_start_date = new Date(sdd_getF('rcur_start_date').val());
                 text = ts("Collects %1 %2 on the %3., beginning %4.<br/>Annual amount is %5.", {
                     1: money_display,
                     2: sdd_getF('interval').find('option[value=' + frequency + ']').text(),
                     3: sdd_getF('cycle_day').val(),
-                    4: sdd_getF('rcur_start_date').val(),
+                    4: sdd_formatDate(my_start_date),
                     5: annual_display,
                     'domain':'org.project60.sepa'});
             }
