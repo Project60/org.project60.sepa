@@ -452,8 +452,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     // where to go from here?
     $session = CRM_Core_Session::singleton();
     $user_context = $session->readUserContext();
-    if (strstr($user_context, 'civicrm/contribute/search')) {
-      // I'm not even sure where this is coming from... but replace
+    if ((strpos($user_context, 'civicrm/contribute/search') !== FALSE)
+       || (strpos($user_context, 'civicrm/sepa/create') !== FALSE)
+       || (strpos($user_context, 'civicrm/contact/view') !== FALSE)) {
+      // I'm not even sure where the first one is coming from... but replace!
       $session->popUserContext();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$values['cid']}&selectedChild=sepa"));
     }
