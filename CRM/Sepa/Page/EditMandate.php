@@ -152,14 +152,16 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
                                   'option_group_name' => 'msg_tpl_workflow_contribution',
                                   'name'              => 'sepa_mandate_pdf'));
     $tpl_ids = array();
-    $query = "SELECT `id`, `msg_title`, `msg_subject`
+    if (!empty($template_entry['id'])) {
+      $query = "SELECT `id`, `msg_title`, `msg_subject`
               FROM   `civicrm_msg_template`
               WHERE  `is_active` = 1
               AND (  (`workflow_id` = '{$template_entry['id']}')
                   OR (`msg_title` LIKE 'SEPA%' AND `workflow_id` IS NULL) );";
-    $result = CRM_Core_DAO::executeQuery($query);
-    while ($result->fetch()) {
-      $tpl_ids[] = array($result->id, $result->msg_title);
+      $result = CRM_Core_DAO::executeQuery($query);
+      while ($result->fetch()) {
+        $tpl_ids[] = array($result->id, $result->msg_title);
+      }
     }
 
     $this->assign('sepa', $mandate);

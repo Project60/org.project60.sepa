@@ -25,6 +25,12 @@
     <access_arguments>view sepa mandates</access_arguments>
   </item>
   <item>
+    <path>civicrm/sepa/createmandate</path>
+    <page_callback>CRM_Sepa_Form_CreateMandate</page_callback>
+    <title>Create SEPA Mandate</title>
+    <access_arguments>create sepa mandates</access_arguments>
+  </item>
+  <item>
     <path>civicrm/sepa/cmandate</path>
     <page_callback>CRM_Sepa_Page_CreateMandate</page_callback>
     <title>Create Mandate</title>

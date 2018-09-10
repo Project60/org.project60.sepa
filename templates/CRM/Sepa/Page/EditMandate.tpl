@@ -114,7 +114,7 @@
             </tr>{/if}{/if}{/if}
 
             <tr>
-            	<td class="label" style="vertical-align: middle;"><a href="{crmURL p="civicrm/sepa/cmandate" q="clone=$mandate_id"}" class="button">{ts domain="org.project60.sepa"}Clone{/ts}</td>
+            	<td class="label" style="vertical-align: middle;"><a href="{crmURL p="civicrm/sepa/createmandate" q="reset=1&clone=$mandate_id"}" class="button">{ts domain="org.project60.sepa"}Clone{/ts}</td>
             	<td>{ts domain="org.project60.sepa"}Create a new mandate similar to this.{/ts}</td>
             </tr>
 
@@ -143,7 +143,7 @@
 <script type="text/javascript">
 cancel_reason_message = "{ts domain="org.project60.sepa"}You need to specify a cancel reason!{/ts}";
 end_date_message = "{ts domain="org.project60.sepa"}You need to specify a date!{/ts}";
-replace_url = "{crmURL p="civicrm/sepa/cmandate" q="replace=$mandate_id"}";
+replace_url = "{crmURL p="civicrm/sepa/createmandate" q="reset=1&replace=$mandate_id"}";
 
 {literal}
 function mandate_action_create_pdf() {

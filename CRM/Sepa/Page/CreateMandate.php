@@ -21,7 +21,7 @@
  *        and should be refactored
  *
  * @package CiviCRM_SEPA
- *
+ * @deprecated in favour of CRM_Sepa_Form_CreateMandate
  */
 
 
