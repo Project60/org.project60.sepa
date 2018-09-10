@@ -258,7 +258,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     if (function_exists('bic_civicrm_install')) {
       $config = CRM_Core_Config::singleton();
       $js_vars['busy_icon_url'] = $config->resourceBase . "i/loading.gif";
-      CRM_Core_Error::debug_log_message(json_encode($js_vars));
       CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/LittleBicLookup.js');
     }
     CRM_Core_Resources::singleton()->addVars('p60sdd', $js_vars);
@@ -383,8 +382,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    */
   public function postProcess() {
     $values = $this->exportValues();
-
-    CRM_Core_Error::debug_log_message("VALUES " . json_encode($values));
 
     // create a new mandate
     $type = $values['interval'] ? 'RCUR' : 'OOFF';
