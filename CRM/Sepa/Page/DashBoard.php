@@ -25,6 +25,9 @@ require_once 'CRM/Core/Page.php';
 
 class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
+  /** cache for getFormatFilename function */
+  protected $_creditorID2format = array();
+
   function run() {
     CRM_Utils_System::setTitle(ts('CiviSEPA Dashboard', array('domain' => 'org.project60.sepa')));
     // get requested group status
@@ -99,6 +102,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $group['latest_submission_date'] = date('Y-m-d', strtotime($group['latest_submission_date']));
         $group['collection_date'] = date('Y-m-d', strtotime($group['collection_date']));
         $group['status'] = $status_2_title[$group['status_id']];
+        $group['file'] = $this->getFormatFilename($group);
         $group['status_label'] = $status2label[$group['status_id']];
         $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60*60*24);
         if ($group['status']=='closed') {
@@ -149,6 +153,32 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
     } else {
       CRM_Core_Session::setStatus(sprintf(ts("Unknown batcher mode '%s'. No batching triggered.", array('domain' => 'org.project60.sepa')), $mode), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+    }
+  }
+
+  /**
+   * Generate the right link wrt the correct file format
+   *
+   * @param $group_data array the group data
+   * @return string new (full) suggested file name
+   * @throws Exception
+   */
+  protected function getFormatFilename($group_data) {
+    if (empty($group_data['file'])) {
+      return '';
+    }
+
+    // get the format
+    if (!empty($group_data['creditor_id'] && !isset($this->_creditorID2format[$group_data['creditor_id']]))) {
+      $format = CRM_Sepa_Logic_Format::getFormatForCreditor($group_data['creditor_id']);
+      $this->_creditorID2format[$group_data['creditor_id']] = $format;
+    }
+    $format = $this->_creditorID2format[$group_data['creditor_id']];
+
+    if ($format) {
+      return $format->getFilename($group_data['file']);
+    } else {
+      return $group_data['file'] . '.xml';
     }
   }
 }

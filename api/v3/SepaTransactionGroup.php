@@ -115,6 +115,7 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
       txgroup.collection_date,
       txgroup.latest_submission_date,
       txgroup.status_id,
+      txgroup.sdd_creditor_id           AS creditor_id,
       civicrm_sdd_file.created_date     AS file_created_date,
       count(*)                          AS nb_contrib,
       sum( contrib.total_amount)        AS total,
