@@ -375,6 +375,11 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
       'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
       'table' => 'civicrm_sepa_contribution_txgroup',
   );
+  $entityTypes[] = array(
+      'name' => 'SepaMandateLink',
+      'class' => 'CRM_Sepa_DAO_SepaMandateLink',
+      'table' => 'civicrm_sdd_entity_mandate',
+  );
 }
 
 /**
