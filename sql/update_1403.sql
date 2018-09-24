@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS `civicrm_sdd_entity_mandate` (
      `id`                    int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
      `mandate_id`            int unsigned NOT NULL                 COMMENT 'FK to sdd_mandate',
-     `entity_table`          varchar(64)  NOT NULL                 COMMENT 'Physical tablename for entity being linked, eg civicrm_membership',
+     `entity_table`          varchar(64)  NOT NULL                 COMMENT 'Physical table name for entity being linked, eg civicrm_membership',
      `entity_id`             int unsigned NOT NULL                 COMMENT 'FK to entity table specified in entity_table column.',
      `class`                 varchar(16)                           COMMENT 'Link class, freely defined by client',
      `is_active`             tinyint NOT NULL  DEFAULT 1           COMMENT 'Is this link still active?',
