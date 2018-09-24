@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | SYSTOPIA CUSTOM DATA HELPER                            |
-| Copyright (C) 2017 SYSTOPIA                            |
+| Copyright (C) 2018 SYSTOPIA                            |
 | Author: B. Endres (endres@systopia.de)                 |
 | Source: https://github.com/systopia/Custom-Data-Helper |
 +--------------------------------------------------------+
@@ -14,7 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-define('CUSTOM_DATA_HELPER_VERSION', '0.4.dev');
+define('CUSTOM_DATA_HELPER_VERSION', '0.5.1');
 define('CUSTOM_DATA_HELPER_LOG_LEVEL', 1);
 
 // log levels
@@ -65,7 +65,7 @@ class CRM_Sepa_CustomData {
           $entity = $this->createEntity($data['entity'], $entity_data);
        } elseif ($entity == 'FAILED') {
           // Couldn't identify:
-          $this->log(CUSTOM_DATA_HELPER_LOG_ERROR, "Couldn't create/update {$entity_type}: " . json_encode($entity_data));
+          $this->log(CUSTOM_DATA_HELPER_LOG_ERROR, "Couldn't create/update {$data['entity']}: " . json_encode($entity_data));
        } else {
           // update OptionValue
           $this->updateEntity($data['entity'], $entity_data, $entity);
@@ -96,7 +96,7 @@ class CRM_Sepa_CustomData {
        return;
     } else {
        // update OptionGroup
-       $this->updateEntity('OptionGroup', $data, $optionGroup);
+       $this->updateEntity('OptionGroup', $data, $optionGroup, array('is_active'));
     }
 
     // now run the update for the OptionValues
@@ -114,7 +114,7 @@ class CRM_Sepa_CustomData {
           $this->log(CUSTOM_DATA_HELPER_LOG_ERROR, "Couldn't create/update OptionValue: " . json_encode($optionValueSpec));
        } else {
           // update OptionValue
-          $this->updateEntity('OptionValue', $optionValueSpec, $optionValue);
+          $this->updateEntity('OptionValue', $optionValueSpec, $optionValue, array('is_active'));
        }
     }
   }
@@ -231,7 +231,7 @@ class CRM_Sepa_CustomData {
        'options'    => array('limit' => 2));
 
     foreach ($data['_lookup'] as $lookup_key) {
-       $lookup_query[$lookup_key] = $data[$lookup_key];
+       $lookup_query[$lookup_key] = CRM_Utils_Array::value($lookup_key, $data, '');
     }
 
     $this->log(CUSTOM_DATA_HELPER_LOG_DEBUG, "LOOKUP {$entity_type}: " . json_encode($lookup_query));
@@ -247,7 +247,7 @@ class CRM_Sepa_CustomData {
 
        default:
           // bad lookup selector
-          $this->log(CUSTOM_DATA_HELPER_LOG_ERROR, "Bad {$entity_type} lookup selector: " . json_encode($selector));
+         $this->log(CUSTOM_DATA_HELPER_LOG_ERROR, "Bad {$entity_type} lookup selector: " . json_encode($lookup_query));
           return 'FAILED';
     }
   }
@@ -284,6 +284,15 @@ class CRM_Sepa_CustomData {
        if (isset($current_data[$field]) && $value != $current_data[$field]) {
           $update_query[$field] = $value;
        }
+    }
+
+    // if _no_override list is set, remove those fields from the update
+    if (isset($requested_data['_no_override']) && is_array($requested_data['_no_override'])) {
+      foreach ($requested_data['_no_override'] as $field_name) {
+        if (isset($update_query[$field_name])) {
+          unset($update_query[$field_name]);
+        }
+      }
     }
 
     // run update if required
@@ -544,8 +553,8 @@ class CRM_Sepa_CustomData {
    *
    * @todo make it more efficient?
    *
-   * @param $params      the parameter array as used by the API
-   * @param $group_names list of group names to process. Default is: all
+   * @param array $params      the parameter array as used by the API
+   * @param array $group_names list of group names to process. Default is: all
    */
   public static function unREST(&$params, $group_names = NULL) {
     if ($group_names == NULL || !is_array($group_names)) {
@@ -595,6 +604,18 @@ class CRM_Sepa_CustomData {
       if (isset($id2table[$group_id])) {
         return $id2table[$group_id];
       }
+    }
+    return NULL;
+  }
+
+  /**
+   * Get group ID
+   */
+  public static function getGroupID($group_name) {
+    $id2name = self::getGroup2Name();
+    $name2id = array_flip($id2name);
+    if (isset($name2id[$group_name])) {
+      return $name2id[$group_name];
     }
     return NULL;
   }
