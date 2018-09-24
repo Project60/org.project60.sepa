@@ -21,7 +21,7 @@
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
 
-class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
+class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
 {
   /**
    * static instance to hold the table name
@@ -81,94 +81,65 @@ class CRM_Sepa_DAO_SEPAMandate extends CRM_Core_DAO
    * @var int unsigned
    */
   public $id;
+
   /**
-   * A unique mandate reference
+   * mandate id
    *
-   * @var string
+   * @var int unsigned
    */
-  public $reference;
+  public $mandate_id;
+
   /**
-   * Information about the source of registration of the mandate
-   *
-   * @var string
-   */
-  public $source;
-  /**
-   * Physical tablename for the contract entity being joined, eg contributionRecur or Membership
-   *
-   * @var string
-   */
-  public $entity_table;
-  /**
-   * FK to contract entity table specified in entity_table column.
+   * linked entity id
    *
    * @var int unsigned
    */
   public $entity_id;
+
   /**
+   * linked entity table
+   *
+   * @var string
+   */
+  public $entity_table;
+
+  /**
+   * link class
+   *
+   * @var string
+   */
+  public $class;
+
+  /**
+   * is this link activ?
+   *
+   * @var int unsigned
+   */
+  public $is_active;
+
+  /**
+   * creation date
    * by default now()
    *
    * @var datetime
    */
-  public $date;
-  /**
-   * FK to ssd_creditor
-   *
-   * @var int unsigned
-   */
-  public $creditor_id;
-  /**
-   * FK to Contact ID of the debtor
-   *
-   * @var int unsigned
-   */
-  public $contact_id;
-  /**
-   * Iban of the debtor
-   *
-   * @var string
-   */
-  public $iban;
-  /**
-   * BIC of the debtor
-   *
-   * @var string
-   */
-  public $bic;
-  /**
-   * RCUR for recurrent (default), OOFF for one-shot
-   *
-   * @var string
-   */
-  public $type;
-  /**
-   * Status of the mandate (INIT, OOFF, FRST, RCUR, INVALID, COMPLETE, ONHOLD)
-   *
-   * @var string
-   */
-  public $status;
-  /**
-   *
-   * @var datetime
-   */
   public $creation_date;
+
   /**
-   * FK to civicrm_contribution
-   *
-   * @var int unsigned
-   */
-  public $first_contribution_id;
-  /**
+   * link start date (optional)
    *
    * @var datetime
    */
-  public $validation_date;
+  public $start_date;
+
   /**
-   * class constructor
+   * link end date (optional)
    *
-   * @access public
-   * @return civicrm_sdd_mandate
+   * @var datetime
    */
+  public $end_date;
+
+
   function __construct()
   {
     $this->__table = 'civicrm_sdd_mandate';
