@@ -84,9 +84,25 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    */
   public function upgrade_1400() {
     // add currency
-    $this->ctx->log->info('Adding currency field');
-    $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `currency` varchar(3) COMMENT 'currency used by this creditor';");
+    $this->ctx->log->info('Added currency field');
+    $currency_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'currency';");
+    if (!$currency_column) {
+      // doesn't exist yet
+      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `currency` varchar(3) COMMENT 'currency used by this creditor';");
+    }
     $this->executeSql("UPDATE civicrm_sdd_creditor SET currency = 'EUR' WHERE currency IS NULL;");
+    return TRUE;
+  }
+
+  /**
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1403() {
+    // add currency
+    $this->ctx->log->info('Added SepaMandateLink entity');
+    $this->executeSqlFile('sql/update_1403.sql');
     return TRUE;
   }
 }
