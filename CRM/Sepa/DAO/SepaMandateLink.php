@@ -29,7 +29,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
    * @var string
    * @static
    */
-  static $_tableName = 'civicrm_sdd_mandate';
+  static $_tableName = 'civicrm_sdd_entity_mandate';
   /**
    * static instance to hold the field values
    *
@@ -333,7 +333,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
       foreach($fields as $name => $field) {
         if (CRM_Utils_Array::value('import', $field)) {
           if ($prefix) {
-            self::$_import['sdd_mandate'] = & $fields[$name];
+            self::$_import['sdd_entity_mandate'] = & $fields[$name];
           } else {
             self::$_import[$name] = & $fields[$name];
           }
@@ -357,7 +357,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
       foreach($fields as $name => $field) {
         if (CRM_Utils_Array::value('export', $field)) {
           if ($prefix) {
-            self::$_export['sdd_mandate'] = & $fields[$name];
+            self::$_export['sdd_entity_mandate'] = & $fields[$name];
           } else {
             self::$_export[$name] = & $fields[$name];
           }

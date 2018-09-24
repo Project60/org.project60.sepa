@@ -19,8 +19,28 @@ use CRM_Sepa_ExtensionUtil as E;
 class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
 
 
-  public static $LINK_CLASS_REPLACE     = 'REPLACE';
+  public static $LINK_CLASS_REPLACES    = 'REPLACES';
   public static $LINK_CLASS_MEMBERSHIP  = 'MEMBERSHIP';
+
+  /**
+   * Create a new mandate link
+   *
+   * @param int $old_mandate_id        ID of the SepaMandate being replaced
+   * @param int $new_mandate_id        ID of the SepaMandate replacing the old one
+   * @param string $replacement_date   timestamp of the replacement, default is: now
+   *
+   * @return object CRM_Sepa_BAO_SepaMandateLink resulting object
+   * @throws Exception if mandatory fields aren't set
+   */
+  public static function addReplaceMandateLink($old_mandate_id, $new_mandate_id, $replacement_date = 'now') {
+    return self::createMandateLink(
+        $new_mandate_id,
+        $old_mandate_id,
+        'civicrm_sdd_mandate',
+        self::$LINK_CLASS_REPLACES,
+        TRUE,
+        $replacement_date);
+  }
 
   /**
    * Create a new mandate link
@@ -57,34 +77,87 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
   }
 
   /**
-   * Get all mandate links with the given parameters
+   * Get all active mandate links with the given parameters,
+   *  i.e. link fulfills the following criteria
+   *        is_active = 1
+   *        start_date NULL or in the past
+   *
    *
    * @param int $mandate_id            the mandate to link
-   * @param int $entity_id             the ID of the entity to link to
-   * @param string $entity_table       table name of the entity to link to
    * @param string|array $class        link class, max 16 characters
-   * @param bool $is_active            is the link active? default is YES
-   * @param string $start_date         start date of the link, default NOW
-   * @param string $end_date           end date of the link, default is NONE
+   * @param string $date               what timestamp does the "active" refer to? Default is: now
    *
-   * @return array of CRM_Sepa_BAO_SepaMandateLinks
+   * @return array of link data
+   * @throws Exception if mandate_id is invalid
    */
-  public static function getMandateLinks($mandate_id, $class = NULL, $entity_id = NULL, $entity_table = NULL, $is_active = TRUE, $start_date = NULL, $end_date = NULL) {
-    // TODO
+  public static function getCurrentMandateLinks($mandate_id, $class = NULL, $date = 'now') {
+    $mandate_id = (int) $mandate_id;
+    if (!$mandate_id) {
+      throw new Exception("mandate_id invalid!");
+    }
+
+    // process class restrictions
+    $CLASS_CLAUSE = '';
+    if ($class) {
+      // make sure they are upper case
+      $classes = array();
+      if (is_string($class)) {
+        $candidates = explode(',', $class);
+      } elseif (is_array($class)) {
+        $candidates = $class;
+      }
+      foreach ($candidates as $candidate) {
+        $candidate = strtoupper(trim($candidate));
+        if (preg_match('#^[A-Z]+$#', $candidate)) {
+          $classes[] = $candidate;
+        }
+      }
+
+      // build clause
+      if (!empty($classes)) {
+        $classes_string = '"' . implode('","', $classes) . '"';
+        $CLASS_CLAUSE = "AND class IN ({$classes_string})";
+      }
+    }
+
+    // process date
+    $now = date('YmdHis', strtotime($date));
+
+    // build and run query
+    $query_sql = "
+    SELECT *
+    FROM civicrm_sdd_entity_mandate
+    WHERE mandate_id = {$mandate_id}
+      AND is_active >= 1
+      AND (start_date IS NULL OR start_date <= '{$now}')
+      AND (end_date   IS NULL OR end_date   >  '{$now}')
+      {$CLASS_CLAUSE}";
+    $query = CRM_Core_DAO::executeQuery($query_sql);
+    $results = array();
+    while ($query->fetch()) {
+      $results[] = $query->toArray();
+    }
+    return $results;
   }
 
 
   /**
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * Create/edit a SepaMandateLink entry
    *
+   * @param array  $params (reference ) an assoc array of name/value pairs
    * @return object CRM_Sepa_BAO_SepaMandateLink object on success, null otherwise
    * @access public
    * @static
    * @throws Exception if mandatory parameters not set
    */
   static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
+    // class should always be upper case
+    if (!empty($params['class'])) {
+      $params['class'] = strtoupper($params['class']);
+    }
 
+    //
+    $hook = empty($params['id']) ? 'create' : 'edit';
     if ($hook == 'create') {
       // check mandatory fields
       if (empty($params['mandate_id'])) {

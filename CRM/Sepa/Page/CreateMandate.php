@@ -168,6 +168,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     // if we want to replace an old mandate:
     if (isset($_REQUEST['replace'])) {
       CRM_Sepa_BAO_SEPAMandate::terminateMandate($_REQUEST['replace'], $_REQUEST['replace_date'], $_REQUEST['replace_reason']);
+      CRM_Sepa_BAO_SepaMandateLink::addReplaceMandateLink($_REQUEST['replace'], $mandate['id'], $_REQUEST['replace_date']);
     }
 
     // if we get here, everything went o.k.
