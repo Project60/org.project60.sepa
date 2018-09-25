@@ -46,9 +46,17 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     if (empty($params['id'])) {
+      // we are creating a new mandate...
       CRM_Utils_SepaCustomisationHooks::create_mandate($params);
 
-      if (empty($params['reference']) && !empty($params['creditor_id'])) {
+      // make sure it has a creditor
+      if (empty($params['creditor_id'])) {
+        $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
+        $params['creditor_id'] = $default_creditor->id;
+      }
+
+      // make sure it has a reference
+      if (empty($params['reference'])) {
         // If no mandate reference was supplied by the caller nor the customisation hook, create a nice default one.
         $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix'));
         $dao = new CRM_Core_DAO();
