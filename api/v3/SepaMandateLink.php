@@ -127,10 +127,24 @@ function civicrm_api3_sepa_mandate_link_get($params) {
 function _civicrm_api3_sepa_mandate_link_getactive_spec(&$spec) {
   $spec['mandate_id'] = array(
       'name'         => 'mandate_id',
-      'api.required' => 1,
+      'api.required' => 0,
       'type'         => CRM_Utils_Type::T_INT,
       'title'        => 'Mandate ID',
       'description'  => 'SepaMandate this link relates to',
+  );
+  $spec['entity_id'] = array(
+      'name'         => 'entity_id',
+      'api.required' => 0,
+      'type'         => CRM_Utils_Type::T_INT,
+      'title'        => 'Entity ID',
+      'description'  => 'Entity this link relates to',
+  );
+  $spec['entity_table'] = array(
+      'name'         => 'entity_table',
+      'api.required' => 0,
+      'type'         => CRM_Utils_Type::T_STRING,
+      'title'        => 'Entity Table',
+      'description'  => 'Entity this link relates to',
   );
   $spec['class'] = array(
       'name'         => 'class',
@@ -158,9 +172,11 @@ function _civicrm_api3_sepa_mandate_link_getactive_spec(&$spec) {
  */
 function civicrm_api3_sepa_mandate_link_getactive($params) {
   try {
-    $result = CRM_Sepa_BAO_SepaMandateLink::getCurrentMandateLinks(
-        $params['mandate_id'],
+    $result = CRM_Sepa_BAO_SepaMandateLink::getActiveLinks(
+        CRM_Utils_Array::value('mandate_id', $params, NULL),
         CRM_Utils_Array::value('class', $params, NULL),
+        CRM_Utils_Array::value('entity_id', $params, NULL),
+        CRM_Utils_Array::value('entity_table', $params, NULL),
         CRM_Utils_Array::value('date', $params, 'now'));
     return civicrm_api3_create_success($result);
   } catch (Exception $ex) {

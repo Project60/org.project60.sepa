@@ -59,7 +59,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
   public static function createMandateLink($mandate_id, $entity_id, $entity_table, $class, $is_active = TRUE, $start_date = 'now', $end_date = NULL) {
     $params = array(
        'mandate_id'   => $mandate_id,
-       '$entity_id'   => $entity_id,
+       'entity_id'    => $entity_id,
        'entity_table' => $entity_table,
        'class'        => $class,
        '$is_active'   => $is_active ? 1 : 0,
@@ -85,19 +85,39 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    *
    * @param int $mandate_id            the mandate to link
    * @param string|array $class        link class, max 16 characters
+   * @param int $entity_id             ID of the linked entity
+   * @param int $entity_table          table name of the linked entity
    * @param string $date               what timestamp does the "active" refer to? Default is: now
+   *
+   * @todo: add limit
    *
    * @return array of link data
    * @throws Exception if mandate_id is invalid
    */
-  public static function getCurrentMandateLinks($mandate_id, $class = NULL, $date = 'now') {
-    $mandate_id = (int) $mandate_id;
-    if (!$mandate_id) {
-      throw new Exception("mandate_id invalid!");
+  public static function getActiveLinks($mandate_id = NULL, $class = NULL, $entity_id = NULL, $entity_table = NULL, $date = 'now') {
+    // build where clause
+    $WHERE_CLAUSES = array();
+
+    // process date
+    $now = date('YmdHis', strtotime($date));
+    $WHERE_CLAUSES[] = "is_active >= 1";
+    $WHERE_CLAUSES[] = "start_date IS NULL OR start_date <= '{$now}'";
+    $WHERE_CLAUSES[] = "end_date   IS NULL OR end_date   >  '{$now}'";
+
+    // process mandate_id
+    if (!empty($mandate_id)) {
+      $mandate_id = (int) $mandate_id;
+      $WHERE_CLAUSES[] = "mandate_id = {$mandate_id}";
+    }
+
+    // process entity restrictions
+    if (!empty($entity_id) && preg_match('#^[a-z_]+$#', $entity_table)) {
+      $entity_id = (int) $entity_id;
+      $WHERE_CLAUSES[] = "entity_id = {$entity_id}";
+      $WHERE_CLAUSES[] = "entity_table = '{$entity_table}'";
     }
 
     // process class restrictions
-    $CLASS_CLAUSE = '';
     if ($class) {
       // make sure they are upper case
       $classes = array();
@@ -116,22 +136,13 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
       // build clause
       if (!empty($classes)) {
         $classes_string = '"' . implode('","', $classes) . '"';
-        $CLASS_CLAUSE = "AND class IN ({$classes_string})";
+        $WHERE_CLAUSES[] = "class IN ({$classes_string})";
       }
     }
 
-    // process date
-    $now = date('YmdHis', strtotime($date));
-
     // build and run query
-    $query_sql = "
-    SELECT *
-    FROM civicrm_sdd_entity_mandate
-    WHERE mandate_id = {$mandate_id}
-      AND is_active >= 1
-      AND (start_date IS NULL OR start_date <= '{$now}')
-      AND (end_date   IS NULL OR end_date   >  '{$now}')
-      {$CLASS_CLAUSE}";
+    $WHERE_CLAUSE = '(' . implode(') AND (', $WHERE_CLAUSES) . ')';
+    $query_sql = "SELECT * FROM civicrm_sdd_entity_mandate WHERE {$WHERE_CLAUSE}";
     $query = CRM_Core_DAO::executeQuery($query_sql);
     $results = array();
     while ($query->fetch()) {
@@ -140,6 +151,25 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     return $results;
   }
 
+  /**
+   * Create a new mandate link
+   *
+   * @param int $link_id               ID of the link
+   * @param string $date               at what timestamp should the link be ended - default is "now"
+   *
+   * @return object CRM_Sepa_BAO_SepaMandateLink resulting object
+   * @throws Exception if mandatory fields aren't set
+   */
+  public static function endMandateLink($link_id, $date = 'now') {
+    $link_id = (int) $link_id;
+    if ($link_id) {
+      $link = new CRM_Sepa_BAO_SepaMandateLink();
+      $link->id = $link_id;
+      $link->is_active = 0;
+      $link->end_date = date('YmdHis', strtotime($date));
+      $link->save();
+    }
+  }
 
   /**
    * Create/edit a SepaMandateLink entry
