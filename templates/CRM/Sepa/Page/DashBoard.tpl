@@ -105,7 +105,7 @@
           {/if}
         {/if}
       {/if}
-      {if $can_delete eq yes}
+      {if $can_delete}
       <a href="{crmURL p="civicrm/sepa/deletegroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Delete{/ts}</a>
       {/if}
     </td>
