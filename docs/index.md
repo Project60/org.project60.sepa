@@ -9,6 +9,8 @@ CiviSEPA is a CiviCRM extension that enables SEPA compliant direct debit actions
 
 This branch is currently maintained by Xavier Dutoit (TTTP, xavier@tttp.eu) and Björn Endres (SYSTOPIA, endres@systopia.de).
 
+View this extension in the [Extension Directory](https://civicrm.org/extensions/civisepa-sepa-direct-debit-extension).
+
 Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSEPA
 
 **Important:** Please download a [official release](https://github.com/Project60/org.project60.sepa/releases)! Don't use the ``master`` branch unless you want bleeding edge and you know what you're doing.
@@ -30,6 +32,12 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 * permission management
 * membership payments
 * automatic submission to the banks
+
+## Installation
+Use the following steps to install CiviSEPA.
+ * **Administer** > **System Settings** > **Extensions**
+ * **Add New**
+ * Find, download, and install
 
 
 ## Customisation
