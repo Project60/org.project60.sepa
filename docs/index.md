@@ -34,7 +34,7 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 * automatic submission to the banks
 
 ## Installation
-Use the following steps to install CiviDiscount.
+Use the following steps to install CiviSEPA.
  * **Administer** > **System Settings** > **Extensions**
  * **Add New**
  * Find, download, and install
