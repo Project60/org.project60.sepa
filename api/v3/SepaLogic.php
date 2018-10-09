@@ -16,10 +16,83 @@
 
 /**
  * Provides the SYSTOPIA alternative batching algorithm
+ *  and other workflow support functions
  *
  * @package CiviCRM_SEPA
  *
  */
+
+
+/**
+ * Get stats to support the retry collection form
+ *
+ * @param $params
+ */
+function civicrm_api3_sepa_logic_get_retry_stats($params) {
+  $stats = CRM_Sepa_Logic_Retry::getStats($params);
+  $dao = NULL;
+  return civicrm_api3_create_success($stats['contribution_count'], $params, 'SepaLogic', 'get_retry_stats', $dao, $stats);
+}
+
+/**
+ * Get stats to support the retry collection form
+ *
+ * @param $params
+ */
+function _civicrm_api3_sepa_logic_get_retry_stats_spec($params) {
+  // CONTACT BASE
+  $params['date_from'] = array(
+      'name'         => 'date_from',
+      'api.required' => 1,
+      'title'        => 'Date Range From',
+      'description'  => 'Start of the date range',
+  );
+  $params['date_to'] = array(
+      'name'         => 'date_to',
+      'api.required' => 1,
+      'title'        => 'Date Range To',
+      'description'  => 'End of the date range',
+  );
+  $params['creditor_list'] = array(
+      'name'         => 'creditor_list',
+      'api.required' => 0,
+      'title'        => 'Creditor IDs',
+      'description'  => 'List of creditor IDs. Default is: all',
+  );
+  $params['txgroup_list'] = array(
+      'name'         => 'txgroup_list',
+      'api.required' => 0,
+      'title'        => 'TxGroup IDs',
+      'description'  => 'List SDD transaction group IDs. Default is: all',
+  );
+  $params['cancel_reason_list'] = array(
+      'name'         => 'cancel_reason_list',
+      'api.required' => 0,
+      'title'        => 'Cancel Reasons',
+      'description'  => 'List of cancel reasons. Default is: all',
+  );
+  $params['frequencies'] = array(
+      'name'         => 'frequencies',
+      'api.required' => 0,
+      'title'        => 'Frequency List',
+      'description'  => 'List of frequencies (collections per year). Default is: all',
+  );
+  $params['amount_min'] = array(
+      'name'         => 'amount_min',
+      'api.required' => 0,
+      'title'        => 'Amount Minimum',
+      'description'  => 'Minimal collection amount. Default is: all',
+  );
+  $params['amount_max'] = array(
+      'name'         => 'amount_max',
+      'api.required' => 0,
+      'title'        => 'Amount Maximum',
+      'description'  => 'Maximal collection amount. Default is: all',
+  );
+}
+
+
+
 
 /**
  * This function will close a transaction group,

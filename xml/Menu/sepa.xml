@@ -75,4 +75,10 @@
     <title>SEPA Mandates</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/sepa/retry</path>
+    <page_callback>CRM_Sepa_Form_RetryCollection</page_callback>
+    <title>RetryCollection</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

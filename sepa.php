@@ -463,6 +463,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
 
     // find the attached mandate, if exists
     $mandates = CRM_Sepa_Logic_Settings::getMandateFor($contribution_id);
+    CRM_Core_Error::debug_log_message("MADATE " . json_encode($mandates));
     if (empty($mandates)) {
       // the contribution has no mandate,
       //   so we should not allow the payment_instrument be set to an SDD one
@@ -482,7 +483,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
       $mandate_id = key($mandates);
       $mandate_pi = $mandates[$mandate_id];
       $requested_pi =  CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $fields['payment_instrument_id']);
-      if ($requested_pi != $mandate_pi && !($requested_pi=='FRST' && $mandate_pi=='RCUR') ) {
+      if ($requested_pi != $mandate_pi && !($requested_pi=='FRST' && $mandate_pi=='RCUR') && !($requested_pi=='RCUR' && $mandate_pi=='FRST') ) {
         $errors['payment_instrument_id'] = sprintf(ts("This contribution has a mandate, its payment instrument has to be '%s'", array('domain' => 'org.project60.sepa')), $mandate_pi);
       }
     }

@@ -141,14 +141,18 @@ class CRM_Sepa_Logic_Batching {
 
       $sql_query = "
         SELECT
-          contribution_recur_id, id
-        FROM civicrm_contribution
-        WHERE contribution_recur_id in ($rcontrib_id_strings)
-          AND DATE(receive_date) = DATE('$collection_date')
-          AND payment_instrument_id = $payment_instrument_id;";
+          contribution.contribution_recur_id AS contribution_recur_id, 
+          contribution.id                    AS contribution_id
+        FROM civicrm_contribution contribution 
+        LEFT JOIN civicrm_sdd_contribution_txgroup ctxg ON ctxg.contribution_id = contribution.id 
+        LEFT JOIN civicrm_sdd_txgroup               txg ON txg.id = ctxg.txgroup_id 
+        WHERE contribution.contribution_recur_id IN ({$rcontrib_id_strings})
+          AND DATE(contribution.receive_date) = DATE('{$collection_date}')
+          AND (txg.type IS NULL OR txg.type IN ('RCUR', 'FRST'))
+          AND contribution.payment_instrument_id = {$payment_instrument_id};";
       $results = CRM_Core_DAO::executeQuery($sql_query);
       while ($results->fetch()) {
-        $existing_contributions_by_recur_id[$results->contribution_recur_id] = $results->id;
+        $existing_contributions_by_recur_id[$results->contribution_recur_id] = $results->contribution_id;
       }
     }
 
@@ -529,7 +533,7 @@ class CRM_Sepa_Logic_Batching {
   /**
    * Check if a transaction group reference is already in use
    */
-  protected static function referenceExists($reference) {
+  public static function referenceExists($reference) {
     $query = civicrm_api('SepaTransactionGroup', 'getsingle', array('reference'=>$reference, 'version'=>3));
     // this should return an error, if the group exists
     return !(isset($query['is_error']) && $query['is_error']);

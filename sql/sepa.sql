@@ -95,28 +95,26 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_file` (
 
 
 
+-- /*******************************************************
+-- *
+-- * civicrm_sdd_txgroup
+-- *
+-- *******************************************************/
 CREATE TABLE IF NOT EXISTS `civicrm_sdd_txgroup` (
-
-
-     `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
-     `reference` varchar(64)    COMMENT 'End-to-end reference for this tx group.',
-     `type` char(4)    COMMENT 'FRST, RCUR or OOFF',
-     `collection_date` datetime    COMMENT 'Target collection date',
-     `latest_submission_date` datetime    COMMENT 'Latest submission date',
-     `created_date` datetime    COMMENT 'When was this item created',
-     `status_id` int unsigned NOT NULL   COMMENT 'fk to Batch Status options in civicrm_option_values',
-     `sdd_creditor_id` int unsigned    COMMENT 'fk to SDD Creditor Id',
-     `sdd_file_id` int unsigned    COMMENT 'fk to SDD File Id'
-,
-    PRIMARY KEY ( `id` )
-
-    ,     UNIQUE INDEX `UI_reference`(
-        reference
-  )
-
-,          CONSTRAINT FK_civicrm_sdd_txgroup_sdd_creditor_id FOREIGN KEY (`sdd_creditor_id`) REFERENCES `civicrm_sdd_creditor`(`id`) ON DELETE SET NULL,
-          CONSTRAINT FK_civicrm_sdd_txgroup_sdd_file_id FOREIGN KEY (`sdd_file_id`) REFERENCES `civicrm_sdd_file`(`id`) ON DELETE SET NULL
-)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+     `id` int unsigned NOT NULL AUTO_INCREMENT       COMMENT 'ID',
+     `reference`              varchar(64)            COMMENT 'End-to-end reference for this tx group.',
+     `type`                   char(4)                COMMENT 'FRST, RCUR, OOFF or RTRY',
+     `collection_date`        datetime               COMMENT 'Target collection date',
+     `latest_submission_date` datetime               COMMENT 'Latest submission date',
+     `created_date`           datetime               COMMENT 'When was this item created',
+     `status_id`              int unsigned NOT NULL  COMMENT 'fk to Batch Status options in civicrm_option_values',
+     `sdd_creditor_id`        int unsigned           COMMENT 'fk to SDD Creditor Id',
+     `sdd_file_id`            int unsigned           COMMENT 'fk to SDD File Id',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `UI_reference` (reference),
+    CONSTRAINT FK_civicrm_sdd_txgroup_sdd_creditor_id FOREIGN KEY (`sdd_creditor_id`) REFERENCES `civicrm_sdd_creditor`(`id`) ON DELETE SET NULL,
+    CONSTRAINT FK_civicrm_sdd_txgroup_sdd_file_id FOREIGN KEY (`sdd_file_id`) REFERENCES `civicrm_sdd_file`(`id`) ON DELETE SET NULL
+)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 
 

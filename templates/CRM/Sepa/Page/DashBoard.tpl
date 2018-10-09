@@ -50,6 +50,14 @@
         </span>
       </a>
     </li>
+      <li>
+        <a title="{ts domain="org.project60.sepa"}retry collection{/ts}" class="refresh button" href="{$batch_retry}">
+        <span>
+          <div class="icon refresh-icon  ui-icon-circle-plus"></div>
+          {ts domain="org.project60.sepa"}retry collection{/ts}
+        </span>
+        </a>
+      </li>
     {/if}
   {/if}
   </ul>

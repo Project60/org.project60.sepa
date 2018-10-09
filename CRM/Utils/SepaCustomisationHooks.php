@@ -59,7 +59,7 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @param $reference        string  currently proposed reference (max. 35 characters!)
    * @param $collection_date  string  scheduled collection date
-   * @param $mode             string  SEPA mode (OOFF, RCUR, FRST)
+   * @param $mode             string  SEPA mode (OOFF, RCUR, FRST, RTRY)
    * @param $creditor_id      string  SDD creditor ID
    *
    * @access public

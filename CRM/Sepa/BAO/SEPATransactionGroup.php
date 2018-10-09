@@ -59,7 +59,12 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $this->total=0;
     $this->nbtransactions=0;
 
-    $group = civicrm_api ("SepaTransactionGroup","getsingle",array("sequential"=>1,"version"=>3,"id"=>$this->id));
+    $group = civicrm_api3("SepaTransactionGroup","getsingle", array('id' => $this->id));
+    if ($group['type'] == 'RTRY') {
+      // RTRY groups (repeated collection attempt of failed debits) still have to be RCUR in the file
+      $group['type'] = 'RCUR';
+    }
+
     $creditor_id = $group["sdd_creditor_id"];
     $creditor    = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
     $format      = CRM_Sepa_Logic_Format::getFormatForCreditor($creditor_id);
@@ -236,9 +241,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    * @return an update array with the txgroup or a string with an error message
    */
   static function adjustCollectionDate($txgroup_id, $latest_submission_date) {
-    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('version'=>3, 'id'=>$txgroup_id));
-    if (!empty($txgroup['is_error'])) {
-      return $txgroup['error_message'];
+    $txgroup = civicrm_api3('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id));
+    if ($txgroup['type'] == 'RTRY') {
+      $txgroup['type'] = 'RCUR';
     }
 
     $test_date_parse = strtotime($latest_submission_date);
