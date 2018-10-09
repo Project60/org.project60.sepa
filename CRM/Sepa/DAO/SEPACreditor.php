@@ -165,6 +165,12 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $sepa_file_format_id;
   /**
+   * type of the creditor, values are SEPA (default) and PSP
+   *
+   * @var string
+   */
+  public $creditor_type;
+  /**
    * class constructor
    *
    * @access public
@@ -302,6 +308,13 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
             'optionGroupName' => 'sepa_file_format',
           )
         ) ,
+        'creditor_type' => array(
+          'name' => 'creditor_type',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Creditor Type: SEPA (default) or PSP', array('domain' => 'org.project60.sepa')) ,
+          'maxlength' => 4,
+          'size' => CRM_Utils_Type::EIGHT,
+        ) ,
       );
     }
     return self::$_fields;
@@ -325,12 +338,14 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
         'country_id' => 'country_id',
         'iban' => 'iban',
         'bic' => 'bic',
+        'currency' => 'currency',
         'mandate_prefix' => 'mandate_prefix',
         'payment_processor_id' => 'payment_processor_id',
         'category' => 'category',
         'tag' => 'tag',
         'mandate_active' => 'mandate_active',
         'sepa_file_format_id' => 'sepa_file_format_id',
+        'creditor_type' => 'creditor_type',
       );
     }
     return self::$_fieldKeys;

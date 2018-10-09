@@ -129,6 +129,12 @@ div.sdd-add-creditor {
           </td>
         </tr>
         <tr>
+          <td class="label">{$form.addcreditor_type.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Type{/ts}", {literal}{"id":"id-creditor-type","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_type.html}
+          </td>
+        </tr>
+        <tr>
           <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
           <td>
             {$form.custom_txmsg.html}
@@ -481,7 +487,8 @@ div.sdd-add-creditor {
           cj('#addcreditor_iban').val(data['iban']);
           cj('#addcreditor_bic').val(data['bic']);
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
-          cj('#addcreditor_currency').val(data['currency']);
+          cj("#addcreditor_currency").val(data['currency']);
+          cj("#addcreditor_type").val(data['creditor_type']);
           cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
           cj('#addcreditor').show(500);
 
@@ -518,6 +525,7 @@ div.sdd-add-creditor {
     map["addcreditor_iban"]         = "iban";
     map["addcreditor_bic"]          = "bic";
     map["addcreditor_pain_version"] = "sepa_file_format_id";
+    map["addcreditor_type"]         = "creditor_type";
     map["addcreditor_creditor_id"]  = "creditor_id";
     map["custom_txmsg"]             = "custom_txmsg";
 
@@ -613,6 +621,7 @@ div.sdd-add-creditor {
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
     cj('#add_creditor_id').val("");
+    cj('#addcreditor_type').val("SEPA");
   }
 </script>
 {/literal}

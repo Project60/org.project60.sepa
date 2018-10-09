@@ -113,8 +113,12 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     while ($contrib->fetch()) {
       $t         = $contrib->toArray();
       $t['id']   = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
-      $t["iban"] = str_replace(array(' ','-'), '', $t["iban"]);
-      $t['ctry'] = substr($t["iban"], 0, 2);
+
+      // SEPA-specific modifications and information on the IBAN.
+      if ($creditor['creditor_type'] == 'SEPA') {
+        $t["iban"] = str_replace(array(' ','-'), '', $t["iban"]);
+        $t['ctry'] = substr($t["iban"], 0, 2);
+      }
 
       // try to convert the name into a more acceptable format
       if (function_exists("iconv")){
