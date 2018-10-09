@@ -50,7 +50,7 @@
         <DrctDbtTx>
           <MndtRltdInf>
             <MndtId>{$contribution.reference}</MndtId>
-            <DtOfSgntr>{$contribution.validation_date|crmDate:"%Y-%m-%d"}</DtOfSgntr>
+            <DtOfSgntr>{$contribution.date|crmDate:"%Y-%m-%d"}</DtOfSgntr>
           </MndtRltdInf>
         </DrctDbtTx>
         <DbtrAgt>
