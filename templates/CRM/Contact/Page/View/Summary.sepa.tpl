@@ -16,8 +16,6 @@
 <script type="text/javascript">
 var contribution_snippet_changed  = false;
 var sepa_edit_mandate_html        = "{ts domain="org.project60.sepa"}SEPA Mandate{/ts}";
-var sepa_edit_mandate_title       = "{ts domain="org.project60.sepa"}Edit SEPA Mandate{/ts}";
-var sepa_edit_mandate_href        = '{crmURL p="civicrm/sepa/xmandate" q="mid=___mandate_id___"}'.replace('&amp;', '&');
 var contribution_tab_selector_44x = "#{ts domain="org.project60.sepa"}Contributions{/ts} > div.crm-container-snippet";
 var can_create_mandate            = {$can_create_mandate};
 var can_edit_mandate              = {$can_edit_mandate};
@@ -55,28 +53,16 @@ function sepa_modify_summary_tab_contribution() {
       var rcur_id = rcur_id_components[rcur_id_components.length-1];
       if (!rcur_id.match(/^[0-9]+$/)) continue;   // only digits, we're looking for an ID
 
-      CRM.api('SepaMandate', 'get', {'q': 'civicrm/ajax/rest',
+      CRM.api3('SepaMandate', 'get', {'q': 'civicrm/ajax/rest',
                                      'entity_id': rcur_id,
                                      'entity_table': 'civicrm_contribution_recur',
                                      'return': 'entity_id,id'},
       {success: function(data) {
           if (data['is_error']==0 && data['count']==1) {
-            for (var mandate_id in data['values']) {
-              var rcur_id = data['values'][mandate_id]['entity_id'];
-              var disable_action = cj("#row_" + rcur_id + ", #contribution_recur-" + rcur_id).find("a.disable-action, a.crm-enable-disable");
-              // hide disable action...
-              disable_action.hide();
-
-              // modify the edit option
-              var edit_action = disable_action.prev();
-              if (can_edit_mandate) {
-                edit_action.attr('href', sepa_edit_mandate_href.replace('___mandate_id___', mandate_id));
-                edit_action.html(sepa_edit_mandate_html);
-                edit_action.attr('title', sepa_edit_mandate_title);
-              } else {
-                edit_action.hide();
+              for (var mandate_id in data['values']) {
+                  var rcur_id = data['values'][mandate_id]['entity_id'];
+                  cj("#row_" + rcur_id + ", #contribution_recur-" + rcur_id).find("a.action-item").parent().html("[" + sepa_edit_mandate_html + "]");
               }
-            }
           }
         }
       });
