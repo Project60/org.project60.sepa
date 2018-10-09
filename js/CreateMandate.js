@@ -224,7 +224,14 @@ cj(document).ready(function() {
      * Set the amount picker back to "new account",
      *  e.g. after manually editing iban or bic
      */
-    function sdd_reset_account_picker() {
+    function sdd_iban_bic_changed() {
+        // remove whitespaces and other stuff from IBAN and BIC
+        let current_iban = sdd_getF('iban').val().replace(/\s+/g, '');
+        sdd_getF('iban').val(current_iban);
+
+        let current_bic = sdd_getF('bic').val().replace(/\s+/g, '');
+        sdd_getF('bic').val(current_bic);
+
         // reset the picker without triggering change event
         sdd_getF('bank_account_preset').select2('val', '');
     }
@@ -241,7 +248,7 @@ cj(document).ready(function() {
     // attach the update methods to the various change events
     cj("#sdd-create-mandate").find("[name=interval],[name=amount],[name=cycle_day],[name^=ooff_date],[name^=rcur_start_date]").change(sdd_recalculate_fields);
     cj("#sdd-create-mandate").find("[name=creditor_id]").change(sdd_creditor_changed);
-    cj("#sdd-create-mandate").find("[name=iban],[name=bic]").change(sdd_reset_account_picker);
+    cj("#sdd-create-mandate").find("[name=iban],[name=bic]").change(sdd_iban_bic_changed);
 
     // trigger the whole thing once
     sdd_creditor_changed();
