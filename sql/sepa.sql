@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_entity_mandate` (
      `entity_id`             int unsigned NOT NULL                 COMMENT 'FK to entity table specified in entity_table column.',
      `class`                 varchar(16)                           COMMENT 'Link class, freely defined by client',
      `is_active`             tinyint NOT NULL  DEFAULT 1           COMMENT 'Is this link still active?',
-     `creation_date`         datetime NOT NULL DEFAULT NOW         COMMENT 'by default now()',
+     `creation_date`         datetime NOT NULL                     COMMENT 'by default now()',
      `start_date`            datetime                              COMMENT 'optional start_date of the link',
      `end_date`              datetime                              COMMENT 'optional start_date of the link',
 

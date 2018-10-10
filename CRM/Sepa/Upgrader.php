@@ -99,11 +99,11 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1403()
-  {
+  public function upgrade_1403() {
     // add currency
     $this->ctx->log->info('Added SepaMandateLink entity');
     $this->executeSqlFile('sql/update_1403.sql');
+    return TRUE;
   }
 
   /**
@@ -114,7 +114,12 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   public function upgrade_1410() {
     // add currency
     $this->ctx->log->info('Adding creditor_type field');
-    $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `creditor_type` varchar(8) COMMENT 'type of the creditor, values are SEPA (default) and PSP';");
+    $currency_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'creditor_type';");
+    if (!$currency_column) {
+      // doesn't exist yet
+      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `creditor_type` varchar(8) COMMENT 'type of the creditor, values are SEPA (default) and PSP';");
+    }
+
     $this->executeSql("UPDATE civicrm_sdd_creditor SET creditor_type = 'SEPA' WHERE creditor_type IS NULL;");
     return TRUE;
   }
