@@ -393,11 +393,10 @@ function civicrm_api3_sepa_mandate_get($params) {
 /**
  * HELPER FUNCTION
  *
- * will add the default creditor_id if no id and creditor_id is given, and the
- * default creditor is valid
+ * will add the default creditor_id if no creditor_id is given, and the default creditor is valid
  */
 function _civicrm_api3_sepa_mandate_adddefaultcreditor(&$params) {
-  if (empty($params['id']) && empty($params['creditor_id'])) {
+  if (empty($params['creditor_id'])) {
     $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
     if ($default_creditor != NULL) {
       $params['creditor_id'] = $default_creditor->id;
