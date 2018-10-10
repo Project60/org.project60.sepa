@@ -31,6 +31,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   protected $old_mandate = null;
   protected $old_contrib = null;
 
+
   public function buildQuickForm() {
     // get parameters
     $this->contact_id  = (int) CRM_Utils_Request::retrieve('cid', 'Positive');
@@ -428,6 +429,11 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
             $values['replace'],
             CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'),
             $values['rpl_cancel_reason']);
+
+        CRM_Sepa_BAO_SepaMandateLink::addReplaceMandateLink(
+            $values['replace'],
+            $mandate['id'],
+            CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'));
 
         /*CRM_Core_Session::setStatus(E::ts("Mandate <a href=\"%2\">%1</a> was scheduled to end on %3", array(
             1 => $rpl_mandate['reference'],
