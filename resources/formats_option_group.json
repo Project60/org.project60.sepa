@@ -90,6 +90,16 @@
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "pain.008.003.02 with Address (EBICS-3.0)",
+      "value": "9",
+      "name": "pain_008_003_02_address",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
     }
   ]
 }

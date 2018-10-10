@@ -123,4 +123,17 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $this->executeSql("UPDATE civicrm_sdd_creditor SET creditor_type = 'SEPA' WHERE creditor_type IS NULL;");
     return TRUE;
   }
+
+  /**
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1411() {
+    $this->ctx->log->info('Adding new file formats');
+    $customData = new CRM_Sepa_CustomData('org.project60.sepa');
+    $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+    return TRUE;
+  }
 }
+
