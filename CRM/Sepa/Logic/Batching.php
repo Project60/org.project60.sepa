@@ -14,6 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * This class holds all SEPA batching functions
@@ -604,11 +605,24 @@ class CRM_Sepa_Logic_Batching {
       if (!empty($rcontribution['mandate_first_executed'])) {
         $date = $rcontribution['mandate_first_executed'];
       } else {
-        $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor_id);
-        $now = strtotime("now +$rcur_notice days");
-        $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
+        $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
+            'entity_table' => 'civicrm_contribution_recur',
+            'entity_id'    => $rcontribution['id'],
+            'return'       => 'status'));
+
+        if ($mandate['status'] == 'RCUR') {
+          // support for RCUR without first contribution
+          $now = strtotime("now");
+          $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, FALSE);
+
+        } else {
+          // hasn't been collected yet
+          $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor_id);
+          $now = strtotime("now +$rcur_notice days");
+          $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
+        }
       }
-      return CRM_Utils_Date::customFormat($date, ts("%B %E%f", array('domain' => 'org.project60.sepa')));
+      return CRM_Utils_Date::customFormat($date, E::ts("%B %E%f"));
     } elseif ($unit == 'week') {
       // FIXME: weekly not supported yet
       return '';
