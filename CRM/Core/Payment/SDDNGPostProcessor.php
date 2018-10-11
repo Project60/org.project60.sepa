@@ -24,7 +24,7 @@
  * @package CiviCRM_SEPA
  */
 
-class CRM_Core_Payment_SDDNGCompletion implements API_Wrapper {
+class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
   /**
    * Nothing to do here, we'll execute _after_ the original call
    */

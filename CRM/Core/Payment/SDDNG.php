@@ -29,52 +29,8 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
   /** Caches a mandate-in-the-making */
   protected static $_pending_mandate = NULL;
 
-
-  /**
-   * @param $contribution_id
-   */
-  public static function processContribution($contribution_id) {
-    CRM_Core_Error::debug_log_message("createPendingMandate for {$contribution_id}??");
-    if (!self::$_pending_mandate) {
-      // nothing pending, nothing to do
-      return;
-    }
-
-    // store contribution ID
-    self::$_pending_mandate['contribution_id'] = $contribution_id;
-  }
-
-  /**
-   * Get the ID of the currently pending contribution, if any
-   */
-  public static function getPendingContributionID() {
-    if (empty(self::$_pending_mandate['contribution_id'])) {
-      return NULL;
-    } else {
-      return self::$_pending_mandate['contribution_id'];
-    }
-  }
-
-  public static function releasePendingMandateData($contribution_id) {
-    if (!self::$_pending_mandate) {
-      // nothing pending, nothing to do
-      return NULL;
-    }
-
-    if (empty(self::$_pending_mandate['contribution_id']) || $contribution_id != self::$_pending_mandate['contribution_id']) {
-      // something's wrong here
-      CRM_Core_Error::debug_log_message("SDD PP workflow error");
-      return NULL;
-    }
-
-    // everything checks out: reset and return data
-    $params = self::$_pending_mandate;
-    self::$_pending_mandate = NULL;
-    return $params;
-  }
-
-
-
+  /** Caches the creditor involved */
+  protected $_creditor = NULL;
 
 
   /**
@@ -90,7 +46,6 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
   public function getPaymentTypeLabel() {
     return E::ts('Direct Debit');
   }
-
 
   /**
    * Should the first payment date be configurable when setting up back office recurring payments.
@@ -326,6 +281,71 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
 //    }
   }
 
+  /****************************************************************************
+   *                           Helpers                                        *
+   ****************************************************************************/
+
+  /**
+   * Get the creditor currently involved in the process
+   *
+   * @return array|void
+   */
+  protected function getCreditor() {
+    if (!$this->_creditor) {
+      $pp = $this->getPaymentProcessor();
+      $creditor_id = $pp['user_name'];
+      $this->_creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
+    }
+    return $this->_creditor;
+  }
+
+  /****************************************************************************
+   *                 Contribution/Mandate Handover                            *
+   ****************************************************************************/
+
+  /**
+   * @param $contribution_id
+   */
+  public static function processContribution($contribution_id) {
+    CRM_Core_Error::debug_log_message("createPendingMandate for {$contribution_id}??");
+    if (!self::$_pending_mandate) {
+      // nothing pending, nothing to do
+      return;
+    }
+
+    // store contribution ID
+    self::$_pending_mandate['contribution_id'] = $contribution_id;
+  }
+
+  /**
+   * Get the ID of the currently pending contribution, if any
+   */
+  public static function getPendingContributionID() {
+    if (empty(self::$_pending_mandate['contribution_id'])) {
+      return NULL;
+    } else {
+      return self::$_pending_mandate['contribution_id'];
+    }
+  }
+
+  public static function releasePendingMandateData($contribution_id) {
+    if (!self::$_pending_mandate) {
+      // nothing pending, nothing to do
+      return NULL;
+    }
+
+    if (empty(self::$_pending_mandate['contribution_id']) || $contribution_id != self::$_pending_mandate['contribution_id']) {
+      // something's wrong here
+      CRM_Core_Error::debug_log_message("SDD PP workflow error");
+      return NULL;
+    }
+
+    // everything checks out: reset and return data
+    $params = self::$_pending_mandate;
+    self::$_pending_mandate = NULL;
+    return $params;
+  }
+
 
 //
 //    protected $_mode = NULL;
@@ -435,21 +455,20 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
    ***********************************************/
 
   function buildForm(&$form) {
-    CRM_Core_Error::debug_log_message("build form");
-
     // add rules
     $form->registerRule('sepa_iban_valid', 'callback', 'rule_valid_IBAN', 'CRM_Sepa_Logic_Verification');
     $form->registerRule('sepa_bic_valid',  'callback', 'rule_valid_BIC',  'CRM_Sepa_Logic_Verification');
 
     // BUFFER DAYS / TODO: MOVE TO SERVICE
+    $creditor = $this->getCreditor();
     $buffer_days      = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
-    $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $this->_creditorId);
-    $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $this->_creditorId);
+    $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor['id']);
+    $ooff_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $creditor['id']);
     $earliest_rcur_date = strtotime("now + $frst_notice_days days + $buffer_days days");
     $earliest_ooff_date = strtotime("now + $ooff_notice_days days");
 
     // find the next cycle day
-    $cycle_days = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId);
+    $cycle_days = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor['id']);
     $earliest_cycle_day = $earliest_rcur_date;
     while (!in_array(date('j', $earliest_cycle_day), $cycle_days)) {
       $earliest_cycle_day = strtotime("+ 1 day", $earliest_cycle_day);
@@ -517,15 +536,16 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
    * @return array
    *   field metadata
    */
-  public function _getPaymentFormFieldsMetadata() {
+  public function getPaymentFormFieldsMetadata() {
     if (version_compare(CRM_Utils_System::version(), '4.6.10', '<')) {
       return parent::getPaymentFormFieldsMetadata();
     } else {
+      $creditor = $this->getCreditor();
       return array(
           'account_holder' => array(
               'htmlType' => 'text',
               'name' => 'account_holder',
-              'title' => E::ts('Account Holder'),
+              'title' => ts('Account Holder', array('domain' => 'org.project60.sepa')),
               'cc_field' => TRUE,
               'attributes' => array(
                   'size' => 20,
@@ -577,7 +597,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
           'bank_name' => array(
               'htmlType' => 'text',
               'name' => 'bank_name',
-              'title' => E::ts('Bank Name'),
+              'title' => ts('Bank Name', array('domain' => 'org.project60.sepa')),
               'cc_field' => TRUE,
               'attributes' => array(
                   'size' => 34,
@@ -591,7 +611,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
               'name' => 'cycle_day',
               'title' => E::ts('Collection Day'),
               'cc_field' => TRUE,
-              'attributes' => CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $this->_creditorId),
+              'attributes' => CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor['id']),
               'is_required' => FALSE,
           ),
           'start_date' => array(
