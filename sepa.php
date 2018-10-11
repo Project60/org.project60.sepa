@@ -160,7 +160,7 @@ function sepa_civicrm_enable() {
   CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
 
   // install/activate SEPA payment processor
-  sepa_pp_install();
+  sepa_pp_enable();
 
   // create a dummy creditor if no creditor exists
   $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');

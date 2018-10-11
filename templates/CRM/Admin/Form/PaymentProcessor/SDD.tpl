@@ -56,11 +56,12 @@ cj('#url_site').parent().parent().remove();
 cj('#url_recur').parent().parent().remove();
 cj('#test_url_site').parent().parent().remove();
 cj('#test_url_recur').parent().parent().remove();
+cj('.crm-paymentProcessor-form-block-accept_credit_cards').hide();
+cj('tr.crm-paymentProcessor-form-block-payment-instrument-id').hide();
 
 // adjust help text
 cj('.crm-paymentProcessor-form-block-user_name').find('.helpicon').replaceWith(cj('#creditor_id_help'));
 cj('.crm-paymentProcessor-form-block-test_user_name').find('.helpicon').replaceWith(cj('#test_creditor_id_help'));
-
 // replace creditor selector
 cj('#user_name').replaceWith(cj('#creditor_id'));
 cj('#test_user_name').replaceWith(cj('#test_creditor_id'));
