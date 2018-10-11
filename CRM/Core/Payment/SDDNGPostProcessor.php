@@ -68,9 +68,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
 
     // CREATE OOFF CONTRIBUTION
     // load contribution
-    $contribution = civicrm_api3('Contribution', 'getsingle', array(
-        'id'     => $contribution_id,
-        'return' => 'contact_id,campaign_id,currency'));
+    $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $contribution_id));
 
     // load payment processor
     $payment_processor = civicrm_api3('PaymentProcessor', 'getsingle', array(
@@ -83,10 +81,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
       CRM_Core_Error::debug_log_message("SDD ERROR: No creditor found for PaymentProcessor [{$payment_processor['id']}].");
       return;
     }
-    $creditor = civicrm_api3('SepaCreditor', 'get', array(
-        'id'     => $creditor_id,
-        'return' => 'id,currency',
-    ));
+    $creditor = civicrm_api3('SepaCreditor', 'get', array('id' => $creditor_id));
 
     if (empty($params['contributionRecurID'])) {
       // OOFF Donation:
@@ -105,6 +100,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
           'date'            => date('YmdHis'),
           'creation_date'   => date('YmdHis'),
           'validation_date' => date('YmdHis'),
+          'source'          => $contribution['contribution_source'],
       ));
 
       // reset contribution to 'Pending'
@@ -128,15 +124,14 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
           'date'            => date('YmdHis'),
           'creation_date'   => date('YmdHis'),
           'validation_date' => date('YmdHis'),
+          'source'          => $contribution['source'],
       ));
 
-      // reset contribution
-      $frst_payment = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
-      self::resetContribution($contribution_id, $frst_payment);
-
       // reset recurring contribution
-      $rcur_payment = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
-      self::resetRecurringContribution($contribution_id, $rcur_payment);
+      self::updateRecurringContribution($params, $creditor['id'], $contribution);
+
+      // finally: delete contribution
+      civicrm_api3('Contribution', 'delete', ['id' => $contribution_id]);
     }
   }
 
@@ -178,27 +173,71 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
   /**
    * Tries to undo some of the stuff done to the recurring contribution
    *
-   * @param $contribution_recur_id int ContributionRecur ID
-   * @param $payment_instrument_id int Payment Instrument to set
+   * @param $contribution_recur_id int   ContributionRecur ID
+   * @param $contribution          array the individual contribution
+   * @param $payment_instrument_id int   Payment Instrument to set
    */
-  public static function resetRecurringContribution($contribution_recur_id, $payment_instrument_id) {
-    // update contribution... this can be tricky
-    $status_pending = (int)CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+  public static function updateRecurringContribution($params, $creditor, $contribution) {
+    // calculate start_date
+    $start_date = self::getNextPossibleCollectionDate($creditor['id']);
+
+    // calculate installments if requested
+    if (!empty($params['installments'])) {
+      // start with the start date (hopefully first collection)
+      $end_date = strtotime($start_date);
+      for ($i = 0; $i < $params['installments']; $i++) {
+        // skip forward one cycle per installment
+        $end_date = strtotime("+{$params['frequency_interval']} {$params['frequency_unit']}", $end_date);
+      }
+      // since this is "one too many", move back 5 days and format
+      $end_date = date('Y-m-d', strtotime("-5 days", $end_date));
+
+    } else {
+      $end_date = '';
+    }
+
+
+    // update recurring contribution
+    $status_pending        = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $contribution_recur_id = (int) $params['contributionRecurID'];
+    $payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
+
     try {
       civicrm_api3('ContributionRecur', 'create', array(
           'skipRecentView'         => 1, // avoid overhead
           'id'                     => $contribution_recur_id,
           'contribution_status_id' => $status_pending,
           'payment_instrument_id'  => $payment_instrument_id,
-      ));
+          'start_date'             => $start_date,
+          'end_date'               => $end_date));
     } catch (Exception $ex) {
       // that's not good... but we can't leave it like this...
       $error_message = $ex->getMessage();
       CRM_Core_Error::debug_log_message("SDD reset contribution via API failed ('{$error_message}'), using SQL...");
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id = %1, payment_instrument_id = %2 WHERE id = %3;", array(
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution_recur SET contribution_status_id = %1, payment_instrument_id = %2 WHERE id = %3;", array(
           1 => array($status_pending,        'Integer'),
           2 => array($payment_instrument_id, 'Integer'),
           3 => array($contribution_recur_id, 'Integer')));
     }
+  }
+
+  /**
+   * Calculate the next possible collection date, based solely on the creditor ID
+   *
+   * @param $creditor_id
+   *
+   * @return date
+   */
+  public static function getNextPossibleCollectionDate($creditor_id, $now = 'now') {
+    $buffer_days      = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
+    $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor_id);
+    $cycle_days       = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor_id);
+
+    $earliest_date = strtotime("+{$buffer_days} days +{$frst_notice_days} days", strtotime($now));
+    while (!in_array(date('j', $earliest_date), $cycle_days)) {
+      $earliest_date = strtotime("+ 1 day", $earliest_date);
+    }
+
+    return date('Y-m-d', $earliest_date);
   }
 }
