@@ -31,7 +31,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * @return void
    */
   function buildForm(&$form) {
-    CRM_Utils_System::setTitle(E::ts('My Search Title'));
+    CRM_Utils_System::setTitle(E::ts('CiviSEPA Contact Search'));
 
     $form->add('text',
       'reference',
@@ -95,7 +95,6 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     // delegate to $this->sql(), $this->select(), $this->from(), $this->where(), etc.
     $query = $this->sql($this->select(), $offset, $rowcount, $sort, $includeContactIDs, NULL);
-    CRM_Core_Error::debug_log_message($query);
     return $query;
   }
 
