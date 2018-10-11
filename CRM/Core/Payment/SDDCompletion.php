@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2018 SYSTOPIA                       |
+| Copyright (C) 2018 SYSTOPIA                            |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -24,7 +24,7 @@
  * @package CiviCRM_SEPA
  */
 
-class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
+class CRM_Core_Payment_SDDNGCompletion implements API_Wrapper {
   /**
    * Nothing to do here, we'll execute _after_ the original call
    */
@@ -56,11 +56,11 @@ class CRM_Core_Payment_SDDCompletion implements API_Wrapper {
   public static function createPendingMandate($contribution_id = NULL) {
     // fall back to current ID
     if ($contribution_id == NULL) {
-      $contribution_id = CRM_Core_Payment_SDD::getPendingContributionID();
+      $contribution_id = CRM_Core_Payment_SDDNG::getPendingContributionID();
     }
 
     // get pending mandate data (and mark as processed)
-    $params = CRM_Core_Payment_SDD::releasePendingMandateData($contribution_id);
+    $params = CRM_Core_Payment_SDDNG::releasePendingMandateData($contribution_id);
     if (!$params) {
       // nothing pending for us...
       return;
