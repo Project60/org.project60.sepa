@@ -21,58 +21,74 @@
  *
  */
 
+define('PP_SDD_PROCESSOR_TYPE',     'SEPA_Direct_Debit');
+define('PP_SDD_PROCESSOR_TYPE_NEW', 'SEPA_Direct_Debit_NG');
+
 /**
  * buildForm Hook for payment processor
  */
 function sepa_pp_buildForm ( $formName, &$form ) {
-	if ($formName == "CRM_Admin_Form_PaymentProcessor") {					// PAYMENT PROCESSOR CONFIGURATION PAGE
-		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
-		if ($pp['class_name'] == "Payment_SDD") {
-			// that's ours!
+  if ($formName == "CRM_Admin_Form_PaymentProcessor" ) {					// PAYMENT PROCESSOR CONFIGURATION PAGE
+    // get payment processor id
+    $pp_id = $form->getVar('_id');
+    $pp_type_id = $form->getVar('_paymentProcessorType');
+    if ($pp_id || $pp_type_id) {
+      // check if its ours (looking into pp or pp_type:
+      $pp_class_name = '';
+      if ($pp_id) {
+        $pp = civicrm_api3("PaymentProcessor", "getsingle", array("id" => $pp_id));
+        $pp_class_name = $pp['class_name'];
+      } else {
+        $pp_type = civicrm_api3("PaymentProcessorType", "getsingle", array("id" => $pp_type_id));
+        $pp_class_name = $pp_type['class_name'];
+      }
 
-			// get payment processor id
-			$pp_id = $form->getVar('_id');
+      if ($pp_class_name == "Payment_SDD" || $pp_class_name == "Payment_SDDNG") {
+        // it's ours!
 
-			// find the associated creditor(s)
-			$creditor_id      = NULL;
-			$test_creditor_id = NULL;
+        // find the associated creditor(s)
+        $creditor_id      = NULL;
+        $test_creditor_id = NULL;
 
-			$pp_creditor      = NULL;
-			$test_pp_creditor = NULL;
+        $pp_creditor      = NULL;
+        $test_pp_creditor = NULL;
 
-			if (!empty($pp_id)) {
-				$creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp'.$pp_id);
-				$test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp_test'.$pp_id);
-			}
+        if (!empty($pp_id)) {
+          $creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp'.$pp_id);
+          $test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp_test'.$pp_id);
+        }
 
-			// load settings from creditor
-			if ($creditor_id) {
-				$pp_creditor      = civicrm_api('SepaCreditor', 'getsingle', array('version'=>3, 'id'=>$creditor_id));
-				$test_pp_creditor = civicrm_api('SepaCreditor', 'getsingle', array('version'=>3, 'id'=>$test_creditor_id));
-				// TODO: ERROR HANDLING
-			}
+        // load settings from creditor
+        if ($creditor_id) {
+          $pp_creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
+        }
+        if ($test_creditor_id) {
+          $test_pp_creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id'=>$test_creditor_id));
+        }
 
-			$creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3));
-			$creditors = $creditors['values'];
+        $creditors = civicrm_api3('SepaCreditor', 'get');
+        $creditors = $creditors['values'];
 
-			$test_creditors = civicrm_api('SepaCreditor', 'get', array('version'=>3, 'category'=>'TEST'));
-			$test_creditors = $test_creditors['values'];
+        $test_creditors = civicrm_api3('SepaCreditor', 'get', array('category'=>'TEST'));
+        $test_creditors = $test_creditors['values'];
 
-			// use settings
-			if ($pp_creditor) {
-				$form->assign('user_name', $creditor_id);
-			}
-			if ($test_pp_creditor) {
-				$form->assign('test_user_name', $test_creditor_id);
-			}
-			$form->assign('creditors', $creditors);
-			$form->assign('test_creditors', $test_creditors);
+        // use settings
+        if ($pp_creditor) {
+          $form->assign('user_name', $creditor_id);
+        }
+        if ($test_pp_creditor) {
+          $form->assign('test_user_name', $test_creditor_id);
+        }
+        $form->assign('creditors', $creditors);
+        $form->assign('test_creditors', $test_creditors);
 
-			// add new elements
-			CRM_Core_Region::instance('page-body')->add(array(
-				'template' => 'CRM/Admin/Form/PaymentProcessor/SDD.tpl'
-			));
-		}
+        // add new elements
+        CRM_Core_Region::instance('page-body')->add(array(
+            'template' => 'CRM/Admin/Form/PaymentProcessor/SDD.tpl'
+        ));
+      }
+    }
+
 
 	} elseif ($formName == "CRM_Contribute_Form_Contribution_Main") {						  // PAYMENT PROCESS MAIN PAGE
 		$mendForm = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_improve_frequency');
@@ -189,23 +205,30 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 
 /**
  * postProcess Hook for payment processor
+ * (old approach)
  */
 function sepa_pp_postProcess( $formName, &$form ) {
+  // SDD: make sure mandate is created:
+  CRM_Core_Payment_SDDNGPostProcessor::createPendingMandate();
+
 	if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
-		$pp = civicrm_api("PaymentProcessorType", "getsingle", array("id"=>$form->_ppType, "version"=>3));
-		if ($pp['class_name'] = "Payment_SDD") {
-			$paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle',
-				array('name' => $form->_submitValues['name'], 'is_test' => 0));
+    $pp_id = $form->getVar('_id');
+    if ($pp_id) {
+      $pp = civicrm_api3("PaymentProcessorType", "getsingle", array("id" => $pp_id));
+      if ($pp['class_name'] = "Payment_SDD" || $pp['class_name'] == 'Payment_SDDNG') {
+        $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle',
+            array('name' => $form->_submitValues['name'], 'is_test' => 0));
 
-			$creditor_id = $form->_submitValues['user_name'];
-			$test_creditor_id = $form->_submitValues['test_user_name'];
-			$pp_id = $paymentProcessor['id'];
+        $creditor_id = $form->_submitValues['user_name'];
+        $test_creditor_id = $form->_submitValues['test_user_name'];
+        $pp_id = $paymentProcessor['id'];
 
-			// save settings
-			// FIXME: we might consider saving this as a JSON object
-			CRM_Core_BAO_Setting::setItem($creditor_id,      'SEPA Direct Debit PP', 'pp'.$pp_id);
-			CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP', 'pp_test'.$pp_id);
-		}
+        // save settings
+        // FIXME: we might consider saving this as a JSON object
+        CRM_Core_BAO_Setting::setItem($creditor_id,      'SEPA Direct Debit PP', 'pp'.$pp_id);
+        CRM_Core_BAO_Setting::setItem($test_creditor_id, 'SEPA Direct Debit PP', 'pp_test'.$pp_id);
+      }
+    }
 
 	} elseif ('CRM_Contribute_Form_Contribution_Confirm' == $formName) {
 		// post process the contributions created
@@ -222,12 +245,13 @@ function sepa_pp_postProcess( $formName, &$form ) {
 /**
  * Will install the SEPA payment processor
  */
-function sepa_pp_install() {
-	$sdd_pp = civicrm_api('PaymentProcessorType', 'getsingle', array('name'=>'sepa_direct_debit', 'version' => 3));
-	if (!empty($sdd_pp['is_error'])) {
+function sepa_pp_enable() {
+  // INSTALL OLD PROCESSOR
+  $sdd_pp_type_ids = [];
+	$sdd_pp = civicrm_api3('PaymentProcessorType', 'get', array('name' => PP_SDD_PROCESSOR_TYPE));
+	if (empty($sdd_pp['id'])) {
 		// doesn't exist yet => create
 		$payment_processor_data = array(
-		    "version"                   => 3,
 		    "name"                      => "SEPA_Direct_Debit",
 		    "title"                     => ts("SEPA Direct Debit"),
 		    "description"               => ts("Payment processor for the 'Single European Payement Area' (SEPA)."),
@@ -242,25 +266,64 @@ function sepa_pp_install() {
 		    "is_recur"                  => "1",
 		    "payment_type"              => CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
 		);
-		$result = civicrm_api('PaymentProcessorType', 'create', $payment_processor_data);
-		if (!empty($result['is_error'])) {
-			// something went wrong here...
-			CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' could not be created. Error was ".$result['error_message']);
-		} else {
-			CRM_Core_Error::debug_log_message("org.project60.sepa_dd: created payment processor with name 'SEPA_Direct_Debit'");
-		}
-
+		$result = civicrm_api3('PaymentProcessorType', 'create', $payment_processor_data);
+    $sdd_pp_type_ids[$result['id']] = 'Payment_SDD';
+    CRM_Core_Error::debug_log_message("org.project60.sepa_dd: created payment processor with name PP_SDD_PROCESSOR_TYPE");
 
 	} else {
 		// already exists => enable if not enabled
-		if (!$sdd_pp['is_active']) {
-			$result = civicrm_api('PaymentProcessorType', 'create', array('id'=>$sdd_pp['id'], 'is_active'=>1, 'version' => 3));
-			if (!empty($result['is_error'])) {
-				// something went wrong here...
-				CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' created.");
-			}
+    $sdd_pp_type_ids[$sdd_pp['id']] = 'Payment_SDD';
+		if (empty($sdd_pp['is_active'])) {
+			$result = civicrm_api3('PaymentProcessorType', 'create', array(
+          'id'        => $sdd_pp['id'],
+          'is_active' => 1));
 		}
 	}
+
+  // INSTALL NEW/NG PROCESSOR
+  $sdd_pp_ng = civicrm_api3('PaymentProcessorType', 'get', array('name' => 'SEPA_Direct_Debit_NG'));
+  if (empty($sdd_pp_ng['id'])) {
+    // doesn't exist yet => create
+    $payment_processor_data = array(
+        "name"                      => "SEPA_Direct_Debit_NG",
+        "title"                     => ts("SEPA Direct Debit (NEW)"),
+        "description"               => ts("Refactored Payment processor for the 'Single European Payement Area' (SEPA)."),
+        "is_active"                 => 1,
+        "user_name_label"           => "SEPA Creditor identifier",
+        "class_name"                => "Payment_SDDNG",
+        "url_site_default"          => "",
+        "url_recur_default"         => "",
+        "url_site_test_default"     => "",
+        "url_recur_test_default"    => "",
+        "billing_mode"              => "1",
+        "is_recur"                  => "1",
+        "payment_type"              => CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
+    );
+    $result = civicrm_api3('PaymentProcessorType', 'create', $payment_processor_data);
+    $sdd_pp_type_ids[$result['id']] = 'Payment_SDDNG';
+    CRM_Core_Error::debug_log_message("org.project60.sepa_dd: created payment processor with name 'SEPA_Direct_Debit_NG'");
+
+  } else {
+    // already exists => enable if not enabled
+    $sdd_pp_type_ids[$sdd_pp_ng['id']] = 'Payment_SDDNG';
+    if (empty($sdd_pp_ng['is_active'])) {
+      $result = civicrm_api3('PaymentProcessorType', 'create', array(
+          'id'        => $sdd_pp_ng['id'],
+          'is_active' => 1));
+    }
+  }
+
+  // restore dummy instances
+  if (!empty($sdd_pp_type_ids)) {
+    $sdd_pps = civicrm_api3('PaymentProcessor', 'get', [
+        'payment_processor_type_id' => ['IN' => array_keys($sdd_pp_type_ids)],
+        'class_name'                => 'Payment_Dummy']);
+    foreach ($sdd_pps['values'] as $sdd_pp) {
+      civicrm_api3('PaymentProcessor', 'create', [
+          'id'         => $sdd_pp['id'],
+          'class_name' => $sdd_pp_type_ids[$sdd_pp['payment_processor_type_id']]]);
+    }
+  }
 }
 
 /**
@@ -268,18 +331,26 @@ function sepa_pp_install() {
  */
 function sepa_pp_disable() {
 	// get payment processor...
-	$sdd_pp = civicrm_api('PaymentProcessorType', 'getsingle', array('name'=>'SEPA_Direct_Debit', 'version' => 3));
-	if (empty($sdd_pp['is_error'])) {
-		// ... and disable, if active. We can't delete it, because there might be donation pages linked to it.
-		if ($sdd_pp['is_active']) {
-			$result = civicrm_api('PaymentProcessorType', 'create', array('id'=>$sdd_pp['id'], 'is_active'=>0, 'version' => 3));
-			if (!empty($result['is_error'])) {
-				// something went wrong here...
-				CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' could not be disabled. Error was ".$result['error_message']);
-			}
-		}
-	} else {
-		// huh? payment processor does not exist (any more)?
-		CRM_Core_Error::debug_log_message("org.project60.sepa_dd: payment processor with name 'SEPA_Direct_Debit' has gone missing.");
-	}
+  $type_ids = [];
+	$sdd_pp_types = civicrm_api3('PaymentProcessorType', 'get', array(
+	    'name' => ['IN' => [PP_SDD_PROCESSOR_TYPE, PP_SDD_PROCESSOR_TYPE_NEW]]));
+	foreach ($sdd_pp_types['values'] as $sdd_pp_type ) {
+    if ($sdd_pp_type['is_active']) {
+      $type_ids[] = $sdd_pp_type['id'];
+      $result = civicrm_api3('PaymentProcessorType', 'create', array(
+          'id'        => $sdd_pp_type['id'],
+          'is_active' => 0));
+    }
+  }
+
+  // set instances to dummy
+  if (!empty($type_ids)) {
+    $sdd_pps = civicrm_api3('PaymentProcessor', 'get', [
+        'payment_processor_type_id' => ['IN' => $type_ids]]);
+    foreach ($sdd_pps['values'] as $sdd_pp) {
+      civicrm_api3('PaymentProcessor', 'create', [
+          'id'         => $sdd_pp['id'],
+          'class_name' => 'Payment_Dummy']);
+    }
+  }
 }
