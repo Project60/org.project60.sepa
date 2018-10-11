@@ -88,31 +88,63 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
         'return' => 'id,currency',
     ));
 
-    // create mandate
-    $mandate = civicrm_api3('SepaMandate', 'create', array(
-        'creditor_id'     => $creditor['id'],
-        'type'            => 'OOFF',
-        'iban'            => $params['iban'],
-        'bic'             => $params['bic'],
-        'status'          => 'OOFF',
-        'entity_table'    => 'civicrm_contribution',
-        'entity_id'       => $contribution_id,
-        'contact_id'      => $contribution['contact_id'],
-        'campaign_id'     => CRM_Utils_Array::value('campaign_id', $contribution),
-        'currency'        => CRM_Utils_Array::value('currency', $creditor, 'EUR'),
-        'date'            => date('YmdHis'),
-        'creation_date'   => date('YmdHis'),
-        'validation_date' => date('YmdHis'),
-    ));
+    if (empty($params['contributionRecurID'])) {
+      // OOFF Donation:
+      // create mandate
+      $mandate = civicrm_api3('SepaMandate', 'create', array(
+          'creditor_id'     => $creditor['id'],
+          'type'            => 'OOFF',
+          'iban'            => $params['iban'],
+          'bic'             => $params['bic'],
+          'status'          => 'OOFF',
+          'entity_table'    => 'civicrm_contribution',
+          'entity_id'       => $contribution_id,
+          'contact_id'      => $contribution['contact_id'],
+          'campaign_id'     => CRM_Utils_Array::value('campaign_id', $contribution),
+          'currency'        => CRM_Utils_Array::value('currency', $creditor, 'EUR'),
+          'date'            => date('YmdHis'),
+          'creation_date'   => date('YmdHis'),
+          'validation_date' => date('YmdHis'),
+      ));
 
-    // reset contribution to 'Pending'
-    $ooff_payment = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
-    self::resetContribution($contribution_id, $ooff_payment);
+      // reset contribution to 'Pending'
+      $ooff_payment = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
+      self::resetContribution($contribution_id, $ooff_payment);
 
+    } else {
+      // RECURRING DONATION
+      // create mandate
+      $mandate = civicrm_api3('SepaMandate', 'create', array(
+          'creditor_id'     => $creditor['id'],
+          'type'            => 'RCUR',
+          'iban'            => $params['iban'],
+          'bic'             => $params['bic'],
+          'status'          => 'FRST',
+          'entity_table'    => 'civicrm_contribution_recur',
+          'entity_id'       => $params['contributionRecurID'],
+          'contact_id'      => $contribution['contact_id'],
+          'campaign_id'     => CRM_Utils_Array::value('campaign_id', $contribution),
+          'currency'        => CRM_Utils_Array::value('currency', $creditor, 'EUR'),
+          'date'            => date('YmdHis'),
+          'creation_date'   => date('YmdHis'),
+          'validation_date' => date('YmdHis'),
+      ));
+
+      // reset contribution
+      $frst_payment = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
+      self::resetContribution($contribution_id, $frst_payment);
+
+      // reset recurring contribution
+      $rcur_payment = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
+      self::resetRecurringContribution($contribution_id, $rcur_payment);
+    }
   }
 
   /**
-   * @param $contribution_id
+   * Tries to undo some of the stuff done to the contribution
+   *
+   * @param $contribution_id       int Contribution ID
+   * @param $payment_instrument_id int Payment Instrument to set
    */
   public static function resetContribution($contribution_id, $payment_instrument_id) {
     // update contribution... this can be tricky
@@ -141,5 +173,32 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
                    FROM civicrm_entity_financial_trxn etx 
                    WHERE etx.entity_id = {$contribution_id}
                      AND etx.entity_table = 'civicrm_contribution');");
+  }
+
+  /**
+   * Tries to undo some of the stuff done to the recurring contribution
+   *
+   * @param $contribution_recur_id int ContributionRecur ID
+   * @param $payment_instrument_id int Payment Instrument to set
+   */
+  public static function resetRecurringContribution($contribution_recur_id, $payment_instrument_id) {
+    // update contribution... this can be tricky
+    $status_pending = (int)CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    try {
+      civicrm_api3('ContributionRecur', 'create', array(
+          'skipRecentView'         => 1, // avoid overhead
+          'id'                     => $contribution_recur_id,
+          'contribution_status_id' => $status_pending,
+          'payment_instrument_id'  => $payment_instrument_id,
+      ));
+    } catch (Exception $ex) {
+      // that's not good... but we can't leave it like this...
+      $error_message = $ex->getMessage();
+      CRM_Core_Error::debug_log_message("SDD reset contribution via API failed ('{$error_message}'), using SQL...");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id = %1, payment_instrument_id = %2 WHERE id = %3;", array(
+          1 => array($status_pending,        'Integer'),
+          2 => array($payment_instrument_id, 'Integer'),
+          3 => array($contribution_recur_id, 'Integer')));
+    }
   }
 }
