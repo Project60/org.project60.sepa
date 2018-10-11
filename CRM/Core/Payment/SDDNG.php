@@ -102,7 +102,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
 
     // verify BIC
     $bad_bic  = CRM_Sepa_Logic_Verification::verifyBIC($params['bic']);
-    if ($bad_iban) {
+    if ($bad_bic) {
       throw new \Civi\Payment\Exception\PaymentProcessorException($bad_bic);
     }
 
@@ -321,11 +321,13 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
    * Get the ID of the currently pending contribution, if any
    */
   public static function getPendingContributionID() {
-    if (empty(self::$_pending_mandate['contribution_id'])) {
-      return NULL;
-    } else {
+    if (!empty(self::$_pending_mandate['contribution_id'])) {
       return self::$_pending_mandate['contribution_id'];
     }
+    if (!empty(self::$_pending_mandate['contributionID'])) {
+      return self::$_pending_mandate['contributionID'];
+    }
+    return NULL;
   }
 
   public static function releasePendingMandateData($contribution_id) {
@@ -334,7 +336,8 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
       return NULL;
     }
 
-    if (empty(self::$_pending_mandate['contribution_id']) || $contribution_id != self::$_pending_mandate['contribution_id']) {
+    $contribution_id = self::getPendingContributionID();
+    if ($contribution_id != $contribution_id) {
       // something's wrong here
       CRM_Core_Error::debug_log_message("SDD PP workflow error");
       return NULL;
@@ -388,64 +391,6 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
 //  }
 
 
-//  /**
-//   * This function checks to see if we have the right config values
-//   *
-//   * @return string the error message if any
-//   * @public
-//   */
-//  function checkConfig() {
-//    // TODO: check urls (creditor IDs)
-//    // don't check frequencies any more (SEPA-452)
-//    // CRM_Utils_SepaOptionGroupTools::checkRecurringFrequencyUnits(TRUE, TRUE);
-//    return NULL;
-//  }
-//
-//  /**
-//   * perform SEPA "payment":
-//   *  - make sure the IBAN is correct
-//   *  - store parameters, so we can create the mandate in the POST hook
-//   *
-//   * @param  array  $params assoc array of input parameters for this transaction
-//   * @param  string $component context of this contribution
-//   *
-//   * @throws \Civi\Payment\Exception\PaymentProcessorException if IBAN or BIC don't check out
-//   * @return array the result in an nice formatted array (or an error object)
-//   */
-//  function doDirectPayment(&$params, $component = 'contribution') {
-//    $original_parameters = $params;
-//
-//    // extract SEPA data
-//    $params['component'] = $component;
-//    $params['iban']      = $params['bank_account_number'];
-//    $params['bic']       = $params['bank_identification_number'];
-//
-//    // Allow further manipulation of the arguments via custom hooks ..
-//    CRM_Utils_Hook::alterPaymentProcessorParams($this, $original_parameters, $params);
-//
-//    // verify IBAN
-//    $bad_iban = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban']);
-//    if ($bad_iban) {
-//      throw new \Civi\Payment\Exception\PaymentProcessorException($bad_iban);
-//    }
-//
-//    // verify BIC
-//    $bad_bic  = CRM_Sepa_Logic_Verification::verifyBIC($params['bic']);
-//    if ($bad_iban) {
-//      throw new \Civi\Payment\Exception\PaymentProcessorException($bad_bic);
-//    }
-//
-//    // make sure there's not an pending mandate
-//    if (self::$_pending_mandate) {
-//      throw new \Civi\Payment\Exception\PaymentProcessorException("SDD PaymentProcessor: workflow broken.");
-//    }
-//
-//    // all good? let's prime the post-hook
-//    self::$_pending_mandate = $params;
-////    $params['payment_status_id'] = 2;
-//
-//    return $params;
-//  }
 
 
 
@@ -558,6 +503,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
           'bank_account_number' => array(
               'htmlType' => 'text',
               'name' => 'bank_account_number',
+              'default' => 'DE91100000000123456789',
               'title' => E::ts('IBAN'),
               'cc_field' => TRUE,
               'attributes' => array(

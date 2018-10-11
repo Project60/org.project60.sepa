@@ -208,6 +208,9 @@ function sepa_pp_buildForm ( $formName, &$form ) {
  * (old approach)
  */
 function sepa_pp_postProcess( $formName, &$form ) {
+  // SDD: make sure mandate is created:
+  CRM_Core_Payment_SDDNGPostProcessor::createPendingMandate();
+
 	if ("CRM_Admin_Form_PaymentProcessor" == $formName) {
     $pp_id = $form->getVar('_id');
     if ($pp_id) {

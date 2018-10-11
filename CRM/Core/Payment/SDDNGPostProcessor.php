@@ -99,7 +99,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
         'entity_id'       => $contribution_id,
         'contact_id'      => $contribution['contact_id'],
         'campaign_id'     => CRM_Utils_Array::value('campaign_id', $contribution),
-        //'currency'        => CRM_Utils_Array::value('currency', $creditor, 'EUR'),
+        'currency'        => CRM_Utils_Array::value('currency', $creditor, 'EUR'),
         'date'            => date('YmdHis'),
         'creation_date'   => date('YmdHis'),
         'validation_date' => date('YmdHis'),

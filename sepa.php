@@ -267,6 +267,10 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
  *   contributions connected to SDD mandates.
  */
 function sepa_civicrm_apiWrappers(&$wrappers, $apiRequest) {
+  // add a wrapper for the payment processor
+  if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'completetransaction') {
+    $wrappers[] = new CRM_Core_Payment_SDDNGPostProcessor();
+  }
   // add a wrapper for Contact.getlist (used e.g. for AJAX lookups)
   if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'delete') {
     $wrappers[] = new CRM_Sepa_Logic_ContributionProtector();
