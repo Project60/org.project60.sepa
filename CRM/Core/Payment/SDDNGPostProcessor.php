@@ -124,7 +124,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
           'date'            => date('YmdHis'),
           'creation_date'   => date('YmdHis'),
           'validation_date' => date('YmdHis'),
-          'source'          => $contribution['source'],
+          'source'          => $contribution['contribution_source'],
       ));
 
       // reset recurring contribution
@@ -198,8 +198,8 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
 
 
     // update recurring contribution
-    $status_pending        = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $contribution_recur_id = (int) $params['contributionRecurID'];
+    $status_pending        = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
 
     try {

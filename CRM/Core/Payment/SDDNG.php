@@ -53,7 +53,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
    * @return bool
    */
   protected function supportsFutureRecurStartDate() {
-    return TRUE;
+    return FALSE;
   }
 
   /**
@@ -125,161 +125,10 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
    *   the error message if any
    */
   public function checkConfig() {
-//    $error = array();
-//    if (empty($this->_paymentProcessor['user_name'])) {
-//      $error[] = ts('APILogin is not set for this payment processor');
-//    }
-//
-//    if (empty($this->_paymentProcessor['password'])) {
-//      $error[] = ts('Key is not set for this payment processor');
-//    }
-//
-//    if (!empty($error)) {
-//      return implode('<p>', $error);
-//    }
-//    else {
-//      return NULL;
-//    }
-    // TODO: do anything here?
+    // TODO: anything to check?
     return NULL;
   }
 
-
-  /**
-   * Submit an Automated Recurring Billing subscription.
-   */
-  public function doRecurPayment() {
-//    $template = CRM_Core_Smarty::singleton();
-//
-//    $intervalLength = $this->_getParam('frequency_interval');
-//    $intervalUnit = $this->_getParam('frequency_unit');
-//    if ($intervalUnit == 'week') {
-//      $intervalLength *= 7;
-//      $intervalUnit = 'days';
-//    }
-//    elseif ($intervalUnit == 'year') {
-//      $intervalLength *= 12;
-//      $intervalUnit = 'months';
-//    }
-//    elseif ($intervalUnit == 'day') {
-//      $intervalUnit = 'days';
-//    }
-//    elseif ($intervalUnit == 'month') {
-//      $intervalUnit = 'months';
-//    }
-//
-//    // interval cannot be less than 7 days or more than 1 year
-//    if ($intervalUnit == 'days') {
-//      if ($intervalLength < 7) {
-//        return self::error(9001, 'Payment interval must be at least one week');
-//      }
-//      elseif ($intervalLength > 365) {
-//        return self::error(9001, 'Payment interval may not be longer than one year');
-//      }
-//    }
-//    elseif ($intervalUnit == 'months') {
-//      if ($intervalLength < 1) {
-//        return self::error(9001, 'Payment interval must be at least one week');
-//      }
-//      elseif ($intervalLength > 12) {
-//        return self::error(9001, 'Payment interval may not be longer than one year');
-//      }
-//    }
-//
-//    $template->assign('intervalLength', $intervalLength);
-//    $template->assign('intervalUnit', $intervalUnit);
-//
-//    $template->assign('apiLogin', $this->_getParam('apiLogin'));
-//    $template->assign('paymentKey', $this->_getParam('paymentKey'));
-//    $template->assign('refId', substr($this->_getParam('invoiceID'), 0, 20));
-//
-//    //for recurring, carry first contribution id
-//    $template->assign('invoiceNumber', $this->_getParam('contributionID'));
-//    $firstPaymentDate = $this->_getParam('receive_date');
-//    if (!empty($firstPaymentDate)) {
-//      //allow for post dated payment if set in form
-//      $startDate = date_create($firstPaymentDate);
-//    }
-//    else {
-//      $startDate = date_create();
-//    }
-//    /* Format start date in Mountain Time to avoid Authorize.net error E00017
-//     * we do this only if the day we are setting our start time to is LESS than the current
-//     * day in mountaintime (ie. the server time of the A-net server). A.net won't accept a date
-//     * earlier than the current date on it's server so if we are in PST we might need to use mountain
-//     * time to bring our date forward. But if we are submitting something future dated we want
-//     * the date we entered to be respected
-//     */
-//    $minDate = date_create('now', new DateTimeZone(self::TIMEZONE));
-//    if (strtotime($startDate->format('Y-m-d')) < strtotime($minDate->format('Y-m-d'))) {
-//      $startDate->setTimezone(new DateTimeZone(self::TIMEZONE));
-//    }
-//
-//    $template->assign('startDate', $startDate->format('Y-m-d'));
-//
-//    $installments = $this->_getParam('installments');
-//
-//    // for open ended subscription totalOccurrences has to be 9999
-//    $installments = empty($installments) ? 9999 : $installments;
-//    $template->assign('totalOccurrences', $installments);
-//
-//    $template->assign('amount', $this->_getParam('amount'));
-//
-//    $template->assign('cardNumber', $this->_getParam('credit_card_number'));
-//    $exp_month = str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT);
-//    $exp_year = $this->_getParam('year');
-//    $template->assign('expirationDate', $exp_year . '-' . $exp_month);
-//
-//    // name rather than description is used in the tpl - see http://www.authorize.net/support/ARB_guide.pdf
-//    $template->assign('name', $this->_getParam('description', TRUE));
-//
-//    $template->assign('email', $this->_getParam('email'));
-//    $template->assign('contactID', $this->_getParam('contactID'));
-//    $template->assign('billingFirstName', $this->_getParam('billing_first_name'));
-//    $template->assign('billingLastName', $this->_getParam('billing_last_name'));
-//    $template->assign('billingAddress', $this->_getParam('street_address', TRUE));
-//    $template->assign('billingCity', $this->_getParam('city', TRUE));
-//    $template->assign('billingState', $this->_getParam('state_province'));
-//    $template->assign('billingZip', $this->_getParam('postal_code', TRUE));
-//    $template->assign('billingCountry', $this->_getParam('country'));
-//
-//    $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
-//    // submit to authorize.net
-//
-//    $submit = curl_init($this->_paymentProcessor['url_recur']);
-//    if (!$submit) {
-//      return self::error(9002, 'Could not initiate connection to payment gateway');
-//    }
-//    curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
-//    curl_setopt($submit, CURLOPT_HTTPHEADER, array("Content-Type: text/xml"));
-//    curl_setopt($submit, CURLOPT_HEADER, 1);
-//    curl_setopt($submit, CURLOPT_POSTFIELDS, $arbXML);
-//    curl_setopt($submit, CURLOPT_POST, 1);
-//    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
-//
-//    $response = curl_exec($submit);
-//
-//    if (!$response) {
-//      return self::error(curl_errno($submit), curl_error($submit));
-//    }
-//
-//    curl_close($submit);
-//    $responseFields = $this->_ParseArbReturn($response);
-//
-//    if ($responseFields['resultCode'] == 'Error') {
-//      return self::error($responseFields['code'], $responseFields['text']);
-//    }
-//
-//    // update recur processor_id with subscriptionId
-//    CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionRecur', $this->_getParam('contributionRecurID'),
-//        'processor_id', $responseFields['subscriptionId']
-//    );
-//    //only impact of assigning this here is is can be used to cancel the subscription in an automated test
-//    // if it isn't cancelled a duplicate transaction error occurs
-//    if (!empty($responseFields['subscriptionId'])) {
-//      $this->_setParam('subscriptionId', $responseFields['subscriptionId']);
-//    }
-  }
 
   /****************************************************************************
    *                           Helpers                                        *
@@ -348,50 +197,6 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
     self::$_pending_mandate = NULL;
     return $params;
   }
-
-
-//
-//    protected $_mode = NULL;
-//  protected $_params = array();
-//
-//  static private $_singleton = NULL;
-//
-//  /** params for pending mandate (after contribution is created) */
-//  protected static $_pending_mandate = NULL;
-
-//  /**
-//   * Constructor
-//   *
-//   * @param string $mode the mode of operation: live or test
-//   *
-//   * @return void
-//   */
-//  function __construct($mode, &$paymentProcessor) {
-//    $this->_mode = $mode;
-//    $this->_paymentProcessor = $paymentProcessor;
-////    $this->_processorName = E::ts('SEPA Direct Debit NG');
-////    $this->_creditorId = $paymentProcessor['user_name'];
-//  }
-//
-//  /**
-//   * singleton function used to manage this object
-//   *
-//   * @param string $mode the mode of operation: live or test
-//   *
-//   * @return object
-//   * @static
-//   *
-//   */
-//  static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-//    $processorName = $paymentProcessor['name'];
-//    if (CRM_Utils_Array::value($processorName, self::$_singleton) === NULL) {
-//      self::$_singleton[$processorName] = new CRM_Core_Payment_SDD($mode, $paymentProcessor);
-//    }
-//    return self::$_singleton[$processorName];
-//  }
-
-
-
 
 
 
