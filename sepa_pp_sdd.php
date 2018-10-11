@@ -270,7 +270,7 @@ function sepa_pp_enable() {
 	} else {
 		// already exists => enable if not enabled
     $sdd_pp_type_ids[$sdd_pp['id']] = 'Payment_SDD';
-		if (!$sdd_pp['is_active']) {
+		if (empty($sdd_pp['is_active'])) {
 			$result = civicrm_api3('PaymentProcessorType', 'create', array(
           'id'        => $sdd_pp['id'],
           'is_active' => 1));
@@ -303,7 +303,7 @@ function sepa_pp_enable() {
   } else {
     // already exists => enable if not enabled
     $sdd_pp_type_ids[$sdd_pp_ng['id']] = 'Payment_SDDNG';
-    if (!$sdd_pp_ng['is_active']) {
+    if (empty($sdd_pp_ng['is_active'])) {
       $result = civicrm_api3('PaymentProcessorType', 'create', array(
           'id'        => $sdd_pp_ng['id'],
           'is_active' => 1));
@@ -313,12 +313,12 @@ function sepa_pp_enable() {
   // restore dummy instances
   if (!empty($sdd_pp_type_ids)) {
     $sdd_pps = civicrm_api3('PaymentProcessor', 'get', [
-        'payment_type' => ['IN' => array_keys($sdd_pp_type_ids)],
-        'class_name'   => 'Payment_Dummy']);
+        'payment_processor_type_id' => ['IN' => array_keys($sdd_pp_type_ids)],
+        'class_name'                => 'Payment_Dummy']);
     foreach ($sdd_pps['values'] as $sdd_pp) {
       civicrm_api3('PaymentProcessor', 'create', [
           'id'         => $sdd_pp['id'],
-          'class_name' => $sdd_pp_type_ids[$sdd_pp['payment_type']]]);
+          'class_name' => $sdd_pp_type_ids[$sdd_pp['payment_processor_type_id']]]);
     }
   }
 }
@@ -343,7 +343,7 @@ function sepa_pp_disable() {
   // set instances to dummy
   if (!empty($type_ids)) {
     $sdd_pps = civicrm_api3('PaymentProcessor', 'get', [
-        'payment_type' => ['IN' => $type_ids]]);
+        'payment_processor_type_id' => ['IN' => $type_ids]]);
     foreach ($sdd_pps['values'] as $sdd_pp) {
       civicrm_api3('PaymentProcessor', 'create', [
           'id'         => $sdd_pp['id'],
