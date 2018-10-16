@@ -38,7 +38,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // handle 'normal' creation process including hooks
     $hook = empty($params['id']) ? 'create' : 'edit';
+
+    // run the PRE hook
     CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
+
+    // load the creditor
     if (empty($params['creditor_id'])) {
       if (empty($params['id'])) {
         // new mandate, use the default creditor
@@ -51,14 +55,16 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
     $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix,creditor_type'));
 
-    // set default date to today
-    if (!array_key_exists("date", $params)) {
-      $params["date"] = date("YmdHis");
-    }
-
     if (empty($params['id'])) {
-      // we are creating a new mandate...
+      // we are creating a NEW MANDATE...
+
+      // call the hook
       CRM_Utils_SepaCustomisationHooks::create_mandate($params);
+
+      // set a default (signature) date
+      if (empty($params["date"])) {
+        $params["date"] = date("YmdHis");
+      }
 
       // make sure it has a reference
       if (empty($params['reference'])) {
