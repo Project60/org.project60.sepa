@@ -59,6 +59,9 @@ class CRM_Sepa_Logic_Verification {
         if (!preg_match("/^[A-Z0-9]+$/", $iban)) {
           return E::ts("IBAN is not correct");
         }
+        if (preg_match("/^IBAN/", $iban)) {
+          return E::ts("Please remove leading IBAN");
+        }
         if (!verify_iban($iban)) {
           return E::ts("IBAN is not correct");
         }
