@@ -89,11 +89,22 @@ function sepa_civicrm_pageRun( &$page ) {
       if (!CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
         return;
 
-      $mandate = civicrm_api("SepaMandate","getsingle",array("version"=>3, "entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
+      $mandate = civicrm_api3("SepaMandate","getsingle",array("entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
       if (!array_key_exists("id",$mandate)) {
           CRM_Core_Error::fatal(ts("Can't find the sepa mandate", array('domain' => 'org.project60.sepa')));
       }
-      $page->assign("sepa",$mandate);
+
+      // load notes
+      $mandate['notes'] = array();
+      if ($mandate['type'] == 'RCUR') {
+        $contribution_recur_id = (int) $mandate['entity_id'];
+        $mandate_note_query = CRM_Core_DAO::executeQuery("SELECT note FROM civicrm_note WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur' ORDER BY modified_date DESC;");
+        while ($mandate_note_query->fetch()) {
+          $mandate['notes'][] = $mandate_note_query->note;
+        }
+      }
+
+      $page->assign("sepa", $mandate);
       $page->assign('can_edit_mandate',   CRM_Core_Permission::check('edit sepa mandates'));
       CRM_Core_Region::instance('page-body')->add(array(
         'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'

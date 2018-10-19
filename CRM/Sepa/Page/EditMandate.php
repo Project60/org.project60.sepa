@@ -79,6 +79,16 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot read contact [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contact1, $contact1['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     }
 
+    // load the mandate's cancel reason(s)
+    $mandate_cancel_reasons = array();
+    if ($mandate['type'] == 'RCUR') {
+      $contribution_recur_id = (int) $mandate['entity_id'];
+      $cancel_reason_query = CRM_Core_DAO::executeQuery("SELECT note FROM civicrm_note WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur' AND subject = 'cancel_reason' ORDER BY modified_date DESC;");
+      while ($cancel_reason_query->fetch()) {
+        $mandate_cancel_reasons[] = $cancel_reason_query->note;
+      }
+    }
+
     // load the contribtion's contact
     if ($mandate['contact_id']==$contribution['contact_id']) {
       $contact2 = $contact1;
@@ -168,6 +178,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $this->assign('contribution', $contribution);
     $this->assign('contact1', $contact1);
     $this->assign('contact2', $contact2);
+    $this->assign('mandate_cancel_reasons', $mandate_cancel_reasons);
     $this->assign('can_delete', CRM_Core_Permission::check('delete sepa groups'));
     $this->assign('can_modify', CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification'));
     $this->assign('sepa_templates', $tpl_ids);

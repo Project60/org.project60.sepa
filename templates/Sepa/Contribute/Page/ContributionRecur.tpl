@@ -60,15 +60,15 @@
 </div-->
 
 {* add note field *}
-{crmAPI var='result' entity='Note' action='get' q='civicrm/ajax/rest' entity_id=$recur.id entity_table='civicrm_contribution_recur'}
 <table hidden="1">
-{foreach from=$result.values item=Note}
-<tr name="note_added"><td class="label">{ts domain="org.project60.sepa"}Note{/ts}</td><td>{$Note.note}</td></tr>
+{foreach from=$sepa.notes item=note}
+<tr name="note_added"><td class="label">{ts domain="org.project60.sepa"}Notes{/ts}</td><td>{$note}</td></tr>
 {/foreach}
 </table>
 
 <script type="text/javascript">
 cj("div.crm-recurcontrib-view-block > table > tbody").append(cj("[name='note_added']"));
+// remove
 </script>
 
 
