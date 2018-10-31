@@ -160,56 +160,32 @@ class CRM_Sepa_Logic_Group {
     }
 
     // step 1.1: fix contributions, that have no financial transactions. (happens due to a status-bug in civicrm)
-    $find_rotten_contributions_sql = "
-    SELECT
-     contribution.id AS contribution_id
-    FROM
-      civicrm_sdd_contribution_txgroup AS txn_to_contribution
-    LEFT JOIN
-      civicrm_contribution AS contribution ON contribution.id = txn_to_contribution.contribution_id
-    WHERE
-      txn_to_contribution.txgroup_id IN ($txgroup_id)
-    AND
-      contribution.id NOT IN (SELECT entity_id FROM civicrm_entity_financial_trxn WHERE entity_table='civicrm_contribution');
-    ";
-    $rotten_contribution = CRM_Core_DAO::executeQuery($find_rotten_contributions_sql);
-    while ($rotten_contribution->fetch()) {
-      $contribution_id = $rotten_contribution->contribution_id;
-      // set these rotten contributions to 'Pending', no 'pay_later'
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id=$status_pending, is_pay_later=0 WHERE id=$contribution_id;");
-      // now they will get their transactions back when they get set to 'completed' in the next step...
-      error_log("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
-    }
-
-    // step 1.2: in CiviCRM before 4.4.4, the status 'In Progress' => 'Completed' was not allowed:
-    if (version_compare(CRM_Utils_System::version(), '4.4.4', '<')) {
-      // therefore, we change all these contributions' statuses back to 'Pending'
-      $fix_status_query = "
-      UPDATE
-          civicrm_contribution
-      SET
-          contribution_status_id = $status_pending,
-          is_pay_later = 0
-      WHERE
-          contribution_status_id = $status_inprogress
-      AND id IN (SELECT contribution_id FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$txgroup_id);
-      ";
-      CRM_Core_DAO::executeQuery($fix_status_query);
+    //  this should only be done in CiviCRM < 4.7.0, otherwise it causes the linked recurring contribution to
+    //  switch status, see SEPA-514
+    if (version_compare(CRM_Utils_System::version(), '4.7.0', '<')) {
+      $find_rotten_contributions_sql = "
+        SELECT contribution.id AS contribution_id
+        FROM civicrm_sdd_contribution_txgroup AS txn_to_contribution
+        LEFT JOIN civicrm_contribution AS contribution ON contribution.id = txn_to_contribution.contribution_id
+        WHERE txn_to_contribution.txgroup_id IN ($txgroup_id)
+          AND contribution.id NOT IN (SELECT entity_id FROM civicrm_entity_financial_trxn WHERE entity_table='civicrm_contribution');";
+      $rotten_contribution = CRM_Core_DAO::executeQuery($find_rotten_contributions_sql);
+      while ($rotten_contribution->fetch()) {
+        $contribution_id = $rotten_contribution->contribution_id;
+        // set these rotten contributions to 'Pending', no 'pay_later'
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id=$status_pending, is_pay_later=0 WHERE id=$contribution_id;");
+        // now they will get their transactions back when they get set to 'completed' in the next step...
+        CRM_Core_Error::debug_log_message("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
+      }
     }
 
     // step 2: update all the contributions
     $find_txgroup_contributions_sql = "
-    SELECT
-     contribution.id AS contribution_id
-    FROM
-      civicrm_sdd_contribution_txgroup AS txn_to_contribution
-    LEFT JOIN
-      civicrm_contribution AS contribution ON contribution.id = txn_to_contribution.contribution_id
-    WHERE
-      contribution_status_id IN ($status_pending,$status_inprogress)
-    AND
-      txn_to_contribution.txgroup_id IN ($txgroup_id);
-    ";
+      SELECT contribution.id AS contribution_id
+      FROM civicrm_sdd_contribution_txgroup AS txn_to_contribution
+      LEFT JOIN civicrm_contribution AS contribution ON contribution.id = txn_to_contribution.contribution_id
+      WHERE contribution_status_id IN ($status_pending,$status_inprogress)
+      AND txn_to_contribution.txgroup_id IN ($txgroup_id);";
     $contribution = CRM_Core_DAO::executeQuery($find_txgroup_contributions_sql);
     $error_count = 0;
     while ($contribution->fetch()) {
@@ -222,7 +198,7 @@ class CRM_Sepa_Logic_Group {
           'receive_date'             => date('YmdHis', strtotime($txgroup['collection_date']))));
       if (!empty($result['is_error'])) {
         $error_count += 1;
-        error_log("org.project60.sepa: ".$result['error_message']);
+        CRM_Core_Error::debug_log_message("org.project60.sepa: ".$result['error_message']);
       }
     }
 
