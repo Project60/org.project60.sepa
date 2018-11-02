@@ -14,6 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+include_once "api/Wrapper.php";
 
 /**
  * SEPA_Direct_Debit payment processor
