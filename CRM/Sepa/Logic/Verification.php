@@ -65,11 +65,55 @@ class CRM_Sepa_Logic_Verification {
         if (!verify_iban($iban)) {
           return E::ts("IBAN is not correct");
         }
+        break;
 
       default:
       case 'PSP':
         if (!preg_match("#^[a-zA-Z0-9_\/\-=+]+$#", $iban)) {
           return E::ts("Invalid PSP Code");
+        }
+    }
+    // all clear
+    return NULL;
+  }
+
+  /**
+   * Verifies if the given mandate reference is formally correct
+   *
+   * @param $reference string reference candidate
+   *
+   * @return NULL if given reference is valid, localized error message otherwise
+   */
+  public static function verifyReference($reference, $type = 'SEPA') {
+    switch ($type) {
+      case 'SEPA':
+        // official guidelines say this:
+        if (!preg_match("#^[A-Za-z0-9+?/\-:()., ']+$#", $reference)) {
+          return E::ts("Illegal characters detected");
+        }
+
+        // we don't want weird numbers starting/ending with special characters
+        if (preg_match("#^[+?/\-:().,' ]#", $reference)) {
+          return E::ts("Don't start with special characters");
+        }
+        if (preg_match("#[+?/\-:().,' ]$#", $reference)) {
+          return E::ts("Don't end with special characters");
+        }
+        break;
+
+      default:
+      case 'PSP':
+        // similar to SEPA, but with extra '_'
+        if (!preg_match("#^[A-Za-z0-9+?/\-:()., _']+$#", $reference)) {
+          return E::ts("Illegal characters detected");
+        }
+
+        // we don't want weird numbers starting/ending with special characters
+        if (preg_match("#^[+?/\-:().,']#", $reference)) {
+          return E::ts("Don't start with special characters");
+        }
+        if (preg_match("#[+?/\-:().,']$#", $reference)) {
+          return E::ts("Don't end with special characters");
         }
     }
     // all clear

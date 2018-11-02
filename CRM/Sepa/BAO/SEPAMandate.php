@@ -76,7 +76,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       }
     }
 
-    // validate IBAN / BIC
+    // validate IBAN / BIC / reference
     if (!empty($params['iban'])) {
       $params['iban'] = strtoupper($params['iban']);           // create uppercase string
       $params['iban'] = str_replace(' ', '', $params['iban']); // strip spaces
@@ -89,6 +89,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       if ($bic_error) throw new CRM_Exception($bic_error . ':' . $params['bic']);
     }
 
+    if (isset($params['reference']) && strlen($params['reference']) > 0) {
+      $reference_error = CRM_Sepa_Logic_Verification::verifyReference($params['reference'], $creditor['creditor_type']);
+      if ($reference_error) throw new CRM_Exception($reference_error . ':' . $params['reference']);
+    }
 
     // create the DAO object
     $dao = new CRM_Sepa_DAO_SEPAMandate();

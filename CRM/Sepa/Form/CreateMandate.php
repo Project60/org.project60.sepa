@@ -364,13 +364,23 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       $this->_errors['amount'] = E::ts("Amount has to be positive.");
     }
 
-    // validate reference
+    // validate the reference
     if (strlen($this->_submitValues['reference']) > 0) {
-      // check if the reference is available
-      $in_use = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_sdd_mandate WHERE reference = %1",
-          array(1 => array($this->_submitValues['reference'], 'String')));
-      if ($in_use) {
-        $this->_errors['reference'] = E::ts("Already in use");
+      if ($creditor_mode == 'SEPA') {
+        $reference_error = CRM_Sepa_Logic_Verification::verifyReference($this->_submitValues['reference']);
+      } else {
+        $reference_error = CRM_Sepa_Logic_Verification::verifyReference($this->_submitValues['reference'], $creditor_mode);
+      }
+      if ($reference_error) {
+        $this->_errors['reference'] = $reference_error;
+      } else {
+        // check if the reference is available
+        $in_use = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_sdd_mandate WHERE reference = %1",
+            array(1 => array($this->_submitValues['reference'], 'String')));
+        if ($in_use) {
+          $this->_errors['reference'] = E::ts("Already in use");
+        }
+
       }
     }
 
