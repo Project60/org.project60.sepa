@@ -285,8 +285,14 @@ class CRM_Sepa_Logic_Queue_Close {
       // this status cannot be set via the API -> use SQL
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN ({$contribution_id_list});");
 
-    } else {
-      // this should be status 'Completed', but it doesn't really matter
+    } else { // this should be status 'Completed', but it doesn't really matter
+      // first, some sanity checks:
+      if (version_compare(CRM_Utils_System::version(), '4.7.0', '>=')) {
+        // make sure they're all in status 'In Progress' to avoid SEPA-514
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN ({$contribution_id_list});");
+      }
+
+      // then: set them all to the new status
       foreach ($contributions as $contribution) {
         civicrm_api3('Contribution', 'create', array(
             'id'                       => $contribution['id'],
