@@ -143,7 +143,15 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
     if (!$this->_creditor) {
       $pp = $this->getPaymentProcessor();
       $creditor_id = $pp['user_name'];
-      $this->_creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
+      try {
+        $this->_creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
+      } catch (Exception $ex) {
+        // probably no creditor set, or creditor has been deleted - use default
+        CRM_Core_Error::debug_log_message("org.project60.sepa: creditor [{$creditor_id}] not found, SDDNG using default/any.");
+        $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
+        $creditors = civicrm_api3('SepaCreditor', 'get', array('id' => $default_creditor_id));
+        $this->_creditor = reset($creditors['values']);
+      }
     }
     return $this->_creditor;
   }

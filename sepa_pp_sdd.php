@@ -70,6 +70,10 @@ function sepa_pp_buildForm ( $formName, &$form ) {
         $creditors = $creditors['values'];
 
         $test_creditors = civicrm_api3('SepaCreditor', 'get', array('category'=>'TEST'));
+        if (empty($test_creditors['values'])) {
+          // no test creditors? just offer the regular ones, selecting none is not good
+          $test_creditors = civicrm_api3('SepaCreditor', 'get');
+        }
         $test_creditors = $test_creditors['values'];
 
         // use settings
@@ -281,11 +285,11 @@ function sepa_pp_enable() {
 	}
 
   // INSTALL NEW/NG PROCESSOR
-  $sdd_pp_ng = civicrm_api3('PaymentProcessorType', 'get', array('name' => 'SEPA_Direct_Debit_NG'));
+  $sdd_pp_ng = civicrm_api3('PaymentProcessorType', 'get', array('name' => PP_SDD_PROCESSOR_TYPE_NEW));
   if (empty($sdd_pp_ng['id'])) {
     // doesn't exist yet => create
     $payment_processor_data = array(
-        "name"                      => "SEPA_Direct_Debit_NG",
+        "name"                      => PP_SDD_PROCESSOR_TYPE_NEW,
         "title"                     => ts("SEPA Direct Debit (NEW)"),
         "description"               => ts("Refactored Payment processor for the 'Single European Payement Area' (SEPA)."),
         "is_active"                 => 1,
