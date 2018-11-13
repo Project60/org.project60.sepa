@@ -71,7 +71,8 @@ function sdd_lookup_bic() {
   }
   if (sdd_hide_bic_enabled) {
     // if it's hidden, we should clear it at this point
-    cj("#bic").attr('value', '');
+    cj("#bic").attr('value', '')
+              .val(data['bic']);
   }
   cj("#bic_busy").show();
   cj("div.payment_processor-section").trigger("sdd_biclookup", "started");
@@ -79,7 +80,8 @@ function sdd_lookup_bic() {
   CRM.api('Bic', 'findbyiban', {'iban': iban_partial},
     {success: function(data) {
       if ('bic' in data) {
-        cj("#bic").attr('value', data['bic']);
+        cj("#bic").attr('value', data['bic'])
+                  .val(data['bic']);
         cj("#bank_name").html(data['title']);
         cj("#bic_busy").hide();
         cj("div.payment_processor-section").trigger("sdd_biclookup", "success");
@@ -87,7 +89,8 @@ function sdd_lookup_bic() {
       } else {
         sdd_clear_bank();
         sdd_show_bic(true, "");
-        cj("#bic").attr('value', '');
+        cj("#bic").attr('value', '')
+                  .val(data['bic']);
         cj("div.payment_processor-section").trigger("sdd_biclookup", "failed");
       }
     }, error: function(result, settings) {
