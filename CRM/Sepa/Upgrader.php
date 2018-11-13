@@ -174,7 +174,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   }
 
   /**
-   * Fixes the damages caused by SEPA-514
+   * Make sure the new PP is available
    *
    * @return TRUE on success
    * @throws Exception
@@ -183,6 +183,19 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $this->ctx->log->info('Applying update 1413');
     // make sure the new payment processor is available
     sepa_pp_enable();
+    return TRUE;
+  }
+
+  /**
+   * Make sure, the payment_processor_id in civicrm_sdd_creditor is NULL.
+   *  This *shouldn't* be the set, but if it is, it can cause errors.
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1414() {
+    $this->ctx->log->info('Applying update 1414');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_sdd_creditor SET payment_processor_id = NULL;');
     return TRUE;
   }
 }
