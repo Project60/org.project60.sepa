@@ -198,5 +198,19 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_sdd_creditor SET payment_processor_id = NULL;');
     return TRUE;
   }
+
+  /**
+   * Apply schema changes from previous upgrades to logging schema
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1415() {
+    $this->ctx->log->info('Applying update 1415: Fix logging schema');
+    $logging = new CRM_Logging_Schema();
+    $logging->fixSchemaDifferences();
+    return TRUE;
+  }
+
 }
 
