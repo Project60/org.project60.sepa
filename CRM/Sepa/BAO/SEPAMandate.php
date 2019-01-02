@@ -179,7 +179,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   public function getUnbatchedContributionIds() {
     // 1.determine the contract (ie. find out how to get contributions)
-    $contrib = $bao->getContract();
+    $contrib = $this->getContract();
 
     // 2. if it is a recurring one, get the contribs that match the pattern
     if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
