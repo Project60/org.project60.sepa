@@ -63,7 +63,7 @@
           <PstlAdr>
             <Ctry>{$contribution.ctry}</Ctry>
             <AdrLine>{if $contribution.street_address}{$contribution.street_address}{else}n/a{/if}</AdrLine>
-            <AdrLine>{if $contribution.postal_code}{$contribution.postal_code}{else}n/a{/if}{if $contribution.city}{$contribution.city}{/if}</AdrLine>
+            <AdrLine>{if $contribution.postal_code}{$contribution.postal_code}{else}n/a{/if} {if $contribution.city}{$contribution.city}{/if}</AdrLine>
           </PstlAdr>
         </Dbtr>
         <DbtrAcct>

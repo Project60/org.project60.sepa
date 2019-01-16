@@ -141,6 +141,27 @@ class CRM_Sepa_Logic_Verification {
     return substr($iban, 0, $reveal_count) . str_repeat($placeholder, $anonymised_count) . substr($iban, (strlen($iban)-$reveal_count), $reveal_count);
   }
 
+  /**
+   * Convert the given string to the SEPA character set (see SEPA-520)
+   *
+   * @param $string string given value
+   * @return string converted string
+   */
+  public static function convert2SepaCharacterSet($string) {
+    if (!isset($string)) {
+      return $string;
+    }
+
+    // try to convert the name into transliterated ASCII
+    if (function_exists("iconv")){
+      $string = iconv("UTF-8", "ASCII//TRANSLIT", $string);
+    }
+
+    // replace the remaining characters with '?'
+    $string = preg_replace("/[^ 0-9a-zA-Z':?,\-(+.)\/\"]/", '?', $string);
+    return $string;
+  }
+
 
   /**
    * Form rule wrapper for ::verifyIBAN
