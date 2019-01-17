@@ -321,7 +321,12 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           $defaults['rpl_cancel_reason'] = trim($this->rpl_reason);
         }
       }
-
+    } else {
+      // set default creditor
+      $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
+      if ($default_creditor_id) {
+        $defaults['creditor_id'] = $default_creditor_id;
+      }
     }
 
     return $defaults;
@@ -491,7 +496,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    *  - the currency
    */
   protected function getCreditors() {
-    $default_creditor_id = CRM_Sepa_Logic_Settings::defaultCreditor();
+    $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
 
     $creditor_query = civicrm_api3('SepaCreditor', 'get', array());
     $creditors = $creditor_query['values'];
