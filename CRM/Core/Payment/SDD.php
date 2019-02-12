@@ -44,8 +44,14 @@ class CRM_Core_Payment_SDD extends CRM_Core_Payment {
       // probably no creditor set, or creditor has been deleted - use default
       CRM_Core_Error::debug_log_message("org.project60.sepa: creditor [{$paymentProcessor['user_name']}] not found, SDD using default/any.");
       $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
-      $creditors = civicrm_api3('SepaCreditor', 'get', array('id' => $default_creditor_id));
-      $this->_creditor = reset($creditors['values']);
+      try {
+        $creditors = civicrm_api3('SepaCreditor', 'get', array('id' => $default_creditor_id));
+        $this->_creditor = reset($creditors['values']);
+      } catch(Exception $ex2) {
+        // there seems to be a fundamental issue -> this can happen during upgrade (see #527)
+        CRM_Core_Error::debug_log_message("Creditor cannot be loaded - SDD payment processor not functional! Maybe run the extension schema update...");
+        $this->_creditor = [];
+      }
     }
   }
 
