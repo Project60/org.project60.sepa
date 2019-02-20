@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: org.project60.sepa\n"
-"POT-Creation-Date: 2016-06-08 15:55+0200\n"
+"POT-Creation-Date: 2019-02-06 21:26+0100\n"
 "Language-Team: CiviCRM Translators <civicrm-translators@lists.civicrm.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,11 +63,20 @@ msgid "- select -"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "SEPA"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "PSP"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Creditor Contact"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Name"
 msgstr ""
@@ -85,7 +94,9 @@ msgid "Country"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php sepa.php
+#: CRM/Core/Payment/SDDNG.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php sepa.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -98,7 +109,9 @@ msgid "BIC"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Core/Payment/SDD.php
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php sepa.php
+#: CRM/Core/Payment/SDDNG.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php js/CreateMandate.js sepa.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -108,6 +121,20 @@ msgstr ""
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "IBAN"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Report/SepaMandateOOFF.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php sepa.php
+msgid "Currency"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPAMandate.php
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php sepa.php
+#: templates/CRM/Sepa/Page/DashBoard.tpl templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Type"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
@@ -122,6 +149,19 @@ msgstr ""
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Exclude Weekends"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "Large Groups"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Only Completed Contributions"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "No XML drafts"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
@@ -171,42 +211,50 @@ msgstr ""
 msgid "Couldn't create SEPA mandate. Error was: "
 msgstr ""
 
-#: CRM/Core/Payment/SDD.php
+#: CRM/Core/Payment/SDD.php CRM/Core/Payment/SDDNG.php
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 msgid "Account Holder"
 msgstr ""
 
-#: CRM/Core/Payment/SDD.php
+#: CRM/Core/Payment/SDD.php CRM/Core/Payment/SDDNG.php
 msgid "This is not a correct IBAN."
 msgstr ""
 
-#: CRM/Core/Payment/SDD.php
+#: CRM/Core/Payment/SDD.php CRM/Core/Payment/SDDNG.php
 msgid "This is not a correct BIC."
 msgstr ""
 
-#: CRM/Core/Payment/SDD.php
+#: CRM/Core/Payment/SDD.php CRM/Core/Payment/SDDNG.php
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 msgid "Bank Name"
 msgstr ""
 
-#: CRM/Core/Payment/SDD.php
+#: CRM/Core/Payment/SDD.php CRM/Core/Payment/SDDNG.php
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Collection Day"
 msgstr ""
 
-#: CRM/Core/Payment/SDD.php CRM/Sepa/Form/Report/SepaMandateRCUR.php
+#: CRM/Core/Payment/SDD.php CRM/Core/Payment/SDDNG.php
+#: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "Start Date"
+msgstr ""
+
+#: CRM/Core/Payment/SDDNG.php
+msgid "Direct Debit"
 msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot close mandate [%s], batching in progress!"
 msgstr ""
 
-#: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Logic/Status.php
+#: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Logic/Status.php
 #: CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php
 #: CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php
 #: CRM/Sepa/Page/ListGroup.php
@@ -244,10 +292,6 @@ msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot modify recurring contribution [%s]. Error was: '%s'"
-msgstr ""
-
-#: CRM/Sepa/BAO/SEPAMandate.php
-msgid "Cannot set cancel reason for mandate [%s]. Error was: '%s'"
 msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
@@ -333,6 +377,10 @@ msgid "Bic"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
+msgid "Currency used by this creditor"
+msgstr ""
+
+#: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Mandate numbering prefix"
 msgstr ""
 
@@ -352,17 +400,23 @@ msgstr ""
 msgid "SEPA File Format"
 msgstr ""
 
+#: CRM/Sepa/DAO/SEPACreditor.php
+msgid "Creditor Type: SEPA (default) or PSP"
+msgstr ""
+
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php
-#: CRM/Sepa/DAO/SEPATransactionGroup.php sepa.php
+#: CRM/Sepa/DAO/SEPATransactionGroup.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php sepa.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/MandateTab.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Reference"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php sepa.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
@@ -370,11 +424,11 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SepaMandateLink.php
 msgid "Entity Table"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SepaMandateLink.php
 msgid "Entity ID"
 msgstr ""
 
@@ -389,17 +443,14 @@ msgid "Creditor ID"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php
 msgid "Contact ID"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPATransactionGroup.php
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php sepa.php
-#: templates/CRM/Sepa/Page/DashBoard.tpl
-msgid "Type"
-msgstr ""
-
-#: CRM/Sepa/DAO/SEPAMandate.php sepa.php templates/CRM/Sepa/Page/DashBoard.tpl
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Search/SepaContactSearch.php
+#: sepa.php templates/CRM/Sepa/Page/DashBoard.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/ListGroup.tpl templates/CRM/Sepa/Page/MandateTab.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Status"
@@ -433,9 +484,165 @@ msgstr ""
 msgid "Comments"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPATransactionGroup.php
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: CRM/Sepa/DAO/SEPATransactionGroup.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/RetryCollection.php templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "Collection Date"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "SepaMandate ID"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
+msgid "Creation Date"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "End Date"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "You can only replace RCUR mandates"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "No contact ID (cid) given."
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Clone SEPA Mandate for Contact [%1]: %2"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Replace SEPA Mandate for Contact [%1]: %2"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Create new SEPA Mandate for Contact [%1]: %2"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Creditor"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateOOFF.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/ListGroup.tpl
+msgid "Financial Type"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateOOFF.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/ListGroup.tpl
+msgid "Campaign"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "not required, will be generated"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "not required"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Account"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "required"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Page/CreateMandate.php
+#: sepa.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/ListGroup.tpl templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Amount"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacement Date"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Replacement Reason"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Day of Month"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/RetryCollection.php
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Frequency"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Create"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Incompatible frequency unit '%1' in mandate."
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php CRM/Utils/SepaOptionGroupTools.php
+msgid "Warning"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "BIC is required"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Amount has to be positive."
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Already in use"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Page/CreateMandate.php
+msgid "'%3' SEPA Mandate <a href=\"%2\">%1</a> created."
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Page/CreateMandate.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Success"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "Failed to create %1 mandate. Error was: %2"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "- none -"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "new account"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "CiviBanking"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "One-time only (OOFF)"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.mgd.php
@@ -447,6 +654,7 @@ msgid "Generic SEPA Mandate Report (org.project60.sepa)"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
@@ -466,27 +674,12 @@ msgid "Signature Date"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
-msgid "Creation Date"
-msgstr ""
-
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
 msgid "Validation Date"
-msgstr ""
-
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
-#: CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Page/CreateMandate.php
-#: sepa.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
-#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-#: templates/CRM/Sepa/Page/ListGroup.tpl
-msgid "Amount"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php
 #: CRM/Sepa/Form/Report/SepaMandateRCUR.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Contribution Status"
 msgstr ""
 
@@ -527,25 +720,7 @@ msgstr ""
 msgid "Contribution ID"
 msgstr ""
 
-#: CRM/Sepa/Form/Report/SepaMandateOOFF.php
-#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-#: templates/CRM/Sepa/Page/ListGroup.tpl
-msgid "Financial Type"
-msgstr ""
-
-#: CRM/Sepa/Form/Report/SepaMandateOOFF.php
-#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-#: templates/CRM/Sepa/Page/ListGroup.tpl
-msgid "Campaign"
-msgstr ""
-
-#: CRM/Sepa/Form/Report/SepaMandateOOFF.php
+#: CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Form/RetryCollection.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel Reason"
 msgstr ""
@@ -555,27 +730,19 @@ msgid "Contribution Page"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php
-#: CRM/Sepa/Form/Report/SepaMandateRCUR.php sepa.php
-msgid "Currency"
-msgstr ""
-
-#: CRM/Sepa/Form/Report/SepaMandateOOFF.php
 #: CRM/Sepa/Form/Report/SepaMandateRCUR.php
 msgid "Contribution Collection Date"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Fee Amount"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Net Amount"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Contribution Amount"
 msgstr ""
 
@@ -600,21 +767,14 @@ msgid "Recurring Contribution Status"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateRCUR.php
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "End Date"
-msgstr ""
-
-#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
 msgid "Cancel Reason(s)"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateRCUR.php
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Transaction ID"
 msgstr ""
 
-#: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php CRM/Sepa/Form/RetryCollection.php
 msgid "Installment Amount"
 msgstr ""
 
@@ -642,6 +802,98 @@ msgstr ""
 msgid "Matching Contribution Count"
 msgstr ""
 
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Retry Collection of Failed DDs"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Date Range"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Creditor(s)"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "SDD Groups"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Generate"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "This Month"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Last 7 Days"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Last 14 Days"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Last 30 Days"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Last 60 Days"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Last 90 Days"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Last Calendar Month"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php
+msgid "Last Two Calendar Months"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php CRM/Utils/SepaOptionGroupTools.php
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "annually"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php CRM/Utils/SepaOptionGroupTools.php
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "semi-annually"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php CRM/Utils/SepaOptionGroupTools.php
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "quarterly"
+msgstr ""
+
+#: CRM/Sepa/Form/RetryCollection.php CRM/Utils/SepaOptionGroupTools.php
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
+#: templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "monthly"
+msgstr ""
+
+#: CRM/Sepa/Form/Search/SepaContactSearch.mgd.php
+msgid "SEPA Contact Search"
+msgstr ""
+
+#: CRM/Sepa/Form/Search/SepaContactSearch.mgd.php
+msgid "Find contacts based on CiviSEPA Mandates"
+msgstr ""
+
+#: CRM/Sepa/Form/Search/SepaContactSearch.php
+msgid "CiviSEPA Contact Search"
+msgstr ""
+
 #: CRM/Sepa/Logic/Batching.php
 msgid "%B %E%f"
 msgstr ""
@@ -650,8 +902,58 @@ msgstr ""
 msgid "%1."
 msgstr ""
 
+#: CRM/Sepa/Logic/ContributionProtector.php
+msgid ""
+"You cannot delete this contribution because it is connected to SEPA mandate "
+"[%s]. Delete the mandate instead!"
+msgstr ""
+
+#: CRM/Sepa/Logic/Format.php
+msgid "Creditor [%1] is missing!"
+msgstr ""
+
+#: CRM/Sepa/Logic/Format.php
+msgid "File format [%1] is missing!"
+msgstr ""
+
 #: CRM/Sepa/Logic/Group.php
 msgid "Cannot close transaction group! Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Close.php
+msgid "Closing SDD Group(s) [%1]"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Close.php
+msgid "Updating contributions in group '%1'... (%2)"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Close.php
+msgid "Updating status of group '%1'"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Close.php
+msgid "Compiling XML for group '%1'"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Update.php
+msgid "Cannot run update, another update is in progress!"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Update.php
+msgid "Updating %1 SEPA Groups"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Update.php
+msgid "Preparing to clean up ended mandates"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Update.php
+msgid "Cleaning up ended mandates"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Update.php
+msgid "Lock released"
 msgstr ""
 
 #: CRM/Sepa/Logic/Settings.php
@@ -688,7 +990,31 @@ msgid "IBAN is not correct"
 msgstr ""
 
 #: CRM/Sepa/Logic/Verification.php
+msgid "Please remove leading IBAN"
+msgstr ""
+
+#: CRM/Sepa/Logic/Verification.php
+msgid "Invalid PSP Code"
+msgstr ""
+
+#: CRM/Sepa/Logic/Verification.php
+msgid "Illegal characters detected"
+msgstr ""
+
+#: CRM/Sepa/Logic/Verification.php
+msgid "Don't start with special characters"
+msgstr ""
+
+#: CRM/Sepa/Logic/Verification.php
+msgid "Don't end with special characters"
+msgstr ""
+
+#: CRM/Sepa/Logic/Verification.php
 msgid "BIC is not correct"
+msgstr ""
+
+#: CRM/Sepa/Logic/Verification.php
+msgid "PSP/BIC is not correct"
 msgstr ""
 
 #: CRM/Sepa/Page/CloseGroup.php
@@ -712,24 +1038,11 @@ msgid "Couldn't create contribution"
 msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
-msgid "Couldn't create note for contribution #%s"
-msgstr ""
-
-#: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create %s mandate for contact #%s"
 msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't create mandate"
-msgstr ""
-
-#: CRM/Sepa/Page/CreateMandate.php
-msgid "'%3' SEPA Mandate <a href=\"%2\">%1</a> created."
-msgstr ""
-
-#: CRM/Sepa/Page/CreateMandate.php
-#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
-msgid "Success"
 msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
@@ -839,6 +1152,10 @@ msgid "Cannot read creditor [%s]. Error was: '%s'"
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
+msgid "None"
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
 msgid "Mandate [%s] is already in use! It cannot be deleted."
 msgstr ""
 
@@ -902,6 +1219,10 @@ msgstr ""
 msgid "Cannot read SEPA transaction group [%s]. Error was: '%s'"
 msgstr ""
 
+#: CRM/Sepa/Page/MandateTab.php sepa.php
+msgid "SEPA Mandates"
+msgstr ""
+
 #: CRM/Sepa/Page/SepaFile.php
 msgid "Generate XML File"
 msgstr ""
@@ -926,36 +1247,8 @@ msgstr ""
 msgid "SEPA Direct Debit Payment Information"
 msgstr ""
 
-#: CRM/Utils/SepaOptionGroupTools.php
-msgid "Warning"
-msgstr ""
-
-#: CRM/Utils/SepaOptionGroupTools.php
-#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
-#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "monthly"
-msgstr ""
-
-#: CRM/Utils/SepaOptionGroupTools.php
-#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
-#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "quarterly"
-msgstr ""
-
-#: CRM/Utils/SepaOptionGroupTools.php
-#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
-#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "semi-annually"
-msgstr ""
-
-#: CRM/Utils/SepaOptionGroupTools.php
-#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
-#: templates/CRM/Contribute/Form/ContributionMain.sepa.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "annually"
+#: CRM/Sepa/Upgrader/Base.php
+msgid "Upgrade %1 to revision %2"
 msgstr ""
 
 #: CRM/Utils/SepaOptionGroupTools.php
@@ -982,38 +1275,86 @@ msgid ""
 "This group corresponds to <a href=\"%s\">SEPA transaction group [%s]</a>"
 msgstr ""
 
+#: js/CreateMandate.js
+msgid "earliest: %1"
+msgstr ""
+
+#: js/CreateMandate.js
+msgid "<i>Not enough information</i>"
+msgstr ""
+
+#: js/CreateMandate.js
+msgid "Collects %1 on %2"
+msgstr ""
+
+#: js/CreateMandate.js
+msgid "Collects %1 %2 on the %3., beginning %4.<br/>Annual amount is %5."
+msgstr ""
+
+#: js/CreateMandate.js
+msgid "Account Reference"
+msgstr ""
+
+#: js/RetryCollection.js
+msgid ""
+"Will attempt to re-collect <strong>%1</strong> failed debit contributions "
+"from %2 different contacts.<br/>The total amount is <strong>%3</strong>."
+msgstr ""
+
+#: js/RetryCollection.js
+msgid "No SEPA collections match your criteria."
+msgstr ""
+
+#: sepa.php
+msgid "<i>None</i>"
+msgstr ""
+
+#: sepa.php
+msgid "<i>Error</i>"
+msgstr ""
+
 #: sepa.php
 msgid "Can't find the sepa mandate"
 msgstr ""
 
 #: sepa.php
-msgid "pain.008.001.02 (ISO 20022/official SEPA guidelines)"
-msgstr ""
-
-#: sepa.php
-msgid "pain.008.003.02 container core direct debit (CDC EBICS-2.7)"
-msgstr ""
-
-#: sepa.php
-msgid "pain.008.003.02 COR1 direct debit (CD1 EBICS-2.7)"
-msgstr ""
-
-#: sepa.php templates/CRM/Contact/Page/View/Summary.sepa.tpl
 msgid "Record SEPA Contribution"
 msgstr ""
 
 #: sepa.php
-msgid "SEPA Mandates"
-msgstr ""
-
-#: sepa.php
-msgid ""
-"You cannot delete this contribution because it is connected to SEPA mandate "
-"[%s]. Delete the mandate instead!"
-msgstr ""
-
-#: sepa.php
 msgid "CiviSEPA Settings"
+msgstr ""
+
+#: sepa.php
+msgid "CiviSEPA"
+msgstr ""
+
+#: sepa.php
+msgid "Create SEPA mandates"
+msgstr ""
+
+#: sepa.php
+msgid "View SEPA mandates"
+msgstr ""
+
+#: sepa.php
+msgid "Edit SEPA mandates"
+msgstr ""
+
+#: sepa.php
+msgid "Delete SEPA mandates"
+msgstr ""
+
+#: sepa.php
+msgid "View SEPA transaction groups"
+msgstr ""
+
+#: sepa.php
+msgid "Batch SEPA transaction groups"
+msgstr ""
+
+#: sepa.php
+msgid "Delete SEPA transaction groups"
 msgstr ""
 
 #: sepa.php
@@ -1030,6 +1371,22 @@ msgstr ""
 msgid "Most Recent SEPA Mandate"
 msgstr ""
 
+#: sepa.php
+msgid "Signature Date (raw)"
+msgstr ""
+
+#: sepa.php
+msgid "IBAN (anonymised)"
+msgstr ""
+
+#: sepa.php
+msgid "Amount (raw)"
+msgstr ""
+
+#: sepa.php
+msgid "First Collection Date (raw)"
+msgstr ""
+
 #: sepa.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 msgid "First Collection Date"
@@ -1043,13 +1400,21 @@ msgstr ""
 msgid "Interval Unit"
 msgstr ""
 
-#: sepa.php templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
+#: sepa.php templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Interval"
 msgstr ""
 
 #: sepa_pp_sdd.php
 msgid "Payment processor for the 'Single European Payement Area' (SEPA)."
+msgstr ""
+
+#: sepa_pp_sdd.php
+msgid "SEPA Direct Debit (NEW)"
+msgstr ""
+
+#: sepa_pp_sdd.php
+msgid ""
+"Refactored Payment processor for the 'Single European Payement Area' (SEPA)."
 msgstr ""
 
 #: templates/CRM/Admin/Form/PaymentProcessor/SDD.hlp
@@ -1060,12 +1425,6 @@ msgstr ""
 msgid ""
 "The creditor object not only determines the creditor ID, but also the "
 "account and the SEPA file format to be used."
-msgstr ""
-
-#: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Creditor"
 msgstr ""
 
 #: templates/CRM/Admin/Form/PaymentProcessor/SDD.tpl
@@ -1306,6 +1665,55 @@ msgid ""
 "recurring donations in time."
 msgstr ""
 
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"If you enable this option, SEPA groups will not be 'closed' and then later "
+"marked as 'received', but skip the 'closed' step."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"As a consequence contributions would skip status 'in Progress' as well and "
+"be put to 'Completed' right away."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"If you enable this option, You cannot download an XML file before you "
+"actually closed the SEPA group."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"This should help prevent the problem of forgetting to close the group after "
+"upload - at the cost of you no being able to change the group if the bank "
+"rejects it."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"If you have large amounts of mandates or large SDD groups, you might be at "
+"risk of a timeout error during the batching/closing process."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"This option will activate a runner page with a progress bar for these "
+"critical processes. There shouldn't be any timeouts, but you have to keep "
+"that open until it's done."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "Always use <code>SEPA</code> if you want to do SEPA style direct debit."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"<code>PSP</code> can help you to use this extension for other direct debit "
+"systems or payment service providers (PSP), but all SEPA style validations "
+"and tools are then disabled."
+msgstr ""
+
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Creditors"
 msgstr ""
@@ -1319,13 +1727,12 @@ msgid "Copy"
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
-#: templates/CRM/Contribute/Form/ContributionView.tpl
+#: templates/CRM/Sepa/Page/MandateTab.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Edit"
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Delete"
@@ -1368,6 +1775,10 @@ msgid "Creditor Identifier"
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Creditor Type"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Custom Batching Settings (for this creditor)"
 msgstr ""
 
@@ -1398,6 +1809,14 @@ msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "System Settings"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "No XML Draft Files"
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Support Large Groups"
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -1433,11 +1852,7 @@ msgid "Creditor updated"
 msgstr ""
 
 #: templates/CRM/Contact/Page/View/Summary.sepa.tpl
-msgid "edit mandate"
-msgstr ""
-
-#: templates/CRM/Contact/Page/View/Summary.sepa.tpl
-msgid "edit sepa mandate"
+msgid "SEPA Mandate"
 msgstr ""
 
 #: templates/CRM/Contact/Page/View/Summary.sepa.tpl
@@ -1447,7 +1862,6 @@ msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
-#: templates/CRM/Contribute/Form/ContributionView.tpl
 msgid "Total Amount"
 msgstr ""
 
@@ -1507,162 +1921,31 @@ msgstr ""
 msgid "Earliest Collection Date"
 msgstr ""
 
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "View Contribution"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "From"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "(test)"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Recurring Contribution"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Installments"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "(ongoing)"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Non-deductible Amount"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Received"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "not available"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Received Into"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Pay Later"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Incomplete Transaction"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Cancelled / Refunded Date"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Cancellation / Refund Reason"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Paid By"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Check Number"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Online Contribution Page"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Receipt Sent"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
-msgid "Note"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Invoice ID"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Thank-you Sent"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Soft Credit To"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "View contact record"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Premium Information"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Premium"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Option"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Fulfilled"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Personal Campaign Page Contribution Information"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Personal Campaign Page"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Contribution was made through this personal campaign page."
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "In Public Honor Roll?"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/DeleteGroup.tpl
-msgid "Yes"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-#: templates/CRM/Sepa/Page/DeleteGroup.tpl
-msgid "No"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Honor Roll Name"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Personal Note"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionView.tpl
-msgid "Billing Address"
-msgstr ""
-
 #: templates/CRM/Core/Payment/SEPA/SDD.tpl
 msgid "Bank unknown, please enter BIC."
 msgstr ""
 
+#: templates/CRM/Sepa/Form/CreateMandate.tpl
+msgid "You're replacing mandate %1"
+msgstr ""
+
+#: templates/CRM/Sepa/Form/RetryCollection.tpl
+msgid "Select the transaction groups you want to re-collect."
+msgstr ""
+
+#: templates/CRM/Sepa/Form/RetryCollection.tpl
+msgid "Add some filters"
+msgstr ""
+
+#: templates/CRM/Sepa/Form/RetryCollection.tpl
+msgid "Collection Options"
+msgstr ""
+
+#: templates/CRM/Sepa/Form/RetryCollection.tpl
+msgid "Preview"
+msgstr ""
+
 #: templates/CRM/Sepa/Form/SepaMandate.tpl
-#: templates/Sepa/Contribute/Form/ContributionView.tpl
-#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Sepa Mandate"
 msgstr ""
 
@@ -1676,6 +1959,10 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "The money should be on its way"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Download Link:"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
@@ -1729,10 +2016,6 @@ msgid ""
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
-msgid "Download Link:"
-msgstr ""
-
-#: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid ""
 "<b>In order to collect these payments, you have to do the following:</b>"
 msgstr ""
@@ -1753,6 +2036,14 @@ msgstr ""
 msgid ""
 "<b>Do it now! No money will be transferred until the file has been submitted "
 "successfully.</b>"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Close this group with the option below"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Download the XML file"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
@@ -1780,7 +2071,15 @@ msgid "The file was rejected"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "Close it now"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
 msgid "I changed my mind"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/CloseGroup.tpl
+msgid "It's very important to select one of the options below."
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
@@ -1790,23 +2089,11 @@ msgid "Contact"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "not required, will be generated"
-msgstr ""
-
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "not required"
+msgid "Note"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Replacing Mandate"
-msgstr ""
-
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "Replacement Date"
-msgstr ""
-
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "Replacement Reason"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
@@ -1866,6 +2153,10 @@ msgid "update recurring"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "retry collection"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Group Name"
 msgstr ""
 
@@ -1898,6 +2189,57 @@ msgid "Mark Received"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Legend"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Description"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Missed"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Submission date has passed!"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Urgent"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid ""
+"Submission date is immanent, you have to close group and upload file to "
+"creditor today!"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Soon"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Submission within 6 days or OOFF (submission not enforced)"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Upcoming"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Submission date more than 6 days from now"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Closed"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid ""
+"The group is closed and uploaded to creditor, submission date is in the past."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Do you really want to mark this groups as 'payment received'?"
 msgstr ""
 
@@ -1915,6 +2257,14 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "contributions"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "retried contributions"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "things"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
@@ -2085,6 +2435,14 @@ msgid "Are you sure this is what you want to do?"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "Yes"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "No"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "SEPA transaction group '%1' could not be deleted succesfully."
 msgstr ""
 
@@ -2179,6 +2537,10 @@ msgid "Payment Details"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Recurring Contribution"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Create Date"
 msgstr ""
 
@@ -2187,7 +2549,8 @@ msgid "Last Modified"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Frequency"
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Next Collection"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
@@ -2245,7 +2608,6 @@ msgid "Change amount to:"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Clone"
 msgstr ""
 
@@ -2292,6 +2654,10 @@ msgid "ID"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/ListGroup.tpl
+msgid "%2&nbsp;%1"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "Contacts"
 msgstr ""
 
@@ -2307,12 +2673,65 @@ msgstr ""
 msgid "Create Accounting Batch"
 msgstr ""
 
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Add new SEPA Mandate"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Recurring SEPA Mandates"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Installs"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Annual Amount"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Last Collection"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "View Mandate"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "View"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Edit Mandate"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "This contact has no recorded recurring mandates."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "One-Off SEPA Mandates"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "This contact has no recorded one-off mandates."
+msgstr ""
+
 #: templates/Sepa/Admin/Form/PaymentProcessor.tpl
 msgid "Sepa Creditor"
 msgstr ""
 
 #: templates/Sepa/Admin/Form/SepaMandate.tpl
 msgid "Debit frequency"
+msgstr ""
+
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+msgid "Sepa Mandate [%1]"
+msgstr ""
+
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+msgid "Grouped in"
 msgstr ""
 
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
@@ -2326,4 +2745,8 @@ msgstr ""
 
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Done"
+msgstr ""
+
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+msgid "Notes"
 msgstr ""
