@@ -27,7 +27,6 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 * automatic adjustment of late OOFF and RCUR transactions
 * integration with [CiviBanking](https://github.com/Project60/CiviBanking)
 
-
 ## What it can not (yet) do
 * permission management
 * membership payments
@@ -39,7 +38,6 @@ Use the following steps to install CiviSEPA.
  * **Add New**
  * Find, download, and install
 
-
 ## Customisation
 If you need customised mandate references, exclude certain collection dates, or add a custom transaction message to the collection, you want to create a sepa customization extension implementing the following hooks:
 
@@ -48,3 +46,5 @@ If you need customised mandate references, exclude certain collection dates, or 
 * `civicrm_modify_txmessage` - to customize the transaction message (Version 1.2+ can set a generic message w/o this hook)
 
 We added an example implementation for your convenience: [org.project60.sepacustom](https://github.com/Project60/sepa_dd/tree/master/org.project60.sepacustom)
+
+If you want to customize the transaction message without creating an extension you can use tokens if you install [nl.hollandopensource.sepatxmessagetokens](https://github.com/HollandOpenSource/nl.hollandopensource.sepatxmessagetokens/#nlhollandopensourcesepatxmessagetokens).
