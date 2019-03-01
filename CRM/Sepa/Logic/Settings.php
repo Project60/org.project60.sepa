@@ -51,7 +51,7 @@ class CRM_Sepa_Logic_Settings {
   /**
    * generate a transaction message for the given mandate/creditor
    *
-   * @return a SEPA compliant transaction message
+   * @return string a SEPA compliant transaction message
    */
   static function getTransactionMessage($mandate, $creditor) {
     // get tx message from settings
@@ -66,7 +66,7 @@ class CRM_Sepa_Logic_Settings {
     }
 
     // make sure that it doesn't contain any special characters
-    $transaction_message = preg_replace("#[^a-zA-Z0-9\/\-\:\(\)\'\+ \.\*]#", '?', $transaction_message);
+    $transaction_message = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($transaction_message);
 
     return $transaction_message;
   }

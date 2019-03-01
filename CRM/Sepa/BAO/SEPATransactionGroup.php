@@ -120,13 +120,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         $t['ctry'] = substr($t["iban"], 0, 2);
       }
 
-      // try to convert the name into a more acceptable format
-      if (function_exists("iconv")){
-        $t["display_name"] = iconv("UTF-8", "ASCII//TRANSLIT", $t["display_name"]);
-        //french banks like utf8 as long as it's ascii7 only
-      }
-      // ...but to be sure, replace any remainig illegit characters with '?'
-      $t["display_name"] = preg_replace("/[^ 0-9a-zA-Z':?,\-(+.)\/\"]/", '?', $t["display_name"]);
+      // make some fields comply with SEPA standards
+      $t["display_name"]   = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["display_name"]);
+      $t["street_address"] = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["street_address"]);
+      $t["postal_code"]    = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["postal_code"]);
+      $t["city"]           = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["city"]);
 
       // create an individual transaction message
       $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor);
@@ -145,8 +143,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       } elseif ($contrib->creditor_id == null) { // it shouldn't happen.
         $contrib->creditor_id = $creditor_id;
       } elseif ($creditor_id != $contrib->creditor_id){
-        CRM_Core_Error::fatal("Mixed creditors ($creditor_id != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
-        //to fix the mandate: update civicrm_sdd_mandate set creditor_id=1;
+        throw new Exception("Mixed creditors ({$creditor_id} != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
       }
       $this->total += $contrib->total_amount;
       $this->nbtransactions++;
