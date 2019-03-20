@@ -31,6 +31,9 @@ function civicrm_api3_sepa_mandate_create($params) {
 
 /**
  * Provide Metadata for SepaMandate.create
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_sepa_mandate_create_spec(&$params) {
   $params['entity_id'] = array(
@@ -96,8 +99,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     if ($params['type']=='RCUR') {
     	$contribution_entity = 'ContributionRecur';
 	    $contribution_table  = 'civicrm_contribution_recur';
-      	$create_contribution['payment_instrument_id'] =
-      		(int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
+      	$create_contribution['payment_instrument_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
       	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'FRST'; // set default status
       	if (empty($create_contribution['is_pay_later']))
@@ -106,8 +108,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     } elseif ($params['type']=='OOFF') {
 	 	$contribution_entity = 'Contribution';
 	    $contribution_table  = 'civicrm_contribution';
-      	$create_contribution['payment_instrument_id'] =
-      		(int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
+      	$create_contribution['payment_instrument_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
       	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'OOFF'; // set default status
       	if (empty($create_contribution['total_amount']))
@@ -141,7 +142,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 }
 
 /**
- * Provide Metadata for SepaMandate.create
+ * Provide Metadata for SepaMandate.createfull
  */
 function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
   $params['contact_id'] = array(
@@ -346,15 +347,12 @@ function _civicrm_api3_sepa_mandate_update_next_scheduled_date_spec(&$params) {
     );
 }
 
-
-
-
 /**
  * Deletes an existing Mandate
  *
  * @param  array  $params
  *
- * @return boolean | error  true if successfull, error otherwise
+ * @return array true if successfull, error otherwise
  * {@getfields sepa_mandate_delete}
  * @access public
  */
@@ -381,13 +379,153 @@ function civicrm_api3_sepa_mandate_get($params) {
 }
 
 
+/**
+ * Modify/update mandates
+ *
+ * @see https://github.com/Project60/org.project60.sepa/issues/413
+ */
+function civicrm_api3_sepa_mandate_modify($params) {
+  if (!CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
+    return civicrm_api3_create_error("Mandate modification not allowed. Check your settings.");
+  }
+
+  // look up mandate ID if only reference is given
+  if (empty($params['mandate_id']) && !empty($params['reference'])) {
+    $mandate = civicrm_api3('SepaMandate', 'get', array('reference' => $params['reference'], 'return' => 'id'));
+    if ($mandate['id']) {
+      $params['mandate_id'] = $mandate['id'];
+    } else {
+      return civicrm_api3_create_error("Couldn't identify mandate with reference '{$params['reference']}'.");
+    }
+  }
+
+  // no mandate could be identified
+  if (empty($params['mandate_id'])) {
+    return civicrm_api3_create_error("You need to provide either 'mandate_id' or 'reference'.");
+  }
+
+  try {
+    $changes = CRM_Sepa_BAO_SEPAMandate::modifyMandate($params['mandate_id'], $params);
+    return civicrm_api3_create_success($changes);
+  } catch (Exception $e) {
+    return civicrm_api3_create_error($e->getMessage());
+  }
+}
+
+/**
+ * API specs for updating mandates
+ */
+function _civicrm_api3_sepa_mandate_modify_spec(&$params) {
+  $params['mandate_id'] = array(
+    'name'         => 'mandate_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Mandate ID',
+  );
+  $params['reference'] = array(
+    'name'         => 'reference',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'Mandate Reference',
+  );
+  $params['amount'] = array(
+    'name'         => 'amount',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'New Amount',
+  );
+  $params['iban'] = array(
+    'name'         => 'iban',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'New IBAN',
+  );
+  $params['bic'] = array(
+    'name'         => 'bic',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'New BIC',
+  );
+  $params['financial_type_id'] = array(
+    'name'         => 'financial_type_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'New Financial Type ID',
+  );
+  $params['campaign_id'] = array(
+    'name'         => 'campaign_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'New Campaign ID',
+  );
+}
 
 
+/**
+ * Terminate mandates responsibly
+ *
+ * @see https://github.com/Project60/org.project60.sepa/issues/483
+ */
+function civicrm_api3_sepa_mandate_terminate($params) {
+  // look up mandate ID if only reference is given
+  if (empty($params['mandate_id']) && !empty($params['reference'])) {
+    $mandate = civicrm_api3('SepaMandate', 'get', array('reference' => $params['reference'], 'return' => 'id'));
+    if ($mandate['id']) {
+      $params['mandate_id'] = $mandate['id'];
+    } else {
+      return civicrm_api3_create_error("Couldn't identify mandate with reference '{$params['reference']}'.");
+    }
+  }
 
+  // no mandate could be identified
+  if (empty($params['mandate_id'])) {
+    return civicrm_api3_create_error("You need to provide either 'mandate_id' or 'reference'.");
+  }
 
+  try {
+    CRM_Sepa_BAO_SEPAMandate::terminateMandate(
+      $params['mandate_id'],
+      CRM_Utils_Array::value('end_date', $params, date('Y-m-d')), // use today rather than now
+      CRM_Utils_Array::value('cancel_reason', $params),
+      FALSE);
+    return civicrm_api3_create_success();
 
+  } catch (Exception $e) {
 
+    return civicrm_api3_create_error($e->getMessage());
+  }
+}
 
+/**
+ * API specs for updating mandates
+ */
+function _civicrm_api3_sepa_mandate_terminate_spec(&$params) {
+  $params['mandate_id'] = array(
+    'name'         => 'mandate_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Mandate ID',
+  );
+  $params['reference'] = array(
+    'name'         => 'reference',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'Mandate Reference',
+  );
+  $params['end_date'] = array(
+    'name'         => 'end_date',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'End Date',
+    'description'  => 'Default is NOW',
+  );
+  $params['cancel_reason'] = array(
+    'name'         => 'cancel_reason',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'Cancel Reason',
+  );
+}
 
 
 /**
