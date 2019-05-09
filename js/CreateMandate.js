@@ -200,19 +200,18 @@ cj(document).ready(function() {
             .val(CRM.vars.p60sdd.creditor_data[creditor_id]['currency'])
             .fadeOut(50).fadeIn(50);
 
-        // if creditor type is not SEPA (or empty): hide bic
+        // if creditor type is not SEPA (or empty): rename bic/iban
         if (!('creditor_type' in CRM.vars.p60sdd.creditor_data[creditor_id])
            || CRM.vars.p60sdd.creditor_data[creditor_id]['creditor_type'] == 'SEPA') {
             // this is a SEPA creditor
-            sdd_getF('bic').parent().parent().show(100);
+            sdd_getF('bic').attr('placeholder', 'required');
+            cj("#sdd-create-mandate").find("label[for=bic]").contents().first()[0].textContent = ts("BIC", {'domain': 'org.project60.sepa'});
             cj("#sdd-create-mandate").find("label[for=iban]").contents().first()[0].textContent = ts("IBAN", {'domain': 'org.project60.sepa'});
 
         } else {
             // this is NOT a SEPA creditor
-            sdd_getF('bic')
-                .val('')
-                .parent().parent().hide(100);
-
+            sdd_getF('bic').attr('placeholder', '');
+            cj("#sdd-create-mandate").find("label[for=bic]").contents().first()[0].textContent = ts("Account Name", {'domain': 'org.project60.sepa'});
             cj("#sdd-create-mandate").find("label[for=iban]").contents().first()[0].textContent = ts("Account Reference", {'domain': 'org.project60.sepa'});
         }
 

@@ -203,7 +203,7 @@ class CRM_Sepa_Logic_Verification {
 
       default:
       case 'PSP':
-        if (preg_match("/^[a-zA-Z0-9_\/\-=+]{1,11}$/", $bic)) {
+        if (preg_match("/^[a-zA-Z0-9_\/\-=+]{1,25}$/", $bic)) {
           return NULL;
         } else {
           return E::ts("PSP/BIC is not correct");
