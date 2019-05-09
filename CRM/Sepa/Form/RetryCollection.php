@@ -138,23 +138,23 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $presets[date('Ym01000000') . '-now'] = E::ts('This Month');
 
     // add "last week"
-    $from = date('YmdHis', strtotime('now - 7 days'));
+    $from = date('Ymd000000', strtotime('now - 7 days'));
     $presets["{$from}-now"] = E::ts('Last 7 Days');
 
     // add "last 2 weeks"
-    $from = date('YmdHis', strtotime('now - 14 days'));
+    $from = date('Ymd000000', strtotime('now - 14 days'));
     $presets["{$from}-now"] = E::ts('Last 14 Days');
 
     // add "last 30 days"
-    $from = date('YmdHis', strtotime(date('YmdHis') . ' - 30 days'));
+    $from = date('Ymd000000', strtotime(date('YmdHis') . ' - 30 days'));
     $presets["{$from}-now"] = E::ts('Last 30 Days');
 
     // add "last 60 days"
-    $from = date('YmdHis', strtotime(date('YmdHis') . ' - 60 days'));
+    $from = date('Ymd000000', strtotime(date('YmdHis') . ' - 60 days'));
     $presets["{$from}-now"] = E::ts('Last 60 Days');
 
     // add "last 90 days"
-    $from = date('YmdHis', strtotime(date('YmdHis') . ' - 90 days'));
+    $from = date('Ymd000000', strtotime(date('YmdHis') . ' - 90 days'));
     $presets["{$from}-now"] = E::ts('Last 90 Days');
 
     // DEFAULT: add "last month"
