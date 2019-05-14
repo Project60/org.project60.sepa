@@ -121,6 +121,43 @@ function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $credi
   $end2endID = "PREFIX{$end2endID}SUFFIX";
 }
 
+/**
+ * This hook is called by the batching algorithm:
+ *  whenever a new installment has been created for a given RCUR mandate
+ *  this hook is called so you can modify the resulting contribution,
+ *  e.g. connect it to a membership, or copy custom fields
+ *
+ * be aware the newly created contribution is still 'Pending', it might NOT be
+ * issued to the bank.
+ *
+ * @param array  $mandate_id             the CiviSEPA mandate entity ID
+ * @param array  $contribution_recur_id  the recurring contribution connected to the mandate
+ * @param array  $contribution_id        the newly created contribution
+ *
+ * @access public
+ */
+function sepacustom_civicrm_installment_created($mandate_id, $contribution_recur_id, $contribution_id) {
+  // example: assign to membership if contact has (exactly) one...
+  try {
+    $contribution = civicrm_api3('Contribution', 'getsingle', [
+        'id'     => $contribution_id,
+        'return' => 'financial_type_id,contact_id']);
+    if ($contribution['financial_type_id'] == 2) {
+      // this is a membership fee (in a default system...)
+      $membership_id = civicrm_api3('Membership', 'getvalue', [
+          'contact_id' => $contribution['contact_id'],
+          'status_id'  => ['IN' => [1, 2, 3]], // current member (in a default system)
+          'return'     => 'id']);
+
+      // if we get here, both exist and we can connect them
+      civicrm_api3('MembershipPayment', 'create', [
+          'membership_id'   => $membership_id,
+          'contribution_id' => $contribution_id]);
+    }
+  } catch (Exception $ex) {
+    // not a big deal, most likely there was not a single membership found in the getvalue call
+  }
+}
 
 
 
