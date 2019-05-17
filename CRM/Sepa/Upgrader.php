@@ -174,19 +174,6 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   }
 
   /**
-   * Make sure the new PP is available
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  public function upgrade_1413() {
-    $this->ctx->log->info('Applying update 1413');
-    // make sure the new payment processor is available
-    sepa_pp_enable();
-    return TRUE;
-  }
-
-  /**
    * Make sure, the payment_processor_id in civicrm_sdd_creditor is NULL.
    *  This *shouldn't* be the set, but if it is, it can cause errors.
    *
