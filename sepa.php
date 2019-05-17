@@ -13,7 +13,6 @@
 +--------------------------------------------------------*/
 
 require_once 'sepa.civix.php';
-require_once 'sepa_pp_sdd.php';
 
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -116,14 +115,6 @@ function sepa_civicrm_pageRun( &$page ) {
 function sepa_civicrm_buildForm ( $formName, &$form ) {
   // restrict payemnt instrument use if necessary
   CRM_Sepa_Logic_PaymentInstruments::restrictPaymentInstrumentsInForm($formName, $form);
-
-  // incorporate payment processor
-  sepa_pp_buildForm($formName, $form);
-}
-
-function sepa_civicrm_postProcess( $formName, &$form ) {
-  // incorporate payment processor
-  sepa_pp_postProcess($formName, $form);
 }
 
 /**
@@ -170,9 +161,6 @@ function sepa_civicrm_enable() {
   require_once 'CRM/Sepa/Page/SepaMandatePdf.php';
   CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
 
-  // install/activate SEPA payment processor
-  sepa_pp_enable();
-
   // create a dummy creditor if no creditor exists
   $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
   if (empty($creditorCount)) {
@@ -208,7 +196,6 @@ function sepa_civicrm_enable() {
  * Implementation of hook_civicrm_disable
  */
 function sepa_civicrm_disable() {
-  sepa_pp_disable();
   return _sepa_civix_civicrm_disable();
 }
 
@@ -278,10 +265,6 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
  *   contributions connected to SDD mandates.
  */
 function sepa_civicrm_apiWrappers(&$wrappers, $apiRequest) {
-  // add a wrapper for the payment processor
-  if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'completetransaction') {
-    $wrappers[] = new CRM_Core_Payment_SDDNGPostProcessor();
-  }
   // add a wrapper for Contact.getlist (used e.g. for AJAX lookups)
   if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'delete') {
     $wrappers[] = new CRM_Sepa_Logic_ContributionProtector();
