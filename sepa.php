@@ -413,7 +413,7 @@ function sepa_civicrm_navigationMenu(&$menu) {
 
   _sepa_civix_insert_navigation_menu($menu,'Contributions',array(
     'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
-    'name' => 'Dashboard',
+    'name' => 'CiviSEPA Dashboard',
     'url' => $sepa_dashboard_url,
     'permission' => 'view sepa groups',
     'operator' => NULL,
