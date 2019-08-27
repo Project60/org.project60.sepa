@@ -34,6 +34,7 @@ div.sdd-add-creditor {
       {if $creditors}
       <table class="form-layout">
           <tr class="crm-creditor-block">
+            <th>{ts domain="org.project60.sepa"}ID{/ts}</th>
             <th>{ts domain="org.project60.sepa"}Name{/ts}</th>
             <th>{ts domain="org.project60.sepa"}IBAN{/ts}</th>
             <th>{ts domain="org.project60.sepa"}BIC{/ts}</th>
@@ -41,6 +42,7 @@ div.sdd-add-creditor {
           </tr>
         {foreach item=creditor from=$creditors}
           <tr class="crm-creditor-block">
+            <td>[{$creditor.id}]</td>
             <td>{$creditor.name}</td>
             <td>{$creditor.iban}</td>
             <td>{$creditor.bic}</td>
@@ -134,6 +136,12 @@ div.sdd-add-creditor {
             {$form.addcreditor_type.html}
           </td>
         </tr>
+         <tr>
+             <td class="label">{$form.addcreditor_uses_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Uses BICs{/ts}", {literal}{"id":"id-uses-bics","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+             <td>
+                 {$form.addcreditor_uses_bic.html}
+             </td>
+         </tr>
         <tr>
           <td class="label">{$form.custom_txmsg.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Transaction Message{/ts}", {literal}{"id":"id-txmsg","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
           <td>
@@ -489,6 +497,7 @@ div.sdd-add-creditor {
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
           cj("#addcreditor_currency").val(data['currency']);
           cj("#addcreditor_type").val(data['creditor_type']);
+          cj("#addcreditor_uses_bic").prop("checked", (data['uses_bic'] == "1"));
           cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
           cj('#addcreditor').show(500);
 
@@ -509,31 +518,35 @@ div.sdd-add-creditor {
     );
   }
 
+  /**
+   * Use an AJAX call to update the creditor with the currrent form values
+   */
   function updateCreditor() {
-    var inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
-    var inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
+    let inputCreditorInfo   = cj("#addcreditor #creditorinfo :input").serializeArray();
+    let inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
     inputCustomBatching.push({'name': "custom_txmsg", 'value': cj('#custom_txmsg').val()});
-    var creditorId = cj('#edit_creditor_id').val();
+    let creditorId = cj('#edit_creditor_id').val();
 
-    var map = new Array();
-    map["edit_creditor_id"]         = "id";
-    map["addcreditor_name"]         = "name";
-    map["addcreditor_address"]      = "address";
-    map["addcreditor_country_id"]   = "country_id";
-    map["addcreditor_currency"]     = "currency";
-    map["addcreditor_id"]           = "identifier";
-    map["addcreditor_iban"]         = "iban";
-    map["addcreditor_bic"]          = "bic";
-    map["addcreditor_pain_version"] = "sepa_file_format_id";
-    map["addcreditor_type"]         = "creditor_type";
-    map["addcreditor_creditor_id"]  = "creditor_id";
-    map["custom_txmsg"]             = "custom_txmsg";
+    let map = {
+        "edit_creditor_id":         "id",
+        "addcreditor_name":         "name",
+        "addcreditor_address":      "address",
+        "addcreditor_country_id":   "country_id",
+        "addcreditor_currency":     "currency",
+        "addcreditor_id":           "identifier",
+        "addcreditor_iban":         "iban",
+        "addcreditor_bic":          "bic",
+        "addcreditor_pain_version": "sepa_file_format_id",
+        "addcreditor_type":         "creditor_type",
+        "addcreditor_creditor_id":  "creditor_id",
+        "addcreditor_uses_bic":     "uses_bic",
+        "custom_txmsg":             "custom_txmsg"};
 
     // update creditor information
-    var updatedCreditorInfo = new Array();
-    for (var i = 0; i < inputCreditorInfo.length; i++) {
-      var name = map[(inputCreditorInfo[i]["name"])] || inputCreditorInfo[i]["name"];
-      var value = inputCreditorInfo[i]["value"];
+    let updatedCreditorInfo = new Array();
+    for (let i = 0; i < inputCreditorInfo.length; i++) {
+      let name = map[(inputCreditorInfo[i]["name"])] || inputCreditorInfo[i]["name"];
+      let value = inputCreditorInfo[i]["value"];
       if (name == "creditor_id") {
         value = cj('#add_creditor_id').val();
       }
@@ -542,14 +555,19 @@ div.sdd-add-creditor {
       }
     }
 
-    var isTestCreditor = cj('#is_test_creditor').is(':checked');
-    if (isTestCreditor) {
+    if (cj('#is_test_creditor').is(':checked')) {
       updatedCreditorInfo['category'] = "TEST";
-    }else{
+    } else{
       updatedCreditorInfo['category'] = "";
     }
 
-    var stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1, 'mandate_active': 1};
+    if (cj('#addcreditor_uses_bic').is(':checked')) {
+      updatedCreditorInfo['uses_bic'] = "1";
+    } else {
+      updatedCreditorInfo['uses_bic'] = "0";
+    }
+
+    let stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1, 'mandate_active': 1};
     if (creditorId != "none") {
       stdObj.id = creditorId;
     }
@@ -559,7 +577,7 @@ div.sdd-add-creditor {
       return;
     }
 
-    var reIBAN = /^[A-Z0-9]+$/;
+    let reIBAN = /^[A-Z0-9]+$/;
     if(!reIBAN.test(updatedCreditorInfo['iban'])) {
       CRM.alert("{/literal}{ts domain="org.project60.sepa"}IBAN is not correct{/ts}", "{ts domain="org.project60.sepa"}Error{/ts}{literal}", "error");
       return;
@@ -568,51 +586,51 @@ div.sdd-add-creditor {
     cj(".save").addClass("disabled");
     cj(".save").attr('onclick','').unbind('click');
 
-    var updObj = cj.extend(stdObj, updatedCreditorInfo);
+    let updObj = cj.extend(stdObj, updatedCreditorInfo);
 
     CRM.api('SepaCreditor', 'create', updObj,
             {success: function(data) {
                 if (data['is_error'] == 0) {
                   // check whether we updated an existing creditor
                   // or created a new one
-                  var creditorId = cj('#edit_creditor_id').val();
+                  let creditorId = cj('#edit_creditor_id').val();
                   if (creditorId == "none") {
                     creditorId = data['values'][0]['id'];
                   }
 
                   // update creditor batching settings
-                  for (var i = 0; i < customBatchingParams.length; i++) {
-                    var name = customBatchingParams[i][0];
-                    var value = inputCustomBatching[i].value;
-                    var param = {};
+                  for (let i = 0; i < customBatchingParams.length; i++) {
+                    let name = customBatchingParams[i][0];
+                    let value = inputCustomBatching[i].value;
+                    let param = {};
 
                     // modify the object from the database if it exists
                     if (customBatchingParams[i][2] !== null) {
                       param[name] = customBatchingParams[i][2];
-                    }else{
+                    } else {
                       param[name] = {};
                     }
 
                     if (value != "") {
                       param[name][creditorId] = value;
-                    }else{
+                    } else {
                       delete param[name][creditorId];
                     }
 
                     param[name] = JSON.stringify(param[name]);
-		    var once = true;
+		            var once = true;
                     CRM.api('Setting', 'create', param, {success: function(data) {
-			 if(once) {
-                           once = !once;
-			   CRM.alert("{/literal}{ts domain="org.project60.sepa"}Creditor updated{/ts}", "{ts domain="org.project60.sepa"}Success{/ts}{literal}", "success");
-                           resetValues();
-                           location.reload();
-			 }
-                      }});
+                        if (once) {
+                            once = !once;
+                            CRM.alert("{/literal}{ts domain="org.project60.sepa"}Creditor updated{/ts}", "{ts domain="org.project60.sepa"}Success{/ts}{literal}", "success");
+                            resetValues();
+                            location.reload();
+                        }
+                    }});
                   }
                 }
-               }
             }
+        }
     );
   }
 
@@ -622,6 +640,7 @@ div.sdd-add-creditor {
     cj('#edit_creditor_id').val("none");
     cj('#add_creditor_id').val("");
     cj('#addcreditor_type').val("SEPA");
+    cj('#add_uses_bic').prop('checked', false);
   }
 </script>
 {/literal}

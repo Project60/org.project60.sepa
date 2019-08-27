@@ -149,6 +149,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('select',     'addcreditor_currency',     ts("Currency", array('domain' => 'org.project60.sepa')), $currencies);
         $this->addElement('select',     'addcreditor_type',         ts("Type", array('domain' => 'org.project60.sepa')), $creditor_types);
         $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version", array('domain' => 'org.project60.sepa')), array('' => ts('- select -', array('domain' => 'org.project60.sepa'))) + CRM_Core_OptionGroup::values('sepa_file_format'));
+        $this->addElement('checkbox',   'addcreditor_uses_bic',     ts("Use BICs", array('domain' => 'org.project60.sepa')), "", (array('checked'=>'checked')));
         $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor", array('domain' => 'org.project60.sepa')), "", array('value' =>'0'));
         $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends", array('domain' => 'org.project60.sepa')), "", ($excld_we?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'sdd_async_batching',       ts("Large Groups", array('domain' => 'org.project60.sepa')), "", ($async_batch?array('checked'=>'checked'):array()));
