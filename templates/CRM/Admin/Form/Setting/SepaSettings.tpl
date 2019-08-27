@@ -137,7 +137,7 @@ div.sdd-add-creditor {
           </td>
         </tr>
          <tr>
-             <td class="label">{$form.addcreditor_uses_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Uses BICs{/ts}", {literal}{"id":"id-uses-bics","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+             <td class="label">{$form.addcreditor_uses_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Uses BICs{/ts}", {literal}{"id":"id-uses-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
              <td>
                  {$form.addcreditor_uses_bic.html}
              </td>
