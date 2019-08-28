@@ -81,7 +81,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       $params['iban'] = strtoupper($params['iban']);           // create uppercase string
       $params['iban'] = str_replace(' ', '', $params['iban']); // strip spaces
       $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type']);
-      if ($iban_error) throw new CRM_Exception($iban_error . ':' . $params['iban']);
+      if ($iban_error) throw new CRM_Exception($iban_error . ': ' . $params['iban']);
     }
 
     if (!empty($params['bic'])) {
