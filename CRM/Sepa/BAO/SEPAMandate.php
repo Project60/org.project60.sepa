@@ -78,13 +78,13 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
     // validate IBAN / BIC / reference
     if (!empty($params['iban'])) {
-      $params['iban'] = strtoupper($params['iban']);           // create uppercase string
-      $params['iban'] = str_replace(' ', '', $params['iban']); // strip spaces
+      $params['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($params['iban'], $creditor['creditor_type']);
       $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type']);
       if ($iban_error) throw new CRM_Exception($iban_error . ':' . $params['iban']);
     }
 
     if (!empty($params['bic'])) {
+      $params['bic'] = CRM_Sepa_Logic_Verification::formatBIC($params['bic'], $creditor['creditor_type']);
       $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type']);
       if ($bic_error) throw new CRM_Exception($bic_error . ':' . $params['bic']);
     }
@@ -470,22 +470,22 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
   /**
    * Allows you to modifiy certain mandate parameters of an active mandate:
-   *  - amount 
+   *  - amount
    *  - campaign_id
    *  - financial type
    *
    * Changes will take effect out to all future contributions,
    *  including already created ones in status 'Pending'
-   * 
+   *
    * @throws Exception
    * @return mixed success
-   * @author endres -at- systopia.de 
+   * @author endres -at- systopia.de
    */
   static function modifyMandate($mandate_id, $changes) {
     // use a lock, in case somebody is batching just now
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
-      throw new Exception(ts("Cannot adjust mandate [%1], batching in progress!", 
+      throw new Exception(ts("Cannot adjust mandate [%1], batching in progress!",
         array(1 => $mandate_id, 'domain' => 'org.project60.sepa')));
     }
 
@@ -505,12 +505,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $bank_data_changes = array();
     if (!empty($changes['iban']) && $changes['iban'] != $mandate['iban']) {
       $bank_data_changes['iban'] = $changes['iban'];
-      $changes_details[] = ts("IBAN changed from '%1' to '%2'", 
+      $changes_details[] = ts("IBAN changed from '%1' to '%2'",
         array(1 => $mandate['iban'], 2 => $changes['iban'], 'domain' => 'org.project60.sepa'));
     }
     if (!empty($changes['bic']) && $changes['bic'] != $mandate['bic']) {
       $bank_data_changes['bic'] = $changes['bic'];
-      $changes_details[] = ts("BIC changed from '%1' to '%2'", 
+      $changes_details[] = ts("BIC changed from '%1' to '%2'",
         array(1 => $mandate['bic'], 2 => $changes['bic'], 'domain' => 'org.project60.sepa'));
     }
     if (!empty($bank_data_changes)) {
@@ -556,7 +556,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
               'domain' => 'org.project60.sepa'));
     }
 
-    // CAMPAIGN CHANGE    
+    // CAMPAIGN CHANGE
     if (!empty($changes['campaign_id']) && $changes['campaign_id'] != $contribution_rcur['campaign_id']) {
       $contribution_changes['campaign_id'] = $changes['campaign_id'];
       $old_campaign = civicrm_api3('Campaign', 'getsingle', array('id' => $contribution_rcur['campaign_id']));
@@ -571,7 +571,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     if (!empty($contribution_changes)) try {
-      // change the recurring contribution 
+      // change the recurring contribution
       $contribution_changes['id'] = $contribution_rcur['id'];
       $contribution_changes['currency'] = $contribution_rcur['currency'];
       civicrm_api3('ContributionRecur', 'create', $contribution_changes);
@@ -617,7 +617,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       }
     } catch (Exception $e) {
       $lock->release();
-      throw $e;      
+      throw $e;
     }
 
     $lock->release();

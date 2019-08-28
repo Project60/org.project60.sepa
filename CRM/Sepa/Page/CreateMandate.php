@@ -411,7 +411,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (!isset($_REQUEST['bic'])) {
       $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
     } else {
-      $_REQUEST['bic'] = strtoupper($_REQUEST['bic']);
+      $_REQUEST['bic'] = CRM_Sepa_Logic_Verification::formatBIC($_REQUEST['bic'], $creditor['creditor_type']);
       if (strlen($_REQUEST['bic']) == 0) {
         $errors['bic'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "BIC");
       } else {
@@ -426,6 +426,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     if (!isset($_REQUEST['iban'])) {
       $errors['iban'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "IBAN");
     } else {
+      $_REQUEST['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($_REQUEST['iban'], $creditor['creditor_type']);
       if (strlen($_REQUEST['iban']) == 0) {
         $errors['iban'] = sprintf(ts("'%s' is a required field.", array('domain' => 'org.project60.sepa')), "IBAN");
       } else {
