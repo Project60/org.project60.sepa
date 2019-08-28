@@ -140,6 +140,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
 
         // add creditor form elements
         $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact", array('domain' => 'org.project60.sepa')));
+        $this->addElement('text',       'addcreditor_label',        ts("Label", array('domain' => 'org.project60.sepa')));
         $this->addElement('text',       'addcreditor_name',         ts("Name", array('domain' => 'org.project60.sepa')));
         $this->addElement('text',       'addcreditor_id',           ts("Identifier", array('domain' => 'org.project60.sepa')));
         $this->addElement('text',       'addcreditor_address',      ts("Address", array('domain' => 'org.project60.sepa')), array('size' => 60));
@@ -197,7 +198,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
           $creditors = array();
           foreach ($creditor_query['values'] as $creditor) {
               $creditors[] = $creditor;
-              $creditors_default_list[$creditor['id']] = $creditor['name'];
+              $creditors_default_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
           }
         }
         $this->assign('creditors', $creditors);

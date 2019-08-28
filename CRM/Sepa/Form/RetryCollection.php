@@ -182,7 +182,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
       'option.limit' => 0,
       'return'       => 'name,id'));
     foreach ($creditor_query['values'] as $creditor) {
-      $creditor_list[$creditor['id']] = $creditor['name'];
+      $creditor_list[$creditor['id']] = $creditor['label'];
     }
     return $creditor_list;
   }

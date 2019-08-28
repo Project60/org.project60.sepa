@@ -227,6 +227,13 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'maxlength' => 35,
           'size' => CRM_Utils_Type::BIG,
         ) ,
+        'label' => array(
+            'name' => 'label',
+            'type' => CRM_Utils_Type::T_STRING,
+            'title' => ts('internal label of the creditor', array('domain' => 'org.project60.sepa')) ,
+            'maxlength' => 128,
+            'size' => CRM_Utils_Type::HUGE,
+        ) ,
         'name' => array(
           'name' => 'name',
           'type' => CRM_Utils_Type::T_STRING,
@@ -338,6 +345,7 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'id'                   => 'id',
           'creditor_id'          => 'creditor_id',
           'identifier'           => 'identifier',
+          'label'                => 'label',
           'name'                 => 'name',
           'address'              => 'address',
           'country_id'           => 'country_id',

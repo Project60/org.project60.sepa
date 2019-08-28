@@ -240,4 +240,19 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1503() {
+    // add currency
+    $this->ctx->log->info('Adding creditor.label field');
+    $uses_bic_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'label';");
+    if (!$uses_bic_column) {
+      // doesn't exist yet, add the column and set to '1'
+      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `label` varchar(128) COMMENT 'internally used label for the creditor';");
+      $this->executeSql("UPDATE civicrm_sdd_creditor SET label=name WHERE label IS NULL");
+    }
+    return TRUE;
+  }
 }

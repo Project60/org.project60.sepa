@@ -288,7 +288,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't find any creditors.", array('domain' => 'org.project60.sepa')), $cid), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     } else {
       foreach ($creditor_query['values'] as $creditor_id => $creditor) {
-        $creditors[$creditor_id] = $creditor['name'];
+        $creditors[$creditor_id] = $creditor['label'];
       }
     }
     $this->assign('creditors', $creditors);
