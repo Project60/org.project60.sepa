@@ -45,7 +45,7 @@ function sepa_modify_summary_tab_contribution() {
     contribution_snippet_changed = true; // important to do this BEFORE changing the model
 
     // modify the edit links for recurring contributons, if they are mandates
-    var recurring_contribution_table_rows = contribution_tab.find("table.selector:last() > tbody > tr[id]");
+    var recurring_contribution_table_rows = contribution_tab.find("table.selector:last() > tbody > tr[id], .crm-contact-contribute-recur > table > tbody > tr[id]");
     for (var i=0; i<recurring_contribution_table_rows.length; i++) {
       var recurring_contribution_table_row = cj(recurring_contribution_table_rows[i]);
       var rcur_id_components = recurring_contribution_table_row.attr('id').split(/[_\-]+/);
