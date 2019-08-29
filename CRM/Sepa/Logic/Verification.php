@@ -35,12 +35,34 @@ class CRM_Sepa_Logic_Verification {
         $iban = trim($iban);
         $iban = strtoupper($iban);
         $iban = str_replace(' ', '', $iban);
-        return $iban;
+        break;
 
-      default:
       case 'PSP':
-        return trim($iban);
+        $iban = trim($iban);
+        break;
     }
+    return $iban;
+  }
+
+  /**
+   * Format the given BIC
+   *
+   * @param $bic
+   * @param string $type
+   *
+   * @return string formatted BIC
+   */
+  public static function formatBIC($bic, $type = 'SEPA') {
+    switch ($type) {
+      case 'SEPA':
+        $bic = strtoupper($bic);
+        break;
+
+      case 'PSP':
+        $bic = trim($bic);
+        break;
+    }
+    return $bic;
   }
 
 
@@ -203,7 +225,7 @@ class CRM_Sepa_Logic_Verification {
 
       default:
       case 'PSP':
-        if (preg_match("/^[a-zA-Z0-9_\/\-=+]{1,25}$/", $bic)) {
+        if (preg_match("/^[a-zA-Z0-9_\/\-=+]{0,25}$/", $bic)) {
           return NULL;
         } else {
           return E::ts("PSP/BIC is not correct");
