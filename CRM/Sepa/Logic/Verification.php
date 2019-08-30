@@ -74,6 +74,11 @@ class CRM_Sepa_Logic_Verification {
    * @return NULL if given IBAN is valid, localized error message otherwise
    */
   public static function verifyIBAN($iban, $type = 'SEPA') {
+    // first: check if blacklisted (#540)
+    if (self::isIbanBlacklisted($iban)) {
+      return E::ts("IBAN is blacklisted");
+    }
+
     switch ($type) {
       case 'SEPA':
         // We only accept uppecase characters and numerals (machine format)
@@ -97,6 +102,29 @@ class CRM_Sepa_Logic_Verification {
     }
     // all clear
     return NULL;
+  }
+
+  /**
+   * Check if this IBAN is blacklisted
+   *
+   * @param $iban string IBAN to check
+   * @return boolean
+   */
+  public static function isIbanBlacklisted($iban) {
+    static $blacklist = NULL;
+    if ($blacklist === NULL) {
+      // we have to check whether the group exists first, getOptionValuesAssocArrayFromName doesn't do that
+      $blacklist = [];
+      $query = civicrm_api3('OptionValue', 'get', [
+          'option_group_id' => 'iban_blacklist',
+          'option.limit'    => 0,
+          'return'          => 'value'
+      ]);
+      foreach ($query['values'] as $value) {
+        $blacklist[$value['value']] = 1;
+      }
+    }
+    return isset($blacklist[$iban]);
   }
 
   /**

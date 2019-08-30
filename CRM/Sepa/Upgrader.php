@@ -55,10 +55,11 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    */
   public function enable() {
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/batch_status_option_group.json');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/msg_tpl_workflow_contribution_option_group.json');
-    $customData->syncOptionGroup(__DIR__ . '/../../resources/payment_instrument_option_group.json');
+    $customData->syncOptionGroup(E::path('resources/batch_status_option_group.json'));
+    $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+    $customData->syncOptionGroup(E::path('resources/msg_tpl_workflow_contribution_option_group.json'));
+    $customData->syncOptionGroup(E::path('resources/payment_instrument_option_group.json'));
+    $customData->syncOptionGroup(E::path('resources/iban_blacklist_option_group.json'));
 
     // TODO: re-enable payment processor
     // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
@@ -227,4 +228,16 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     }
     return TRUE;
   }
+
+  /**
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1502() {
+    $this->ctx->log->info('Adding IBAN Blacklist');
+    $customData = new CRM_Sepa_CustomData('org.project60.sepa');
+    $customData->syncOptionGroup(E::path('resources/iban_blacklist_option_group.json'));
+    return TRUE;
+  }
+
 }

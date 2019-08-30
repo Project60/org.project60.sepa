@@ -1,0 +1,16 @@
+{
+  "_lookup": ["name"],
+  "_translate": ["title"],
+  "name": "iban_blacklist",
+  "title": "IBAN Blacklist",
+  "is_reserved": 0,
+  "is_enabled": 1,
+  "_values": [
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "Blacklist Example",
+      "value": "DE27100777770209299700"
+    }
+  ]
+}
