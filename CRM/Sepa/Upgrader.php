@@ -212,5 +212,19 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1501() {
+    // add currency
+    $this->ctx->log->info('Adding uses_bic field');
+    $uses_bic_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'uses_bic';");
+    if (!$uses_bic_column) {
+      // doesn't exist yet, add the column and set to '1'
+      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `uses_bic` tinyint COMMENT 'If true, BICs are not used for this creditor';");
+      $this->executeSql("UPDATE civicrm_sdd_creditor SET `uses_bic`=1 WHERE uses_bic IS NULL");
+    }
+    return TRUE;
+  }
 }
-

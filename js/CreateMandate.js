@@ -180,6 +180,20 @@ cj(document).ready(function() {
         let creditor_id = sdd_getF('creditor_id').val();
         let creditor = CRM.vars.p60sdd.creditor_data[creditor_id];
 
+        // show/hide BIC field
+        if (parseInt(creditor['uses_bic'])) {
+            sdd_getF('bic')
+                .parent()
+                .parent()
+                .show();
+        } else {
+            sdd_getF('bic')
+                .val('')
+                .parent()
+                .parent()
+                .hide();
+        }
+
         // reset cycle days
         sdd_getF('cycle_day').find('option').remove();
         let cycle_days = CRM.vars.p60sdd.creditor_data[creditor_id]['cycle_days'];

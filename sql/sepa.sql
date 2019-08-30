@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `mandate_active`       tinyint             COMMENT 'If true, new Mandates for this Creditor are set to active directly upon creation; otherwise, they have to be activated explicitly later on.',
      `sepa_file_format_id`  int unsigned        COMMENT 'Variant of the pain.008 format to use when generating SEPA XML files for this creditor. FK to SEPA File Formats in civicrm_option_value.',
      `creditor_type`        varchar(8)          COMMENT 'type of the creditor, values are SEPA (default) and PSP',
+     `uses_bic`             tinyint             COMMENT 'If true, BICs are not used for this creditor',
     PRIMARY KEY ( `id` ),
     CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,
     CONSTRAINT FK_civicrm_sdd_creditor_country_id  FOREIGN KEY (`country_id`)  REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL

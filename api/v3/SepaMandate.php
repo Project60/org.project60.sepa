@@ -79,9 +79,18 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     // get creditor
     try {
       _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
-      $creditor = civicrm_api('SepaCreditor', 'getsingle', array('id' => $params['creditor_id']));
+      $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $params['creditor_id']));
     } catch (Exception $e) {
       throw new Exception("Couldn't load creditor [{$params['creditor_id']}].");
+    }
+
+    // if BIC is used for this creditor, it is required (see #245)
+    if (empty($params['bic'])) {
+      if ($creditor['uses_bic']) {
+        return civicrm_api3_create_error("BIC is required for creditor [{$params['creditor_id']}].");
+      } else {
+        $params['bic'] = 'NOTPROVIDED';
+      }
     }
 
     $create_contribution = $params; // copy array
@@ -90,11 +99,11 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     	// in case someone wants another contact for the contribution than for the mandate...
     	$create_contribution['contact_id'] = $create_contribution['contribution_contact_id'];
     }
-	if (empty($create_contribution['currency']))
-		$create_contribution['currency'] = $creditor['currency'];
+	  if (empty($create_contribution['currency']))
+		  $create_contribution['currency'] = $creditor['currency'];
 
-	if (empty($create_contribution['contribution_status_id']))
-		$create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+	  if (empty($create_contribution['contribution_status_id']))
+		  $create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
     if ($params['type']=='RCUR') {
     	$contribution_entity = 'ContributionRecur';
@@ -165,7 +174,7 @@ function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
   );
   $params['bic'] = array(
     'name'         => 'bic',
-    'api.required' => 1,
+    'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'BIC (bank number) for the mandate',
   );
