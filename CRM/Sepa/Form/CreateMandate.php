@@ -355,16 +355,20 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     }
 
     // validate BIC
-    if ($creditor_mode == 'SEPA' && empty($this->_submitValues['bic'])) {
-      $bic_error = E::ts("BIC is required");
-    } else {
-      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC(
-        CRM_Sepa_Logic_Verification::formatBIC(
-          $this->_submitValues['bic'],
-          $creditor_mode
-        ),
-        $creditor_mode
-      );
+    $bic_error = NULL;
+    if ($creditor_mode == 'SEPA') {
+      if (empty($this->_submitValues['bic'])) {
+        if ($creditor['uses_bic']) {
+          $bic_error = E::ts("BIC is required");
+        }
+      } else {
+        $bic_error = CRM_Sepa_Logic_Verification::verifyBIC(
+            CRM_Sepa_Logic_Verification::formatBIC(
+                $this->_submitValues['bic'],
+                $creditor_mode
+            ),
+          $creditor_mode);
+      }
     }
     if ($bic_error) {
       $this->_errors['bic'] = $bic_error;

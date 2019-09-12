@@ -315,6 +315,11 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'maxlength' => 4,
           'size' => CRM_Utils_Type::EIGHT,
         ) ,
+        'uses_bic' => array(
+            'name' => 'uses_bic',
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+            'title' => ts('Does this creditor use BICs?', array('domain' => 'org.project60.sepa')) ,
+        ) ,
       );
     }
     return self::$_fields;
@@ -330,22 +335,23 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
   {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
-        'id' => 'id',
-        'creditor_id' => 'creditor_id',
-        'identifier' => 'identifier',
-        'name' => 'name',
-        'address' => 'address',
-        'country_id' => 'country_id',
-        'iban' => 'iban',
-        'bic' => 'bic',
-        'currency' => 'currency',
-        'mandate_prefix' => 'mandate_prefix',
-        'payment_processor_id' => 'payment_processor_id',
-        'category' => 'category',
-        'tag' => 'tag',
-        'mandate_active' => 'mandate_active',
-        'sepa_file_format_id' => 'sepa_file_format_id',
-        'creditor_type' => 'creditor_type',
+          'id'                   => 'id',
+          'creditor_id'          => 'creditor_id',
+          'identifier'           => 'identifier',
+          'name'                 => 'name',
+          'address'              => 'address',
+          'country_id'           => 'country_id',
+          'iban'                 => 'iban',
+          'bic'                  => 'bic',
+          'currency'             => 'currency',
+          'mandate_prefix'       => 'mandate_prefix',
+          'payment_processor_id' => 'payment_processor_id',
+          'category'             => 'category',
+          'tag'                  => 'tag',
+          'mandate_active'       => 'mandate_active',
+          'sepa_file_format_id'  => 'sepa_file_format_id',
+          'creditor_type'        => 'creditor_type',
+          'uses_bic'             => 'uses_bic',
       );
     }
     return self::$_fieldKeys;

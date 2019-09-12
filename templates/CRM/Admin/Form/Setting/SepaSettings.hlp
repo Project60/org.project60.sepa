@@ -149,3 +149,9 @@
     <p>{ts domain="org.project60.sepa"}Always use <code>SEPA</code> if you want to do SEPA style direct debit.{/ts}</p>
     <p>{ts domain="org.project60.sepa"}<code>PSP</code> can help you to use this extension for other direct debit systems or payment service providers (PSP), but all SEPA style validations and tools are then disabled.{/ts}</p>
 {/htxt}
+
+{htxt id='id-uses-bic'}
+    <p>{ts domain="org.project60.sepa"}This setting let's you define whether this creditor uses BICs.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}<strong>Caution:</strong> if you turn this (back) on with an existing creditor, you would have to manually make sure that all mandates of this creditor have BICs.{/ts}</p>
+{/htxt}
+
