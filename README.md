@@ -12,7 +12,7 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 
 * OOFF and RCUR payments
 * SEPA dashboard gives you great status overview
-* payment processer for online donations and event registrations
+* payment processer for online donations and event registrations (separate extension)
 * UI to manipulate mandates
 * automatic BIC lookup if [Little BIC Extension](https://github.com/Project60/org.project60.bic) in installed
 * full SEPA group life cycle: 'open'-'closed/sent'->'received'

@@ -508,7 +508,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   protected function getCreditors() {
     $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
 
-    $creditor_query = civicrm_api3('SepaCreditor', 'get', array());
+    $creditor_query = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
     $creditors = $creditor_query['values'];
 
     foreach ($creditors as &$creditor) {
@@ -537,7 +537,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   protected function getCreditorList($creditors) {
     $creditor_list = array();
     foreach ($creditors as $creditor) {
-      $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['name']}";
+      $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
     }
     return $creditor_list;
   }

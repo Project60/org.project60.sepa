@@ -35,7 +35,7 @@ div.sdd-add-creditor {
       <table class="form-layout">
           <tr class="crm-creditor-block">
             <th>{ts domain="org.project60.sepa"}ID{/ts}</th>
-            <th>{ts domain="org.project60.sepa"}Name{/ts}</th>
+            <th>{ts domain="org.project60.sepa"}Label{/ts}</th>
             <th>{ts domain="org.project60.sepa"}IBAN{/ts}</th>
             <th>{ts domain="org.project60.sepa"}BIC{/ts}</th>
             <th>{ts domain="org.project60.sepa"}Actions{/ts}</th>
@@ -43,7 +43,7 @@ div.sdd-add-creditor {
         {foreach item=creditor from=$creditors}
           <tr class="crm-creditor-block">
             <td>[{$creditor.id}]</td>
-            <td>{$creditor.name}</td>
+            <td>{$creditor.label}</td>
             <td>{$creditor.iban}</td>
             <td>{$creditor.bic}</td>
             <td>
@@ -70,6 +70,12 @@ div.sdd-add-creditor {
      <h2>{ts domain="org.project60.sepa"}Add/Edit Creditor{/ts}</h2>
      <h3>{ts domain="org.project60.sepa"}Creditor Information{/ts}</h3>
      <table id="creditorinfo" class="form-layout">
+        <tr>
+         <td class="label">{$form.addcreditor_label.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Label{/ts}", {literal}{"id":"id-label","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+         <td>
+           {$form.addcreditor_label.html}
+         </td>
+        </tr>
         <tr>
          <td class="label">{$form.addcreditor_name.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Creditor Name{/ts}", {literal}{"id":"id-name","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
          <td>
@@ -488,6 +494,7 @@ div.sdd-add-creditor {
             cj('#edit_creditor_id').val("none");
           }
           cj('#add_creditor_id').val(data['creditor_id']);
+          cj('#addcreditor_label').val(data['label']);
           cj('#addcreditor_name').val(data['name']);
           cj('#addcreditor_address').val(data['address']);
           cj('#addcreditor_country_id').val(data['country_id']);
@@ -529,6 +536,7 @@ div.sdd-add-creditor {
 
     let map = {
         "edit_creditor_id":         "id",
+        "addcreditor_label":        "label",
         "addcreditor_name":         "name",
         "addcreditor_address":      "address",
         "addcreditor_country_id":   "country_id",

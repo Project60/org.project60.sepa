@@ -105,7 +105,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       if (!empty($creditor['is_error'])) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read creditor [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate['creditor_id'], $creditor['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
       } else {
-        $mandate['creditor_name'] = $creditor['name'];
+        $mandate['creditor_name'] = $creditor['label'];
       }
     }
 

@@ -20,7 +20,7 @@
 {if $creditors}
 <select id="creditor_id" name="user_name">
   {foreach from=$creditors item=creditor key=id}
-  <option value="{$id}" {if $id eq $user_name}selected{/if}>{$creditor.name}&nbsp;[{$id}]</option>
+  <option value="{$id}" {if $id eq $user_name}selected{/if}>{$creditor.label}&nbsp;[{$id}]</option>
   {/foreach}
 </select>
 {else}
@@ -35,7 +35,7 @@
 {if $creditors}
 <select id="test_creditor_id" name="test_user_name">
   {foreach from=$test_creditors item=creditor key=id}
-  <option value="{$id}" {if $id eq $test_user_name}selected{/if}>{$creditor.name}&nbsp;[{$id}]</option>
+  <option value="{$id}" {if $id eq $test_user_name}selected{/if}>{$creditor.label}&nbsp;[{$id}]</option>
   {/foreach}
 </select>
 {else}
