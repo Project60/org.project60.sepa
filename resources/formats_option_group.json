@@ -100,6 +100,15 @@
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"
+    },
+    {
+      "_lookup": ["name"],
+      "_translate": ["label"],
+      "label": "pain.008.001.02 with alternative DbtrAgt ID",
+      "name": "pain_008_001_02_OTHERID",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
     }
   ]
 }

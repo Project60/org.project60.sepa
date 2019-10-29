@@ -271,4 +271,18 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     }
     return TRUE;
   }
+
+  /**
+   * Fix civicrm_sdd_contribution_txgroup constraint (#548)
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1505() {
+    $dsn = DB::parseDSN(CIVICRM_DSN);
+    $this->ctx->log->info("Adding new 'pain.008.001.02 with alternative DbtrAgt ID' format.");
+    $customData = new CRM_Sepa_CustomData('org.project60.sepa');
+    $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+    return TRUE;
+  }
 }
