@@ -254,6 +254,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     $notice_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.${txgroup['type']}.notice", $txgroup['sdd_creditor_id']);
     $new_collection_date = date('YmdHis', strtotime("$latest_submission_date + $notice_period days"));
+    $new_collection_date = CRM_Sepa_Logic_Batching::deferCollectionDate($new_collection_date, $txgroup['sdd_creditor_id']);
     $new_latest_submission_date = date('YmdHis', strtotime("$latest_submission_date"));
 
     $result = civicrm_api('SepaTransactionGroup', 'create', array(
