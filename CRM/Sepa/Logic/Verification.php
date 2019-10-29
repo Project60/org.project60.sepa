@@ -96,7 +96,8 @@ class CRM_Sepa_Logic_Verification {
 
       default:
       case 'PSP':
-        if (!preg_match("#^[a-zA-Z0-9_\/\-=+]+$#", $iban)) {
+        // anything that's a string and not empty is fine
+        if (empty($iban) || !is_string($iban)) {
           return E::ts("Invalid PSP Code");
         }
     }
