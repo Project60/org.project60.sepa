@@ -57,7 +57,7 @@
         <DbtrAgt>
           <FinInstnId>
             <Other>
-              <Identification>{$contribution.bic}</Identification>
+              <Identification>NOTPROVIDED</Identification>
             </Other>
           </FinInstnId>
         </DbtrAgt>

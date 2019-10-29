@@ -273,14 +273,14 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   }
 
   /**
-   * Fix civicrm_sdd_contribution_txgroup constraint (#548)
+   * add new file format (#549)
    *
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1505() {
+  public function upgrade_1506() {
     $dsn = DB::parseDSN(CIVICRM_DSN);
-    $this->ctx->log->info("Adding new 'pain.008.001.02 with alternative DbtrAgt ID' format.");
+    $this->ctx->log->info("Adding new 'pain.008.001.02 without BIC.");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
     return TRUE;
