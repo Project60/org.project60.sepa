@@ -255,4 +255,20 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     }
     return TRUE;
   }
+
+  /**
+   * Fix civicrm_sdd_contribution_txgroup constraint (#548)
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1504() {
+    $dsn = DB::parseDSN(CIVICRM_DSN);
+    $this->ctx->log->info('Adding civicrm_sdd_contribution_txgroup.FK_civicrm_sdd_contribution_id constraint');
+    $constraint_exists = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = '{$dsn['database']}' AND TABLE_NAME = 'civicrm_sdd_contribution_txgroup' AND CONSTRAINT_NAME='FK_civicrm_sdd_contribution_id';");
+    if (!$constraint_exists) {
+      $this->executeSql("ALTER TABLE `civicrm_sdd_contribution_txgroup` ADD CONSTRAINT FK_civicrm_sdd_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`) ON DELETE CASCADE;");
+    }
+    return TRUE;
+  }
 }

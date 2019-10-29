@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_contribution_txgroup` (
     UNIQUE INDEX `contriblookup`(contribution_id),
     INDEX `txglookup`(txgroup_id),
     CONSTRAINT FK_civicrm_sdd_cGGoup_id FOREIGN KEY (`txgroup_id`) REFERENCES `civicrm_sdd_txgroup`(`id`),
-    CONSTRAINT FK_civicrm_sdd_Contriubution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`) ON DELETE CASCADE
+    CONSTRAINT FK_civicrm_sdd_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
