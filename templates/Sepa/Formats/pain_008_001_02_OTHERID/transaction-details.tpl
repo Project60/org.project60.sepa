@@ -56,9 +56,9 @@
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
-            <Other>
-              <Identification>NOTPROVIDED</Identification>
-            </Other>
+            <Othr>
+              <Id>NOTPROVIDED</Id>
+            </Othr>
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
