@@ -15,7 +15,20 @@
 require_once 'sepa.civix.php';
 require_once 'sepa_pp_sdd.php';
 
+
+use \Symfony\Component\DependencyInjection\ContainerBuilder;
 use CRM_Sepa_ExtensionUtil as E;
+
+/**
+ * Implements hook_civicrm_container()
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_container/
+ */
+function sepa_civicrm_container(ContainerBuilder $container) {
+  if (class_exists("\Civi\ActionProvider\Action\AbstractAction")) {
+    $container->addCompilerPass(new \Civi\Sepa\ActionProvider\Action\SepaActions());
+  }
+}
 
 function sepa_civicrm_pageRun( &$page ) {
   if (get_class($page) == "CRM_Contact_Page_View_Summary") {
