@@ -580,6 +580,9 @@ class CRM_Sepa_Logic_Batching {
 
     // and check if it's not after the end_date
     $return_date = date('Y-m-d', $next_date);
+
+    // Call a hook so extensions could alter the next collection date.
+    CRM_Utils_SepaCustomisationHooks::alter_next_collection_date($next_date, $rcontribution['mandate_id']);
     if (!empty($rcontribution['end_date']) && strtotime($rcontribution['end_date'])<$next_date) {
       return NULL;
     }
