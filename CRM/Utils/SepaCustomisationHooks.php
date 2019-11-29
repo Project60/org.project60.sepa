@@ -142,16 +142,16 @@ class CRM_Utils_SepaCustomisationHooks {
    *  So the next collection is in January.
    *
    * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
-   * @param array  $mandate_id      the id of the mandate
+   * @param array  $data array with data (such as mandate_id, mandate_entity_id for contribution recur id).
    *
    * @access public
    */
-  static function alter_next_collection_date(&$next_collection_date, $mandate_id) {
+  static function alter_next_collection_date(&$next_collection_date, $data) {
     if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
     {
-      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $mandate_id, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
+      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $data, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
     }else{
-      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $mandate_id, self::$null, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
+      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $data, self::$null, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
     }
   }
 

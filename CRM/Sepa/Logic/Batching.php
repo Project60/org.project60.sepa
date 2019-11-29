@@ -59,6 +59,7 @@ class CRM_Sepa_Logic_Batching {
         mandate.contact_id AS mandate_contact_id,
         mandate.entity_id AS mandate_entity_id,
         mandate.source AS mandate_source,
+        mandate.creditor_id AS mandate_creditor_id,
         first_contribution.receive_date AS mandate_first_executed,
         rcontribution.cycle_day AS cycle_day,
         rcontribution.frequency_interval AS frequency_interval,
@@ -91,6 +92,7 @@ class CRM_Sepa_Logic_Batching {
           'mandate_entity_id'             => $results->mandate_entity_id,
           'mandate_first_executed'        => $results->mandate_first_executed,
           'mandate_source'                => $results->mandate_source,
+          'mandate_creditor_id'           => $results->mandate_creditor_id,
           'cycle_day'                     => $results->cycle_day,
           'frequency_interval'            => $results->frequency_interval,
           'frequency_unit'                => $results->frequency_unit,
@@ -582,10 +584,7 @@ class CRM_Sepa_Logic_Batching {
     $return_date = date('Y-m-d', $next_date);
 
     // Call a hook so extensions could alter the next collection date.
-    // Only when a mandate id is set because the this function is also called before a mandate is created.
-    if (isset($rcontribution['mandate_id']) && !empty($rcontribution['mandate_id'])) {
-      CRM_Utils_SepaCustomisationHooks::alter_next_collection_date($next_date, $rcontribution['mandate_id']);
-    }
+    CRM_Utils_SepaCustomisationHooks::alter_next_collection_date($next_date, $rcontribution);
     if (!empty($rcontribution['end_date']) && strtotime($rcontribution['end_date'])<$next_date) {
       return NULL;
     }

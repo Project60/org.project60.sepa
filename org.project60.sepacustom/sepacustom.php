@@ -24,18 +24,15 @@ require_once 'sepacustom.civix.php';
  *  So the next collection is in January.
  *
  * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
- * @param array  $mandate_id      the id of the mandate
+ * @param array  $data array with data (such as mandate_id, mandate_entity_id for contribution recur id).
  */
-function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $mandate_id) {
+function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $data) {
   // Check if this rcontribution is part of a membership.
-  $sql = "SELECT * FROM civicrm_sdd_mandate WHERE id = %1 AND entity_table = 'civicrm_contribution_recur'";
-  $sqlParams[1] = array($mandate_id, 'Integer');
-  $mandate = CRM_Core_DAO::executeQuery($sql, $sqlParams);
-  if (!$mandate->fetch()) {
+  if (!isset($data['mandate_entity_id']) || !isset($data['mandate_creditor_id'])) {
     return;
   }
-  $contribution_recur_id = $mandate->entity_id;
-  $creditor_id = $mandate->creditor_id;
+  $contribution_recur_id = $data['mandate_entity_id'];
+  $creditor_id = $data['mandate_creditor_id'];
 
   // Fetch the possible cycle days.
   $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor_id);
