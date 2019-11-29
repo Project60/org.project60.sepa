@@ -31,6 +31,9 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
   $sql = "SELECT * FROM civicrm_sdd_mandate WHERE id = %1 AND entity_table = 'civicrm_contribution_recur'";
   $sqlParams[1] = array($mandate_id, 'Integer');
   $mandate = CRM_Core_DAO::executeQuery($sql, $sqlParams);
+  if (!$mandate->fetch()) {
+    return;
+  }
   $contribution_recur_id = $mandate->entity_id;
   $creditor_id = $mandate->creditor_id;
 
@@ -41,6 +44,8 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
   }
   asort($cycle_days);
   $notice_days = \CRM_Sepa_Logic_Settings::getSetting('batching_RCUR_notice', $creditor_id);
+  $now = new \DateTime();
+  $now->modify('+'.$notice_days.' days');
 
   // Check whether this is the first contribution or not.
   $sqlContributionCount = "SELECT count(*) FROM civicrm_contribution WHERE contribution_recur_id = %1";
@@ -52,6 +57,9 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
       $membership = civicrm_api3('Membership', 'getsingle', ['contribution_recur_id' => $contribution_recur_id]);
       $membershipEndDate = new \DateTime($membership['end_date']);
       $membershipEndDate->modify('+1 days');
+      if ($membershipEndDate < $now) {
+        $membershipEndDate = $now;
+      }
       // Move the first collection date
       while(!in_array($membershipEndDate->format('j'), $cycle_days)) {
         $membershipEndDate->modify('+1 day');
