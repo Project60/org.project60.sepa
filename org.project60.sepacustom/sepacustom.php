@@ -16,7 +16,58 @@
 
 require_once 'sepacustom.civix.php';
 
+/**
+ * This hook is called by the alternativeBatching:
+ *  you can set a custom collection date for a rcurring contribution.
+ *  For example you can use this hook when you mandate is connected to a yearly membership from January to December.
+ *  And when a new member signs up in October. You want to collect that money in october and the membership will end on 31st of December.
+ *  So the next collection is in January.
+ *
+ * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
+ * @param array  $data array with data (such as mandate_id, mandate_entity_id for contribution recur id).
+ */
+function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $data) {
+  // Check if this rcontribution is part of a membership.
+  if (!isset($data['mandate_entity_id']) || !isset($data['mandate_creditor_id'])) {
+    return;
+  }
+  $contribution_recur_id = $data['mandate_entity_id'];
+  $creditor_id = $data['mandate_creditor_id'];
 
+  // Fetch the possible cycle days.
+  $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor_id);
+  if (!is_array($cycle_days) || !count($cycle_days)) {
+    return;
+  }
+  asort($cycle_days);
+  $notice_days = \CRM_Sepa_Logic_Settings::getSetting('batching_RCUR_notice', $creditor_id);
+  $now = new \DateTime();
+  $now->modify('+'.$notice_days.' days');
+
+  // Check whether this is the first contribution or not.
+  $sqlContributionCount = "SELECT count(*) FROM civicrm_contribution WHERE contribution_recur_id = %1";
+  $sqlContributionCountParams[1] = array($contribution_recur_id, 'Integer');
+  $contributionCount = CRM_Core_DAO::singleValueQuery($sqlContributionCount, $sqlContributionCountParams);
+  if ($contributionCount > 0) {
+    // Only alter the collection date when this is not the first contribution.
+    try {
+      $membership = civicrm_api3('Membership', 'getsingle', ['contribution_recur_id' => $contribution_recur_id]);
+      $membershipEndDate = new \DateTime($membership['end_date']);
+      $membershipEndDate->modify('+1 days');
+      if ($membershipEndDate < $now) {
+        $membershipEndDate = $now;
+      }
+      // Move the first collection date
+      while(!in_array($membershipEndDate->format('j'), $cycle_days)) {
+        $membershipEndDate->modify('+1 day');
+      }
+      $next_collection_date = $membershipEndDate->format('Y-m-d');
+    } catch (CiviCRM_API3_Exception $e) {
+      // No membership found.
+      // Do not alter the date.
+    }
+  }
+}
 
 /**
  * This hook lets you modify the parameters of a to-be-created mandate.
@@ -28,7 +79,7 @@ require_once 'sepacustom.civix.php';
  *          \_______\____________ contact ID
  *       \_\_____________________ inteval, 00=OOFF, 04=quarterly, 02=monthly, etc.
  *   \__\________________________ identifier string
- */ 
+ */
 function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
 
   if (isset($mandate_parameters['reference']) && !empty($mandate_parameters['reference']))
@@ -83,7 +134,7 @@ function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
  *
  * In this implementation, we only prevent the collection day to be on weekend,
  * but -depending on your bank- you might want to include national holidays as well.
- */ 
+ */
 function sepacustom_civicrm_defer_collection_date(&$collection_date, $creditor_id) {
   // Don't collect on the week end
   $day_of_week = date('N', strtotime($collection_date));
@@ -97,26 +148,26 @@ function sepacustom_civicrm_defer_collection_date(&$collection_date, $creditor_i
 
 /**
  * This hook lets you customize the collection message.
- * 
+ *
  * You can simply put a string here, but most likely you would want to base
  * the message on the type of payment and/or the creditor.
- */ 
+ */
 function sepacustom_civicrm_modify_txmessage(&$txmessage, $info, $creditor) {
     $txmessage = "This is a customized message.";
 }
 
 
 /**
- * This hook lets you customize the EndToEndId used when submitting 
+ * This hook lets you customize the EndToEndId used when submitting
  *  a collection file to the bank
- * 
+ *
  * The variable end2endID already contains a uniqe ID (contribution ID),
- * but you can add a custom prefix or suffix. 
+ * but you can add a custom prefix or suffix.
  *
  * If you want to create your own ID you have to make sure it's really unique for
  * each transactions, otherwise it'll be rejected by the bank.
  * It will also have to create the SAME ID every time it's called for the same transaction.
- */ 
+ */
 function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $creditor) {
   $end2endID = "PREFIX{$end2endID}SUFFIX";
 }

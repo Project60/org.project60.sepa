@@ -136,6 +136,27 @@ class CRM_Utils_SepaCustomisationHooks {
 
   /**
    * This hook is called by the alternativeBatching:
+   *  you can set a custom collection date for a rcurring contribution.
+   *  For example you can use this hook when you mandate is connected to a yearly membership from January to December.
+   *  And when a new member signs up in October. You want to collect that money in october and the membership will end on 31st of December.
+   *  So the next collection is in January.
+   *
+   * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
+   * @param array  $data array with data (such as mandate_id, mandate_entity_id for contribution recur id).
+   *
+   * @access public
+   */
+  static function alter_next_collection_date(&$next_collection_date, $data) {
+    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
+    {
+      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $data, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
+    }else{
+      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $data, self::$null, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
+    }
+  }
+
+  /**
+   * This hook is called by the alternativeBatching:
    *  to avoid using a collection date that is not accepted by the bank, e.g. holidays,
    *  this hook lets you alter the calculated collection date string (format: "YYYY-MM-DD").
    *  You should _only_ defer the date by a few days!
