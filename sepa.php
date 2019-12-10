@@ -27,7 +27,7 @@ use CRM_Sepa_ExtensionUtil as E;
 function sepa_civicrm_container(ContainerBuilder $container) {
   if (
     class_exists("\Civi\ActionProvider\Action\AbstractAction")
-  && class_exists('\Civi\Sepa\ActionProvider\Action\SepaActions')
+    && class_exists('\Civi\Sepa\ActionProvider\Action\SepaActions')
   ) {
     $container->addCompilerPass(new \Civi\Sepa\ActionProvider\Action\SepaActions());
   }
