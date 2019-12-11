@@ -41,9 +41,22 @@ TODO
 | V02     |  TODO  | creditor_type=PSP | Validate BICs | Creating mandates with various valid/invalid BICs, assert that all creations pass |
 | V03     |  TODO  | default       | Validate IBANs | Creating mandates with various valid/invalid IBANs, assert that with invalid ones the creation causes an error |
 | V04     |  TODO  | creditor_type=PSP | Validate IBANs | Creating mandates with various valid/invalid IBANs, assert that all creations pass |
+| V05     |  TODO  | default | Validate Blacklist | Add some example IBANs to the black list, assert that creation with those IBANs fail, while other (valid) IBANs pass |
 
+
+## Generated Files
+
+TODO
 
 ## Reference Generation
+
+TODO
+
+## Retry Collection
+
+TODO
+
+## Next Collection Date
 
 TODO
 
