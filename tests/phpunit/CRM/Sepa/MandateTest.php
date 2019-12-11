@@ -66,6 +66,27 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $this->assertSame('1', $transactionGroup['status_id'], E::ts('OOFF transaction group status after batching is incorrect.'));
   }
 
+  /**
+   * Test the closing of an OOFF mandate.
+   */
+  public function testOOFFClose()
+  {
+    $mandate = $this->createOOFFMandate();
+
+    $this->executeOOFFBatching();
+
+    $transactionGroup = $this->getActiveTransactionGroup();
+
+    $this->closeTransactionGroup($transactionGroup['id']);
+
+    $closedMandate = $this->getMandate($mandate['id']);
+    $closedContribution = $this->getContributionForOOFFMandate($closedMandate);
+    $closedTransactionGroup = $this->getTransactionGroup($transactionGroup['id']);
+
+    $this->assertSame('SENT', $closedMandate['status'], E::ts('OOFF Mandate status after closing is incorrect.'));
+    $this->assertSame('5', $closedContribution['contribution_status_id'], E::ts('OOFF contribution status after closing is incorrect.'));
+    $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('OOFF transaction group status after closing is incorrect.'));
+  }
 
   /**
    * Create an OOFF mandate.
@@ -103,6 +124,21 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
         'type' => 'OOFF',
       ]
     );
+  }
+
+  /**
+   * Close a transaction group of the given ID.
+   */
+  protected function closeTransactionGroup(string $groupId): void
+  {
+    $this->callAPISuccess(
+      'SepaAlternativeBatching',
+      'close',
+      [
+        'txgroup_id' =>  $groupId
+      ]
+    );
+  }
 
   /**
    * Get a mandate by it's ID.
@@ -151,6 +187,20 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     return $group;
   }
 
+  /**
+   * Get a transaction group by ID.
+   */
+  protected function getTransactionGroup(string $groupId): array
+  {
+    $group = $this->callAPISuccessGetSingle(
+      'SepaTransactionGroup',
+      [
+        'id' => $groupId
+      ]
+    );
+
+    return $group;
+  }
   /**
    * Checks if two date strings or date and time strings have the same date.
    */
