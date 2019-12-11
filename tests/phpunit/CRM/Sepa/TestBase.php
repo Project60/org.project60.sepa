@@ -97,7 +97,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
       'create',
       [
         'contact_type' => 'Individual',
-        'email' => 'unittests@sepa.project60.org'
+        'email' => 'unittests@sepa.project60.org',
       ]
     );
 

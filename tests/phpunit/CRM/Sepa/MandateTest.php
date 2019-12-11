@@ -34,11 +34,14 @@ include_once('TestBase.php');
  */
 class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 {
-  public function setUp(): void
-  {
-    parent::setUp();
-  }
+  //
+  //  Tests
+  //
 
+
+  /**
+   * Test the creation of a OOFF mandate.
+   */
   public function testOOFFCreate()
   {
     $mandate = $this->createOOFFMandate();
@@ -87,6 +90,10 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $this->assertSame('5', $closedContribution['contribution_status_id'], E::ts('OOFF contribution status after closing is incorrect.'));
     $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('OOFF transaction group status after closing is incorrect.'));
   }
+
+  //
+  //  Actions
+  //
 
   /**
    * Create an OOFF mandate.
@@ -139,6 +146,10 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
       ]
     );
   }
+
+  //
+  //  Getters
+  //
 
   /**
    * Get a mandate by it's ID.
@@ -201,6 +212,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 
     return $group;
   }
+
+  //
+  //  Helpers
+  //
+
   /**
    * Checks if two date strings or date and time strings have the same date.
    */
