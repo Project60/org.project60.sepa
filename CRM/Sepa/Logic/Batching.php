@@ -144,11 +144,11 @@ class CRM_Sepa_Logic_Batching {
 
       $sql_query = "
         SELECT
-          contribution.contribution_recur_id AS contribution_recur_id, 
+          contribution.contribution_recur_id AS contribution_recur_id,
           contribution.id                    AS contribution_id
-        FROM civicrm_contribution contribution 
-        LEFT JOIN civicrm_sdd_contribution_txgroup ctxg ON ctxg.contribution_id = contribution.id 
-        LEFT JOIN civicrm_sdd_txgroup               txg ON txg.id = ctxg.txgroup_id 
+        FROM civicrm_contribution contribution
+        LEFT JOIN civicrm_sdd_contribution_txgroup ctxg ON ctxg.contribution_id = contribution.id
+        LEFT JOIN civicrm_sdd_txgroup               txg ON txg.id = ctxg.txgroup_id
         WHERE contribution.contribution_recur_id IN ({$rcontrib_id_strings})
           AND DATE(contribution.receive_date) = DATE('{$collection_date}')
           AND (txg.type IS NULL OR txg.type IN ('RCUR', 'FRST'))
@@ -584,12 +584,12 @@ class CRM_Sepa_Logic_Batching {
     $return_date = date('Y-m-d', $next_date);
 
     // Call a hook so extensions could alter the next collection date.
-    CRM_Utils_SepaCustomisationHooks::alter_next_collection_date($next_date, $rcontribution);
-    if (!empty($rcontribution['end_date']) && strtotime($rcontribution['end_date'])<$next_date) {
+    CRM_Utils_SepaCustomisationHooks::alter_next_collection_date($return_date, $rcontribution);
+    if (!empty($rcontribution['end_date']) && strtotime($rcontribution['end_date']) < strtotime($return_date)) {
       return NULL;
     }
     // ..or the cancel_date
-    if (!empty($rcontribution['cancel_date']) && strtotime($rcontribution['cancel_date'])<$next_date) {
+    if (!empty($rcontribution['cancel_date']) && strtotime($rcontribution['cancel_date']) < strotime($next_date)) {
       return NULL;
     }
 
