@@ -45,7 +45,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $contribution = $this->getContributionForOOFFMandate($mandate);
 
     $this->assertSame('OOFF', $mandate['status'], E::ts('OOFF Mandate after creation is incorrect.'));
-    $this->assertSame('1', $contribution['contribution_status_id'], E::ts('OOFF contribution after creation is incorrect.'));
+    $this->assertSame('2', $contribution['contribution_status_id'], E::ts('OOFF contribution after creation is incorrect.'));
   }
 
   /**
