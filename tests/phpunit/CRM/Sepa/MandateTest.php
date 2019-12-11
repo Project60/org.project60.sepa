@@ -48,6 +48,23 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $this->assertSame('1', $contribution['contribution_status_id'], E::ts('OOFF contribution after creation is incorrect.'));
   }
 
+  /**
+   * Test the batching for an OOFF mandate.
+   */
+  public function testOOFFBatch()
+  {
+    $mandate = $this->createOOFFMandate();
+
+    $this->executeOOFFBatching();
+
+    $batchedMandate = $this->getMandate($mandate['id']);
+    $batchedContribution = $this->getContributionForOOFFMandate($batchedMandate);
+    $transactionGroup = $this->getActiveTransactionGroup();
+
+    $this->assertSame('OOFF', $batchedMandate['status'], E::ts('OOFF Mandate status after batching is incorrect.'));
+    $this->assertSame('2', $batchedContribution['contribution_status_id'], E::ts('OOFF contribution status after batching is incorrect.'));
+    $this->assertSame('1', $transactionGroup['status_id'], E::ts('OOFF transaction group status after batching is incorrect.'));
+  }
 
 
   /**
@@ -75,6 +92,34 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   }
 
   /**
+   * Execute batching for OOFF mandates, resulting in the creation of a group.
+  */
+  protected function executeOOFFBatching(): void
+  {
+    $this->callAPISuccess(
+      'SepaAlternativeBatching',
+      'update',
+      [
+        'type' => 'OOFF',
+      ]
+    );
+
+  /**
+   * Get a mandate by it's ID.
+   */
+  protected function getMandate(string $mandateId): array
+  {
+    $mandate = $this->callAPISuccessGetSingle(
+      'SepaMandate',
+      [
+        'id' => $mandateId
+      ]
+    );
+
+      return $mandate;
+  }
+
+  /**
    * Get the contribution for a given OOFF mandate.
    */
   protected function getContributionForOOFFMandate(array $mandate): array
@@ -89,6 +134,21 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     );
 
     return $contribution;
+  }
+
+  /**
+   * Get the only active transaction group.
+   */
+  protected function getActiveTransactionGroup(): array
+  {
+    $group = $this->callAPISuccessGetSingle(
+      'SepaTransactionGroup',
+      [
+        'status_id' => 1
+      ]
+    );
+
+    return $group;
   }
 
   /**
