@@ -44,17 +44,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $mandate = $this->createOOFFMandate();
     $contribution = $this->getContributionForOOFFMandate($mandate);
 
-    $currentDate = date('Ymd', time());
-
-    $mandateDate = $mandate['date'];
-    $contributionDate = $contribution['receive_date'];
-
-    $mandateDateIsCorrect = $this->dateIsTheSame($mandateDate, $currentDate);
-    $contributionDateIsCorrect = $this->dateIsTheSame($contributionDate, $currentDate);
-
-    $this->assertTrue($mandateDateIsCorrect, E::ts('Mandate date is incorrect, which means probably the mandate creation is incorrect.'));
-    $this->assertTrue($contributionDateIsCorrect, E::ts('Contribution date is incorrect, which means probably the mandate creation is incorrect.'));
+    $this->assertSame('OOFF', $mandate['status'], E::ts('OOFF Mandate after creation is incorrect.'));
+    $this->assertSame('1', $contribution['contribution_status_id'], E::ts('OOFF contribution after creation is incorrect.'));
   }
+
+
 
   /**
    * Create an OOFF mandate.
