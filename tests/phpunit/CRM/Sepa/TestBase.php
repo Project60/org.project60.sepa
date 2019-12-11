@@ -112,15 +112,10 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   private function setUpCreditor(): string
   {
     // fetch the test creditor
-    $creditorId = $this->callAPISuccess(
+    $creditorId = $this->callAPISuccessGetValue(
       'SepaCreditor',
-      'getvalue',
       [
         'return' => 'id',
-        'options' =>
-        [
-          'limit' => 1
-        ],
       ]
     );
 

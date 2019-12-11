@@ -87,17 +87,12 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   {
     $contributionId = $mandate['entity_id'];
 
-    $result = $this->callAPISuccess(
+    $contribution = $this->callAPISuccessGetSingle(
       'Contribution',
-      'get',
       [
         'id' => $contributionId,
-        'sequential' => 1,
-        'options' => ['limit' => 1],
       ]
     );
-
-    $contribution = $result['values'][0];
 
     return $contribution;
   }
