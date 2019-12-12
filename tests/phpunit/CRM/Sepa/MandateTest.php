@@ -34,6 +34,11 @@ include_once('TestBase.php');
  */
 class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 {
+  const MANDATE_TYPE_OOFF = 'OOFF';
+  const MANDATE_TYPE_RCUR = 'RCUR';
+  const MANDATE_TYPE_FRST = 'FRST';
+  const MANDATE_TYPE_SENT = 'SENT';
+
   //
   //  Tests
   //
@@ -44,10 +49,10 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testOOFFCreate()
   {
-    $mandate = $this->createOOFFMandate();
-    $contribution = $this->getContributionForOOFFMandate($mandate);
+    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
+    $contribution = $this->getContributionForMandate($mandate, self::MANDATE_TYPE_OOFF);
 
-    $this->assertSame('OOFF', $mandate['status'], E::ts('OOFF Mandate after creation is incorrect.'));
+    $this->assertSame(self::MANDATE_TYPE_OOFF, $mandate['status'], E::ts('OOFF Mandate after creation is incorrect.'));
     $this->assertSame('2', $contribution['contribution_status_id'], E::ts('OOFF contribution after creation is incorrect.'));
   }
 
@@ -56,15 +61,15 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testOOFFBatch()
   {
-    $mandate = $this->createOOFFMandate();
+    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
 
-    $this->executeOOFFBatching();
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
     $batchedMandate = $this->getMandate($mandate['id']);
-    $batchedContribution = $this->getContributionForOOFFMandate($batchedMandate);
-    $transactionGroup = $this->getActiveTransactionGroup();
+    $batchedContribution = $this->getContributionForMandate($batchedMandate, self::MANDATE_TYPE_OOFF);
+    $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_OOFF);
 
-    $this->assertSame('OOFF', $batchedMandate['status'], E::ts('OOFF Mandate status after batching is incorrect.'));
+    $this->assertSame(self::MANDATE_TYPE_OOFF, $batchedMandate['status'], E::ts('OOFF Mandate status after batching is incorrect.'));
     $this->assertSame('2', $batchedContribution['contribution_status_id'], E::ts('OOFF contribution status after batching is incorrect.'));
     $this->assertSame('1', $transactionGroup['status_id'], E::ts('OOFF transaction group status after batching is incorrect.'));
   }
@@ -74,19 +79,19 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testOOFFClose()
   {
-    $mandate = $this->createOOFFMandate();
+    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
 
-    $this->executeOOFFBatching();
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
-    $transactionGroup = $this->getActiveTransactionGroup();
+    $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_OOFF);
 
     $this->closeTransactionGroup($transactionGroup['id']);
 
     $closedMandate = $this->getMandate($mandate['id']);
-    $closedContribution = $this->getContributionForOOFFMandate($closedMandate);
+    $closedContribution = $this->getContributionForMandate($closedMandate, self::MANDATE_TYPE_OOFF);
     $closedTransactionGroup = $this->getTransactionGroup($transactionGroup['id']);
 
-    $this->assertSame('SENT', $closedMandate['status'], E::ts('OOFF Mandate status after closing is incorrect.'));
+    $this->assertSame(self::MANDATE_TYPE_SENT, $closedMandate['status'], E::ts('OOFF Mandate status after closing is incorrect.'));
     $this->assertSame('5', $closedContribution['contribution_status_id'], E::ts('OOFF contribution status after closing is incorrect.'));
     $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('OOFF transaction group status after closing is incorrect.'));
   }
@@ -96,21 +101,30 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   //
 
   /**
-   * Create an OOFF mandate.
+   * Create a mandate.
+   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X"..
    * @return array The mandate.
    */
-  protected function createOOFFMandate(): array
+  protected function createMandate(string $mandateType): array
   {
+    $parameters = [
+      'contact_id' => $this->createContact(),
+      'type' => $mandateType,
+      'iban' => self::TEST_IBAN,
+      'amount' => 8,
+      'financial_type_id' => 1,
+    ];
+
+    if ($mandateType == self::MANDATE_TYPE_RCUR)
+    {
+      $parameters['frequency_unit'] = 'month';
+      $parameters['frequency_interval'] = 1;
+    }
+
     $result = $this->callAPISuccess(
       'SepaMandate',
       'createfull',
-      [
-        'contact_id' => $this->createContact(),
-        'type' => 'OOFF',
-        'iban' => self::TEST_IBAN,
-        'amount' => 8,
-        'financial_type_id' => 1
-      ]
+      $parameters
     );
 
     $mandateId = $result['id'];
@@ -120,15 +134,16 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   }
 
   /**
-   * Execute batching for OOFF mandates, resulting in the creation of a group.
+   * Execute batching for mandates, resulting in the creation of a group.
+   * @param string $type The type of the mandates to batch, possible values can be found in the class constants as "MANDATE_TYPE_X".
   */
-  protected function executeOOFFBatching(): void
+  protected function executeBatching(string $type): void
   {
     $this->callAPISuccess(
       'SepaAlternativeBatching',
       'update',
       [
-        'type' => 'OOFF',
+        'type' => $type,
       ]
     );
   }
@@ -167,14 +182,18 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   }
 
   /**
-   * Get the contribution for a given OOFF mandate.
+   * Get the contribution for a given mandate.
+   * @param array $mandate The mandate to get the contribution for.
+   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
    */
-  protected function getContributionForOOFFMandate(array $mandate): array
+  protected function getContributionForMandate(array $mandate, string $mandateType): array
   {
     $contributionId = $mandate['entity_id'];
 
+    $contributionEntity = $mandateType == self::MANDATE_TYPE_OOFF ? 'Contribution' : 'ContributionRecur';
+
     $contribution = $this->callAPISuccessGetSingle(
-      'Contribution',
+      $contributionEntity,
       [
         'id' => $contributionId,
       ]
@@ -185,13 +204,16 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 
   /**
    * Get the only active transaction group.
+   * @param string $type The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @return array The transaction group.
    */
-  protected function getActiveTransactionGroup(): array
+  protected function getActiveTransactionGroup(string $type): array
   {
     $group = $this->callAPISuccessGetSingle(
       'SepaTransactionGroup',
       [
-        'status_id' => 1
+        'type' => $type,
+        'status_id' => 1,
       ]
     );
 
