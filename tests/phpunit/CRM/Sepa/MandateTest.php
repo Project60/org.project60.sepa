@@ -87,6 +87,26 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   }
 
   /**
+   * Test the batching for a RCUR mandate.
+   */
+  public function testRCURBatch()
+  {
+    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+
+    // RCUR mandates are splitted into two types: FRST for the first contribution, RCUR for every one after that:
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $batchedMandate = $this->getMandate($mandate['id']);
+    $batchedContribution = $this->getContributionForMandate($batchedMandate, self::MANDATE_TYPE_RCUR);
+    $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
+
+    $this->assertSame(self::MANDATE_TYPE_FRST, $batchedMandate['status'], E::ts('RCUR Mandate status after batching is incorrect.'));
+    $this->assertSame('2', $batchedContribution['contribution_status_id'], E::ts('RCUR contribution status after batching is incorrect.'));
+    $this->assertSame('1', $transactionGroup['status_id'], E::ts('RCUR transaction group status after batching is incorrect.'));
+  }
+
+  /**
    * Test the closing of an OOFF mandate.
    */
   public function testOOFFClose()
