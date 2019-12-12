@@ -128,6 +128,30 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('OOFF transaction group status after closing is incorrect.'));
   }
 
+  /**
+   * Test the closing of a RCUR mandate.
+   */
+  public function testRCURClose()
+  {
+    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+
+    // RCUR mandates are splitted into two types: FRST for the first contribution, RCUR for every one after that:
+      $this->executeBatching(self::MANDATE_TYPE_FRST);
+      $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
+
+    $this->closeTransactionGroup($transactionGroup['id']);
+
+    $closedMandate = $this->getMandate($mandate['id']);
+    $closedContribution = $this->getContributionForMandate($closedMandate, self::MANDATE_TYPE_RCUR);
+    $closedTransactionGroup = $this->getTransactionGroup($transactionGroup['id']);
+
+    $this->assertSame(self::MANDATE_TYPE_RCUR, $closedMandate['status'], E::ts('RCUR Mandate status after closing is incorrect.'));
+    $this->assertSame('2', $closedContribution['contribution_status_id'], E::ts('RCUR contribution status after closing is incorrect.'));
+    $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('RCUR transaction group status after closing is incorrect.'));
+  }
+
   //
   //  Actions
   //
