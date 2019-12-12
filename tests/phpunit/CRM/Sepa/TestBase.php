@@ -41,7 +41,14 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
   protected const TEST_IBAN = 'DE02370501980001802057';
 
+  protected const MANDATE_TYPE_OOFF = 'OOFF';
+  protected const MANDATE_TYPE_RCUR = 'RCUR';
+  protected const MANDATE_TYPE_FRST = 'FRST';
+  protected const MANDATE_TYPE_SENT = 'SENT';
+
   protected $testCreditorId;
+
+  #region PHPUnit Framework implementation
 
   public function setUpHeadless(): Civi\Test\CiviEnvBuilder
   {
@@ -65,46 +72,9 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     parent::tearDown();
   }
 
-  /**
-   * Remove 'xdebug' result key set by Civi\API\Subscriber\XDebugSubscriber
-   *
-   * This breaks some tests when xdebug is present, and we don't need it.
-   *
-   * @param $entity
-   * @param $action
-   * @param $params
-   * @param null $checkAgainst
-   *
-   * @return array|int
-   */
-  protected function callAPISuccess(string $entity, string $action, array $params, $checkAgainst = NULL)
-  {
-    $result = $this->traitCallAPISuccess($entity, $action, $params, $checkAgainst);
-    if (is_array($result)) {
-      unset($result['xdebug']);
-    }
-    return $result;
-  }
+  #endregion
 
-  /**
-   * Create a contact and return it's ID.
-   * @return string The Id of the created contact.
-   */
-  protected function createContact(): string
-  {
-    $contact = $this->callAPISuccess(
-      'Contact',
-      'create',
-      [
-        'contact_type' => 'Individual',
-        'email' => 'unittests@sepa.project60.org',
-      ]
-    );
-
-    $contactId = $contact['id'];
-
-    return $contactId;
-  }
+  #region Set up and tear down functions
 
   /**
    * Set up a test creditor and return it's ID.
@@ -137,4 +107,210 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
     return $creditorId;
   }
+
+  #endregion
+
+  #region Test helpers
+
+  /**
+   * Remove 'xdebug' result key set by Civi\API\Subscriber\XDebugSubscriber
+   *
+   * This breaks some tests when xdebug is present, and we don't need it.
+   *
+   * @param $entity
+   * @param $action
+   * @param $params
+   * @param null $checkAgainst
+   *
+   * @return array|int
+   */
+  protected function callAPISuccess(string $entity, string $action, array $params, $checkAgainst = NULL)
+  {
+    $result = $this->traitCallAPISuccess($entity, $action, $params, $checkAgainst);
+    if (is_array($result)) {
+      unset($result['xdebug']);
+    }
+    return $result;
+  }
+
+  #endregion
+
+  #region General helpers
+
+  /**
+   * Create a contact and return it's ID.
+   * @return string The Id of the created contact.
+   */
+  protected function createContact(): string
+  {
+    $contact = $this->callAPISuccess(
+      'Contact',
+      'create',
+      [
+        'contact_type' => 'Individual',
+        'email' => 'unittests@sepa.project60.org',
+      ]
+    );
+
+    $contactId = $contact['id'];
+
+    return $contactId;
+  }
+
+  /**
+   * Checks if two date strings or date and time strings have the same date.
+   */
+  protected function dateIsTheSame(string $dateOrDatetimeA, string $dateOrDatetimeB): bool
+  {
+    $lengthOfDate = 8; // 4 (the year) + 2 (the month) + 2 (the day) NOTE: This will break in the year 10000.
+
+    $cleanedDateA = preg_replace('/[^0-9]/', '', $dateOrDatetimeA); // Remove everything that is not a number.
+    $cleanedDateB = preg_replace('/[^0-9]/', '', $dateOrDatetimeB);
+
+    $dateA = substr($cleanedDateA, 0, $lengthOfDate);
+    $dateB = substr($cleanedDateB, 0, $lengthOfDate);
+
+    $datesAreTheSame = $dateA == $dateB;
+
+    return $datesAreTheSame;
+  }
+
+  #endregion
+
+  #region Sepa helpers
+
+  /**
+   * Create a mandate.
+   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X"..
+   * @return array The mandate.
+   */
+  protected function createMandate(string $mandateType): array
+  {
+    $parameters = [
+      'contact_id' => $this->createContact(),
+      'type' => $mandateType,
+      'iban' => self::TEST_IBAN,
+      'amount' => 8,
+      'financial_type_id' => 1,
+    ];
+
+    if ($mandateType == self::MANDATE_TYPE_RCUR)
+    {
+      $parameters['frequency_unit'] = 'month';
+      $parameters['frequency_interval'] = 1;
+    }
+
+    $result = $this->callAPISuccess(
+      'SepaMandate',
+      'createfull',
+      $parameters
+    );
+
+    $mandateId = $result['id'];
+    $mandate = $result['values'][$mandateId];
+
+    return $mandate;
+  }
+
+  /**
+   * Execute batching for mandates, resulting in the creation of a group.
+   * @param string $type The type of the mandates to batch, possible values can be found in the class constants as "MANDATE_TYPE_X".
+  */
+  protected function executeBatching(string $type): void
+  {
+    $this->callAPISuccess(
+      'SepaAlternativeBatching',
+      'update',
+      [
+        'type' => $type,
+      ]
+    );
+  }
+
+  /**
+   * Close a transaction group of the given ID.
+   */
+  protected function closeTransactionGroup(string $groupId): void
+  {
+    $this->callAPISuccess(
+      'SepaAlternativeBatching',
+      'close',
+      [
+        'txgroup_id' =>  $groupId,
+      ]
+    );
+  }
+
+  /**
+   * Get a mandate by it's ID.
+   */
+  protected function getMandate(string $mandateId): array
+  {
+    $mandate = $this->callAPISuccessGetSingle(
+      'SepaMandate',
+      [
+        'id' => $mandateId,
+      ]
+    );
+
+      return $mandate;
+  }
+
+  /**
+   * Get the contribution for a given mandate.
+   * @param array $mandate The mandate to get the contribution for.
+   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   */
+  protected function getContributionForMandate(array $mandate, string $mandateType): array
+  {
+    $contributionId = $mandate['entity_id'];
+
+    $contributionEntity = $mandateType == self::MANDATE_TYPE_OOFF ? 'Contribution' : 'ContributionRecur';
+
+    $contribution = $this->callAPISuccessGetSingle(
+      $contributionEntity,
+      [
+        'id' => $contributionId,
+      ]
+    );
+
+    return $contribution;
+  }
+
+  /**
+   * Get the only active transaction group.
+   * @param string $type The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @return array The transaction group.
+   */
+  protected function getActiveTransactionGroup(string $type): array
+  {
+    $group = $this->callAPISuccessGetSingle(
+      'SepaTransactionGroup',
+      [
+        'type' => $type,
+        'status_id' => 1,
+      ]
+    );
+
+    return $group;
+  }
+
+  /**
+   * Get a transaction group by ID.
+   * @return array The transaction group.
+   */
+  protected function getTransactionGroup(string $groupId): array
+  {
+    $group = $this->callAPISuccessGetSingle(
+      'SepaTransactionGroup',
+      [
+        'id' => $groupId,
+      ]
+    );
+
+    return $group;
+  }
+
+  #endregion
+
 }
