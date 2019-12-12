@@ -57,6 +57,18 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   }
 
   /**
+   * Test the creation of a RCUR mandate.
+   */
+  public function testRCURCreate()
+  {
+    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+    $contribution = $this->getContributionForMandate($mandate, self::MANDATE_TYPE_RCUR);
+
+    $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], E::ts('RCUR Mandate after creation is incorrect.'));
+    $this->assertSame('2', $contribution['contribution_status_id'], E::ts('RCUR contribution after creation is incorrect.'));
+  }
+
+  /**
    * Test the batching for an OOFF mandate.
    */
   public function testOOFFBatch()
