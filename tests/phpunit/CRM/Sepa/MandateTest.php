@@ -16,8 +16,6 @@
 
 use CRM_Sepa_ExtensionUtil as E;
 
-include_once('TestBase.php');
-
 /**
  * Tests for mandates.
  *
