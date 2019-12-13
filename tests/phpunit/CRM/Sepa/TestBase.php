@@ -44,7 +44,8 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   protected const MANDATE_TYPE_OOFF = 'OOFF';
   protected const MANDATE_TYPE_RCUR = 'RCUR';
   protected const MANDATE_TYPE_FRST = 'FRST';
-  protected const MANDATE_TYPE_SENT = 'SENT';
+
+  protected const MANDATE_STATUS_SENT = 'SENT';
 
   protected $testCreditorId;
 

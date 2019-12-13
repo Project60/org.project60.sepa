@@ -113,7 +113,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $closedContribution = $this->getContributionForMandate($closedMandate, self::MANDATE_TYPE_OOFF);
     $closedTransactionGroup = $this->getTransactionGroup($transactionGroup['id']);
 
-    $this->assertSame(self::MANDATE_TYPE_SENT, $closedMandate['status'], E::ts('OOFF Mandate status after closing is incorrect.'));
+    $this->assertSame(self::MANDATE_STATUS_SENT, $closedMandate['status'], E::ts('OOFF Mandate status after closing is incorrect.'));
     $this->assertSame('5', $closedContribution['contribution_status_id'], E::ts('OOFF contribution status after closing is incorrect.'));
     $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('OOFF transaction group status after closing is incorrect.'));
   }
