@@ -260,13 +260,20 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   /**
    * Get the contribution for a given mandate.
    * @param array $mandate The mandate to get the contribution for.
-   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
    */
-  protected function getContributionForMandate(array $mandate, string $mandateType): array
+  protected function getContributionForMandate(array $mandate): array
   {
-    $contributionId = $mandate['entity_id'];
+    $mandateType = $mandate['type'];
+
+    // Check if the mandate type is supported:
+    if (!in_array($mandateType, [self::MANDATE_TYPE_OOFF, self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST]))
+    {
+      throw new Exception('For this mandate type can no contribution be determined.');
+    }
 
     $contributionEntity = $mandateType == self::MANDATE_TYPE_OOFF ? 'Contribution' : 'ContributionRecur';
+
+    $contributionId = $mandate['entity_id'];
 
     $contribution = $this->callAPISuccessGetSingle(
       $contributionEntity,
