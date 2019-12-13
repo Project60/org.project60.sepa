@@ -82,7 +82,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   private function setUpCreditor(): string
   {
-    // fetch the test creditor
+    // Fetch the test creditor:
     $creditorId = $this->callAPISuccessGetValue(
       'SepaCreditor',
       [
@@ -163,6 +163,8 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   protected function dateIsTheSame(string $dateOrDatetimeA, string $dateOrDatetimeB): bool
   {
+    // TODO: Make a test helper in assertion style out of this.
+
     $lengthOfDate = 8; // 4 (the year) + 2 (the month) + 2 (the day) NOTE: This will break in the year 10000.
 
     $cleanedDateA = preg_replace('/[^0-9]/', '', $dateOrDatetimeA); // Remove everything that is not a number.

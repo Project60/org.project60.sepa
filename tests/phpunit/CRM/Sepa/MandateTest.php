@@ -35,7 +35,7 @@ include_once('TestBase.php');
 class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 {
   /**
-   * Test the creation of a OOFF mandate.
+   * Test the creation of an OOFF mandate.
    */
   public function testOOFFCreate()
   {
