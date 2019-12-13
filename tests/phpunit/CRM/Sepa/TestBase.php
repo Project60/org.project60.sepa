@@ -46,6 +46,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   protected const MANDATE_TYPE_FRST = 'FRST';
 
   protected const MANDATE_STATUS_SENT = 'SENT';
+  protected const MANDATE_STATUS_INVALID = 'INVALID';
 
   protected $testCreditorId;
 
@@ -183,6 +184,32 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   #region Sepa helpers
 
   /**
+   * Set a configuration/setting for the creditor in use.
+   * @param string $key The settings key.
+   * @param mixed $value The settings value.
+   */
+  protected function setCreditorConfiguration(string $key, $value): void
+  {
+    // Fetch the active/default creditor:
+    $creditorId = $this->callAPISuccessGetValue(
+      'SepaCreditor',
+      [
+        'return' => 'id',
+      ]
+    );
+
+    // Set the creditor's config:
+    $this->callAPISuccess(
+      'SepaCreditor',
+      'create',
+      [
+        'id' => $creditorId,
+        $key => $value,
+      ]
+    );
+  }
+
+  /**
    * Create a mandate.
    * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X"..
    * @return array The mandate.
@@ -213,6 +240,21 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     $mandate = $result['values'][$mandateId];
 
     return $mandate;
+  }
+
+  /**
+   * Terminate a mandate.
+   * @param array $mandate The mandate to terminate.
+   */
+  protected function terminateMandate(array $mandate): void
+  {
+    $this->callAPISuccess(
+      'SepaMandate',
+      'terminate',
+      [
+        'mandate_id' => $mandate['id'],
+      ]
+    );
   }
 
   /**
@@ -317,6 +359,27 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
         'id' => $groupId,
       ]
     );
+
+    return $group;
+  }
+
+  /**
+   * Get the transaction group that is associated with the given contribution.
+   * @return array The transaction group.
+   */
+  protected function getTransactionGroupForContribution(array $contribution): array
+  {
+    $contributionId = $contribution['id'];
+
+    $groupId = $this->callAPISuccessGetValue(
+      'SepaContributionGroup',
+      [
+        'return' => 'txgroup_id',
+        'contribution_id' => $contributionId,
+      ]
+    );
+
+    $group = $this->getTransactionGroup($groupId);
 
     return $group;
   }
