@@ -26,8 +26,7 @@ class CRM_Sepa_Logic_Batching {
    *
    * @param $creditor_id  the creaditor to be batched
    * @param $mode         'FRST' or 'RCUR'
-   * @param $now          can be set to cause a batching run from another
-   *                           temporal point of view than, well, "now".
+   * @param string $now   Overwrite what is used as "now" for batching, can be everything valid for strtotime, a "+n days" is added.
    */
   static function updateRCUR($creditor_id, $mode, $now = 'now', $offset=NULL, $limit=NULL) {
     // check lock
@@ -239,6 +238,7 @@ class CRM_Sepa_Logic_Batching {
    * runs a batching update for all OOFF mandates
    *
    * @param $creditor_id  the creditor ID to run this for
+   * @param string $now   Overwrite what is used as "now" for batching, can be everything valid for strtotime, a "+n days" is added.
    * @param $offset       used for segmented updates
    * @param $limit        used for segmented updates
    */
