@@ -100,7 +100,7 @@ class CRM_Sepa_Logic_Batching {
           'end_date'                      => $results->end_date,
           'cancel_date'                   => $results->cancel_date,
           'rc_contact_id'                 => $results->rc_contact_id,
-          'rc_amount'                     => $results->rc_amount,
+          'rc_amount'                     => (float) $results->rc_amount,
           'rc_currency'                   => $results->rc_currency,
           'rc_financial_type_id'          => $results->rc_financial_type_id,
           'rc_contribution_status_id'     => $results->rc_contribution_status_id,
