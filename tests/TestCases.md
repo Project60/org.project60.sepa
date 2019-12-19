@@ -4,8 +4,8 @@
 
 | Case_ID | Status | Configuration | Description   | Process                                |
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |
-| M01     |  PASS? | default       | Simple OOF Mandate  | Create OOFF mandate, batch, check status, close group, check status |
-| M02     |  PASS? | default       | Simple RCUR Mandate | Create RCUR mandate, batch, check status, close group, check status |
+| M01     |  PASS  | default       | Simple OOF Mandate  | Create OOFF mandate, batch, check status, close group, check status |
+| M02     |  PASS  | default       | Simple RCUR Mandate | Create RCUR mandate, batch, check status, close group, check status |
 | M03     |  TODO  | ooff_horizon=31 | OOFF Annual | Create ``n`` OOFF mandates with collection dates spread of the next year, batch & close, verify dates, ``timetravel:+1month``, and repeat. |
 | M04     |  TODO  | rcur_horizon=31 | RCUR Annual | Create ``n`` RCUR mandates (different start dates / monthly,quarterly,semi-annually/annually)  with collection dates spread of the next year, batch & close, verify dates and collection rhythm, ``timetravel:+1month``, and repeat. |
 
@@ -18,7 +18,7 @@ TODO: more complex batching scenarios
 
 | Case_ID | Status | Configuration | Description   | Process                                |
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |
-| T01     |  TODO  | ooff_horizon=31  | Terminate OOF Mandate   | Create OOFF mandate with collection date now, batch, assert contribution in group, terminate now, assert mandate terminated, assert contribution *not* in group, batch, assert mandate not being grouped  again |
+| T01     |  PASS  | ooff_horizon=31  | Terminate OOF Mandate   | Create OOFF mandate with collection date now, batch, assert contribution in group, terminate now, assert mandate terminated, assert contribution *not* in group, batch, assert mandate not being grouped  again |
 | T02     |  TODO  | ooff_horizon=31  | Terminate OOF Mandate   | Create OOFF mandate with collection date now, batch, assert contribution in group, *close group*, terminate now, assert result is error |
 | T03     |  TODO  | rcur_horizon=31  | Terminate RCUR Mandate  | Create monthly RCUR mandate with start date now, batch, assert contribution in group, terminate now, assert mandate terminated, assert contribution *not* in group, batch, assert mandate not being grouped again |
 | T04     |  TODO  | rcur_horizon=31  | Terminate RCUR Mandate  | Create monthly RCUR mandate with start date now, batch, assert contribution in group, terminate after collection date, assert mandate *not* terminated, but has end date, assert contribution still in group, batch, ``timetravel:+1month``, group, assert mandate not being grouped again |
