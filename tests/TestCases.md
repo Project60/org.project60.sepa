@@ -8,8 +8,8 @@
 | M02     |  PASS? | default       | Simple RCUR Mandate | Create RCUR mandate, batch, check status, close group, check status |
 | M03     |  TODO  | ooff_horizon=31 | OOFF Annual | Create ``n`` OOFF mandates with collection dates spread of the next year, batch & close, verify dates, ``timetravel:+1month``, and repeat. |
 | M04     |  TODO  | rcur_horizon=31 | RCUR Annual | Create ``n`` RCUR mandates (different start dates / monthly,quarterly,semi-annually/annually)  with collection dates spread of the next year, batch & close, verify dates and collection rhythm, ``timetravel:+1month``, and repeat. |
- 
- 
+
+
 ## Batching
 
 TODO: more complex batching scenarios
@@ -83,7 +83,7 @@ LATER
 
 ## Hooks
 
-These would have to be implemented in a separate extension shipped with the tests. There might be a point in having the extension always installed, and add enable/disable flags in the respective hook implementations. This should perform a lot better than enabling the extension over and over.  
+These would have to be implemented in a separate extension shipped with the tests. There might be a point in having the extension always installed, and add enable/disable flags in the respective hook implementations. This should perform a lot better than enabling the extension over and over.
 
 | Case_ID | Status | Configuration | Description   | Process                                |
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |

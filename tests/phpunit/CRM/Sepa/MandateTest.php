@@ -130,8 +130,8 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
 
     // RCUR mandates are splitted into two types: FRST for the first contribution, RCUR for every one after that:
-      $this->executeBatching(self::MANDATE_TYPE_FRST);
-      $this->executeBatching(self::MANDATE_TYPE_RCUR);
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
 
