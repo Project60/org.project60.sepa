@@ -86,4 +86,33 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       'The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.'
     );
   }
+
+  /**
+   * Test the illegal termination of an OOFF mandate after it has been closed..
+   * @see Case_ID T02
+   */
+  public function testOOFFTerminateAfterClosingFails()
+  {
+    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
+
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
+
+    $contribution = $this->getContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+
+    $this->assertNotNull($transactionGroup);
+
+    $this->closeTransactionGroup($transactionGroup['id']);
+
+    // After closing the termination must fail:
+
+    $this->assertException(
+      CRM_Core_Exception::class,
+      function() use ($mandate)
+      {
+        $this->terminateMandate($mandate);
+      },
+      'It must not be allowed to terminate the mandate after the group has been closed.'
+    );
+  }
 }
