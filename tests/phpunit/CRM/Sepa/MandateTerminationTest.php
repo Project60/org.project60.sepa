@@ -115,4 +115,51 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       'It must not be allowed to terminate the mandate after the group has been closed.'
     );
   }
+
+  /**
+   * Test the termination of an RCUR mandate.
+   * @see Case_ID T03
+   */
+  public function testRCURTerminate()
+  {
+    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $contribution = $this->getContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+
+    $this->assertNotNull($transactionGroup);
+
+    $this->terminateMandate($mandate);
+
+    $terminatedMandate = $this->getMandate($mandate['id']);
+
+    $this->assertSame(self::MANDATE_STATUS_INVALID, $terminatedMandate['status']);
+    $this->assertException(
+      CRM_Core_Exception::class,
+      function() use ($contribution)
+      {
+        $this->getTransactionGroupForContribution($contribution);
+      },
+      'There should be no transaction group be associated with the mandate after terminating.'
+    );
+
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    // Assert mandate not being grouped again:
+
+    $mandateForRetesting = $this->getMandate($mandate['id']);
+    $contributionForRetesting = $this->getContributionForMandate($mandateForRetesting);
+
+    $this->assertSame(self::MANDATE_STATUS_INVALID, $mandateForRetesting['status']);
+    $this->assertException(
+      CRM_Core_Exception::class,
+      function() use ($contributionForRetesting)
+      {
+        $this->getTransactionGroupForContribution($contributionForRetesting);
+      },
+      'The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.'
+    );
+  }
 }

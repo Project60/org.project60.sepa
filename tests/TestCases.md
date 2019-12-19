@@ -20,7 +20,7 @@ TODO: more complex batching scenarios
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |
 | T01     |  PASS  | ooff_horizon=31  | Terminate OOF Mandate   | Create OOFF mandate with collection date now, batch, assert contribution in group, terminate now, assert mandate terminated, assert contribution *not* in group, batch, assert mandate not being grouped  again |
 | T02     |  ERROR  | ooff_horizon=31  | Terminate OOF Mandate   | Create OOFF mandate with collection date now, batch, assert contribution in group, *close group*, terminate now, assert result is error |
-| T03     |  TODO  | rcur_horizon=31  | Terminate RCUR Mandate  | Create monthly RCUR mandate with start date now, batch, assert contribution in group, terminate now, assert mandate terminated, assert contribution *not* in group, batch, assert mandate not being grouped again |
+| T03     |  ERROR  | rcur_horizon=31  | Terminate RCUR Mandate  | Create monthly RCUR mandate with start date now, batch, assert contribution in group, terminate now, assert mandate terminated, assert contribution *not* in group, batch, assert mandate not being grouped again |
 | T04     |  TODO  | rcur_horizon=31  | Terminate RCUR Mandate  | Create monthly RCUR mandate with start date now, batch, assert contribution in group, terminate after collection date, assert mandate *not* terminated, but has end date, assert contribution still in group, batch, ``timetravel:+1month``, group, assert mandate not being grouped again |
 
 
