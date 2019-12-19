@@ -40,7 +40,8 @@ class CRM_Sepa_Constraints_ExceptionThrown extends PHPUnit_Framework_Constraint
      */
     protected function matches($other)
     {
-        $matched = is_subclass_of($other, $this->exceptionType);
+        // Both matches if $other is an instance of the exception type or one of it's child classes.
+        $matched = is_a($other, $this->exceptionType);
 
         return $matched;
     }
