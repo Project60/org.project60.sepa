@@ -136,6 +136,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       ]
     );
 
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getContributionForMandate($mandate);
@@ -157,6 +158,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       'There should be no transaction group be associated with the mandate after terminating.'
     );
 
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     // Assert mandate not being grouped again:
@@ -187,6 +189,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       ]
     );
 
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getContributionForMandate($mandate);
@@ -208,6 +211,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->assertNotNull($transactionGroup, 'The mandate is not in the transaction group anymore but should be.');
     $this->assertSameDate($endDate, $contribution['end_date'], 'The end date is not correct.');
 
+    $this->executeBatching(self::MANDATE_TYPE_FRST, '+1 month');
     $this->executeBatching(self::MANDATE_TYPE_RCUR, '+1 month');
 
     // Assert mandate not being grouped again:
