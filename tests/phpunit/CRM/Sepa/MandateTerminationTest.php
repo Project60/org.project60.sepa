@@ -60,9 +60,14 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $terminatedMandate = $this->getMandate($mandate['id']);
 
     $this->assertSame(self::MANDATE_STATUS_INVALID, $terminatedMandate['status']);
-
-    $this->expectException(CRM_Core_Exception::class);
-    $this->getTransactionGroupForContribution($contribution);
+    $this->assertException(
+      CRM_Core_Exception::class,
+      function() use ($contribution)
+      {
+        $this->getTransactionGroupForContribution($contribution);
+      },
+      'There should be no transaction group be associated with the mandate after terminating.'
+    );
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
@@ -72,6 +77,13 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $contributionForRetesting = $this->getContributionForMandate($mandate);
 
     $this->assertSame(self::MANDATE_STATUS_INVALID, $mandateForRetesting['status']);
-    $this->expectException($this->getTransactionGroupForContribution($contributionForRetesting));
+    $this->assertException(
+      CRM_Core_Exception::class,
+      function() use ($contributionForRetesting)
+      {
+        $this->getTransactionGroupForContribution($contributionForRetesting);
+      },
+      'The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.'
+    );
   }
 }

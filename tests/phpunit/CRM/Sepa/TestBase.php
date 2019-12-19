@@ -135,6 +135,22 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     return $result;
   }
 
+  protected function assertException(string $exceptionType, callable $function, string $message = '')
+  {
+    $thrown = null;
+    try
+    {
+      $function();
+    }
+    catch (Exception $e)
+    {
+      $thrown = $e;
+    }
+
+    $constraint = new CRM_Sepa_Constraints_ExceptionThrown($exceptionType);
+    $this->assertThat($thrown, $constraint, $message);
+  }
+
   #endregion
 
   #region General helpers
