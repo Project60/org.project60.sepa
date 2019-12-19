@@ -211,10 +211,11 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
   /**
    * Create a mandate.
-   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X"..
+   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @param string $collectionDate A string parsable by strtotime to set the (first) collection date.
    * @return array The mandate.
    */
-  protected function createMandate(string $mandateType): array
+  protected function createMandate(string $mandateType, string $collectionDate = 'now'): array
   {
     $parameters = [
       'contact_id' => $this->createContact(),
@@ -224,10 +225,17 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
       'financial_type_id' => 1,
     ];
 
-    if ($mandateType == self::MANDATE_TYPE_RCUR)
+    $collectionDate = date('Y-m-d', strtotime($collectionDate));
+
+    if ($mandateType == self::MANDATE_TYPE_OOFF)
+    {
+      $parameters['receive_date'] = $collectionDate;
+    }
+    else
     {
       $parameters['frequency_unit'] = 'month';
       $parameters['frequency_interval'] = 1;
+      $parameters['start_date'] = $collectionDate;
     }
 
     $result = $this->callAPISuccess(
@@ -260,14 +268,16 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   /**
    * Execute batching for mandates, resulting in the creation of a group.
    * @param string $type The type of the mandates to batch, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @param string $nowOverwrite A string parsable by strtotime to overwrite the current time used for batching.
   */
-  protected function executeBatching(string $type): void
+  protected function executeBatching(string $type, string $nowOverwrite = 'now'): void
   {
     $this->callAPISuccess(
       'SepaAlternativeBatching',
       'update',
       [
         'type' => $type,
+        'now' => $nowOverwrite,
       ]
     );
   }
@@ -284,6 +294,20 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
         'txgroup_id' =>  $groupId,
       ]
     );
+  }
+
+  /**
+   * Close a list of transaction groups.
+   */
+  protected function closeTransactionGroups(array $groups): void
+  {
+    // NOTE: The Sepa API does not support "IN" statements. That's why we have
+    //       to call the API once for every transaction group...
+
+    foreach ($groups as $group)
+    {
+      $this->closeTransactionGroup($group['id']);
+    }
   }
 
   /**
@@ -331,7 +355,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
   /**
    * Get the only active transaction group.
-   * @param string $type The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @param string $type The mandate type of the group to search for, possible values can be found in the class constants as "MANDATE_TYPE_X".
    * @return array The transaction group.
    */
   protected function getActiveTransactionGroup(string $type): array
@@ -345,6 +369,27 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     );
 
     return $group;
+  }
+
+  /**
+   * Get all active transaction groups.
+   * @param string $type The mandate type of the groups to search for, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @return array[] The list of transaction groups.
+   */
+  protected function getActiveTransactionGroups(string $type): array
+  {
+    $result = $this->callAPISuccess(
+      'SepaTransactionGroup',
+      'get',
+      [
+        'type' => $type,
+        'status_id' => 1,
+      ]
+    );
+
+    $groups = $result['values'];
+
+    return $groups;
   }
 
   /**
