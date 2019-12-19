@@ -151,6 +151,22 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     $this->assertThat($thrown, $constraint, $message);
   }
 
+  /**
+   * Assert that two date strings or date and time strings have the same date.
+   */
+  protected function assertSameDate(string $expectedDateOrDateTime, string $actualDateOrDateTime, string $message = ''): void
+  {
+    $lengthOfDate = 8; // 4 (the year) + 2 (the month) + 2 (the day) NOTE: This will break in the year 10000.
+
+    $cleanedDateA = preg_replace('/[^0-9]/', '', $expectedDateOrDateTime); // Remove everything that is not a number.
+    $cleanedDateB = preg_replace('/[^0-9]/', '', $actualDateOrDateTime);
+
+    $dateA = substr($cleanedDateA, 0, $lengthOfDate);
+    $dateB = substr($cleanedDateB, 0, $lengthOfDate);
+
+    $this->assertSame($dateA, $dateB, $message);
+  }
+
   #endregion
 
   #region General helpers
@@ -173,26 +189,6 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     $contactId = $contact['id'];
 
     return $contactId;
-  }
-
-  /**
-   * Checks if two date strings or date and time strings have the same date.
-   */
-  protected function dateIsTheSame(string $dateOrDatetimeA, string $dateOrDatetimeB): bool
-  {
-    // TODO: Make a test helper in assertion style out of this.
-
-    $lengthOfDate = 8; // 4 (the year) + 2 (the month) + 2 (the day) NOTE: This will break in the year 10000.
-
-    $cleanedDateA = preg_replace('/[^0-9]/', '', $dateOrDatetimeA); // Remove everything that is not a number.
-    $cleanedDateB = preg_replace('/[^0-9]/', '', $dateOrDatetimeB);
-
-    $dateA = substr($cleanedDateA, 0, $lengthOfDate);
-    $dateB = substr($cleanedDateB, 0, $lengthOfDate);
-
-    $datesAreTheSame = $dateA == $dateB;
-
-    return $datesAreTheSame;
   }
 
   #endregion
