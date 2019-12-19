@@ -40,6 +40,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   }
 
   protected const TEST_IBAN = 'DE02370501980001802057';
+  protected const TEST_BIC = 'COLSDE33XXX';
 
   protected const MANDATE_TYPE_OOFF = 'OOFF';
   protected const MANDATE_TYPE_RCUR = 'RCUR';
@@ -439,6 +440,8 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
         'contribution_id' => $contributionId,
       ]
     );
+
+    // FIXME: This is wrong for RCUR mandates! The contribution IDs do not match.
 
     $group = $this->getTransactionGroup($groupId);
 

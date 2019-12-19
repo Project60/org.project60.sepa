@@ -41,7 +41,6 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
     self::markTestIncomplete('FIXME: Test OOFFSpread for test case M03 is incomplete.');
 
     $this->setCreditorConfiguration('batching.OOFF.horizon', 31);
-    $this->setCreditorConfiguration('batching.RCUR.horizon', 31);
 
     for ($n = 0; $n < 28; $n++)
     {
