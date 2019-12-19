@@ -42,6 +42,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
   /**
    * Test the legal termination of an OOFF mandate.
+   * @see Case_ID T01
    */
   public function testOOFFLegalTerminate()
   {

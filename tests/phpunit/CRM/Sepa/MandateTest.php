@@ -34,6 +34,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 {
   /**
    * Test the creation of an OOFF mandate.
+   * @see Case_ID M01
    */
   public function testOOFFCreate()
   {
@@ -46,6 +47,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 
   /**
    * Test the creation of a RCUR mandate.
+   * @see Case_ID M02
    */
   public function testRCURCreate()
   {
@@ -58,6 +60,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 
   /**
    * Test the batching for an OOFF mandate.
+   * @see Case_ID M01
    */
   public function testOOFFBatch()
   {
@@ -76,6 +79,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 
   /**
    * Test the batching for a RCUR mandate.
+   * @see Case_ID M02
    */
   public function testRCURBatch()
   {
@@ -96,6 +100,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 
   /**
    * Test the closing of an OOFF mandate.
+   * @see Case_ID M01
    */
   public function testOOFFClose()
   {
@@ -118,6 +123,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
 
   /**
    * Test the closing of a RCUR mandate.
+   * @see Case_ID M02
    */
   public function testRCURClose()
   {
