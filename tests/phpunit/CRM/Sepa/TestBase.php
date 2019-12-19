@@ -66,6 +66,8 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   {
     $this->testCreditorId = $this->setUpCreditor();
 
+    // TODO: Should we make sure that there are no mandates and groups open?
+
     parent::setUp();
   }
 
@@ -135,6 +137,9 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     return $result;
   }
 
+  /**
+   * Assert that an exception of a specific type (or it child classes) is thrown when calling a function.
+   */
   protected function assertException(string $exceptionType, callable $function, string $message = '')
   {
     $thrown = null;
