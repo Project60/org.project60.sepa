@@ -232,27 +232,24 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    * @param string $collectionDate A string parsable by strtotime to set the (first) collection date.
    * @return array The mandate.
    */
-  protected function createMandate(string $mandateType, string $collectionDate = 'now'): array
+  protected function createMandate(array $parameters, string $collectionDate = 'now'): array
   {
-    $parameters = [
-      'contact_id' => $this->createContact(),
-      'type' => $mandateType,
-      'iban' => self::TEST_IBAN,
-      'amount' => 8,
-      'financial_type_id' => 1,
-    ];
+    $parameters['contact_id']        = array_key_exists('contact_id', $parameters)        ? $parameters['contact_id']        : $this->createContact();
+    $parameters['iban']              = array_key_exists('iban', $parameters)              ? $parameters['iban']              : self::TEST_IBAN;
+    $parameters['amount']            = array_key_exists('amount', $parameters)            ? $parameters['amount']            : 8;
+    $parameters['financial_type_id'] = array_key_exists('financial_type_id', $parameters) ? $parameters['financial_type_id'] : 1;
 
     $collectionDate = date('Y-m-d', strtotime($collectionDate));
 
-    if ($mandateType == self::MANDATE_TYPE_OOFF)
+    if ($parameters['type'] == self::MANDATE_TYPE_OOFF)
     {
-      $parameters['receive_date'] = $collectionDate;
+      $parameters['receive_date'] = array_key_exists('receive_date', $parameters) ? $parameters['receive_date'] : $collectionDate;
     }
     else
     {
-      $parameters['frequency_unit'] = 'month';
-      $parameters['frequency_interval'] = 1;
-      $parameters['start_date'] = $collectionDate;
+      $parameters['start_date']         = array_key_exists('start_date', $parameters)         ? $parameters['start_date']         : $collectionDate;
+      $parameters['frequency_unit']     = array_key_exists('frequency_unit', $parameters)     ? $parameters['frequency_unit']     : 'month';
+      $parameters['frequency_interval'] = array_key_exists('frequency_interval', $parameters) ? $parameters['frequency_interval'] : 1;
     }
 
     $result = $this->callAPISuccess(

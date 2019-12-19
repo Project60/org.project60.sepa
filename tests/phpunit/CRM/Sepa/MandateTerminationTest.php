@@ -46,7 +46,11 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testOOFFLegalTerminate()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+      ]
+    );
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
@@ -93,7 +97,11 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testOOFFTerminateAfterClosingFails()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+      ]
+    );
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
@@ -122,7 +130,11 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testRCURTerminate()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ]
+    );
 
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
@@ -169,7 +181,11 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testRCURTerminateAfterCollectionDate()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ]
+    );
 
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 

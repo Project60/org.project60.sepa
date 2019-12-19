@@ -51,7 +51,12 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
       // If we use a multiple of seven we have an equal distribution over every day of the week.
       $date = 'next Monday + ' . $n * 4 . ' days';
 
-      $this->createMandate(self::MANDATE_TYPE_OOFF, $date);
+      $this->createMandate(
+        [
+          'type' => self::MANDATE_TYPE_OOFF,
+        ],
+        $date
+      );
     }
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);

@@ -38,7 +38,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testOOFFCreate()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+      ]
+    );
     $contribution = $this->getContributionForMandate($mandate);
 
     $this->assertSame(self::MANDATE_TYPE_OOFF, $mandate['status'], E::ts('OOFF Mandate after creation is incorrect.'));
@@ -51,7 +55,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testRCURCreate()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ]
+    );
     $contribution = $this->getContributionForMandate($mandate);
 
     $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], E::ts('RCUR Mandate after creation is incorrect.'));
@@ -64,7 +72,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testOOFFBatch()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+      ]
+    );
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
@@ -83,7 +95,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testRCURBatch()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ]
+    );
 
     // RCUR mandates are splitted into two types: FRST for the first contribution, RCUR for every one after that:
     $this->executeBatching(self::MANDATE_TYPE_FRST);
@@ -104,7 +120,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testOOFFClose()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_OOFF);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+      ]
+    );
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
@@ -127,7 +147,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testRCURClose()
   {
-    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ]
+    );
 
     // RCUR mandates are splitted into two types: FRST for the first contribution, RCUR for every one after that:
     $this->executeBatching(self::MANDATE_TYPE_FRST);
