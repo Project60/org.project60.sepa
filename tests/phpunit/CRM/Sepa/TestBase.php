@@ -265,14 +265,16 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   /**
    * Terminate a mandate.
    * @param array $mandate The mandate to terminate.
+   * @param string $endDate A string parsable by strtotime. If it differs from 'now' only the end date is set and the mandate not terminated.
    */
-  protected function terminateMandate(array $mandate): void
+  protected function terminateMandate(array $mandate, string $endDate = 'now'): void
   {
     $this->callAPISuccess(
       'SepaMandate',
       'terminate',
       [
         'mandate_id' => $mandate['id'],
+        'end_date' => $endDate,
       ]
     );
   }

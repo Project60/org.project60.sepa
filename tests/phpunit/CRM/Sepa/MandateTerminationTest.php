@@ -162,4 +162,44 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       'The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.'
     );
   }
+
+  /**
+   * Test the termination of an RCUR mandate after it's collection date.
+   * @see Case_ID T04
+   */
+  public function testRCURTerminateAfterCollectionDate()
+  {
+    $mandate = $this->createMandate(self::MANDATE_TYPE_RCUR);
+
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $contribution = $this->getContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+
+    $this->assertNotNull($transactionGroup);
+
+    // Terminate after collection date, which is once a month:
+    $endDateString = '+1 month 1 week';
+    $this->terminateMandate($mandate, $endDateString);
+
+    $mandate = $this->getMandate($mandate['id']);
+    $contribution = $this->getContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+    $endDate = date('Y-m-d', strtotime($endDateString));
+
+    // At this point, the end date must be set but the mandate NOT be terminated yet!
+    $this->assertNotSame(self::MANDATE_STATUS_INVALID, $mandate['status'], 'The mandate has been incorrectly terminated.');
+    $this->assertNotNull($transactionGroup, 'The mandate is not in the transaction group anymore but should be.');
+    $this->assertSameDate($endDate, $contribution['end_date'], 'The end date is not correct.');
+
+    $this->executeBatching(self::MANDATE_TYPE_RCUR, '+1 month');
+
+    // Assert mandate not being grouped again:
+
+    $mandateAfterSecondBatching = $this->getMandate($mandate['id']);
+    $contributionAfterSecondBatching = $this->getContributionForMandate($mandateAfterSecondBatching);
+    $transactionGroupAfterSecondBatching = $this->getTransactionGroupForContribution($contributionAfterSecondBatching);
+
+    $this->assertSame($transactionGroup['id'], $transactionGroupAfterSecondBatching['id'], 'The mandate has been incorrectly regrouped.');
+  }
 }
