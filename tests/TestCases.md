@@ -83,8 +83,6 @@ LATER
 
 ## Hooks
 
-These would have to be implemented in a separate extension shipped with the tests. There might be a point in having the extension always installed, and add enable/disable flags in the respective hook implementations. This should perform a lot better than enabling the extension over and over.
-
 | Case_ID | Status | Configuration | Description   | Process                                |
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |
 | H01     |  TODO  | default  | Custom OOFF reference | Like R03 but implement ``create_mandate`` hook for a custom reference. See bundled example module. Verify result |
