@@ -42,7 +42,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
   {
     $this->createMandate(
       [
-        'type' => self::MANDATE_TYPE_RCUR,
+        'type' => self::MANDATE_TYPE_OOFF,
         'iban' => self::TEST_IBAN,
         'bic' => self::TEST_BIC,
       ]
@@ -57,7 +57,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
   {
     $this->createMandate(
       [
-        'type' => self::MANDATE_TYPE_RCUR,
+        'type' => self::MANDATE_TYPE_OOFF,
         'iban' => self::TEST_IBAN,
         'bic' => self::TEST_BIC_SHORT,
       ]
@@ -74,7 +74,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
 
     $this->createMandate(
       [
-        'type' => self::MANDATE_TYPE_RCUR,
+        'type' => self::MANDATE_TYPE_OOFF,
         'iban' => self::TEST_IBAN,
         'bic' => self::TEST_BIC_TEST_CODE,
       ]
@@ -95,7 +95,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN,
             'bic' => self::TEST_BIC_WRONG_FOR_IBAN,
           ]
@@ -119,7 +119,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN,
             'bic' => self::TEST_BIC_NONEXISTENT,
           ]
@@ -141,7 +141,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN,
             'bic' => self::TEST_BIC_INCORRECT,
           ]
@@ -161,7 +161,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
 
     $this->createMandate(
       [
-        'type' => self::MANDATE_TYPE_RCUR,
+        'type' => self::MANDATE_TYPE_OOFF,
         'iban' => self::TEST_IBAN,
         'bic' => self::TEST_BIC_INCORRECT,
       ]

@@ -36,7 +36,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
   {
     $this->createMandate(
       [
-        'type' => self::MANDATE_TYPE_RCUR,
+        'type' => self::MANDATE_TYPE_OOFF,
         'iban' => self::TEST_IBAN,
       ]
     );
@@ -54,7 +54,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN_INCORRECT_CONTENT,
           ]
         );
@@ -75,7 +75,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN_INCORRECT_BANK_CODE,
           ]
         );
@@ -98,7 +98,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN_INCORRECT_ACCOUNT_NUMBER,
           ]
         );
@@ -119,7 +119,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN_INCORRECT_CHECKSUM,
           ]
         );
@@ -140,7 +140,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN_INCORRECT_LENGTH,
           ]
         );
@@ -161,7 +161,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       {
         $this->createMandate(
           [
-            'type' => self::MANDATE_TYPE_RCUR,
+            'type' => self::MANDATE_TYPE_OOFF,
             'iban' => self::TEST_IBAN_INCORRECT_CHAR,
           ]
         );
@@ -180,7 +180,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
 
     $this->createMandate(
       [
-        'type' => self::MANDATE_TYPE_RCUR,
+        'type' => self::MANDATE_TYPE_OOFF,
         'iban' => self::TEST_IBAN_INCORRECT_CONTENT,
       ]
     );
