@@ -34,7 +34,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFNotBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $batchingDate = 'next Saturday';
     $mandateDate = $batchingDate . ' + 2 weeks';
@@ -64,7 +64,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFNotBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $batchingDate = 'next Sunday';
     $mandateDate = $batchingDate . ' + 2 weeks';
@@ -94,7 +94,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURNotBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $batchingDate = 'next Saturday';
     $mandateDate = $batchingDate . ' + 2 weeks';
@@ -125,7 +125,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURNotBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $batchingDate = 'next Sunday';
     $mandateDate = $batchingDate . ' + 2 weeks';
@@ -156,7 +156,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $this->setCreditorConfiguration('exclude_weekends', '1');
 
@@ -189,7 +189,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $this->setCreditorConfiguration('exclude_weekends', '1');
 
@@ -222,7 +222,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $this->setCreditorConfiguration('exclude_weekends', '1');
 
@@ -256,7 +256,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The configuration seems to be ignored completely.');
+    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
 
     $this->setCreditorConfiguration('exclude_weekends', '1');
 
