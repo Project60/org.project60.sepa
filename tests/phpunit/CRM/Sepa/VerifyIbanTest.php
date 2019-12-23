@@ -213,9 +213,9 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
   }
 
   /**
-   * This will test if a valid IBAN works when there is another IBAN on the blacklist.
-   * NOTE: In the default settings of the Sepa extension there is a test entry on the blacklist,
-   *       so technically this is not necessary as testValidIban does the same; but this
+   * This will test if a valid IBAN works when there is another IBAN on the blacklist. \
+   * NOTE: In the default settings of the Sepa extension there is a test entry on the blacklist, \
+   *       so technically this is not necessary as testValidIban does the same; but this \
    *       test will go sure in the case someone removes the default test entry.
    * @see Case_ID V05
    */

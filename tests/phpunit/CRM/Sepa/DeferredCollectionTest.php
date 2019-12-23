@@ -17,7 +17,12 @@
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
- * Tests for deferred collections regarding weekends.
+ * Tests for deferred collections regarding weekends. \
+ * FIXME: There is something wrong (and odd) with all of these tests. \
+ *        The configuration for exclude_weekends seems to be ignored completely. \
+ *        This could be because of an error in the Sepa extension or because something \
+ *        is wrong with the tests, either a bug or a wrong assumption regarding the \
+ *        correct dates/days to set for it to work.
  */
 class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 {

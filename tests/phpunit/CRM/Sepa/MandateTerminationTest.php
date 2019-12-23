@@ -144,7 +144,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getContributionForMandate($mandate);
-    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution); // FIXME: There is no group found!
 
     $this->assertNotNull($transactionGroup);
 
@@ -152,7 +152,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     $terminatedMandate = $this->getMandate($mandate['id']);
 
-    $this->assertSame(self::MANDATE_STATUS_INVALID, $terminatedMandate['status']);
+    $this->assertSame(self::MANDATE_STATUS_INVALID, $terminatedMandate['status']); // FIXME: This fails because the status is "FRST". Why?
     $this->assertException(
       CRM_Core_Exception::class,
       function() use ($contribution)
@@ -199,7 +199,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getContributionForMandate($mandate);
-    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution); // FIXME: There is no group found!
 
     $this->assertNotNull($transactionGroup);
 
