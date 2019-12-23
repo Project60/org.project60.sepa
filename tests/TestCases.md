@@ -41,7 +41,7 @@ TODO: more complex batching scenarios
 | V02     |  PASS  | creditor_type=PSP | Validate BICs | Creating mandates with various valid/invalid BICs, assert that all creations pass |
 | V03     |  ERROR  | default       | Validate IBANs | Creating mandates with various valid/invalid IBANs, assert that with invalid ones the creation causes an error |
 | V04     |  PASS  | creditor_type=PSP | Validate IBANs | Creating mandates with various valid/invalid IBANs, assert that all creations pass |
-| V05     |  TODO  | default | Validate Blacklist | Add some example IBANs to the black list, assert that creation with those IBANs fail, while other (valid) IBANs pass |
+| V05     |  ERROR  | default | Validate Blacklist | Add some example IBANs to the black list, assert that creation with those IBANs fail, while other (valid) IBANs pass |
 
 
 ## Generated Files
