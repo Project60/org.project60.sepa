@@ -228,6 +228,34 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   }
 
   /**
+   * Add an IBAN to the blacklist.
+   * @param string $iban The IBAN.
+   */
+  protected function addIbanToBlacklist(string $iban): void
+  {
+    $existsAlready = $this->callAPISuccessGetCount(
+      'OptionValue',
+      [
+        'option_group_id' => 'iban_blacklist',
+        'value' => $iban,
+      ]
+    );
+
+    if (!$existsAlready)
+    {
+      $this->callAPISuccess(
+        'OptionValue',
+        'create',
+        [
+          'option_group_id' => 'iban_blacklist',
+          'value' => $iban,
+          'label' => 'Test-' . $iban,
+        ]
+      );
+    }
+  }
+
+  /**
    * Create a mandate.
    * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
    * @param string $collectionDate A string parsable by strtotime to set the (first) collection date.

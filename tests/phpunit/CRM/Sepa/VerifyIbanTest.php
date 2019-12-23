@@ -21,6 +21,7 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
 {
+  protected const TEST_IBAN_2 = 'DE02100100100006820101';
   protected const TEST_IBAN_INCORRECT_CONTENT = 'DE12300105171814696324';
   protected const TEST_IBAN_INCORRECT_BANK_CODE = 'DE02470501980001802057';
   protected const TEST_IBAN_INCORRECT_ACCOUNT_NUMBER = 'DE35500105171814696323';
@@ -182,6 +183,48 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       [
         'type' => self::MANDATE_TYPE_OOFF,
         'iban' => self::TEST_IBAN_INCORRECT_CONTENT,
+      ]
+    );
+  }
+
+  /**
+   * Test that an IBAN put on the blacklist will fail.
+   * @see Case_ID V05
+   */
+  public function testBlacklistedIbanFails()
+  {
+    $this->addIbanToBlacklist(self::TEST_IBAN);
+
+    $this->assertException(
+      PHPUnit_Framework_ExpectationFailedException::class,
+      function ()
+      {
+        $this->createMandate(
+          [
+            'type' => self::MANDATE_TYPE_OOFF,
+            'iban' => self::TEST_IBAN,
+          ]
+        );
+      },
+      'Blacklistet IBAN should fail but did not!'
+    );
+  }
+
+  /**
+   * This will test if a valid IBAN works when there is another IBAN on the blacklist.
+   * NOTE: In the default settings of the Sepa extension there is a test entry on the blacklist,
+   *       so technically this is not necessary as testValidIban does the same; but this
+   *       test will go sure in the case someone removes the default test entry.
+   * @see Case_ID V05
+   */
+  public function testValidIbanWhenOtherIbanIsBlacklisted()
+  {
+    $this->addIbanToBlacklist(self::TEST_IBAN_2);
+
+    $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+        'iban' => self::TEST_IBAN,
       ]
     );
   }
