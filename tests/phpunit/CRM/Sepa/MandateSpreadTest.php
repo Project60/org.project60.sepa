@@ -41,7 +41,7 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
   }
 
   /**
-   * Test a spread of collection dates with timetravel.
+   * Test a spread of collection dates with timetravel for OOFF mandates.
    * @see Case_ID M03
    */
   public function testOOFFSpread()
@@ -73,7 +73,7 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
     // TODO: Verify dates
     // TODO: Timetravel one month and repeat
 
-    // TODO: In the specification for this test there is talk of an annual spread. This is not
+    // NOTE: In the specification for this test there is talk of an annual spread. This is not
     //       implemented and replaced by a fixed spread over the next n times four days. This is
     //       because more than that is not needed in this scenario and having the time frame
     //       resulting out of the amount of mandates makes the test simpler and deterministic.
