@@ -46,7 +46,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $contribution = $this->getLatestContributionForMandate($mandate);
 
     $this->assertSame(self::MANDATE_TYPE_OOFF, $mandate['status'], E::ts('OOFF Mandate after creation is incorrect.'));
-    $this->assertSame('2', $contribution['contribution_status_id'], E::ts('OOFF contribution after creation is incorrect.'));
+    $this->assertSame(
+      self::CONTRIBUTION_STATUS_PENDING,
+      $contribution['contribution_status_id'],
+      E::ts('OOFF contribution after creation is incorrect.')
+    );
   }
 
   /**
@@ -62,8 +66,13 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     );
 
     $recurringContribution = $this->getRecurringContributionForMandate($mandate);
+
     $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], E::ts('RCUR Mandate after creation is incorrect.'));
-    $this->assertSame('2', $contribution['contribution_status_id'], E::ts('RCUR contribution after creation is incorrect.'));
+    $this->assertSame(
+      self::RECURRING_CONTRIBUTION_STATUS_PENDING,
+      $recurringContribution['contribution_status_id'],
+      E::ts('RCUR contribution after creation is incorrect.')
+    );
   }
 
   /**
@@ -84,9 +93,21 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $batchedContribution = $this->getLatestContributionForMandate($batchedMandate);
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_OOFF);
 
-    $this->assertSame(self::MANDATE_TYPE_OOFF, $batchedMandate['status'], E::ts('OOFF Mandate status after batching is incorrect.'));
-    $this->assertSame('2', $batchedContribution['contribution_status_id'], E::ts('OOFF contribution status after batching is incorrect.'));
-    $this->assertSame('1', $transactionGroup['status_id'], E::ts('OOFF transaction group status after batching is incorrect.'));
+    $this->assertSame(
+      self::MANDATE_TYPE_OOFF,
+      $batchedMandate['status'],
+      E::ts('OOFF Mandate status after batching is incorrect.')
+    );
+    $this->assertSame(
+      self::CONTRIBUTION_STATUS_PENDING,
+      $batchedContribution['contribution_status_id'],
+      E::ts('OOFF contribution status after batching is incorrect.')
+    );
+    $this->assertSame(
+      self::BATCH_STATUS_OPEN,
+      $transactionGroup['status_id'],
+      E::ts('OOFF transaction group status after batching is incorrect.')
+    );
   }
 
   /**
@@ -109,9 +130,21 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $batchedContribution = $this->getLatestContributionForMandate($batchedMandate);
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
 
-    $this->assertSame(self::MANDATE_TYPE_FRST, $batchedMandate['status'], E::ts('RCUR Mandate status after batching is incorrect.'));
-    $this->assertSame('2', $batchedContribution['contribution_status_id'], E::ts('RCUR contribution status after batching is incorrect.'));
-    $this->assertSame('1', $transactionGroup['status_id'], E::ts('RCUR transaction group status after batching is incorrect.'));
+    $this->assertSame(
+      self::MANDATE_TYPE_FRST,
+      $batchedMandate['status'],
+      E::ts('RCUR Mandate status after batching is incorrect.')
+    );
+    $this->assertSame(
+      self::CONTRIBUTION_STATUS_PENDING,
+      $batchedContribution['contribution_status_id'],
+      E::ts('RCUR contribution status after batching is incorrect.')
+    );
+    $this->assertSame(
+      self::BATCH_STATUS_OPEN,
+      $transactionGroup['status_id'],
+      E::ts('RCUR transaction group status after batching is incorrect.')
+    );
   }
 
   /**
@@ -136,9 +169,21 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $closedContribution = $this->getLatestContributionForMandate($closedMandate);
     $closedTransactionGroup = $this->getTransactionGroup($transactionGroup['id']);
 
-    $this->assertSame(self::MANDATE_STATUS_SENT, $closedMandate['status'], E::ts('OOFF Mandate status after closing is incorrect.'));
-    $this->assertSame('5', $closedContribution['contribution_status_id'], E::ts('OOFF contribution status after closing is incorrect.'));
-    $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('OOFF transaction group status after closing is incorrect.'));
+    $this->assertSame(
+      self::MANDATE_STATUS_SENT,
+      $closedMandate['status'],
+      E::ts('OOFF Mandate status after closing is incorrect.')
+    );
+    $this->assertSame(
+      self::CONTRIBUTION_STATUS_COMPLETED, // FIXME: This fails because we get the status "in progress". Is this intended?
+      $closedContribution['contribution_status_id'],
+      E::ts('OOFF contribution status after closing is incorrect.')
+    );
+    $this->assertSame(
+      self::BATCH_STATUS_CLOSED,
+      $closedTransactionGroup['status_id'],
+      E::ts('OOFF transaction group status after closing is incorrect.')
+    );
   }
 
   /**
@@ -165,8 +210,20 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
     $closedRecurringContribution = $this->getRecurringContributionForMandate($closedMandate);
     $closedTransactionGroup = $this->getTransactionGroup($transactionGroup['id']);
 
-    $this->assertSame(self::MANDATE_TYPE_RCUR, $closedMandate['status'], E::ts('RCUR Mandate status after closing is incorrect.'));
-    $this->assertSame('2', $closedContribution['contribution_status_id'], E::ts('RCUR contribution status after closing is incorrect.'));
-    $this->assertSame('2', $closedTransactionGroup['status_id'], E::ts('RCUR transaction group status after closing is incorrect.'));
+    $this->assertSame(
+      self::MANDATE_TYPE_RCUR,
+      $closedMandate['status'],
+      E::ts('RCUR Mandate status after closing is incorrect.')
+    );
+    $this->assertSame(
+      self::RECURRING_CONTRIBUTION_STATUS_COMPLETED,
+      $closedRecurringContribution['contribution_status_id'],
+      E::ts('RCUR contribution status after closing is incorrect.')
+    );
+    $this->assertSame(
+      self::BATCH_STATUS_CLOSED,
+      $closedTransactionGroup['status_id'],
+      E::ts('RCUR transaction group status after closing is incorrect.')
+    );
   }
 }

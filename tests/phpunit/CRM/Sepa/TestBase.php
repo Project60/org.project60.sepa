@@ -51,6 +51,36 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   protected const MANDATE_STATUS_SENT = 'SENT';
   protected const MANDATE_STATUS_INVALID = 'INVALID';
 
+  // TODO: Move the following constants to a better place (or get them dynamically from Civi):
+  protected const CONTRIBUTION_STATUS_COMPLETED = '1';
+  protected const CONTRIBUTION_STATUS_PENDING = '2';
+  protected const CONTRIBUTION_STATUS_CANCELLED = '3';
+  protected const CONTRIBUTION_STATUS_FAILED = '4';
+  protected const CONTRIBUTION_STATUS_IN_PROGRESS = '5';
+  protected const CONTRIBUTION_STATUS_OVERDUE = '6';
+  protected const CONTRIBUTION_STATUS_REFUNDED = '7';
+  protected const CONTRIBUTION_STATUS_PARTIALLY_PAID = '8';
+  protected const CONTRIBUTION_STATUS_PENDING_REFUND = '9';
+  protected const CONTRIBUTION_STATUS_CHARGEBACK = '10';
+
+  // TODO: Move the following constants to a better place (or get them dynamically from Civi):
+  protected const RECURRING_CONTRIBUTION_STATUS_COMPLETED = '1';
+  protected const RECURRING_CONTRIBUTION_STATUS_PENDING = '2';
+  protected const RECURRING_CONTRIBUTION_STATUS_CANCELLED = '3';
+  protected const RECURRING_CONTRIBUTION_STATUS_FAILED = '4';
+  protected const RECURRING_CONTRIBUTION_STATUS_IN_PROGRESS = '5';
+  protected const RECURRING_CONTRIBUTION_STATUS_OVERDUE = '6';
+  protected const RECURRING_CONTRIBUTION_STATUS_PROCESSING = '7';
+  protected const RECURRING_CONTRIBUTION_STATUS_FAILING = '8';
+
+  // TODO: Move the following constants to a better place (or get them dynamically from Civi):
+  protected const BATCH_STATUS_OPEN = '1';
+  protected const BATCH_STATUS_CLOSED = '2';
+  protected const BATCH_STATUS_DATA_ENTRY = '3';
+  protected const BATCH_STATUS_REOPENED = '4';
+  protected const BATCH_STATUS_EXPORTED = '5';
+  protected const BATCH_STATUS_RECEIVED = '6';
+
   protected $testCreditorId;
 
   #region PHPUnit Framework implementation
