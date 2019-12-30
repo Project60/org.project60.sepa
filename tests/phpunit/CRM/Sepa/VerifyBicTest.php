@@ -23,6 +23,9 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
 {
   protected const TEST_BIC_SHORT = 'COLSDE33';
   protected const TEST_BIC_TEST_CODE = 'ABCDDE30XXX'; // 8th digit is a zero, meaning this is a test BIC.
+  protected const TEST_BIC_PASSIVE_MEMBER_CODE = 'ABCDDE31XXX'; // 8th digit is a one, meaning the owner of the BIC is passive SWIFT member.
+  protected const TEST_BIC_TRANSACTION_COST_CODE = 'ABCDDE32XXX'; // 8th digit is a two, marking that the receiver pays the transaction cost.
+  protected const TEST_BIC_INVALID_LOCATION = 'BELADE0EXXX'; // 7th digit must not be zero or one.
   protected const TEST_BIC_WRONG_FOR_IBAN = 'BELADEBEXXX';
   protected const TEST_BIC_NONEXISTENT = 'ABCDDE33XXX'; // Correct format but does not exist.
   protected const TEST_BIC_INCORRECT = 'INCORRECT';
@@ -76,6 +79,58 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
         'iban' => self::TEST_IBAN,
         'bic' => self::TEST_BIC_TEST_CODE,
       ]
+    );
+  }
+
+  /**
+   * Test that the BIC of a passive SWIFT member works.
+   * @see Case_ID V01
+   */
+  public function testPassiveSwiftMemberBic()
+  {
+    $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+        'iban' => self::TEST_IBAN,
+        'bic' => self::TEST_BIC_PASSIVE_MEMBER_CODE,
+      ]
+    );
+  }
+
+  /**
+   * Test that a BIC with a marking that the receiver pays the transaction cost works.
+   * @see Case_ID V01
+   */
+  public function testReceiverPaysTransactionCostBic()
+  {
+    $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+        'iban' => self::TEST_IBAN,
+        'bic' => self::TEST_BIC_TRANSACTION_COST_CODE,
+      ]
+    );
+  }
+
+  /**
+   * Test that a BIC with an invalid location code fails.
+   * @see Case_ID V01
+   */
+  public function testInvalidLocationBic()
+  {
+    $this->assertException(
+      PHPUnit_Framework_ExpectationFailedException::class,
+      function ()
+      {
+        $this->createMandate(
+          [
+            'type' => self::MANDATE_TYPE_OOFF,
+            'iban' => self::TEST_IBAN,
+            'bic' => self::TEST_BIC_INVALID_LOCATION,
+          ]
+        );
+      },
+      E::ts('Invalid BIC location detection fails!')
     );
   }
 
