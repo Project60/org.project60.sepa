@@ -115,14 +115,14 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->closeTransactionGroup($transactionGroup['id']);
 
     // After closing the termination must fail:
-
     $this->assertException(
       CRM_Core_Exception::class,
       function() use ($mandate)
       {
         $this->terminateMandate($mandate);
       },
-      'It must not be allowed to terminate the mandate after the group has been closed.'
+      E::ts('It must not be allowed to terminate the mandate after the group has been closed.')
+    );
 
     $closedMandate = $this->getMandate($mandate['id']);
 
