@@ -238,6 +238,10 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $contributionAfterSecondBatching = $this->getLatestContributionForMandate($mandateAfterSecondBatching);
     $transactionGroupAfterSecondBatching = $this->getTransactionGroupForContribution($contributionAfterSecondBatching);
 
-    $this->assertSame($transactionGroup['id'], $transactionGroupAfterSecondBatching['id'], 'The mandate has been incorrectly regrouped.');
+    $this->assertSame(
+      $transactionGroup['id'],
+      $transactionGroupAfterSecondBatching['id'],
+      E::ts('The mandate has been incorrectly regrouped.')
+    );
   }
 }

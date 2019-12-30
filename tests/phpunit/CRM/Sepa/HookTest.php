@@ -115,7 +115,11 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
     );
 
     $this->assertNotNull($this->lastMandateReference, E::ts('The create_mandate hook has not been called.'));
-    $this->assertSame($this->lastMandateReference, $mandate['reference'], E::ts('The mandate reference is not the generated one.'));
+    $this->assertSame(
+      $this->lastMandateReference,
+      $mandate['reference'],
+      E::ts('The mandate reference is not the generated one.')
+    );
   }
 
   /**
@@ -134,7 +138,11 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
     );
 
     $this->assertNotNull($this->lastMandateReference, E::ts('The create_mandate hook has not been called.'));
-    $this->assertSame($this->lastMandateReference, $mandate['reference'], E::ts('The mandate reference is not the generated one.'));
+    $this->assertSame(
+      $this->lastMandateReference,
+      $mandate['reference'],
+      E::ts('The mandate reference is not the generated one.')
+    );
   }
 
   /**
@@ -182,8 +190,15 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
 
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_OOFF);
 
-    $this->assertNotNull($this->lastTransactionGroupReference, E::ts('The modify_txgroup_reference hook has not been called.'));
-    $this->assertSame($this->lastTransactionGroupReference, $transactionGroup['reference'], E::ts('The transaction group reference is not the generated one.'));
+    $this->assertNotNull(
+      $this->lastTransactionGroupReference,
+      E::ts('The modify_txgroup_reference hook has not been called.')
+    );
+    $this->assertSame(
+      $this->lastTransactionGroupReference,
+      $transactionGroup['reference'],
+      E::ts('The transaction group reference is not the generated one.')
+    );
   }
 
   /**
@@ -205,8 +220,16 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
 
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
 
-    $this->assertNotNull($this->lastTransactionGroupReference, E::ts('The modify_txgroup_reference hook has not been called.'));
-    $this->assertSame($this->lastTransactionGroupReference, $transactionGroup['reference'], E::ts('The transaction group reference is not the generated one.'));
+    $this->assertNotNull(
+      $this->lastTransactionGroupReference,
+      E::ts('The modify_txgroup_reference hook has not been called.')
+    );
+    $this->assertSame(
+      $this->lastTransactionGroupReference,
+      $transactionGroup['reference'],
+      E::ts('The transaction group reference is not the generated one.')
+    );
+  }
 
   /**
    * This hook is called by the batching algorithm: \
