@@ -22,7 +22,7 @@ use CRM_Sepa_ExtensionUtil as E;
 class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
 {
   protected const TEST_BIC_SHORT = 'COLSDE33';
-  protected const TEST_BIC_TEST_CODE = 'ABCDDE03XXX';
+  protected const TEST_BIC_TEST_CODE = 'ABCDDE30XXX'; // 8th digit is a zero, meaning this is a test BIC.
   protected const TEST_BIC_WRONG_FOR_IBAN = 'BELADEBEXXX';
   protected const TEST_BIC_NONEXISTENT = 'ABCDDE33XXX'; // Correct format but does not exist.
   protected const TEST_BIC_INCORRECT = 'INCORRECT';
@@ -70,8 +70,6 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
    */
   public function testTestBic()
   {
-    self::markTestSkipped('FIXME: Test fails because the Sepa extension marks test BICs as invalid.');
-
     $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
