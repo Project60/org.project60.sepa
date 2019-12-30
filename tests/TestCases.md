@@ -64,10 +64,10 @@ TODO: more complex batching scenarios
 
 | Case_ID | Status | Configuration | Description   | Process                                |
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |
-| R01     |  TODO  | default       | Default OOFF Reference | Create a OOFF mandate, verify reference integrity (SEPA reference allowed charecters) |
-| R02     |  TODO  | default       | Default RCUR Reference | Create a RCUR mandate, verify reference integrity (SEPA reference allowed charecters) |
-| R03     |  TODO  | default       | Multiple OOFF Reference | Create 101 OOFF mandates with varying financial types and campaigns, verify reference integrity (SEPA reference allowed charecters), detect collisions |
-| R04     |  TODO  | default       | Multiple RCUR Reference | Create 101 RCUR mandates with varying financial types and campaigns, verify reference integrity (SEPA reference allowed charecters), detect collisions |
+| R01     |  PASS  | default       | Default OOFF Reference | Create a OOFF mandate, verify reference integrity (SEPA reference allowed charecters) |
+| R02     |  PASS  | default       | Default RCUR Reference | Create a RCUR mandate, verify reference integrity (SEPA reference allowed charecters) |
+| R03     |  PARTLY  | default       | Multiple OOFF Reference | Create 101 OOFF mandates with varying financial types and campaigns, verify reference integrity (SEPA reference allowed charecters), detect collisions |
+| R04     |  PARTLY  | default       | Multiple RCUR Reference | Create 101 RCUR mandates with varying financial types and campaigns, verify reference integrity (SEPA reference allowed charecters), detect collisions |
 | R05     |  TODO  | change creditor prefix | Default OOFF Reference | Create a OOFF mandate, verify reference integrity (SEPA reference allowed charecters) |
 | R06     |  TODO  | change creditor prefix | Default RCUR Reference | Create a RCUR mandate, verify reference integrity (SEPA reference allowed charecters) |
 
