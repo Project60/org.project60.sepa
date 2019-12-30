@@ -101,7 +101,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Wrong BIC for IBAN detection fails!'
+      E::ts('Wrong BIC for IBAN detection fails!')
     );
   }
 
@@ -125,7 +125,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Nonexistent BIC detection fails!'
+      E::ts('Nonexistent BIC detection fails!')
     );
   }
 
@@ -147,7 +147,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Incorrect BIC detection fails!'
+      E::ts('Incorrect BIC detection fails!')
     );
   }
 

@@ -60,7 +60,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Incorrect IBAN detection fails!'
+      E::ts('Incorrect IBAN detection fails!')
     );
   }
 
@@ -81,7 +81,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Incorrect bank code detection fails!'
+      E::ts('Incorrect bank code detection fails!')
     );
   }
 
@@ -104,7 +104,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Incorrect account number detection fails!'
+      E::ts('Incorrect account number detection fails!')
     );
   }
 
@@ -125,7 +125,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Incorrect IBAN checksum detection fails!'
+      E::ts('Incorrect IBAN checksum detection fails!')
     );
   }
 
@@ -146,7 +146,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Incorrect IBAN length detection fails!'
+      E::ts('Incorrect IBAN length detection fails!')
     );
   }
 
@@ -167,7 +167,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Incorrect char in IBAN detection fails!'
+      E::ts('Incorrect char in IBAN detection fails!')
     );
   }
 
@@ -208,7 +208,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           ]
         );
       },
-      'Blacklistet IBAN should fail but did not!'
+      E::ts('Blacklistet IBAN should fail but did not!')
     );
   }
 

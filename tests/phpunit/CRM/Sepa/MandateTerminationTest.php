@@ -70,7 +70,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       {
         $this->getTransactionGroupForContribution($contribution);
       },
-      'There should be no transaction group be associated with the mandate after terminating.'
+      E::ts('There should be no transaction group be associated with the mandate after terminating.')
     );
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
@@ -87,7 +87,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       {
         $this->getTransactionGroupForContribution($contributionForRetesting);
       },
-      'The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.'
+      E::ts('The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.')
     );
   }
 
@@ -171,7 +171,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       {
         $this->getTransactionGroupForContribution($contribution);
       },
-      'There should be no transaction group be associated with the mandate after terminating.'
+      E::ts('There should be no transaction group be associated with the mandate after terminating.')
     );
 
     $this->executeBatching(self::MANDATE_TYPE_FRST);
@@ -189,7 +189,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       {
         $this->getTransactionGroupForContribution($contributionForRetesting);
       },
-      'The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.'
+      E::ts('The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.')
     );
   }
 
@@ -225,9 +225,9 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $endDate = date('Y-m-d', strtotime($endDateString));
 
     // At this point, the end date must be set but the mandate NOT be terminated yet!
-    $this->assertNotSame(self::MANDATE_STATUS_INVALID, $mandate['status'], 'The mandate has been incorrectly terminated.');
-    $this->assertNotNull($transactionGroup, 'The mandate is not in the transaction group anymore but should be.');
-    $this->assertSameDate($endDate, $contribution['end_date'], 'The end date is not correct.');
+    $this->assertNotSame(self::MANDATE_STATUS_INVALID, $mandate['status'], E::ts('The mandate has been incorrectly terminated.'));
+    $this->assertNotNull($transactionGroup, E::ts('The mandate is not in the transaction group anymore but should be.'));
+    $this->assertSameDate($endDate, $contribution['end_date'], E::ts('The end date is not correct.'));
 
     $this->executeBatching(self::MANDATE_TYPE_FRST, '+1 month');
     $this->executeBatching(self::MANDATE_TYPE_RCUR, '+1 month');
