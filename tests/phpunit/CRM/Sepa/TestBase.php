@@ -19,6 +19,8 @@ use Civi\Test\HeadlessInterface;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
 
+use CRM_Sepa_ExtensionUtil as E;
+
 /**
  * FIXME - Add test description.
  *
@@ -371,10 +373,10 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   }
 
   /**
-   * Get the contribution for a given mandate.
+   * Get the latest contribution for a given mandate.
    * @param array $mandate The mandate to get the contribution for.
    */
-  protected function getContributionForMandate(array $mandate): array
+  protected function getLatestContributionForMandate(array $mandate): array
   {
     $mandateType = $mandate['type'];
 
@@ -384,18 +386,66 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
       throw new Exception('For this mandate type can no contribution be determined.');
     }
 
-    $contributionEntity = $mandateType == self::MANDATE_TYPE_OOFF ? 'Contribution' : 'ContributionRecur';
+    $contribution = null;
 
-    $contributionId = $mandate['entity_id'];
+    if ($mandateType == self::MANDATE_TYPE_OOFF)
+    {
+      // If it is an OOFF mandate, we simply have the contribution ID given in the mandate's entity_id.
 
-    $contribution = $this->callAPISuccessGetSingle(
-      $contributionEntity,
+      $contribution = $this->callAPISuccessGetSingle(
+        'Contribution',
+        [
+          'id' => $mandate['entity_id'],
+        ]
+      );
+    }
+    else if (in_array($mandateType, [self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST]))
+    {
+      // If it is an RCUR/FRST mandate, we need to get the contribution from the recurring contribution given in the mandate's entity_id.
+      // There could be multiple contributions attached, so we return the latest one.
+
+      $contribution = $this->callAPISuccessGetSingle(
+        'Contribution',
+        [
+          'contribution_recur_id' => $mandate['entity_id'],
+          'options' =>
+          [
+            'sort' => 'id DESC',
+            'limit' => 1,
+          ],
+        ]
+      );
+    }
+    else
+    {
+      throw new Exception('For this mandate type can no contribution be determined.');
+    }
+
+    $this->assertNotNull($contribution, E::ts('The contribution for the mandate is null. That should not be possible at this point.'));
+
+    return $contribution;
+  }
+
+  /**
+   * Get the recurring contribution for a given RCUR/FRST mandate.
+   * @param array $mandate The RCUR or FRST mandate to get the contribution for.
+   */
+  protected function getRecurringContributionForMandate(array $mandate): array
+  {
+    // Only RCUR/FRST mandates are allowed:
+    if (!in_array($mandate['type'], [self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST]))
+    {
+       throw new Exception('For this mandate type can no recurring contribution be determined.');
+    }
+
+    $recurringContribution = $this->callAPISuccessGetSingle(
+      'ContributionRecur',
       [
-        'id' => $contributionId,
+        'id' => $mandate['entity_id'],
       ]
     );
 
-    return $contribution;
+    return $recurringContribution;
   }
 
   /**

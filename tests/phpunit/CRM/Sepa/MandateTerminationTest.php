@@ -54,7 +54,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $this->assertNotNull($transactionGroup);
@@ -78,7 +78,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     // Assert mandate not being grouped again:
 
     $mandateForRetesting = $this->getMandate($mandate['id']);
-    $contributionForRetesting = $this->getContributionForMandate($mandate);
+    $contributionForRetesting = $this->getLatestContributionForMandate($mandate);
 
     $this->assertSame(self::MANDATE_STATUS_INVALID, $mandateForRetesting['status']);
     $this->assertException(
@@ -107,7 +107,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $this->assertNotNull($transactionGroup);
@@ -143,8 +143,8 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_FRST);
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
-    $contribution = $this->getContributionForMandate($mandate);
-    $transactionGroup = $this->getTransactionGroupForContribution($contribution); // FIXME: There is no group found!
+    $contribution = $this->getLatestContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $this->assertNotNull($transactionGroup);
 
@@ -168,7 +168,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     // Assert mandate not being grouped again:
 
     $mandateForRetesting = $this->getMandate($mandate['id']);
-    $contributionForRetesting = $this->getContributionForMandate($mandateForRetesting);
+    $contributionForRetesting = $this->getLatestContributionForMandate($mandateForRetesting);
 
     $this->assertSame(self::MANDATE_STATUS_INVALID, $mandateForRetesting['status']);
     $this->assertException(
@@ -198,8 +198,8 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_FRST);
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
-    $contribution = $this->getContributionForMandate($mandate);
-    $transactionGroup = $this->getTransactionGroupForContribution($contribution); // FIXME: There is no group found!
+    $contribution = $this->getLatestContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $this->assertNotNull($transactionGroup);
 
@@ -208,7 +208,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->terminateMandate($mandate, $endDateString);
 
     $mandate = $this->getMandate($mandate['id']);
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
     $endDate = date('Y-m-d', strtotime($endDateString));
 
@@ -223,7 +223,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     // Assert mandate not being grouped again:
 
     $mandateAfterSecondBatching = $this->getMandate($mandate['id']);
-    $contributionAfterSecondBatching = $this->getContributionForMandate($mandateAfterSecondBatching);
+    $contributionAfterSecondBatching = $this->getLatestContributionForMandate($mandateAfterSecondBatching);
     $transactionGroupAfterSecondBatching = $this->getTransactionGroupForContribution($contributionAfterSecondBatching);
 
     $this->assertSame($transactionGroup['id'], $transactionGroupAfterSecondBatching['id'], 'The mandate has been incorrectly regrouped.');

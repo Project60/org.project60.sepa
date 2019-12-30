@@ -53,7 +53,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
@@ -83,7 +83,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
@@ -114,7 +114,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
     $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
@@ -145,7 +145,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
     $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
@@ -177,7 +177,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
@@ -210,7 +210,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
@@ -244,7 +244,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
     $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
@@ -278,7 +278,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
     $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
 
-    $contribution = $this->getContributionForMandate($mandate);
+    $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
 
     $collectionDate = $transactionGroup['collection_date'];
