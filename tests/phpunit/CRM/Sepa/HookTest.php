@@ -21,6 +21,8 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
 {
+  protected const INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX = 'HookTest-';
+
   /**
    * If true the create_mandate hook will be executed.
    * TODO: Would it be cleaner to have one test file for every hook?
@@ -49,6 +51,12 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    */
   protected $lastTransactionGroupReference = null;
 
+  /**
+   * If true the installment_created hook will be executed.
+   * TODO: Would it be cleaner to have one test file for every hook?
+   */
+  protected $executeInstallmentCreatedHook = false;
+
   public function setUp(): void
   {
     parent::setUp();
@@ -65,6 +73,7 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
     // Prevent all hooks from being called after the test has happened:
     $this->executeCreateMandateHook = false;
     $this->executeModifyTxGroupHook = false;
+    $this->executeInstallmentCreatedHook = false;
   }
 
   /**
@@ -198,5 +207,67 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
 
     $this->assertNotNull($this->lastTransactionGroupReference, E::ts('The modify_txgroup_reference hook has not been called.'));
     $this->assertSame($this->lastTransactionGroupReference, $transactionGroup['reference'], E::ts('The transaction group reference is not the generated one.'));
+
+  /**
+   * This hook is called by the batching algorithm: \
+   * Whenever a new installment has been created for a given RCUR mandate this hook is called so you can modify \
+   * the resulting contribution, e.g. connect it to a membership, or copy custom fields. \
+   * We implement this hook to test if it is called correctly. For this we set the contribution's source to the mandate's reference. \
+   * FIXME: In the sepacustom example extension the three parameters are marked as array, which is wrong and should be fixed.
+   * @param string $mandate_id The CiviSEPA mandate entity ID.
+   * @param string $contribution_recur_id The recurring contribution connected to the mandate.
+   * @param string $contribution_id The newly created contribution.
+   */
+  function hook_civicrm_installment_created(string $mandate_id, string $contribution_recur_id, string $contribution_id): void
+  {
+    // Only execute this hook if we are ordered to:
+    if (!$this->executeInstallmentCreatedHook)
+    {
+      return;
+    }
+
+    $mandateReference = $this->callAPISuccessGetValue(
+      'SepaMandate',
+      [
+        'return' => 'reference',
+      ]
+    );
+
+    $this->callAPISuccess(
+      'Contribution',
+      'create',
+      [
+        'id' => $contribution_id,
+        'contribution_source' => self::INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX . $mandateReference,
+      ]
+    );
+  }
+
+  /**
+   * Test the installment created hook.
+   * @see Case_ID H08
+   */
+  public function testInstallmentCreated(): void
+  {
+    $this->executeInstallmentCreatedHook = true;
+
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ]
+    );
+
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $contribution = $this->getLatestContributionForMandate($mandate);
+
+    $excepted = self::INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX . $mandate['reference'];
+
+    $this->assertSame(
+      $excepted,
+      $contribution['contribution_source'],
+      E::ts('The installment_created hook has not been called (correctly).')
+    );
   }
 }

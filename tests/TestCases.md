@@ -92,7 +92,7 @@ LATER
 | H05     |  TODO  | default  | Custom OOFF txmessage | Like F01 but implement ``modify_txmessage`` hook for a custom txmessage. See bundled example module. Verify result in XML |
 | H06     |  TODO  | default  | Custom RCUR txmessage | Like F01 but implement ``modify_txmessage`` hook for a custom txmessage. See bundled example module. Verify result in XML |
 | H07     |  TODO  | default  | Custom end2end | Like F01 but implement ``modify_endtoendid`` hook for a custom end2end id. See bundled example module. Verify result in XML |
-| H08     |  TODO  | default  | Customize installment | Create RCUR mandate, implement ``installment_created`` hook to change something in the contribution, batch, verify that the changes have been applied to the newly created contribution |
+| H08     |  PASS  | default  | Customize installment | Create RCUR mandate, implement ``installment_created`` hook to change something in the contribution, batch, verify that the changes have been applied to the newly created contribution |
 | H09     |  TODO  | default  | Customize recurring contribution | Implement ``mend_rcontrib`` hook to change something in the recurring contribution, create RCUR mandate, verify that the changes have been applied to the newly created recurring contribution |
 | H10     |  TODO  | default  | Customize collection date | Like M04, but implement ``defer_collection_date`` hook to offset the collection date, batch and verify that the date has been applied |
 
