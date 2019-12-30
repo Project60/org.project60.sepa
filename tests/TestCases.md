@@ -85,10 +85,10 @@ LATER
 
 | Case_ID | Status | Configuration | Description   | Process                                |
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |
-| H01     |  TODO  | default  | Custom OOFF reference | Like R03 but implement ``create_mandate`` hook for a custom reference. See bundled example module. Verify result |
-| H02     |  TODO  | default  | Custom RCUR reference | Like R04 but implement ``create_mandate`` hook for a custom reference. See bundled example module. Verify result |
-| H03     |  TODO  | default  | Custom OOFF group reference | Like M01 but implement ``modify_txgroup_reference`` hook for a custom reference. See bundled example module. Verify result |
-| H04     |  TODO  | default  | Custom RCUR group reference | Like M02 but implement ``modify_txgroup_reference`` hook for a custom reference. See bundled example module. Verify result |
+| H01     |  PASS  | default  | Custom OOFF reference | Like R03 but implement ``create_mandate`` hook for a custom reference. See bundled example module. Verify result |
+| H02     |  PASS  | default  | Custom RCUR reference | Like R04 but implement ``create_mandate`` hook for a custom reference. See bundled example module. Verify result |
+| H03     |  PASS  | default  | Custom OOFF group reference | Like M01 but implement ``modify_txgroup_reference`` hook for a custom reference. See bundled example module. Verify result |
+| H04     |  PASS  | default  | Custom RCUR group reference | Like M02 but implement ``modify_txgroup_reference`` hook for a custom reference. See bundled example module. Verify result |
 | H05     |  TODO  | default  | Custom OOFF txmessage | Like F01 but implement ``modify_txmessage`` hook for a custom txmessage. See bundled example module. Verify result in XML |
 | H06     |  TODO  | default  | Custom RCUR txmessage | Like F01 but implement ``modify_txmessage`` hook for a custom txmessage. See bundled example module. Verify result in XML |
 | H07     |  TODO  | default  | Custom end2end | Like F01 but implement ``modify_endtoendid`` hook for a custom end2end id. See bundled example module. Verify result in XML |
