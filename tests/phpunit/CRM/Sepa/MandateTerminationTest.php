@@ -123,6 +123,18 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
         $this->terminateMandate($mandate);
       },
       'It must not be allowed to terminate the mandate after the group has been closed.'
+
+    $closedMandate = $this->getMandate($mandate['id']);
+
+    $this->assertNotSame(
+      self::MANDATE_STATUS_INVALID,
+      $closedMandate['status'],
+      E::ts('The mandate has been illegally terminated after closing.')
+    );
+    $this->assertSame(
+      self::MANDATE_STATUS_SENT,
+      $closedMandate['status'],
+      E::ts('The mandate status has been illegally touched after closing.')
     );
   }
 
