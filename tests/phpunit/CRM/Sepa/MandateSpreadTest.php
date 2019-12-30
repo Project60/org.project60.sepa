@@ -32,6 +32,14 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
 {
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    $this->setCreditorConfiguration('batching.OOFF.horizon', 31);
+    $this->setCreditorConfiguration('batching.RCUR.horizon', 31);
+  }
+
   /**
    * Test a spread of collection dates with timetravel.
    * @see Case_ID M03
@@ -39,8 +47,6 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
   public function testOOFFSpread()
   {
     self::markTestIncomplete('FIXME: Test OOFFSpread for test case M03 is incomplete.');
-
-    $this->setCreditorConfiguration('batching.OOFF.horizon', 31);
 
     for ($n = 0; $n < 28; $n++)
     {
