@@ -7,7 +7,7 @@
 | M01     |  PASS  | default       | Simple OOF Mandate  | Create OOFF mandate, batch, check status, close group, check status |
 | M02     |  PASS  | default       | Simple RCUR Mandate | Create RCUR mandate, batch, check status, close group, check status |
 | M03     |  PARTLY  | ooff_horizon=31 | OOFF Annual | Create ``n`` OOFF mandates with collection dates spread of the next year, batch & close, verify dates, ``timetravel:+1month``, and repeat. |
-| M04     |  TODO  | rcur_horizon=31 | RCUR Annual | Create ``n`` RCUR mandates (different start dates / monthly,quarterly,semi-annually/annually)  with collection dates spread of the next year, batch & close, verify dates and collection rhythm, ``timetravel:+1month``, and repeat. |
+| M04     |  PARTLY  | rcur_horizon=31 | RCUR Annual | Create ``n`` RCUR mandates (different start dates / monthly,quarterly,semi-annually/annually)  with collection dates spread of the next year, batch & close, verify dates and collection rhythm, ``timetravel:+1month``, and repeat. |
 
 
 ## Batching

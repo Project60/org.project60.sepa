@@ -78,4 +78,70 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
     //       because more than that is not needed in this scenario and having the time frame
     //       resulting out of the amount of mandates makes the test simpler and deterministic.
   }
+
+  /**
+   * Test a spread of collection dates with timetravel for RCUR mandates.
+   * @see Case_ID M04
+   */
+  public function testRCURSpread()
+  {
+    self::markTestIncomplete('FIXME: Test RCURSpread for test case M04 is incomplete.');
+
+    for ($n = 0; $n < 21; $n++)
+    {
+      // For the following collection date generation:
+      // Starting at the next monday guarantees the determinism of this test.
+      // Every four days spreads seven mandates once for every day of the week over 3.5 weeks.
+      // If we use a multiple of seven we have an equal distribution over every day of the week.
+      $date = 'next Monday + ' . $n * 4 . ' days';
+
+      $this->createMandate(
+        [
+          'type' => self::MANDATE_TYPE_RCUR,
+          'frequency_unit' => 'month',
+          'frequency_interval' => '1',
+        ],
+        $date
+      );
+      $this->createMandate(
+        [
+          'type' => self::MANDATE_TYPE_RCUR,
+          'frequency_unit' => 'month',
+          'frequency_interval' => '3',
+        ],
+        $date
+      );
+      $this->createMandate(
+        [
+          'type' => self::MANDATE_TYPE_RCUR,
+          'frequency_unit' => 'month',
+          'frequency_interval' => '6',
+        ],
+        $date
+      );
+      $this->createMandate(
+        [
+          'type' => self::MANDATE_TYPE_RCUR,
+          'frequency_unit' => 'year',
+          'frequency_interval' => '1',
+        ],
+        $date
+      );
+    }
+
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
+
+    $transactionGroups = $this->getActiveTransactionGroups(self::MANDATE_TYPE_OOFF);
+
+    $this->closeTransactionGroups($transactionGroups);
+
+    // TODO: Verify dates.
+    // TODO: Verify collection rhythm.
+    // TODO: Timetravel one month and repeat.
+
+    // NOTE: In the specification for this test there is talk of an annual spread. This is not
+    //       implemented and replaced by a fixed spread over the next n times four days. This is
+    //       because more than that is not needed in this scenario and having the time frame
+    //       resulting out of the amount of mandates makes the test simpler and deterministic.
+  }
 }
