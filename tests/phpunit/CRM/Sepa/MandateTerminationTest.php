@@ -97,7 +97,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testOOFFTerminateAfterClosingFails()
   {
-    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension.');
+    self::markTestSkipped('FIXME: Test fails because the Sepa extension does not throw an error.');
 
     $mandate = $this->createMandate(
       [
@@ -199,7 +199,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testRCURTerminateAfterCollectionDate()
   {
-    self::markTestSkipped('FIXME: This test fails for multiple unknown reasons, possibly related to the failure of testRCURTerminate.');
+    self::markTestSkipped('FIXME: This test fails for an unknown reason, must be debugged.');
 
     $mandate = $this->createMandate(
       [

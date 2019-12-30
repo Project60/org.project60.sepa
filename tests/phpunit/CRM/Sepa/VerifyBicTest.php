@@ -70,7 +70,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
    */
   public function testTestBic()
   {
-    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension.');
+    self::markTestSkipped('FIXME: Test fails because the Sepa extension marks test BICs as invalid.');
 
     $this->createMandate(
       [
@@ -87,7 +87,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
    */
   public function testWrongBicForIbanFails()
   {
-    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension.');
+    self::markTestSkipped('FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.');
 
     $this->assertException(
       PHPUnit_Framework_ExpectationFailedException::class,
@@ -111,7 +111,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
    */
   public function testNonexistentBic()
   {
-    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension.');
+    self::markTestSkipped('FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.');
 
     $this->assertException(
       PHPUnit_Framework_ExpectationFailedException::class,
