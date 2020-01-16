@@ -164,7 +164,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     $terminatedMandate = $this->getMandate($mandate['id']);
 
-    $this->assertSame(self::MANDATE_STATUS_INVALID, $terminatedMandate['status']); // FIXME: This fails because the status is "FRST". Why?
+    $this->assertSame(self::MANDATE_STATUS_COMPLETE, $terminatedMandate['status']);
     $this->assertException(
       CRM_Core_Exception::class,
       function() use ($contribution)

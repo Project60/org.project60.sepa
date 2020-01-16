@@ -50,6 +50,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
   protected const MANDATE_STATUS_SENT = 'SENT';
   protected const MANDATE_STATUS_INVALID = 'INVALID';
+  protected const MANDATE_STATUS_COMPLETE = 'COMPLETE';
 
   // TODO: Move the following constants to a better place (or get them dynamically from Civi):
   protected const CONTRIBUTION_STATUS_COMPLETED = '1';
@@ -328,9 +329,9 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   /**
    * Terminate a mandate.
    * @param array $mandate The mandate to terminate.
-   * @param string $endDate A string parsable by strtotime. If it differs from 'now' only the end date is set and the mandate not terminated.
+   * @param string $endDate A string parsable by strtotime. If it differs from 'today' only the end date is set and the mandate not terminated.
    */
-  protected function terminateMandate(array $mandate, string $endDate = 'now'): void
+  protected function terminateMandate(array $mandate, string $endDate = 'today'): void
   {
     $this->callAPISuccess(
       'SepaMandate',
@@ -548,8 +549,6 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
         'contribution_id' => $contributionId,
       ]
     );
-
-    // FIXME: This is wrong for RCUR mandates! The contribution IDs do not match.
 
     $group = $this->getTransactionGroup($groupId);
 

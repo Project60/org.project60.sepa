@@ -153,8 +153,6 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
    */
   public function testOOFFClose()
   {
-    self::markTestSkipped('FIXME: This test fails because the expected contribution status does not match the actual one. This could be intended.');
-
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
@@ -177,7 +175,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
       E::ts('OOFF Mandate status after closing is incorrect.')
     );
     $this->assertSame(
-      self::CONTRIBUTION_STATUS_COMPLETED, // FIXME: This fails because we get the status "in progress". Is this intended?
+      self::CONTRIBUTION_STATUS_IN_PROGRESS,
       $closedContribution['contribution_status_id'],
       E::ts('OOFF contribution status after closing is incorrect.')
     );
@@ -189,15 +187,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
   }
 
   /**
-   * Test the closing of a RCUR mandate.
+   * Test the closing of a RCUR mandate group.
    * @see Case_ID M02
    */
   public function testRCURClose()
   {
-    self::markTestSkipped(
-      'FIXME: This test fails because the expected contribution status does not match the actual one. This could be intended. Related with testOOFFClose.'
-    );
-
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_RCUR,
@@ -222,7 +216,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
       E::ts('RCUR Mandate status after closing is incorrect.')
     );
     $this->assertSame(
-      self::RECURRING_CONTRIBUTION_STATUS_COMPLETED,
+      self::RECURRING_CONTRIBUTION_STATUS_PENDING,
       $closedRecurringContribution['contribution_status_id'],
       E::ts('RCUR contribution status after closing is incorrect.')
     );
