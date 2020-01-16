@@ -193,7 +193,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    */
   public function testBlacklistedIbanFails()
   {
-    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension.');
+    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension. No error thrown in createMandate?');
 
     $this->addIbanToBlacklist(self::TEST_IBAN);
 

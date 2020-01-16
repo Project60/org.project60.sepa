@@ -144,7 +144,9 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testRCURTerminate()
   {
-    self::markTestSkipped('FIXME: Test fails because of a possible error in the Sepa extension. -> Check if intended.');
+    self::markTestSkipped(
+      'FIXME: The reason why this fails could be that the upgrader fpr #548 does not work.'
+    );
 
     $mandate = $this->createMandate(
       [

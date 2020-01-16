@@ -296,6 +296,10 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   protected function createMandate(array $parameters, string $collectionDate = 'now'): array
   {
+    // FIXME: cycle_day must be set! Otherwise we have invalid results depending on the current date.
+    //        To go sure it is the same it must be (today - notice perdiod) (as day of month).
+    //        NOTE: notice period in OOFFs differ from RCURs.
+
     $parameters['contact_id']        = array_key_exists('contact_id', $parameters)        ? $parameters['contact_id']        : $this->createContact();
     $parameters['iban']              = array_key_exists('iban', $parameters)              ? $parameters['iban']              : self::TEST_IBAN;
     $parameters['amount']            = array_key_exists('amount', $parameters)            ? $parameters['amount']            : 8;
