@@ -85,11 +85,15 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
 
     $referenceMap = [];
 
+    // Use the same contact for every mandate to check reference generation per contact:
+    $contactId = $this->createContact();
+
     for ($i = 0; $i <= 101; $i++) // Test more than hundred for a possible counter overflow after 99.
     {
       $mandate = $this->createMandate(
         [
           'type' => self::MANDATE_TYPE_OOFF,
+          'contact_id' => $contactId,
         ]
       );
 
@@ -118,11 +122,15 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
 
     $referenceMap = [];
 
+    // Use the same contact for every mandate to check reference generation per contact:
+    $contactId = $this->createContact();
+
     for ($i = 0; $i <= 101; $i++) // Test more than hundred for a possible counter overflow after 99.
     {
       $mandate = $this->createMandate(
         [
           'type' => self::MANDATE_TYPE_RCUR,
+          'contact_id' => $contactId,
         ]
       );
 
