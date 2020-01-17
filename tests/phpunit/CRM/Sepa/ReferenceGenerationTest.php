@@ -32,6 +32,21 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
 {
+  /* activates the hook to generate static references */
+  protected $static_mandate_reference = NULL;
+
+  public function setUp(): void
+  {
+    parent::setUp();
+    $this->static_mandate_reference = NULL;
+  }
+
+  public function tearDown(): void
+  {
+    $this->static_mandate_reference = NULL;
+    parent::tearDown();
+  }
+
   /**
    * Assert that a given mandate reference is valid. \
    * TODO: Should this be moved to CRM_Sepa_TestBase?
@@ -44,6 +59,19 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
 
     $this->assertThat($actual, $constraint, $message);
   }
+
+  /**
+   * This hook is called before a newly created mandate is written to the DB. \
+   * We implement it to test if it works by setting a custom reference.
+   * @param array $mandate_parameters The parameters that will be used to create the mandate.
+   * @return bool|string Based on op. pre-hooks return a boolean or an error message which aborts the operation.
+   */
+  public function hook_civicrm_create_mandate(array &$mandate_parameters) {
+    if ($this->static_mandate_reference) {
+      $mandate_parameters['reference'] = $this->static_mandate_reference;
+    }
+  }
+
 
   /**
    * Test the integrity of an OOFF mandate reference.
@@ -81,35 +109,34 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
    */
   public function testOOFFMandateReferenceCollision()
   {
-    self::markTestIncomplete('FIXME: Test OOFFMandateReferenceCollision for test case R03 is incomplete.');
-
-    $referenceMap = [];
+    // enable usage of static reference
+    $this->static_mandate_reference = "OOFF-STATIC-TEST-0001";
 
     // Use the same contact for every mandate to check reference generation per contact:
     $contactId = $this->createContact();
 
-    for ($i = 0; $i <= 101; $i++) // Test more than hundred for a possible counter overflow after 99.
-    {
-      $mandate = $this->createMandate(
-        [
-          'type' => self::MANDATE_TYPE_OOFF,
-          'contact_id' => $contactId,
-        ]
-      );
+    // first mandate should work
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+        'contact_id' => $contactId,
+      ]
+    );
 
-      $reference = $mandate['reference'];
-
-      $this->assertValidMandateReference($reference, E::ts("The OOFF mandate reference with index $i is invalid."));
-
-      $referenceIsDuplucate = array_key_exists($reference, $referenceMap);
-
-      $this->assertFalse($referenceIsDuplucate, E::ts("The OOFF mandate reference with index $i is duplicate."));
-
-      $referenceMap[$reference] = 1;
-    }
-
-    // TODO: Add varying financial types.
-    // TODO: Add varying campaigns.
+    // second one should fail
+    $this->assertException(
+      PHPUnit_Framework_Error_Notice::class,
+      function ()
+      {
+        $mandate = $this->createMandate(
+          [
+            'type' => self::MANDATE_TYPE_OOFF,
+            'contact_id' => $contactId,
+          ]
+        );
+      },
+      E::ts('There should be a clashing reference')
+    );
   }
 
   /**
@@ -118,34 +145,33 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
    */
   public function testRCURMandateReferenceCollision()
   {
-    self::markTestIncomplete('FIXME: Test RCURMandateReferenceCollision for test case R04 is incomplete.');
-
-    $referenceMap = [];
+    // enable usage of static reference
+    $this->static_mandate_reference = "RCUR-STATIC-TEST-0001";
 
     // Use the same contact for every mandate to check reference generation per contact:
     $contactId = $this->createContact();
 
-    for ($i = 0; $i <= 101; $i++) // Test more than hundred for a possible counter overflow after 99.
-    {
-      $mandate = $this->createMandate(
-        [
-          'type' => self::MANDATE_TYPE_RCUR,
-          'contact_id' => $contactId,
-        ]
-      );
+    // first mandate should work
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+        'contact_id' => $contactId,
+      ]
+    );
 
-      $reference = $mandate['reference'];
-
-      $this->assertValidMandateReference($reference, E::ts("The RCUR mandate reference with index $i is invalid."));
-
-      $referenceIsDuplucate = array_key_exists($reference, $referenceMap);
-
-      $this->assertFalse($referenceIsDuplucate, E::ts("The RCUR mandate reference with index $i is duplicate."));
-
-      $referenceMap[$reference] = 1;
-    }
-
-    // TODO: Add varying financial types.
-    // TODO: Add varying campaigns.
+    // second one should fail
+    $this->assertException(
+      PHPUnit_Framework_Error_Notice::class,
+      function ()
+      {
+        $mandate = $this->createMandate(
+          [
+            'type' => self::MANDATE_TYPE_RCUR,
+            'contact_id' => $contactId,
+          ]
+        );
+      },
+      E::ts('There should be a clashing reference')
+    );
   }
 }

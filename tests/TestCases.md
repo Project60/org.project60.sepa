@@ -66,8 +66,8 @@ TODO: more complex batching scenarios
 | ------- |:------:|:-------------:|:-------------:| :------------------------------------- |
 | R01     |  PASS  | default       | Default OOFF Reference | Create a OOFF mandate, verify reference integrity (SEPA reference allowed charecters) |
 | R02     |  PASS  | default       | Default RCUR Reference | Create a RCUR mandate, verify reference integrity (SEPA reference allowed charecters) |
-| R03     |  PARTLY  | default       | Multiple OOFF Reference | Create 101 OOFF mandates with varying financial types and campaigns, verify reference integrity (SEPA reference allowed charecters), detect collisions |
-| R04     |  PARTLY  | default       | Multiple RCUR Reference | Create 101 RCUR mandates with varying financial types and campaigns, verify reference integrity (SEPA reference allowed charecters), detect collisions |
+| R03     |  PASS  | default       | Clashing OOFF Reference | Use hook to create OOFF clashing references and detect collision |
+| R04     |  PASS  | default       | Clashing RCUR Reference | Use hook to create RCUR clashing references and detect collision |
 | R05     |  TODO  | change creditor prefix | Default OOFF Reference | Create a OOFF mandate, verify reference integrity (SEPA reference allowed charecters) |
 | R06     |  TODO  | change creditor prefix | Default RCUR Reference | Create a RCUR mandate, verify reference integrity (SEPA reference allowed charecters) |
 
