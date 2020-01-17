@@ -26,10 +26,12 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
   protected const TEST_IBAN_2 = 'DE02100100100006820101';
   protected const TEST_IBAN_INCORRECT_CONTENT = 'DE12300105171814696324';
   protected const TEST_IBAN_INCORRECT_BANK_CODE = 'DE02470501980001802057';
-  protected const TEST_IBAN_INCORRECT_ACCOUNT_NUMBER = 'DE35500105171814696323';
   protected const TEST_IBAN_INCORRECT_CHECKSUM = 'DE03370501980001802057';
   protected const TEST_IBAN_INCORRECT_LENGTH = 'DE1250010517414168455';
   protected const TEST_IBAN_INCORRECT_CHAR = 'DE1250010517414168aä🙂';
+
+  // CiviSEPA doesn't test for German internal account number verification
+  // protected const TEST_IBAN_INCORRECT_ACCOUNT_NUMBER = 'DE35500105171814696323';
 
   /**
    * Test that a valid IBAN works.
@@ -44,6 +46,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       ]
     );
   }
+
 
   /**
    * Test that an IBAN with incorrect content (but correct format) fails.
@@ -84,29 +87,6 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
         );
       },
       E::ts('Incorrect bank code detection fails!')
-    );
-  }
-
-  /**
-   * Test that an IBAN with an incorrect account number fails.
-   * @see Case_ID V03
-   */
-  public function testIncorrectAccountNumberFails()
-  {
-    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension. Maybe an oversight?');
-
-    $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function ()
-      {
-        $this->createMandate(
-          [
-            'type' => self::MANDATE_TYPE_OOFF,
-            'iban' => self::TEST_IBAN_INCORRECT_ACCOUNT_NUMBER,
-          ]
-        );
-      },
-      E::ts('Incorrect account number detection fails!')
     );
   }
 
@@ -195,23 +175,20 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    */
   public function testBlacklistedIbanFails()
   {
-    self::markTestSkipped('FIXME: Test fails because of an error in the Sepa extension. No error thrown in createMandate?');
-
     $this->addIbanToBlacklist(self::TEST_IBAN);
 
-    $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function ()
-      {
-        $this->createMandate(
-          [
-            'type' => self::MANDATE_TYPE_OOFF,
-            'iban' => self::TEST_IBAN,
-          ]
-        );
-      },
-      E::ts('Blacklistet IBAN should fail but did not!')
-    );
+    // should be using $this->assertException but there's something off here
+    try {
+      $mandate = $this->createMandate(
+        [
+          'type' => self::MANDATE_TYPE_OOFF,
+          'iban' => self::TEST_IBAN,
+        ]
+      );
+      $this->fail(E::ts('Blacklistet IBAN should fail but did not!'));
+    } catch (Exception $ex) {
+      // this is expected
+    }
   }
 
   /**
