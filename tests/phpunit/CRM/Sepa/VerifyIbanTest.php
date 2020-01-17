@@ -18,6 +18,8 @@ use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Tests for IBAN verification.
+ *
+ * @group headless
  */
 class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
 {

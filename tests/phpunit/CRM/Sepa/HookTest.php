@@ -18,6 +18,7 @@ use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Tests for hooks.
+ * @group headless
  */
 class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
 {

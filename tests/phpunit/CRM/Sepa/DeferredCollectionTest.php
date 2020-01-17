@@ -23,6 +23,7 @@ use CRM_Sepa_ExtensionUtil as E;
  *        This could be because of an error in the Sepa extension or because something \
  *        is wrong with the tests, either a bug or a wrong assumption regarding the \
  *        correct dates/days to set for it to work.
+ * @group headless
  */
 class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 {

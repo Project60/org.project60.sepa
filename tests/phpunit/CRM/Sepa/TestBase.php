@@ -92,7 +92,6 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
     return \Civi\Test::headless()
         ->installMe(__DIR__)
-        ->install('org.project60.banking')
         ->apply();
   }
 

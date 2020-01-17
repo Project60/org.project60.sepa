@@ -18,6 +18,8 @@ use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Tests for BIC verification.
+ *
+ * @group headless
  */
 class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
 {
