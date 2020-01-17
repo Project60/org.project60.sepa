@@ -111,13 +111,16 @@ class CRM_Sepa_Logic_Settings {
     } else {
       // set the individual override
       $override_string = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name . "_override");
-      $override = json_decode($override_string);
+      $override = json_decode($override_string, TRUE);
+      if (!$override) {
+        $override = [];
+      }
       if ($value==NULL || $value=='') {
         // remove override
-        unset($override->{$creditor_id});
+        unset($override[$creditor_id]);
       } else {
         // add override
-        $override->{$creditor_id} = $value;
+        $override[$creditor_id] = $value;
       }
       CRM_Core_BAO_Setting::setItem(json_encode($override), 'SEPA Direct Debit Preferences', $param_name . "_override");
     }

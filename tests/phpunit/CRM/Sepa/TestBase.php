@@ -141,6 +141,9 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
     // Set the creditor as default:
     CRM_Sepa_Logic_Settings::setSetting('batching_default_creditor', $creditorId);
+    CRM_Sepa_Logic_Settings::setSetting('batching.FRST.notice', '3', $creditorId);
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.notice', '3', $creditorId);
+    CRM_Sepa_Logic_Settings::setSetting('batching.OOFF.notice', '3', $creditorId);
 
     return $creditorId;
   }
@@ -295,16 +298,12 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   protected function createMandate(array $parameters, string $collectionDate = 'now'): array
   {
-    // FIXME: cycle_day must be set! Otherwise we have invalid results depending on the current date.
-    //        To go sure it is the same it must be (today - notice perdiod) (as day of month).
-    //        NOTE: notice period in OOFFs differ from RCURs.
-
+    // default parameters
     $parameters['contact_id']        = array_key_exists('contact_id', $parameters)        ? $parameters['contact_id']        : $this->createContact();
     $parameters['iban']              = array_key_exists('iban', $parameters)              ? $parameters['iban']              : self::TEST_IBAN;
     $parameters['amount']            = array_key_exists('amount', $parameters)            ? $parameters['amount']            : 8;
     $parameters['financial_type_id'] = array_key_exists('financial_type_id', $parameters) ? $parameters['financial_type_id'] : 1;
-
-    $collectionDate = date('Y-m-d', strtotime($collectionDate));
+    $parameters['creditor_id']       = array_key_exists('creditor_id', $parameters)       ? $parameters['creditor_id']       : CRM_Sepa_Logic_Settings::defaultCreditor()->id;
 
     if ($parameters['type'] == self::MANDATE_TYPE_OOFF)
     {
@@ -315,6 +314,10 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
       $parameters['start_date']         = array_key_exists('start_date', $parameters)         ? $parameters['start_date']         : $collectionDate;
       $parameters['frequency_unit']     = array_key_exists('frequency_unit', $parameters)     ? $parameters['frequency_unit']     : 'month';
       $parameters['frequency_interval'] = array_key_exists('frequency_interval', $parameters) ? $parameters['frequency_interval'] : 1;
+
+      // set the cycle day to the next possible collection date
+      $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $parameters['creditor_id']);
+      $parameters['cycle_day'] = date('j', strtotime("now + {$frst_notice_days} days"));
     }
 
     $result = $this->callAPISuccess(
