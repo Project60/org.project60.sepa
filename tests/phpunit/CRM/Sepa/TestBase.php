@@ -269,6 +269,18 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   }
 
   /**
+   * Set a generic configuration/setting
+   * @param string $key The settings key.
+   * @param mixed $value The settings value.
+   */
+  protected function setSepaConfiguration(string $key, $value): void
+  {
+    CRM_Sepa_Logic_Settings::setSetting($key, $value);
+  }
+
+
+
+  /**
    * Add an IBAN to the blacklist.
    * @param string $iban The IBAN.
    */
@@ -323,7 +335,13 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
       // set the cycle day to the next possible collection date
       $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $parameters['creditor_id']);
-      $parameters['cycle_day'] = date('j', strtotime("now + {$frst_notice_days} days"));
+      $earliest_start_date  = date('Y-m-d', strtotime("now + {$frst_notice_days} days"));
+      $requested_start_date = date('Y-m-d', strtotime($collectionDate));
+      if ($requested_start_date < $earliest_start_date) {
+        $parameters['cycle_day'] = date('j', strtotime($earliest_start_date));
+      } else {
+        $parameters['cycle_day'] = date('j', strtotime($requested_start_date));
+      }
     }
 
     $result = $this->callAPISuccess(

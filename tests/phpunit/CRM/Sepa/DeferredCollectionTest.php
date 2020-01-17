@@ -29,7 +29,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 {
   public function setUp(): void
   {
-    $this->setCreditorConfiguration('exclude_weekends', '0');
+    $this->setSepaConfiguration('exclude_weekends', '0');
 
     parent::setUp();
   }
@@ -40,10 +40,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFNotBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '0');
 
-    $batchingDate = 'next Saturday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Saturday + 1 week';
 
     $mandate = $this->createMandate(
     [
@@ -52,7 +51,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
@@ -70,10 +69,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFNotBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '0');
 
-    $batchingDate = 'next Sunday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Sunday + 1 week';
 
     $mandate = $this->createMandate(
     [
@@ -82,7 +80,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
@@ -100,10 +98,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURNotBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '0');
 
-    $batchingDate = 'next Saturday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Saturday + 1 week';
 
     $mandate = $this->createMandate(
     [
@@ -112,8 +109,8 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
-    $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
@@ -131,20 +128,19 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURNotBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '0');
 
-    $batchingDate = 'next Sunday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Sunday + 1 week';
 
     $mandate = $this->createMandate(
-    [
-      'type' => self::MANDATE_TYPE_RCUR,
-    ],
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ],
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
-    $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
@@ -153,7 +149,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $collectionDate = strtotime($collectionDate);
     $dayOfWeek = date('l', $collectionDate);
 
-    $this->assertSame('Sunday', $dayOfWeek, 'Collection date is not a Sunday.');
+    $this->assertSame('Sunday', $dayOfWeek, 'Collection date is not a Saturday.');
   }
 
   /**
@@ -162,12 +158,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '1');
 
-    $this->setCreditorConfiguration('exclude_weekends', '1');
-
-    $batchingDate = 'next Saturday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Saturday + 1 week';
 
     $mandate = $this->createMandate(
     [
@@ -176,7 +169,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
@@ -195,12 +188,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testOOFFBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '1');
 
-    $this->setCreditorConfiguration('exclude_weekends', '1');
-
-    $batchingDate = 'next Sunday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Sunday + 1 week';
 
     $mandate = $this->createMandate(
     [
@@ -209,7 +199,7 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_OOFF, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
@@ -228,12 +218,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURBeingDeferredOnSaturday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '1');
 
-    $this->setCreditorConfiguration('exclude_weekends', '1');
-
-    $batchingDate = 'next Saturday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Saturday + 1 week';
 
     $mandate = $this->createMandate(
     [
@@ -242,8 +229,8 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
-    $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
@@ -262,12 +249,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
    */
   public function testRCURBeingDeferredOnSunday()
   {
-    self::markTestIncomplete('FIXME: The exclude_weekends configuration seems to be ignored completely.');
+    $this->setSepaConfiguration('exclude_weekends', '1');
 
-    $this->setCreditorConfiguration('exclude_weekends', '1');
-
-    $batchingDate = 'next Sunday';
-    $mandateDate = $batchingDate . ' + 2 weeks';
+    $mandateDate = 'next Sunday + 1 week';
 
     $mandate = $this->createMandate(
     [
@@ -276,8 +260,8 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
       $mandateDate
     );
 
-    $this->executeBatching(self::MANDATE_TYPE_FRST, $batchingDate);
-    $this->executeBatching(self::MANDATE_TYPE_RCUR, $batchingDate);
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     $contribution = $this->getLatestContributionForMandate($mandate);
     $transactionGroup = $this->getTransactionGroupForContribution($contribution);
