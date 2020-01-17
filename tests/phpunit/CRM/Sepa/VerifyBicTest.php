@@ -136,53 +136,53 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
     );
   }
 
-//  /**
-//   * Test that a BIC not matching the IBAN but being correct and real fails.
-//   * @see Case_ID V01
-//   */
-//  public function testWrongBicForIbanFails()
-//  {
-//    self::markTestSkipped('FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.');
-//
-//    $this->assertException(
-//      PHPUnit_Framework_ExpectationFailedException::class,
-//      function ()
-//      {
-//        $this->createMandate(
-//          [
-//            'type' => self::MANDATE_TYPE_OOFF,
-//            'iban' => self::TEST_IBAN,
-//            'bic' => self::TEST_BIC_WRONG_FOR_IBAN,
-//          ]
-//        );
-//      },
-//      E::ts('Wrong BIC for IBAN detection fails!')
-//    );
-//  }
-//
-//  /**
-//   * Test that a BIC with correct format but not in use fails.
-//   * @see Case_ID V01
-//   */
-//  public function testNonexistentBic()
-//  {
-//    self::markTestSkipped('FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.');
-//
-//    $this->assertException(
-//      PHPUnit_Framework_ExpectationFailedException::class,
-//      function ()
-//      {
-//        $this->createMandate(
-//          [
-//            'type' => self::MANDATE_TYPE_OOFF,
-//            'iban' => self::TEST_IBAN,
-//            'bic' => self::TEST_BIC_NONEXISTENT,
-//          ]
-//        );
-//      },
-//      E::ts('Nonexistent BIC detection fails!')
-//    );
-//  }
+  /**
+   * Test that a BIC not matching the IBAN but being correct and real fails.
+   * @see Case_ID V01
+   */
+  public function disabled_testWrongBicForIbanFails()
+  {
+    self::markTestSkipped('FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.');
+
+    $this->assertException(
+      PHPUnit_Framework_ExpectationFailedException::class,
+      function ()
+      {
+        $this->createMandate(
+          [
+            'type' => self::MANDATE_TYPE_OOFF,
+            'iban' => self::TEST_IBAN,
+            'bic' => self::TEST_BIC_WRONG_FOR_IBAN,
+          ]
+        );
+      },
+      E::ts('Wrong BIC for IBAN detection fails!')
+    );
+  }
+
+  /**
+   * Test that a BIC with correct format but not in use fails.
+   * @see Case_ID V01
+   */
+  public function disabled_testNonexistentBic()
+  {
+    self::markTestSkipped('FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.');
+
+    $this->assertException(
+      PHPUnit_Framework_ExpectationFailedException::class,
+      function ()
+      {
+        $this->createMandate(
+          [
+            'type' => self::MANDATE_TYPE_OOFF,
+            'iban' => self::TEST_IBAN,
+            'bic' => self::TEST_BIC_NONEXISTENT,
+          ]
+        );
+      },
+      E::ts('Nonexistent BIC detection fails!')
+    );
+  }
 
   /**
    * Test that an incorrect BIC fails.
