@@ -46,8 +46,6 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
    */
   public function testOOFFSpread()
   {
-    self::markTestIncomplete('FIXME: Test OOFFSpread for test case M03 is incomplete.');
-
     for ($n = 0; $n < 21; $n++)
     {
       // For the following collection date generation:
@@ -85,8 +83,6 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
    */
   public function testRCURSpread()
   {
-    self::markTestIncomplete('FIXME: Test RCURSpread for test case M04 is incomplete.');
-
     for ($n = 0; $n < 21; $n++)
     {
       // For the following collection date generation:
