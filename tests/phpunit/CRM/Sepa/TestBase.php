@@ -141,9 +141,15 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
     // Set the creditor as default:
     CRM_Sepa_Logic_Settings::setSetting('batching_default_creditor', $creditorId);
-    CRM_Sepa_Logic_Settings::setSetting('batching.FRST.notice', '3', $creditorId);
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.notice', '3', $creditorId);
-    CRM_Sepa_Logic_Settings::setSetting('batching.OOFF.notice', '3', $creditorId);
+
+    // set some basic config
+    CRM_Sepa_Logic_Settings::setSetting('batching.OOFF.notice',  '2');
+    CRM_Sepa_Logic_Settings::setSetting('batching.OOFF.horizon', '20');
+
+    CRM_Sepa_Logic_Settings::setSetting('batching.FRST.notice',  '2');
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.notice',  '2');
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.horizon', '20');
+    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace',   '1');
 
     return $creditorId;
   }
@@ -413,7 +419,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    * Get the latest contribution for a given mandate.
    * @param array $mandate The mandate to get the contribution for.
    */
-  protected function getLatestContributionForMandate(array $mandate): array
+  protected function getLatestContributionForMandate(array $mandate, $can_be_null = false)
   {
     $mandateType = $mandate['type'];
 
@@ -441,24 +447,33 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
       // If it is an RCUR/FRST mandate, we need to get the contribution from the recurring contribution given in the mandate's entity_id.
       // There could be multiple contributions attached, so we return the latest one.
 
-      $contribution = $this->callAPISuccessGetSingle(
-        'Contribution',
+      $contributions = $this->callAPISuccess(
+        'Contribution', 'get',
         [
           'contribution_recur_id' => $mandate['entity_id'],
           'options' =>
-          [
-            'sort' => 'id DESC',
-            'limit' => 1,
-          ],
+            [
+              'sort' => 'id DESC',
+              'limit' => 1,
+            ],
         ]
       );
+
+      if ($contributions['count'] == 0) {
+        $contribution = NULL;
+      } else {
+        $contribution = reset($contributions['values']);
+      }
+
     }
     else
     {
       throw new Exception('For this mandate type can no contribution be determined.');
     }
 
-    $this->assertNotNull($contribution, E::ts('The contribution for the mandate is null. That should not be possible at this point.'));
+    if (!$can_be_null) {
+      $this->assertNotNull($contribution, E::ts('The contribution for the mandate is null. That should not be possible at this point.'));
+    }
 
     return $contribution;
   }

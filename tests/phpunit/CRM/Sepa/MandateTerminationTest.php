@@ -97,8 +97,6 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testOOFFTerminateAfterClosingFails()
   {
-    self::markTestSkipped('FIXME: Test fails because the Sepa extension does not throw an error.');
-
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
@@ -116,7 +114,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     // After closing the termination must fail:
     $this->assertException(
-      CRM_Core_Exception::class,
+      PHPUnit_Framework_ExpectationFailedException::class,
       function() use ($mandate)
       {
         $this->terminateMandate($mandate);
@@ -144,10 +142,6 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testRCURTerminate()
   {
-    self::markTestSkipped(
-      'FIXME: The reason why this fails could be that the upgrader fpr #548 does not work.'
-    );
-
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_RCUR,
@@ -180,19 +174,11 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_RCUR);
 
     // Assert mandate not being grouped again:
-
     $mandateForRetesting = $this->getMandate($mandate['id']);
-    $contributionForRetesting = $this->getLatestContributionForMandate($mandateForRetesting);
+    $this->assertSame(self::MANDATE_STATUS_COMPLETE, $mandateForRetesting['status']);
 
-    $this->assertSame(self::MANDATE_STATUS_INVALID, $mandateForRetesting['status']);
-    $this->assertException(
-      CRM_Core_Exception::class,
-      function() use ($contributionForRetesting)
-      {
-        $this->getTransactionGroupForContribution($contributionForRetesting);
-      },
-      E::ts('The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.')
-    );
+    $contributionForRetesting = $this->getLatestContributionForMandate($mandateForRetesting, true);
+    $this->assertNULL($contributionForRetesting, E::ts('A new contribution has been created for a terminated mandate.'));
   }
 
   /**
@@ -201,8 +187,6 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    */
   public function testRCURTerminateAfterCollectionDate()
   {
-    self::markTestSkipped('FIXME: This test fails for an unknown reason, must be debugged.');
-
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_RCUR,
@@ -218,7 +202,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->assertNotNull($transactionGroup);
 
     // Terminate after collection date, which is once a month:
-    $endDateString = '+1 month 1 week';
+    $endDateString = '+3 weeks';
     $this->terminateMandate($mandate, $endDateString);
 
     $mandate = $this->getMandate($mandate['id']);
@@ -229,13 +213,15 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     // At this point, the end date must be set but the mandate NOT be terminated yet!
     $this->assertNotSame(self::MANDATE_STATUS_INVALID, $mandate['status'], E::ts('The mandate has been incorrectly terminated.'));
     $this->assertNotNull($transactionGroup, E::ts('The mandate is not in the transaction group anymore but should be.'));
-    $this->assertSameDate($endDate, $contribution['end_date'], E::ts('The end date is not correct.'));
+
+    // verify end date
+    $recurring_contribution = $this->getRecurringContributionForMandate($mandate);
+    $this->assertSameDate($endDate, $recurring_contribution['end_date'], E::ts('The end date is not correct.'));
 
     $this->executeBatching(self::MANDATE_TYPE_FRST, '+1 month');
     $this->executeBatching(self::MANDATE_TYPE_RCUR, '+1 month');
 
     // Assert mandate not being grouped again:
-
     $mandateAfterSecondBatching = $this->getMandate($mandate['id']);
     $contributionAfterSecondBatching = $this->getLatestContributionForMandate($mandateAfterSecondBatching);
     $transactionGroupAfterSecondBatching = $this->getTransactionGroupForContribution($contributionAfterSecondBatching);
