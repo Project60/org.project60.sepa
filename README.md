@@ -28,7 +28,7 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 
 # Automated Testing
 
-[![CircleCI](https://circleci.com/gh/bjendres/org.project60.sepa.svg?style=svg)](https://circleci.com/gh/bjendres/org.project60.sepa)
+[![CircleCI](https://circleci.com/gh/project60/org.project60.sepa.svg?style=svg)](https://circleci.com/gh/project60/org.project60.sepa)
 
 
 # Customisation
