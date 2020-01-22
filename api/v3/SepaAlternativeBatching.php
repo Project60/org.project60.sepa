@@ -134,9 +134,12 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
     }
   }
 
+  // Optional now parameter, will be default if not present:
+  $now = array_key_exists('now', $params) ? $params['now'] : null;
+
   if ($params['type']=='OOFF') {
     foreach ($creditors as $creditor_id) {
-      CRM_Sepa_Logic_Batching::updateOOFF($creditor_id);
+      CRM_Sepa_Logic_Batching::updateOOFF($creditor_id, $now);
     }
 
   } elseif ($params['type']=='RCUR' || $params['type']=='FRST') {
@@ -145,7 +148,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
 
     // then, run the update for recurring mandates
     foreach ($creditors as $creditor_id) {
-      CRM_Sepa_Logic_Batching::updateRCUR($creditor_id, $params['type']);
+      CRM_Sepa_Logic_Batching::updateRCUR($creditor_id, $params['type'], $now);
     }
 
   } else {

@@ -2,7 +2,7 @@ If you are in Europe and use CiviCRM to manage recurring contributions, you need
 
 # SEPA Direct Debit Module
 
-This branch is currently maintained by Xavier Dutoit (TTTP, xavier@tttp.eu) and Björn Endres (SYSTOPIA, endres@systopia.de).
+This branch is currently maintained by Björn Endres (SYSTOPIA, endres@systopia.de).
 
 Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSEPA
 
@@ -23,9 +23,12 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 
 
 # What it can not (yet) do
-* permission management
 * membership payments
 * automatic submission to the banks
+
+# Automated Testing
+
+[![CircleCI](https://circleci.com/gh/project60/org.project60.sepa.svg?style=svg)](https://circleci.com/gh/project60/org.project60.sepa)
 
 
 # Customisation
