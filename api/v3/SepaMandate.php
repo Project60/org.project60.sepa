@@ -492,12 +492,16 @@ function civicrm_api3_sepa_mandate_terminate($params) {
   }
 
   try {
-    CRM_Sepa_BAO_SEPAMandate::terminateMandate(
+    $success = CRM_Sepa_BAO_SEPAMandate::terminateMandate(
       $params['mandate_id'],
-      CRM_Utils_Array::value('end_date', $params, date('Y-m-d')), // use today rather than now
+      date('Y-m-d', strtotime(CRM_Utils_Array::value('end_date', $params, 'today'))),
       CRM_Utils_Array::value('cancel_reason', $params),
       FALSE);
-    return civicrm_api3_create_success();
+    if ($success) {
+      return civicrm_api3_create_success();
+    } else {
+      return civicrm_api3_create_error("Mandate couldn't be closed (again).");
+    }
 
   } catch (Exception $e) {
 
