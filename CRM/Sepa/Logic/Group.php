@@ -178,7 +178,7 @@ class CRM_Sepa_Logic_Group {
         // set these rotten contributions to 'Pending', no 'pay_later'
         CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id=$status_pending, is_pay_later=0 WHERE id=$contribution_id;");
         // now they will get their transactions back when they get set to 'completed' in the next step...
-        CRM_Core_Error::debug_log_message("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
+        Civi::log()->debug("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
       }
     }
 
@@ -201,7 +201,7 @@ class CRM_Sepa_Logic_Group {
           'receive_date'             => date('YmdHis', strtotime($txgroup['collection_date']))));
       if (!empty($result['is_error'])) {
         $error_count += 1;
-        CRM_Core_Error::debug_log_message("org.project60.sepa: ".$result['error_message']);
+        Civi::log()->debug("org.project60.sepa: ".$result['error_message']);
       }
     }
 

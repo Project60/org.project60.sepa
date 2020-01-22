@@ -65,7 +65,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
 
     if (!$contribution_recur_id) {
       // error
-      CRM_Core_Error::debug_log_message("org.project60.sepa: updateNextCollectionDate: couldn't identify recurring contribution.");
+      Civi::log()->debug("org.project60.sepa: updateNextCollectionDate: couldn't identify recurring contribution.");
       return;
     }
 
@@ -133,7 +133,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
       $joins = "LEFT JOIN civicrm_contribution ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id";
       $where = 'civicrm_contribution.id IN (' . implode(',', $contribution_id_list) . ')';
     } else {
-      CRM_Core_Error::debug_log_message("org.project60.sepa: advanceNextCollectionDate failed - no identifier given.");
+      Civi::log()->debug("org.project60.sepa: advanceNextCollectionDate failed - no identifier given.");
       return;
     }
 
@@ -150,7 +150,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
     $info_query = CRM_Core_DAO::executeQuery($info_query_sql);
     if (!$info_query->fetch() || empty($info_query->receive_date) || empty($info_query->cycle_day) || $info_query->cycle_day < 1 || $info_query->cycle_day > 31) {
       // i.e. there's something wrong
-      CRM_Core_Error::debug_log_message('org.project60.sepa: advanceNextCollectionDate failed - contribution data incomplete');
+      Civi::log()->debug('org.project60.sepa: advanceNextCollectionDate failed - contribution data incomplete');
       return;
     }
     $last_collection_date = strtotime($info_query->receive_date);

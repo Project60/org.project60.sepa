@@ -147,7 +147,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
         $this->_creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
       } catch (Exception $ex) {
         // probably no creditor set, or creditor has been deleted - use default
-        CRM_Core_Error::debug_log_message("org.project60.sepa: creditor [{$creditor_id}] not found, SDDNG using default/any.");
+        Civi::log()->debug("org.project60.sepa: creditor [{$creditor_id}] not found, SDDNG using default/any.");
         $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
         $creditors = civicrm_api3('SepaCreditor', 'get', array('id' => $default_creditor_id));
         $this->_creditor = reset($creditors['values']);
@@ -164,7 +164,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
    * @param $contribution_id
    */
   public static function processContribution($contribution_id) {
-    CRM_Core_Error::debug_log_message("createPendingMandate for {$contribution_id}??");
+    Civi::log()->debug("org.project60.sepa: createPendingMandate for {$contribution_id}??");
     if (!self::$_pending_mandate) {
       // nothing pending, nothing to do
       return;
@@ -196,7 +196,7 @@ class CRM_Core_Payment_SDDNG extends CRM_Core_Payment {
     $contribution_id = self::getPendingContributionID();
     if ($contribution_id != $contribution_id) {
       // something's wrong here
-      CRM_Core_Error::debug_log_message("SDD PP workflow error");
+      Civi::log()->debug("org.project60.sepa: SDD PP workflow error");
       return NULL;
     }
 

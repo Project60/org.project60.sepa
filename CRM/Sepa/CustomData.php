@@ -42,7 +42,7 @@ class CRM_Sepa_CustomData {
    */
   protected function log($level, $message) {
     if ($level >= CUSTOM_DATA_HELPER_LOG_LEVEL) {
-      CRM_Core_Error::debug_log_message("CustomDataHelper {$this->version} ({$this->ts_domain}): {$message}");
+      Civi::log()->debug("CustomDataHelper {$this->version} ({$this->ts_domain}): {$message}");
     }
   }
 
@@ -264,7 +264,7 @@ class CRM_Sepa_CustomData {
     }
 
     // then run query
-    CRM_Core_Error::debug_log_message("CustomDataHelper ({$this->ts_domain}): CREATE {$entity_type}: " . json_encode($data));
+    Civi::log()->debug("CustomDataHelper ({$this->ts_domain}): CREATE {$entity_type}: " . json_encode($data));
     return civicrm_api3($entity_type, 'create', $data);
   }
 

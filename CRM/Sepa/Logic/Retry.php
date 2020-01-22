@@ -124,7 +124,6 @@ class CRM_Sepa_Logic_Retry {
       contribution.financial_type_id     AS financial_type_id,
       contribution.campaign_id           AS campaign_id
       ", $params);
-    //CRM_Core_Error::debug_log_message($contribution_query_sql);
     $contributions_raw = CRM_Core_DAO::executeQuery($contribution_query_sql);
     $contributions = array();
     while ($contributions_raw->fetch()) {
@@ -159,7 +158,6 @@ class CRM_Sepa_Logic_Retry {
    * @param $params array see SepaLogic.get_retry_stats API call
    */
   public static function getStats($params) {
-    //CRM_Core_Error::debug_log_message("getStats: " . json_encode($params));
     $stats_query_sql = self::getQuery("
       COUNT(contribution.id)                             AS contribution_count,
       SUM(contribution.total_amount)                     AS total_amount,
@@ -168,9 +166,8 @@ class CRM_Sepa_Logic_Retry {
       GROUP_CONCAT(DISTINCT(mandate.creditor_id))        AS creditor_list,
       GROUP_CONCAT(DISTINCT(ctxg.txgroup_id))            AS txgroup_list,
       GROUP_CONCAT(DISTINCT(contribution.cancel_reason)) AS cancel_reason_list,
-      GROUP_CONCAT(DISTINCT(CONCAT(rcontrib.frequency_interval, rcontrib.frequency_unit))) 
+      GROUP_CONCAT(DISTINCT(CONCAT(rcontrib.frequency_interval, rcontrib.frequency_unit)))
                                                          AS frequencies", $params);
-    //CRM_Core_Error::debug_log_message($stats_query_sql);
     $stats_raw = CRM_Core_DAO::executeQuery($stats_query_sql);
     $stats_raw->fetch();
     $stats = array(
@@ -312,10 +309,10 @@ class CRM_Sepa_Logic_Retry {
     SELECT {$select_clause}
     FROM civicrm_contribution contribution
     LEFT JOIN civicrm_contribution_recur   rcontrib ON rcontrib.id = contribution.contribution_recur_id
-    LEFT JOIN civicrm_contact               contact ON contact.id = contribution.contact_id 
-    LEFT JOIN civicrm_sdd_contribution_txgroup ctxg ON ctxg.contribution_id = contribution.id 
-    LEFT JOIN civicrm_sdd_txgroup               txg ON txg.id = ctxg.txgroup_id 
-    LEFT JOIN civicrm_sdd_mandate           mandate ON mandate.entity_id = contribution.contribution_recur_id 
+    LEFT JOIN civicrm_contact               contact ON contact.id = contribution.contact_id
+    LEFT JOIN civicrm_sdd_contribution_txgroup ctxg ON ctxg.contribution_id = contribution.id
+    LEFT JOIN civicrm_sdd_txgroup               txg ON txg.id = ctxg.txgroup_id
+    LEFT JOIN civicrm_sdd_mandate           mandate ON mandate.entity_id = contribution.contribution_recur_id
                                                     AND mandate.entity_table = 'civicrm_contribution_recur'
     WHERE {$where_clause_sql}";
     return $stats_query_sql;

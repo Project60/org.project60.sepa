@@ -89,7 +89,7 @@ class CRM_Utils_SepaSafeLock {
   public static function releaseLock($name) {
     if (self::$_acquired_lock == NULL) {
       // weird, we don't own this lock...
-      CRM_Core_Error::debug_log_message("org.project60.sepa: This process cannot release lock '$name', it has not been acquired.");
+      Civi::log()->debug("org.project60.sepa: This process cannot release lock '$name', it has not been acquired.");
       throw new Exception("This process cannot release lock '$name', it has not been acquired.");
 
     } elseif (self::$_acquired_lock->getName() == $name) {
@@ -99,7 +99,7 @@ class CRM_Utils_SepaSafeLock {
     } else {
       // somebody is trying to release ANOTHER LOCK
       $lock_name = $self::$_acquired_lock->getName();
-      CRM_Core_Error::debug_log_message("org.project60.sepa: This process cannot realease lock '$name', it still owns lock '$lock_name'.");
+      Civi::log()->debug("org.project60.sepa: This process cannot realease lock '$name', it still owns lock '$lock_name'.");
       throw new Exception("This process cannot realease lock '$name', it still owns lock '$lock_name'.");
     }
   }
@@ -122,7 +122,7 @@ class CRM_Utils_SepaSafeLock {
 
     } else {
       // lock has already been released!
-      CRM_Core_Error::debug_log_message("org.project60.sepa: This process cannot realease lock '$name', it has already been released before.");
+      Civi::log()->debug("org.project60.sepa: This process cannot realease lock '$name', it has already been released before.");
       throw new Exception("This process cannot realease lock '$name', it has already been released before.");
     }
   }
