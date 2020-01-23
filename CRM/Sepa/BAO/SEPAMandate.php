@@ -80,18 +80,18 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if (!empty($params['iban'])) {
       $params['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($params['iban'], $creditor['creditor_type']);
       $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type']);
-      if ($iban_error) throw new CRM_Exception($iban_error . ': ' . $params['iban']);
+      if ($iban_error) throw new CRM_Core_Exception($iban_error . ': ' . $params['iban']);
     }
 
     if (!empty($params['bic'])) {
       $params['bic'] = CRM_Sepa_Logic_Verification::formatBIC($params['bic'], $creditor['creditor_type']);
       $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type']);
-      if ($bic_error) throw new CRM_Exception($bic_error . ':' . $params['bic']);
+      if ($bic_error) throw new CRM_Core_Exception($bic_error . ':' . $params['bic']);
     }
 
     if (isset($params['reference']) && strlen($params['reference']) > 0) {
       $reference_error = CRM_Sepa_Logic_Verification::verifyReference($params['reference'], $creditor['creditor_type']);
-      if ($reference_error) throw new CRM_Exception($reference_error . ':' . $params['reference']);
+      if ($reference_error) throw new CRM_Core_Exception($reference_error . ':' . $params['reference']);
     }
 
     // create the DAO object
