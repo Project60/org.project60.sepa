@@ -16,7 +16,6 @@
 
 namespace Civi\Sepa\ActionProvider\Action;
 
-use \Civi\ActionProvider\Action\AbstractAction;
 use \Civi\ActionProvider\Parameter\ParameterBagInterface;
 use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;

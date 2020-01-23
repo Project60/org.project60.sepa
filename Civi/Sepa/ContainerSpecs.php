@@ -14,18 +14,17 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-namespace Civi\Sepa\ActionProvider\Action;
+namespace Civi\Sepa;
 
-use Civi\ActionProvider\Action\AbstractAction;
 use CRM_Sepa_ExtensionUtil as E;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SepaActions implements CompilerPassInterface {
+class ContainerSpecs implements CompilerPassInterface {
 
   /**
-   * Register this one action: XcmGetOrCreate
+   * Register SEPA Actions
    */
   public function process(ContainerBuilder $container) {
     if (!$container->hasDefinition('action_provider')) {
@@ -33,10 +32,13 @@ class SepaActions implements CompilerPassInterface {
     }
     $typeFactoryDefinition = $container->getDefinition('action_provider');
     $typeFactoryDefinition->addMethodCall('addAction', ['SepaMandateOOFF', 'Civi\Sepa\ActionProvider\Action\CreateOneOffMandate', E::ts('Create SEPA Mandate (One-Off)'), [
-        AbstractAction::SINGLE_CONTACT_ACTION_TAG,
+        \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
     ]]);
     $typeFactoryDefinition->addMethodCall('addAction', ['SepaMandateRCUR', 'Civi\Sepa\ActionProvider\Action\CreateRecurringMandate', E::ts('Create SEPA Mandate (Recurring)'), [
-        AbstractAction::SINGLE_CONTACT_ACTION_TAG,
+        \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
+    ]]);
+    $typeFactoryDefinition->addMethodCall('addAction', ['FindMandate', 'Civi\Sepa\ActionProvider\Action\FindMandate', E::ts('Find SEPA Mandate'), [
+        \Civi\ActionProvider\Action\AbstractAction::DATA_RETRIEVAL_TAG,
     ]]);
   }
 }
