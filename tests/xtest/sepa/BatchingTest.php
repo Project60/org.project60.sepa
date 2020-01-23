@@ -386,21 +386,21 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
   public function testFRSTtoRCURswitch() {
     // select cycle day so that the submission would be due today
     $frst_payment_instrument = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'FRST');
-    $this->assertNotEmpty($frst_payment_instrument, "Payment Instrument FRST not found!");    
+    $this->assertNotEmpty($frst_payment_instrument, "Payment Instrument FRST not found!");
 
-    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
+    $frst_notice = CRM_Sepa_Logic_Settings::getGenericSetting('batching_FRST_notice');
     $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
     CRM_Core_BAO_Setting::setItem($frst_notice, 'SEPA Direct Debit Preferences', 'batching_RCUR_notice');
 
-    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+    $rcur_notice = CRM_Sepa_Logic_Settings::getGenericSetting('batching_RCUR_notice');
     $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
     $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
-    
+
     $cycle_day = date("d", strtotime("+$frst_notice days"));
 
     // also, horizon mustn't be big enough to create another contribution
     CRM_Core_BAO_Setting::setItem(27, 'SEPA Direct Debit Preferences', 'batching_RCUR_horizon');
-    $rcur_horizon = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_horizon');
+    $rcur_horizon = CRM_Sepa_Logic_Settings::getGenericSetting('batching_RCUR_horizon');
 
     // 1) create a FRST mandate, due for collection right now
     $mandate = $this->createMandate(array('type'=>'RCUR', 'status'=>'FRST'), array('cycle_day' => $cycle_day));
@@ -465,10 +465,10 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
    */
   public function testLostGroup() {
     // 1) create a payment and select cycle day so that the submission would be due today
-    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
+    $frst_notice = CRM_Sepa_Logic_Settings::getGenericSetting('batching_FRST_notice');
     $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
     CRM_Core_BAO_Setting::setItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice', $frst_notice);
-    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+    $rcur_notice = CRM_Sepa_Logic_Settings::getGenericSetting('batching_RCUR_notice');
     $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
     $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
     $cycle_day = date("d", strtotime("+$frst_notice days"));
@@ -493,7 +493,7 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
 
     // 4) set the grace period to 7 and virtually execute batching for the day after tomorrow
     //      => the group should be retained
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace', '7');
+    CRM_Sepa_Logic_Settings::setSetting(7, 'batching.RCUR.grace');
     $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $mandate['creditor_id']);
     $this->assertEquals(7, $grace_period, "Setting the grace period failed!");
     CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST', date('Y-m-d', strtotime("+3 day")));
@@ -502,7 +502,7 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
 
     // 5) set the grace period to 0 and virtually execute batching for the day after tomorrow
     //      => the group should be deleted
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace', '0');
+    CRM_Sepa_Logic_Settings::setSetting(0, 'batching.RCUR.grace');
     $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.grace", $mandate['creditor_id']);
     $this->assertEquals(0, $grace_period, "Setting the grace period failed!");
     CRM_Sepa_Logic_Batching::updateRCUR($mandate['creditor_id'], 'FRST', date('Y-m-d', strtotime("+3 day")));
@@ -521,10 +521,10 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
     $this->assertDBQuery(NULL, 'delete from civicrm_sdd_txgroup;', array());
     $this->assertDBQuery(NULL, 'delete from civicrm_contribution;', array());
 
-    $frst_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_FRST_notice');
+    $frst_notice = CRM_Sepa_Logic_Settings::getGenericSetting('batching_FRST_notice');
     $this->assertNotEmpty($frst_notice, "No FRST notice period specified!");
     CRM_Core_BAO_Setting::setItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice', $frst_notice);
-    $rcur_notice = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'batching_RCUR_notice');
+    $rcur_notice = CRM_Sepa_Logic_Settings::getGenericSetting('batching_RCUR_notice');
     $this->assertNotEmpty($rcur_notice, "No RCUR notice period specified!");
     $this->assertEquals($frst_notice, $rcur_notice, "Notice periods should be the same.");
     $cycle_day = date("d", strtotime("+$frst_notice days"));
@@ -567,8 +567,8 @@ class SEPA_BatchingTest extends SEPA_BaseTestCase {
     $this->assertDBQuery(NULL, 'delete from civicrm_contribution;', array());
     $this->assertDBQuery(NULL, 'delete from civicrm_sdd_mandate;', array());
     $rcur_notice = 6;
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.notice', $rcur_notice);
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace', 2 * $rcur_notice);
+    CRM_Sepa_Logic_Settings::setSetting($rcur_notice, 'batching.RCUR.notice');
+    CRM_Sepa_Logic_Settings::setSetting(2 * $rcur_notice, 'batching.RCUR.grace');
     $contactId = $this->individualCreate();
     $collection_date = strtotime("+1 days");
     $deferred_collection_date = strtotime("+$rcur_notice days");

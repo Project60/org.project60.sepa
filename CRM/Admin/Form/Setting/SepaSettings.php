@@ -34,7 +34,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
                          array('batching.RCUR.notice',   ts('Recurring&nbsp;notice&nbsp;days (follow-up)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('batching.FRST.notice',   ts('Recurring&nbsp;notice&nbsp;days (initial)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('batching.UPDATE.lock.timeout', ts('Update lock timeout', array('domain' => 'org.project60.sepa')), array('size' => 2)),
-                         array('custom_txmsg', ts('Transaction Message', array('domain' => 'org.project60.sepa')), array('size' => 60, 'placeholder' => CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'custom_txmsg'))));
+                         array('custom_txmsg', ts('Transaction Message', array('domain' => 'org.project60.sepa')), array('size' => 60, 'placeholder' => CRM_Sepa_Logic_Settings::getGenericSetting('custom_txmsg'))));
 
       $this->custom_fields = array(
                          array('custom_cycledays',       ts('Cycle Day(s)', array('domain' => 'org.project60.sepa')), array('size' => 6)),
@@ -60,7 +60,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $fields = array();
         // get all default values (they are set once when the extension is being enabled)
         foreach ($this->config_fields as $key => $value) {
-            $fields[$this->domainToString($value[0])] = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($value[0]));
+            $fields[$this->domainToString($value[0])] = CRM_Sepa_Logic_Settings::getGenericSetting($this->domainToString($value[0]));
         }
         return $fields;
     }
@@ -129,14 +129,14 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
           'PSP'  => ts('PSP', array('domain' => 'org.project60.sepa')));
 
         // look up some values
-        $async_batch = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
-        $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
-        $no_draftxml = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_no_draft_xml');
-        $excld_we = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
-        $hide_bic = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_bic');
-        $hide_bil = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_hide_billing');
-        $bffrdays = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_buffer_days');
-        $mendForm = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_improve_frequency');
+        $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
+        $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
+        $no_draftxml = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_no_draft_xml');
+        $excld_we = CRM_Sepa_Logic_Settings::getGenericSetting('exclude_weekends');
+        $hide_bic = CRM_Sepa_Logic_Settings::getGenericSetting('pp_hide_bic');
+        $hide_bil = CRM_Sepa_Logic_Settings::getGenericSetting('pp_hide_billing');
+        $bffrdays = CRM_Sepa_Logic_Settings::getGenericSetting('pp_buffer_days');
+        $mendForm = CRM_Sepa_Logic_Settings::getGenericSetting('pp_improve_frequency');
 
         // add creditor form elements
         $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact", array('domain' => 'org.project60.sepa')));
@@ -171,7 +171,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
             } else {
               $properties = array();
             }
-            $properties['placeholder'] = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $this->domainToString($this->config_fields[$index][0]));
+            $properties['placeholder'] = CRM_Sepa_Logic_Settings::getGenericSetting($this->domainToString($this->config_fields[$index][0]));
             $this->addElement('text', $this->domainToString($value[0]), $value[1], $properties);
             $elementName = $this->domainToString($value[0]);
             if (!in_array($elementName, array('custom_cycledays', 'custom_txmsg'))) {
@@ -218,26 +218,26 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // save field values
         foreach ($this->config_fields as $key => $value) {
             if(array_key_exists($this->domainToString($value[0]), $values)) {
-                CRM_Core_BAO_Setting::setItem($values[$this->domainToString($value[0])], 'SEPA Direct Debit Preferences', $this->domainToString($value[0]));
+              CRM_Sepa_Logic_Settings::setSetting($values[$this->domainToString($value[0])], $this->domainToString($value[0]));
             }
         }
 
         // save general config options:
         // default creditor
-        CRM_Core_BAO_Setting::setItem($values['batching_default_creditor'], 'SEPA Direct Debit Preferences', 'batching_default_creditor');
+        CRM_Sepa_Logic_Settings::setSetting($values['batching_default_creditor'], 'batching_default_creditor');
 
         // mandate modification
         $allow_mandate_modification = empty($values['allow_mandate_modification'])?'0':'1';
-        CRM_Core_BAO_Setting::setItem($allow_mandate_modification, 'SEPA Direct Debit Preferences', 'allow_mandate_modification');
+        CRM_Sepa_Logic_Settings::setSetting($allow_mandate_modification, 'allow_mandate_modification');
 
-        CRM_Core_BAO_Setting::setItem((isset($values['exclude_weekends'])     ? "1" : "0"), 'SEPA Direct Debit Preferences', 'exclude_weekends');
-        CRM_Core_BAO_Setting::setItem((isset($values['sdd_async_batching'])   ? "1" : "0"), 'SEPA Direct Debit Preferences', 'sdd_async_batching');
-        CRM_Core_BAO_Setting::setItem((isset($values['sdd_skip_closed'])      ? "1" : "0"), 'SEPA Direct Debit Preferences', 'sdd_skip_closed');
-        CRM_Core_BAO_Setting::setItem((isset($values['sdd_no_draft_xml'])     ? "1" : "0"), 'SEPA Direct Debit Preferences', 'sdd_no_draft_xml');
-        CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_bic'])          ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_bic');
-        CRM_Core_BAO_Setting::setItem((isset($values['pp_hide_billing'])      ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_hide_billing');
-        CRM_Core_BAO_Setting::setItem((isset($values['pp_improve_frequency']) ? "1" : "0"), 'SEPA Direct Debit Preferences', 'pp_improve_frequency');
-        CRM_Core_BAO_Setting::setItem((isset($values['pp_buffer_days'])       ? (int) $values['pp_buffer_days'] : "0"), 'SEPA Direct Debit Preferences', 'pp_buffer_days');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['exclude_weekends'])     ? "1" : "0"), 'exclude_weekends');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_async_batching'])   ? "1" : "0"), 'sdd_async_batching');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_skip_closed'])      ? "1" : "0"), 'sdd_skip_closed');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_no_draft_xml'])     ? "1" : "0"), 'sdd_no_draft_xml');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_hide_bic'])          ? "1" : "0"), 'pp_hide_bic');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_hide_billing'])      ? "1" : "0"), 'pp_hide_billing');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_improve_frequency']) ? "1" : "0"), 'pp_improve_frequency');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_buffer_days'])       ? (int) $values['pp_buffer_days'] : "0"), 'pp_buffer_days');
 
         $session = CRM_Core_Session::singleton();
         $session->setStatus(ts("Settings successfully saved", array('domain' => 'org.project60.sepa')));

@@ -34,7 +34,7 @@ class CRM_Sepa_Logic_Group {
     }
 
     // step 1: gather data
-    $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
+    $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
     if ($skip_closed) {
       $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');

@@ -653,7 +653,7 @@ class CRM_Sepa_Logic_Batching {
    */
   public static function deferCollectionDate(&$collection_date, $creditor_id) {
     // first check if the weekends are to be excluded
-    $exclude_weekends = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'exclude_weekends');
+    $exclude_weekends = CRM_Sepa_Logic_Settings::getGenericSetting('exclude_weekends');
     if ($exclude_weekends) {
       // skip (western) week ends, if the option is activated.
       $day_of_week = date('N', strtotime($collection_date));

@@ -140,16 +140,16 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     );
 
     // Set the creditor as default:
-    CRM_Sepa_Logic_Settings::setSetting('batching_default_creditor', $creditorId);
+    CRM_Sepa_Logic_Settings::setGenericSetting($creditorId, 'batching_default_creditor');
 
     // set some basic config
-    CRM_Sepa_Logic_Settings::setSetting('batching.OOFF.notice',  '2');
-    CRM_Sepa_Logic_Settings::setSetting('batching.OOFF.horizon', '20');
+    CRM_Sepa_Logic_Settings::setGenericSetting('2',  'batching.OOFF.notice');
+    CRM_Sepa_Logic_Settings::setGenericSetting('20', 'batching.OOFF.horizon');
 
-    CRM_Sepa_Logic_Settings::setSetting('batching.FRST.notice',  '2');
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.notice',  '2');
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.horizon', '20');
-    CRM_Sepa_Logic_Settings::setSetting('batching.RCUR.grace',   '1');
+    CRM_Sepa_Logic_Settings::setGenericSetting('2',  'batching.FRST.notice');
+    CRM_Sepa_Logic_Settings::setGenericSetting('2',  'batching.RCUR.notice');
+    CRM_Sepa_Logic_Settings::setGenericSetting('20', 'batching.RCUR.horizon');
+    CRM_Sepa_Logic_Settings::setGenericSetting('1',  'batching.RCUR.grace');
 
     return $creditorId;
   }
@@ -275,7 +275,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   protected function setSepaConfiguration(string $key, $value): void
   {
-    CRM_Sepa_Logic_Settings::setSetting($key, $value);
+    CRM_Sepa_Logic_Settings::setSetting($value, $key);
   }
 
 
