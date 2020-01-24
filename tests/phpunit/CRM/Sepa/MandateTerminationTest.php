@@ -82,7 +82,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     $this->assertSame(self::MANDATE_STATUS_INVALID, $mandateForRetesting['status']);
     $this->assertException(
-      CRM_Core_Exception::class,
+      Exception::class,
       function() use ($contributionForRetesting)
       {
         $this->getTransactionGroupForContribution($contributionForRetesting);
