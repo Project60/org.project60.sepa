@@ -21,30 +21,85 @@
 class CRM_Sepa_Logic_Settings {
 
   /**
+   * Get a generic configuration setting, not related to any of the creditors
+   *
+   * @param $setting_name string setting name
+   * @return mixed value
+   */
+  public static function getGenericSetting($setting_name) {
+    $setting_name = str_replace('.', '_', $setting_name);
+    return Civi::settings()->get($setting_name);
+  }
+
+  /**
+   * Get a generic configuration setting, not related to any of the creditors
+   *
+   * @param $value        mixed  new value
+   * @param $setting_name string setting name
+   */
+  public static function setGenericSetting($value, $setting_name) {
+    $setting_name = str_replace('.', '_', $setting_name);
+    Civi::settings()->set($setting_name, $value);
+  }
+
+  /**
    * Get a SEPA setting.
-   * We have extended the system used in CRM_Core_BAO_Setting by
-   * an override mechanism, so creditors can indivudally have
+   * We have extended the system used by CiviCRM by
+   * an override mechanism, so creditors can individually have
    * different values than the default
    *
-   * @return string
+   * @param $param_name  string   the parameter name. note that '.' will be replaced with '_'
+   * @param $creditor_id int|null creditor context
+   * @return mixed|null the current value
    */
-  static function getSetting($param_name, $creditor_id=NULL) {
+  public static function getSetting($param_name, $creditor_id = NULL) {
     $param_name = str_replace('.', '_', $param_name);
-    $override = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name . "_override");
-    $stdvalue = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name);
+    $stdvalue = Civi::settings()->get($param_name);
+    $override = Civi::settings()->get("{$param_name}_override");
     $exception = array('cycledays','pp_buffer_days');
     if (($override == NULL && $stdvalue == NULL) || ($stdvalue == NULL && !in_array($param_name, $exception))) {
-        CRM_Core_Error::debug_log_message("org.project60.sepa: get_parameter for unknown key: $param_name");
-        return NULL;
-    }else if ($override == NULL) {
+      Civi::log()->debug("org.project60.sepa: get_parameter for unknown key: $param_name");
+      return NULL;
+    } else if ($override == NULL) {
       return $stdvalue;
-    }else{
+    } else {
       $override = json_decode($override);
       if (isset($override->{$creditor_id})) {
         return $override->{$creditor_id};
       } else {
         return $stdvalue;
       }
+    }
+  }
+
+  /**
+   * Set SEPA a setting.
+   * We have extended the system used by CiviCRM by
+   * an override mechanism, so creditors can individually have
+   * different values than the default
+   *
+   * @param string
+   */
+  static function setSetting($value, $param_name, $creditor_id=NULL) {
+    $param_name = str_replace('.', '_', $param_name);
+    if (empty($creditor_id)) {
+      // set the general setting
+      Civi::settings()->set($param_name, $value);
+    } else {
+      // set the individual override
+      $override_string = CRM_Sepa_Logic_Settings::getGenericSetting("{$param_name}_override");
+      $override = json_decode($override_string, TRUE);
+      if (!$override) {
+        $override = [];
+      }
+      if ($value==NULL || $value=='') {
+        // remove override
+        unset($override[$creditor_id]);
+      } else {
+        // add override
+        $override[$creditor_id] = $value;
+      }
+      Civi::settings()->set("{$param_name}_override", json_encode($override));
     }
   }
 
@@ -92,38 +147,6 @@ class CRM_Sepa_Logic_Settings {
       $result[$item] = $item;
     }
     return $result;
-  }
-
-
-  /**
-   * Set SEPA a setting.
-   * We have extended the system used in CRM_Core_BAO_Setting by
-   * an override mechanism, so creditors can indivudally have
-   * different values than the default
-   *
-   * @param string
-   */
-  static function setSetting($param_name, $value, $creditor_id=NULL) {
-    $param_name = str_replace('.', '_', $param_name);
-    if (empty($creditor_id)) {
-      // set the general setting
-      CRM_Core_BAO_Setting::setItem($value, 'SEPA Direct Debit Preferences', $param_name);
-    } else {
-      // set the individual override
-      $override_string = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', $param_name . "_override");
-      $override = json_decode($override_string, TRUE);
-      if (!$override) {
-        $override = [];
-      }
-      if ($value==NULL || $value=='') {
-        // remove override
-        unset($override[$creditor_id]);
-      } else {
-        // add override
-        $override[$creditor_id] = $value;
-      }
-      CRM_Core_BAO_Setting::setItem(json_encode($override), 'SEPA Direct Debit Preferences', $param_name . "_override");
-    }
   }
 
   /**
@@ -237,7 +260,7 @@ class CRM_Sepa_Logic_Settings {
    */
   public static function acquireAsyncLock($name, $timeout, $renew = FALSE) {
     $now = time();
-    $locks = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    $locks = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching_lock');
     if (!is_array($locks)) {
       // data invalid -> reset
       $locks = array();
@@ -251,7 +274,7 @@ class CRM_Sepa_Logic_Settings {
     }
     // NO (VALID) LOCK
     $locks[$name] = $now + $timeout;
-    CRM_Core_BAO_Setting::setItem($locks, 'SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    CRM_Sepa_Logic_Settings::setSetting($locks, 'sdd_async_batching_lock');
     return TRUE;
   }
 
@@ -277,13 +300,13 @@ class CRM_Sepa_Logic_Settings {
    * @return TRUE if lock could be acquired
    */
   public static function releaseAsyncLock($name) {
-    $locks = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    $locks = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching_lock');
     if (!is_array($locks)) {
       // data invalid -> reset
       $locks = array();
     }
     $locks[$name] = 0;
-    CRM_Core_BAO_Setting::setItem($locks, 'SEPA Direct Debit Preferences', 'sdd_async_batching_lock');
+    CRM_Sepa_Logic_Settings::setSetting($locks, 'sdd_async_batching_lock');
   }
 
 }

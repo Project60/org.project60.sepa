@@ -79,7 +79,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
     // load creditor
     $creditor_id = (int) CRM_Utils_Array::value('user_name', $payment_processor);
     if (!$creditor_id) {
-      CRM_Core_Error::debug_log_message("SDD ERROR: No creditor found for PaymentProcessor [{$payment_processor['id']}].");
+      Civi::log()->debug("org.project60.sepa: SDD ERROR: No creditor found for PaymentProcessor [{$payment_processor['id']}].");
       return;
     }
     $creditor = civicrm_api3('SepaCreditor', 'get', array('id' => $creditor_id));
@@ -155,7 +155,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
     } catch (Exception $ex) {
       // that's not good... but we can't leave it like this...
       $error_message = $ex->getMessage();
-      CRM_Core_Error::debug_log_message("SDD reset contribution via API failed ('{$error_message}'), using SQL...");
+      Civi::log()->debug("org.project60.sepa: SDD reset contribution via API failed ('{$error_message}'), using SQL...");
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id = %1, payment_instrument_id = %2 WHERE id = %3;", array(
           1 => array($status_pending,        'Integer'),
           2 => array($payment_instrument_id, 'Integer'),
@@ -165,8 +165,8 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
     // delete all finacial transactions
     CRM_Core_DAO::executeQuery("
       DELETE FROM civicrm_financial_trxn
-      WHERE id IN (SELECT etx.financial_trxn_id 
-                   FROM civicrm_entity_financial_trxn etx 
+      WHERE id IN (SELECT etx.financial_trxn_id
+                   FROM civicrm_entity_financial_trxn etx
                    WHERE etx.entity_id = {$contribution_id}
                      AND etx.entity_table = 'civicrm_contribution');");
   }
@@ -214,7 +214,7 @@ class CRM_Core_Payment_SDDNGPostProcessor implements API_Wrapper {
     } catch (Exception $ex) {
       // that's not good... but we can't leave it like this...
       $error_message = $ex->getMessage();
-      CRM_Core_Error::debug_log_message("SDD reset contribution via API failed ('{$error_message}'), using SQL...");
+      Civi::log()->debug("org.project60.sepa: SDD reset contribution via API failed ('{$error_message}'), using SQL...");
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution_recur SET contribution_status_id = %1, payment_instrument_id = %2 WHERE id = %3;", array(
           1 => array($status_pending,        'Integer'),
           2 => array($payment_instrument_id, 'Integer'),

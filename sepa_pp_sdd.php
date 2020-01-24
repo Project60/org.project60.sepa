@@ -53,9 +53,10 @@ function sepa_pp_buildForm ( $formName, &$form ) {
         $pp_creditor      = NULL;
         $test_pp_creditor = NULL;
 
+        // FIXME: refactor!!
         if (!empty($pp_id)) {
-          $creditor_id      = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp'.$pp_id);
-          $test_creditor_id = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit PP', 'pp_test'.$pp_id);
+          $creditor_id      = CRM_Sepa_Logic_Settings::getGenericSetting("pp{$pp_id}");
+          $test_creditor_id = CRM_Sepa_Logic_Settings::getGenericSetting("pp_test{$pp_id}");
         }
 
         // load settings from creditor
@@ -95,7 +96,7 @@ function sepa_pp_buildForm ( $formName, &$form ) {
 
 
 	} elseif ($formName == "CRM_Contribute_Form_Contribution_Main") {						  // PAYMENT PROCESS MAIN PAGE
-		$mendForm = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'pp_improve_frequency');
+		$mendForm = CRM_Sepa_Logic_Settings::getGenericSetting('pp_improve_frequency');
 		if ($mendForm) {
 			// inject improved form logic
 			CRM_Core_Region::instance('page-body')->add(array(
@@ -272,7 +273,7 @@ function sepa_pp_enable() {
 		);
 		$result = civicrm_api3('PaymentProcessorType', 'create', $payment_processor_data);
     $sdd_pp_type_ids[$result['id']] = 'Payment_SDD';
-    CRM_Core_Error::debug_log_message("org.project60.sepa_dd: created payment processor with name PP_SDD_PROCESSOR_TYPE");
+    Civi::log()->debug("org.project60.sepa_dd: created payment processor with name PP_SDD_PROCESSOR_TYPE");
 
 	} else {
 		// already exists => enable if not enabled
@@ -305,7 +306,7 @@ function sepa_pp_enable() {
     );
     $result = civicrm_api3('PaymentProcessorType', 'create', $payment_processor_data);
     $sdd_pp_type_ids[$result['id']] = 'Payment_SDDNG';
-    CRM_Core_Error::debug_log_message("org.project60.sepa_dd: created payment processor with name 'SEPA_Direct_Debit_NG'");
+    Civi::log()->debug("org.project60.sepa_dd: created payment processor with name 'SEPA_Direct_Debit_NG'");
 
   } else {
     // already exists => enable if not enabled

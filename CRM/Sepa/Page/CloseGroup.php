@@ -54,7 +54,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
               $this->assign('is_test_group', $isTestGroup);
 
               // check if this is allowed
-              $no_draftxml = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_no_draft_xml');
+              $no_draftxml = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_no_draft_xml');
               $this->assign('allow_xml', !$no_draftxml);
 
               if ($_REQUEST['status'] == "") {
@@ -84,10 +84,10 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
               if ($_REQUEST['status'] == "closed" && !$isTestGroup) {
                 // CLOSE THE GROUP:
-                $async_batch = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
+                $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
                 if ($async_batch) {
                   // call the closing runner
-                  $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
+                  $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
                   if ($skip_closed) {
                     $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
                     $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');

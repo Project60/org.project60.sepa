@@ -34,7 +34,7 @@ class CRM_Sepa_Logic_Group {
     }
 
     // step 1: gather data
-    $skip_closed = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_skip_closed');
+    $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
     if ($skip_closed) {
       $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
@@ -178,7 +178,7 @@ class CRM_Sepa_Logic_Group {
         // set these rotten contributions to 'Pending', no 'pay_later'
         CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id=$status_pending, is_pay_later=0 WHERE id=$contribution_id;");
         // now they will get their transactions back when they get set to 'completed' in the next step...
-        CRM_Core_Error::debug_log_message("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
+        Civi::log()->debug("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
       }
     }
 
@@ -201,7 +201,7 @@ class CRM_Sepa_Logic_Group {
           'receive_date'             => date('YmdHis', strtotime($txgroup['collection_date']))));
       if (!empty($result['is_error'])) {
         $error_count += 1;
-        CRM_Core_Error::debug_log_message("org.project60.sepa: ".$result['error_message']);
+        Civi::log()->debug("org.project60.sepa: ".$result['error_message']);
       }
     }
 

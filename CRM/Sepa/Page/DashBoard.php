@@ -138,7 +138,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
    * call the batching API
    */
   function callBatcher($mode) {
-    $async_batching = CRM_Core_BAO_Setting::getItem('SEPA Direct Debit Preferences', 'sdd_async_batching');
+    $async_batching = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
     if ($async_batching) {
       // use the runner rather that the API (this doesn't return)
       CRM_Sepa_Logic_Queue_Update::launchUpdateRunner($mode);
