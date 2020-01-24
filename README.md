@@ -28,7 +28,7 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 
 # Automated Testing
 
-[![CircleCI](https://circleci.com/gh/project60/org.project60.sepa.svg?style=svg)](https://circleci.com/gh/project60/org.project60.sepa)
+[![CircleCI](https://circleci.com/gh/Project60/org.project60.sepa.svg?style=svg)](https://circleci.com/gh/Project60/org.project60.sepa)
 
 
 # Customisation
@@ -37,7 +37,7 @@ If you need customised mandate references, exclude certain collection dates, or 
 * `civicrm_create_mandate` - to generate custom mandate reference numbers
 * `civicrm_defer_collection_date` - to avoid days when your bank won't accept collections. (Version 1.2+ can skip weekends w/o this hook)
 * `civicrm_modify_txmessage` - to customize the transaction message (Version 1.2+ can set a generic message w/o this hook)
-* `civicrm_alter_next_collection_date` - alter the next collection date for a mandate. 
+* `civicrm_alter_next_collection_date` - alter the next collection date for a mandate.
 
 We added an example implementation for your convenience: [org.project60.sepacustom](https://github.com/Project60/sepa_dd/tree/master/org.project60.sepacustom)
 
