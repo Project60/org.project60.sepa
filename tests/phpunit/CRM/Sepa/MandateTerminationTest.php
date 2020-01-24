@@ -65,7 +65,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     $this->assertSame(self::MANDATE_STATUS_INVALID, $terminatedMandate['status']);
     $this->assertException(
-      CRM_Core_Exception::class,
+      Exception::class,
       function() use ($contribution)
       {
         $this->getTransactionGroupForContribution($contribution);
@@ -162,7 +162,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     $this->assertSame(self::MANDATE_STATUS_COMPLETE, $terminatedMandate['status']);
     $this->assertException(
-      CRM_Core_Exception::class,
+      Exception::class,
       function() use ($contribution)
       {
         $this->getTransactionGroupForContribution($contribution);
