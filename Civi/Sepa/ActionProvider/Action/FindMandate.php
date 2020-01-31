@@ -77,6 +77,8 @@ class FindMandate extends CreateRecurringMandate {
       new Specification('type',      'String',  E::ts('Mandate Type'), false, null, null, null, false),
       new Specification('iban',      'String',  E::ts('IBAN'), false, null, null, null, false),
       new Specification('bic',       'String',  E::ts('BIC'), false, null, null, null, false),
+      new Specification('contact_id','Integer', E::ts('Contact ID'), false, null, null, null, false),
+      new Specification('status',    'String',  E::ts('Status'), false, null, null, null, false),
     ]);
   }
 
@@ -123,8 +125,9 @@ class FindMandate extends CreateRecurringMandate {
       $output->setParameter('id', $mandate['id']);
       $output->setParameter('reference', $mandate['reference']);
       $output->setParameter('type', $mandate['type']);
+      $output->setParameter('status', $mandate['status']);
       $output->setParameter('iban', $mandate['iban']);
-      $output->setParameter('bic', $mandate['bic']);
+      $output->setParameter('contact_id', $mandate['contact_id']);
     }
   }
 }
