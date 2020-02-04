@@ -226,4 +226,35 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase
       E::ts('RCUR transaction group status after closing is incorrect.')
     );
   }
+
+  /**
+   * Test if status and first_contribution_id are correctly set in FRST -> RCUR transition
+   *
+   * @see Case_ID M02
+   */
+  public function testRCURFirstContributionID()
+  {
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_RCUR,
+      ]
+    );
+
+    // the status should be FRST, and first_contribution_id empty
+    $this->assertSame(self::MANDATE_TYPE_FRST,  $mandate['status'],  E::ts('Mandate status of new mandate is incorrect.'));
+    $this->assertEmpty(CRM_Utils_Array::value('first_contribution_id', $mandate), "first_contribution_id should not be set yet.");
+
+    // batch & check
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $batchedMandate = $this->getMandate($mandate['id']);
+    $this->assertSame(self::MANDATE_TYPE_FRST,  $batchedMandate['status'],  E::ts('Mandate status of new mandate is incorrect.'));
+    $this->assertEmpty(CRM_Utils_Array::value('first_contribution_id', $batchedMandate), "first_contribution_id should not be set yet.");
+
+    // close & check
+    $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
+    $this->closeTransactionGroup($transactionGroup['id']);
+    $rcurMandate = $this->getMandate($mandate['id']);
+    $this->assertSame(self::MANDATE_TYPE_RCUR,  $rcurMandate['status'],  E::ts('Mandate status of new mandate is incorrect.'));
+    $this->assertNotEmpty(CRM_Utils_Array::value('first_contribution_id', $rcurMandate), "first_contribution_id should be set now.");
+  }
 }
