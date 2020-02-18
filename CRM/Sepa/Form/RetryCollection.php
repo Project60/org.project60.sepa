@@ -180,7 +180,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $creditor_list = array();
     $creditor_query = civicrm_api3('SepaCreditor', 'get', array(
       'option.limit' => 0,
-      'return'       => 'name,id'));
+      'return'       => 'name,label,id'));
     foreach ($creditor_query['values'] as $creditor) {
       $creditor_list[$creditor['id']] = $creditor['label'];
     }
