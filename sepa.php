@@ -25,7 +25,9 @@ use CRM_Sepa_ExtensionUtil as E;
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_container/
  */
 function sepa_civicrm_container(ContainerBuilder $container) {
-  $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs());
+  if (class_exists('\Civi\Sepa\ContainerSpecs')) {
+    $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs());
+  }
 }
 
 function sepa_civicrm_pageRun( &$page ) {
