@@ -100,7 +100,7 @@ class CreateOneOffMandate extends AbstractAction {
     }
 
     // add override fields
-    foreach (['creditor_id', 'financial_type_id', 'campaign_id'] as $parameter_name) {
+    foreach (['creditor_id', 'financial_type_id', 'campaign_id', 'amount'] as $parameter_name) {
       $value = $parameters->getParameter($parameter_name);
       if (empty($value)) {
         $value = $this->configuration->getParameter("default_{$parameter_name}");
