@@ -81,6 +81,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
     return new SpecificationBag([
       new Specification('mandate_id',        'Integer', E::ts('Mandate ID'), false, null, null, null, false),
       new Specification('mandate_reference', 'String',  E::ts('Mandate Reference'), false, null, null, null, false),
+      new Specification('error',             'String',  E::ts('Error Message (if creation failed)'), false, null, null, null, false),
     ]);
   }
 
@@ -126,10 +127,16 @@ class CreateRecurringMandate extends CreateOneOffMandate {
     }
 
     // create mandate
-    $mandate = \civicrm_api3('SepaMandate', 'createfull', $mandate_data);
-    $mandate = \civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate['id'], 'return' => 'id,reference']);
-    $output->setParameter('mandate_id', $mandate['id']);
-    $output->setParameter('mandate_reference', $mandate['reference']);
+    try {
+      $mandate = \civicrm_api3('SepaMandate', 'createfull', $mandate_data);
+      $mandate = \civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate['id'], 'return' => 'id,reference']);
+      $output->setParameter('mandate_id', $mandate['id']);
+      $output->setParameter('mandate_reference', $mandate['reference']);
+    } catch (\Exception $ex) {
+      $output->setParameter('mandate_id', '');
+      $output->setParameter('mandate_reference', '');
+      $output->setParameter('error', $ex->getMessage());
+    }
   }
 
   /**
