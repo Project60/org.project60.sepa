@@ -589,7 +589,7 @@ class CRM_Sepa_Logic_Batching {
       return NULL;
     }
     // ..or the cancel_date
-    if (!empty($rcontribution['cancel_date']) && strtotime($rcontribution['cancel_date']) < strotime($next_date)) {
+    if (!empty($rcontribution['cancel_date']) && strtotime($rcontribution['cancel_date']) < strtotime($next_date)) {
       return NULL;
     }
 
