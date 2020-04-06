@@ -72,13 +72,23 @@ class FindMandate extends CreateRecurringMandate {
    */
   public function getOutputSpecification() {
     return new SpecificationBag([
-      new Specification('id',        'Integer', E::ts('Mandate ID'), false, null, null, null, false),
-      new Specification('reference', 'String',  E::ts('Mandate Reference'), false, null, null, null, false),
-      new Specification('type',      'String',  E::ts('Mandate Type'), false, null, null, null, false),
-      new Specification('iban',      'String',  E::ts('IBAN'), false, null, null, null, false),
-      new Specification('bic',       'String',  E::ts('BIC'), false, null, null, null, false),
-      new Specification('contact_id','Integer', E::ts('Contact ID'), false, null, null, null, false),
-      new Specification('status',    'String',  E::ts('Status'), false, null, null, null, false),
+      new Specification('id',                'Integer', E::ts('Mandate ID'), false, null, null, null, false),
+      new Specification('reference',         'String',  E::ts('Mandate Reference'), false, null, null, null, false),
+      new Specification('type',              'String',  E::ts('Mandate Type'), false, null, null, null, false),
+      new Specification('iban',              'String',  E::ts('IBAN'), false, null, null, null, false),
+      new Specification('bic',               'String',  E::ts('BIC'), false, null, null, null, false),
+      new Specification('contact_id',        'Integer', E::ts('Contact ID'), false, null, null, null, false),
+      new Specification('status',            'String',  E::ts('Status'), false, null, null, null, false),
+      new Specification('amount',            'Money',   E::ts('Amount'), false, null, null, null, false),
+      new Specification('annual_amount',     'Money',   E::ts('Annual Amount'), false, null, null, null, false),
+      new Specification('frequency',         'Integer', E::ts('Frequency'), false, null, null, null, false),
+      new Specification('cycle_day',         'Integer', E::ts('Collection Day'), false, null, null, null, false),
+      new Specification('creditor_id',       'Integer', E::ts('Creditor ID'), false, null, null, null, false),
+      new Specification('financial_type_id', 'Integer', E::ts('Financial Type (default)'), false, null, null, null, false),
+      new Specification('campaign_id',       'Integer', E::ts('Campaign (default)'), false, null, null, null, false),
+      new Specification('start_date',        'Date',    E::ts('Start Date'), false, null, null, null, false),
+      new Specification('date',              'Date',    E::ts('Signature Date'), false, null, null, null, false),
+      new Specification('validation_date',   'Date',    E::ts('Validation Date'), false, null, null, null, false),
     ]);
   }
 
@@ -128,6 +138,51 @@ class FindMandate extends CreateRecurringMandate {
       $output->setParameter('status', $mandate['status']);
       $output->setParameter('iban', $mandate['iban']);
       $output->setParameter('contact_id', $mandate['contact_id']);
+      $output->setParameter('creditor_id', $mandate['creditor_id']);
+      $output->setParameter('date', $mandate['date']);
+      $output->setParameter('validation_date', $mandate['validation_date']);
+
+      // these output values depend on the type
+      switch ($mandate['type']) {
+        case 'RCUR':
+          $recurring_contribution = civicrm_api3('ContributionRecur', 'getsingle', [
+            'id' => $mandate['entity_id']
+          ]);
+          $output->setParameter('amount', $recurring_contribution['amount']);
+          $output->setParameter('cycle_day', $recurring_contribution['cycle_day']);
+          $output->setParameter('financial_type_id', $recurring_contribution['financial_type_id']);
+          $output->setParameter('campaign_id', \CRM_Utils_Array::value('campaign_id', $recurring_contribution));
+          $output->setParameter('start_date', $recurring_contribution['start_date']);
+
+          // some need to be calculated
+          $frequency = 0; // frequency is 'how ofter per year'
+          if ($recurring_contribution['frequency_unit'] == 'month') {
+              $frequency = 12 / $recurring_contribution['frequency_interval'];
+          } elseif ($recurring_contribution['frequency_unit'] == 'year') {
+              $frequency = 1.0 / $recurring_contribution['frequency_interval'];
+          } elseif ($recurring_contribution['frequency_unit'] == 'week') {
+              $frequency = 52.0 / $recurring_contribution['frequency_interval'];
+          }
+          $output->setParameter('frequency', $frequency);
+          $output->setParameter('annual_amount', number_format($frequency * $recurring_contribution['amount'], 2, '.', ''));
+          break;
+
+        case 'OOFF':
+          $contribution = civicrm_api3('Contribution', 'getsingle', [
+            'id' => $mandate['entity_id']
+          ]);
+          $output->setParameter('amount', $contribution['total_amount']);
+          $output->setParameter('financial_type_id', $contribution['financial_type_id']);
+          $output->setParameter('campaign_id', $contribution['campaign_id']);
+          $output->setParameter('cycle_day', null);
+          $output->setParameter('frequency', 0);
+          $output->setParameter('annual_amount', null);
+          break;
+
+        default:
+          // this shouldn't happen
+          break;
+      }
     }
   }
 }
