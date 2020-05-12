@@ -116,6 +116,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'title' => ts('Cycle Interval', array('domain' => 'org.project60.sepa')),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $cycle_intervals,
+          'type' => CRM_Utils_Type::T_INT,
         ),
         'cycle_day' => array(
           'title' => ts('Cycle Days', array('domain' => 'org.project60.sepa')),
