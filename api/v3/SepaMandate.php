@@ -199,19 +199,19 @@ function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
   $params['date'] = array(
     'name'         => 'date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE,
+    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
     'title'        => 'Signature date',
   );
   $params['creation_date'] = array(
     'name'         => 'creation_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE,
+    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
     'title'        => 'Creation date',
   );
   $params['validation_date'] = array(
     'name'         => 'validation_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE,
+    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
     'title'        => 'Validation date',
   );
   $params['is_enabled'] = array(
@@ -241,25 +241,19 @@ function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
   $params['receive_date'] = array(
     'name'         => 'receive_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE,
+    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
     'title'        => 'Collection date (only for OOFF)',
   );
   $params['start_date'] = array(
     'name'         => 'start_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE,
+    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
     'title'        => 'Start of collection (only for RCUR)',
   );
   $params['end_date'] = array(
     'name'         => 'end_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE,
-    'title'        => 'Start of collection (only for RCUR)',
-  );
-  $params['end_date'] = array(
-    'name'         => 'end_date',
-    'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE,
+    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
     'title'        => 'Start of collection (only for RCUR)',
   );
   $params['frequency_interval'] = array(
