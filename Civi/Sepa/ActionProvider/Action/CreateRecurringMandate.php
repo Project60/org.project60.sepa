@@ -35,7 +35,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
         new Specification('default_financial_type_id', 'Integer', E::ts('Financial Type (default)'), true, null, null, $this->getFinancialTypes(), false),
         new Specification('default_campaign_id',       'Integer', E::ts('Campaign (default)'), false, null, null, $this->getCampaigns(), false),
         new Specification('default_frequency',         'Integer', E::ts('Frequency (default)'), true, 12, null, $this->getFrequencies()),
-        new Specification('default_cycle_day',         'Integer', E::ts('Collection Day (default)'), true, 1, null, $this->getCollectionDays()),
+        new Specification('default_cycle_day',         'Integer', E::ts('Collection Day (default)'), false, 0, null, $this->getCollectionDays()),
         new Specification('buffer_days',               'Integer', E::ts('Buffer Days'), true, 7),
     ]);
   }
@@ -126,6 +126,11 @@ class CreateRecurringMandate extends CreateOneOffMandate {
       $mandate_data['start_date'] = date('YmdHis', $earliest_start_date);
     }
 
+    // if not set, calculate the closest cycle day
+    if (empty($mandate_data['cycle_day'])) {
+      $mandate_data['cycle_day'] = $this->calculateSoonestCycleDay($mandate_data);
+    }
+
     // create mandate
     try {
       $mandate = \civicrm_api3('SepaMandate', 'createfull', $mandate_data);
@@ -156,7 +161,51 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    * Get list of collection days
    */
   protected function getCollectionDays() {
-    $list = range(1,28);
-    return array_combine($list, $list);
+    $list = range(0,28);
+    $options = array_combine($list, $list);
+    $options[0] = E::ts("as soon as possible");
+    return $options;
+  }
+
+    /**
+     * Select the cycle day from the given creditor,
+     *  that allows for the soonest collection given the buffer time
+     *
+     * @param array $mandate_data
+     *      all data known about the mandate
+     *
+     */
+  protected function calculateSoonestCycleDay($mandate_data) {
+      // get creditor ID
+      $creditor_id = (int) $mandate_data['creditor_id'];
+      if (!$creditor_id) {
+          $default_creditor = \CRM_Sepa_Logic_Settings::defaultCreditor();
+          if ($default_creditor) {
+              $creditor_id = $default_creditor->id;
+          } else {
+              \Civi::log()->notice("CreateRecurringMandate action: No creditor, and no default creditor set! Using cycle day 1");
+              return 1;
+          }
+      }
+
+      // get start date
+      $date = strtotime(\CRM_Utils_Array::value('start_date', $mandate_data, date('Y-m-d')));
+
+      // get cycle days
+      $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor_id);
+
+      // iterate through the days until we hit a cycle day
+      for ($i = 0; $i < 31; $i++) {
+        if (in_array(date('j', $date), $cycle_days)) {
+            // we found our cycle_day!
+            return date('j', $date);
+        } else {
+            // no? try the next one...
+            $date = strtotime("+ 1 day", $date);
+        }
+      }
+
+      // no hit? that shouldn't happen...
+      return 1;
   }
 }
