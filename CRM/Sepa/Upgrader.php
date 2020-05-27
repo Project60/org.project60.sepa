@@ -46,8 +46,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * Example: Run a simple query when a module is disabled.
    */
   public function disable() {
-    // TODO: disable payment processor
-    // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
+    // TODO: anything?
   }
 
   /**
@@ -60,9 +59,6 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $customData->syncOptionGroup(E::path('resources/msg_tpl_workflow_contribution_option_group.json'));
     $customData->syncOptionGroup(E::path('resources/payment_instrument_option_group.json'));
     $customData->syncOptionGroup(E::path('resources/iban_blacklist_option_group.json'));
-
-    // TODO: re-enable payment processor
-    // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
   }
 
 
@@ -175,19 +171,6 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   }
 
   /**
-   * Make sure the new PP is available
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  public function upgrade_1413() {
-    $this->ctx->log->info('Applying update 1413');
-    // make sure the new payment processor is available
-    sepa_pp_enable();
-    return TRUE;
-  }
-
-  /**
    * Make sure, the payment_processor_id in civicrm_sdd_creditor is NULL.
    *  This *shouldn't* be the set, but if it is, it can cause errors.
    *
@@ -285,4 +268,52 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
     return TRUE;
   }
+
+    /**
+     * SDD Payment processors have been moved to another extension,
+     *  so remove SDD payment processors if not used,
+     *  and disable/warn user otherwise
+     *
+     * @see https://github.com/project60/org.project60.sepa/issues/534
+     *
+     * @return TRUE on success
+     * @throws Exception
+     */
+    public function upgrade_1507() {
+        $this->ctx->log->info("Dealing with migrated payment processor code...");
+
+        // get the IDs of the SDD processor types
+        $sdd_processor_type_ids = [];
+        $sdd_processor_type_query = civicrm_api3('PaymentProcessorType', 'get', [
+            'name'         => ['IN' => ['SEPA_Direct_Debit', 'SEPA_Direct_Debit_NG']],
+            'return'       => 'id',
+            'option.limit' => 0,
+        ]);
+        foreach ($sdd_processor_type_query['values'] as $pp_type) {
+            $sdd_processor_type_ids[] = (int) $pp_type['id'];
+        }
+
+        // if there is SDD types registered (which should be the case), we have to deal with them
+        if (!empty($sdd_processor_type_ids)) {
+            // find out, if they're being used
+            $sdd_processor_type_id_list = implode(',', $sdd_processor_type_ids);
+            $use_count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
+
+            if ($use_count) {
+                // if the payment processors are being used, divert them to the dummy processor
+                //  and issue a warning to install the SDD PP extension
+                $message = E::ts("Your CiviSEPA payment processors have been disabled, the code was moved into a new extension. If you want to continue using your CiviSEPA payment processors, please install the latest version of the <a href=\"https://github.com/Project60/org.project60.sepapp/releases\">CiviSEPA Payment Processor</a> Extension.");
+                CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET class_name='Payment_Dummy' WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
+                CRM_Core_Session::setStatus($message, E::ts("%1 Payment Processor(s) Disabled!", [1 => $use_count]), 'warn');
+                Civi::log()->warning($message);
+
+            } else {
+                // if they are _not_ used, we can simply delete them.
+                foreach ($sdd_processor_type_ids as $sdd_processor_type_id) {
+                    civicrm_api3('PaymentProcessorType', 'delete', ['id' => $sdd_processor_type_id]);
+                }
+            }
+        }
+        return TRUE;
+    }
 }
