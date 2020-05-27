@@ -270,8 +270,11 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   }
 
     /**
-     * remove SDD payment processors if not used,
-     *  and disable/warn user if used
+     * SDD Payment processors have been moved to another extension,
+     *  so remove SDD payment processors if not used,
+     *  and disable/warn user otherwise
+     *
+     * @see https://github.com/project60/org.project60.sepa/issues/534
      *
      * @return TRUE on success
      * @throws Exception
