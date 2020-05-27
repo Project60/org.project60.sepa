@@ -1,9 +1,7 @@
 sepa_dd (org.project60.sepa) release history
 ============================================
 
-Version 1.4
-===========
-ONGOING DEVELOPMENT
+for current versions see https://github.com/Project60/org.project60.sepa/releases
 
 
 Version 1.2.6
