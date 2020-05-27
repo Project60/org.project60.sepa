@@ -46,8 +46,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * Example: Run a simple query when a module is disabled.
    */
   public function disable() {
-    // TODO: disable payment processor
-    // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
+    // TODO: anything?
   }
 
   /**
@@ -60,9 +59,6 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $customData->syncOptionGroup(E::path('resources/msg_tpl_workflow_contribution_option_group.json'));
     $customData->syncOptionGroup(E::path('resources/payment_instrument_option_group.json'));
     $customData->syncOptionGroup(E::path('resources/iban_blacklist_option_group.json'));
-
-    // TODO: re-enable payment processor
-    // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
   }
 
 
@@ -171,19 +167,6 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
       CRM_Core_Session::setStatus("There seems to be {$lost_contributions} SEPA contributions in status 'In Progress', that are not in any transaction group. This is likely due to the bug SEPA-514, and you might want to check, if these shouldn't be deleted.");
     }
 
-    return TRUE;
-  }
-
-  /**
-   * Make sure the new PP is available
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  public function upgrade_1413() {
-    $this->ctx->log->info('Applying update 1413');
-    // make sure the new payment processor is available
-    sepa_pp_enable();
     return TRUE;
   }
 
