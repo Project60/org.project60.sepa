@@ -6,24 +6,25 @@ This branch is currently maintained by Björn Endres (SYSTOPIA, endres@systopia.
 
 Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSEPA
 
-**Important:** Please download a [official release](https://github.com/Project60/org.project60.sepa/releases)!
+**Important:** Please download a [official release](https://github.com/Project60/org.project60.sepa/releases/latest)!
 
 # What it can do
 
 * OOFF and RCUR payments
 * SEPA dashboard gives you great status overview
-* payment processer for online donations and event registrations (separate extension)
+* Payment processer for online donations and event registrations with the [SEPA PP Extension](https://github.com/Project60/org.project60.sepapp)
 * UI to manipulate mandates
-* automatic BIC lookup if [Little BIC Extension](https://github.com/Project60/org.project60.bic) in installed
-* full SEPA group life cycle: 'open'-'closed/sent'->'received'
-* record SEPA payment action and form for contacts
-* manual batching with parameters for notice period and horizon
-* automatic adjustment of late OOFF and RCUR transactions
-* integration with [CiviBanking](https://github.com/Project60/CiviBanking)
+* Automatic BIC lookup if [Little BIC Extension](https://github.com/Project60/org.project60.bic) in installed
+* Full SEPA group life cycle: 'open'-'closed/sent'->'received'
+* Record SEPA payment action and form for contacts
+* Manual batching with parameters for notice period and horizon
+* Automatic adjustment of late OOFF and RCUR transactions
+* Integration with [FormProcessor Actions](https://civicrm.org/extensions/form-processor)
+* Integration with [CiviBanking](https://github.com/Project60/CiviBanking)
+* Membership payments (with the [Project60 Membership Extension](https://github.com/Project60/org.project60.membership))
 
 
 # What it can not (yet) do
-* membership payments
 * automatic submission to the banks
 
 # Automated Testing
