@@ -629,16 +629,18 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
 }
 
 /**
- * Implements hook_civicrm_tabs()
+ * Implements hook_civicrm_tabset()
  *
  * Will inject the SepaMandate tab
  */
-function sepa_civicrm_tabs(&$tabs, $contactID) {
-  if (CRM_Core_Permission::check('view sepa mandates')) {
-    $tabs[] = array( 'id'     => 'sepa',
-                     'url'    => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$contactID}"),
-                     'title'  => E::ts('SEPA Mandates'),
-                     'count'  => CRM_Sepa_Page_MandateTab::getMandateCount($contactID),
-                     'weight' => 20);
+function sepa_civicrm_tabset($tabsetName, &$tabs, $context) {
+  if ($tabsetName == 'civicrm/contact/view' && !empty($context['contact_id'])) {
+    $tabs[] = [
+      'id'     => 'sepa',
+      'url'    => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$context['contact_id']}"),
+      'title'  => E::ts('SEPA Mandates'),
+      'count'  => CRM_Sepa_Page_MandateTab::getMandateCount($context['contact_id']),
+      'weight' => 20
+    ];
   }
 }
