@@ -271,6 +271,12 @@ div.sdd-add-creditor {
                 {$form.batching_default_creditor.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-buffer-days">
+                <td class="label">{$form.pp_buffer_days.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Recurring Buffer Days{/ts}", {literal}{"id":"id-buffer-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
+                <td>
+                    {$form.pp_buffer_days.html}
+                </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-allow_mandate_modification">
               <td class="label">{$form.allow_mandate_modification.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Mandate Modifications{/ts}", {literal}{"id":"id-mandatemodifications","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
@@ -313,34 +319,6 @@ div.sdd-add-creditor {
                 {$form.sdd_async_batching.html}
               </td>
             </tr>
-       </table>
-       <br/>
-       <h2>{ts domain="org.project60.sepa"}Payment Processor Settings{/ts}</h2>
-        <table class="form-layout">
-          <tr class="crm-pp-form-block-hide-billing">
-            <td class="label">{$form.pp_hide_billing.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Hide Billing{/ts}", {literal}{"id":"id-hide-billing","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-            <td>
-              {$form.pp_hide_billing.html}
-            </td>
-          </tr>
-          <tr class="crm-pp-form-block-hide-bic">
-            <td class="label">{$form.pp_hide_bic.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Hide BIC{/ts}", {literal}{"id":"id-hide-bic","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-            <td>
-              {$form.pp_hide_bic.html}
-            </td>
-          </tr>
-          <tr class="crm-pp-form-block-improve-frequency">
-            <td class="label">{$form.pp_improve_frequency.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Improve frequency dropdown{/ts}", {literal}{"id":"id-improve-frequency","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-            <td>
-              {$form.pp_improve_frequency.html}
-            </td>
-          </tr>
-          <tr class="crm-pp-form-block-buffer-days">
-            <td class="label">{$form.pp_buffer_days.label} <a onclick='CRM.help("{ts domain="org.project60.sepa"}Recurring Buffer Days{/ts}", {literal}{"id":"id-buffer-days","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a></td>
-            <td>
-              {$form.pp_buffer_days.html}
-            </td>
-          </tr>
        </table>
        <br/>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

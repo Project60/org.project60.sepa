@@ -133,10 +133,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
         $no_draftxml = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_no_draft_xml');
         $excld_we = CRM_Sepa_Logic_Settings::getGenericSetting('exclude_weekends');
-        $hide_bic = CRM_Sepa_Logic_Settings::getGenericSetting('pp_hide_bic');
-        $hide_bil = CRM_Sepa_Logic_Settings::getGenericSetting('pp_hide_billing');
         $bffrdays = CRM_Sepa_Logic_Settings::getGenericSetting('pp_buffer_days');
-        $mendForm = CRM_Sepa_Logic_Settings::getGenericSetting('pp_improve_frequency');
 
         // add creditor form elements
         $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact", array('domain' => 'org.project60.sepa')));
@@ -156,10 +153,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $this->addElement('checkbox',   'sdd_async_batching',       ts("Large Groups", array('domain' => 'org.project60.sepa')), "", ($async_batch?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'sdd_skip_closed',          ts("Only Completed Contributions", array('domain' => 'org.project60.sepa')), "", ($skip_closed?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'sdd_no_draft_xml',         ts("No XML drafts", array('domain' => 'org.project60.sepa')), "", ($no_draftxml?array('checked'=>'checked'):array()));
-        $this->addElement('checkbox',   'pp_hide_bic',              ts("Hide BIC in PP", array('domain' => 'org.project60.sepa')),   "", ($hide_bic?array('checked'=>'checked'):array()));
-        $this->addElement('checkbox',   'pp_hide_billing',          ts("Hide Billing in PP", array('domain' => 'org.project60.sepa')),   "", ($hide_bil?array('checked'=>'checked'):array()));
-        $this->addElement('checkbox',   'pp_improve_frequency',     ts("Improve payment processor form", array('domain' => 'org.project60.sepa')),   "", ($mendForm?array('checked'=>'checked'):array()));
-        $this->addElement('text',       'pp_buffer_days',           ts("Recurring Buffer Days", array('domain' => 'org.project60.sepa')), array('size' => 1, 'value' => $bffrdays));
+        $this->addElement('text',       'pp_buffer_days',           ts("Buffer Days", array('domain' => 'org.project60.sepa')), array('size' => 2, 'value' => $bffrdays));
         $this->addElement('hidden',     'edit_creditor_id',         '', array('id' => 'edit_creditor_id'));
         $this->addElement('hidden',     'add_creditor_id',          '', array('id' => 'add_creditor_id'));
 
@@ -234,9 +228,6 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_async_batching'])   ? "1" : "0"), 'sdd_async_batching');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_skip_closed'])      ? "1" : "0"), 'sdd_skip_closed');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_no_draft_xml'])     ? "1" : "0"), 'sdd_no_draft_xml');
-        CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_hide_bic'])          ? "1" : "0"), 'pp_hide_bic');
-        CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_hide_billing'])      ? "1" : "0"), 'pp_hide_billing');
-        CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_improve_frequency']) ? "1" : "0"), 'pp_improve_frequency');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_buffer_days'])       ? (int) $values['pp_buffer_days'] : "0"), 'pp_buffer_days');
 
         $session = CRM_Core_Session::singleton();
