@@ -131,7 +131,7 @@
 {/htxt}
 
 {htxt id='id-buffer-days'}
-    <p>{ts domain="org.project60.sepa"}Define the number of days that the donation page leaves you to submit recurring donations in time.{/ts}</p>
+    <p>{ts domain="org.project60.sepa"}To avoid creating recurring mandates for a date that has already be submitted, you can set a buffer time. It determines how many days before submission the mandate has to be created.{/ts}</p>
 {/htxt}
 
 {htxt id='id-skip-closed'}
