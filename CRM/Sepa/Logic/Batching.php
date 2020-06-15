@@ -184,7 +184,7 @@ class CRM_Sepa_Logic_Batching {
               "contribution_status_id"              => $mandate['rc_contribution_status_id'],
               "campaign_id"                         => $mandate['rc_campaign_id'],
               "is_test"                             => $mandate['rc_is_test'],
-              "payment_instrument_id"               => $payment_instrument_id,
+              "payment_instrument_id"               => $mandate['rc_payment_instrument_id'],
             );
           $contribution = civicrm_api('Contribution', 'create', $contribution_data);
           if (empty($contribution['is_error'])) {
