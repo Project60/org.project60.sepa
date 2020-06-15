@@ -138,10 +138,10 @@ class CRM_Sepa_Logic_Batching {
       $mandates_by_payment_instrument = [];
       foreach ($mandates as $mandate) {
         $mandates_by_payment_instrument[$mandate['rc_payment_instrument_id']][] = $mandate['mandate_entity_id'];
-        //array_push($rcontrib_ids, $mandate['mandate_entity_id']);
       }
       foreach($mandates_by_payment_instrument as $mandate_payment_instrument_id => $rcontrib_ids) {
         $rcontrib_id_strings = implode(',', $rcontrib_ids);
+        $rcontrib_payment_instrument = $mode == 'FRST' ? $payment_instrument_id : $mandate_payment_instrument_id;
 
         $sql_query = "
           SELECT
@@ -153,7 +153,7 @@ class CRM_Sepa_Logic_Batching {
           WHERE contribution.contribution_recur_id IN ({$rcontrib_id_strings})
             AND DATE(contribution.receive_date) = DATE('{$collection_date}')
             AND (txg.type IS NULL OR txg.type IN ('RCUR', 'FRST'))
-            AND contribution.payment_instrument_id = {$mandate_payment_instrument_id};";
+            AND contribution.payment_instrument_id = {$rcontrib_payment_instrument};";
         $results = CRM_Core_DAO::executeQuery($sql_query);
         while ($results->fetch()) {
           $existing_contributions_by_recur_id[$results->contribution_recur_id] = $results->contribution_id;
@@ -184,7 +184,7 @@ class CRM_Sepa_Logic_Batching {
               "contribution_status_id"              => $mandate['rc_contribution_status_id'],
               "campaign_id"                         => $mandate['rc_campaign_id'],
               "is_test"                             => $mandate['rc_is_test'],
-              "payment_instrument_id"               => $mandate['rc_payment_instrument_id'],
+              "payment_instrument_id"               => $mode == 'FRST' ? $payment_instrument_id : $mandate['rc_payment_instrument_id'],
             );
           $contribution = civicrm_api('Contribution', 'create', $contribution_data);
           if (empty($contribution['is_error'])) {
