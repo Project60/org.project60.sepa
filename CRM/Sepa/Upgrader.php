@@ -39,7 +39,33 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * so here to avoid order of operation problems.
    */
   public function postInstall() {
-    // TODO: anything?
+      // add default message templates
+      CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
+
+      // create default creditor
+      $creditor_count = civicrm_api3('SepaCreditor', 'getcount');
+      if (empty($creditor_count)) {
+          $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
+          $default_pi_ooff = isset($sepa_pis['OOFF']['value']) ? $sepa_pis['OOFF']['value'] : '';
+          $default_pi_rcur = isset($sepa_pis['FRST']['value']) && isset($sepa_pis['RCUR']['value']) ? "{$sepa_pis['FRST']['value']}-{$sepa_pis['RCUR']['value']}" : '';
+          civicrm_api3('SepaCreditor', 'create', [
+              'identifier' => 'TEST CREDITOR',
+              'name' => 'TESTCREDITORDE',
+              'address' => '221B Baker Street\nLondon',
+              'country_id' => '1226',
+              'iban' => 'DE12500105170648489890',
+              'bic' => 'SEPATEST',
+              'mandate_prefix' => 'TEST',
+              'mandate_active' => 1,
+              'category' => 'TEST',
+              'currency' => 'EUR',
+              'creditor_type' => 'SEPA',
+              'uses_bic' => 1,
+              'label' => 'Test Creditor',
+              'pi_ooff' => $default_pi_ooff,
+              'pi_rcur' => $default_pi_rcur,
+          ]);
+      }
   }
 
   /**

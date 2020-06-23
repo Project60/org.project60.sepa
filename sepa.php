@@ -170,38 +170,6 @@ function sepa_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function sepa_civicrm_enable() {
-  // add all required message templates
-  require_once 'CRM/Sepa/Page/SepaMandatePdf.php';
-  CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
-
-  // create a dummy creditor if no creditor exists
-  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
-  if (empty($creditorCount)) {
-    Civi::log()->debug("org.project60.sepa_dd: Trying to install dummy creditor.");
-    // to create, we need to first find a default contact
-    $default_contact = 0;
-    $domains = civicrm_api('Domain', 'get', array('version'=>3));
-    foreach ($domains['values'] as $domain) {
-      if (!empty($domain['contact_id'])) {
-        $default_contact = $domain['contact_id'];
-        break;
-      }
-    }
-
-    if (empty($default_contact)) {
-      Civi::log()->debug("org.project60.sepa_dd: Cannot install dummy creditor - no default contact found.");
-    } else {
-      Civi::log()->debug("org.project60.sepa_dd: Inserting dummy creditor into database.");
-      // remark: we're within the enable hook, so we cannot use our own API/BAOs...
-      $create_creditor_sql = "
-      INSERT INTO civicrm_sdd_creditor
-      (`creditor_id`,    `identifier`,      `name`,           `address`,                   `country_id`, `iban`,                   `bic`,      `mandate_prefix`, `mandate_active`, `sepa_file_format_id`, `category`)
-      VALUES
-      ($default_contact, 'TESTCREDITORDE', 'TEST CREDITOR', '221B Baker Street\nLondon', '1226',       'DE12500105170648489890', 'SEPATEST', 'TEST',           1,                1, 'TEST');";
-      CRM_Core_DAO::executeQuery($create_creditor_sql);
-    }
-  }
-
   return _sepa_civix_civicrm_enable();
 }
 
