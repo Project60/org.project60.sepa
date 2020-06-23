@@ -316,4 +316,33 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
         }
         return TRUE;
     }
+
+    /**
+     * Add new payment instrument selectors
+     *
+     * @return TRUE on success
+     * @throws Exception
+     */
+    public function upgrade_1601() {
+        // add currency
+        $this->ctx->log->info('Added payment instrument fields');
+        $pi_ooff = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_ooff';");
+        if (!$pi_ooff) {
+            $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_ooff` varchar(64) COMMENT 'payment instruments, comma separated, to be used for one-off collections';");
+        }
+        $pi_rcur = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_rcur';");
+        if (!$pi_rcur) {
+            $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_rcur` varchar(64) COMMENT 'payment instruments, comma separated, to be used for recurring collections';");
+        }
+
+        // fill with the fields with the implicit default
+        $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
+        $default_pi_ooff = isset($sepa_pis['OOFF']['value']) ? $sepa_pis['OOFF']['value'] : '';
+        $default_pi_rcur = isset($sepa_pis['FRST']['value']) && isset($sepa_pis['RCUR']['value']) ? "{$sepa_pis['FRST']['value']}-{$sepa_pis['RCUR']['value']}" : '';
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_sdd_creditor SET pi_ooff = %1, pi_rcur = %2;", [
+            1 => [$default_pi_ooff, 'String'],
+            2 => [$default_pi_rcur, 'String']
+        ]);
+        return TRUE;
+    }
 }
