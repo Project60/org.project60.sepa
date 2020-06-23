@@ -13,149 +13,164 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
 {htxt id='id-contact'}
-    <p>{ts domain="org.project60.sepa"}This is the name of the contact to which this creditor is associated to.{/ts}</p>
+    <p>{ts}This is the name of the contact to which this creditor is associated to.{/ts}</p>
 {/htxt}
 
 {htxt id='id-label'}
-    <p>{ts domain="org.project60.sepa"}This is the internal name of the creditor.  It can be chosen freely and will not be used outside of CiviCRM.{/ts}</p>
+    <p>{ts}This is the internal name of the creditor.  It can be chosen freely and will not be used outside of CiviCRM.{/ts}</p>
 {/htxt}
 
 {htxt id='id-name'}
-    <p>{ts domain="org.project60.sepa"}This is the official name of the creditor. This will be used when communication to the banks.{/ts}</p>
+    <p>{ts}This is the official name of the creditor. This will be used when communication to the banks.{/ts}</p>
 {/htxt}
 
 {htxt id='id-address'}
-    <p>{ts domain="org.project60.sepa"}Postal address of the creditor.{/ts}</p>
+    <p>{ts}Postal address of the creditor.{/ts}</p>
 {/htxt}
 
 {htxt id='id-country'}
-    <p>{ts domain="org.project60.sepa"}Home country of the creditor. <strong>Only countries that are enabled under "Settings - Localization" are shown here.</strong>{/ts}</p>
+    <p>{ts}Home country of the creditor. <strong>Only countries that are enabled under "Settings - Localization" are shown here.</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-cycle-days'}
-    <p>{ts domain="org.project60.sepa"}You should specify a day (as in "day of month") on which you plan to collect the monthly payments. You can also provide a comma separated list of such days.{/ts}</p>
+    <p>{ts}You should specify a day (as in "day of month") on which you plan to collect the monthly payments. You can also provide a comma separated list of such days.{/ts}</p>
 {/htxt}
 
 {htxt id='id-id'}
-    <p>{ts domain="org.project60.sepa"}This is the Creditor Identifier, an international ID that has to be requested by the national banks.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Be careful when changing this!</strong>{/ts}</p>
+    <p>{ts}This is the Creditor Identifier, an international ID that has to be requested by the national banks.{/ts}</p>
+    <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-iban'}
-    <p>{ts domain="org.project60.sepa"}International Bank Account Number (IBAN) of the creditor.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Be careful when changing this!</strong>{/ts}</p>
+    <p>{ts}International Bank Account Number (IBAN) of the creditor.{/ts}</p>
+    <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-bic'}
-    <p>{ts domain="org.project60.sepa"}Business Identifier Code (BIC) of the financial institution of the creditor.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Be careful when changing this!</strong>{/ts}</p>
+    <p>{ts}Business Identifier Code (BIC) of the financial institution of the creditor.{/ts}</p>
+    <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-pain'}
-    <p>{ts domain="org.project60.sepa"}SEPA file format used for the transmission of the payment request file to the bank.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}After changing this, <i>any</i> file downloaded -old or new- for this creditor will be in the new format.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Be careful when changing this!</strong>{/ts}</p>
+    <p>{ts}SEPA file format used for the transmission of the payment request file to the bank.{/ts}</p>
+    <p>{ts}After changing this, <i>any</i> file downloaded -old or new- for this creditor will be in the new format.{/ts}</p>
+    <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-test-creditor'}
-    <p>{ts domain="org.project60.sepa"}The payment processor's test mode will only accept creditors that are defined as a test creditor.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}Transaction groups of a test creditor can be downloaded, but <i>NOT</i> closed.{/ts}</p>
+    <p>{ts}The payment processor's test mode will only accept creditors that are defined as a test creditor.{/ts}</p>
+    <p>{ts}Transaction groups of a test creditor can be downloaded, but <i>NOT</i> closed.{/ts}</p>
 {/htxt}
 
 {htxt id='id-ooff-horizon'}
-    <p>{ts domain="org.project60.sepa"}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which single payments (OOFF) should be generated.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Only positive values are allowed!</strong>{/ts}</p>
+    <p>{ts}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which single payments (OOFF) should be generated.{/ts}</p>
+    <p>{ts}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
+    <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-rcur-horizon'}
-    <p>{ts domain="org.project60.sepa"}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which recurring payments (RCUR) should be generated.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Only positive values are allowed!</strong>{/ts}</p>
+    <p>{ts}The horizon is the "look ahead" time frame (in days) that CiviSEPA uses to determine which recurring payments (RCUR) should be generated.{/ts}</p>
+    <p>{ts}For instance, a horizon value of 30 means, that the payments and the groups containing them for the next 30 days will be generated and become visible on the SEPA dashboard.{/ts}</p>
+    <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-rcur-grace'}
-    <p>{ts domain="org.project60.sepa"}The RCUR grace period is the time, that the submission of a group could be delayed before it gets deleted.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}For instance, a grace value of 7 means, that if you forget to submit the group in time for a week, it gets deleted. During the grace period, you can still try to submit the group, but it's up to the bank whether it is accepted or rejected.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Only positive values are allowed!</strong>{/ts}</p>
+    <p>{ts}The RCUR grace period is the time, that the submission of a group could be delayed before it gets deleted.{/ts}</p>
+    <p>{ts}For instance, a grace value of 7 means, that if you forget to submit the group in time for a week, it gets deleted. During the grace period, you can still try to submit the group, but it's up to the bank whether it is accepted or rejected.{/ts}</p>
+    <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-notice'}
-    <p>{ts domain="org.project60.sepa"}The 'notice days' value determines the time that the creditor's financial institution requires the payment file to be submitted <i>before</i> the collection date.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Only positive values are allowed!</strong>{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Be careful when changing this!</strong>{/ts}</p>
+    <p>{ts}The 'notice days' value determines the time that the creditor's financial institution requires the payment file to be submitted <i>before</i> the collection date.{/ts}</p>
+    <p>{ts}<strong>Only positive values are allowed!</strong>{/ts}</p>
+    <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='id-lock'}
-    <p>{ts domain="org.project60.sepa"}<i>Usually, you should not have to adjust this value.</i>{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}CiviSEPA operations like batching require exclusive access to the SEPA data structures. Therefore, the access of other processes is blocked while these are in progress. For security reasons, this lock times out after the specified time.{/ts}</p>
+    <p>{ts}<i>Usually, you should not have to adjust this value.</i>{/ts}</p>
+    <p>{ts}CiviSEPA operations like batching require exclusive access to the SEPA data structures. Therefore, the access of other processes is blocked while these are in progress. For security reasons, this lock times out after the specified time.{/ts}</p>
 {/htxt}
 
 {htxt id='id-defaultcreditor'}
-    <p>{ts domain="org.project60.sepa"}The default creditor will be used when no other creditor is exclicitely set. It will also be pre-selected in the back office forms.{/ts}</p>
+    <p>{ts}The default creditor will be used when no other creditor is exclicitely set. It will also be pre-selected in the back office forms.{/ts}</p>
 {/htxt}
 
 {htxt id='id-mandatemodifications'}
-    <p>{ts domain="org.project60.sepa"}A strict interpretation of the SEPA standards would not allow you to modify an active mandate. Furthermore, it can potentially cause technial problems.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}If you enable this option, you will get extra actions on the 'edit mandate' page.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}Be aware that you should send out a new prenotification to the debitor every time you modify a mandate.{/ts}</p>
+    <p>{ts}A strict interpretation of the SEPA standards would not allow you to modify an active mandate. Furthermore, it can potentially cause technial problems.{/ts}</p>
+    <p>{ts}If you enable this option, you will get extra actions on the 'edit mandate' page.{/ts}</p>
+    <p>{ts}Be aware that you should send out a new prenotification to the debitor every time you modify a mandate.{/ts}</p>
 {/htxt}
 
 {htxt id='id-txmsg'}
-    <p>{ts domain="org.project60.sepa"}The transaction message is a text that shows up on your debitors' bank statement.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}If left empty it defaults to "Thank you".{/ts}</p>
+    <p>{ts}The transaction message is a text that shows up on your debitors' bank statement.{/ts}</p>
+    <p>{ts}If left empty it defaults to "Thank you".{/ts}</p>
 {/htxt}
 
 {htxt id='id-exclude-weekends'}
-    <p>{ts domain="org.project60.sepa"}Some banks reject SDD groups with a collection date that doesn't happen to be a bank day, for example a week end.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}If you activate this option, the collection date will be automatically deferred to the following Monday.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}Be aware that an active <code>defer_collection_date</code> hook can further defer the collection date.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook.{/ts}</p>
+    <p>{ts}Some banks reject SDD groups with a collection date that doesn't happen to be a bank day, for example a week end.{/ts}</p>
+    <p>{ts}If you activate this option, the collection date will be automatically deferred to the following Monday.{/ts}</p>
+    <p>{ts}Be aware that an active <code>defer_collection_date</code> hook can further defer the collection date.{/ts}</p>
+    <p>{ts}Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook.{/ts}</p>
 {/htxt}
 
 {htxt id='id-hide-billing'}
-    <p>{ts domain="org.project60.sepa"}Hides the otherwise mandatory billing block from the payment processor page.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}This feature is only available from CiviCRM 4.6.10+{/ts}</p>
+    <p>{ts}Hides the otherwise mandatory billing block from the payment processor page.{/ts}</p>
+    <p>{ts}This feature is only available from CiviCRM 4.6.10+{/ts}</p>
 {/htxt}
 
 {htxt id='id-hide-bic'}
-    <p>{ts domain="org.project60.sepa"}Currently this SDD extension requires not only the IBAN but also the BIC (bank code).{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}If you have the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> installed, the BIC can be derived automatically from the IBAN in most cases.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}If you enable this option, the BIC will be hidden unless this lookup fails. Then the donor would be required to enter the BIC after all.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}REMARK: This option only has an effect, if the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> is installed.{/ts}</p>
+    <p>{ts}Currently this SDD extension requires not only the IBAN but also the BIC (bank code).{/ts}</p>
+    <p>{ts}If you have the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> installed, the BIC can be derived automatically from the IBAN in most cases.{/ts}</p>
+    <p>{ts}If you enable this option, the BIC will be hidden unless this lookup fails. Then the donor would be required to enter the BIC after all.{/ts}</p>
+    <p>{ts}REMARK: This option only has an effect, if the <a href="https://github.com/Project60/org.project60.bic">Little BIC Extension</a> is installed.{/ts}</p>
 {/htxt}
 
 {htxt id='id-improve-frequency'}
-    <p>{ts domain="org.project60.sepa"}The CiviCRM built-in dropdown for recurring contributions is rather ugly. Enabeling this option would will replace the eyesore frequency unit / interval fields with a nice dropdown.{/ts}</p>
+    <p>{ts}The CiviCRM built-in dropdown for recurring contributions is rather ugly. Enabeling this option would will replace the eyesore frequency unit / interval fields with a nice dropdown.{/ts}</p>
 {/htxt}
 
 {htxt id='id-buffer-days'}
-    <p>{ts domain="org.project60.sepa"}To avoid creating recurring mandates for a date that has already be submitted, you can set a buffer time. It determines how many days before submission the mandate has to be created.{/ts}</p>
+    <p>{ts}To avoid creating recurring mandates for a date that has already be submitted, you can set a buffer time. It determines how many days before submission the mandate has to be created.{/ts}</p>
 {/htxt}
 
 {htxt id='id-skip-closed'}
-    <p>{ts domain="org.project60.sepa"}If you enable this option, SEPA groups will not be 'closed' and then later marked as 'received', but skip the 'closed' step.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}As a consequence contributions would skip status 'in Progress' as well and be put to 'Completed' right away.{/ts}</p>
+    <p>{ts}If you enable this option, SEPA groups will not be 'closed' and then later marked as 'received', but skip the 'closed' step.{/ts}</p>
+    <p>{ts}As a consequence contributions would skip status 'in Progress' as well and be put to 'Completed' right away.{/ts}</p>
 {/htxt}
 
 {htxt id='id-no-draft-xml'}
-    <p>{ts domain="org.project60.sepa"}If you enable this option, You cannot download an XML file before you actually closed the SEPA group.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}This should help prevent the problem of forgetting to close the group after upload - at the cost of you no being able to change the group if the bank rejects it.{/ts}</p>
+    <p>{ts}If you enable this option, You cannot download an XML file before you actually closed the SEPA group.{/ts}</p>
+    <p>{ts}This should help prevent the problem of forgetting to close the group after upload - at the cost of you no being able to change the group if the bank rejects it.{/ts}</p>
 {/htxt}
 
 {htxt id='id-async-batching'}
-    <p>{ts domain="org.project60.sepa"}If you have large amounts of mandates or large SDD groups, you might be at risk of a timeout error during the batching/closing process.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}This option will activate a runner page with a progress bar for these critical processes. There shouldn't be any timeouts, but you have to keep that open until it's done.{/ts}</p>
+    <p>{ts}If you have large amounts of mandates or large SDD groups, you might be at risk of a timeout error during the batching/closing process.{/ts}</p>
+    <p>{ts}This option will activate a runner page with a progress bar for these critical processes. There shouldn't be any timeouts, but you have to keep that open until it's done.{/ts}</p>
 {/htxt}
 
 {htxt id='id-creditor-type'}
-    <p>{ts domain="org.project60.sepa"}Always use <code>SEPA</code> if you want to do SEPA style direct debit.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<code>PSP</code> can help you to use this extension for other direct debit systems or payment service providers (PSP), but all SEPA style validations and tools are then disabled.{/ts}</p>
+    <p>{ts}Always use <code>SEPA</code> if you want to do SEPA style direct debit.{/ts}</p>
+    <p>{ts}<code>PSP</code> can help you to use this extension for other direct debit systems or payment service providers (PSP), but all SEPA style validations and tools are then disabled.{/ts}</p>
 {/htxt}
 
 {htxt id='id-uses-bic'}
-    <p>{ts domain="org.project60.sepa"}This setting let's you define whether this creditor uses BICs.{/ts}</p>
-    <p>{ts domain="org.project60.sepa"}<strong>Caution:</strong> if you turn this (back) on with an existing creditor, you would have to manually make sure that all mandates of this creditor have BICs.{/ts}</p>
+    <p>{ts}This setting let's you define whether this creditor uses BICs.{/ts}</p>
+    <p>{ts}<strong>Caution:</strong> if you turn this (back) on with an existing creditor, you would have to manually make sure that all mandates of this creditor have BICs.{/ts}</p>
 {/htxt}
 
+{htxt id='id-payment-instruments-rcur'}
+    <p>{ts}This setting lets you choose the payment instruments available to create a mandates. The payment instrument selected on creation will define the payment instrument of all installments.{/ts}</p>
+    <p>{ts}If you select more than one payment instrument you will <i>have</i> to select one at mandate creation - in the UI <i>and</i> the API.{/ts}</p>
+    <p>{ts}If you leave this empty, no (new) mandates can be created for recurring collection{/ts}</p>
+    <p>{ts}<strong>Caution:</strong> Be sure you know what you're doing before changing these settings.{/ts}</p>
+{/htxt}
+
+{htxt id='id-payment-instruments-ooff'}
+    <p>{ts}This setting lets you choose the payment instruments available to create the collection mandate. It will therfore define the payment instrument of the collected contribution.{/ts}</p>
+    <p>{ts}If you select more than one payment instrument you will <i>have</i> to select one at mandate creation - in the UI <i>and</i> the API.{/ts}</p>
+    <p>{ts}If you leave this empty, no (new) one-off mandates can be created any more.{/ts}</p>
+    <p>{ts}<strong>Caution:</strong> Be sure you know what you're doing before changing these settings.{/ts}</p>
+{/htxt}
+{/crmScope}

@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2018 SYSTOPIA                       |
+| Copyright (C) 2013-2020 SYSTOPIA                       |
 | Author: N. Bochan (bochan -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -13,6 +13,8 @@
 | copyright header is strictly prohibited without        |
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
+
+use CRM_Sepa_ExtensionUtil as E;
 
 /*
 * This class holds methods to manipulate option groups
@@ -142,5 +144,50 @@ class CRM_Utils_SepaOptionGroupTools {
     } else {
       return $ts?ts('on an irregular basis', array('domain' => 'org.project60.sepa')):'on an irregular basis';
     }
+  }
+
+    /**
+     * Get the option list of payment instruments eligible with the creditor settings
+     *
+     * @param boolean $recurring
+     *      is this for recurring? if not, it's for one-off
+     *
+     * @return array
+     *      list of eligible options
+     */
+  public static function getPaymentInstrumentOptions($recurring = false) {
+      // gather some basic data
+      $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
+      static $all_pis = NULL;
+      if ($all_pis === NULL) {
+          // load all payment instruments
+          $all_pis = [];
+          $instrument_query = civicrm_api3('OptionValue', 'get', [
+              'option_group_id' => 'payment_instrument',
+              'return'          => 'value,name,label',
+              'option.limit'    => 0,
+              'sequential'      => 0
+          ]);
+          foreach ($instrument_query['values'] as $pi) {
+              $all_pis[$pi['value']] = $pi['label'];
+          }
+      }
+
+      // start compiling the list
+      $eligible_pis = $all_pis;
+      if ($recurring) {
+          // remove OOFF/FRST
+          unset($eligible_pis[$sepa_pis['OOFF']['value']]);
+          unset($eligible_pis[$sepa_pis['FRST']['value']]);
+
+          // but add the SEPA default combo
+          $eligible_pis["{$sepa_pis['FRST']['value']}-{$sepa_pis['RCUR']['value']}"] = E::ts("SEPA Standard (FRST/RCUR)");
+      } else {
+          // remove FRST/RCUR
+          unset($eligible_pis[$sepa_pis['FRST']['value']]);
+          unset($eligible_pis[$sepa_pis['RCUR']['value']]);
+      }
+
+      return $eligible_pis;
   }
 }
