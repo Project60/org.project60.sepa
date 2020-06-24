@@ -8,9 +8,9 @@
     <author>B. Endres</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate></releaseDate>
-  <version>1.5-dev</version>
-  <develStage>dev</develStage>
+  <releaseDate>2020-06-24</releaseDate>
+  <version>1.5-beta1</version>
+  <develStage>beta</develStage>
   <compatibility>
     <ver>5.0</ver>
     <ver>5.5</ver>
@@ -25,7 +25,8 @@
   <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches.</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi" />
-  </classloader>  <civix>
+  </classloader>
+  <civix>
     <namespace>CRM/Sepa</namespace>
   </civix>
 </extension>
