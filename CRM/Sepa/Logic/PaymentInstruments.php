@@ -26,6 +26,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
   /**
    * get the SDD payment instruments, indexed by name
+   *
+   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
    */
   public static function getSddPaymentInstruments() {
     if (self::$sdd_payment_instruments === NULL) {
@@ -45,6 +47,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
   /**
    * the payment instrument ID for a given SDD type (RCUR,OOFF,FRST)
+   *
+   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
    */
   public static function getSddPaymentInstrumentID($sdd_name) {
     $payment_instruments = self::getSddPaymentInstruments();
@@ -60,6 +64,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
    * look up the SDD payment instrument for the given contribution
    *
    * @return OOFF, FRST, RCUR or NULL (if not SDD)
+   *
+   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
    */
   public static function getSDDPaymentInstrumentForContribution($contribution_id) {
     if (!array_key_exists($contribution_id, self::$contribution_id_to_pi)) {
@@ -94,6 +100,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
    * @param $contribution   an array with the attributes of the contribution
    *
    * @return true if the contribution is a SEPA contribution
+   *
+   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
    */
   public static function isSDD($contribution) {
     if (!empty($contribution['payment_instrument_id'])) {
@@ -151,5 +159,153 @@ class CRM_Sepa_Logic_PaymentInstruments {
       // inject JS file
       CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/form_adjustments/CRM/Contribute/Form/Contribution/manipulate_sdd_payment_instruments.js');
     }
+  }
+
+  /**
+   * Get a list of all CiviSEPA creditors
+   *
+   * @return array
+   *  [id => creditor data]
+   */
+  public static function getAllSddCreditors() {
+    static $sdd_creditors = NULL;
+    if ($sdd_creditors === NULL) {
+      $sdd_creditors = [];
+      $creditors = civicrm_api3('SepaCreditor', 'get', [
+        'option.limit' => 0,
+      ]);
+      foreach ($creditors['values'] as $creditor) {
+        $sdd_creditors[$creditor['id']] = $creditor;
+      }
+    }
+    return $sdd_creditors;
+  }
+
+  /**
+   * Get a list of all payment instruments used by CiviSEPA
+   *
+   * @return array
+   *   id => [name, label, id]
+   */
+  public static function getAllSddPaymentInstruments()
+  {
+    static $sdd_payment_instruments = NULL;
+    if ($sdd_payment_instruments === NULL) {
+      $sdd_payment_instruments = [];
+
+      // first, collect all payment instruments in use
+      $creditors = self::getAllSddCreditors();
+      $pi_ids = [];
+
+      // collect OOFF payment instruments
+      foreach ($creditors as $creditor) {
+        $creditor_id = (int) $creditor['id'];
+        foreach (explode(',', $creditor['pi_ooff']) as $pi_value) {
+          $pi_id = (int) $pi_value;
+          if ($pi_id) {
+            $pi_ids[] = $pi_id;
+          }
+        }
+      }
+
+      // collect RCUR payment instruments
+      foreach ($creditors as $creditor) {
+        foreach (explode(',', $creditor['pi_rcur']) as $pi_value) {
+          if (strstr($pi_value, '-')) {
+            // this is a frst-rcur combo
+            $frst_rcur = explode('-', $pi_value, 2);
+            $pi_frst = (int) $frst_rcur[0];
+            $pi_rcur = (int) $frst_rcur[1];
+            if ($pi_frst) {
+              $pi_ids[] = $pi_frst;
+            }
+            if ($pi_rcur) {
+              $pi_ids[] = $pi_rcur;
+            }
+
+          } else {
+            // this is a simple pi
+            $pi_id = (int) $pi_value;
+            if ($pi_id) {
+              $pi_ids[] = $pi_id;
+            }
+          }
+        }
+      }
+
+      // now load all of those payment instruments used by creditors
+      $instruments = civicrm_api3('OptionValue', 'get', [
+        'option_group_id' => 'payment_instrument',
+        'value'           => ['IN' => $pi_ids],
+        'is_active'       => 1,
+        'return'          => 'value,name,label',
+      ]);
+      foreach ($instruments['values'] as $instrument) {
+        $payment_instrument_id = $instrument['value'];
+        $instrument['id'] = $payment_instrument_id;
+        $sdd_payment_instruments[$payment_instrument_id] = $instrument;
+      }
+    }
+    return $sdd_payment_instruments;
+  }
+
+
+  /**
+   * Get the payment instruments used for the given creditor
+   *
+   * @param integer $creditor_id
+   *    SddCreditor ID
+   * @param string $type
+   *    one of ['OOFF', 'FRST', 'RCUR']
+   *
+   * @return array
+   *    list of payment instrument data
+   */
+  public static function getPaymentInstrumentsForCreditor($creditor_id, $type)
+  {
+    // get the creditor
+    $creditors = self::getAllSddCreditors();
+    $creditor = CRM_Utils_Array::value($creditor_id, $creditors);
+    if (!$creditor) {
+      return NULL; // creditor not found
+    }
+
+    // now extract the IDs as defined by the creditor
+    $payment_instrument_ids = [];
+    if ($type == 'OOFF') {
+      $payment_instrument_ids = explode(',', $creditor['pi_ooff']);
+
+    } elseif ($type == 'FRST' || $type == 'RCUR') {
+      foreach (explode(',', $creditor['pi_rcur']) as $pi_spec) {
+        if (strstr($pi_spec, '-')) {
+          // this is a frst-rcur combo
+          $frst_rcur = explode('-', $pi_spec, 2);
+          if ($type == 'FRST') {
+            $payment_instrument_ids[] = (int) $frst_rcur[0];
+          } else {
+            $payment_instrument_ids[] = (int) $frst_rcur[1];
+          }
+        } else {
+          // this is one simple type
+          $payment_instrument_ids[] = (int) $pi_spec;
+        }
+      }
+
+    } else {
+      Civi::log()->warning("Invalid type '{$type}' passed to CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor()");
+    }
+
+    // strip duplicates
+    $payment_instrument_ids = array_unique($payment_instrument_ids);
+
+    // now return a subset of the payment instruments (there's probably some array_xxx magic for this...)
+    $result_payment_instruments = [];
+    foreach (self::getAllSddPaymentInstruments() as $existing_payment_instrument) {
+      if (in_array($existing_payment_instrument['id'], $payment_instrument_ids)) {
+        $result_payment_instruments[$existing_payment_instrument['id']] = $existing_payment_instrument;
+      }
+    }
+
+    return $result_payment_instruments;
   }
 }
