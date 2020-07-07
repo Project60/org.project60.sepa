@@ -106,6 +106,16 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
        array('class' => 'crm-select2')
     );
 
+    // add payment instrument
+    $this->add(
+      'select',
+      'payment_instrument_id',
+      E::ts('Payment Method'),
+      $this->getPaymentInstrumentList(),
+      TRUE,
+      array('class' => 'crm-select2')
+    );
+
     // add financial type
     $this->add(
         'select',
@@ -418,6 +428,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'contact_id'                => $values['cid'],
         'campaign_id'               => $values['campaign_id'],
         'financial_type_id'         => $values['financial_type_id'],
+        'payment_instrument_id'     => $values['payment_instrument_id'],
         'currency'                  => $values['currency'],
         'iban'                      => $values['iban'],
         'bic'                       => empty($values['bic']) ? 'NOTPROVIDED' : $values['bic'],
@@ -507,9 +518,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    */
   protected function getCreditors() {
     $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
-
-    $creditor_query = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
-    $creditors = $creditor_query['values'];
+    $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
 
     foreach ($creditors as &$creditor) {
       // add default flag
@@ -524,6 +533,16 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       $creditor['buffer_days'] = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
       $creditor['ooff_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $creditor['id']);
       $creditor['frst_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor['id']);
+
+      // add FRST/OOFF payment instruments
+      $frst_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor['id'], 'FRST');
+      foreach ($frst_pis as $pi) {
+        $creditor['pi_frst'][$pi['id']] = $pi['label'];
+      }
+      $ooff_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor['id'], 'OOFF');
+      foreach ($ooff_pis as $pi) {
+        $creditor['pi_ooff'][$pi['id']] = $pi['label'];
+      }
     }
 
     return $creditors;
@@ -555,6 +574,19 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     foreach ($query['values'] as $value) {
       $list[$value['id']] = $value['name'];
+    }
+
+    return $list;
+  }
+
+  /**
+   * Get the list of (CiviSEPA) payment instruments
+   */
+  protected function getPaymentInstrumentList() {
+    $list = array();
+    $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getAllSddPaymentInstruments();
+    foreach ($payment_instruments as $payment_instrument) {
+      $list[$payment_instrument['id']] = $payment_instrument['label'];
     }
 
     return $list;
