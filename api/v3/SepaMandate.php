@@ -84,6 +84,30 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       throw new Exception("Couldn't load creditor [{$params['creditor_id']}].");
     }
 
+    // verify/set payment_instrument_id
+    $pi_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
+    $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $pi_status);
+    if (empty($params['payment_instrument_id'])) {
+      // no payment instrument given, see if there is a unique one set
+      if (count($eligible_payment_instruments) == 1) {
+        // there is exactly one instrument defined -> use that
+        $params['payment_instrument_id'] = reset($eligible_payment_instruments)['id'];
+
+      } elseif (count($eligible_payment_instruments) == 0) {
+        // no payment instrument -> disabled
+        throw new Exception("{$pi_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
+      } else {
+        // unclear which one to take
+        throw new Exception("You have to define the payment_instrument_id for {$pi_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
+      }
+
+    } else {
+      // a payment instrument is set, verify that it's allowed
+      if (!in_array($params['payment_instrument_id'], $eligible_payment_instruments)) {
+        throw new Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$pi_status} mandates with creditor ID [{$params['creditor_id']}].");
+      }
+    }
+
     // if BIC is used for this creditor, it is required (see #245)
     if (empty($params['bic'])) {
       if ($creditor['uses_bic']) {
@@ -108,7 +132,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     if ($params['type']=='RCUR') {
     	$contribution_entity = 'ContributionRecur';
 	    $contribution_table  = 'civicrm_contribution_recur';
-      	$create_contribution['payment_instrument_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
+      	$create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
       	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'FRST'; // set default status
       	if (empty($create_contribution['is_pay_later']))
@@ -117,7 +141,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     } elseif ($params['type']=='OOFF') {
 	 	$contribution_entity = 'Contribution';
 	    $contribution_table  = 'civicrm_contribution';
-      	$create_contribution['payment_instrument_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
+      	$create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
       	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'OOFF'; // set default status
       	if (empty($create_contribution['total_amount']))
@@ -231,6 +255,12 @@ function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Financial type of the contribution(s)',
+  );
+  $params['payment_instrument_id'] = array(
+    'name'         => 'payment_instrument_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Payment Method',
   );
   $params['campaign_id'] = array(
     'name'         => 'campaign_id',
