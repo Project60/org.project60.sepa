@@ -492,8 +492,8 @@ div.sdd-add-creditor {
           cj('#addcreditor_id').val(data['identifier']);
           cj('#addcreditor_iban').val(data['iban']);
           cj('#addcreditor_bic').val(data['bic']);
-          cj('#addcreditor_pi_ooff').val(data['pi_ooff'].split(',')).change();
-          cj('#addcreditor_pi_rcur').val(data['pi_rcur'].split(',')).change();
+          cj('#addcreditor_pi_ooff').val(data['pi_ooff'] ? data['pi_ooff'].split(',') : []).change();
+          cj('#addcreditor_pi_rcur').val(data['pi_rcur'] ? data['pi_rcur'].split(',') : []).change();
           cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
           cj("#addcreditor_currency").val(data['currency']);
           cj("#addcreditor_type").val(data['creditor_type']);
@@ -557,8 +557,8 @@ div.sdd-add-creditor {
     }
 
     // add payment instruments
-    updatedCreditorInfo['pi_ooff'] = cj("#addcreditor_pi_ooff").val().join(',');
-    updatedCreditorInfo['pi_rcur'] = cj("#addcreditor_pi_rcur").val().join(',');
+    updatedCreditorInfo['pi_ooff'] = cj("#addcreditor_pi_ooff").val() ? cj("#addcreditor_pi_ooff").val().join(',') : '';
+    updatedCreditorInfo['pi_rcur'] = cj("#addcreditor_pi_rcur").val() ? cj("#addcreditor_pi_rcur").val().join(',') : '';
 
     if (cj('#is_test_creditor').is(':checked')) {
       updatedCreditorInfo['category'] = "TEST";
