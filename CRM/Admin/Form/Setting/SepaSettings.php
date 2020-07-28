@@ -207,7 +207,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $amm_options = CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')?array('checked'=>'checked'):array();
         $this->addElement('checkbox', 'allow_mandate_modification', ts("Mandate Modifications", array('domain' => 'org.project60.sepa')), NULL, $amm_options);
 
-        parent::buildQuickForm();
+        // add JS logic
+        CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/SepaSettings.js');
+
+      parent::buildQuickForm();
     }
 
     function postProcess() {
