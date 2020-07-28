@@ -103,7 +103,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 
     } else {
       // a payment instrument is set, verify that it's allowed
-      if (!in_array($params['payment_instrument_id'], $eligible_payment_instruments)) {
+      if (!array_key_exists($params['payment_instrument_id'], $eligible_payment_instruments)) {
         throw new Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$pi_status} mandates with creditor ID [{$params['creditor_id']}].");
       }
     }
