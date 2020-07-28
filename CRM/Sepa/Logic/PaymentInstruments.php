@@ -308,4 +308,20 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
     return $result_payment_instruments;
   }
+
+  /**
+   * Get the default payment instruments for SEPA creditors
+   *
+   * @return array
+   *   'ooff_sepa_default' -> payment instrument list
+   *   'rcur_sepa_default' -> payment instrument list
+   */
+  public static function getDefaultSEPAPaymentInstruments() {
+    $instruments = self::getSddPaymentInstruments();
+    return [
+      'ooff_sepa_default' => ["{$instruments['OOFF']['value']}"],
+      'rcur_sepa_default' => ["{$instruments['FRST']['value']}-{$instruments['RCUR']['value']}"],
+    ];
+  }
+
 }

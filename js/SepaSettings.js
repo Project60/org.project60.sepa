@@ -73,9 +73,10 @@ cj(function () {
                 }
             });
 
+            // // add a function to set default values for SEPA creditors
+            cj('#addcreditor_type').change(setDefaultSEPAPaymentInstruments);
         }
     });
-
 });
 
 /**
@@ -327,9 +328,26 @@ function updateCreditor() {
 }
 
 /**
+ * If the chosen creditor type is SEPA and there
+ *   are no payment instruments chose, this sets them to the standard
+ */
+function setDefaultSEPAPaymentInstruments() {
+    if (cj('#addcreditor_type').val() == 'SEPA') {
+        if (cj("#addcreditor_pi_ooff").val() || cj("#addcreditor_pi_rcur").val()) {
+            // there is some values set -> leave them alone
+        } else {
+            // set some defaults
+            cj("#addcreditor_pi_ooff").val(CRM.vars.p60sdd.ooff_sepa_default).change();
+            cj("#addcreditor_pi_rcur").val(CRM.vars.p60sdd.rcur_sepa_default).change();
+        }
+    }
+}
+
+/**
  * Reset creditor form
  */
 function resetValues() {
+    console.log("reset");
     cj('#custombatching :input').val("");
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
@@ -338,4 +356,5 @@ function resetValues() {
     cj('#add_uses_bic').prop('checked', false);
     cj('#addcreditor_pi_ooff').val('').change();
     cj('#addcreditor_pi_rcur').val('').change();
+    setDefaultSEPAPaymentInstruments();
 }
