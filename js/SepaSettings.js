@@ -12,10 +12,25 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-//let ts = CRM.ts();
-cj('#edit_creditor_id').val("none");
+/**
+ * These are batching parameters that are overwrites to the general settings
+ *  and are not stored in the creditor itself
+ */
+const customBatchingParams = [
+    ["cycledays_override", "custom_cycledays", null],
+    ["batching_OOFF_horizon_override", "custom_OOFF_horizon", null],
+    ["batching_OOFF_notice_override", "custom_OOFF_notice", null],
+    ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
+    ["batching_RCUR_grace_override", "custom_RCUR_grace", null],
+    ["batching_RCUR_notice_override", "custom_RCUR_notice", null],
+    ["batching_FRST_notice_override", "custom_FRST_notice", null],
+    ["custom_txmsg_override", "custom_txmsg", null]
+];
+
+
 
 // INITIALISATION
+cj('#edit_creditor_id').val("none");
 cj(function () {
     CRM.api3('Domain', 'getsingle', {
         'sequential': 1,
@@ -62,17 +77,6 @@ cj(function () {
     });
 
 });
-
-var customBatchingParams = [
-    ["cycledays_override", "custom_cycledays", null],
-    ["batching_OOFF_horizon_override", "custom_OOFF_horizon", null],
-    ["batching_OOFF_notice_override", "custom_OOFF_notice", null],
-    ["batching_RCUR_horizon_override", "custom_RCUR_horizon", null],
-    ["batching_RCUR_grace_override", "custom_RCUR_grace", null],
-    ["batching_RCUR_notice_override", "custom_RCUR_notice", null],
-    ["batching_FRST_notice_override", "custom_FRST_notice", null],
-    ["custom_txmsg_override", "custom_txmsg", null]
-];
 
 /**
  * Delete the given creditor
@@ -255,6 +259,11 @@ function updateCreditor() {
 
     if (updatedCreditorInfo['creditor_id'] === undefined) {
         CRM.alert(ts("You must provide a valid contact to save this creditor"), ts("Error"), "error");
+        return;
+    }
+
+    if (!(updatedCreditorInfo['pi_ooff'].length + updatedCreditorInfo['pi_rcur'].length)) {
+        CRM.alert(ts("You need to set at least one payment instrument"), ts("Error"), "error");
         return;
     }
 
