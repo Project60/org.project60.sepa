@@ -316,4 +316,22 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
         }
         return TRUE;
     }
+
+  /**
+   * SDD Payment processors have been moved to another extension,
+   *  so remove SDD payment processors if not used,
+   *  and disable/warn user otherwise
+   *
+   * @see https://github.com/project60/org.project60.sepa/issues/534
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1508() {
+    $this->ctx->log->info("Make sure the new action-provider actions are available.");
+    // run twice, classloader/psr-4 prefixes/angular is a tricky combination
+    CRM_Core_Invoke::rebuildMenuAndCaches();
+    CRM_Core_Invoke::rebuildMenuAndCaches();
+    return TRUE;
+  }
 }
