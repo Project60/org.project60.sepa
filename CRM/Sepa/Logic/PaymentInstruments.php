@@ -97,7 +97,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *
    * It simply checks, whether the contribution uses a SEPA payment instrument
    *
-   * @param $contribution   an array with the attributes of the contribution
+   * @param array $contribution
+   *   attributes of the contribution
    *
    * @return true if the contribution is a SEPA contribution
    *
@@ -324,4 +325,35 @@ class CRM_Sepa_Logic_PaymentInstruments {
     ];
   }
 
+
+  /**
+   * Return a list of FRST-RCUR payment instrument tuples for the given creditor
+   *
+   * @param integer $creditor_id
+   *    the creditor used
+   *
+   * @return array
+   *    [FRST-PI-id => RCUR-PI-id]
+   */
+  public static function getFrst2RcurMapping($creditor_id) {
+    static $creditor2frst_rcur_map = [];
+    if (!isset($creditor2frst_rcur_map[$creditor_id])) {
+      $creditor2frst_rcur_map[$creditor_id] = [];
+
+      // get the creditor data
+      $creditors = self::getAllSddCreditors();
+      $creditor = CRM_Utils_Array::value($creditor_id, $creditors);
+      if ($creditor) {
+        foreach (explode(',', $creditor['pi_rcur']) as $pi_spec) {
+          if (strstr($pi_spec, '-')) {
+            // this is a frst-rcur combo. record it!
+            $frst_rcur = explode('-', $pi_spec, 2);
+            $creditor2frst_rcur_map[$creditor_id][(int) $frst_rcur[0]] = (int) $frst_rcur[1];
+          }
+        }
+      }
+    }
+
+    return $creditor2frst_rcur_map[$creditor_id];
+  }
 }
