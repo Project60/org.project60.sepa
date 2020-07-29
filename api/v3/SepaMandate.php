@@ -86,6 +86,9 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 
     // verify/set payment_instrument_id
     $pi_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
+    if ($params['status'] == 'RCUR') { // if there is a status override, use that
+      $pi_status = 'RCUR';
+    }
     $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $pi_status);
     if (empty($params['payment_instrument_id'])) {
       // no payment instrument given, see if there is a unique one set
@@ -148,7 +151,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       		$create_contribution['total_amount'] = $create_contribution['amount']; // copy from amount
 
     } else {
-    	return civicrm_api3_create_error('Unknown mandata type: '.$params['type']);
+    	return civicrm_api3_create_error('Unknown mandate type: '.$params['type']);
     }
 
     // create the contribution

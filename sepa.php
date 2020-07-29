@@ -43,11 +43,10 @@ function sepa_civicrm_pageRun( &$page ) {
   } elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
     if (CRM_Core_Permission::check('view sepa mandates')) {
-      if (!CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
-        return;
-
       $contribution_id = $page->getTemplate()->get_template_vars('id');
-      if (empty($contribution_id)) return;
+      if (empty($contribution_id) || !CRM_Sepa_Logic_PaymentInstruments::getContributionMandateID($contribution_id)) {
+        return; // not a SEPA contribution
+      }
 
       if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
         // This is an installment of a recurring contribution.
@@ -91,20 +90,20 @@ function sepa_civicrm_pageRun( &$page ) {
   }
 
   elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
-    // recurring contribuion view
+    // recurring contribution view
     if (CRM_Core_Permission::check('view sepa mandates')) {
       $recur = $page->getTemplate()->get_template_vars("recur");
-
-      // This is a one-off contribution => try to show mandate data.
-      $template_vars = $page->getTemplate()->get_template_vars('recur');
-      $payment_instrument_id = $template_vars['payment_instrument_id'];
-      if (!CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
-        return;
-
-      $mandate = civicrm_api3("SepaMandate","getsingle",array("entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
-      if (!array_key_exists("id",$mandate)) {
-          CRM_Core_Error::fatal(ts("Can't find the sepa mandate", array('domain' => 'org.project60.sepa')));
+      if (empty($recur['id'])) {
+        return; // nothing to do here
       }
+
+      // find mandate
+      $mandate_id = CRM_Sepa_Logic_PaymentInstruments::getRecurringContributionMandateID($recur['id']);
+      if (empty($mandate_id)) {
+        // this is not a SEPA recurring contribution
+        return;
+      }
+      $mandate = civicrm_api3("SepaMandate","getsingle", ['id' => $mandate_id]);
 
       // load notes
       $mandate['notes'] = array();
@@ -445,6 +444,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     $contribution_id = $form->getVar('_id');
     if (empty($contribution_id)) return;
 
+    // TODO: rework:
     // find the attached mandate, if exists
     $mandates = CRM_Sepa_Logic_Settings::getMandateFor($contribution_id);
     if (empty($mandates)) {

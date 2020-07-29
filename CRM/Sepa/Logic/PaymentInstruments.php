@@ -18,52 +18,44 @@
  */
 class CRM_Sepa_Logic_PaymentInstruments {
 
-  protected static $sdd_pi_names            = array('FRST', 'RCUR', 'OOFF');
-
   // caches
-  protected static $sdd_payment_instruments = NULL;
   protected static $contribution_id_to_pi   = array();
 
   /**
    * get the SDD payment instruments, indexed by name
    *
-   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
+   * @return array
+   *   map name => payment instrument id
    */
   public static function getSddPaymentInstruments() {
-    if (self::$sdd_payment_instruments === NULL) {
-      $instrument_query = civicrm_api3('OptionValue', 'get', array(
-        'option_group_id' => 'payment_instrument',
-        'name'            => array('IN' => array('FRST', 'RCUR', 'OOFF')),
-        'return'          => 'value,name,label',
-        'sequential'      => 0
-      ));
-      self::$sdd_payment_instruments = array();
-      foreach ($instrument_query['values'] as $pi) {
-        self::$sdd_payment_instruments[$pi['name']] = $pi;
+    static $result = null;
+    if ($result === null) {
+      $all_pis = self::getAllSddPaymentInstruments();
+      foreach ($all_pis as $pi_id => $pi_data) {
+        $result[$pi_data['name']] = $pi_data['value'];
       }
     }
-    return self::$sdd_payment_instruments;
+    return $result;
   }
 
   /**
    * the payment instrument ID for a given SDD type (RCUR,OOFF,FRST)
    *
-   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
+   * @param string $sdd_name
+   *   PI name
+   *
+   * @return integer
+   *   PI ID
    */
   public static function getSddPaymentInstrumentID($sdd_name) {
-    $payment_instruments = self::getSddPaymentInstruments();
-    foreach ($payment_instruments as $payment_instrument) {
-      if ($payment_instrument['name'] == $sdd_name) {
-        return $payment_instrument['value'];
-      }
-    }
-    return NULL;
+    $all_pis = self::getSddPaymentInstruments();
+    return CRM_Utils_Array::value($sdd_name, $all_pis);
   }
 
   /**
    * look up the SDD payment instrument for the given contribution
    *
-   * @return OOFF, FRST, RCUR or NULL (if not SDD)
+   * @return string OOFF, FRST, RCUR or NULL (if not SDD)
    *
    * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
    */
@@ -92,8 +84,63 @@ class CRM_Sepa_Logic_PaymentInstruments {
   }
 
   /**
+   * Give a (cache) ID of the sepa mandate belonging to this contribution (if any)
+   *
+   * @param integer $contribution_id
+   *   contribution to look up
+   *
+   * @return integer
+   *   mandate ID or 0
+   */
+  public static function getContributionMandateID($contribution_id) {
+    static $mandate_by_contribution_id = [];
+    $contribution_id = (int) $contribution_id;
+    if (!isset($mandate_by_contribution_id[$contribution_id])) {
+      // run a SQL query
+      $mandate_id = CRM_Core_DAO::singleValueQuery("
+      SELECT COALESCE(ooff_mandate.id, rcur_mandate.id)
+      FROM civicrm_contribution contribution
+      LEFT JOIN civicrm_contribution_recur recurring_contribution 
+             ON recurring_contribution.id = contribution.contribution_recur_id
+      LEFT JOIN civicrm_sdd_mandate        rcur_mandate 
+             ON rcur_mandate.entity_table = 'civicrm_contribution_recur'
+             AND rcur_mandate.entity_id = recurring_contribution.id
+      LEFT JOIN civicrm_sdd_mandate        ooff_mandate 
+             ON ooff_mandate.entity_table = 'civicrm_contribution'
+             AND ooff_mandate.entity_id = contribution.id
+      WHERE contribution.id = {$contribution_id}");
+      $mandate_by_contribution_id[$contribution_id] = (int) $mandate_id;
+    }
+    return $mandate_by_contribution_id[$contribution_id];
+  }
+
+  /**
+   * Give a (cache) ID of the sepa mandate belonging to this recurring contribution (if any)
+   *
+   * @param integer $recurring_contribution_id
+   *   recurring contribution to look up
+   *
+   * @return integer
+   *   mandate ID or 0
+   */
+  public static function getRecurringContributionMandateID($recurring_contribution_id) {
+    static $mandate_by_rcontribution_id = [];
+    $recurring_contribution_id = (int) $recurring_contribution_id;
+    if (!isset($mandate_by_rcontribution_id[$recurring_contribution_id])) {
+      // run a SQL query
+      $mandate_id = CRM_Core_DAO::singleValueQuery("
+      SELECT mandate.id
+      FROM civicrm_mandate
+      WHERE mandate.entity_table = 'civicrm_contribution_recur'
+        AND  rcur_mandate.entity_id = {$recurring_contribution_id}");
+      $mandate_by_rcontribution_id[$recurring_contribution_id] = (int) $mandate_id;
+    }
+    return $mandate_by_contribution_id[$recurring_contribution_id];
+  }
+
+  /**
    * Checks if a given contribution is a SEPA contribution.
-   * This works for contribution and contribution_recur entities
+   *   This works for contribution and contribution_recur entities
    *
    * It simply checks, whether the contribution uses a SEPA payment instrument
    *
@@ -102,7 +149,10 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *
    * @return true if the contribution is a SEPA contribution
    *
-   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
+   * @deprecated With the introduction of #572 this doesn't work reliably any more.
+   *  Use getContributionMandateID or getRecurringContributionMandateID instead
+   *
+   * @see https://github.com/Project60/org.project60.sepa/issues/572
    */
   public static function isSDD($contribution) {
     if (!empty($contribution['payment_instrument_id'])) {
