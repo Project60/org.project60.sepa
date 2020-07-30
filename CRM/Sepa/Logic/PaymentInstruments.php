@@ -100,12 +100,12 @@ class CRM_Sepa_Logic_PaymentInstruments {
       $mandate_id = CRM_Core_DAO::singleValueQuery("
       SELECT COALESCE(ooff_mandate.id, rcur_mandate.id)
       FROM civicrm_contribution contribution
-      LEFT JOIN civicrm_contribution_recur recurring_contribution 
+      LEFT JOIN civicrm_contribution_recur recurring_contribution
              ON recurring_contribution.id = contribution.contribution_recur_id
-      LEFT JOIN civicrm_sdd_mandate        rcur_mandate 
+      LEFT JOIN civicrm_sdd_mandate        rcur_mandate
              ON rcur_mandate.entity_table = 'civicrm_contribution_recur'
              AND rcur_mandate.entity_id = recurring_contribution.id
-      LEFT JOIN civicrm_sdd_mandate        ooff_mandate 
+      LEFT JOIN civicrm_sdd_mandate        ooff_mandate
              ON ooff_mandate.entity_table = 'civicrm_contribution'
              AND ooff_mandate.entity_id = contribution.id
       WHERE contribution.id = {$contribution_id}");
@@ -251,7 +251,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
       // collect OOFF payment instruments
       foreach ($creditors as $creditor) {
         $creditor_id = (int) $creditor['id'];
-        foreach (explode(',', $creditor['pi_ooff']) as $pi_value) {
+        $creditor_pi_ooff = CRM_Utils_Array::value('pi_ooff', $creditor, '');
+        foreach (explode(',', $creditor_pi_ooff) as $pi_value) {
           $pi_id = (int) $pi_value;
           if ($pi_id) {
             $pi_ids[] = $pi_id;
@@ -261,7 +262,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
       // collect RCUR payment instruments
       foreach ($creditors as $creditor) {
-        foreach (explode(',', $creditor['pi_rcur']) as $pi_value) {
+        $creditor_pi_rcur = CRM_Utils_Array::value('pi_rcur', $creditor, '');
+        foreach (explode(',', $creditor_pi_rcur) as $pi_value) {
           if (strstr($pi_value, '-')) {
             // this is a frst-rcur combo
             $frst_rcur = explode('-', $pi_value, 2);
@@ -285,16 +287,18 @@ class CRM_Sepa_Logic_PaymentInstruments {
       }
 
       // now load all of those payment instruments used by creditors
-      $instruments = civicrm_api3('OptionValue', 'get', [
-        'option_group_id' => 'payment_instrument',
-        'value'           => ['IN' => $pi_ids],
-        'is_active'       => 1,
-        'return'          => 'value,name,label',
-      ]);
-      foreach ($instruments['values'] as $instrument) {
-        $payment_instrument_id = $instrument['value'];
-        $instrument['id'] = $payment_instrument_id;
-        $sdd_payment_instruments[$payment_instrument_id] = $instrument;
+      if (!empty($pi_ids)) {
+        $instruments = civicrm_api3('OptionValue', 'get', [
+          'option_group_id' => 'payment_instrument',
+          'value'           => ['IN' => $pi_ids],
+          'is_active'       => 1,
+          'return'          => 'value,name,label',
+        ]);
+        foreach ($instruments['values'] as $instrument) {
+          $payment_instrument_id = $instrument['value'];
+          $instrument['id'] = $payment_instrument_id;
+          $sdd_payment_instruments[$payment_instrument_id] = $instrument;
+        }
       }
     }
     return $sdd_payment_instruments;
@@ -323,10 +327,10 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
     // now extract the IDs as defined by the creditor
     $payment_instrument_ids = [];
-    if ($type == 'OOFF') {
+    if (isset($creditor['pi_ooff']) && $type == 'OOFF') {
       $payment_instrument_ids = explode(',', $creditor['pi_ooff']);
 
-    } elseif ($type == 'FRST' || $type == 'RCUR') {
+    } elseif (isset($creditor['pi_rcur']) && ($type == 'FRST' || $type == 'RCUR')) {
       foreach (explode(',', $creditor['pi_rcur']) as $pi_spec) {
         if (strstr($pi_spec, '-')) {
           // this is a frst-rcur combo
