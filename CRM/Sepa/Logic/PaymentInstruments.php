@@ -20,7 +20,17 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
   // caches
   protected static $contribution_id_to_pi   = [];
-  public static $sdd_creditors              = NULL;
+  protected static $sdd_creditors           = NULL;
+  protected static $sdd_payment_instruments = NULL;
+
+  /**
+   * This class uses heavy caching, so this method allows
+   *  you to clear the cache after changing anything about a creditor
+   */
+  public static function clearCaches() {
+    self::$sdd_creditors = NULL;
+    self::$sdd_payment_instruments = null;
+  }
 
   /**
    * get the SDD payment instruments, indexed by name
@@ -29,7 +39,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *   map name => payment instrument id
    */
   public static function getSddPaymentInstruments() {
-    static $result = null;
+    $result = null;
     if ($result === null) {
       $all_pis = self::getAllSddPaymentInstruments();
       foreach ($all_pis as $pi_id => $pi_data) {
@@ -240,9 +250,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
    */
   public static function getAllSddPaymentInstruments()
   {
-    static $sdd_payment_instruments = NULL;
-    if ($sdd_payment_instruments === NULL) {
-      $sdd_payment_instruments = [];
+    if (self::$sdd_payment_instruments === NULL) {
+      self::$sdd_payment_instruments = [];
 
       // first, collect all payment instruments in use
       $creditors = self::getAllSddCreditors();
@@ -297,11 +306,11 @@ class CRM_Sepa_Logic_PaymentInstruments {
         foreach ($instruments['values'] as $instrument) {
           $payment_instrument_id = $instrument['value'];
           $instrument['id'] = $payment_instrument_id;
-          $sdd_payment_instruments[$payment_instrument_id] = $instrument;
+          self::$sdd_payment_instruments[$payment_instrument_id] = $instrument;
         }
       }
     }
-    return $sdd_payment_instruments;
+    return self::$sdd_payment_instruments;
   }
 
 

@@ -162,6 +162,32 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   #region Test helpers
 
   /**
+   * This allows test to create their own creditor instance,
+   *    that's different from the main creditor
+   *
+   * @param array $params
+   *   a list of parameters that are to be different from the default creditor
+   *
+   * @return integer
+   *   new creditor ID
+   */
+  protected function getCustomCreditor($params)
+  {
+    // load the default creditor
+    $creditor_template = $this->callAPISuccess('SepaCreditor', 'getsingle', ['id' => $this->testCreditorId]);
+    unset($creditor_template['id']);
+    unset($creditor_template['creditor_id']);
+    $creditor_template['name'] = "creditor-" . random_int(0, 999999);
+
+    // add custom data
+    foreach ($params as $key => $value) {
+      $creditor_template[$key] = $value;
+    }
+    $creditor = $this->callAPISuccess('SepaCreditor', 'create', $creditor_template);
+    return $creditor['id'];
+  }
+
+  /**
    * Remove 'xdebug' result key set by Civi\API\Subscriber\XDebugSubscriber
    *
    * This breaks some tests when xdebug is present, and we don't need it.
