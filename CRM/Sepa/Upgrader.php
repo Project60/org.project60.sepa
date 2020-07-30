@@ -172,7 +172,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
     CRM_Core_DAO::executeQuery("
         UPDATE civicrm_contribution_recur rcur
-        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = rcur.id 
+        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = rcur.id
                                                AND mandate.entity_table = 'civicrm_contribution_recur'
           SET rcur.contribution_status_id = {$status_pending}
         WHERE rcur.contribution_status_id = {$status_inprogress}
@@ -183,8 +183,8 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $lost_contributions = CRM_Core_DAO::singleValueQuery("
         SELECT COUNT(*)
         FROM civicrm_contribution contribution
-        LEFT JOIN  civicrm_sdd_contribution_txgroup c2txg ON c2txg.contribution_id = contribution.id 
-        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = contribution.contribution_recur_id 
+        LEFT JOIN  civicrm_sdd_contribution_txgroup c2txg ON c2txg.contribution_id = contribution.id
+        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = contribution.contribution_recur_id
                                                AND mandate.entity_table = 'civicrm_contribution_recur'
         WHERE contribution.contribution_status_id = {$status_inprogress}
           AND mandate.id IS NOT NULL
@@ -362,13 +362,29 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
         }
 
         // fill with the fields with the implicit default
-        $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
-        $default_pi_ooff = isset($sepa_pis['OOFF']['value']) ? $sepa_pis['OOFF']['value'] : '';
-        $default_pi_rcur = isset($sepa_pis['FRST']['value']) && isset($sepa_pis['RCUR']['value']) ? "{$sepa_pis['FRST']['value']}-{$sepa_pis['RCUR']['value']}" : '';
+      $classic_payment_instruments = civicrm_api3('OptionValue', 'get', [
+        'option_group_id' => 'payment_instrument',
+        'name'            => ['IN' => ['OOFF', 'FRST', 'RCUR']],
+        'return'          => 'name,value']);
+      $classic_payment_instrument_ids = [];
+      foreach ($classic_payment_instruments['values'] as $classic_payment_instrument) {
+        $classic_payment_instrument_ids[$classic_payment_instrument['name']] = $classic_payment_instrument['value'];
+      }
+
+      if (count($classic_payment_instrument_ids) <> 3) {
+        // We have a problem if the old payment instruments have been disabled
+        $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
+        CRM_Core_Session::setStatus($message, E::ts("Missing payment instruments!", [1 => $use_count]), 'warn');
+        Civi::log()->warning($message);
+
+      } else {
+        // all is fine -> set old PIs as default
         CRM_Core_DAO::executeQuery("UPDATE civicrm_sdd_creditor SET pi_ooff = %1, pi_rcur = %2;", [
-            1 => [$default_pi_ooff, 'String'],
-            2 => [$default_pi_rcur, 'String']
+          1 => ["{$classic_payment_instrument_ids['OOFF']}", 'String'],
+          2 => ["{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}", 'String']
         ]);
-        return TRUE;
+      }
+
+      return TRUE;
     }
 }
