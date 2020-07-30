@@ -51,6 +51,8 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
    * in the $mandate_data array with respect to the creditor settings
    *
    * Caution: will NOT modify the mandata on the database!
+   *
+   * @deprecated this is not used by this extension, will be removed in CiviSEPA >= 1.6
    */
   public static function initialiseMandateData($creditor_id, &$mandate_data) {
     if (empty($creditor_id) || empty($mandate_data['id']) || empty($mandate_data['type'])) return;
