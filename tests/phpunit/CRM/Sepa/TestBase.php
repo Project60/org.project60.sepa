@@ -97,11 +97,10 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
   public function setUp(): void
   {
+    parent::setUp();
     $this->testCreditorId = $this->setUpCreditor();
 
     // TODO: Should we make sure that there are no mandates and groups open?
-
-    parent::setUp();
   }
 
   public function tearDown(): void

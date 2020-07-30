@@ -34,9 +34,8 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
 
   public function setUp(): void
   {
-    $this->setCreditorConfiguration('uses_bic', 'true');
-
     parent::setUp();
+    $this->setCreditorConfiguration('uses_bic', 'true');
   }
 
   /**
