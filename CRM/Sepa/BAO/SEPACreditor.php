@@ -42,6 +42,9 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
     $dao->copyValues($params);
     $dao->save();
 
+    // reset creditor cache
+    CRM_Sepa_Logic_PaymentInstruments::$sdd_creditors = NULL;
+
     CRM_Utils_Hook::post($hook, 'SepaCreditor', $dao->id, $dao);
     return $dao;
   }

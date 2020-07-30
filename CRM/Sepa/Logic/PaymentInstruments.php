@@ -19,7 +19,8 @@
 class CRM_Sepa_Logic_PaymentInstruments {
 
   // caches
-  protected static $contribution_id_to_pi   = array();
+  protected static $contribution_id_to_pi   = [];
+  public static $sdd_creditors              = NULL;
 
   /**
    * get the SDD payment instruments, indexed by name
@@ -219,17 +220,16 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *  [id => creditor data]
    */
   public static function getAllSddCreditors() {
-    static $sdd_creditors = NULL;
-    if ($sdd_creditors === NULL) {
-      $sdd_creditors = [];
+    if (self::$sdd_creditors === NULL) {
+      self::$sdd_creditors = [];
       $creditors = civicrm_api3('SepaCreditor', 'get', [
         'option.limit' => 0,
       ]);
       foreach ($creditors['values'] as $creditor) {
-        $sdd_creditors[$creditor['id']] = $creditor;
+        self::$sdd_creditors[$creditor['id']] = $creditor;
       }
     }
-    return $sdd_creditors;
+    return self::$sdd_creditors;
   }
 
   /**
@@ -322,7 +322,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
     $creditors = self::getAllSddCreditors();
     $creditor = CRM_Utils_Array::value($creditor_id, $creditors);
     if (!$creditor) {
-      return NULL; // creditor not found
+      return []; // creditor not found
     }
 
     // now extract the IDs as defined by the creditor
