@@ -171,6 +171,25 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $creditor_type;
   /**
+   * does this creditor use BICs
+   *
+   * @var integer
+   */
+  public $uses_bic;
+  /**
+   * list of comma separated payment instruments (OOFF)
+   *
+   * @var string
+   */
+  public $pi_ooff;
+  /**
+   * list of comma separated payment instruments (RCUR)
+   *
+   * @var string
+   */
+  public $pi_rcur;
+
+  /**
    * class constructor
    *
    * @access public
