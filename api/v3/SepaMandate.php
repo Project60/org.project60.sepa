@@ -73,12 +73,12 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
  * @return array API result array
  */
 function civicrm_api3_sepa_mandate_createfull($params) {
-    // create the "contract" first: a contribution
-    // TODO: sanity checks
+    // TODO: more sanity checks?
 
     // get creditor
     try {
       _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
+      $creditors = civicrm_api3('SepaCreditor', 'get', []);
       $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $params['creditor_id']));
     } catch (Exception $e) {
       throw new Exception("Couldn't load creditor [{$params['creditor_id']}].");
@@ -86,7 +86,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 
     // verify/set payment_instrument_id
     $pi_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
-    if ($params['status'] == 'RCUR') { // if there is a status override, use that
+    if (isset($params['status']) && $params['status'] == 'RCUR') { // if there is a status override, use that
       $pi_status = 'RCUR';
     }
     $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $pi_status);
