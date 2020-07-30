@@ -118,6 +118,9 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   private function setUpCreditor(): string
   {
+    // make sure there is at least one...
+    CRM_Sepa_BAO_SEPACreditor::addDefaultCreditorIfMissing();
+
     // Fetch the test creditor:
     $creditorId = $this->callAPISuccessGetValue(
       'SepaCreditor',
@@ -135,7 +138,8 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
         'creditor_type' => 'SEPA',
         'uses_bic' => false,
         'currency'  => 'EUR',
-        'category' => null, // It must NOT be a test creditor!
+        'category' => null, // It must NOT be a test creditor!,
+        ''
       ]
     );
 

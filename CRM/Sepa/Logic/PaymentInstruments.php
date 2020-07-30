@@ -410,4 +410,34 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
     return $creditor2frst_rcur_map[$creditor_id];
   }
+
+  /**
+   * Will get the list of the three classic SEPA payment instruments
+   *   OOFF, FRST, RCUR
+   *
+   * @return array
+   *   [name => id]
+   *
+   * @throws Exception
+   *   if not all of these payment instruments could be identified
+   */
+  public static function getClassicSepaPaymentInstruments() {
+    static $classic_payment_instrument_ids = NULL;
+    if ($classic_payment_instrument_ids === null) {
+      $classic_payment_instrument_ids = [];
+      $classic_payment_instruments = civicrm_api3('OptionValue', 'get', [
+        'option_group_id' => 'payment_instrument',
+        'name'            => ['IN' => ['OOFF', 'FRST', 'RCUR']],
+        'return'          => 'name,value']);
+      foreach ($classic_payment_instruments['values'] as $classic_payment_instrument) {
+        $classic_payment_instrument_ids[$classic_payment_instrument['name']] = $classic_payment_instrument['value'];
+      }
+    }
+
+    if (count($classic_payment_instrument_ids) <> 3) {
+      throw new Exception("Missing classic SEPA payment instruments ('OOFF', 'FRST', 'RCUR')");
+    } else {
+      return $classic_payment_instrument_ids;
+    }
+  }
 }

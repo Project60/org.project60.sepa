@@ -81,5 +81,37 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
       }
     }
   }
+
+  /**
+   * If there is currently no creditors available, create one
+   */
+  public static function addDefaultCreditorIfMissing() {
+    $creditor_count = civicrm_api3('SepaCreditor', 'getcount');
+    if (empty($creditor_count)) {
+      // get the classic payment instruments
+      try {
+        $classic_payment_instrument_ids = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
+        civicrm_api3('SepaCreditor', 'create', [
+          'identifier'     => 'TEST CREDITOR',
+          'name'           => 'TESTCREDITORDE',
+          'address'        => '221B Baker Street\nLondon',
+          'country_id'     => '1226',
+          'iban'           => 'DE12500105170648489890',
+          'bic'            => 'SEPATEST',
+          'mandate_prefix' => 'TEST',
+          'mandate_active' => 1,
+          'category'       => 'TEST',
+          'currency'       => 'EUR',
+          'creditor_type'  => 'SEPA',
+          'uses_bic'       => 1,
+          'label'          => 'Test Creditor',
+          'pi_ooff'        => "{$classic_payment_instrument_ids['OOFF']}",
+          'pi_rcur'        => "{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}",
+        ]);
+      } catch (Exception $ex) {
+        throw new Exception("Couldn't create default creditor: " . $ex->getMessage());
+      }
+    }
+  }
 }
 

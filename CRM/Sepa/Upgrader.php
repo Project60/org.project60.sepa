@@ -43,29 +43,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
       CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
 
       // create default creditor
-      $creditor_count = civicrm_api3('SepaCreditor', 'getcount');
-      if (empty($creditor_count)) {
-          $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
-          $default_pi_ooff = isset($sepa_pis['OOFF']['value']) ? $sepa_pis['OOFF']['value'] : '';
-          $default_pi_rcur = isset($sepa_pis['FRST']['value']) && isset($sepa_pis['RCUR']['value']) ? "{$sepa_pis['FRST']['value']}-{$sepa_pis['RCUR']['value']}" : '';
-          civicrm_api3('SepaCreditor', 'create', [
-              'identifier' => 'TEST CREDITOR',
-              'name' => 'TESTCREDITORDE',
-              'address' => '221B Baker Street\nLondon',
-              'country_id' => '1226',
-              'iban' => 'DE12500105170648489890',
-              'bic' => 'SEPATEST',
-              'mandate_prefix' => 'TEST',
-              'mandate_active' => 1,
-              'category' => 'TEST',
-              'currency' => 'EUR',
-              'creditor_type' => 'SEPA',
-              'uses_bic' => 1,
-              'label' => 'Test Creditor',
-              'pi_ooff' => $default_pi_ooff,
-              'pi_rcur' => $default_pi_rcur,
-          ]);
-      }
+      CRM_Sepa_BAO_SEPACreditor::addDefaultCreditorIfMissing();
   }
 
   /**
@@ -350,39 +328,29 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
      * @throws Exception
      */
     public function upgrade_1601() {
-        // add currency
-        $this->ctx->log->info('Added payment instrument fields');
-        $pi_ooff = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_ooff';");
-        if (!$pi_ooff) {
-            $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_ooff` varchar(64) COMMENT 'payment instruments, comma separated, to be used for one-off collections';");
-        }
-        $pi_rcur = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_rcur';");
-        if (!$pi_rcur) {
-            $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_rcur` varchar(64) COMMENT 'payment instruments, comma separated, to be used for recurring collections';");
-        }
-
-        // fill with the fields with the implicit default
-      $classic_payment_instruments = civicrm_api3('OptionValue', 'get', [
-        'option_group_id' => 'payment_instrument',
-        'name'            => ['IN' => ['OOFF', 'FRST', 'RCUR']],
-        'return'          => 'name,value']);
-      $classic_payment_instrument_ids = [];
-      foreach ($classic_payment_instruments['values'] as $classic_payment_instrument) {
-        $classic_payment_instrument_ids[$classic_payment_instrument['name']] = $classic_payment_instrument['value'];
+      // add currency
+      $this->ctx->log->info('Added payment instrument fields');
+      $pi_ooff = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_ooff';");
+      if (!$pi_ooff) {
+          $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_ooff` varchar(64) COMMENT 'payment instruments, comma separated, to be used for one-off collections';");
+      }
+      $pi_rcur = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_rcur';");
+      if (!$pi_rcur) {
+          $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_rcur` varchar(64) COMMENT 'payment instruments, comma separated, to be used for recurring collections';");
       }
 
-      if (count($classic_payment_instrument_ids) <> 3) {
-        // We have a problem if the old payment instruments have been disabled
-        $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
-        CRM_Core_Session::setStatus($message, E::ts("Missing payment instruments!", [1 => $use_count]), 'warn');
-        Civi::log()->warning($message);
-
-      } else {
-        // all is fine -> set old PIs as default
+      // fill with the fields with the implicit default
+      try {
+        $classic_payment_instrument_ids = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
         CRM_Core_DAO::executeQuery("UPDATE civicrm_sdd_creditor SET pi_ooff = %1, pi_rcur = %2;", [
           1 => ["{$classic_payment_instrument_ids['OOFF']}", 'String'],
           2 => ["{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}", 'String']
         ]);
+      } catch (Exception $ex) {
+        // We have a problem if the old payment instruments have been disabled
+        $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
+        CRM_Core_Session::setStatus($message, E::ts("Missing payment instruments!", [1 => $use_count]), 'warn');
+        Civi::log()->warning($message);
       }
 
       return TRUE;

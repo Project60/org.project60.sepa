@@ -92,4 +92,16 @@ class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase
     // restore setting
     CRM_Sepa_Logic_Settings::setSetting($old_value, 'batching.FRST.notice');
   }
+
+
+  /**
+   * Test a simple set/retrieve setting
+   */
+  public function testDefaultCreditor()
+  {
+    $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
+    $this->assertNotNull($default_creditor, "Default creditor is not available");
+    $this->assertNotNull($default_creditor->id, "Default creditor is broken");
+  }
+
 }
