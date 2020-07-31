@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2018                                     |
+| Copyright (C) 2018-2020                                |
 | Author: B. Endres (endres@systopia.de)                 |
 +--------------------------------------------------------+
 | This program is released as free software under the    |
@@ -61,6 +61,26 @@ class CRM_Sepa_Logic_PaymentInstruments {
   public static function getSddPaymentInstrumentID($sdd_name) {
     $all_pis = self::getSddPaymentInstruments();
     return CRM_Utils_Array::value($sdd_name, $all_pis);
+  }
+
+  /**
+   * Determine the allowed SDD payment instruments for this contribution
+   *
+   * @param integer $contribution_id
+   *   ID of the contribution
+   *
+   * @return array|null
+   *   if it's a SEPA contribution, returns list of allowed payment instruments, otherwise null
+   */
+  public static function getSDDPaymentInstrumentsForContribution($contribution_id) {
+    $mandate_id = self::getContributionMandateID($contribution_id);
+    if (!$mandate_id) {
+      return null;
+    } else {
+      // get the creditor ID
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', ['return' => 'creditor_id,type,status', 'id' => $mandate_id]);
+      return self::getPaymentInstrumentsForCreditor($mandate['creditor_id'], $mandate['type']);
+    }
   }
 
   /**
@@ -190,6 +210,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
   /**
    * restrict payment instruments in certain forms
+   *
+   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
    */
   public static function restrictPaymentInstrumentsInForm($formName, $form) {
     if ($formName == 'CRM_Contribute_Form_Contribution') {

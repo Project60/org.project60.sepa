@@ -444,31 +444,15 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     $contribution_id = $form->getVar('_id');
     if (empty($contribution_id)) return;
 
-    // TODO: rework:
-    // find the attached mandate, if exists
-    $mandates = CRM_Sepa_Logic_Settings::getMandateFor($contribution_id);
-    if (empty($mandates)) {
-      // the contribution has no mandate,
-      //   so we should not allow the payment_instrument be set to an SDD one
-      if (CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $fields['payment_instrument_id']))) {
-        $errors['payment_instrument_id'] = ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.", array('domain' => 'org.project60.sepa'));
+    // if this contribution has no mandate, it should not have the classic sepa PIs
+    $mandate_id = CRM_Sepa_Logic_PaymentInstruments::getContributionMandateID($contribution_id);
+    if (!$mandate_id) {
+      $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
+      if (isset($payment_instruments[$fields['payment_instrument_id']])) {
+        $errors['payment_instrument_id'] = E::ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.");
       }
-
     } else {
-      // the contribution has a mandate which determines the payment instrument
-
-      // ..but first some sanity checks...
-      if (count($mandates) != 1) {
-        Civi::log()->debug("org.project60.sepa_dd: contribution [$contribution_id] has more than one mandate.");
-      }
-
-      // now compare requested with expected payment instrument
-      $mandate_id = key($mandates);
-      $mandate_pi = $mandates[$mandate_id];
-      $requested_pi =  CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $fields['payment_instrument_id']);
-      if ($requested_pi != $mandate_pi && !($requested_pi=='FRST' && $mandate_pi=='RCUR') && !($requested_pi=='RCUR' && $mandate_pi=='FRST') ) {
-        $errors['payment_instrument_id'] = sprintf(ts("This contribution has a mandate, its payment instrument has to be '%s'", array('domain' => 'org.project60.sepa')), $mandate_pi);
-      }
+      // TODO: restrict to the PIs the creditor allows?
     }
   }
 }
