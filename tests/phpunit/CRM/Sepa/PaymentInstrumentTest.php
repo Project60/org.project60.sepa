@@ -19,14 +19,16 @@ use CRM_Sepa_ExtensionUtil as E;
 /**
  * Tests for the variable payment instruments introduced in #572
  *
- * Testing:
+ * Tests:
  *  payment instruments in a traditional SEPA mandate live cycle (OOFF / RCUR)
  *  creditors with customised payment instruments
  *    - unique payment instruments
  *    - multiple payment instruments
  *    - no ooff (disabled)
  *    - no rcur (disabled)
- *  custom frst/rcur cycles
+ * TODO Tests:
+ *  - custom frst/rcur cycles
+ *  - check payemnt instrument ID for recurring contributions
  *
  * @group headless
  */
