@@ -355,4 +355,51 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
 
       return TRUE;
     }
+
+  /**
+   * With the new status/payment instrument model, the payment instrument IDs of the
+   *  mandate's recurring contributions have to be adjusted
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1602() {
+    // add currency
+    $this->ctx->log->info('Adjusting RCUR mandates payment instruments.');
+    try {
+      $sdd_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
+
+      // recurring contributions of mandates in status 'RCUR' should always have the RCUR payment instrument set
+      //  (that should have already been the case)
+      $pi_rcur = (int) $sdd_instruments['RCUR'];
+      CRM_Core_DAO::singleValueQuery("
+        UPDATE civicrm_contribution_recur recurring_contribution
+        LEFT JOIN civicrm_sdd_mandate     mandate
+               ON mandate.entity_id = recurring_contribution.id
+               AND mandate.entity_table = 'civicrm_contribution_recur'
+        SET payment_instrument_id = {$pi_rcur}
+        WHERE mandate.id IS NOT NULL
+          AND mandate.status = 'RCUR'");
+
+      // recurring contributions of mandates in status 'FRST' should always have the FRST payment instrument set
+      //  (that should have already been the case)
+      $pi_frst = (int) $sdd_instruments['FRST'];
+      CRM_Core_DAO::singleValueQuery("
+        UPDATE civicrm_contribution_recur recurring_contribution
+        LEFT JOIN civicrm_sdd_mandate     mandate
+               ON mandate.entity_id = recurring_contribution.id
+               AND mandate.entity_table = 'civicrm_contribution_recur'
+        SET payment_instrument_id = {$pi_frst}
+        WHERE mandate.id IS NOT NULL
+          AND mandate.status = 'FRST'");
+
+    } catch (Exception $ex) {
+      // We have a problem if the old payment instruments have been disabled
+      $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
+      CRM_Core_Session::setStatus($message, E::ts("Missing payment instruments!", [1 => $use_count]), 'warn');
+      Civi::log()->warning($message);
+    }
+
+    return TRUE;
+  }
 }
