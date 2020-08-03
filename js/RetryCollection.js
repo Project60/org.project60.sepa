@@ -121,12 +121,13 @@ cj(document).ready(function() {
         query['creditor_list']      = cj("#creditor_list").val();
         query['txgroup_list']       = cj("#txgroup_list").val();
 
-        if (cj.inArray(change_source, ['cancel_reason_list', 'frequencies', 'amount_max', 'amount_min']) >= 0) {
+        if (cj.inArray(change_source, ['contribution_status_list', 'cancel_reason_list', 'frequencies', 'amount_max', 'amount_min']) >= 0) {
             // this is a filter query
-            query['cancel_reason_list'] = cj("#cancel_reason_list").val();
-            query['frequencies']        = cj("#frequencies").val();
-            query['amount_max']         = cj("#amount_max").val();
-            query['amount_min']         = cj("#amount_min").val();
+            query['contribution_status_list'] = cj("#contribution_status_list").val();
+            query['cancel_reason_list']       = cj("#cancel_reason_list").val();
+            query['frequencies']              = cj("#frequencies").val();
+            query['amount_max']               = cj("#amount_max").val();
+            query['amount_min']               = cj("#amount_min").val();
         }
 
         // show busy indicator
@@ -198,6 +199,6 @@ cj(document).ready(function() {
     }
 
     // add change handler to all items
-    cj("[name=date_range], #creditor_list, #txgroup_list, #frequencies, #cancel_reason_list, #amount_min, #amount_max").change(separetry_updateForm);
+    cj("[name=date_range], #creditor_list, #txgroup_list, #frequencies, #contribution_status_list, #cancel_reason_list, #amount_min, #amount_max").change(separetry_updateForm);
     separetry_updateForm(null);
 });

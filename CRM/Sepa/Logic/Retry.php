@@ -113,16 +113,17 @@ class CRM_Sepa_Logic_Retry {
    */
   public static function getRetryContributions($params) {
     $contribution_query_sql = self::getQuery("
-      contribution.id                    AS contribution_id,
-      contribution.total_amount          AS total_amount,
-      contribution.currency              AS currency,
-      contribution.contact_id            AS contact_id,
-      mandate.creditor_id                AS creditor_id,
-      mandate.id                         AS mandate_id,
-      mandate.source                     AS source,
-      contribution.contribution_recur_id AS contribution_recur_id,
-      contribution.financial_type_id     AS financial_type_id,
-      contribution.campaign_id           AS campaign_id
+      contribution.id                     AS contribution_id,
+      contribution.total_amount           AS total_amount,
+      contribution.currency               AS currency,
+      contribution.contact_id             AS contact_id,
+      mandate.creditor_id                 AS creditor_id,
+      mandate.id                          AS mandate_id,
+      mandate.source                      AS source,
+      contribution.contribution_recur_id  AS contribution_recur_id,
+      contribution.contribution_status_id AS contribution_status_id,
+      contribution.financial_type_id      AS financial_type_id,
+      contribution.campaign_id            AS campaign_id
       ", $params);
     $contributions_raw = CRM_Core_DAO::executeQuery($contribution_query_sql);
     $contributions = array();
@@ -228,7 +229,15 @@ class CRM_Sepa_Logic_Retry {
     $where_clauses[] = "txg.status_id IN ({$group_status_id_closed},{$group_status_id_received})";
     $where_clauses[] = "mandate.type = 'RCUR'";
     $where_clauses[] = "mandate.status IN ('RCUR', 'FRST')";
-    $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
+
+    // CONDITION: contribution_status_id
+    if (empty($params['contribution_status_list'])) {
+      $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
+    } else {
+      $contribution_status_ids = array_map('intval', $params['contribution_status_list']);
+      $contribution_status_list = implode(',', $contribution_status_ids);
+      $where_clauses[] = "contribution.contribution_status_id IN ({$contribution_status_list})";
+    }
 
     // CONDITION: date_from
     if (!empty($params['date_from'])) {

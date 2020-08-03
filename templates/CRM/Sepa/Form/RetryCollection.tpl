@@ -43,6 +43,12 @@
 </div>
 
 <div class="crm-section">
+  <div class="label">{$form.contribution_status_list.label}</div>
+  <div class="content">{$form.contribution_status_list.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
   <div class="label">{$form.frequencies.label}</div>
   <div class="content">{$form.frequencies.html}</div>
   <div class="clear"></div>

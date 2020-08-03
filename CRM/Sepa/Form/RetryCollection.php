@@ -65,6 +65,14 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         FALSE,
         array('class' => 'crm-select2', 'multiple' => 'multiple'));
 
+    $this->add(
+        'select',
+        'contribution_status_list',
+        E::ts('Contribution Status'),
+        $this->getContributionStatusList(),
+        FALSE,
+        array('class' => 'crm-select2', 'multiple' => 'multiple'));
+
     $frequency_list = $this->getFrequencyList();
     $js_vars['frequencies'] = $frequency_list;
     $this->add(
@@ -214,5 +222,18 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
 //        "6" => E::ts("bi-monthly"),
         "12" => E::ts("monthly"),
     );
+  }
+
+  protected function getContributionStatusList() {
+    $contribution_status_list = [];
+    $query = civicrm_api3('OptionValue', 'get', [
+        'option_group_id' => 'contribution_status',
+        'option.limit'    => 0,
+        'return'          => 'value,label'
+    ]);
+    foreach ($query['values'] as $contribution_status) {
+      $contribution_status_list[$contribution_status['value']] = $contribution_status['label'];
+    }
+    return $contribution_status_list;
   }
 }
