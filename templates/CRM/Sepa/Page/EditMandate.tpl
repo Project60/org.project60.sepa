@@ -82,33 +82,33 @@
 
         	{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT' or $sepa.status eq 'OOFF'}<tr>
             	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_cancel();">{ts domain="org.project60.sepa"}Cancel{/ts}</td>
-            	<td>{ts domain="org.project60.sepa"}Cancel this mandate immediately for the following reason:{/ts}&nbsp;<input type="text" name="cancel_reason" size="32" /></td>
+            	<td>{ts domain="org.project60.sepa"}Cancel this mandate immediately for the following reason:{/ts}&nbsp;<input type="text" name="cancel_reason" size="32" class="crm-form-text" /></td>
             </tr>{/if}
 
             {if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
             	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_end();">{ts domain="org.project60.sepa"}Set End Date{/ts}</td>
             	<td>
-                    {ts domain="org.project60.sepa"}Terminate this mandate:{/ts}&nbsp;<input type="text" name="end_date" id="end_date" size="12" value="{$contribution.default_end_date}" />
+                    {ts domain="org.project60.sepa"}Terminate this mandate:{/ts}&nbsp;<input type="text" name="end_date" id="end_date" size="12" class="crm-form-text" value="{$contribution.default_end_date}" />
                     <br/>
                     {ts domain="org.project60.sepa"}Terminate for the following reason:{/ts}&nbsp;
-                    <input type="text" name="end_reason" size="32" />
+                    <input type="text" name="end_reason" size="32" class="crm-form-text" />
                 </td>
             </tr>{/if}{/if}
 
             {if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
                 <td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_replace();">{ts domain="org.project60.sepa"}Replace{/ts}</td>
                 <td>
-                    {ts domain="org.project60.sepa"}Replace the mandate beginning:{/ts}&nbsp;<input type="text" name="replace_date" id="replace_date" size="12" value="{$contribution.default_end_date}" />
+                    {ts domain="org.project60.sepa"}Replace the mandate beginning:{/ts}&nbsp;<input type="text" name="replace_date" id="replace_date" size="12" class="crm-form-text" value="{$contribution.default_end_date}" />
                     <br/>
                     {ts domain="org.project60.sepa"}Replace for the following reason:{/ts}&nbsp;
-                    <input type="text" name="replace_reason" size="32" />
+                    <input type="text" name="replace_reason" size="32" class="crm-form-text" />
                 </td>
             </tr>{/if}{/if}
 
             {if $can_modify}{if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
                 <td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_adjust_amount();">{ts domain="org.project60.sepa"}Adjust Amount{/ts}</td>
                 <td>
-                    {ts domain="org.project60.sepa"}Change amount to:{/ts}&nbsp;<input type="text" name="adjust_amount" id="adjust_amount" size="12" value="{$contribution.amount}" />&nbsp;EUR
+                    {ts domain="org.project60.sepa"}Change amount to:{/ts}&nbsp;<input type="text" name="adjust_amount" id="adjust_amount" size="12" class="crm-form-text" value="{$contribution.amount}" />&nbsp;EUR
                 </td>
             </tr>{/if}{/if}{/if}
 
