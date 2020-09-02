@@ -86,7 +86,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *
    * @return string OOFF, FRST, RCUR or NULL (if not SDD)
    *
-   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
+   * @deprecated With the introduction of #572 this doesn't work reliably any more.
    */
   public static function getSDDPaymentInstrumentForContribution($contribution_id) {
     if (!array_key_exists($contribution_id, self::$contribution_id_to_pi)) {
