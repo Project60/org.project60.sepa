@@ -19,7 +19,7 @@ require_once 'CRM/Core/BAO/CustomField.php';
 
 use CRM_Sepa_ExtensionUtil as E;
 
-class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
+class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
 {
     private $config_fields;
     private $custom_fields;
@@ -196,7 +196,11 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
           $creditors = array();
           foreach ($creditor_query['values'] as $creditor) {
               $creditors[] = $creditor;
-              $creditors_default_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
+              if (isset($creditor['label'])) {
+                $creditors_default_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
+              } else {
+                $creditors_default_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['name']}";
+              }
           }
         }
         $this->assign('creditors', $creditors);
@@ -210,6 +214,18 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         // add JS logic
         CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/SepaSettings.js');
         CRM_Core_Resources::singleton()->addVars('p60sdd', CRM_Sepa_Logic_PaymentInstruments::getDefaultSEPAPaymentInstruments());
+
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => E::ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => E::ts('Cancel'),
+        ],
+      ]);
 
       parent::buildQuickForm();
     }
@@ -239,8 +255,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_buffer_days'])       ? (int) $values['pp_buffer_days'] : "0"), 'pp_buffer_days');
 
         $session = CRM_Core_Session::singleton();
-        $session->setStatus(ts("Settings successfully saved", array('domain' => 'org.project60.sepa')));
-
+        $session->setStatus(E::ts("Settings successfully updated."), E::ts("Saved"), 'info');
         CRM_Core_DAO::triggerRebuild();
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/setting/sepa'));
     }
