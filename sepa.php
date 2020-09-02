@@ -207,7 +207,7 @@ function sepa_civicrm_summaryActions( &$actions, $contactID ) {
   // add "create SEPA mandate action"
   if (CRM_Core_Permission::check('create sepa mandates')) {
     $actions['sepa_contribution'] = array(
-        'title'           => ts("Record SEPA Contribution", array('domain' => 'org.project60.sepa')),
+        'title'           => E::ts("Record SEPA Mandate"),
         'weight'          => 5,
         'ref'             => 'new-sepa-contribution',
         'key'             => 'sepa_contribution',
