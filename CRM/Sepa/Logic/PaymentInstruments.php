@@ -39,12 +39,10 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *   map name => payment instrument id
    */
   public static function getSddPaymentInstruments() {
-    $result = null;
-    if ($result === null) {
-      $all_pis = self::getAllSddPaymentInstruments();
-      foreach ($all_pis as $pi_id => $pi_data) {
-        $result[$pi_data['name']] = $pi_data['value'];
-      }
+    $result = [];
+    $all_pis = self::getAllSddPaymentInstruments();
+    foreach ($all_pis as $pi_id => $pi_data) {
+      $result[$pi_data['name']] = $pi_data['value'];
     }
     return $result;
   }
@@ -209,29 +207,26 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
 
   /**
-   * restrict payment instruments in certain forms
-   *
-   * @todo adjust to https://github.com/Project60/org.project60.sepa/issues/572
+   * Restrict payment instruments in some UI forms
    */
   public static function restrictPaymentInstrumentsInForm($formName, $form) {
     if ($formName == 'CRM_Contribute_Form_Contribution') {
-      $payment_instruments = self::getSddPaymentInstruments();
-
-      // is this a SEPA contribution?
-      $my_sdd_pi = NULL;
+      $mandate = null;
       if ($form->_id) {
-        // this is an edit
-        $my_sdd_pi = self::getSDDPaymentInstrumentForContribution($form->_id);
+        // this is an edit, so see if this is a CiviSEPA contribution
+        $mandate = CRM_Sepa_BAO_SEPAMandate::getMandateFor($form->_id);
       }
 
-      if ($my_sdd_pi) {
-        // this is a SEPA edit: remove all PIs except for ours
-        $my_sdd_pi_ids[] = self::getSddPaymentInstrumentID($my_sdd_pi);
-        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_remove' => NULL));
-        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_keep'   => $my_sdd_pi_ids));
+      if ($mandate) {
+        // this is a CiviSEPA contribution, leave only the allowed PIs
+        $allowed_pis = self::getPaymentInstrumentsForCreditor($mandate['creditor_id'], $mandate['type']);
 
-      } else {
-        // this is a regular contributions: remove all SDD PIs
+        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_keep'   => array_keys($allowed_pis)));
+        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_remove' => null));
+
+      }
+      else {
+        // this is a regular or new contribution: remove all SDD-only PIs
         $pi_ids[] = self::getSddPaymentInstrumentID('RCUR');
         $pi_ids[] = self::getSddPaymentInstrumentID('FRST');
         $pi_ids[] = self::getSddPaymentInstrumentID('OOFF');
