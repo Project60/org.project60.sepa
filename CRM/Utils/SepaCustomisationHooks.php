@@ -34,19 +34,15 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * You can implement this hook e.g. to modify the mandate reference ($parameters['reference'])
    *
-   * @param object $parameters the parameters that will be used to create the mandate.
+   * @param array $mandate_parameters the parameters that will be used to create the mandate.
    *
    * @return mixed             based on op. pre-hooks return a boolean or
    *                           an error message which aborts the operation
    * @access public
    */
   static function create_mandate(&$mandate_parameters) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-        return CRM_Utils_Hook::singleton()->invoke(1, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
-    }else{
-        return CRM_Utils_Hook::singleton()->invoke(1, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
-    }
+    $names = ['mandate_parameters'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
   }
 
   /**
@@ -65,12 +61,8 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function modify_txgroup_reference(&$reference, $creditor_id, $mode, $collection_date) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-      return CRM_Utils_Hook::singleton()->invoke(4, $reference, $creditor_id, $mode, $collection_date, self::$null, 'civicrm_modify_txgroup_reference');
-    }else{
-      return CRM_Utils_Hook::singleton()->invoke(4, $reference, $creditor_id, $mode, $collection_date, self::$null, self::$null, 'civicrm_modify_txgroup_reference');
-    }
+    $names = ['reference', 'creditor_id', 'mode', 'collection_date'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $reference, $creditor_id, $mode, $collection_date, self::$null, self::$null, 'civicrm_modify_txgroup_reference');
   }
 
 
@@ -87,12 +79,8 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function modify_txmessage(&$txmessage, $contribution, $creditor) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-      return CRM_Utils_Hook::singleton()->invoke(3, $txmessage, $contribution, $creditor, self::$null, self::$null, 'civicrm_modify_txmessage');
-    }else{
-      return CRM_Utils_Hook::singleton()->invoke(3, $txmessage, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_txmessage');
-    }
+    $names = ['txmessage', 'contribution', 'creditor'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $txmessage, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_txmessage');
   }
 
   /**
@@ -107,12 +95,8 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function modify_endtoendid(&$end2endID, $contribution, $creditor) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, 'civicrm_modify_endtoendid');
-    }else{
-      return CRM_Utils_Hook::singleton()->invoke(3, $end2endID, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_endtoendid');
-    }
+    $names = ['end2endID', 'contribution', 'creditor'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $end2endID, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_endtoendid');
   }
 
 
@@ -126,12 +110,8 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function mend_rcontrib($rcontribId, &$rcontrib) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-      return CRM_Utils_Hook::singleton()->invoke(2, $rcontribId, $rcontrib, self::$null, self::$null, self::$null, 'civicrm_mend_rcontrib');
-    }else{
-      return CRM_Utils_Hook::singleton()->invoke(2, $rcontribId, $rcontrib, self::$null, self::$null, self::$null, self::$null, 'civicrm_mend_rcontrib');
-    }
+    $names = ['rcontribId', 'rcontrib'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $rcontribId, $rcontrib, self::$null, self::$null, self::$null, self::$null, 'civicrm_mend_rcontrib');
   }
 
   /**
@@ -147,12 +127,8 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function alter_next_collection_date(&$next_collection_date, $data) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $data, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
-    }else{
-      return CRM_Utils_Hook::singleton()->invoke(2, $next_collection_date, $data, self::$null, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
-    }
+    $names = ['next_collection_date', 'data'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $next_collection_date, $data, self::$null, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
   }
 
   /**
@@ -167,12 +143,8 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function defer_collection_date(&$collection_date, $creditor_id) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-      return CRM_Utils_Hook::singleton()->invoke(2, $collection_date, $creditor_id, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
-    }else{
-      return CRM_Utils_Hook::singleton()->invoke(2, $collection_date, $creditor_id, self::$null, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
-    }
+    $names = ['collection_date', 'creditor_id'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $collection_date, $creditor_id, self::$null, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
   }
 
 
@@ -192,11 +164,7 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   static function installment_created($mandate_id, $contribution_recur_id, $contribution_id) {
-    if (version_compare(CRM_Utils_System::version(), '4.5', '<'))
-    {
-      return CRM_Utils_Hook::singleton()->invoke(3, $mandate_id, $contribution_recur_id, $contribution_id, self::$null, self::$null, 'civicrm_installment_created');
-    }else{
-      return CRM_Utils_Hook::singleton()->invoke(3, $mandate_id, $contribution_recur_id, $contribution_id, self::$null, self::$null, self::$null, 'civicrm_installment_created');
-    }
+    $names = ['mandate_id', 'contribution_recur_id', 'contribution_id'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $mandate_id, $contribution_recur_id, $contribution_id, self::$null, self::$null, self::$null, 'civicrm_installment_created');
   }
 }
