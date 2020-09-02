@@ -400,8 +400,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
   public static function getDefaultSEPAPaymentInstruments() {
     $instruments = self::getClassicSepaPaymentInstruments();
     return [
-      'ooff_sepa_default' => ["{$instruments['OOFF']['value']}"],
-      'rcur_sepa_default' => ["{$instruments['FRST']['value']}-{$instruments['RCUR']['value']}"],
+      'ooff_sepa_default' => ["{$instruments['OOFF']}"],
+      'rcur_sepa_default' => ["{$instruments['FRST']}-{$instruments['RCUR']}"],
     ];
   }
 

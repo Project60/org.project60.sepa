@@ -177,16 +177,16 @@ class CRM_Utils_SepaOptionGroupTools {
       $eligible_pis = $all_pis;
       if ($recurring) {
           // add the SEPA default combo
-          $eligible_pis["{$sepa_pis['FRST']['value']}-{$sepa_pis['RCUR']['value']}"] = E::ts("SEPA Standard (FRST/RCUR)");
+          $eligible_pis["{$sepa_pis['FRST']}-{$sepa_pis['RCUR']}"] = E::ts("SEPA Standard (FRST/RCUR)");
 
           // ...but remove OOFF/FRST individually
-          unset($eligible_pis[$sepa_pis['OOFF']['value']]);
-          unset($eligible_pis[$sepa_pis['FRST']['value']]);
+          unset($eligible_pis[$sepa_pis['OOFF']]);
+          unset($eligible_pis[$sepa_pis['FRST']]);
 
       } else {
           // remove FRST/RCUR
-          unset($eligible_pis[$sepa_pis['FRST']['value']]);
-          unset($eligible_pis[$sepa_pis['RCUR']['value']]);
+          unset($eligible_pis[$sepa_pis['FRST']]);
+          unset($eligible_pis[$sepa_pis['RCUR']]);
       }
 
       return $eligible_pis;
