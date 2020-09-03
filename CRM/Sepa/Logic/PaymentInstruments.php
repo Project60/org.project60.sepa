@@ -318,7 +318,9 @@ class CRM_Sepa_Logic_PaymentInstruments {
       }
 
     } else {
-      Civi::log()->warning("Invalid type '{$type}' passed to CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor()");
+      if (!in_array($type, ['OOFF', 'FRST', 'RCUR'])) {
+        Civi::log()->warning("Invalid type '{$type}' passed to CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor()");
+      }
     }
 
     // strip duplicates
