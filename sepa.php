@@ -44,7 +44,7 @@ function sepa_civicrm_pageRun( &$page ) {
     // single contribuion view
     if (CRM_Core_Permission::check('view sepa mandates')) {
       $contribution_id = $page->getTemplate()->get_template_vars('id');
-      if (empty($contribution_id) || !CRM_Sepa_Logic_PaymentInstruments::getContributionMandateID($contribution_id)) {
+      if (empty($contribution_id) || !CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id)) {
         return; // not a SEPA contribution
       }
 
@@ -98,7 +98,7 @@ function sepa_civicrm_pageRun( &$page ) {
       }
 
       // find mandate
-      $mandate_id = CRM_Sepa_Logic_PaymentInstruments::getRecurringContributionMandateID($recur['id']);
+      $mandate_id = CRM_Sepa_BAO_SEPAMandate::getRecurringContributionMandateID($recur['id']);
       if (empty($mandate_id)) {
         // this is not a SEPA recurring contribution
         return;
@@ -445,7 +445,7 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     if (empty($contribution_id)) return;
 
     // if this contribution has no mandate, it should not have the classic sepa PIs
-    $mandate_id = CRM_Sepa_Logic_PaymentInstruments::getContributionMandateID($contribution_id);
+    $mandate_id = CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id);
     if (!$mandate_id) {
       $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
       if (isset($payment_instruments[$fields['payment_instrument_id']])) {
