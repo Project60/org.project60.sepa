@@ -41,8 +41,8 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
     // add default payment instruments for a new creditor if none provided
     if (empty($params['id']) && !isset($params['pi_ooff']) && !isset($params['pi_rcur'])) {
       $default_pis = CRM_Sepa_Logic_PaymentInstruments::getDefaultSEPAPaymentInstruments();
-      $params['pi_ooff'] = $default_pis['ooff_sepa_default'];
-      $params['pi_rcur'] = $default_pis['rcur_sepa_default'];
+      $params['pi_ooff'] = implode(',', $default_pis['ooff_sepa_default']);
+      $params['pi_rcur'] = implode(',', $default_pis['rcur_sepa_default']);
     }
 
     $dao = new CRM_Sepa_DAO_SEPACreditor();
