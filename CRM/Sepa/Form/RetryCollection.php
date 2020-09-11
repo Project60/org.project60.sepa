@@ -168,6 +168,11 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
     $presets["{$from}-{$to}"] = E::ts('Last Two Calendar Months');
 
+    // add last 12 months
+    $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 12 month'));
+    $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
+    $presets["{$from}-{$to}"] = E::ts('Last 12 Calendar Months (!)');
+
     // finally: add custom option
     // TODO: implement: $presets['custom'] = E::ts('Custom Range');
     return $presets;
