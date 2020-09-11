@@ -84,11 +84,12 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     }
 
     // verify/set payment_instrument_id
-    $pi_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
+    $mandate_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
     if (isset($params['status']) && $params['status'] == 'RCUR') { // if there is a status override, use that
-      $pi_status = 'RCUR';
+      $mandate_status = 'RCUR';
     }
-    $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $pi_status);
+    $rcur_pi_status = ($mandate_status == 'OOFF') ? 'OOFF' : 'RCUR';
+    $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $rcur_pi_status);
     if (empty($params['payment_instrument_id'])) {
       // no payment instrument given, see if there is a unique one set
       if (count($eligible_payment_instruments) == 1) {
@@ -97,16 +98,16 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 
       } elseif (count($eligible_payment_instruments) == 0) {
         // no payment instrument -> disabled
-        throw new CiviCRM_API3_Exception("{$pi_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
+        throw new CiviCRM_API3_Exception("{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
       } else {
         // unclear which one to take
-        throw new CiviCRM_API3_Exception("You have to define the payment_instrument_id for {$pi_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
+        throw new CiviCRM_API3_Exception("You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
       }
 
     } else {
       // a payment instrument is set, verify that it's allowed
       if (!array_key_exists($params['payment_instrument_id'], $eligible_payment_instruments)) {
-        throw new CiviCRM_API3_Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$pi_status} mandates with creditor ID [{$params['creditor_id']}].");
+        throw new CiviCRM_API3_Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}].");
       }
     }
 

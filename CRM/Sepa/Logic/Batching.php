@@ -85,8 +85,8 @@ class CRM_Sepa_Logic_Batching {
       INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id AND mandate.entity_table = 'civicrm_contribution_recur'
       LEFT  JOIN civicrm_contribution       AS first_contribution  ON mandate.first_contribution_id = first_contribution.id
       WHERE mandate.type = 'RCUR'
-        AND mandate.status = '$mode'
-        AND mandate.creditor_id = $creditor_id
+        AND mandate.status = '{$mode}'
+        AND mandate.creditor_id = {$creditor_id}
         {$batch_clause};";
     $results = CRM_Core_DAO::executeQuery($sql_query);
     $relevant_mandates = array();
@@ -176,6 +176,8 @@ class CRM_Sepa_Logic_Batching {
           $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution_id;
         } else {
           // else: create it
+          $installment_pi = CRM_Sepa_Logic_PaymentInstruments::getInstallmentPaymentInstrument(
+            $creditor_id, $mandate['rc_payment_instrument_id'], ($mode == 'FRST'));
           $contribution_data = array(
               "version"                             => 3,
               "total_amount"                        => $mandate['rc_amount'],
@@ -188,7 +190,7 @@ class CRM_Sepa_Logic_Batching {
               "contribution_status_id"              => $mandate['rc_contribution_status_id'],
               "campaign_id"                         => $mandate['rc_campaign_id'],
               "is_test"                             => $mandate['rc_is_test'],
-              "payment_instrument_id"               => $mandate['rc_payment_instrument_id'],
+              "payment_instrument_id"               => $installment_pi
             );
           $contribution = civicrm_api('Contribution', 'create', $contribution_data);
           if (empty($contribution['is_error'])) {

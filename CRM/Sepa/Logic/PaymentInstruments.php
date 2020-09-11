@@ -338,6 +338,63 @@ class CRM_Sepa_Logic_PaymentInstruments {
   }
 
   /**
+   * Determine the correct payment instrument the next installment
+   *  for the given creditor/recurring contribution ID
+   *
+   * @param integer $creditor_id
+   *   creditor ID
+   * @param integer $recurring_contribution_pi
+   *   recurring contribution's payment instrument
+   * @param boolean $is_first
+   *   is the next installment the first contribution?
+   */
+  public static function getInstallmentPaymentInstrument($creditor_id, $recurring_contribution_pi, $is_first)
+  {
+    if (!$is_first) {
+      // in the RCUR case, this is simple: it's the same as the recurring contribution
+      return $recurring_contribution_pi;
+    }
+
+    // OK: we're looking for the matching FRST PI for a given RCUR PI (from the recurring contribution)
+    // get the creditor
+    static $cache = [];
+    if (isset($cache[$creditor_id][$recurring_contribution_pi])) {
+      return $cache[$creditor_id][$recurring_contribution_pi];
+    }
+
+    $creditors = self::getAllSddCreditors();
+    $creditor = CRM_Utils_Array::value($creditor_id, $creditors);
+    if (!$creditor) {
+      $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
+      return $recurring_contribution_pi; // creditor not found
+    }
+
+    // we found our creditor
+    if (isset($creditor['pi_rcur'])) {
+      foreach (explode(',', $creditor['pi_rcur']) as $pi_spec) {
+        if (strstr($pi_spec, '-')) {
+          // this is a frst-rcur combo
+          $frst_rcur = explode('-', $pi_spec, 2);
+          if ($frst_rcur[1] == $recurring_contribution_pi) {
+            $cache[$creditor_id][$recurring_contribution_pi] = $frst_rcur[0];
+            return $frst_rcur[0];
+          }
+        } else {
+          // if this matches an individual PI, we're also happy
+          if ($pi_spec == $recurring_contribution_pi) {
+            $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
+            return $recurring_contribution_pi;
+          }
+        }
+      }
+    }
+
+    // fallback (happens e.g. if creditor settings have changed, or recurring contribution has been manipulated)
+    $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
+    return $recurring_contribution_pi;
+  }
+
+  /**
    * Get the default payment instruments for SEPA creditors
    *
    * @return array
