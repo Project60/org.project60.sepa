@@ -177,7 +177,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     $creditor_template = $this->callAPISuccess('SepaCreditor', 'getsingle', ['id' => $this->testCreditorId]);
     unset($creditor_template['id']);
     unset($creditor_template['creditor_id']);
-    $creditor_template['name'] = "creditor-" . random_int(0, 999999);
+    $creditor_template['name'] = "creditor-" . CRM_Core_DAO::singleValueQuery("SELECT MAX(id) + 2 FROM civicrm_sdd_creditor");
 
     // add custom data
     foreach ($params as $key => $value) {
