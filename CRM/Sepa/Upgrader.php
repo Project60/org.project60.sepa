@@ -384,18 +384,6 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
         WHERE mandate.id IS NOT NULL
           AND mandate.status = 'RCUR'");
 
-      // recurring contributions of mandates in status 'FRST' should always have the FRST payment instrument set
-      //  (that should have already been the case)
-      $pi_frst = (int) $sdd_instruments['FRST'];
-      CRM_Core_DAO::singleValueQuery("
-        UPDATE civicrm_contribution_recur recurring_contribution
-        LEFT JOIN civicrm_sdd_mandate     mandate
-               ON mandate.entity_id = recurring_contribution.id
-               AND mandate.entity_table = 'civicrm_contribution_recur'
-        SET payment_instrument_id = {$pi_frst}
-        WHERE mandate.id IS NOT NULL
-          AND mandate.status = 'FRST'");
-
     } catch (Exception $ex) {
       // We have a problem if the old payment instruments have been disabled
       $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
