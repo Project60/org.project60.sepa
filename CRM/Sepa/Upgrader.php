@@ -339,6 +339,9 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
           $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_rcur` varchar(64) COMMENT 'payment instruments, comma separated, to be used for recurring collections';");
       }
 
+      $logging = new CRM_Logging_Schema();
+      $logging->fixSchemaDifferences();
+
       // fill with the fields with the implicit default
       try {
         $classic_payment_instrument_ids = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
