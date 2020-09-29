@@ -126,7 +126,11 @@ class CRM_Sepa_Logic_Batching {
       $deferred_collection_date = $collection_date;
       self::deferCollectionDate($deferred_collection_date, $creditor_id);
       if ($deferred_collection_date != $collection_date) {
-        $mandates_by_nextdate[$deferred_collection_date] = $mandates_by_nextdate[$collection_date];
+        if (empty($mandates_by_nextdate[$deferred_collection_date])) {
+          $mandates_by_nextdate[$deferred_collection_date] = $mandates_by_nextdate[$collection_date];
+        } else {
+          $mandates_by_nextdate[$deferred_collection_date] = array_merge($mandates_by_nextdate[$collection_date], $mandates_by_nextdate[$deferred_collection_date]);
+        }
         unset($mandates_by_nextdate[$collection_date]);
       }
     }
