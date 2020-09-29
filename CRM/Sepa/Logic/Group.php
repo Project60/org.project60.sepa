@@ -79,7 +79,10 @@ class CRM_Sepa_Logic_Group {
       CRM_Core_DAO::executeQuery($sql);
 
     } else if ($txgroup['type']=='RCUR') {
-      // AFAIK there's nothing to do with RCURs...
+      // AFAIK there's nothing to do for RCURs...
+
+    } else if ($txgroup['type']=='RTRY') {
+      // AFAIK there's nothing to do for RTRYs...
 
     } else {
       $lock->release();
