@@ -23,14 +23,14 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase
 {
-  protected const TEST_BIC_SHORT = 'COLSDE33';
-  protected const TEST_BIC_TEST_CODE = 'ABCDDE30XXX'; // 8th digit is a zero, meaning this is a test BIC.
-  protected const TEST_BIC_PASSIVE_MEMBER_CODE = 'ABCDDE31XXX'; // 8th digit is a one, meaning the owner of the BIC is passive SWIFT member.
-  protected const TEST_BIC_TRANSACTION_COST_CODE = 'ABCDDE32XXX'; // 8th digit is a two, marking that the receiver pays the transaction cost.
-  protected const TEST_BIC_INVALID_LOCATION = 'BELADE0EXXX'; // 7th digit must not be zero or one.
-  protected const TEST_BIC_WRONG_FOR_IBAN = 'BELADEBEXXX';
-  protected const TEST_BIC_NONEXISTENT = 'ABCDDE33XXX'; // Correct format but does not exist.
-  protected const TEST_BIC_INCORRECT = 'INCORRECT';
+  const TEST_BIC_SHORT = 'COLSDE33';
+  const TEST_BIC_TEST_CODE = 'ABCDDE30XXX'; // 8th digit is a zero, meaning this is a test BIC.
+  const TEST_BIC_PASSIVE_MEMBER_CODE = 'ABCDDE31XXX'; // 8th digit is a one, meaning the owner of the BIC is passive SWIFT member.
+  const TEST_BIC_TRANSACTION_COST_CODE = 'ABCDDE32XXX'; // 8th digit is a two, marking that the receiver pays the transaction cost.
+  const TEST_BIC_INVALID_LOCATION = 'BELADE0EXXX'; // 7th digit must not be zero or one.
+  const TEST_BIC_WRONG_FOR_IBAN = 'BELADEBEXXX';
+  const TEST_BIC_NONEXISTENT = 'ABCDDE33XXX'; // Correct format but does not exist.
+  const TEST_BIC_INCORRECT = 'INCORRECT';
 
   public function setUp(): void
   {

@@ -22,7 +22,7 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
 {
-  protected const INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX = 'HookTest-';
+  const INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX = 'HookTest-';
 
   /**
    * If true the create_mandate hook will be executed.
