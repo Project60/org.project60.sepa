@@ -724,7 +724,7 @@ msgstr "CiviBanking"
 
 #: CRM/Sepa/Form/CreateMandate.php
 msgid "One-time only (OOFF)"
-msgstr "Nur einmalige Einzüge (OOFF)"
+msgstr "Einmaliger Einzuge (OOFF)"
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.mgd.php
 msgid "SEPA Mandates (generic)"
