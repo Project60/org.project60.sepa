@@ -1493,22 +1493,16 @@ msgid "Annual Amount"
 msgstr "Jahresbetrag"
 
 #: Civi/Sepa/ContainerSpecs.php
-#, fuzzy
-#| msgid "SEPA Mandates (One-Off)"
 msgid "Create SEPA Mandate (One-Off)"
-msgstr "SEPA Mandate (Einzeleinzug)"
+msgstr "SEPA Mandat (Einzel-Lastschrift) erstellen"
 
 #: Civi/Sepa/ContainerSpecs.php
-#, fuzzy
-#| msgid "SEPA Mandates (Recurring)"
 msgid "Create SEPA Mandate (Recurring)"
-msgstr "SEPA Mandate (Dauereinzüge)"
+msgstr "SEPA Mandat (Dauerlastschrift) erstellen"
 
 #: Civi/Sepa/ContainerSpecs.php
-#, fuzzy
-#| msgid "SEPA Mandate"
 msgid "Find SEPA Mandate"
-msgstr "SEPA-Mandat"
+msgstr "SEPA-Mandate Finden"
 
 #: api/v3/SepaTransactionGroup.php
 msgid "SEPA DD Transaction Batch"
