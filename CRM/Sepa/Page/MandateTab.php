@@ -44,7 +44,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_contribution.total_amount  AS total_amount,
         civicrm_contribution.currency      AS currency,
         civicrm_contribution.cancel_reason AS cancel_reason,
-        IF(civicrm_sdd_mandate.status IN ('INIT', 'OOFF'), 'sepa-active', 'sepa-inactive')           
+        IF(civicrm_sdd_mandate.status IN ('OOFF'), 'sepa-active', 'sepa-inactive')           
                                            AS class
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution   ON civicrm_contribution.id = civicrm_sdd_mandate.entity_id
@@ -105,7 +105,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_contribution_recur.frequency_unit               AS frequency_unit,
         civicrm_contribution_recur.currency                     AS currency,
         civicrm_contribution_recur.amount                       AS amount,
-        IF(civicrm_sdd_mandate.status IN ('FRST', 'RCUR', 'INIT', 'OOFF'), 'sepa-active', 'sepa-inactive')           
+        IF(civicrm_sdd_mandate.status IN ('FRST', 'RCUR'), 'sepa-active', 'sepa-inactive')           
                                                                 AS class
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
