@@ -70,7 +70,7 @@ class CRM_Sepa_Logic_Status {
   public static function translateToMandateStatus($status, $mandate_type = NULL) {
     switch ($status) {
 
-      case "Not activated":
+      case "Not yet activated":
         return ($mandate_type?'INIT':array('INIT'));
 
       case "Ready":
