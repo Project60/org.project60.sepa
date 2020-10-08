@@ -71,8 +71,8 @@
 	<div class="crm-container">
         <table class="crm-info-panel">
         	{if $sepa.status eq 'INIT'}<tr>
-            	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_activate();">{ts domain="org.project60.sepa"}Activate{/ts}</td>
-            	<td>{ts domain="org.project60.sepa"}Activate the mandate when the written permission was received.{/ts}</td>
+            	<td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_validate();">{ts domain="org.project60.sepa"}Validate/Activate{/ts}</td>
+            	<td>{ts domain="org.project60.sepa"}Activate the mandate when all requirements for collection are met.{/ts}</td>
             </tr>{/if}
 
         	{if $can_delete}{if $sepa.status eq 'OOFF' or $sepa.status eq 'FRST'}<tr>
@@ -148,6 +148,11 @@ replace_url = "{crmURL p="civicrm/sepa/createmandate" q="reset=1&replace=$mandat
 function mandate_action_create_pdf() {
   var selected_template = cj("#sepa_tpl_select").val();
   window.open({/literal}'{crmURL p='civicrm/sepa/pdf' h=0 q="reset=1&pdfaction=print&id=$mandate_id"}'{literal} + '&tpl=' + selected_template, '_blank');
+}
+
+function mandate_action_validate() {
+    cj("#mandate_action_value").val('validate');
+    cj("#sepa_action_form").submit();
 }
 
 function mandate_action_delete() {
