@@ -109,7 +109,7 @@ cj(document).ready(function() {
         let frequency = parseInt(sdd_getF('interval').val());
 
         // UPDATE AVAILABLE PAYMENT instruments
-        let available_pis = frequency ? creditor['pi_frst_options'] : creditor['pi_ooff_options'];
+        let available_pis = frequency ? creditor['pi_rcur_options'] : creditor['pi_ooff_options'];
         let payment_instrument_field = sdd_getF('payment_instrument_id');
         payment_instrument_field.find('option').remove();
         for (let available_pi_id in available_pis) {
@@ -253,7 +253,7 @@ cj(document).ready(function() {
         } else {
             interval_field.find('option[value=0]').attr('disabled', 'disabled');
         }
-        if (Object.keys(creditor['pi_frst_options']).length > 0) {
+        if (Object.keys(creditor['pi_rcur_options']).length > 0) {
             interval_field.find('option[value!=0]').removeAttr('disabled');
         } else {
             interval_field.find('option[value!=0]').attr('disabled', 'disabled');

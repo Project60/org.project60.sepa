@@ -535,10 +535,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       $creditor['frst_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor['id']);
 
       // add FRST/OOFF payment instruments
-      $creditor['pi_ooff_options'] = $creditor['pi_frst_options'] = [];
-      $frst_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor['id'], 'FRST');
-      foreach ($frst_pis as $pi) {
-        $creditor['pi_frst_options'][$pi['id']] = $pi['label'];
+      $creditor['pi_ooff_options'] = $creditor['pi_rcur_options'] = [];
+      $rcur_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor['id'], 'RCUR');
+      foreach ($rcur_pis as $pi) {
+        $creditor['pi_rcur_options'][$pi['id']] = $pi['label'];
       }
       $ooff_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor['id'], 'OOFF');
       foreach ($ooff_pis as $pi) {
