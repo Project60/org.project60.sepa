@@ -67,6 +67,8 @@
 <table>
   <tr>
     <th>{ts domain="org.project60.sepa"}Group Name{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Message{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Note{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Type{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Submission{/ts}</th>
@@ -81,6 +83,16 @@
   <tr bgcolor="#FF0000" class="status_{$group.status_id} submit_{$group.submit}" data-id="{$group.id}" data-type="{$group.type}">
 
     <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
+    <td title="{$group.transaction_message}">
+      {if $group.transaction_message != null}
+        ⓘ
+      {/if}
+    </td>
+    <td title="{$group.transaction_note}">
+      {if $group.transaction_note != null}
+        ⓘ
+      {/if}
+    </td>
     <td>
       {$group.status_label}
       <img id="busy_{$group_id}" height="16" src="{$config->resourceBase}i/loading.gif" style="float: right; padding: 0px 4px;" hidden="1" />
