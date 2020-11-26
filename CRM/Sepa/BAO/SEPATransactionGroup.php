@@ -403,7 +403,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    * @return string|null
    */
   public static function getCustomGroupTransactionMessage($groupId) {
-    return self::getNoteWithSubject($groupId, 'transaction_message')
+    return self::getNoteWithSubject($groupId, 'transaction_message');
   }
 
   /**
@@ -424,7 +424,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    * @return string|null
    */
   public static function getNote($groupId) {
-    return self::getNoteWithSubject($groupId, 'transaction_note')
+    return self::getNoteWithSubject($groupId, 'transaction_note');
   }
 
   /**
