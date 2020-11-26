@@ -93,54 +93,21 @@ class CRM_Sepa_Logic_Retry {
     }
 
     if (isset($group) && is_array($group)) {
-      // Create a transaction message as a CiviCRM note:
+      // Create a transaction message:
       if ((array_key_exists('transaction_message', $params)) && !empty($params['transaction_message'])) {
-        self::createOrUpdateNote($group['id'], 'transaction_message', $params['transaction_message']);
+        CRM_Sepa_BAO_SEPATransactionGroup::setCustomGroupTransactionMessage(
+          $group['id'],
+          $params['transaction_message']
+        );
       }
 
-      // Create a transaction note as a CiviCRM note:
+      // Create a transaction note:
       if ((array_key_exists('transaction_note', $params)) && !empty($params['transaction_note'])) {
-        self::createOrUpdateNote($group['id'], 'transaction_note', $params['transaction_note']);
+        CRM_Sepa_BAO_SEPATransactionGroup::setNote($group['id'], $params['transaction_note']);
       }
     }
 
     return $group['id'];
-  }
-
-  /**
-   * @param int|string $groupId The ID of the transaction group associated with the note.
-   * @param string $subject The subject for the note.
-   * @param string $text The text content of the note.
-   */
-  private static function createOrUpdateNote($groupId, $subject, $text)
-  {
-    // NOTE: We cannot use the API here as it seems to only allow a fixed set of values for entity_table.
-
-    CRM_Core_DAO::executeQuery(
-      "DELETE FROM
-        civicrm_note
-      WHERE
-        entity_table = 'civicrm_sdd_txgroup'
-        AND entity_id = %1
-        AND `subject` = %2",
-      [
-        1 => [(int)$groupId, 'Integer'],
-        2 => [$subject, 'String'],
-      ]
-    );
-    // TODO: Is simply deleting any existing notes a good practice or should we check if it exists and then update?
-
-    CRM_Core_DAO::executeQuery(
-      "INSERT INTO
-        civicrm_note (entity_table, entity_id, `subject`, note)
-      VALUES
-        ('civicrm_sdd_txgroup', %1, %2, %3)",
-      [
-        1 => [(int)$groupId, 'Integer'],
-        2 => [$subject, 'String'],
-        3 => [$text, 'String'],
-      ]
-    );
   }
 
   /**

@@ -122,28 +122,8 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
           }
         }
 
-        // NOTE: We cannot use the API here as it seems to only allow a fixed set of values for entity_table.
-        $queryResult = CRM_Core_DAO::executeQuery(
-          "SELECT
-            `subject`, note
-          FROM
-            civicrm_note
-          WHERE
-            entity_table = 'civicrm_sdd_txgroup'
-            AND entity_id = %1",
-          [
-            1 => [$group['id'], 'Integer'],
-          ]
-        );
-
-        while ($queryResult->fetch()) {
-          if ($queryResult->subject === 'transaction_message') {
-            $group['transaction_message'] = $queryResult->note;
-          }
-          else if ($queryResult->subject === 'transaction_note') {
-            $group['transaction_note'] = $queryResult->note;
-          }
-        }
+        $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage($group['id']);
+        $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote($group['id']);
 
         array_push($groups, $group);
       }
