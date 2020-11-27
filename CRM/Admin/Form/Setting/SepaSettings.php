@@ -17,7 +17,9 @@
 require_once 'CRM/Admin/Form/Setting.php';
 require_once 'CRM/Core/BAO/CustomField.php';
 
-class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
+use CRM_Sepa_ExtensionUtil as E;
+
+class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
 {
     private $config_fields;
     private $custom_fields;
@@ -203,6 +205,17 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Admin_Form_Setting
         $amm_options = CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')?array('checked'=>'checked'):array();
         $this->addElement('checkbox', 'allow_mandate_modification', ts("Mandate Modifications", array('domain' => 'org.project60.sepa')), NULL, $amm_options);
 
+        $this->addButtons([
+            [
+                'type' => 'next',
+                'name' => E::ts('Save'),
+                'isDefault' => TRUE,
+            ],
+            [
+                'type' => 'cancel',
+                'name' => E::ts('Cancel'),
+            ],
+        ]);
         parent::buildQuickForm();
     }
 
