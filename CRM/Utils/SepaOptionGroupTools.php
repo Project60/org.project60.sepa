@@ -124,9 +124,9 @@ class CRM_Utils_SepaOptionGroupTools {
         return $ts?ts('annually', array('domain' => 'org.project60.sepa')):'annually';
       } else {
         if ($ts) {
-          return sprintf(ts("every %1 months", array('domain' => 'org.project60.sepa')), $interval);
+          return sprintf(ts("every %1 months", array(1 => $interval, 'domain' => 'org.project60.sepa')));
         } else {
-          return sprintf("every %1 months", $interval);
+          return sprintf("every %s months", $interval);
         }
       }
     } elseif ($unit == 'year') {
