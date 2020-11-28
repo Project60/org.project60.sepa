@@ -217,7 +217,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * @throws Exception
    */
   public function upgrade_1502() {
-    $this->ctx->log->info('Adding IBAN Blacklist');
+    $this->ctx->log->info('Adding IBAN Blocklist');
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/iban_blacklist_option_group.json'));
     return TRUE;

@@ -281,10 +281,10 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
 
   /**
-   * Add an IBAN to the blacklist.
+   * Add an IBAN to the blocklist.
    * @param string $iban The IBAN.
    */
-  protected function addIbanToBlacklist(string $iban): void
+  protected function addIbanToBlocklist(string $iban): void
   {
     $existsAlready = $this->callAPISuccessGetCount(
       'OptionValue',

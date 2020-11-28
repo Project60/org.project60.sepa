@@ -170,12 +170,12 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
   }
 
   /**
-   * Test that an IBAN put on the blacklist will fail.
+   * Test that an IBAN put on the blocklist will fail.
    * @see Case_ID V05
    */
-  public function testBlacklistedIbanFails()
+  public function testBlocklistedIbanFails()
   {
-    $this->addIbanToBlacklist(self::TEST_IBAN);
+    $this->addIbanToBlocklist(self::TEST_IBAN);
 
     // should be using $this->assertException but there's something off here
     try {
@@ -185,22 +185,22 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
           'iban' => self::TEST_IBAN,
         ]
       );
-      $this->fail(E::ts('Blacklistet IBAN should fail but did not!'));
+      $this->fail(E::ts('Blocklistet IBAN should fail but did not!'));
     } catch (Exception $ex) {
       // this is expected
     }
   }
 
   /**
-   * This will test if a valid IBAN works when there is another IBAN on the blacklist. \
-   * NOTE: In the default settings of the Sepa extension there is a test entry on the blacklist, \
+   * This will test if a valid IBAN works when there is another IBAN on the blocklist. \
+   * NOTE: In the default settings of the Sepa extension there is a test entry on the blocklist, \
    *       so technically this is not necessary as testValidIban does the same; but this \
    *       test will go sure in the case someone removes the default test entry.
    * @see Case_ID V05
    */
-  public function testValidIbanWhenOtherIbanIsBlacklisted()
+  public function testValidIbanWhenOtherIbanIsBlocklisted()
   {
-    $this->addIbanToBlacklist(self::TEST_IBAN_2);
+    $this->addIbanToBlocklist(self::TEST_IBAN_2);
 
     $this->createMandate(
       [

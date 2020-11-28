@@ -1065,7 +1065,7 @@ msgid "Incomplete Donation"
 msgstr ""
 
 #: CRM/Sepa/Logic/Verification.php
-msgid "IBAN is blacklisted"
+msgid "IBAN is blocklisted"
 msgstr ""
 
 #: CRM/Sepa/Logic/Verification.php
@@ -3136,5 +3136,5 @@ msgid "Incorrect char in IBAN detection fails!"
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Blacklistet IBAN should fail but did not!"
+msgid "Blocklistet IBAN should fail but did not!"
 msgstr ""

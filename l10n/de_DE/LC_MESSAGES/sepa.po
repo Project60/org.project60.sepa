@@ -1091,8 +1091,8 @@ msgid "Incomplete Donation"
 msgstr "Unvollständige Zuwendung"
 
 #: CRM/Sepa/Logic/Verification.php
-msgid "IBAN is blacklisted"
-msgstr "IBAN ist auf der schwarzen Liste"
+msgid "IBAN is blocklisted"
+msgstr "IBAN ist auf der Blockliste"
 
 #: CRM/Sepa/Logic/Verification.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -3244,10 +3244,8 @@ msgid "The mandate is not in the transaction group anymore but should be."
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-#, fuzzy
-#| msgid "This is not a correct BIC."
 msgid "The end date is not correct."
-msgstr "Das ist keine gültige BIC."
+msgstr "Das Enddatum ist nicht korrekt"
 
 #: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
 msgid "The mandate has been incorrectly regrouped."
@@ -3360,16 +3358,12 @@ msgid "Nonexistent BIC detection fails!"
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/VerifyBicTest.php
-#, fuzzy
-#| msgid "Incorrect date format"
 msgid "Incorrect BIC detection fails!"
-msgstr "Falsches Datumsformat."
+msgstr ""
 
 #: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-#, fuzzy
-#| msgid "Incorrect date format"
 msgid "Incorrect IBAN detection fails!"
-msgstr "Falsches Datumsformat."
+msgstr ""
 
 #: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
 msgid "Incorrect bank code detection fails!"
@@ -3388,7 +3382,7 @@ msgid "Incorrect char in IBAN detection fails!"
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Blacklistet IBAN should fail but did not!"
+msgid "Blocklistet IBAN should fail but did not!"
 msgstr ""
 
 #~ msgid "Hide BIC in PP"

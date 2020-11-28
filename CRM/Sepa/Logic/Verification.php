@@ -74,9 +74,9 @@ class CRM_Sepa_Logic_Verification {
    * @return NULL if given IBAN is valid, localized error message otherwise
    */
   public static function verifyIBAN($iban, $type = 'SEPA') {
-    // first: check if blacklisted (#540)
-    if (self::isIbanBlacklisted($iban)) {
-      return E::ts("IBAN is blacklisted");
+    // first: check if blocklisted (#540)
+    if (self::isIbanBlocklisted($iban)) {
+      return E::ts("IBAN is blocklisted");
     }
 
     switch ($type) {
@@ -106,26 +106,26 @@ class CRM_Sepa_Logic_Verification {
   }
 
   /**
-   * Check if this IBAN is blacklisted
+   * Check if this IBAN is blocklisted
    *
    * @param $iban string IBAN to check
    * @return boolean
    */
-  public static function isIbanBlacklisted($iban) {
-    static $blacklist = NULL;
-    if ($blacklist === NULL) {
+  public static function isIbanBlocklisted($iban) {
+    static $blocklist = NULL;
+    if ($blocklist === NULL) {
       // we have to check whether the group exists first, getOptionValuesAssocArrayFromName doesn't do that
-      $blacklist = [];
+      $blocklist = [];
       $query = civicrm_api3('OptionValue', 'get', [
           'option_group_id' => 'iban_blacklist',
           'option.limit'    => 0,
           'return'          => 'value'
       ]);
       foreach ($query['values'] as $value) {
-        $blacklist[$value['value']] = 1;
+        $blocklist[$value['value']] = 1;
       }
     }
-    return isset($blacklist[$iban]);
+    return isset($blocklist[$iban]);
   }
 
   /**
