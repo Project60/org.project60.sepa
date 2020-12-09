@@ -1,5 +1,10 @@
 version: 2.1
 commands:
+  setup:
+    description: "Setup environment"
+    steps:
+      - run: |
+          composer self-update --1
   install_civicrm:
     description: "Install CiviCRM"
     parameters:
@@ -110,11 +115,14 @@ executors:
         name: mysql
         environment:
           MYSQL_ROOT_PASSWORD: buildkit
+      - image: maildev/maildev
+        name: maildev
 
 jobs:
   build_mysql_5_7:
     executor: civicrm
     steps:
+      - setup
       - checkout
       - run_all
       - run_all:
@@ -141,7 +149,10 @@ jobs:
         name: mysql
         environment:
           MYSQL_ROOT_PASSWORD: buildkit
+      - image: maildev/maildev
+        name: maildev
     steps:
+      - setup
       - checkout
       - run_all
       - run_all:
@@ -168,7 +179,10 @@ jobs:
         name: mysql
         environment:
           MYSQL_ROOT_PASSWORD: buildkit
+      - image: maildev/maildev
+        name: maildev
     steps:
+      - setup
       - checkout
       - run_all
       - run_all:
