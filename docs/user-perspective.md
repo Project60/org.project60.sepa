@@ -18,7 +18,7 @@ I will show you how that is done step by step:
 ## Step 1: Add the recurring contribution/mandate
 First navigate to the contact for John Smith or create John Smith as an individual. Next click on the **Contributions** tab for John Smith. From this page you can click on **Record SEPA Contribution** to add a mandate.
 
-![Screenshot](/img/record_sepa_contribution.png)
+![Screenshot](img/record_sepa_contribution.png)
 
 !!! note
     In CiviSEPA version later than 1.2.5 SEPA Mandates have their own tab on the **Contact Summary**. 
@@ -27,7 +27,7 @@ First navigate to the contact for John Smith or create John Smith as an individu
 
 Now set up the mandate by adding a recurring contribution to CiviCRM entering the following information:
 
-![Screenshot](/img/record_sepa_contribution_firstpart.png)
+![Screenshot](img/record_sepa_contribution_firstpart.png)
 
 * **Amount**: 50,00
 * **Financial Type**: Donation
@@ -42,7 +42,7 @@ Now set up the mandate by adding a recurring contribution to CiviCRM entering th
 	If you want to have a separate note for donations, memberships or campaigns, you need to do that through customisation. Ask help to do that. 
 	
 The second part of the mandate contains information about the bank account of the donor and the type of SEPA contribution
-![Screenshot](/img/record_sepa_contribution_secondpart.png)
+![Screenshot](img/record_sepa_contribution_secondpart.png)
 
 * **IBAN**: the bank account number. There is a check to verify if it is a valid bank account number
 * **Bic**: BIC code of the bank
@@ -59,7 +59,7 @@ The second part of the mandate contains information about the bank account of th
 A Mandate has now been created for John Smith's donation. This is the 'Agreement' between John Smith and Free the Tree.
 You will see the mandate in the page with the main details. You can either **View** or **Edit** the mandate with the links behind the mandate.
  
-![Screenshot](/img/sepa_contribution_mandate.png)
+![Screenshot](img/sepa_contribution_mandate.png)
 
 Now it is time to create contributions and collect the money. 
 
@@ -72,7 +72,7 @@ Based on the settings (check [Configuration Example](config-example)) it will ge
 For Mr. John Smith a pending contribution has been created for the 22nd of that month. 
 
 On the dashboard lines are shown with info about the specific group of all contributions: 
-![Screenshot](/img/sepa_dashboard_first_and_recurr.png)
+![Screenshot](img/sepa_dashboard_first_and_recurr.png)
 
 * **Name of the group**: Generated automatically by CiviCRM/Sepa. Contains info if it is First of Recurring. Contains the collection date. 
 * **Status of the group**: open (or closed) 
@@ -94,21 +94,21 @@ So on the 18th at the latest you need to generate your file and submit it to the
 
 Before you send your file to the bank, you might want to see if the file contains the correct information. 
 Click **Contributions** and you will see an overview of all contacts and amounts. 
-![Screenshot](/img/sepa_dashboard_contributionsdetails.png)
+![Screenshot](img/sepa_dashboard_contributionsdetails.png)
 
 **Generate file**
 
 Click **Close and Submit** in the dashboard and you are able to download the XML file. (This is the format of the file you send to the bank) 
 
 You now have three options: 
-![Screenshot](/img/sepa_close_and_submit_group.png)
+![Screenshot](img/sepa_close_and_submit_group.png)
 
 * **I changed my mind**: you choose that option if you want to check what the file looks like but don't want to send it to the bank as yet. 
 * **The file was rejected by the bank**: you will see the following information.
-![Screenshot](/img/sepa_close_group.png)
+![Screenshot](img/sepa_close_group.png)
 If all is well this will never happen, but if so you will have to check your settings and check with the bank. 
 * **The file was submitted succesfully**: the group will be closed. In practice you usually close the group when the bank has accepted the file and the file is processed. 
-![Screenshot](/img/sepa_close_group.png)
+![Screenshot](img/sepa_close_group.png)
 
 !!! Note "Status Contribution"
 	After having closed the group, the status of the contribution changes from 'Pending (incomplete transaction) into 'in Progress'. 

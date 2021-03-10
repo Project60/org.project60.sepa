@@ -38,14 +38,14 @@ You can find the CiviSEPA settings with **Administer>CiviContribute>CiviSEPA Set
 
 **Creditors**
 
-If you access this CiviSEPA settings form for the first time the top will probably look like this: ![Screenshot](/img/create-creditor.png)
+If you access this CiviSEPA settings form for the first time the top will probably look like this: ![Screenshot](img/create-creditor.png)
 And a lot more stuff below this, but as a first step you need to create a creditor. CiviSEPA will be installed with a Test Creditor but you need to set up your own.
 You can do this by clicking on the **ADD** button just below **Creditors**.
 
 !!! note
     You can have more creditors if you use more bank accounts. The basic configuration example assumes you only need one creditor.
 
-In the form you will first enter general information about you and your organization in the top half of the screen, as you can see in the example: ![Screenshot](/img/add-creditor-first-part.png).
+In the form you will first enter general information about you and your organization in the top half of the screen, as you can see in the example: ![Screenshot](img/add-creditor-first-part.png).
  
 * **Name** - here you enter the name of your creditor
 * **Is this a test creditor** - leave this at the default value (because this is not a test creditor)
@@ -62,7 +62,7 @@ In the form you will first enter general information about you and your organiza
 !!! warning
     If the PAIN version your bank has given to you is not present in the list where you can select from (which would be really weird and you should consider changing bank!) we recommend you contact a CiviCRM/CiviSEPA expert.
     
-In the bottom part of the form you will enter specific configuration settings for your creditor as you can see here: ![Screenshot](/img/add-creditor-second-part.png)
+In the bottom part of the form you will enter specific configuration settings for your creditor as you can see here: ![Screenshot](img/add-creditor-second-part.png)
 
 * **Cycle Day(s)** - (22) this contains the actual date you want to collect the money from the donors or members. In the basic configuration we suggest you only use one cycle day. In the example we have entered 22 as in The Netherland most people get their wages into their account on the 20th of each month. You need to specify the actual calendar day.
 * **One-off horizon** - (30) this is the _look ahead_ time frame (in days) that CiviSEPA uses to determine which single collections (**contributions** in CiviCRM) (One-off) should be generated. A horizon value of 30 means that the collections for the next 30 days will be generated.
@@ -82,7 +82,7 @@ In the bottom part of the form you will enter specific configuration settings fo
     So if I should have sent on 18 April for a collection date of 22 April, and I actually send the file on the 20 April the collection date will be set to 24 April. If that would not be done, the bank will possibly reject the file because you have not given them their required notice days. 
 
 Once you have entered all the settings as mentioned above you hit the **Save** button to save the creditor with its settings.                                                                                                                                                                                                                                                               
-Your form will now look like this: ![Screenshot](/img/saved-creditor.png). The creditor you have just created will be in the list.                                                                                                                                                                                                                                                          
+Your form will now look like this: ![Screenshot](img/saved-creditor.png). The creditor you have just created will be in the list.                                                                                                                                                                                                                                                          
                                                                                                                                                                                                                                                                                                                                                                                             
 !!! attention
     The **Default Batching Settings** you see below the list of creditors is just the default settings when you create a new creditor, they do NOT reflect the settings CiviSEPA will use. This seems a bit confusing, but CiviSEPA will use the settings in your creditor like you have just saved it. If you want to check or change them, you hit the **Edit** button next to your creditor.
