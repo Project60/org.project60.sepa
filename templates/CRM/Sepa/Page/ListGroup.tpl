@@ -16,6 +16,7 @@
 <h3>{ts domain="org.project60.sepa"}Contributions for transaction group{/ts} '{$reference}'</h3>
 <table>
   <thead>
+    <th>{ts domain="org.project60.sepa"}#{/ts}</th>
     <th>{ts domain="org.project60.sepa"}ID{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Amount{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
@@ -27,6 +28,7 @@
   <tbody>
     {foreach from=$contributions item=contribution}
     <tr>
+      <td>{counter}</td>
       <td><a href="{$contribution.contribution_link}">[{$contribution.contribution_id}]</a></td>
       <td style="text-align: right;"><a href="{$contribution.contribution_link}"><b>{$contribution.contribution_amount_str}</b></a></td>
       <td>{$contribution.contribution_status}</td>
@@ -39,7 +41,7 @@
   </tbody>
   <tfoot>
         <tr class="columnfooter">
-            <td>{$total_count}&nbsp;{ts domain="org.project60.sepa"}Contributions{/ts}</td>
+            <td colspan="2">{$total_count}&nbsp;{ts domain="org.project60.sepa"}Contributions{/ts}</td>
             <td align="right">{$total_amount_str}</td>
             <td align="right">
               {foreach from=$status_stats key=status_name item=status_count}
