@@ -101,6 +101,11 @@
       <div class="clear"></div>
   </div>
 
+  <div class="crm-section">
+    <div class="label">{$form.payment_instrument_id.label}</div>
+    <div class="content">{$form.payment_instrument_id.html}</div>
+    <div class="clear"></div>
+  </div>
 
   <div id="sdd-ooff-data">
     <div class="crm-section">

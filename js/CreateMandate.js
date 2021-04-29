@@ -106,6 +106,25 @@ cj(document).ready(function() {
         let today = new Date();
         let creditor_id = sdd_getF('creditor_id').val();
         let creditor = CRM.vars.p60sdd.creditor_data[creditor_id];
+        let frequency = parseInt(sdd_getF('interval').val());
+
+        // UPDATE AVAILABLE PAYMENT instruments
+        let available_pis = frequency ? creditor['pi_rcur_options'] : creditor['pi_ooff_options'];
+        let payment_instrument_field = sdd_getF('payment_instrument_id');
+        payment_instrument_field.find('option').remove();
+        for (let available_pi_id in available_pis) {
+            let pi_option = new Option(available_pis[available_pi_id], available_pi_id, false, true);
+            payment_instrument_field.append(pi_option);
+        }
+        payment_instrument_field.change();
+
+        // hide field if only one option available
+        if (Object.keys(available_pis).length > 1) {
+            payment_instrument_field.parent().parent().show();
+        } else {
+            payment_instrument_field.parent().parent().hide();
+        }
+
 
         // ADJUST OOFF START DATE
         let ooff_earliest = new Date(today.getFullYear(), today.getMonth(), today.getDate() + creditor['buffer_days'] + creditor['ooff_notice']);
@@ -150,7 +169,6 @@ cj(document).ready(function() {
         // CALCULATE SUMMARY TEXT
         let text = ts("<i>Not enough information</i>", {'domain':'org.project60.sepa'});
         let amount = sdd_getAmount();
-        let frequency = parseInt(sdd_getF('interval').val());
         let money_display = CRM.formatMoney(amount);
         if (amount) {
             if (frequency == 0) {
@@ -196,7 +214,7 @@ cj(document).ready(function() {
 
         // reset cycle days
         sdd_getF('cycle_day').find('option').remove();
-        let cycle_days = CRM.vars.p60sdd.creditor_data[creditor_id]['cycle_days'];
+        let cycle_days = creditor['cycle_days'];
         for (var day in cycle_days) {
             sdd_getF('cycle_day').append('<option val="' + day + '">' + day + '</option>');
         }
@@ -215,8 +233,7 @@ cj(document).ready(function() {
             .fadeOut(50).fadeIn(50);
 
         // if creditor type is not SEPA (or empty): rename bic/iban
-        if (!('creditor_type' in CRM.vars.p60sdd.creditor_data[creditor_id])
-           || CRM.vars.p60sdd.creditor_data[creditor_id]['creditor_type'] == 'SEPA') {
+        if (!('creditor_type' in creditor) || creditor['creditor_type'] == 'SEPA') {
             // this is a SEPA creditor
             sdd_getF('bic').attr('placeholder', 'required');
             cj("#sdd-create-mandate").find("label[for=bic]").contents().first()[0].textContent = ts("BIC", {'domain': 'org.project60.sepa'});
@@ -228,6 +245,21 @@ cj(document).ready(function() {
             cj("#sdd-create-mandate").find("label[for=bic]").contents().first()[0].textContent = ts("Account Name", {'domain': 'org.project60.sepa'});
             cj("#sdd-create-mandate").find("label[for=iban]").contents().first()[0].textContent = ts("Account Reference", {'domain': 'org.project60.sepa'});
         }
+
+        // update recurring/ooff intervals
+        let interval_field = sdd_getF('interval');
+        if (Object.keys(creditor['pi_ooff_options']).length > 0) {
+            interval_field.find('option[value=0]').removeAttr('disabled');
+        } else {
+            interval_field.find('option[value=0]').attr('disabled', 'disabled');
+        }
+        if (Object.keys(creditor['pi_rcur_options']).length > 0) {
+            interval_field.find('option[value!=0]').removeAttr('disabled');
+        } else {
+            interval_field.find('option[value!=0]').attr('disabled', 'disabled');
+        }
+        // set frequency to the first enabled option
+        interval_field.find('option:not([disabled])').first().attr('selected', true).change();
 
         // trigger update of calculations
         sdd_recalculate_fields();

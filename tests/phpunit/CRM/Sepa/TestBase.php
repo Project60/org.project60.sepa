@@ -97,11 +97,10 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
 
   public function setUp(): void
   {
+    parent::setUp();
     $this->testCreditorId = $this->setUpCreditor();
 
     // TODO: Should we make sure that there are no mandates and groups open?
-
-    parent::setUp();
   }
 
   public function tearDown(): void
@@ -118,6 +117,9 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   private function setUpCreditor(): string
   {
+    // make sure there is at least one...
+    CRM_Sepa_BAO_SEPACreditor::addDefaultCreditorIfMissing();
+
     // Fetch the test creditor:
     $creditorId = $this->callAPISuccessGetValue(
       'SepaCreditor',
@@ -127,6 +129,7 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
     );
 
     // Make sure the test creditor has all needed configs:
+    $classic_payment_instrument_ids = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
     $this->callAPISuccess(
       'SepaCreditor',
       'create',
@@ -136,6 +139,8 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
         'uses_bic' => false,
         'currency'  => 'EUR',
         'category' => null, // It must NOT be a test creditor!
+        'pi_ooff' => $classic_payment_instrument_ids['OOFF'],
+        'pi_rcur' => "{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}",
       ]
     );
 
@@ -157,6 +162,32 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   #endregion
 
   #region Test helpers
+
+  /**
+   * This allows test to create their own creditor instance,
+   *    that's different from the main creditor
+   *
+   * @param array $params
+   *   a list of parameters that are to be different from the default creditor
+   *
+   * @return integer
+   *   new creditor ID
+   */
+  protected function getCustomCreditor($params)
+  {
+    // load the default creditor
+    $creditor_template = $this->callAPISuccess('SepaCreditor', 'getsingle', ['id' => $this->testCreditorId]);
+    unset($creditor_template['id']);
+    unset($creditor_template['creditor_id']);
+    $creditor_template['name'] = "creditor-" . CRM_Core_DAO::singleValueQuery("SELECT MAX(id) + 2 FROM civicrm_sdd_creditor");
+
+    // add custom data
+    foreach ($params as $key => $value) {
+      $creditor_template[$key] = $value;
+    }
+    $creditor = $this->callAPISuccess('SepaCreditor', 'create', $creditor_template);
+    return $creditor['id'];
+  }
 
   /**
    * Remove 'xdebug' result key set by Civi\API\Subscriber\XDebugSubscriber

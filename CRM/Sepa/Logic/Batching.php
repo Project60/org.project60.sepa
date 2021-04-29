@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2018 SYSTOPIA                       |
+| Copyright (C) 2013-2020 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -43,7 +43,14 @@ class CRM_Sepa_Logic_Batching {
     $now = strtotime("$now +$rcur_notice days -$grace_period days");
     $now = strtotime(date('Y-m-d', $now));        // round to full day
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
-    $payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $mode);
+
+    // get payment instruments
+    $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor_id, $mode);
+    $payment_instrument_id_list = implode(',', array_keys($payment_instruments));
+    if (empty($payment_instrument_id_list)) {
+      $lock->release();
+      return; // disabled
+    }
 
     if ($offset !== NULL && $limit!==NULL) {
       $batch_clause = "LIMIT {$limit} OFFSET {$offset}";
@@ -78,8 +85,8 @@ class CRM_Sepa_Logic_Batching {
       INNER JOIN civicrm_contribution_recur AS rcontribution       ON mandate.entity_id = rcontribution.id AND mandate.entity_table = 'civicrm_contribution_recur'
       LEFT  JOIN civicrm_contribution       AS first_contribution  ON mandate.first_contribution_id = first_contribution.id
       WHERE mandate.type = 'RCUR'
-        AND mandate.status = '$mode'
-        AND mandate.creditor_id = $creditor_id
+        AND mandate.status = '{$mode}'
+        AND mandate.creditor_id = {$creditor_id}
         {$batch_clause};";
     $results = CRM_Core_DAO::executeQuery($sql_query);
     $relevant_mandates = array();
@@ -155,7 +162,7 @@ class CRM_Sepa_Logic_Batching {
         WHERE contribution.contribution_recur_id IN ({$rcontrib_id_strings})
           AND DATE(contribution.receive_date) = DATE('{$collection_date}')
           AND (txg.type IS NULL OR txg.type IN ('RCUR', 'FRST'))
-          AND contribution.payment_instrument_id = {$payment_instrument_id};";
+          AND contribution.payment_instrument_id IN ({$payment_instrument_id_list});";
       $results = CRM_Core_DAO::executeQuery($sql_query);
       while ($results->fetch()) {
         $existing_contributions_by_recur_id[$results->contribution_recur_id] = $results->contribution_id;
@@ -173,6 +180,8 @@ class CRM_Sepa_Logic_Batching {
           $mandates_by_nextdate[$collection_date][$index]['mandate_entity_id'] = $contribution_id;
         } else {
           // else: create it
+          $installment_pi = CRM_Sepa_Logic_PaymentInstruments::getInstallmentPaymentInstrument(
+            $creditor_id, $mandate['rc_payment_instrument_id'], ($mode == 'FRST'));
           $contribution_data = array(
               "version"                             => 3,
               "total_amount"                        => $mandate['rc_amount'],
@@ -185,7 +194,7 @@ class CRM_Sepa_Logic_Batching {
               "contribution_status_id"              => $mandate['rc_contribution_status_id'],
               "campaign_id"                         => $mandate['rc_campaign_id'],
               "is_test"                             => $mandate['rc_is_test'],
-              "payment_instrument_id"               => $payment_instrument_id,
+              "payment_instrument_id"               => $installment_pi
             );
           $contribution = civicrm_api('Contribution', 'create', $contribution_data);
           if (empty($contribution['is_error'])) {

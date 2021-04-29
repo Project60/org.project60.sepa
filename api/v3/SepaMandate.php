@@ -73,8 +73,7 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
  * @return array API result array
  */
 function civicrm_api3_sepa_mandate_createfull($params) {
-    // create the "contract" first: a contribution
-    // TODO: sanity checks
+    // TODO: more sanity checks?
 
     // get creditor
     try {
@@ -82,6 +81,34 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $params['creditor_id']));
     } catch (Exception $e) {
       throw new Exception("Couldn't load creditor [{$params['creditor_id']}].");
+    }
+
+    // verify/set payment_instrument_id
+    $mandate_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
+    if (isset($params['status']) && $params['status'] == 'RCUR') { // if there is a status override, use that
+      $mandate_status = 'RCUR';
+    }
+    $rcur_pi_status = ($mandate_status == 'OOFF') ? 'OOFF' : 'RCUR';
+    $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $rcur_pi_status);
+    if (empty($params['payment_instrument_id'])) {
+      // no payment instrument given, see if there is a unique one set
+      if (count($eligible_payment_instruments) == 1) {
+        // there is exactly one instrument defined -> use that
+        $params['payment_instrument_id'] = reset($eligible_payment_instruments)['id'];
+
+      } elseif (count($eligible_payment_instruments) == 0) {
+        // no payment instrument -> disabled
+        throw new CiviCRM_API3_Exception("{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
+      } else {
+        // unclear which one to take
+        throw new CiviCRM_API3_Exception("You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
+      }
+
+    } else {
+      // a payment instrument is set, verify that it's allowed
+      if (!array_key_exists($params['payment_instrument_id'], $eligible_payment_instruments)) {
+        throw new CiviCRM_API3_Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}].");
+      }
     }
 
     // if BIC is used for this creditor, it is required (see #245)
@@ -108,7 +135,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     if ($params['type']=='RCUR') {
     	$contribution_entity = 'ContributionRecur';
 	    $contribution_table  = 'civicrm_contribution_recur';
-      	$create_contribution['payment_instrument_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
+      	$create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
       	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'FRST'; // set default status
       	if (empty($create_contribution['is_pay_later']))
@@ -117,14 +144,14 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     } elseif ($params['type']=='OOFF') {
 	 	$contribution_entity = 'Contribution';
 	    $contribution_table  = 'civicrm_contribution';
-      	$create_contribution['payment_instrument_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'OOFF');
+      	$create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
       	if (empty($create_contribution['status']))
       		$create_contribution['status'] = 'OOFF'; // set default status
       	if (empty($create_contribution['total_amount']))
       		$create_contribution['total_amount'] = $create_contribution['amount']; // copy from amount
 
     } else {
-    	return civicrm_api3_create_error('Unknown mandata type: '.$params['type']);
+    	return civicrm_api3_create_error('Unknown mandate type: '.$params['type']);
     }
 
     // create the contribution
@@ -231,6 +258,12 @@ function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Financial type of the contribution(s)',
+  );
+  $params['payment_instrument_id'] = array(
+    'name'         => 'payment_instrument_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Payment Method',
   );
   $params['campaign_id'] = array(
     'name'         => 'campaign_id',
