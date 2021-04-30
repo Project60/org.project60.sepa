@@ -159,9 +159,11 @@ class CRM_Utils_SepaOptionGroupTools {
       // gather some basic data
       $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
       static $all_pis = NULL;
+      static $all_pis_by_name = NULL;
       if ($all_pis === NULL) {
           // load all payment instruments
           $all_pis = [];
+          $all_pis_by_name = [];
           $instrument_query = civicrm_api3('OptionValue', 'get', [
               'option_group_id' => 'payment_instrument',
               'return'          => 'value,name,label',
@@ -170,23 +172,23 @@ class CRM_Utils_SepaOptionGroupTools {
           ]);
           foreach ($instrument_query['values'] as $pi) {
               $all_pis[$pi['value']] = $pi['label'];
+              $all_pis_by_name[$pi['name']] = $pi['value'];
           }
       }
-
       // start compiling the list
       $eligible_pis = $all_pis;
       if ($recurring) {
           // add the SEPA default combo
-          $eligible_pis["{$sepa_pis['FRST']}-{$sepa_pis['RCUR']}"] = E::ts("SEPA Standard (FRST/RCUR)");
+          $eligible_pis["{$all_pis_by_name['FRST']}-{$all_pis_by_name['RCUR']}"] = E::ts("SEPA Standard (FRST/RCUR)");
 
           // ...but remove OOFF/FRST individually
-          unset($eligible_pis[$sepa_pis['OOFF']]);
-          unset($eligible_pis[$sepa_pis['FRST']]);
+          unset($eligible_pis[$all_pis_by_name['OOFF']]);
+          unset($eligible_pis[$all_pis_by_name['FRST']]);
 
       } else {
           // remove FRST/RCUR
-          unset($eligible_pis[$sepa_pis['FRST']]);
-          unset($eligible_pis[$sepa_pis['RCUR']]);
+          unset($eligible_pis[$all_pis_by_name['FRST']]);
+          unset($eligible_pis[$all_pis_by_name['RCUR']]);
       }
 
       return $eligible_pis;
