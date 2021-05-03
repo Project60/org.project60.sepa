@@ -43,11 +43,10 @@ function sepa_civicrm_pageRun( &$page ) {
   } elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
     if (CRM_Core_Permission::check('view sepa mandates')) {
-      if (!CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $page->getTemplate()->get_template_vars('payment_instrument_id'))))
-        return;
-
       $contribution_id = $page->getTemplate()->get_template_vars('id');
-      if (empty($contribution_id)) return;
+      if (empty($contribution_id) || !CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id)) {
+        return; // not a SEPA contribution
+      }
 
       if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
         // This is an installment of a recurring contribution.
@@ -91,20 +90,20 @@ function sepa_civicrm_pageRun( &$page ) {
   }
 
   elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
-    // recurring contribuion view
+    // recurring contribution view
     if (CRM_Core_Permission::check('view sepa mandates')) {
       $recur = $page->getTemplate()->get_template_vars("recur");
-
-      // This is a one-off contribution => try to show mandate data.
-      $template_vars = $page->getTemplate()->get_template_vars('recur');
-      $payment_instrument_id = $template_vars['payment_instrument_id'];
-      if (!CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $payment_instrument_id)))
-        return;
-
-      $mandate = civicrm_api3("SepaMandate","getsingle",array("entity_table"=>"civicrm_contribution_recur", "entity_id"=>$recur["id"]));
-      if (!array_key_exists("id",$mandate)) {
-          CRM_Core_Error::fatal(ts("Can't find the sepa mandate", array('domain' => 'org.project60.sepa')));
+      if (empty($recur['id'])) {
+        return; // nothing to do here
       }
+
+      // find mandate
+      $mandate_id = CRM_Sepa_BAO_SEPAMandate::getRecurringContributionMandateID($recur['id']);
+      if (empty($mandate_id)) {
+        // this is not a SEPA recurring contribution
+        return;
+      }
+      $mandate = civicrm_api3("SepaMandate","getsingle", ['id' => $mandate_id]);
 
       // load notes
       $mandate['notes'] = array();
@@ -170,38 +169,6 @@ function sepa_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function sepa_civicrm_enable() {
-  // add all required message templates
-  require_once 'CRM/Sepa/Page/SepaMandatePdf.php';
-  CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
-
-  // create a dummy creditor if no creditor exists
-  $creditorCount = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM `civicrm_sdd_creditor`;');
-  if (empty($creditorCount)) {
-    Civi::log()->debug("org.project60.sepa_dd: Trying to install dummy creditor.");
-    // to create, we need to first find a default contact
-    $default_contact = 0;
-    $domains = civicrm_api('Domain', 'get', array('version'=>3));
-    foreach ($domains['values'] as $domain) {
-      if (!empty($domain['contact_id'])) {
-        $default_contact = $domain['contact_id'];
-        break;
-      }
-    }
-
-    if (empty($default_contact)) {
-      Civi::log()->debug("org.project60.sepa_dd: Cannot install dummy creditor - no default contact found.");
-    } else {
-      Civi::log()->debug("org.project60.sepa_dd: Inserting dummy creditor into database.");
-      // remark: we're within the enable hook, so we cannot use our own API/BAOs...
-      $create_creditor_sql = "
-      INSERT INTO civicrm_sdd_creditor
-      (`creditor_id`,    `identifier`,      `label`,      `name`,           `address`,                   `country_id`, `iban`,                   `bic`,      `mandate_prefix`, `mandate_active`, `sepa_file_format_id`, `category`)
-      VALUES
-      ($default_contact, 'TESTCREDITORDE', 'TEST CREDITOR', 'TEST CREDITOR', '221B Baker Street\nLondon', '1226',       'DE12500105170648489890', 'SEPATEST', 'TEST',           1,                1, 'TEST');";
-      CRM_Core_DAO::executeQuery($create_creditor_sql);
-    }
-  }
-
   return _sepa_civix_civicrm_enable();
 }
 
@@ -240,7 +207,7 @@ function sepa_civicrm_summaryActions( &$actions, $contactID ) {
   // add "create SEPA mandate action"
   if (CRM_Core_Permission::check('create sepa mandates')) {
     $actions['sepa_contribution'] = array(
-        'title'           => ts("Record SEPA Contribution", array('domain' => 'org.project60.sepa')),
+        'title'           => E::ts("Record SEPA Mandate"),
         'weight'          => 5,
         'ref'             => 'new-sepa-contribution',
         'key'             => 'sepa_contribution',
@@ -477,30 +444,15 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
     $contribution_id = $form->getVar('_id');
     if (empty($contribution_id)) return;
 
-    // find the attached mandate, if exists
-    $mandates = CRM_Sepa_Logic_Settings::getMandateFor($contribution_id);
-    if (empty($mandates)) {
-      // the contribution has no mandate,
-      //   so we should not allow the payment_instrument be set to an SDD one
-      if (CRM_Sepa_Logic_PaymentInstruments::isSDD(array('payment_instrument_id' => $fields['payment_instrument_id']))) {
-        $errors['payment_instrument_id'] = ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.", array('domain' => 'org.project60.sepa'));
+    // if this contribution has no mandate, it should not have the classic sepa PIs
+    $mandate_id = CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id);
+    if (!$mandate_id) {
+      $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
+      if (isset($payment_instruments[$fields['payment_instrument_id']])) {
+        $errors['payment_instrument_id'] = E::ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.");
       }
-
     } else {
-      // the contribution has a mandate which determines the payment instrument
-
-      // ..but first some sanity checks...
-      if (count($mandates) != 1) {
-        Civi::log()->debug("org.project60.sepa_dd: contribution [$contribution_id] has more than one mandate.");
-      }
-
-      // now compare requested with expected payment instrument
-      $mandate_id = key($mandates);
-      $mandate_pi = $mandates[$mandate_id];
-      $requested_pi =  CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $fields['payment_instrument_id']);
-      if ($requested_pi != $mandate_pi && !($requested_pi=='FRST' && $mandate_pi=='RCUR') && !($requested_pi=='RCUR' && $mandate_pi=='FRST') ) {
-        $errors['payment_instrument_id'] = sprintf(ts("This contribution has a mandate, its payment instrument has to be '%s'", array('domain' => 'org.project60.sepa')), $mandate_pi);
-      }
+      // TODO: restrict to the PIs the creditor allows?
     }
   }
 }

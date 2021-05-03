@@ -207,6 +207,53 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
   }
 
   /**
+   * Gets the mandate for any  given contribution
+   *
+   * @param integer contribution_id
+   *   ID of the contribution
+   *
+   * @return array|null
+   *   basic mandate data like id, type, creditor_id, etc.
+   */
+  public static function getMandateFor($contribution_id) {
+    $contribution_id = (int) $contribution_id;
+    $mandate_query = CRM_Core_DAO::executeQuery("
+    SELECT
+      COALESCE(ooff_mandate.id, rcur_mandate.id)                   AS mandate_id,
+      COALESCE(ooff_mandate.type, rcur_mandate.type)               AS type,
+      COALESCE(ooff_mandate.status, rcur_mandate.status)           AS status,
+      COALESCE(ooff_mandate.creditor_id, rcur_mandate.creditor_id) AS creditor_id,
+      COALESCE(ooff_mandate.reference, rcur_mandate.reference)     AS reference,
+      COALESCE(ooff_mandate.contact_id, rcur_mandate.contact_id)   AS contact_id,
+      COALESCE(ooff_mandate.iban, rcur_mandate.iban)               AS iban,
+      COALESCE(ooff_mandate.bic, rcur_mandate.bic)                 AS bic
+    FROM civicrm_contribution contribution
+    LEFT JOIN civicrm_sdd_mandate ooff_mandate
+           ON ooff_mandate.entity_id = contribution.id
+           AND ooff_mandate.entity_table = 'civicrm_contribution'
+    LEFT JOIN civicrm_sdd_mandate rcur_mandate
+           ON rcur_mandate.entity_id = contribution.id
+           AND rcur_mandate.entity_table = 'civicrm_contribution_recur'
+    WHERE contribution.id = {$contribution_id}
+    LIMIT 1");
+    if ($mandate_query->fetch()) {
+      return [
+        'id'          => $mandate_query->mandate_id,
+        'type'        => $mandate_query->type,
+        'status'      => $mandate_query->status,
+        'creditor_id' => $mandate_query->creditor_id,
+        'reference'   => $mandate_query->reference,
+        'contact_id'  => $mandate_query->contact_id,
+        'iban'        => $mandate_query->iban,
+        'bic'         => $mandate_query->bic
+      ];
+    } else {
+      return null;
+    }
+  }
+
+
+  /**
    * gracefully terminates OOFF mandates
    *
    * @return boolean success
@@ -768,6 +815,62 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $lock->release();
     return TRUE;
   }
+
+  /**
+   * Give a (cache) ID of the sepa mandate belonging to this contribution (if any)
+   *
+   * @param integer $contribution_id
+   *   contribution to look up
+   *
+   * @return integer
+   *   mandate ID or 0
+   */
+  public static function getContributionMandateID($contribution_id) {
+    static $mandate_by_contribution_id = [];
+    $contribution_id = (int) $contribution_id;
+    if (!isset($mandate_by_contribution_id[$contribution_id])) {
+      // run a SQL query
+      $mandate_id = CRM_Core_DAO::singleValueQuery("
+      SELECT COALESCE(ooff_mandate.id, rcur_mandate.id)
+      FROM civicrm_contribution contribution
+      LEFT JOIN civicrm_contribution_recur recurring_contribution
+             ON recurring_contribution.id = contribution.contribution_recur_id
+      LEFT JOIN civicrm_sdd_mandate        rcur_mandate
+             ON rcur_mandate.entity_table = 'civicrm_contribution_recur'
+             AND rcur_mandate.entity_id = recurring_contribution.id
+      LEFT JOIN civicrm_sdd_mandate        ooff_mandate
+             ON ooff_mandate.entity_table = 'civicrm_contribution'
+             AND ooff_mandate.entity_id = contribution.id
+      WHERE contribution.id = {$contribution_id}");
+      $mandate_by_contribution_id[$contribution_id] = (int) $mandate_id;
+    }
+    return $mandate_by_contribution_id[$contribution_id];
+  }
+
+  /**
+   * Give a (cache) ID of the sepa mandate belonging to this recurring contribution (if any)
+   *
+   * @param integer $recurring_contribution_id
+   *   recurring contribution to look up
+   *
+   * @return integer
+   *   mandate ID or 0
+   */
+  public static function getRecurringContributionMandateID($recurring_contribution_id) {
+    static $mandate_by_rcontribution_id = [];
+    $recurring_contribution_id = (int) $recurring_contribution_id;
+    if (!isset($mandate_by_rcontribution_id[$recurring_contribution_id])) {
+      // run a SQL query
+      $mandate_id = CRM_Core_DAO::singleValueQuery("
+      SELECT mandate.id
+      FROM civicrm_sdd_mandate mandate
+      WHERE mandate.entity_table = 'civicrm_contribution_recur'
+        AND  mandate.entity_id = {$recurring_contribution_id}");
+      $mandate_by_rcontribution_id[$recurring_contribution_id] = (int) $mandate_id;
+    }
+    return $mandate_by_rcontribution_id[$recurring_contribution_id];
+  }
+
 }
 
 

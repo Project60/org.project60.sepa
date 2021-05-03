@@ -1,7 +1,7 @@
 <?php
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2018 SYSTOPIA                       |
+| Copyright (C) 2013-2020 SYSTOPIA                       |
 | Author: N. Bochan (bochan -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -138,24 +138,26 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
         $bffrdays = CRM_Sepa_Logic_Settings::getGenericSetting('pp_buffer_days');
 
         // add creditor form elements
-        $this->addElement('text',       'addcreditor_creditor_id',  ts("Creditor Contact", array('domain' => 'org.project60.sepa')));
-        $this->addElement('text',       'addcreditor_label',        ts("Label", array('domain' => 'org.project60.sepa')));
-        $this->addElement('text',       'addcreditor_name',         ts("Name", array('domain' => 'org.project60.sepa')));
-        $this->addElement('text',       'addcreditor_id',           ts("Identifier", array('domain' => 'org.project60.sepa')));
-        $this->addElement('text',       'addcreditor_address',      ts("Address", array('domain' => 'org.project60.sepa')), array('size' => 60));
-        $this->addElement('select',     'addcreditor_country_id',   ts("Country", array('domain' => 'org.project60.sepa')), $country_ids);
-        $this->addElement('text',       'addcreditor_bic',          ts("BIC", array('domain' => 'org.project60.sepa')));
-        $this->addElement('text',       'addcreditor_iban',         ts("IBAN", array('domain' => 'org.project60.sepa')), array('size' => 30));
-        $this->addElement('select',     'addcreditor_currency',     ts("Currency", array('domain' => 'org.project60.sepa')), $currencies);
-        $this->addElement('select',     'addcreditor_type',         ts("Type", array('domain' => 'org.project60.sepa')), $creditor_types);
-        $this->addElement('select',     'addcreditor_pain_version', ts("PAIN Version", array('domain' => 'org.project60.sepa')), array('' => ts('- select -', array('domain' => 'org.project60.sepa'))) + CRM_Core_OptionGroup::values('sepa_file_format'));
-        $this->addElement('checkbox',   'addcreditor_uses_bic',     ts("Use BICs", array('domain' => 'org.project60.sepa')), "", (array('checked'=>'checked')));
-        $this->addElement('checkbox',   'is_test_creditor',         ts("Is a Test Creditor", array('domain' => 'org.project60.sepa')), "", array('value' =>'0'));
-        $this->addElement('checkbox',   'exclude_weekends',         ts("Exclude Weekends", array('domain' => 'org.project60.sepa')), "", ($excld_we?array('checked'=>'checked'):array()));
-        $this->addElement('checkbox',   'sdd_async_batching',       ts("Large Groups", array('domain' => 'org.project60.sepa')), "", ($async_batch?array('checked'=>'checked'):array()));
-        $this->addElement('checkbox',   'sdd_skip_closed',          ts("Only Completed Contributions", array('domain' => 'org.project60.sepa')), "", ($skip_closed?array('checked'=>'checked'):array()));
-        $this->addElement('checkbox',   'sdd_no_draft_xml',         ts("No XML drafts", array('domain' => 'org.project60.sepa')), "", ($no_draftxml?array('checked'=>'checked'):array()));
-        $this->addElement('text',       'pp_buffer_days',           ts("Buffer Days", array('domain' => 'org.project60.sepa')), array('size' => 2, 'value' => $bffrdays));
+        $this->addElement('text',       'addcreditor_creditor_id',  E::ts("Creditor Contact"));
+        $this->addElement('text',       'addcreditor_label',        E::ts("Label"));
+        $this->addElement('text',       'addcreditor_name',         E::ts("Name"));
+        $this->addElement('text',       'addcreditor_id',           E::ts("Identifier"));
+        $this->addElement('text',       'addcreditor_address',      E::ts("Address"), array('size' => 60));
+        $this->addElement('select',     'addcreditor_country_id',   E::ts("Country"), $country_ids);
+        $this->addElement('text',       'addcreditor_bic',          E::ts("BIC"));
+        $this->addElement('text',       'addcreditor_iban',         E::ts("IBAN"), array('size' => 30));
+        $this->addElement('select',     'addcreditor_currency',     E::ts("Currency"), $currencies);
+        $this->addElement('select',     'addcreditor_type',         E::ts("Type"), $creditor_types);
+        $this->addElement('select',     'addcreditor_pain_version', E::ts("PAIN Version"), array('' => E::ts('- select -')) + CRM_Core_OptionGroup::values('sepa_file_format'));
+        $this->addElement('select',     'addcreditor_pi_ooff',      E::ts("One-Off Payment Instruments"), CRM_Utils_SepaOptionGroupTools::getPaymentInstrumentOptions(false), ['class' => 'crm-select2', 'multiple' => 'multiple']);
+        $this->addElement('select',     'addcreditor_pi_rcur',      E::ts("Recurring Payment Instruments"), CRM_Utils_SepaOptionGroupTools::getPaymentInstrumentOptions(true), ['class' => 'crm-select2', 'multiple' => 'multiple']);
+        $this->addElement('checkbox',   'addcreditor_uses_bic',     E::ts("Use BICs"), "", (array('checked'=>'checked')));
+        $this->addElement('checkbox',   'is_test_creditor',         E::ts("Is a Test Creditor"), "", array('value' =>'0'));
+        $this->addElement('checkbox',   'exclude_weekends',         E::ts("Exclude Weekends"), "", ($excld_we?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'sdd_async_batching',       E::ts("Large Groups"), "", ($async_batch?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'sdd_skip_closed',          E::ts("Only Completed Contributions"), "", ($skip_closed?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'sdd_no_draft_xml',         E::ts("No XML drafts"), "", ($no_draftxml?array('checked'=>'checked'):array()));
+        $this->addElement('text',       'pp_buffer_days',           E::ts("Buffer Days"), array('size' => 2, 'value' => $bffrdays));
         $this->addElement('hidden',     'edit_creditor_id',         '', array('id' => 'edit_creditor_id'));
         $this->addElement('hidden',     'add_creditor_id',          '', array('id' => 'add_creditor_id'));
 
@@ -194,7 +196,11 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
           $creditors = array();
           foreach ($creditor_query['values'] as $creditor) {
               $creditors[] = $creditor;
-              $creditors_default_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
+              if (isset($creditor['label'])) {
+                $creditors_default_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
+              } else {
+                $creditors_default_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['name']}";
+              }
           }
         }
         $this->assign('creditors', $creditors);
@@ -205,18 +211,23 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
         $amm_options = CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')?array('checked'=>'checked'):array();
         $this->addElement('checkbox', 'allow_mandate_modification', ts("Mandate Modifications", array('domain' => 'org.project60.sepa')), NULL, $amm_options);
 
-        $this->addButtons([
-            [
-                'type' => 'next',
-                'name' => E::ts('Save'),
-                'isDefault' => TRUE,
-            ],
-            [
-                'type' => 'cancel',
-                'name' => E::ts('Cancel'),
-            ],
-        ]);
-        parent::buildQuickForm();
+        // add JS logic
+        CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/SepaSettings.js');
+        CRM_Core_Resources::singleton()->addVars('p60sdd', CRM_Sepa_Logic_PaymentInstruments::getDefaultSEPAPaymentInstruments());
+
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => E::ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => E::ts('Cancel'),
+        ],
+      ]);
+
+      parent::buildQuickForm();
     }
 
     function postProcess() {
@@ -244,8 +255,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
         CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_buffer_days'])       ? (int) $values['pp_buffer_days'] : "0"), 'pp_buffer_days');
 
         $session = CRM_Core_Session::singleton();
-        $session->setStatus(ts("Settings successfully saved", array('domain' => 'org.project60.sepa')));
-
+        $session->setStatus(E::ts("Settings successfully updated."), E::ts("Saved"), 'info');
         CRM_Core_DAO::triggerRebuild();
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/setting/sepa'));
     }

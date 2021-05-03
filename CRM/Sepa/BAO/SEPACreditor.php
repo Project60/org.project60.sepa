@@ -38,9 +38,19 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaCreditor', CRM_Utils_Array::value('id', $params), $params);
 
+    // add default payment instruments for a new creditor if none provided
+    if (empty($params['id']) && !isset($params['pi_ooff']) && !isset($params['pi_rcur'])) {
+      $default_pis = CRM_Sepa_Logic_PaymentInstruments::getDefaultSEPAPaymentInstruments();
+      $params['pi_ooff'] = implode(',', $default_pis['ooff_sepa_default']);
+      $params['pi_rcur'] = implode(',', $default_pis['rcur_sepa_default']);
+    }
+
     $dao = new CRM_Sepa_DAO_SEPACreditor();
     $dao->copyValues($params);
     $dao->save();
+
+    // reset creditor cache
+    CRM_Sepa_Logic_PaymentInstruments::clearCaches();
 
     CRM_Utils_Hook::post($hook, 'SepaCreditor', $dao->id, $dao);
     return $dao;
@@ -80,6 +90,39 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
         $mandate_data['status'] = 'FRST';
       } elseif ($mandate_data['type'] == 'OOFF') {
         $mandate_data['status'] = 'OOFF';
+      }
+    }
+  }
+
+  /**
+   * If there is currently no creditors available, create one
+   */
+  public static function addDefaultCreditorIfMissing() {
+    $creditor_count = civicrm_api3('SepaCreditor', 'getcount');
+    if (empty($creditor_count)) {
+      // get the classic payment instruments
+      try {
+        $classic_payment_instrument_ids = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
+        civicrm_api3('SepaCreditor', 'create', [
+          'identifier'          => 'TEST CREDITOR',
+          'name'                => 'TESTCREDITORDE',
+          'label'               => 'Test Creditor',
+          'address'             => 'Bernau-Menzenschwander-Str. 6, 79837 St. Blasien',
+          'country_id'          => '1226',
+          'iban'                => 'DE12500105170648489890',
+          'bic'                 => 'SEPATEST',
+          'mandate_prefix'      => 'TEST',
+          'mandate_active'      => 1,
+          'category'            => 'TEST',
+          'currency'            => 'EUR',
+          'creditor_type'       => 'SEPA',
+          'uses_bic'            => 1,
+          'sepa_file_format_id' => 1,
+          'pi_ooff'             => "{$classic_payment_instrument_ids['OOFF']}",
+          'pi_rcur'             => "{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}",
+        ]);
+      } catch (Exception $ex) {
+        throw new Exception("Couldn't create default creditor: " . $ex->getMessage());
       }
     }
   }

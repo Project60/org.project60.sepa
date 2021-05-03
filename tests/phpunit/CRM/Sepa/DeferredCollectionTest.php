@@ -29,9 +29,8 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 {
   public function setUp(): void
   {
-    $this->setSepaConfiguration('exclude_weekends', '0');
-
     parent::setUp();
+    $this->setSepaConfiguration('exclude_weekends', '0');
   }
 
   /**

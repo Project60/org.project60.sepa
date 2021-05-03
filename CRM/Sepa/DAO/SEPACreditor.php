@@ -171,6 +171,25 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
    */
   public $creditor_type;
   /**
+   * does this creditor use BICs
+   *
+   * @var integer
+   */
+  public $uses_bic;
+  /**
+   * list of comma separated payment instruments (OOFF)
+   *
+   * @var string
+   */
+  public $pi_ooff;
+  /**
+   * list of comma separated payment instruments (RCUR)
+   *
+   * @var string
+   */
+  public $pi_rcur;
+
+  /**
    * class constructor
    *
    * @access public
@@ -327,6 +346,16 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
             'type' => CRM_Utils_Type::T_BOOLEAN,
             'title' => ts('Does this creditor use BICs?', array('domain' => 'org.project60.sepa')) ,
         ) ,
+        'pi_ooff' => array(
+            'name' => 'pi_ooff',
+            'type' => CRM_Utils_Type::T_STRING,
+            'title' => ts('Payment Instruments (One-Off)', array('domain' => 'org.project60.sepa')) ,
+        ) ,
+        'pi_rcur' => array(
+            'name' => 'pi_rcur',
+            'type' => CRM_Utils_Type::T_STRING,
+            'title' => ts('Payment Instruments (Recurring)', array('domain' => 'org.project60.sepa')) ,
+        ) ,
       );
     }
     return self::$_fields;
@@ -360,6 +389,8 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO
           'sepa_file_format_id'  => 'sepa_file_format_id',
           'creditor_type'        => 'creditor_type',
           'uses_bic'             => 'uses_bic',
+          'pi_ooff'              => 'pi_ooff',
+          'pi_rcur'              => 'pi_rcur',
       );
     }
     return self::$_fieldKeys;

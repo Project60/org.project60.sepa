@@ -39,7 +39,11 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * so here to avoid order of operation problems.
    */
   public function postInstall() {
-    // TODO: anything?
+      // add default message templates
+      CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
+
+      // create default creditor
+      CRM_Sepa_BAO_SEPACreditor::addDefaultCreditorIfMissing();
   }
 
   /**
@@ -146,7 +150,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
     CRM_Core_DAO::executeQuery("
         UPDATE civicrm_contribution_recur rcur
-        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = rcur.id 
+        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = rcur.id
                                                AND mandate.entity_table = 'civicrm_contribution_recur'
           SET rcur.contribution_status_id = {$status_pending}
         WHERE rcur.contribution_status_id = {$status_inprogress}
@@ -157,8 +161,8 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $lost_contributions = CRM_Core_DAO::singleValueQuery("
         SELECT COUNT(*)
         FROM civicrm_contribution contribution
-        LEFT JOIN  civicrm_sdd_contribution_txgroup c2txg ON c2txg.contribution_id = contribution.id 
-        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = contribution.contribution_recur_id 
+        LEFT JOIN  civicrm_sdd_contribution_txgroup c2txg ON c2txg.contribution_id = contribution.id
+        LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = contribution.contribution_recur_id
                                                AND mandate.entity_table = 'civicrm_contribution_recur'
         WHERE contribution.contribution_status_id = {$status_inprogress}
           AND mandate.id IS NOT NULL
@@ -269,58 +273,57 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     return TRUE;
   }
 
-    /**
-     * SDD Payment processors have been moved to another extension,
-     *  so remove SDD payment processors if not used,
-     *  and disable/warn user otherwise
-     *
-     * @see https://github.com/project60/org.project60.sepa/issues/534
-     *
-     * @return TRUE on success
-     * @throws Exception
-     */
-    public function upgrade_1507() {
-        $this->ctx->log->info("Dealing with migrated payment processor code...");
-
-        // get the IDs of the SDD processor types
-        $sdd_processor_type_ids = [];
-        $sdd_processor_type_query = civicrm_api3('PaymentProcessorType', 'get', [
-            'name'         => ['IN' => ['SEPA_Direct_Debit', 'SEPA_Direct_Debit_NG']],
-            'return'       => 'id',
-            'option.limit' => 0,
-        ]);
-        foreach ($sdd_processor_type_query['values'] as $pp_type) {
-            $sdd_processor_type_ids[] = (int) $pp_type['id'];
-        }
-
-        // if there is SDD types registered (which should be the case), we have to deal with them
-        if (!empty($sdd_processor_type_ids)) {
-            // find out, if they're being used
-            $sdd_processor_type_id_list = implode(',', $sdd_processor_type_ids);
-            $use_count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
-
-            if ($use_count) {
-                // if the payment processors are being used, divert them to the dummy processor
-                //  and issue a warning to install the SDD PP extension
-                $message = E::ts("Your CiviSEPA payment processors have been disabled, the code was moved into a new extension. If you want to continue using your CiviSEPA payment processors, please install the latest version of the <a href=\"https://github.com/Project60/org.project60.sepapp/releases\">CiviSEPA Payment Processor</a> Extension.");
-                CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET class_name='Payment_Dummy' WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
-                CRM_Core_Session::setStatus($message, E::ts("%1 Payment Processor(s) Disabled!", [1 => $use_count]), 'warn');
-                Civi::log()->warning($message);
-
-            } else {
-                // if they are _not_ used, we can simply delete them.
-                foreach ($sdd_processor_type_ids as $sdd_processor_type_id) {
-                    civicrm_api3('PaymentProcessorType', 'delete', ['id' => $sdd_processor_type_id]);
-                }
-            }
-        }
-        return TRUE;
-    }
-
   /**
    * SDD Payment processors have been moved to another extension,
    *  so remove SDD payment processors if not used,
    *  and disable/warn user otherwise
+   *
+   * @see https://github.com/project60/org.project60.sepa/issues/534
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1507() {
+      $this->ctx->log->info("Dealing with migrated payment processor code...");
+
+      // get the IDs of the SDD processor types
+      $sdd_processor_type_ids = [];
+      $sdd_processor_type_query = civicrm_api3('PaymentProcessorType', 'get', [
+          'name'         => ['IN' => ['SEPA_Direct_Debit', 'SEPA_Direct_Debit_NG']],
+          'return'       => 'id',
+          'option.limit' => 0,
+      ]);
+      foreach ($sdd_processor_type_query['values'] as $pp_type) {
+          $sdd_processor_type_ids[] = (int) $pp_type['id'];
+      }
+
+      // if there is SDD types registered (which should be the case), we have to deal with them
+      if (!empty($sdd_processor_type_ids)) {
+          // find out, if they're being used
+          $sdd_processor_type_id_list = implode(',', $sdd_processor_type_ids);
+          $use_count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
+
+          if ($use_count) {
+              // if the payment processors are being used, divert them to the dummy processor
+              //  and issue a warning to install the SDD PP extension
+              $message = E::ts("Your CiviSEPA payment processors have been disabled, the code was moved into a new extension. If you want to continue using your CiviSEPA payment processors, please install the latest version of the <a href=\"https://github.com/Project60/org.project60.sepapp/releases\">CiviSEPA Payment Processor</a> Extension.");
+              CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET class_name='Payment_Dummy' WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
+              CRM_Core_Session::setStatus($message, E::ts("%1 Payment Processor(s) Disabled!", [1 => $use_count]), 'warn');
+              Civi::log()->warning($message);
+
+          } else {
+              // if they are _not_ used, we can simply delete them.
+              foreach ($sdd_processor_type_ids as $sdd_processor_type_id) {
+                  civicrm_api3('PaymentProcessorType', 'delete', ['id' => $sdd_processor_type_id]);
+              }
+          }
+      }
+      return TRUE;
+  }
+
+  /**
+   * In order to use the actions (via action provider), we need to flush the
+   *   caches (twice, apparently)
    *
    * @see https://github.com/project60/org.project60.sepa/issues/534
    *
@@ -332,6 +335,92 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     // run twice, classloader/psr-4 prefixes/angular is a tricky combination
     CRM_Core_Invoke::rebuildMenuAndCaches();
     CRM_Core_Invoke::rebuildMenuAndCaches();
+    return TRUE;
+  }
+
+    /**
+     * Add new payment instrument selectors
+     *
+     * @return TRUE on success
+     * @throws Exception
+     */
+    public function upgrade_1601() {
+      // add currency
+      $this->ctx->log->info('Added payment instrument fields');
+      $pi_ooff = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_ooff';");
+      if (!$pi_ooff) {
+          $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_ooff` varchar(64) COMMENT 'payment instruments, comma separated, to be used for one-off collections';");
+      }
+      $pi_rcur = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_rcur';");
+      if (!$pi_rcur) {
+          $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_rcur` varchar(64) COMMENT 'payment instruments, comma separated, to be used for recurring collections';");
+      }
+
+      $logging = new CRM_Logging_Schema();
+      $logging->fixSchemaDifferences();
+
+      // fill with the fields with the implicit default
+      try {
+        $classic_payment_instrument_ids = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_sdd_creditor SET pi_ooff = %1, pi_rcur = %2;", [
+          1 => ["{$classic_payment_instrument_ids['OOFF']}", 'String'],
+          2 => ["{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}", 'String']
+        ]);
+      } catch (Exception $ex) {
+        // We have a problem if the old payment instruments have been disabled
+        $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
+        CRM_Core_Session::setStatus($message, E::ts("Missing payment instruments!", [1 => $use_count]), 'warn');
+        Civi::log()->warning($message);
+      }
+
+      return TRUE;
+    }
+
+  /**
+   * With the new status/payment instrument model, the payment instrument IDs of the
+   *  mandate's recurring contributions have to be adjusted
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1602() {
+    // add currency
+    $this->ctx->log->info('Adjusting RCUR mandates payment instruments.');
+    try {
+      $sdd_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
+
+      /* RETRACTED: this should already be the case AND it messes with precisely the setups that we want to support now
+      // recurring contributions of mandates in status 'RCUR' should always have the RCUR payment instrument set
+      //  (that should have already been the case)
+      $pi_rcur = (int) $sdd_instruments['RCUR'];
+      CRM_Core_DAO::singleValueQuery("
+        UPDATE civicrm_contribution_recur recurring_contribution
+        LEFT JOIN civicrm_sdd_mandate     mandate
+               ON mandate.entity_id = recurring_contribution.id
+               AND mandate.entity_table = 'civicrm_contribution_recur'
+        SET payment_instrument_id = {$pi_rcur}
+        WHERE mandate.id IS NOT NULL
+          AND mandate.status = 'RCUR'");
+
+      // recurring contributions of mandates in status 'FRST' should always have the FRST payment instrument set
+      //  (that should have already been the case)
+      $pi_frst = (int) $sdd_instruments['FRST'];
+      CRM_Core_DAO::singleValueQuery("
+        UPDATE civicrm_contribution_recur recurring_contribution
+        LEFT JOIN civicrm_sdd_mandate     mandate
+               ON mandate.entity_id = recurring_contribution.id
+               AND mandate.entity_table = 'civicrm_contribution_recur'
+        SET payment_instrument_id = {$pi_frst}
+        WHERE mandate.id IS NOT NULL
+          AND mandate.status = 'FRST'");
+      */ // END RETRACTED
+    } catch (Exception $ex) {
+      // We have a problem if the old payment instruments have been disabled
+      $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
+      CRM_Core_Session::setStatus($message, E::ts("Missing payment instruments!", [1 => $use_count]), 'warn');
+      Civi::log()->warning($message);
+    }
+
     return TRUE;
   }
 }

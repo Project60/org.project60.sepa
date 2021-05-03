@@ -78,6 +78,21 @@ class CRM_Sepa_Logic_Group {
                 AND civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
       CRM_Core_DAO::executeQuery($sql);
 
+      // update the recurring contribution payment instruments
+      $creditor_id = CRM_Core_DAO::singleValueQuery("SELECT sdd_creditor_id FROM civicrm_sdd_txgroup WHERE id = {$txgroup_id};");
+      $frst2rcur_pis = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor_id);
+      foreach ($frst2rcur_pis as $frst_pi_id => $rcur_pi_id) {
+        // do this for every frst/rcur type tuple separately
+        $sql = "
+            UPDATE civicrm_contribution_recur
+            LEFT JOIN civicrm_contribution             ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
+            LEFT JOIN civicrm_sdd_contribution_txgroup ON civicrm_sdd_contribution_txgroup.contribution_id = civicrm_contribution.id
+            SET civicrm_contribution_recur.payment_instrument_id = {$rcur_pi_id}
+            WHERE civicrm_contribution_recur.payment_instrument_id = {$frst_pi_id}
+              AND civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
+        CRM_Core_DAO::executeQuery($sql);
+      }
+
     } else if ($txgroup['type']=='RCUR') {
       // AFAIK there's nothing to do for RCURs...
 
