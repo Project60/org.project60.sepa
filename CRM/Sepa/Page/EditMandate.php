@@ -179,7 +179,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $this->assign('contact1', $contact1);
     $this->assign('contact2', $contact2);
     $this->assign('mandate_cancel_reasons', $mandate_cancel_reasons);
-    $this->assign('can_delete', CRM_Core_Permission::check('delete sepa groups'));
+    $this->assign('can_delete', CRM_Core_Permission::check('delete sepa mandates'));
     $this->assign('can_modify', CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification'));
     $this->assign('sepa_templates', $tpl_ids);
 
