@@ -92,6 +92,21 @@ class CRM_Sepa_Logic_Retry {
       }
     }
 
+    if (isset($group) && is_array($group)) {
+      // Create a transaction message:
+      if ((array_key_exists('transaction_message', $params)) && !empty($params['transaction_message'])) {
+        CRM_Sepa_BAO_SEPATransactionGroup::setCustomGroupTransactionMessage(
+          $group['id'],
+          $params['transaction_message']
+        );
+      }
+
+      // Create a transaction note:
+      if ((array_key_exists('transaction_note', $params)) && !empty($params['transaction_note'])) {
+        CRM_Sepa_BAO_SEPATransactionGroup::setNote($group['id'], $params['transaction_note']);
+      }
+    }
+
     return $group['id'];
   }
 

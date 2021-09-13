@@ -75,6 +75,18 @@
   <div class="clear"></div>
 </div>
 
+<div class="crm-section">
+  <div class="label">{$form.transaction_message.label}</div>
+  <div class="content">{$form.transaction_message.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
+  <div class="label">{$form.transaction_note.label}</div>
+  <div class="content">{$form.transaction_note.html}</div>
+  <div class="clear"></div>
+</div>
+
 <h3>{ts}Preview{/ts}</h3>
 
 <p>
