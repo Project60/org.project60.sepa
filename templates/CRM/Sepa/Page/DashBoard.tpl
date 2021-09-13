@@ -67,8 +67,6 @@
 <table>
   <tr>
     <th>{ts domain="org.project60.sepa"}Group Name{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Message{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Note{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Type{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Submission{/ts}</th>
@@ -81,17 +79,10 @@
   {assign var='file_id' value=$group.file_id}
   {assign var='group_id' value=$group.id}
   <tr bgcolor="#FF0000" class="status_{$group.status_id} submit_{$group.submit}" data-id="{$group.id}" data-type="{$group.type}">
-
-    <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
-    <td title="{$group.transaction_message}">
-      {if $group.transaction_message != null}
-        ⓘ
-      {/if}
-    </td>
-    <td title="{$group.transaction_note}">
-      {if $group.transaction_note != null}
-        ⓘ
-      {/if}
+    <td title="id {$group.id}" class="nb_contrib">
+      {$group.reference}
+      {if $group.transaction_message}<span class="crm-i fa-envelope-o" title="{ts domain="org.project60.sepa"}Custom Transaction Message:{/ts} {$group.transaction_message}"></span>{/if}
+      {if $group.transaction_note}<span class="crm-i fa-sticky-note" title="{ts domain="org.project60.sepa"}Note:{/ts} {$group.transaction_note}"></span>{/if}
     </td>
     <td>
       {$group.status_label}
@@ -104,7 +95,9 @@
     <td>{$group.latest_submission_date}</td>
   {/if}
     <td>{$group.collection_date}</td>
-    <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
+    <td class="nb_contrib" title="list all the contributions">
+      {$group.nb_contrib}
+    </td>
     <td style="white-space:nowrap;">{$group.total|crmMoney:$group.currency}</td>
     <td>
       <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Contributions{/ts}</a>
