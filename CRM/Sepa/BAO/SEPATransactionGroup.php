@@ -127,7 +127,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t["city"]           = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["city"]);
 
       // create an individual transaction message
-      $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor);
+      $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor, $this->id);
 
       // create an individual EndToEndId
       $end2endID = $t['id']; // that's the old default
