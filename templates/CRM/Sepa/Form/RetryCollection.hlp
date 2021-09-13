@@ -16,7 +16,7 @@
 {crmScope extensionKey='org.project60.sepa'}
 
 {htxt id='id-trxn-message'}
-  <p>{ts}Allows you to add a customised transaction message, i.e. the messag the donor will find on their bank statement.{/ts}</p>
+  <p>{ts}Allows you to add a customised transaction message, i.e. the message the donor will find on their bank statement.{/ts}</p>
 {/htxt}
 
 {htxt id='id-trxn-note'}
