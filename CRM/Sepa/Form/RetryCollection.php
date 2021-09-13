@@ -104,14 +104,14 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $this->add(
       'text',
       'transaction_message',
-      E::ts('Transaction Message'),
+      E::ts('Custom Transaction Message'),
       ['class' => 'huge']
     );
 
     $this->add(
       'text',
       'transaction_note',
-      E::ts('Transaction Note'),
+      E::ts('Note'),
       ['class' => 'huge']
     );
 
