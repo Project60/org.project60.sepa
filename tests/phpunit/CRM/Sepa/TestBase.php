@@ -35,7 +35,7 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessInterface, HookInterface, TransactionalInterface
+class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface
 {
   use Api3TestTrait {
     callAPISuccess as protected traitCallAPISuccess;
@@ -211,22 +211,25 @@ class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessI
   }
 
   /**
-   * Assert that an exception of a specific type (or it child classes) is thrown when calling a function.
+   * Assert that an exception of a specific type (or it's child classes) is thrown when calling a function.
    */
   protected function assertException(string $exceptionType, callable $function, string $message = '')
   {
-    $thrown = null;
+    // convert to phpunit6 exception types
+    $exceptionType = preg_replace('/_/', '\\', $exceptionType);
     try
     {
       $function();
     }
     catch (Exception $e)
     {
-      $thrown = $e;
+      if ($e instanceof $exceptionType) {
+        return;
+      } else{
+        $this->fail($message);
+      }
     }
-
-    $constraint = new CRM_Sepa_Constraints_ExceptionThrown($exceptionType);
-    $this->assertThat($thrown, $constraint, $message);
+    $this->fail($message);
   }
 
   /**

@@ -53,11 +53,13 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
    */
   protected function assertValidMandateReference(string $actual, string $message = '')
   {
-    // TODO: The following is inefficient and should only initialised once.
-    //       PHPUnit uses globals for this, a singleton could be an alternative.
-    $constraint = new CRM_Sepa_Constraints_MandateReferenceIsValid();
+    $isValid = is_string($actual) &&
+        (strlen($actual) > 0) &&
+        (strlen($actual) <= 35) &&
+        !preg_match("/[^0-9A-Za-z\+\?\/\-\:\(\)\.\,\' ]/", $actual); // There must be no invalid character found.
 
-    $this->assertThat($actual, $constraint, $message);
+    $this->assertTrue($isValid, $message);
+    return $isValid;
   }
 
   /**
