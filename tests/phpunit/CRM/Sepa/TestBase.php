@@ -215,15 +215,19 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    */
   protected function assertException(string $exceptionType, callable $function, string $message = '')
   {
-    $thrown = null;
+    // convert to phpunit6 exception types
+    $exceptionType = preg_replace('/_/', '\\', $exceptionType);
     try
     {
       $function();
     }
     catch (Exception $e)
     {
-      $this->assertTrue(($e instanceof $exceptionType), $message);
-      return;
+      if ($e instanceof $exceptionType) {
+        return;
+      } else{
+        $this->fail($message);
+      }
     }
     $this->fail($message);
   }
