@@ -3,9 +3,8 @@
 <table>  
   <base>CRM/Sepa</base>  
   <class>SEPAMandate</class>  
-  <name>civicrm_sdd_mandate</name>  
-  <add>4.3</add> 
-  <log>true</log> 
+  <name>civicrm_sdd_mandate</name>
+  <log>true</log>
   <field>  
     <name>id</name>  
     <type>int unsigned</type>  
@@ -86,13 +85,11 @@
     <title>Creditor ID</title>
     <type>int unsigned</type> 
     <comment>FK to ssd_creditor</comment>
-    <add>4.3</add> 
-  </field> 
+  </field>
   <foreignKey> 
     <name>creditor_id</name> 
     <table>civicrm_sdd_creditor</table> 
     <key>id</key> 
-    <add>4.3</add> 
     <onDelete>SET NULL</onDelete>
   </foreignKey>
 
@@ -101,13 +98,11 @@
     <title>Contact ID</title>
     <type>int unsigned</type> 
     <comment>FK to Contact ID of the debtor</comment>
-    <add>4.3</add> 
-  </field> 
+  </field>
   <foreignKey> 
     <name>contact_id</name> 
     <table>civicrm_contact</table> 
     <key>id</key> 
-    <add>4.3</add> 
     <onDelete>SET NULL</onDelete>
   </foreignKey>
 
@@ -139,7 +134,6 @@
     <length>4</length>
     <required>true</required>  
     <default>"RCUR"</default> 
-    <add>4.3</add> 
     <comment>RCUR for recurrent (default), OOFF for one-shot</comment>
   </field> 
 
@@ -166,13 +160,11 @@
     <title>First Contribution (to be deprecated)</title>
     <type>int unsigned</type> 
     <comment>FK to civicrm_contribution</comment>
-    <add>4.3</add> 
-  </field> 
+  </field>
   <foreignKey> 
     <name>first_contribution_id</name> 
     <table>civicrm_contribution</table> 
     <key>id</key> 
-    <add>4.3</add> 
   </foreignKey>
   <field>
     <name>validation_date</name>
