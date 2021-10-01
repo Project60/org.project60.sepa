@@ -68,7 +68,7 @@ commands:
       - run: |
           mkdir -p /phpunit
           chown buildkit:buildkit /phpunit
-          su - buildkit -c "cd /buildkit/build/<< parameters.build_name >>/web/sites/default/files/civicrm/ext/$CIRCLE_PROJECT_REPONAME && /buildkit/bin/phpunit5 --log-junit /phpunit/<< parameters.build_name >>/junit.xml"
+          su - buildkit -c "cd /buildkit/build/<< parameters.build_name >>/web/sites/default/files/civicrm/ext/$CIRCLE_PROJECT_REPONAME && /buildkit/bin/phpunit6 --log-junit /phpunit/<< parameters.build_name >>/junit.xml"
   run_all:
     description: "Run all steps"
     parameters:
