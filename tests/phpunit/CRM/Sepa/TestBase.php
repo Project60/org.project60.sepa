@@ -35,7 +35,7 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_TestBase extends \PHPUnit_Framework_TestCase implements HeadlessInterface, HookInterface, TransactionalInterface
+class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface
 {
   use Api3TestTrait {
     callAPISuccess as protected traitCallAPISuccess;
