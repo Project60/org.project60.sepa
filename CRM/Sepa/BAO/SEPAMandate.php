@@ -216,7 +216,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    *   basic mandate data like id, type, creditor_id, etc.
    */
   public static function getMandateFor($contribution_id) {
+    // cache results
+    static $contribution_map = [];
     $contribution_id = (int) $contribution_id;
+    if (array_key_exists($contribution_id, $contribution_map)) {
+      return $contribution_map[$contribution_id];
+    }
+
+    // run the lookup
     $mandate_query = CRM_Core_DAO::executeQuery("
     SELECT
       COALESCE(ooff_mandate.id, rcur_mandate.id)                   AS mandate_id,
@@ -232,12 +239,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
            ON ooff_mandate.entity_id = contribution.id
            AND ooff_mandate.entity_table = 'civicrm_contribution'
     LEFT JOIN civicrm_sdd_mandate rcur_mandate
-           ON rcur_mandate.entity_id = contribution.id
+           ON rcur_mandate.entity_id = contribution.contribution_recur_id
            AND rcur_mandate.entity_table = 'civicrm_contribution_recur'
     WHERE contribution.id = {$contribution_id}
     LIMIT 1");
     if ($mandate_query->fetch() && !empty($mandate_query->mandate_id)) {
-      return [
+      $contribution_map[$contribution_id] = [
         'id'          => $mandate_query->mandate_id,
         'type'        => $mandate_query->type,
         'status'      => $mandate_query->status,
@@ -248,8 +255,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         'bic'         => $mandate_query->bic
       ];
     } else {
-      return null;
+      $contribution_map[$contribution_id] = null;
     }
+    return $contribution_map[$contribution_id];
   }
 
 
