@@ -236,7 +236,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
            AND rcur_mandate.entity_table = 'civicrm_contribution_recur'
     WHERE contribution.id = {$contribution_id}
     LIMIT 1");
-    if ($mandate_query->fetch()) {
+    if ($mandate_query->fetch() && !empty($mandate_query->mandate_id)) {
       return [
         'id'          => $mandate_query->mandate_id,
         'type'        => $mandate_query->type,
