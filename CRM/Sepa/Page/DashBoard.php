@@ -122,6 +122,9 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
           }
         }
 
+        $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage($group['id']);
+        $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote($group['id']);
+
         array_push($groups, $group);
       }
       $this->assign("groups", $groups);

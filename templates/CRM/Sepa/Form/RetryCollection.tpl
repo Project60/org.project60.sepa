@@ -1,6 +1,6 @@
 {*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2018 SYSTOPIA                       |
+| Copyright (C) 2013-2021 SYSTOPIA                       |
 | Author: B. Endres (endres -at- systopia.de)            |
 | http://www.systopia.de/                                |
 +--------------------------------------------------------+
@@ -14,7 +14,7 @@
 +-------------------------------------------------------*}
 
 
-<h3>{ts}Select the transaction groups you want to re-collect.{/ts}</h3>
+<h3>{ts}Select the transaction groups of which you want to re-collect failed transactions{/ts}</h3>
 
 <div class="crm-section">
   <div class="label">{$form.date_range.label}</div>
@@ -72,6 +72,18 @@
 <div class="crm-section">
   <div class="label">{$form.collection_date.label}</div>
   <div class="content">{include file="CRM/common/jcalendar.tpl" elementName=collection_date}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
+  <div class="label">{$form.transaction_message.label}&nbsp;{help id="id-trxn-message" title=$form.transaction_message.label}</div>
+  <div class="content">{$form.transaction_message.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
+  <div class="label">{$form.transaction_note.label}&nbsp;{help id="id-trxn-note" title=$form.transaction_note.label}</div>
+  <div class="content">{$form.transaction_note.html}</div>
   <div class="clear"></div>
 </div>
 

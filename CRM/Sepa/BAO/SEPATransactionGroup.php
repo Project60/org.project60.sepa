@@ -127,7 +127,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t["city"]           = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["city"]);
 
       // create an individual transaction message
-      $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor);
+      $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor, $this->id);
 
       // create an individual EndToEndId
       $end2endID = $t['id']; // that's the old default
@@ -393,5 +393,118 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       }
     }
     return $deleted_contributions;
+  }
+
+  /**
+   * Get the custom transaction message for the given group.
+   *
+   * @param int|string $groupId
+   *
+   * @return string|null
+   */
+  public static function getCustomGroupTransactionMessage($groupId) {
+    return self::getNoteWithSubject($groupId, 'transaction_message');
+  }
+
+  /**
+   * Set the custom transaction message for the given group.
+   *
+   * @param int|string $groupId
+   * @param string $note
+   */
+  public static function setCustomGroupTransactionMessage($groupId, $note) {
+    self::setNoteWithSubject($groupId, 'transaction_message', $note);
+  }
+
+  /**
+   * Get the transaction note for the given group.
+   *
+   * @param int|string $groupId
+   *
+   * @return string|null
+   */
+  public static function getNote($groupId) {
+    return self::getNoteWithSubject($groupId, 'transaction_note');
+  }
+
+  /**
+   * Set the transaction note for the given group.
+   *
+   * @param int|string $groupId
+   * @param string $note
+   */
+  public static function setNote($groupId, $note) {
+    self::setNoteWithSubject($groupId, 'transaction_note', $note);
+  }
+
+  /**
+   * Get the CiviCRM note with the given subject for the given group.
+   *
+   * @param int|string $groupId
+   * @param string $subject
+   *
+   * @return string|null
+   */
+  private static function getNoteWithSubject($groupId, $subject) {
+    // NOTE: We cannot use the API here as it seems to only allow a fixed set of values for entity_table.
+
+    $queryResult = CRM_Core_DAO::executeQuery(
+      "SELECT
+        note
+      FROM
+        civicrm_note
+      WHERE
+        entity_table = 'civicrm_sdd_txgroup'
+        AND entity_id = %1
+        AND `subject` = %2",
+      [
+        1 => [(int)$groupId, 'Integer'],
+        2 => [$subject, 'String'],
+      ]
+    );
+
+    if ($queryResult->fetch()) {
+      return $queryResult->note;
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
+   * Set a note with the given subject for the given group.
+   *
+   * @param int|string $groupId
+   * @param string $subject
+   * @param string $note
+   */
+  private static function setNoteWithSubject($groupId, $subject, $note) {
+    // NOTE: We cannot use the API here as it seems to only allow a fixed set of values for entity_table.
+
+    CRM_Core_DAO::executeQuery(
+      "DELETE FROM
+        civicrm_note
+      WHERE
+        entity_table = 'civicrm_sdd_txgroup'
+        AND entity_id = %1
+        AND `subject` = %2",
+      [
+        1 => [(int)$groupId, 'Integer'],
+        2 => [$subject, 'String'],
+      ]
+    );
+    // TODO: Is simply deleting any existing notes a good practice or should we check if it exists and then update?
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO
+        civicrm_note (entity_table, entity_id, `subject`, note)
+      VALUES
+        ('civicrm_sdd_txgroup', %1, %2, %3)",
+      [
+        1 => [(int)$groupId, 'Integer'],
+        2 => [$subject, 'String'],
+        3 => [$note, 'String'],
+      ]
+    );
   }
 }

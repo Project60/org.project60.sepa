@@ -104,13 +104,26 @@ class CRM_Sepa_Logic_Settings {
   }
 
   /**
-   * generate a transaction message for the given mandate/creditor
+   * Generate a transaction message for the given mandate/creditor
+   *
+   * @param array $mandate
+   *   mandate / contribution data
+   * @param array $creditor
+   *   creditor data
+   * @param integer $txgroup_id
+   *   ID of the transactino group
    *
    * @return string a SEPA compliant transaction message
    */
-  static function getTransactionMessage($mandate, $creditor) {
+  static function getTransactionMessage($mandate, $creditor, $txgroup_id = 0) {
     // get tx message from settings
     $transaction_message = self::getSetting('custom_txmsg', $creditor['id']);
+
+    // override with custom txgroup message
+    $custom_transaction_message = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage($txgroup_id);
+    if ($custom_transaction_message) {
+      $transaction_message = $custom_transaction_message;
+    }
 
     // run hook for further customisation
     CRM_Utils_SepaCustomisationHooks::modify_txmessage($transaction_message, $mandate, $creditor);

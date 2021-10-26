@@ -101,6 +101,19 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         TRUE,
         array('formatType' => 'activityDate'));
 
+    $this->add(
+      'text',
+      'transaction_message',
+      E::ts('Custom Transaction Message'),
+      ['class' => 'huge']
+    );
+
+    $this->add(
+      'text',
+      'transaction_note',
+      E::ts('Note'),
+      ['class' => 'huge']
+    );
 
     $this->addButtons(array(
       array(

@@ -79,8 +79,11 @@
   {assign var='file_id' value=$group.file_id}
   {assign var='group_id' value=$group.id}
   <tr bgcolor="#FF0000" class="status_{$group.status_id} submit_{$group.submit}" data-id="{$group.id}" data-type="{$group.type}">
-
-    <td title="id {$group.id}" class="nb_contrib">{$group.reference}</td>
+    <td title="id {$group.id}" class="nb_contrib">
+      {$group.reference}
+      {if $group.transaction_message}<span class="crm-i fa-envelope-o" title="{ts domain="org.project60.sepa"}Custom Transaction Message:{/ts} {$group.transaction_message}"></span>{/if}
+      {if $group.transaction_note}<span class="crm-i fa-sticky-note" title="{ts domain="org.project60.sepa"}Note:{/ts} {$group.transaction_note}"></span>{/if}
+    </td>
     <td>
       {$group.status_label}
       <img id="busy_{$group_id}" height="16" src="{$config->resourceBase}i/loading.gif" style="float: right; padding: 0px 4px;" hidden="1" />
@@ -92,7 +95,9 @@
     <td>{$group.latest_submission_date}</td>
   {/if}
     <td>{$group.collection_date}</td>
-    <td class="nb_contrib" title="list all the contributions">{$group.nb_contrib}</td>
+    <td class="nb_contrib" title="list all the contributions">
+      {$group.nb_contrib}
+    </td>
     <td style="white-space:nowrap;">{$group.total|crmMoney:$group.currency}</td>
     <td>
       <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Contributions{/ts}</a>
