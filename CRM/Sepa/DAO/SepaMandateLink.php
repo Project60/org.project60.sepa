@@ -145,6 +145,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
     $this->__table = 'civicrm_sdd_mandate';
     parent::__construct();
   }
+
   /**
    * return foreign keys and entity references
    *
@@ -154,13 +155,13 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
    */
   static function getReferenceColumns()
   {
-    if (!self::$_links) {
-      self::$_links = array(
-          new CRM_Core_EntityReference(self::getTableName() , 'mandate_id', 'civicrm_sdd_mandate', 'id') ,
-          new CRM_Core_EntityReference(self::getTableName() , 'entity_id', NULL, 'id', 'entity_table') ,
-      );
+    if (!isset(Civi::$statics[__CLASS__]['links'])) {
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mandate_id', 'civicrm_sdd_mandate', 'id');
+      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'entity_id', null, 'id');
+      CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
-    return self::$_links;
+    return Civi::$statics[__CLASS__]['links'];
   }
 
   /**
