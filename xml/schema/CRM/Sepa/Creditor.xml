@@ -151,4 +151,36 @@
     </pseudoconstant>
     <add>4.4</add>
   </field>
+
+  <field>
+    <name>creditor_type</name>
+    <title>Creditor Type</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Type of the creditor, values are SEPA (default) and PSP</comment>
+  </field>
+
+  <field>
+    <name>pi_ooff</name>
+    <title>OOFF Payment Instruments</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Payment instruments, comma separated, to be used for one-off collections</comment>
+  </field>
+
+  <field>
+    <name>pi_rcur</name>
+    <title>RCUR Payment Instruments</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Payment instruments, comma separated, to be used for recurring collections</comment>
+  </field>
+
+  <field>
+    <name>uses_bic</name>
+    <title>Immediately activate new Mandates</title>
+    <type>boolean</type>
+    <comment>If true, BICs are not used for this creditor</comment>
+  </field>
+
 </table>
