@@ -39,12 +39,22 @@
     <comment>Provided by the bank. ISO country code+check digit+ZZZ+country specific identifier</comment>
     <add>4.3</add>
   </field>
+
   <field>
     <name>name</name>
-    <title>name of the creditor</title>
+    <title>Creditor Name</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>by default creditor_id.display_name snapshot at creation</comment>
+    <comment>official creditor name, passed to exported files</comment>
+    <add>4.3</add>
+  </field>
+
+  <field>
+    <name>label</name>
+    <title>Creditor Label</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>internally used label for the creditor</comment>
     <add>4.3</add>
   </field>
 
