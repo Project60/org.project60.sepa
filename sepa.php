@@ -331,27 +331,27 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
   $entityTypes[] = array(
       'name' => 'SepaMandate',
       'class' => 'CRM_Sepa_DAO_SEPAMandate',
-      'table' => 'civicrm_sepa_mandate',
+      'table' => 'civicrm_sdd_mandate',
   );
   $entityTypes[] = array(
       'name' => 'SepaCreditor',
       'class' => 'CRM_Sepa_DAO_SEPACreditor',
-      'table' => 'civicrm_sepa_creditor',
+      'table' => 'civicrm_sdd_creditor',
   );
   $entityTypes[] = array(
       'name' => 'SepaTransactionGroup',
       'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
-      'table' => 'civicrm_sepa_txgroup',
+      'table' => 'civicrm_sdd_txgroup',
   );
   $entityTypes[] = array(
       'name' => 'SepaSddFile',
       'class' => 'CRM_Sepa_DAO_SEPASddFile',
-      'table' => 'civicrm_sepa_file',
+      'table' => 'civicrm_sdd_file',
   );
   $entityTypes[] = array(
       'name' => 'SepaContributionGroup',
       'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
-      'table' => 'civicrm_sepa_contribution_txgroup',
+      'table' => 'civicrm_sdd_contribution_txgroup',
   );
   $entityTypes[] = array(
       'name' => 'SepaMandateLink',
