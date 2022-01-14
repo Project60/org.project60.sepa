@@ -435,6 +435,9 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
       // doesn't exist yet, add the column and set to '1'
       $this->executeSql("ALTER TABLE civicrm_sdd_mandate ADD COLUMN `account_holder` varchar(255) NULL DEFAULT NULL COMMENT 'Name of the account holder';");
     }
+    // run upgrade 1508 because this upgrade had that number before and blipp thinks it will not be run otherwise.
+    // TODO Remove this for upstreaming.
+    upgrade_1508();
     return TRUE;
   }
 }
