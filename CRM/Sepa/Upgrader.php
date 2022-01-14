@@ -414,6 +414,10 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
         WHERE mandate.id IS NOT NULL
           AND mandate.status = 'FRST'");
       */ // END RETRACTED
+
+      // make sure we rebuild caches anyway
+      CRM_Core_Invoke::rebuildMenuAndCaches();
+
     } catch (Exception $ex) {
       // We have a problem if the old payment instruments have been disabled
       $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");

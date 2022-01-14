@@ -86,16 +86,16 @@ cj(function () {
 function deletecreditor(id) {
 
     CRM.confirm(function () {
-            CRM.api('SepaCreditor', 'delete', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
+            CRM.api3('SepaCreditor', 'delete', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
                 {
                     success: function (data) {
-                        CRM.api('Setting', 'get', {'q': 'civicrm/ajax/rest', 'sequential': 1},
+                        CRM.api3('Setting', 'get', {'q': 'civicrm/ajax/rest', 'sequential': 1},
                             {
                                 success: function (data) {
                                     if (data['is_error'] == 0) {
                                         cj.each(data["values"], function (key, value) {
                                             if (value.batching_default_creditor == id) {
-                                                CRM.api('Setting', 'create', {'batching_default_creditor': '0'}, {
+                                                CRM.api3('Setting', 'create', {'batching_default_creditor': '0'}, {
                                                     success: function (data) {
                                                     }
                                                 });
@@ -120,7 +120,7 @@ function deletecreditor(id) {
 }
 
 
-// This function is needed due to the asynchronous call of success() in CRM.api().
+// This function is needed due to the asynchronous call of success() in CRM.api3().
 function createCallback(data, map, i, creditorId) {
     return function (data) {
         if (data['is_error'] == 0) {
@@ -146,7 +146,7 @@ function createCallback(data, map, i, creditorId) {
  * @param isCopy flag to indicate copying of a creditor
  */
 function fetchCreditor(id, isCopy) {
-    CRM.api('SepaCreditor', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
+    CRM.api3('SepaCreditor', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
         {
             success: function (data) {
                 if (data['is_error'] == 0) {
@@ -172,7 +172,7 @@ function fetchCreditor(id, isCopy) {
                     cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
                     cj('#addcreditor').show(500);
 
-                    CRM.api('Contact', 'getsingle', {
+                    CRM.api3('Contact', 'getsingle', {
                             'q': 'civicrm/ajax/rest',
                             'sequential': 1,
                             'id': data['creditor_id']
@@ -186,7 +186,7 @@ function fetchCreditor(id, isCopy) {
                         });
 
                     for (var i = 0; i < customBatchingParams.length; i++) {
-                        CRM.api('Setting', 'getvalue', {
+                        CRM.api3('Setting', 'getvalue', {
                             'q': 'civicrm/ajax/rest',
                             'sequential': 1,
                             'group': 'SEPA Direct Debit Preferences',
@@ -278,7 +278,7 @@ function updateCreditor() {
     cj(".save").attr('onclick', '').unbind('click');
 
     let updObj = cj.extend(stdObj, updatedCreditorInfo);
-    CRM.api('SepaCreditor', 'create', updObj,
+    CRM.api3('SepaCreditor', 'create', updObj,
         {
             success: function (data) {
                 if (data['is_error'] == 0) {
@@ -310,7 +310,7 @@ function updateCreditor() {
 
                         param[name] = JSON.stringify(param[name]);
                         var once = true;
-                        CRM.api('Setting', 'create', param, {
+                        CRM.api3('Setting', 'create', param, {
                             success: function (data) {
                                 if (once) {
                                     once = !once;
@@ -347,7 +347,6 @@ function setDefaultSEPAPaymentInstruments() {
  * Reset creditor form
  */
 function resetValues() {
-    console.log("reset");
     cj('#custombatching :input').val("");
     cj('#creditorinfo :input').val("");
     cj('#edit_creditor_id').val("none");
