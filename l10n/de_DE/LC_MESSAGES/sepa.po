@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2020-09-29 11:05+0200\n"
+"POT-Creation-Date: 2020-10-08 15:42+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -702,6 +702,7 @@ msgid "'%3' SEPA Mandate <a href=\"%2\">%1</a> created."
 msgstr "'%3' SEPA Mandat <a href=\"%2\">%1</a> erstellt."
 
 #: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Page/CreateMandate.php
+#: CRM/Sepa/Page/EditMandate.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Success"
 msgstr "Erfolg"
@@ -1266,6 +1267,10 @@ msgstr "Konnte Creditor [%s] nicht lesen. Fehler ist: '%s'"
 #: CRM/Sepa/Page/EditMandate.php
 msgid "None"
 msgstr "keine"
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "Mandate [%1] was validated/activated."
+msgstr "Mandat [%1] wurde validiert und aktiviert."
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Mandate [%s] is already in use! It cannot be deleted."
@@ -2996,12 +3001,13 @@ msgid "Options"
 msgstr "Optionen"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Activate"
-msgstr "Aktivieren"
+msgid "Validate/Activate"
+msgstr "Validieren / Aktivieren"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Activate the mandate when the written permission was received."
-msgstr "Aktiviert das Mandat (z.B. eine Unterschrift liegt jetzt vor)"
+msgid "Activate the mandate when all requirements for collection are met."
+msgstr ""
+"Aktiviere das Mandat wenn alle Bedingungen für den Einzug erfüllt sind."
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid ""
@@ -3384,6 +3390,9 @@ msgstr ""
 #: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
 msgid "Blocklistet IBAN should fail but did not!"
 msgstr ""
+
+#~ msgid "Activate"
+#~ msgstr "Aktivieren"
 
 #~ msgid "Hide BIC in PP"
 #~ msgstr "BIC Verstecken"

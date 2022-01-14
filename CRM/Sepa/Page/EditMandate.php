@@ -26,6 +26,8 @@
 
 require_once 'CRM/Core/Page.php';
 
+use CRM_Sepa_ExtensionUtil as E;
+
 class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
   function run() {
@@ -46,6 +48,9 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
       } else if ($_REQUEST['action']=='end') {
         $this->endMandate($mandate_id);
+
+      } else if ($_REQUEST['action']=='validate') {
+        $this->validateMandate($mandate_id);
 
       } else if ($_REQUEST['action']=='cancel') {
         $this->cancelMandate($mandate_id);
@@ -184,6 +189,53 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $this->assign('sepa_templates', $tpl_ids);
 
     parent::run();
+  }
+
+  /**
+   * Validate the given mandate (if in status PENDING), i.e.:
+   *  - set status to FRST/INIT (depending on type)
+   *  - set validation date
+   *
+   * @param integer $mandate_id
+   *   mandate ID
+   *
+   * @throws Exception
+   *   if anything is wrong
+   */
+  function validateMandate($mandate_id) {
+    // first, load the mandate
+    $mandate = civicrm_api3("SepaMandate", "getsingle", ['id' => $mandate_id]);
+
+    // make sure it's in the right status
+    if ($mandate['status'] != 'INIT') {
+      throw new Exception("Mandate is not in status INIT");
+    }
+
+    // prepare the change data
+    $update = [
+        'id' => $mandate_id,
+        'validation_date' => date('YmdHis'),
+    ];
+
+    // determine the correct status
+    if ($mandate['type'] == 'RCUR') {
+      $update['status'] = 'FRST';
+    }
+    elseif ($mandate['type'] == 'OOFF') {
+      $update['status'] = 'OOFF';
+    }
+    else {
+      throw new Exception("Unexpected mandate type {$mandate['type']}");
+    }
+
+    // apply change
+    civicrm_api3('SepaMandate', 'create', $update);
+
+    // inform user
+    CRM_Core_Session::setStatus(
+        E::ts("Mandate [%1] was validated/activated.", [1 => $mandate_id]),
+        E::ts("Success"),
+        'info');
   }
 
 

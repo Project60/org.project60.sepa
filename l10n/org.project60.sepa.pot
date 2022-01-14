@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: org.project60.sepa\n"
-"POT-Creation-Date: 2020-09-29 11:05+0200\n"
+"POT-Creation-Date: 2020-10-08 15:42+0200\n"
 "Language-Team: CiviCRM Translators <civicrm-translators@lists.civicrm.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -680,6 +680,7 @@ msgid "'%3' SEPA Mandate <a href=\"%2\">%1</a> created."
 msgstr ""
 
 #: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Page/CreateMandate.php
+#: CRM/Sepa/Page/EditMandate.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Success"
 msgstr ""
@@ -1237,6 +1238,10 @@ msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "None"
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "Mandate [%1] was validated/activated."
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
@@ -2754,11 +2759,11 @@ msgid "Options"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Activate"
+msgid "Validate/Activate"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
-msgid "Activate the mandate when the written permission was received."
+msgid "Activate the mandate when all requirements for collection are met."
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
