@@ -22,11 +22,13 @@
           <IBAN>{$creditor.iban}</IBAN>
         </Id>
       </CdtrAcct>
-      <CdtrAgt>
-        <FinInstnId>
-          <BIC>{$creditor.bic}</BIC>
-        </FinInstnId>
-      </CdtrAgt>
+      {if $contribution.bic ne ''}
+        <DbtrAgt>
+          <FinInstnId>
+            <BIC>{$contribution.bic}</BIC>
+          </FinInstnId>
+        </DbtrAgt>
+      {/if}
       <ChrgBr>SLEV</ChrgBr>
       <CdtrSchmeId>
         <Id>
