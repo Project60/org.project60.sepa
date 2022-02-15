@@ -61,6 +61,8 @@
             </Othr>
           </FinInstnId>
         </DbtrAgt>
+        <Dbtr>
+        </Dbtr>
         <DbtrAcct>
           <Id>
             <IBAN>{$contribution.iban}</IBAN>
