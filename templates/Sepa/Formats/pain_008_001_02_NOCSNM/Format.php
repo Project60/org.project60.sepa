@@ -13,6 +13,6 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-class CRM_Sepa_Logic_Format_pain_008_001_02_NODBTRNM extends CRM_Sepa_Logic_Format {
+class CRM_Sepa_Logic_Format_pain_008_001_02_NOCSNM extends CRM_Sepa_Logic_Format {
 
 }

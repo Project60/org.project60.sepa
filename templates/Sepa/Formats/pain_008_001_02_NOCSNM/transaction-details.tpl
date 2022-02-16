@@ -29,7 +29,6 @@
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
       <CdtrSchmeId>
-        <Nm>{$creditor.name}</Nm>
         <Id>
           <PrvtId>
             <Othr>
