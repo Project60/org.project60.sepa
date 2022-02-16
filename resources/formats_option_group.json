@@ -113,7 +113,7 @@
     {
       "_lookup": ["name"],
       "_translate": ["label"],
-      "label": "pain.008.001.02 without BIC and Debitor Name",
+      "label": "pain.008.001.02 without BIC and CdtrSchmId:Nm",
       "name": "pain_008_001_02_NOCSNM",
       "filter": "0",
       "is_reserved": "1",
