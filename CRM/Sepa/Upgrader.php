@@ -427,4 +427,18 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
 
     return TRUE;
   }
+
+  /**
+   * Add new payment instrument selectors
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1604() {
+    // add currency
+    $this->ctx->log->info('Adding new PAIN file format.');
+    $customData = new CRM_Sepa_CustomData('org.project60.sepa');
+    $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+    return TRUE;
+  }
 }
