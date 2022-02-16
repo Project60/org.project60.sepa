@@ -61,6 +61,7 @@
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
+          <Nm>{$contribution.display_name}</Nm>
         </Dbtr>
         <DbtrAcct>
           <Id>
