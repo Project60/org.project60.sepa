@@ -259,7 +259,9 @@ cj(document).ready(function() {
             interval_field.find('option[value!=0]').attr('disabled', 'disabled');
         }
         // set frequency to the first enabled option
-        interval_field.find('option:not([disabled])').first().attr('selected', true).change();
+        if (!interval_field.val()) {
+          interval_field.find('option:not([disabled])').first().attr('selected', true).change();
+        }
 
         // trigger update of calculations
         sdd_recalculate_fields();
