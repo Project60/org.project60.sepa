@@ -162,6 +162,14 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         array('class' => 'crm-select2 huge')
     );
 
+    // add account_holder field
+    $this->add(
+        'text',
+        'account_holder',
+        E::ts('Account Holder'),
+        array('placeholder' => E::ts("not required if same as contact"), 'size' => '32')
+    );
+
     // add iban field
     $this->add(
         'text',
@@ -298,6 +306,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       $defaults['creditor_id']       = $this->old_mandate['creditor_id'];
       $defaults['financial_type_id'] = $this->old_contrib['financial_type_id'];
       $defaults['campaign_id']       = CRM_Utils_Array::value('campaign_id', $this->old_contrib, '');
+      $defaults['account_holder']    = $this->old_mandate['account_holder'];
       $defaults['iban']              = $this->old_mandate['iban'];
       $defaults['bic']               = $this->old_mandate['bic'];
       $defaults['amount']            = $this->old_contrib['amount'];
@@ -430,6 +439,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'financial_type_id'         => $values['financial_type_id'],
         'payment_instrument_id'     => $values['payment_instrument_id'],
         'currency'                  => $values['currency'],
+        'account_holder'            => $values['account_holder'],
         'iban'                      => $values['iban'],
         'bic'                       => empty($values['bic']) ? 'NOTPROVIDED' : $values['bic'],
         'cycle_day'                 => $values['cycle_day'],
