@@ -237,7 +237,7 @@ class CRM_Sepa_Logic_MandateRepairs {
       $message.= "</div>";
 
       // set status
-      CRM_Core_Session::setStatus(E::ts("CiviSEPA Health Check"), $message, 'warn');
+      CRM_Core_Session::setStatus($message, E::ts("CiviSEPA Health Check"), 'warn');
     }
   }
 
