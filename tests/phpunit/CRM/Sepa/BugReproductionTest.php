@@ -28,8 +28,8 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
 
   /**
    * Verify that but #629 is fixed:
-   *  "each time recurring contributions are updated via the dashboard new contributions are created for recurring
-   *   mandates even if there is a contribution for the current period.
+   *  'each time recurring contributions are updated via the dashboard new contributions are created for recurring
+   *   mandates even if there is a contribution for the current period.'
    *
    * Presumably this goes back to a bad payment instrument id, set for example by a faulty payment processor
    *
