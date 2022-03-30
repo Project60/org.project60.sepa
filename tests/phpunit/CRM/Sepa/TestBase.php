@@ -81,6 +81,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   const BATCH_STATUS_REOPENED = '4';
   const BATCH_STATUS_EXPORTED = '5';
   const BATCH_STATUS_RECEIVED = '6';
+  const PAYMENT_INSTRUMENT_FRST = '6';
+  const PAYMENT_INSTRUMENT_RCUR = '7';
 
   protected $testCreditorId;
 
