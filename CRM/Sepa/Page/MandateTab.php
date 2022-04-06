@@ -44,7 +44,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_contribution.total_amount  AS total_amount,
         civicrm_contribution.currency      AS currency,
         civicrm_contribution.cancel_reason AS cancel_reason,
-        IF(civicrm_sdd_mandate.status IN ('OOFF'), 'sepa-active', 'sepa-inactive')           
+        IF(civicrm_sdd_mandate.status IN ('OOFF'), 'sepa-active', 'sepa-inactive')
                                            AS class
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution   ON civicrm_contribution.id = civicrm_sdd_mandate.entity_id
@@ -105,7 +105,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_contribution_recur.frequency_unit               AS frequency_unit,
         civicrm_contribution_recur.currency                     AS currency,
         civicrm_contribution_recur.amount                       AS amount,
-        IF(civicrm_sdd_mandate.status IN ('FRST', 'RCUR'), 'sepa-active', 'sepa-inactive')           
+        IF(civicrm_sdd_mandate.status IN ('FRST', 'RCUR'), 'sepa-active', 'sepa-inactive')
                                                                 AS class
       FROM civicrm_sdd_mandate
       LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
@@ -124,8 +124,13 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       ORDER BY civicrm_contribution_recur.start_date DESC, civicrm_sdd_mandate.id DESC;";
 
     $mandate_ids = array();
+
+    CRM_Core_DAO::disableFullGroupByMode();
     $rcur_mandates = CRM_Core_DAO::executeQuery($rcur_query,
-      array( 1 => array($contact_id, 'Integer')));
+      array(1 => array($contact_id, 'Integer'))
+    );
+    CRM_Core_DAO::reenableFullGroupByMode();
+
     while ($rcur_mandates->fetch()) {
       $rcur = array(
         'mandate_id'           => $rcur_mandates->mandate_id,
@@ -182,7 +187,11 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
           AND civicrm_contribution.id IS NOT NULL
         GROUP BY civicrm_sdd_mandate.id
         ORDER BY civicrm_contribution.receive_date;";
+
+      CRM_Core_DAO::disableFullGroupByMode();
       $fail_query = CRM_Core_DAO::executeQuery($fail_sequence);
+      CRM_Core_DAO::reenableFullGroupByMode();
+
       while ($fail_query->fetch()) {
         if (preg_match("#(?<last_fails>1+)$#", $fail_query->fail_sequence, $match)) {
           $last_sequence = $match['last_fails'];
@@ -202,7 +211,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
    */
   public static function getMandateCount($contact_id) {
     return CRM_Core_DAO::singleValueQuery("
-        SELECT COUNT(id) FROM civicrm_sdd_mandate 
+        SELECT COUNT(id) FROM civicrm_sdd_mandate
         WHERE contact_id = %1
           AND status IN ('FRST', 'RCUR', 'OOFF', 'INIT');",
             array( 1 => array($contact_id, 'Integer')));

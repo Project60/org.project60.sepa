@@ -126,8 +126,9 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
     LEFT JOIN civicrm_contribution as contrib on txgroup_contrib.contribution_id = contrib.id
     LEFT JOIN civicrm_sdd_file on sdd_file_id = civicrm_sdd_file.id
     WHERE $where
-    GROUP BY txgroup.id
+    GROUP BY txgroup.id, txgroup.reference, sdd_file_id, txgroup.type, txgroup.collection_date, txgroup.latest_submission_date, txgroup.status_id, txgroup.sdd_creditor_id, civicrm_sdd_file.created_date, contrib.currency, civicrm_sdd_file.reference
     $orderby;";
+
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result= array();
   $total =0;
@@ -264,9 +265,10 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   LEFT JOIN civicrm_contribution          AS contribution ON txgroup_contrib.contribution_id = contribution.id
   LEFT JOIN civicrm_entity_financial_trxn AS entity_trxn  ON entity_trxn.entity_id = contribution.id AND entity_trxn.entity_table='civicrm_contribution'
   WHERE txgroup_contrib.txgroup_id = $txgroup_id
-  GROUP BY contribution.id;";
+  GROUP BY contribution.id, entity_trxn.financial_trxn_id, contribution.total_amount;";
 
   $contributions_query = CRM_Core_DAO::executeQuery($contributions_query_sql);
+
   $transactions = array();
   $contributions_missing_transaction = array();
   $total = 0.0;
