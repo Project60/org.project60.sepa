@@ -90,9 +90,69 @@ class CRM_Sepa_Logic_MandateRepairs {
    */
   public function runAllRepairs()
   {
+    $this->repairOpenGroupContributionStatus();
     $this->repairFrstPaymentInstruments();
     $this->repairInstallmentPaymentInstruments();
+
     $this->showSessionStatusNotification();
+  }
+
+  /**
+   * Contribution is open transaction groups should be in status 'Pending'. However,
+   *  if the corresponding recurring contributions are (wrongly) 'in Progress',
+   *  the generated contributions are as well. This repair task tries to fix that
+   *
+   * @see https://github.com/Project60/org.project60.sepa/issues/629
+   *
+   * @return void
+   */
+  protected function repairOpenGroupContributionStatus()
+  {
+    // get the status IDs
+    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $contribution_status_in_progress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+    $batch_status_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+
+    // run the search for contributions in the wrong status
+    CRM_Core_DAO::disableFullGroupByMode();
+    $case = CRM_Core_DAO::executeQuery("
+        SELECT 
+               open_contribution.id                     AS contribution_id,
+               open_contribution.contribution_status_id AS contribution_status_id
+        FROM civicrm_sdd_txgroup txgroup
+        LEFT JOIN civicrm_sdd_contribution_txgroup txgroup_contribution
+               ON txgroup.id = txgroup_contribution.txgroup_id
+        LEFT JOIN civicrm_contribution open_contribution
+               ON open_contribution.id = txgroup_contribution.contribution_id
+        WHERE txgroup.status_id = %1
+          AND open_contribution.contribution_status_id = %2",
+        [
+            1 => [$batch_status_open, 'Integer'],
+            2 => [$contribution_status_in_progress, 'Integer'],
+        ]
+    );
+    CRM_Core_DAO::reenableFullGroupByMode();
+
+    // apply changes
+    $status_adjustment_counter = 0;
+    while ($case->fetch()) {
+      $status_adjustment_counter++;
+      /* sadly, can't do this via API
+      civicrm_api3('Contribution', 'create', [
+          'id' => $case->contribution_id,
+          'contribution_status_id' => $contribution_status_pending
+      ]);*/
+      CRM_Core_DAO::executeQuery("
+         UPDATE civicrm_contribution SET contribution_status_id = %1 WHERE id = %2",
+         [
+           1 => [$contribution_status_pending, 'Integer'],
+           2 => [$case->contribution_id, 'Integer'],
+         ]);
+      $this->log("Adjusted status of contribution [{$case->contribution_id}] from [{$case->contribution_status_id}] to status 'Pending'.");
+    }
+    if ($status_adjustment_counter) {
+      $this->addUINotification(E::ts("Warning: had to adjusted the status of %1 contribution(s) to 'Pending', as they are part of an open transaction group.", [1 => $status_adjustment_counter]));
+    }
   }
 
 
@@ -118,6 +178,7 @@ class CRM_Sepa_Logic_MandateRepairs {
       } else {
         foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
           // fix the recurring contributions
+          CRM_Core_DAO::disableFullGroupByMode();
           $case = CRM_Core_DAO::executeQuery(
             "
             SELECT rcur.id AS rcur_id,
@@ -133,6 +194,8 @@ class CRM_Sepa_Logic_MandateRepairs {
               2 => [$rcur_pi_id, 'Integer'],
             ]
           );
+          CRM_Core_DAO::reenableFullGroupByMode();
+
           while ($case->fetch()) {
             $pi_adjustment_counter++;
             civicrm_api3('ContributionRecur', 'create', [
@@ -172,6 +235,7 @@ class CRM_Sepa_Logic_MandateRepairs {
       } else {
         foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
           // fix the recurring contributions
+          CRM_Core_DAO::disableFullGroupByMode();
           $case = CRM_Core_DAO::executeQuery(
             "
             SELECT contribution.id                    AS contribution_id,
@@ -195,6 +259,8 @@ class CRM_Sepa_Logic_MandateRepairs {
               3 => [$rcur_pi_id, 'Integer'],
             ]
           );
+          CRM_Core_DAO::reenableFullGroupByMode();
+
           while ($case->fetch()) {
             $pi_adjustment_counter++;
             $new_pi = $case->first_contribution_id == $case->contribution_id ? $frst_pi_id : $rcur_pi_id;
