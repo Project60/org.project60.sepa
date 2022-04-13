@@ -90,12 +90,69 @@ class CRM_Sepa_Logic_MandateRepairs {
    */
   public function runAllRepairs()
   {
+    $this->detectOrphanedInProgressContributions();
     $this->repairOpenGroupContributionStatus();
     $this->repairFrstPaymentInstruments();
     $this->repairInstallmentPaymentInstruments();
 
+    // detect/repair
+    //$this->detectOrphanedPendingContributions();
+
     $this->showSessionStatusNotification();
   }
+
+
+  /**
+   * This process will identify all Pending CiviSEPA contributions
+   *  that are not part of a SEPA transaction group which most likely means,
+   *  that the group has been deleted without them. They clog up the system
+   *
+   * @see https://github.com/Project60/org.project60.sepa/issues/629
+   *
+   * @todo currently don't do that - they don't cause any harm (afaik), and they might simply get re-assigned to a group
+   *
+   * @return void
+   */
+  protected function detectOrphanedPendingContributions()
+  {
+    static $already_run = false; // run this one only once per process, since it doesn't refer to any mandates
+    if (!$already_run) {
+      $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+      $orphaned_pending_contribution_ids = $this->getOrphanedContributions($contribution_status_pending);
+      if ($orphaned_pending_contribution_ids) {
+        $this->log("Orphaned pending contributions detected: " . implode($orphaned_pending_contribution_ids));
+        $this->addUINotification(E::ts("%1 orphaned open (pending) SEPA contributions were found in the system, i.e. they are not part of a SEPA transaction group, and will not be collected any more. You should delete them by searching for contributions in status 'Pending' with payment instruments RCUR and FRST.",
+          [1 => count($orphaned_pending_contribution_ids)]));
+      }
+    }
+    $already_run = true;
+  }
+
+  /**
+   * This process will identify all In Progress CiviSEPA contributions
+   *  that are not part of a SEPA transaction group which most likely means,
+   *  that the group has been deleted without them.
+   * They may cause serious ramifications with the collection system
+   *
+   * @see https://github.com/Project60/org.project60.sepa/issues/629
+   *
+   * @return void
+   */
+  protected function detectOrphanedInProgressContributions()
+  {
+    static $already_run = false; // run this one only once per process, since it doesn't refer to any mandates
+    if (!$already_run) {
+      $contribution_status_in_progress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+      $orphaned_in_progress_contribution_ids = $this->getOrphanedContributions($contribution_status_in_progress);
+      if ($orphaned_in_progress_contribution_ids) {
+        $this->log("WARNING: Orphaned contributions in status 'In Progress' detected: " . implode($orphaned_in_progress_contribution_ids));
+        $this->addUINotification(E::ts("WARNING: %1 orphaned active (in Progress) SEPA contributions detected. These may cause irregularities in the generation of the SEPA collection groups, and in particular might cause the same installment to be collected multiple times. You should find them by searching for contributions in status 'in Progress' with the SEPA payment instruments (e.g. RCUR and FRST), and then export (to be safe) and delete them.",
+          [1 => count($orphaned_in_progress_contribution_ids)]));
+      }
+    }
+    $already_run = true;
+  }
+
 
   /**
    * Contribution is open transaction groups should be in status 'Pending'. However,
@@ -307,7 +364,54 @@ class CRM_Sepa_Logic_MandateRepairs {
     }
   }
 
+  /**
+   * Identify all 'orphaned' contributions by contribution status,
+   *  i.e. SEPA contributions that are not part of a sepa transaction group
+   *
+   * @param integer $contribution_status_id
+   *   contribution status ID
+   *
+   * @return array
+   *   list of contribution IDs
+   */
+  protected function getOrphanedContributions($contribution_status_id)
+  {
+    // get recurring payment instruments
+    $rcur_pis = [];
+    $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
+    foreach ($creditors as $creditor) {
+      $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor['id']);
+      foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
+        $rcur_pis[] = $frst_pi_id;
+        $rcur_pis[] = $rcur_pi_id;
+      }
+    }
 
+    // run the query
+    CRM_Core_DAO::disableFullGroupByMode();
+    $case = CRM_Core_DAO::executeQuery("
+        SELECT contribution.id AS contribution_id
+        FROM civicrm_contribution contribution
+        LEFT JOIN civicrm_sdd_contribution_txgroup txgroup_contribution
+               ON txgroup_contribution.contribution_id = contribution.id
+        WHERE txgroup_contribution.id IS NULL
+          AND contribution.contribution_status_id = %1
+          AND contribution.payment_instrument_id IN (%2)
+          ",
+      [
+        1 => [$contribution_status_id, 'Integer'],
+        2 => [implode(',', $rcur_pis), 'CommaSeparatedIntegers'],
+      ]
+    );
+    CRM_Core_DAO::reenableFullGroupByMode();
+
+    // collect all ids
+    $contribution_ids = [];
+    while ($case->fetch()) {
+      $contribution_ids[] = (int) $case->contribution_id;
+    }
+    return $contribution_ids;
+  }
 
   /**
    * Run all mandate repairs for the given IDs
