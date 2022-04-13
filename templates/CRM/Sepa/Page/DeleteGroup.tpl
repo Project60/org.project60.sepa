@@ -81,12 +81,15 @@
 	<input id="delete_contents_NO" name="delete_contents" value="no" class="form-radio" type="radio">
 	<label for="delete_contents_NO">{ts 1=$entity_label domain="org.project60.sepa"}don't delete any %1{/ts}</label>
 	</input>
+	<br/>
 	<input id="delete_contents_ALL" name="delete_contents" value="all" class="form-radio" type="radio">
 	<label for="delete_contents_ALL">{ts 1=$entity_label domain="org.project60.sepa"}delete all %1{/ts}</label>
 	</input>
+	<br/>
 	<input id="delete_contents_OPEN" name="delete_contents" value="open" class="form-radio" type="radio">
-	<label for="delete_contents_OPEN">{ts 1=$entity_label domain="org.project60.sepa"}delete pending %1{/ts}</label>
+	<label for="delete_contents_OPEN">{ts 1=$entity_label domain="org.project60.sepa"}delete pending %1{/ts} ({ts 1=$entity_label domain="org.project60.sepa"}recommended{/ts})</label>
 	</input>
+	<br/>
 </p>
 
 
@@ -97,7 +100,7 @@
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_RCUR-Open_all" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<span class="crm-i fa-trash" title="Warning"></span>
 	{ts domain="org.project60.sepa"}You should be very careful when deleting processed contributions. It usually means, that related 'real world activites' (like money transfers) have already been initiated or even completed.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
@@ -240,7 +243,6 @@ cj("#cancel_button").click(leaveForm);
 cj("#delete_contents_NO").attr("checked", "checked");
 cj("#delete_contents_NO").trigger("change");
 
-
 {literal}
 function showWarning(event) {
 	// first hide all warnings
@@ -259,6 +261,11 @@ function submitForm(object) {
 function leaveForm(object) {
 	cj("#delete_group_form").submit();
 }
+
+cj(document).ready(function() {
+	// pre-select the delete open contributions button for deletion
+	cj("input[id=delete_contents_OPEN]").click();
+});
 {/literal}
 
 </script>
