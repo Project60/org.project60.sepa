@@ -57,7 +57,7 @@
 		{else}
 			<span class="status message"><b>{ts domain="org.project60.sepa"}This is an illegal state!{/ts}</b></span>
 		{/if}
-		<p class="status message"><span class="icon red-icon alert-icon"></span>{ts domain="org.project60.sepa"}Only proceed if you know what you're doing.{/ts}</p>
+		<p class="status message"><i class="crm-i fa-exclamation-triangle"></i>{ts domain="org.project60.sepa"}Only proceed if you know what you're doing.{/ts}</p>
 	{/if}
 </p>
 
@@ -95,7 +95,7 @@
 
 {* These warnings relate to the option selected above *}
 <p id="warning_RCUR-Open_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}You should consider deleting the open contributions. If the recurring transaction group is deleted, these payments do not make sense any more. They will also be generated again, once you hit update.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
@@ -105,12 +105,12 @@
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_RCUR-Closed_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A closed group has usually been sent to a bank to initiate the payment process, so you shouldn't want to delete this group anyway. However if you do, you should also consider deleting all associated contributions, since they will otherwise remain in the status 'in progress' and not be processed any more.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_RCUR-Closed_open" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A closed group has usually been sent to a bank to initiate the payment process, so you shouldn't want to delete this group anyway. However if you do, you should also consider deleting all associated contributions, since they will otherwise remain in the status 'in progress' and not be processed any more.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
@@ -119,39 +119,39 @@
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_RCUR-Received_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group. However if you do, be sure to delete the associated contributions in case there was no money transferred in the first place.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_RCUR-Received_open" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group. However if you do, you should consider not deleting the associated contributions in case money was actually transferred.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_RCUR-Received_all" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group. However if you do, you should consider not deleting the associated contributions in case money was actually transferred.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 
 
 <p id="warning_FRST-Open_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}You should consider deleting the open contributions. If the recurring transaction group is deleted, these payments do not make sense any more. They will also be generated again, once you hit update.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_FRST-Open_all" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}You should be very careful when deleting processed contributions. It usually means, that related 'real world activites' (like money transfers) have already been initiated or even completed.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_FRST-Closed_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A closed group has usually been sent to a bank to initiate the payment process, so you shouldn't want to delete this group anyway. However if you do, you should also consider deleting all associated contributions, since they will otherwise remain in the status 'in progress' and not be processed any more.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_FRST-Closed_open" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A closed group has usually been sent to a bank to initiate the payment process, so you shouldn't want to delete this group anyway. However if you do, you should also consider deleting all associated contributions, since they will otherwise remain in the status 'in progress' and not be processed any more.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
@@ -160,39 +160,39 @@
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_FRST-Received_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group. However if you do, be sure to delete the associated contributions in case there was no money transferred in the first place.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_FRST-Received_open" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group. However if you do, you should consider not deleting the associated contributions in case money was actually transferred.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 <p id="warning_FRST-Received_all" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group. However if you do, you should consider not deleting the associated contributions in case money was actually transferred.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these contributions will <i>not</i> affect the associated mandates.{/ts}
 </p>
 
 
 <p id="warning_OOFF-Open_open" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}If you delete the mandates associated with this group, they cannot be collected any more. Be sure that you know what you're doing before proceeding.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
 <p id="warning_OOFF-Open_all" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}If you delete the mandates associated with this group, they cannot be collected any more. Be sure that you know what you're doing before proceeding.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
 <p id="warning_OOFF-Closed_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A closed group has usually been sent to a bank to initiate the payment process, so you shouldn't want to delete this group anyway. However if you do, you should also consider deleting all associated mandates, since they will otherwise remain in the status 'in progress' and not be processed any more.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
 <p id="warning_OOFF-Closed_open" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A closed group has usually been sent to a bank to initiate the payment process, so you shouldn't want to delete this in the first place. However, if there's something wrong with it, be sure not to delete any mandates that you still want to collect or keep on record.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
@@ -201,17 +201,17 @@
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
 <p id="warning_OOFF-Received_no" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group in the first place.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
 <p id="warning_OOFF-Received_open" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group in the first place. However, if there's something wrong with it, be sure not to delete any mandates that you still want to collect or keep a record of.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
 <p id="warning_OOFF-Received_all" hidden="1" class="status message" name="warnings">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{ts domain="org.project60.sepa"}A transaction group marked as received has usually been fully processed, i.e. the money actually arrived on your account. You shouldn't want to delete this group in the first place. However, if there's something wrong with it, be sure not to delete any mandates that you still want to collect or keep a record of.{/ts}
 	<br/>{ts domain="org.project60.sepa"}Deleting these mandates will also delete the associated contributions.{/ts}
 </p>
@@ -315,7 +315,7 @@ cj(document).ready(function() {
 
 {else}
 <p class="status message">
-	<span class="icon red-icon alert-icon"></span>
+	<i class="crm-i fa-exclamation-triangle"></i>
 	{if not $smarty.request.group_id}
 	{ts domain="org.project60.sepa"}No group_id given!{/ts}
 	{else}
