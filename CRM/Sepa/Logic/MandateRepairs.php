@@ -205,7 +205,7 @@ class CRM_Sepa_Logic_MandateRepairs {
            1 => [$contribution_status_pending, 'Integer'],
            2 => [$case->contribution_id, 'Integer'],
          ]);
-      $this->log("Adjusted status of contribution [{$case->contribution_id}] from [{$case->contribution_status_id}] to status 'Pending'.");
+      $this->log("Adjusted status of SEPA contribution [{$case->contribution_id}] from [{$case->contribution_status_id}] to status 'Pending'.");
     }
     if ($status_adjustment_counter) {
       $this->addUINotification(E::ts("Warning: had to adjusted the status of %1 contribution(s) to 'Pending', as they are part of an open transaction group.", [1 => $status_adjustment_counter]));
@@ -370,7 +370,7 @@ class CRM_Sepa_Logic_MandateRepairs {
       $message.= "</div>";
 
       // set status
-      CRM_Core_Session::setStatus($message, E::ts("CiviSEPA Health Check"), 'warn');
+      CRM_Core_Session::setStatus($message, E::ts("CiviSEPA Health Check"), 'warn', ['expires' => 0]);
     }
   }
 
