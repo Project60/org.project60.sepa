@@ -120,7 +120,7 @@ class CRM_Sepa_Logic_MandateRepairs {
       $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
       $orphaned_pending_contribution_ids = $this->getOrphanedContributions($contribution_status_pending);
       if ($orphaned_pending_contribution_ids) {
-        $this->log("Orphaned pending contributions detected: " . implode($orphaned_pending_contribution_ids));
+        $this->log("Orphaned pending contributions detected: " . implode(',', $orphaned_pending_contribution_ids));
         $this->addUINotification(E::ts("%1 orphaned open (pending) SEPA contributions were found in the system, i.e. they are not part of a SEPA transaction group, and will not be collected any more. You should delete them by searching for contributions in status 'Pending' with payment instruments RCUR and FRST.",
           [1 => count($orphaned_pending_contribution_ids)]));
       }
@@ -145,7 +145,7 @@ class CRM_Sepa_Logic_MandateRepairs {
       $contribution_status_in_progress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
       $orphaned_in_progress_contribution_ids = $this->getOrphanedContributions($contribution_status_in_progress);
       if ($orphaned_in_progress_contribution_ids) {
-        $this->log("WARNING: Orphaned contributions in status 'In Progress' detected: " . implode($orphaned_in_progress_contribution_ids));
+        $this->log("WARNING: Orphaned contributions in status 'In Progress' detected: " . implode(',', $orphaned_in_progress_contribution_ids));
         $this->addUINotification(E::ts("WARNING: %1 orphaned active (in Progress) SEPA contributions detected. These may cause irregularities in the generation of the SEPA collection groups, and in particular might cause the same installment to be collected multiple times. You should find them by searching for contributions in status 'in Progress' with the SEPA payment instruments (e.g. RCUR and FRST), and then export (to be safe) and delete them.",
           [1 => count($orphaned_in_progress_contribution_ids)]));
       }
@@ -321,12 +321,22 @@ class CRM_Sepa_Logic_MandateRepairs {
           while ($case->fetch()) {
             $pi_adjustment_counter++;
             $new_pi = $case->first_contribution_id == $case->contribution_id ? $frst_pi_id : $rcur_pi_id;
-            civicrm_api3('Contribution', 'create', [
-              'id' => $case->contribution_id,
-              'payment_instrument_id' => $new_pi,
-              'financial_type_id' => $case->financial_type_id, // just to avoid warnings in unit tests
-            ]);
-            $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}]");
+            try {
+              civicrm_api3('Contribution', 'create', [
+                'id' => $case->contribution_id,
+                'payment_instrument_id' => $new_pi,
+                'financial_type_id' => $case->financial_type_id, // just to avoid warnings in unit tests
+              ]);
+              $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}]");
+            } catch (CiviCRM_API3_Exception $ex) {
+              // this is probably an issue with interference with other processes, but we HAVE to fix this:
+              CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2",
+                [
+                  1 => [$new_pi, 'Integer'],
+                  2 => [$case->contribution_id, 'Integer'],
+              ]);
+              $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}] via SQL.");
+            }
           }
         }
       }
