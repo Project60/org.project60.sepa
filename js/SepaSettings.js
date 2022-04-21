@@ -31,42 +31,42 @@ const customBatchingParams = [
 
 // INITIALISATION
 cj('#edit_creditor_id').val("none");
-cj(function () {
+cj(function() {
     CRM.api3('Domain', 'getsingle', {
         'sequential': 1,
         'return': 'version'
-    }).done(function (result) {
+    }).done(function(result) {
         if (result['is_error'] === 0) {
             var raw_version = result['version'].split('.', 3);
             var version = [];
 
-            cj.each(raw_version, function (k, v) {
+            cj.each(raw_version, function(k, v) {
                 version[k] = parseInt(v, 10);
             });
 
 
             cj('#addcreditor_creditor_id').autocomplete({
-                source: function (request, response) {
+                source: function(request, response) {
                     var
                         option = cj('#addcreditor_creditor_id'),
                         params = {
                             'sequential': 1,
                             'sort_name': option.val()
                         };
-                    CRM.api3('Contact', 'get', params).done(function (result) {
+                    CRM.api3('Contact', 'get', params).done(function(result) {
                         var ret = [];
                         if (result.values) {
-                            cj.each(result.values, function (k, v) {
-                                ret.push({value: v.contact_id, label: "[" + v.contact_id + "] " + v.display_name});
+                            cj.each(result.values, function(k, v) {
+                                ret.push({ value: v.contact_id, label: "[" + v.contact_id + "] " + v.display_name });
                             })
                         }
                         response(ret);
                     })
                 },
-                focus: function (event, ui) {
+                focus: function(event, ui) {
                     return false;
                 },
-                select: function (event, ui) {
+                select: function(event, ui) {
                     cj('#addcreditor_creditor_id').val(ui.item.label);
                     cj('#add_creditor_id').val(ui.item.value);
                     return false;
@@ -85,44 +85,37 @@ cj(function () {
  */
 function deletecreditor(id) {
 
-    CRM.confirm(function () {
-            CRM.api3('SepaCreditor', 'delete', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
-                {
-                    success: function (data) {
-                        CRM.api3('Setting', 'get', {'q': 'civicrm/ajax/rest', 'sequential': 1},
-                            {
-                                success: function (data) {
-                                    if (data['is_error'] == 0) {
-                                        cj.each(data["values"], function (key, value) {
-                                            if (value.batching_default_creditor == id) {
-                                                CRM.api3('Setting', 'create', {'batching_default_creditor': '0'}, {
-                                                    success: function (data) {
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                        CRM.alert(ts("Creditor deleted"), ts("Success"), "success");
-                                        location.reload();
-                                    }
+    CRM.confirm(function() {
+        CRM.api3('SepaCreditor', 'delete', { 'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id }, {
+            success: function(data) {
+                CRM.api3('Setting', 'get', { 'q': 'civicrm/ajax/rest', 'sequential': 1 }, {
+                    success: function(data) {
+                        if (data['is_error'] == 0) {
+                            cj.each(data["values"], function(key, value) {
+                                if (value.batching_default_creditor == id) {
+                                    CRM.api3('Setting', 'create', { 'batching_default_creditor': '0' }, {
+                                        success: function(data) {}
+                                    });
                                 }
-                            }
-                        );
+                            });
+
+                            CRM.alert(ts("Creditor deleted"), ts("Success"), "success");
+                            location.reload();
+                        }
                     }
-                }
-            );
-            resetValues();
-        },
-        {
-            message: ts("Are you sure you want to delete this creditor?")
-        }
-    );
+                });
+            }
+        });
+        resetValues();
+    }, {
+        message: ts("Are you sure you want to delete this creditor?")
+    });
 }
 
 
 // This function is needed due to the asynchronous call of success() in CRM.api3().
 function createCallback(data, map, i, creditorId) {
-    return function (data) {
+    return function(data) {
         if (data['is_error'] == 0) {
             var result = "";
 
@@ -146,57 +139,54 @@ function createCallback(data, map, i, creditorId) {
  * @param isCopy flag to indicate copying of a creditor
  */
 function fetchCreditor(id, isCopy) {
-    CRM.api3('SepaCreditor', 'getsingle', {'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id},
-        {
-            success: function (data) {
-                if (data['is_error'] == 0) {
-                    if (!isCopy) {
-                        cj('#edit_creditor_id').val(data['id']);
-                    } else {
-                        cj('#edit_creditor_id').val("none");
-                    }
-                    cj('#add_creditor_id').val(data['creditor_id']);
-                    cj('#addcreditor_label').val(data['label']);
-                    cj('#addcreditor_name').val(data['name']);
-                    cj('#addcreditor_address').val(data['address']);
-                    cj('#addcreditor_country_id').val(data['country_id']);
-                    cj('#addcreditor_id').val(data['identifier']);
-                    cj('#addcreditor_iban').val(data['iban']);
-                    cj('#addcreditor_bic').val(data['bic']);
-                    cj('#addcreditor_pi_ooff').val(data['pi_ooff'] ? data['pi_ooff'].split(',') : []).change();
-                    cj('#addcreditor_pi_rcur').val(data['pi_rcur'] ? data['pi_rcur'].split(',') : []).change();
-                    cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
-                    cj("#addcreditor_currency").val(data['currency']);
-                    cj("#addcreditor_type").val(data['creditor_type']);
-                    cj("#addcreditor_uses_bic").prop("checked", (data['uses_bic'] == "1"));
-                    cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
-                    cj('#addcreditor').show(500);
+    CRM.api3('SepaCreditor', 'getsingle', { 'q': 'civicrm/ajax/rest', 'sequential': 1, 'id': id }, {
+        success: function(data) {
+            if (data['is_error'] == 0) {
+                if (!isCopy) {
+                    cj('#edit_creditor_id').val(data['id']);
+                } else {
+                    cj('#edit_creditor_id').val("none");
+                }
+                cj('#add_creditor_id').val(data['creditor_id']);
+                cj('#addcreditor_label').val(data['label']);
+                cj('#addcreditor_name').val(data['name']);
+                cj('#addcreditor_address').val(data['address']);
+                cj('#addcreditor_country_id').val(data['country_id']);
+                cj('#addcreditor_id').val(data['identifier']);
+                cj('#addcreditor_iban').val(data['iban']);
+                cj('#addcreditor_bic').val(data['bic']);
+                cj('#addcreditor_pi_ooff').val(data['pi_ooff'] ? data['pi_ooff'].split(',') : []).change();
+                cj('#addcreditor_pi_rcur').val(data['pi_rcur'] ? data['pi_rcur'].split(',') : []).change();
+                cj("#addcreditor_pain_version").val(data['sepa_file_format_id']);
+                cj("#addcreditor_currency").val(data['currency']);
+                cj("#addcreditor_type").val(data['creditor_type']);
+                cj("#addcreditor_uses_bic").prop("checked", (data['uses_bic'] == "1"));
+                cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
+                cj('#addcreditor').show(500);
 
-                    CRM.api3('Contact', 'getsingle', {
-                            'q': 'civicrm/ajax/rest',
-                            'sequential': 1,
-                            'id': data['creditor_id']
-                        },
-                        {
-                            success: function (data2) {
-                                if (data2['is_error'] == 0) {
-                                    cj('#addcreditor_creditor_id').val("[" + data2['id'] + "] " + data2['display_name']);
-                                }
-                            }
-                        });
-
-                    for (var i = 0; i < customBatchingParams.length; i++) {
-                        CRM.api3('Setting', 'getvalue', {
-                            'q': 'civicrm/ajax/rest',
-                            'sequential': 1,
-                            'group': 'SEPA Direct Debit Preferences',
-                            'name': customBatchingParams[i][0]
-                        }, {success: createCallback(data, customBatchingParams, i, id)});
+                CRM.api3('Contact', 'getsingle', {
+                    'q': 'civicrm/ajax/rest',
+                    'sequential': 1,
+                    'id': data['creditor_id']
+                }, {
+                    success: function(data2) {
+                        if (data2['is_error'] == 0) {
+                            cj('#addcreditor_creditor_id').val("[" + data2['id'] + "] " + data2['display_name']);
+                        }
                     }
+                });
+
+                for (var i = 0; i < customBatchingParams.length; i++) {
+                    CRM.api3('Setting', 'getvalue', {
+                        'q': 'civicrm/ajax/rest',
+                        'sequential': 1,
+                        'group': 'SEPA Direct Debit Preferences',
+                        'name': customBatchingParams[i][0]
+                    }, { success: createCallback(data, customBatchingParams, i, id) });
                 }
             }
         }
-    );
+    });
 }
 
 /**
@@ -205,24 +195,26 @@ function fetchCreditor(id, isCopy) {
 function updateCreditor() {
     let inputCreditorInfo = cj("#addcreditor #creditorinfo :input").serializeArray();
     let inputCustomBatching = cj("#addcreditor #custombatching :input").serializeArray();
-    inputCustomBatching.push({'name': "custom_txmsg", 'value': cj('#custom_txmsg').val()});
+    inputCustomBatching.push({ 'name': "custom_txmsg", 'value': cj('#custom_txmsg').val() });
     let creditorId = cj('#edit_creditor_id').val();
 
     let map = {
-        "edit_creditor_id":         "id",
-        "addcreditor_label":        "label",
-        "addcreditor_name":         "name",
-        "addcreditor_address":      "address",
-        "addcreditor_country_id":   "country_id",
-        "addcreditor_currency":     "currency",
-        "addcreditor_id":           "identifier",
-        "addcreditor_iban":         "iban",
-        "addcreditor_bic":          "bic",
+        "edit_creditor_id": "id",
+        "addcreditor_label": "label",
+        "addcreditor_name": "name",
+        "addcreditor_address": "address",
+        "addcreditor_country_id": "country_id",
+        "addcreditor_currency": "currency",
+        "addcreditor_id": "identifier",
+        "addcreditor_iban": "iban",
+        "addcreditor_bic": "bic",
         "addcreditor_pain_version": "sepa_file_format_id",
-        "addcreditor_type":         "creditor_type",
-        "addcreditor_creditor_id":  "creditor_id",
-        "addcreditor_uses_bic":     "uses_bic",
-        "custom_txmsg":             "custom_txmsg"};
+        "addcreditor_type": "creditor_type",
+        "addcreditor_creditor_id": "creditor_id",
+        "addcreditor_uses_bic": "uses_bic",
+        "addcreditor_cuc": "cuc",
+        "custom_txmsg": "custom_txmsg"
+    };
 
     // update creditor information
     let updatedCreditorInfo = new Array();
@@ -253,7 +245,7 @@ function updateCreditor() {
         updatedCreditorInfo['uses_bic'] = "0";
     }
 
-    let stdObj = {'q': 'civicrm/ajax/rest', 'sequential': 1, 'mandate_active': 1};
+    let stdObj = { 'q': 'civicrm/ajax/rest', 'sequential': 1, 'mandate_active': 1 };
     if (creditorId != "none") {
         stdObj.id = creditorId;
     }
@@ -278,53 +270,51 @@ function updateCreditor() {
     cj(".save").attr('onclick', '').unbind('click');
 
     let updObj = cj.extend(stdObj, updatedCreditorInfo);
-    CRM.api3('SepaCreditor', 'create', updObj,
-        {
-            success: function (data) {
-                if (data['is_error'] == 0) {
-                    // check whether we updated an existing creditor
-                    // or created a new one
-                    let creditorId = cj('#edit_creditor_id').val();
-                    if (creditorId == "none") {
-                        creditorId = data['values'][0]['id'];
+    CRM.api3('SepaCreditor', 'create', updObj, {
+        success: function(data) {
+            if (data['is_error'] == 0) {
+                // check whether we updated an existing creditor
+                // or created a new one
+                let creditorId = cj('#edit_creditor_id').val();
+                if (creditorId == "none") {
+                    creditorId = data['values'][0]['id'];
+                }
+
+                // update creditor batching settings
+                for (let i = 0; i < customBatchingParams.length; i++) {
+                    let name = customBatchingParams[i][0];
+                    let value = inputCustomBatching[i].value;
+                    let param = {};
+
+                    // modify the object from the database if it exists
+                    if (customBatchingParams[i][2] !== null) {
+                        param[name] = customBatchingParams[i][2];
+                    } else {
+                        param[name] = {};
                     }
 
-                    // update creditor batching settings
-                    for (let i = 0; i < customBatchingParams.length; i++) {
-                        let name = customBatchingParams[i][0];
-                        let value = inputCustomBatching[i].value;
-                        let param = {};
+                    if (value != "") {
+                        param[name][creditorId] = value;
+                    } else {
+                        delete param[name][creditorId];
+                    }
 
-                        // modify the object from the database if it exists
-                        if (customBatchingParams[i][2] !== null) {
-                            param[name] = customBatchingParams[i][2];
-                        } else {
-                            param[name] = {};
-                        }
-
-                        if (value != "") {
-                            param[name][creditorId] = value;
-                        } else {
-                            delete param[name][creditorId];
-                        }
-
-                        param[name] = JSON.stringify(param[name]);
-                        var once = true;
-                        CRM.api3('Setting', 'create', param, {
-                            success: function (data) {
-                                if (once) {
-                                    once = !once;
-                                    CRM.alert(ts("Creditor updated"), ts("Success"), "success");
-                                    resetValues();
-                                    location.reload();
-                                }
+                    param[name] = JSON.stringify(param[name]);
+                    var once = true;
+                    CRM.api3('Setting', 'create', param, {
+                        success: function(data) {
+                            if (once) {
+                                once = !once;
+                                CRM.alert(ts("Creditor updated"), ts("Success"), "success");
+                                resetValues();
+                                location.reload();
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             }
         }
-    );
+    });
 }
 
 /**

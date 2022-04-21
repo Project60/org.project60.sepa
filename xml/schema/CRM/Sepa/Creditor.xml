@@ -208,6 +208,7 @@
 
     <field>
         <name>cuc</name>
+        <title>CUC</title>
         <type>varchar</type>
         <length>8</length>
         <comment>CUC of the creditor</comment>
