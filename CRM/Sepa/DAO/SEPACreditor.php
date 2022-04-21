@@ -95,6 +95,13 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO {
   public $bic;
 
   /**
+   * CUC of the creditor
+   *
+   * @var string
+   */
+  public $cuc;
+
+  /**
    * prefix for mandate identifiers
    *
    * @var string

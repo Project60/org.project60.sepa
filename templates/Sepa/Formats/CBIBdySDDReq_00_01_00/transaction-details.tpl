@@ -43,54 +43,27 @@
 {foreach from=$contributions item="contribution"}
     <PMRQ:DrctDbtTxInf xmlns:PMRQ="urn:CBI:xsd:CBISDDReqLogMsg.00.01.00">
         <PMRQ:PmtId>
-            <PMRQ:InstrId>3</PMRQ:InstrId>
+            <PMRQ:InstrId>INSTRID-{$contribution.end2endID}</PMRQ:InstrId>
             <PMRQ:EndToEndId>{$contribution.end2endID}</PMRQ:EndToEndId>
         </PMRQ:PmtId>
-        <PMRQ:InstdAmt Ccy="EUR">45.00</PMRQ:InstdAmt>
+        <PMRQ:InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</PMRQ:InstdAmt>
         <PMRQ:DrctDbtTx>
             <PMRQ:MndtRltdInf>
-                <PMRQ:MndtId>BSSRGR42H03H501E</PMRQ:MndtId>
-                <PMRQ:DtOfSgntr>2022-03-02</PMRQ:DtOfSgntr>
+                <PMRQ:MndtId>{$contribution.reference}</PMRQ:MndtId>
+                <PMRQ:DtOfSgntr>{$contribution.date|crmDate:"%Y-%m-%d"}</PMRQ:DtOfSgntr>
             </PMRQ:MndtRltdInf>
         </PMRQ:DrctDbtTx>
         <PMRQ:Dbtr>
-            <PMRQ:Nm>Bises    Ruggero</PMRQ:Nm>
+            <PMRQ:Nm>{$contribution.display_name}</PMRQ:Nm>
         </PMRQ:Dbtr>
         <PMRQ:DbtrAcct>
             <PMRQ:Id>
-                <PMRQ:IBAN>IT45A0200801005000005310398</PMRQ:IBAN>
+                <PMRQ:IBAN>{$contribution.iban}</PMRQ:IBAN>
             </PMRQ:Id>
         </PMRQ:DbtrAcct>
         <PMRQ:RmtInf>
-            <PMRQ:Ustrd>ordinario</PMRQ:Ustrd>
+            <PMRQ:Ustrd>{$contribution.message}</PMRQ:Ustrd>
         </PMRQ:RmtInf>
-
-        <PmtId>
-          <EndToEndId>{$contribution.end2endID}</EndToEndId>
-        </PmtId>
-        <InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</InstdAmt>
-        <DrctDbtTx>
-          <MndtRltdInf>
-            <MndtId>{$contribution.reference}</MndtId>
-            <DtOfSgntr>{$contribution.date|crmDate:"%Y-%m-%d"}</DtOfSgntr>
-          </MndtRltdInf>
-        </DrctDbtTx>
-        <DbtrAgt>
-          <FinInstnId>
-            <BIC>{$contribution.bic}</BIC>
-          </FinInstnId>
-        </DbtrAgt>
-        <Dbtr>
-          <Nm>{$contribution.display_name}</Nm>
-        </Dbtr>
-        <DbtrAcct>
-          <Id>
-            <IBAN>{$contribution.iban}</IBAN>
-          </Id>
-        </DbtrAcct>
-        <RmtInf>
-          <Ustrd>{$contribution.message}</Ustrd>
-        </RmtInf>
     </PMRQ:DrctDbtTxInf>
 {/foreach}
 

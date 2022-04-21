@@ -56,7 +56,7 @@
             <ClrSysMmbId>
               <MmbId>09000</MmbId>
             </ClrSysMmbId>
-          </FinInstnId>
+          </FinInstnId>g
         </DbtrAgt>
         <Dbtr>
           <Nm>{$contribution.display_name}</Nm>
