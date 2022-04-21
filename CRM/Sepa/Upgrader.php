@@ -441,4 +441,25 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
     return TRUE;
   }
+
+  /**
+   * Add new file format CBIBdySDDReq.00.01.00
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1605() {
+    $dsn = DB::parseDSN(CIVICRM_DSN);
+    $this->ctx->log->info("Adding new 'SDD - CBIBdySDDReq.00.01.00");
+    $customData = new CRM_Sepa_CustomData('org.project60.sepa');
+    $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+
+    // add currency
+    $this->ctx->log->info('Adding CUC ("Codice Univoco CBI" for CBIBdySDDReq.00.01.00 standard');
+    $cuc = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'cuc';");
+    if (!$cuc) {
+        $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `cuc` varchar(8) COMMENT 'CUC of the creditor (Codice Univoco CBI)';");
+    }
+    return TRUE;
+  }
 }

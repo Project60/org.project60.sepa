@@ -1,123 +1,131 @@
 {
-  "_comment": "!!Each value name requires an equally named folder in templates/CRM/Sepa/Formats!!",
-  "_lookup": ["name"],
-  "_translate": ["title"],
-  "name": "sepa_file_format",
-  "title": "SEPA XML File Format Variants",
-  "is_reserved": "1",
-  "is_active": "1",
-  "_values": [
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "pain.008.001.02 (ISO 20022/official SEPA guidelines)",
-      "value": "1",
-      "name": "pain.008.001.02",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "pain.008.003.02 container core direct debit (CDC EBICS-2.7)",
-      "value": "2",
-      "name": "pain.008.003.02",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "pain.008.003.02 (COR1 EBICS-3.0)",
-      "value": "3",
-      "name": "pain.008.003.02 COR1",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "pain.008.003.02 (CDD EBICS-3.0)",
-      "value": "4",
-      "description": "Identical with 'pain.008.003.02 (COR1 EBICS-3.0)', don't re-enable.",
-      "name": "pain.008.003.02 EBICS3",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "0",
-      "_comment": "disabled, identical with ID 3"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "CitiBank (PL)",
-      "value": "5",
-      "name": "citibank-pl",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "0"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "Bank BPH PL direct debit",
-      "value": "6",
-      "name": "bphpl",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "0"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "pain.008.003.02 (EBICS-3.0 RCUR/CH)",
-      "description": "EBIC-3.0 RCUR only, Support for CH",
-      "value": "7",
-      "name": "pain_008_003_02_rcur_ch",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "pain.008.001.02.CH.03 (CH-DD)",
-      "description": "SIX Interbank CH-DD",
-      "value": "8",
-      "name": "pain_008_001_02_CH_03",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    },
-    {
-      "_lookup": ["value"],
-      "_translate": ["label"],
-      "label": "pain.008.003.02 with Address (EBICS-3.0)",
-      "value": "9",
-      "name": "pain_008_003_02_address",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    },
-    {
-      "_lookup": ["name"],
-      "_translate": ["label"],
-      "label": "pain.008.001.02 without BIC",
-      "name": "pain_008_001_02_OTHERID",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    },
-    {
-      "_lookup": ["name"],
-      "_translate": ["label"],
-      "label": "pain.008.001.02 without BIC and CdtrSchmId:Nm",
-      "name": "pain_008_001_02_NOCSNM",
-      "filter": "0",
-      "is_reserved": "1",
-      "is_active": "1"
-    }
-  ]
+    "_comment": "!!Each value name requires an equally named folder in templates/CRM/Sepa/Formats!!",
+    "_lookup": ["name"],
+    "_translate": ["title"],
+    "name": "sepa_file_format",
+    "title": "SEPA XML File Format Variants",
+    "is_reserved": "1",
+    "is_active": "1",
+    "_values": [{
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "pain.008.001.02 (ISO 20022/official SEPA guidelines)",
+            "value": "1",
+            "name": "pain.008.001.02",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "pain.008.003.02 container core direct debit (CDC EBICS-2.7)",
+            "value": "2",
+            "name": "pain.008.003.02",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "pain.008.003.02 (COR1 EBICS-3.0)",
+            "value": "3",
+            "name": "pain.008.003.02 COR1",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "pain.008.003.02 (CDD EBICS-3.0)",
+            "value": "4",
+            "description": "Identical with 'pain.008.003.02 (COR1 EBICS-3.0)', don't re-enable.",
+            "name": "pain.008.003.02 EBICS3",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "0",
+            "_comment": "disabled, identical with ID 3"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "CitiBank (PL)",
+            "value": "5",
+            "name": "citibank-pl",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "0"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "Bank BPH PL direct debit",
+            "value": "6",
+            "name": "bphpl",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "0"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "pain.008.003.02 (EBICS-3.0 RCUR/CH)",
+            "description": "EBIC-3.0 RCUR only, Support for CH",
+            "value": "7",
+            "name": "pain_008_003_02_rcur_ch",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "pain.008.001.02.CH.03 (CH-DD)",
+            "description": "SIX Interbank CH-DD",
+            "value": "8",
+            "name": "pain_008_001_02_CH_03",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "pain.008.003.02 with Address (EBICS-3.0)",
+            "value": "9",
+            "name": "pain_008_003_02_address",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["name"],
+            "_translate": ["label"],
+            "label": "pain.008.001.02 without BIC",
+            "name": "pain_008_001_02_OTHERID",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["name"],
+            "_translate": ["label"],
+            "label": "pain.008.001.02 without BIC and CdtrSchmId:Nm",
+            "name": "pain_008_001_02_NOCSNM",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        },
+        {
+            "_lookup": ["value"],
+            "_translate": ["label"],
+            "label": "SDD - CBIBdySDDReq.00.01.00",
+            "name": "CBIBdySDDReq_00_01_00",
+            "filter": "0",
+            "is_reserved": "1",
+            "is_active": "1"
+        }
+    ]
 }

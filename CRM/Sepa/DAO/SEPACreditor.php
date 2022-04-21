@@ -496,6 +496,20 @@ class CRM_Sepa_DAO_SEPACreditor extends CRM_Core_DAO {
           'localizable' => 0,
           'add' => NULL,
         ],
+        'cuc' => [
+            'name' => 'cuc',
+            'type' => CRM_Utils_Type::T_STRING,
+            'title' => E::ts('CUC'),
+            'description' => E::ts('CUC of the creditor'),
+            'maxlength' => 8,
+            'size' => CRM_Utils_Type::EIGHT,
+            'where' => 'civicrm_sdd_creditor.cuc',
+            'table_name' => 'civicrm_sdd_creditor',
+            'entity' => 'SEPACreditor',
+            'bao' => 'CRM_Sepa_DAO_SEPACreditor',
+            'localizable' => 0,
+            'add' => null,
+          ],
       ];
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }
