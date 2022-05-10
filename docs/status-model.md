@@ -36,12 +36,12 @@ A recurring mandate consists of three entities:
 ## Status 2: running
 * Mandate: ``status=RCUR``
 * RecurringContribution: ``contribution_status_id=In Progress``
-* Contributions: ``Pending``/``In Progress``/``Completed``/``Cancelled``
+* Contributions: ``contribution_status_id`` one of ``Pending``/``In Progress``/``Completed``/``Cancelled``
 
 ## Status 3: completed/ended
 * Mandate: ``status=COMPLETE``
 * RecurringContribution: ``contribution_status_id=Completed``
-* Contributions: ``Pending``/``In Progress``/``Completed``/``Cancelled``
+* Contributions: ``contribution_status_id`` one of  ``Pending``/``In Progress``/``Completed``/``Cancelled``
 
 # Additional statuses
 
