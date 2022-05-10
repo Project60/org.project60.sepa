@@ -30,13 +30,13 @@ A recurring mandate consists of three entities:
 ## Status 1: new
 * Mandate: ``status=FRST``
 * RecurringContribution: ``contribution_status_id=Pending``
-* Contribution: ``contribution_status_id=Pending``
+* Contribution: ``contribution_status_id=Pending``, ``payment_instrument_id=FRST`` (or custom PIs)
 * Remark: once the first contribution is submitted, it will be stored in the ``first_contribution_id`` field of the mandate.
 
 ## Status 2: running
 * Mandate: ``status=RCUR``
 * RecurringContribution: ``contribution_status_id=In Progress``
-* Contributions: ``contribution_status_id`` one of ``Pending``/``In Progress``/``Completed``/``Cancelled``
+* Contributions: ``contribution_status_id`` one of ``Pending``/``In Progress``/``Completed``/``Cancelled``, , ``payment_instrument_id=RCUR`` (or custom PIs)
 
 ## Status 3: completed/ended
 * Mandate: ``status=COMPLETE``
