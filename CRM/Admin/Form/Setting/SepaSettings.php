@@ -144,6 +144,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
         $this->addElement('text',       'addcreditor_id',           E::ts("Identifier"));
         $this->addElement('text',       'addcreditor_address',      E::ts("Address"), array('size' => 60));
         $this->addElement('select',     'addcreditor_country_id',   E::ts("Country"), $country_ids);
+        $this->addElement('text',       'addcreditor_account_holder', E::ts("Account Holder"));
         $this->addElement('text',       'addcreditor_bic',          E::ts("BIC"));
         $this->addElement('text',       'addcreditor_iban',         E::ts("IBAN"), array('size' => 30));
         $this->addElement('select',     'addcreditor_currency',     E::ts("Currency"), $currencies);
