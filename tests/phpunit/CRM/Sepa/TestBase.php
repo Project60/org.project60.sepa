@@ -81,6 +81,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   const BATCH_STATUS_REOPENED = '4';
   const BATCH_STATUS_EXPORTED = '5';
   const BATCH_STATUS_RECEIVED = '6';
+  const PAYMENT_INSTRUMENT_FRST = '6';
+  const PAYMENT_INSTRUMENT_RCUR = '7';
 
   protected $testCreditorId;
 
@@ -469,7 +471,10 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   /**
    * Get the latest contribution for a given mandate.
+   *
    * @param array $mandate The mandate to get the contribution for.
+   *
+   * @return array|null contribution data
    */
   protected function getLatestContributionForMandate(array $mandate, $can_be_null = false)
   {
@@ -524,7 +529,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
     }
 
     if (!$can_be_null) {
-      $this->assertNotNull($contribution, E::ts('The contribution for the mandate is null. That should not be possible at this point.'));
+      $this->assertNotNull($contribution, E::ts('This mandate has no contribution, even though there should be one.'));
     }
 
     return $contribution;
