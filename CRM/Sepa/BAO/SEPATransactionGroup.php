@@ -105,7 +105,10 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
       GROUP BY c.id"; //and not cancelled
+
+    CRM_Core_DAO::disableFullGroupByMode();
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     setlocale(LC_CTYPE, 'en_US.utf8');
     //dear dear, it might work, but seems to be highly dependant of the system running it, without any way to know what is available, or if the setting was done properly #phpeature
