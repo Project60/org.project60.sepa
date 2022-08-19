@@ -8,7 +8,7 @@
     <author>B. Endres</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate></releaseDate>
+  <releaseDate/>
   <version>1.7-dev</version>
   <develStage>dev</develStage>
   <compatibility>
@@ -23,11 +23,17 @@
     <url desc="Support">https://github.com/Project60/org.project60.sepa/issues/new</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches.</comments>
+  <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Bj&#xF6;rn Endres' (endres@systopia.de) Project60 branches.</comments>
   <classloader>
-    <psr4 prefix="Civi\" path="Civi" />
+    <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
     <namespace>CRM/Sepa</namespace>
+    <format>22.05.2</format>
   </civix>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+  </mixins>
 </extension>
