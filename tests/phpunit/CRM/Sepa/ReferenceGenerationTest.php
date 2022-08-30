@@ -128,7 +128,7 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
     // second one should fail
     $this->assertException(
       PHPUnit_Framework_Error_Notice::class,
-      function ()
+      function () use ($contactId)
       {
         $mandate = $this->createMandate(
           [
@@ -164,7 +164,7 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
     // second one should fail
     $this->assertException(
       PHPUnit_Framework_Error_Notice::class,
-      function ()
+      function () use ($contactId)
       {
         $mandate = $this->createMandate(
           [

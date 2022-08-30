@@ -63,18 +63,21 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
       'version' => 3]);
     $pi_mapping_reversed = array_flip(CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($monthly_mandate['creditor_id']));
     $wrong_payment_instrument_id = $pi_mapping_reversed[$recurring_contribution['payment_instrument_id']];
+    # $result =
     $this->civicrm_api('ContributionRecur', 'create', [
       'id' => $monthly_mandate['entity_id'],
       'payment_instrument_id' => $wrong_payment_instrument_id,
       'contribution_status_id' => self::CONTRIBUTION_STATUS_PENDING,
+      # 'version' => '3',
     ]);
-
+    # var_dump($result);
     // now generate and close three groups
     $group_type = self::MANDATE_TYPE_FRST;
     $contributions = [];
     foreach (['-60', '-30', '+0'] as $batch_time_offset) {
       // run batching and close the groups
       $this->executeBatching($group_type, "now {$batch_time_offset} days");
+
       $contribution = $this->getLatestContributionForMandate($monthly_mandate);
       $tx_group = $this->getTransactionGroupForContribution($contribution);
       $this->closeTransactionGroup($tx_group['id']);
