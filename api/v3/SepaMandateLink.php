@@ -15,7 +15,6 @@
 +--------------------------------------------------------*/
 
 use CRM_Sepa_ExtensionUtil as E;
-use CRM_Sepa_BAO_SepaMandateLink;
 
 /**
  * SepaMandateLink.create API specification (optional)
@@ -93,7 +92,7 @@ function _civicrm_api3_sepa_mandate_link_create_spec(&$spec) {
  */
 
 function civicrm_api3_sepa_mandate_link_create($params) {
-  return _civicrm_api3_basic_create(CRM_Sepa_BAO_SepaMandateLink, $params);
+  return _civicrm_api3_basic_create('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
 
 /**
@@ -104,7 +103,7 @@ function civicrm_api3_sepa_mandate_link_create($params) {
  * @throws API_Exception
  */
 function civicrm_api3_sepa_mandate_link_delete($params) {
-  return _civicrm_api3_basic_delete(CRM_Sepa_BAO_SepaMandateLink, $params);
+  return _civicrm_api3_basic_delete('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
 
 /**
@@ -115,7 +114,7 @@ function civicrm_api3_sepa_mandate_link_delete($params) {
  * @throws API_Exception
  */
 function civicrm_api3_sepa_mandate_link_get($params) {
-  return _civicrm_api3_basic_get(CRM_Sepa_BAO_SepaMandateLink, $params);
+  return _civicrm_api3_basic_get('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
 
 
