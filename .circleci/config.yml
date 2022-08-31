@@ -106,7 +106,7 @@ commands:
 executors:
   civicrm:
     docker:
-      - image: michaelmcandrew/civicrm-buildkit
+      - image: civicrm/civicrm-buildkit
         name: civicrm
         environment:
           TERM: xterm-color
@@ -133,7 +133,7 @@ jobs:
   build_mariadb_10_4:
     executor: civicrm
     docker:
-      - image: michaelmcandrew/civicrm-buildkit
+      - image: civicrm/civicrm-buildkit
         name: civicrm
         environment:
           TERM: xterm-color
