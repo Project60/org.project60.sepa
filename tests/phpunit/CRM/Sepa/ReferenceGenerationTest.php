@@ -128,15 +128,12 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
     // second one should fail
     $this->assertException(
       PHPUnit_Framework_Error_Notice::class,
-      function () use ($contactId)
-      {
-        $mandate = $this->createMandate(
+      fn () => $this->createMandate(
           [
             'type' => self::MANDATE_TYPE_OOFF,
             'contact_id' => $contactId,
           ]
-        );
-      },
+        ),
       E::ts('There should be a clashing reference')
     );
   }
@@ -164,15 +161,12 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
     // second one should fail
     $this->assertException(
       PHPUnit_Framework_Error_Notice::class,
-      function () use ($contactId)
-      {
-        $mandate = $this->createMandate(
-          [
-            'type' => self::MANDATE_TYPE_RCUR,
-            'contact_id' => $contactId,
-          ]
-        );
-      },
+      fn() => $this->createMandate(
+        [
+          'type' => self::MANDATE_TYPE_RCUR,
+          'contact_id' => $contactId,
+        ]
+      ),
       E::ts('There should be a clashing reference')
     );
   }

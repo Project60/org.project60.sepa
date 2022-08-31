@@ -286,7 +286,7 @@ class CRM_Sepa_Logic_Settings {
       }
     }
     // NO (VALID) LOCK
-    $locks[$name] = $now + $timeout;
+    $locks[$name] = $now + (int)$timeout;
     CRM_Sepa_Logic_Settings::setSetting($locks, 'sdd_async_batching_lock');
     return TRUE;
   }
