@@ -103,6 +103,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         civicrm_sdd_mandate.reference                           AS reference,
         civicrm_contribution_recur.frequency_interval           AS frequency_interval,
         civicrm_contribution_recur.frequency_unit               AS frequency_unit,
+        civicrm_contribution_recur.cycle_day                    AS cycle_day,
         civicrm_contribution_recur.currency                     AS currency,
         civicrm_contribution_recur.amount                       AS amount,
         IF(civicrm_sdd_mandate.status IN ('FRST', 'RCUR'), 'sepa-active', 'sepa-inactive')
