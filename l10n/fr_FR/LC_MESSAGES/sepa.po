@@ -1,1 +1,3 @@
-copy from Transifex
+copy from Transifex .po and 
+msgfmt -o civicrm.mo civicrm.po
+to get .mo
