@@ -7,7 +7,7 @@
   </testsuites>
   <filter>
     <whitelist>
-      <directory suffix=".php">./</directory>
+      <directory phpVersion="7.4.0" phpVersionOperator=">=" suffix=".php">./</directory>
     </whitelist>
   </filter>
   <listeners>
