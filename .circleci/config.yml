@@ -123,10 +123,6 @@ jobs:
       - checkout
       - run_all
       - run_all:
-          build_name: civi-stable
-          version: "stable"
-          url: http://localhost:8081
-      - run_all:
           build_name: civi-5.19.4
           version: "5.19.4"
           url: http://localhost:8082
