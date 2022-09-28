@@ -122,10 +122,10 @@ jobs:
     steps:
       - checkout
       - run_all
-      - run_all:
-          build_name: civi-stable
-          version: "stable"
-          url: http://localhost:8081
+#      - run_all:
+#          build_name: civi-stable
+#          version: "stable"
+#          url: http://localhost:8081
       - run_all:
           build_name: civi-5.50.4
           version: "5.50.4"
