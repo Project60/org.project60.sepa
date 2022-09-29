@@ -78,9 +78,12 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     // get creditor
     try {
       _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
+      if (empty($params['creditor_id'])) {
+        throw new CiviCRM_API3_Exception("No creditor ID provided, and no default creditor set.");
+      }
       $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $params['creditor_id']));
     } catch (Exception $e) {
-      throw new Exception("Couldn't load creditor [{$params['creditor_id']}].");
+      throw new CiviCRM_API3_Exception("Couldn't load creditor [{$params['creditor_id']}].");
     }
 
     // verify/set payment_instrument_id
