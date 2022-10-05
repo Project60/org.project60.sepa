@@ -147,7 +147,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $this->ctx->log->info('Applying update 1412');
     // set all SEPA recurring contributions in status 'In Progress' to 'Pending'
     $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+    $status_inprogress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     CRM_Core_DAO::executeQuery("
         UPDATE civicrm_contribution_recur rcur
         LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = rcur.id

@@ -46,7 +46,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   const MANDATE_TYPE_OOFF = 'OOFF';
   const MANDATE_TYPE_RCUR = 'RCUR';
-  const MANDATE_TYPE_FRST = 'FRST';
+  const MANDATE_TYPE_FRST = 'FRST';  // fixme: this is *NOT* a mandate _type_ but only a mandate status
+                                     // (while RCUR and OOFF are mandate types)
 
   const MANDATE_STATUS_SENT = 'SENT';
   const MANDATE_STATUS_INVALID = 'INVALID';
@@ -58,11 +59,12 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   const CONTRIBUTION_STATUS_CANCELLED = '3';
   const CONTRIBUTION_STATUS_FAILED = '4';
   const CONTRIBUTION_STATUS_IN_PROGRESS = '5';
-  const CONTRIBUTION_STATUS_OVERDUE = '6';
+  //const CONTRIBUTION_STATUS_OVERDUE = '6';
   const CONTRIBUTION_STATUS_REFUNDED = '7';
   const CONTRIBUTION_STATUS_PARTIALLY_PAID = '8';
   const CONTRIBUTION_STATUS_PENDING_REFUND = '9';
   const CONTRIBUTION_STATUS_CHARGEBACK = '10';
+  const CONTRIBUTION_STATUS_TEMPLATE = '11';
 
   // TODO: Move the following constants to a better place (or get them dynamically from Civi):
   const RECURRING_CONTRIBUTION_STATUS_COMPLETED = '1';

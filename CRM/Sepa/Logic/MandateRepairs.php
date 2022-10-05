@@ -142,7 +142,7 @@ class CRM_Sepa_Logic_MandateRepairs {
   {
     static $already_run = false; // run this one only once per process, since it doesn't refer to any mandates
     if (!$already_run) {
-      $contribution_status_in_progress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+      $contribution_status_in_progress =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
       $orphaned_in_progress_contribution_ids = $this->getOrphanedContributions($contribution_status_in_progress);
       if ($orphaned_in_progress_contribution_ids) {
         $this->log("WARNING: Orphaned contributions in status 'In Progress' detected: " . implode(',', $orphaned_in_progress_contribution_ids));
@@ -167,13 +167,13 @@ class CRM_Sepa_Logic_MandateRepairs {
   {
     // get the status IDs
     $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    $contribution_status_in_progress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+    $contribution_status_in_progress =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     $batch_status_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
     // run the search for contributions in the wrong status
     CRM_Core_DAO::disableFullGroupByMode();
     $case = CRM_Core_DAO::executeQuery("
-        SELECT 
+        SELECT
                open_contribution.id                     AS contribution_id,
                open_contribution.contribution_status_id AS contribution_status_id
         FROM civicrm_sdd_txgroup txgroup
