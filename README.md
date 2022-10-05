@@ -4,7 +4,7 @@ If you are in Europe and use CiviCRM to manage recurring contributions, you need
 
 This branch is currently maintained by Björn Endres (SYSTOPIA, endres@systopia.de).
 
-Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSEPA
+Find more documentation [here](https://docs.civicrm.org/civisepa).
 
 **Important:** Please download a [official release](https://github.com/Project60/org.project60.sepa/releases/latest)!
 
