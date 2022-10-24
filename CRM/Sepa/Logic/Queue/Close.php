@@ -152,7 +152,7 @@ class CRM_Sepa_Logic_Queue_Close {
    */
   protected function updateContributions() {
     $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    $status_inProgress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+    $status_inProgress =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
 
     // get eligible contributions (slightly different queries for OOFF/RCUR)
     if ($this->txgroup['type'] == 'OOFF') {
@@ -276,7 +276,7 @@ class CRM_Sepa_Logic_Queue_Close {
    */
   protected function updateContributionStatus($contributions) {
     $contribution_id_list = implode(',', array_keys($contributions));
-    $status_inProgress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+    $status_inProgress =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     if (empty($contribution_id_list)) {
       // this would cause SQL errors
       return;
