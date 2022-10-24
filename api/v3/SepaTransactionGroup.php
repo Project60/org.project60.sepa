@@ -151,7 +151,7 @@ function civicrm_api3_sepa_transaction_group_close($params) {
     set contribution_status_id=1
     where contribution_id = contrib.id and txgroup_id=%1";
   $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['id'], 'Integer')));
-  return civicrm_api3_sepa_transaction_group_create (array("id"=>$params['id'],status_id=>2));
+  return civicrm_api3_sepa_transaction_group_create (array("id"=>$params['id'],'status_id'=>2));
 }
 
 

@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php">
   <testsuites>
-    <testsuite name="Sepa Test Suite">
+    <testsuite name="CiviSEPA Test Suite">
       <directory>./tests/phpunit</directory>
     </testsuite>
   </testsuites>
   <filter>
     <whitelist>
-      <directory suffix=".php">./</directory>
+      <directory phpVersion="7.4.0" phpVersionOperator=">=" suffix=".php">./</directory>
     </whitelist>
   </filter>
   <listeners>

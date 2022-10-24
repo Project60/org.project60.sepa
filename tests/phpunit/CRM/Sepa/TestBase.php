@@ -535,6 +535,12 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
       $this->assertNotNull($contribution, E::ts('This mandate has no contribution, even though there should be one.'));
     }
 
+    if ($contribution) {
+      // assert some required attributes are there
+      $this->assertArrayHasKey('contribution_status_id', $contribution, "Mandate contribution does not have a 'contribution_status_id'.");
+      $this->assertNotEmpty($contribution['contribution_status_id'], "Mandate contribution does not have a 'contribution_status_id'.");
+    }
+
     return $contribution;
   }
 
