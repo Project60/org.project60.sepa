@@ -92,7 +92,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
                     $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
                     $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
                   } else {
-                    $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+                    $target_contribution_status =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
                     $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
                   }
                   // this call doesn't return (redirect to runner)

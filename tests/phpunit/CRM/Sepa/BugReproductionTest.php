@@ -25,6 +25,31 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
 {
+  // simulate CiviCRM >
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    // simulate a newly installed CiviCRM 5.54+, which has no 'In Progress' contribution status
+    $contribution_in_progress_status = null;
+    try {
+      // get status (if it exists) and delete it
+      $contribution_in_progress_status = civicrm_api3('OptionValue', 'getsingle', [
+        'option_group_id' => 'contribution_status',
+        'value' => self::CONTRIBUTION_STATUS_IN_PROGRESS,
+      ]);
+    } catch (CiviCRM_API3_Exception $ex) {
+      // this means the status is already missing, no harm done
+    }
+
+    if ($contribution_in_progress_status) {
+      // the status is there (older civicrm version): delete it to simulate a newer version
+      civicrm_api3('OptionValue', 'delete', [
+        'id' => $contribution_in_progress_status['id']
+      ]);
+    }
+  }
+
 
   /**
    * Verify that but #629 is fixed:
@@ -101,5 +126,44 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
     $this->executeBatching($group_type);
     $contribution = $this->getLatestContributionForMandate($monthly_mandate);
     $this->assertTrue(isset($contributions[$contribution['id']]), "A new contribution was generated, but it shouldn't have.");
+  }
+
+
+  /**
+   * Verify that but #632 is fixed:
+   *  The status CONTRIBUTION_STATUS_PENDING is not shipped with the CiviCRM 5.54+ (?)
+   *
+   * @return void
+   *
+   * @see https://github.com/Project60/org.project60.sepa/issues/632
+   * @see https://lab.civicrm.org/dev/financial/-/issues/201
+   */
+  public function testBug632()
+  {
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+      ]
+    );
+
+    $this->executeBatching(self::MANDATE_TYPE_OOFF);
+
+    $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_OOFF);
+
+    $this->closeTransactionGroup($transactionGroup['id']);
+
+    $closedMandate = $this->getMandate($mandate['id']);
+    $closedContribution = $this->getLatestContributionForMandate($closedMandate);
+
+    $this->assertSame(
+      self::MANDATE_STATUS_SENT,
+      $closedMandate['status'],
+      E::ts('OOFF Mandate status after closing is incorrect.')
+    );
+    $this->assertSame(
+      self::CONTRIBUTION_STATUS_IN_PROGRESS,
+      $closedContribution['contribution_status_id'],
+      E::ts('OOFF contribution status after closing is incorrect, probably related to SEPA-629')
+    );
   }
 }
