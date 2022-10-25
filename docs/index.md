@@ -25,7 +25,7 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 * record SEPA payment action and form for contacts
 * manual batching with parameters for notice period and horizon
 * automatic adjustment of late OOFF and RCUR transactions
-* integration with [CiviBanking](https://github.com/Project60/CiviBanking)
+* integration with [CiviBanking](https://docs.civicrm.org/banking/en/latest)
 
 ## What it can not (yet) do
 * permission management
