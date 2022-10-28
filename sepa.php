@@ -561,7 +561,9 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
  * Will inject the SepaMandate tab
  */
 function sepa_civicrm_tabset($tabsetName, &$tabs, $context) {
-  if ($tabsetName == 'civicrm/contact/view' && !empty($context['contact_id'])) {
+  if (    $tabsetName == 'civicrm/contact/view'
+       && !empty($context['contact_id'])
+       && CRM_Core_Permission::check('view sepa mandates')) {
     $tabs[] = [
       'id'     => 'sepa',
       'url'    => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$context['contact_id']}"),
