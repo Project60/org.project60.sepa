@@ -14,6 +14,7 @@
 
 require_once 'sepa.civix.php';
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use \Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use CRM_Sepa_ExtensionUtil as E;
@@ -25,7 +26,7 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 function sepa_civicrm_container(ContainerBuilder $container) {
   if (class_exists('\Civi\Sepa\ContainerSpecs')) {
-    $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs());
+    $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs(), PassConfig::TYPE_OPTIMIZE);
   }
 }
 

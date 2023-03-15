@@ -27,18 +27,47 @@ class ContainerSpecs implements CompilerPassInterface {
    * Register SEPA Actions
    */
   public function process(ContainerBuilder $container) {
-    if (!$container->hasDefinition('action_provider')) {
-      return;
+    if ($container->hasDefinition('action_provider')) {
+      $typeFactoryDefinition = $container->getDefinition('action_provider');
+      $typeFactoryDefinition->addMethodCall('addAction', [
+        'SepaMandateOOFF',
+        'Civi\Sepa\ActionProvider\Action\CreateOneOffMandate',
+        E::ts('Create SEPA Mandate (One-Off)'),
+        [
+          \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
+        ]
+      ]);
+      $typeFactoryDefinition->addMethodCall('addAction', [
+        'SepaMandateRCUR',
+        'Civi\Sepa\ActionProvider\Action\CreateRecurringMandate',
+        E::ts('Create SEPA Mandate (Recurring)'),
+        [
+          \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
+        ]
+      ]);
+      $typeFactoryDefinition->addMethodCall('addAction', [
+        'FindMandate',
+        'Civi\Sepa\ActionProvider\Action\FindMandate',
+        E::ts('Find SEPA Mandate'),
+        [
+          \Civi\ActionProvider\Action\AbstractAction::DATA_RETRIEVAL_TAG,
+        ]
+      ]);
     }
-    $typeFactoryDefinition = $container->getDefinition('action_provider');
-    $typeFactoryDefinition->addMethodCall('addAction', ['SepaMandateOOFF', 'Civi\Sepa\ActionProvider\Action\CreateOneOffMandate', E::ts('Create SEPA Mandate (One-Off)'), [
-        \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
-    ]]);
-    $typeFactoryDefinition->addMethodCall('addAction', ['SepaMandateRCUR', 'Civi\Sepa\ActionProvider\Action\CreateRecurringMandate', E::ts('Create SEPA Mandate (Recurring)'), [
-        \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
-    ]]);
-    $typeFactoryDefinition->addMethodCall('addAction', ['FindMandate', 'Civi\Sepa\ActionProvider\Action\FindMandate', E::ts('Find SEPA Mandate'), [
-        \Civi\ActionProvider\Action\AbstractAction::DATA_RETRIEVAL_TAG,
-    ]]);
+    if ($container->hasDefinition('data_processor_factory')) {
+      $dataProcessorFactoryDefinition = $container->getDefinition('data_processor_factory');
+      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
+        'sepa_mandate', 'Civi\Sepa\DataProcessor\Source\SepaMandate', E::ts('SEPA Mandate')]);
+      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
+        'sepa_creditor', 'Civi\Sepa\DataProcessor\Source\SepaCreditor', E::ts('SEPA Creditor')]);
+      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
+        'sepa_transaction_group', 'Civi\Sepa\DataProcessor\Source\SepaTransactionGroup', E::ts('SEPA Transaction Group')]);
+      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
+        'sepa_sdd_file', 'Civi\Sepa\DataProcessor\Source\SepaSddFile', E::ts('SEPA SDD File')]);
+      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
+        'sepa_contribution_group', 'Civi\Sepa\DataProcessor\Source\SepaContributionGroup', E::ts('SEPA Contribution Group')]);
+      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
+        'sepa_mandate_link', 'Civi\Sepa\DataProcessor\Source\SepaMandateLink', E::ts('SEPA Mandate Link')]);
+    }
   }
 }
