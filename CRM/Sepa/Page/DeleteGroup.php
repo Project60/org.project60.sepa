@@ -45,7 +45,7 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         if (empty($_REQUEST['confirmed'])) {
         	// gather information to display
     	    $PENDING = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    	    $INPROGRESS = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+    	    $INPROGRESS =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
 
         	$stats = array('busy' => 0, 'open' => 0, 'other' => 0, 'total' => 0);
         	$status2contributions = $this->contributionStats($group_id);

@@ -123,7 +123,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     // add creditor information
     $api->SepaCreditor->getsingle(array('id' => $mandate->creditor_id));
     $creditor = $api->result;
-    $this->assign("mandate_creditor", $creditor);
+    $this->assign("mandate_creditor", (array) $creditor);
 
     // add payment processor information
     if (!empty($recur->payment_processor_id))        $payment_processor_id = $recur->payment_processor_id;

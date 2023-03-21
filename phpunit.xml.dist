@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" syntaxCheck="false" bootstrap="tests/phpunit/bootstrap.php">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory phpVersion="8.0.0" phpVersionOperator="&gt;=" suffix=".php">./</directory>
+    </include>
+  </coverage>
   <testsuites>
-    <testsuite name="Sepa Test Suite">
+    <testsuite name="CiviSEPA Test Suite">
       <directory>./tests/phpunit</directory>
     </testsuite>
   </testsuites>
-  <filter>
-    <whitelist>
-      <directory suffix=".php">./</directory>
-    </whitelist>
-  </filter>
   <listeners>
     <listener class="Civi\Test\CiviTestListener">
       <arguments/>

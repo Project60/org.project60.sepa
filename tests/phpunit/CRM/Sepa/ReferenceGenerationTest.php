@@ -106,7 +106,8 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
   }
 
   /**
-   * Test that there are no collisions in a greater amount of OOFF mandates.
+   * Test to ensure OOFF reference collisions are detected
+   *
    * @see Case_ID R03
    */
   public function testOOFFMandateReferenceCollision()
@@ -125,25 +126,25 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
       ]
     );
 
-    // second one should fail
-    $this->assertException(
-      PHPUnit_Framework_Error_Notice::class,
-      function ()
-      {
-        $mandate = $this->createMandate(
-          [
-            'type' => self::MANDATE_TYPE_OOFF,
-            'contact_id' => $contactId,
-          ]
-        );
-      },
-      E::ts('There should be a clashing reference')
-    );
+    // NOW: try creating a second mandate with the _same_ reference
+    try {
+      $this->createMandate(['type' => self::MANDATE_TYPE_OOFF, 'contact_id' => $contactId,]);
+      // this should, of course, fail:
+      $this->fail("This should've failed, since we're using the same reference for multiple mandates");
+
+    } catch (Throwable $ex) {
+      // ok, it failed - let's check if it's the right failure
+      $this->assertStringStartsWith(
+        "Failure in api call for SepaMandate createfull:  DB Error: already exists",
+        $ex->getMessage(),
+        "This should've thrown an 'DB Error: already exists'");
+    }
   }
 
   /**
-   * Test that there are no collisions in a greater amount of RCUR mandates.
-   * @see Case_ID R04
+   * Test to ensure RCUR reference collisions are detected
+   *
+   * @see Case_ID R03
    */
   public function testRCURMandateReferenceCollision()
   {
@@ -161,19 +162,18 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
       ]
     );
 
-    // second one should fail
-    $this->assertException(
-      PHPUnit_Framework_Error_Notice::class,
-      function ()
-      {
-        $mandate = $this->createMandate(
-          [
-            'type' => self::MANDATE_TYPE_RCUR,
-            'contact_id' => $contactId,
-          ]
-        );
-      },
-      E::ts('There should be a clashing reference')
-    );
+    // NOW: try creating a second mandate with the _same_ reference
+    try {
+      $this->createMandate(['type' => self::MANDATE_TYPE_RCUR, 'contact_id' => $contactId,]);
+      // this should, of course, fail:
+      $this->fail("This should've failed, since we're using the same reference for multiple mandates");
+
+    } catch (Throwable $ex) {
+      // ok, it failed - let's check if it's the right failure
+      $this->assertStringStartsWith(
+        "Failure in api call for SepaMandate createfull:  DB Error: already exists",
+        $ex->getMessage(),
+        "This should've thrown an 'DB Error: already exists'");
+    }
   }
 }

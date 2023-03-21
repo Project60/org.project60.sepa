@@ -58,6 +58,13 @@ class CRM_Sepa_Logic_Batching {
       $batch_clause = "";
     }
 
+    // RCUR-STEP 0: check/repair mandates
+    CRM_Sepa_Logic_MandateRepairs::runWithMandateSelector(
+      "mandate.type = 'RCUR' AND mandate.status = '{$mode}' AND mandate.creditor_id = {$creditor_id} {$batch_clause}",
+      true
+    );
+
+
     // RCUR-STEP 1: find all active/pending RCUR mandates within the horizon that are NOT in a closed batch
     $sql_query = "
       SELECT

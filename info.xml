@@ -9,25 +9,30 @@
     <email>endres@systopia.de</email>
   </maintainer>
   <releaseDate></releaseDate>
-  <version>1.7-dev</version>
+  <version>1.9-dev</version>
   <develStage>dev</develStage>
   <compatibility>
-    <ver>5.0</ver>
     <ver>5.19</ver>
     <ver>5.28</ver>
     <ver>5.43</ver>
   </compatibility>
   <urls>
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
-    <url desc="Documentation">https://wiki.civicrm.org/confluence/display/CRM/CiviSEPA</url>
-    <url desc="Support">https://github.com/Project60/org.project60.sepa/issues/new</url>
+    <url desc="Documentation">https://docs.civicrm.org/civisepa</url>
+    <url desc="Support">https://github.com/Project60/org.project60.sepa/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Björn Endres' (endres@systopia.de) Project60 branches.</comments>
+  <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Bj&#xF6;rn Endres' (endres@systopia.de) Project60 branches.</comments>
   <classloader>
-    <psr4 prefix="Civi\" path="Civi" />
+    <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
     <namespace>CRM/Sepa</namespace>
+    <format>22.05.2</format>
   </civix>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+  </mixins>
 </extension>

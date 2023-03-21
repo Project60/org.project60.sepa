@@ -147,7 +147,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $this->ctx->log->info('Applying update 1412');
     // set all SEPA recurring contributions in status 'In Progress' to 'Pending'
     $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+    $status_inprogress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     CRM_Core_DAO::executeQuery("
         UPDATE civicrm_contribution_recur rcur
         LEFT JOIN civicrm_sdd_mandate  mandate ON mandate.entity_id = rcur.id
@@ -443,12 +443,30 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
   }
 
   /**
+   * Addding account_holder field
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_1701() {
+    $this->ctx->log->info('Adding mandate.account_holder field');
+    $has_account_holder_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_mandate` LIKE 'account_holder';");
+    if (!$has_account_holder_column) {
+      // doesn't exist yet, add the column and set to '1'
+      $this->executeSql(
+          "ALTER TABLE civicrm_sdd_mandate ADD COLUMN `account_holder` varchar(255) NULL DEFAULT NULL COMMENT 'Name of the account holder';"
+      );
+    }
+    return TRUE;
+  }
+
+  /**
    * Add new file format CBIBdySDDReq.00.01.00
    *
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1605() {
+  public function upgrade_1702() {
     $dsn = DB::parseDSN(CIVICRM_DSN);
     $this->ctx->log->info("Adding new 'SDD - CBIBdySDDReq.00.01.00");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');

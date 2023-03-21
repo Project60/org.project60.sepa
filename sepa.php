@@ -14,6 +14,7 @@
 
 require_once 'sepa.civix.php';
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use \Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use CRM_Sepa_ExtensionUtil as E;
@@ -25,7 +26,7 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 function sepa_civicrm_container(ContainerBuilder $container) {
   if (class_exists('\Civi\Sepa\ContainerSpecs')) {
-    $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs());
+    $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs(), PassConfig::TYPE_OPTIMIZE);
   }
 }
 
@@ -137,15 +138,6 @@ function sepa_civicrm_config(&$config) {
 }
 
 /**
- * Implementation of hook_civicrm_xmlMenu
- *
- * @param $files array(string)
- */
-function sepa_civicrm_xmlMenu(&$files) {
-  _sepa_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implementation of hook_civicrm_install
  */
 function sepa_civicrm_install() {
@@ -192,17 +184,6 @@ function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
   return _sepa_civix_civicrm_upgrade($op, $queue);
 }
 
-/**
- * Implementation of hook_civicrm_managed
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- */
-function sepa_civicrm_managed(&$entities) {
-  return _sepa_civix_civicrm_managed($entities);
-}
-
-
 function sepa_civicrm_summaryActions( &$actions, $contactID ) {
   // add "create SEPA mandate action"
   if (CRM_Core_Permission::check('create sepa mandates')) {
@@ -217,7 +198,6 @@ function sepa_civicrm_summaryActions( &$actions, $contactID ) {
       );
   }
 }
-
 
 /**
  *  Support SEPA mandates in merge operations
@@ -324,7 +304,6 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   }
 }
 
-
 // totten's addition
 function sepa_civicrm_entityTypes(&$entityTypes) {
   // add my DAO's
@@ -363,9 +342,6 @@ function sepa_civicrm_entityTypes(&$entityTypes) {
 /**
 * Implementation of hook_civicrm_config
 */
-function sepa_civicrm_alterSettingsFolders(&$metaDataFolders = NULL){
-  _sepa_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
 
 /**
 * Implementation of hook_civicrm_navigationMenu
@@ -429,7 +405,6 @@ function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissi
   $permissions['sepa_mandate']['get'] = array('view sepa mandates');
 }
 
-
 /**
  * CiviCRM validateForm hook
  *
@@ -457,7 +432,6 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
   }
 }
 
-
 /**
  * Insert "Last Mandate" tokens
  */
@@ -471,6 +445,7 @@ function sepa_civicrm_tokens(&$tokens) {
     "$prefix.status"                  => ts('Status', array('domain' => 'org.project60.sepa')),
     "$prefix.date"                    => ts('Signature Date (raw)', array('domain' => 'org.project60.sepa')),
     "$prefix.date_text"               => ts('Signature Date', array('domain' => 'org.project60.sepa')),
+    "$prefix.account_holder"          => ts('Account Holder', array('domain' => 'org.project60.sepa')),
     "$prefix.iban"                    => ts('IBAN', array('domain' => 'org.project60.sepa')),
     "$prefix.iban_anonymised"         => ts('IBAN (anonymised)', array('domain' => 'org.project60.sepa')),
     "$prefix.bic"                     => ts('BIC', array('domain' => 'org.project60.sepa')),
@@ -531,6 +506,7 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
       $values[$result->contact_id]["$prefix.type"]            = $mandate['type'];
       $values[$result->contact_id]["$prefix.status"]          = $mandate['status'];
       $values[$result->contact_id]["$prefix.date"]            = $mandate['date'];
+      $values[$result->contact_id]["$prefix.account_holder"]  = $mandate['account_holder'];
       $values[$result->contact_id]["$prefix.iban"]            = $mandate['iban'];
       $values[$result->contact_id]["$prefix.iban_anonymised"] = CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']);
       $values[$result->contact_id]["$prefix.bic"]             = $mandate['bic'];
@@ -586,13 +562,34 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(
  * Will inject the SepaMandate tab
  */
 function sepa_civicrm_tabset($tabsetName, &$tabs, $context) {
-  if ($tabsetName == 'civicrm/contact/view' && !empty($context['contact_id'])) {
+  if ($tabsetName == 'civicrm/contact/view' &&
+    (empty($context['contact_id']) || CRM_Core_Permission::check('view sepa mandates'))
+  ) {
     $tabs[] = [
       'id'     => 'sepa',
       'url'    => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$context['contact_id']}"),
       'title'  => E::ts('SEPA Mandates'),
       'count'  => CRM_Sepa_Page_MandateTab::getMandateCount($context['contact_id']),
-      'weight' => 20
+      'icon'   => 'crm-i fa-bank',
+      'weight' => 20,
     ];
   }
 }
+
+/**
+ * Implements hook_civicrm_postInstall().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
+ */
+function sepa_civicrm_postInstall() {
+  _sepa_civix_civicrm_postInstall();
+}
+
+// /**
+//  * Implements hook_civicrm_entityTypes().
+//  *
+//  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
+//  */
+// function sepa_civicrm_entityTypes(&$entityTypes) {
+//   _sepa_civix_civicrm_entityTypes($entityTypes);
+// }

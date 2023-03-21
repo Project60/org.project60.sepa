@@ -46,7 +46,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   const MANDATE_TYPE_OOFF = 'OOFF';
   const MANDATE_TYPE_RCUR = 'RCUR';
-  const MANDATE_TYPE_FRST = 'FRST';
+  const MANDATE_TYPE_FRST = 'FRST';  // fixme: this is *NOT* a mandate _type_ but only a mandate status
+                                     // (while RCUR and OOFF are mandate types)
 
   const MANDATE_STATUS_SENT = 'SENT';
   const MANDATE_STATUS_INVALID = 'INVALID';
@@ -58,11 +59,12 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   const CONTRIBUTION_STATUS_CANCELLED = '3';
   const CONTRIBUTION_STATUS_FAILED = '4';
   const CONTRIBUTION_STATUS_IN_PROGRESS = '5';
-  const CONTRIBUTION_STATUS_OVERDUE = '6';
+  //const CONTRIBUTION_STATUS_OVERDUE = '6';
   const CONTRIBUTION_STATUS_REFUNDED = '7';
   const CONTRIBUTION_STATUS_PARTIALLY_PAID = '8';
   const CONTRIBUTION_STATUS_PENDING_REFUND = '9';
   const CONTRIBUTION_STATUS_CHARGEBACK = '10';
+  const CONTRIBUTION_STATUS_TEMPLATE = '11';
 
   // TODO: Move the following constants to a better place (or get them dynamically from Civi):
   const RECURRING_CONTRIBUTION_STATUS_COMPLETED = '1';
@@ -81,6 +83,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   const BATCH_STATUS_REOPENED = '4';
   const BATCH_STATUS_EXPORTED = '5';
   const BATCH_STATUS_RECEIVED = '6';
+  const PAYMENT_INSTRUMENT_FRST = '6';
+  const PAYMENT_INSTRUMENT_RCUR = '7';
 
   protected $testCreditorId;
 
@@ -356,6 +360,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
     $parameters['amount']            = array_key_exists('amount', $parameters)            ? $parameters['amount']            : 8;
     $parameters['financial_type_id'] = array_key_exists('financial_type_id', $parameters) ? $parameters['financial_type_id'] : 1;
     $parameters['creditor_id']       = array_key_exists('creditor_id', $parameters)       ? $parameters['creditor_id']       : CRM_Sepa_Logic_Settings::defaultCreditor()->id;
+    $parameters['account_holder']    = array_key_exists('account_holder', $parameters)    ? $parameters['account_holder']    : "";
 
     if ($parameters['type'] == self::MANDATE_TYPE_OOFF)
     {
@@ -469,7 +474,10 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   /**
    * Get the latest contribution for a given mandate.
+   *
    * @param array $mandate The mandate to get the contribution for.
+   *
+   * @return array|null contribution data
    */
   protected function getLatestContributionForMandate(array $mandate, $can_be_null = false)
   {
@@ -524,7 +532,13 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
     }
 
     if (!$can_be_null) {
-      $this->assertNotNull($contribution, E::ts('The contribution for the mandate is null. That should not be possible at this point.'));
+      $this->assertNotNull($contribution, E::ts('This mandate has no contribution, even though there should be one.'));
+    }
+
+    if ($contribution) {
+      // assert some required attributes are there
+      $this->assertArrayHasKey('contribution_status_id', $contribution, "Mandate contribution does not have a 'contribution_status_id'.");
+      $this->assertNotEmpty($contribution['contribution_status_id'], "Mandate contribution does not have a 'contribution_status_id'.");
     }
 
     return $contribution;

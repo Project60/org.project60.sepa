@@ -261,6 +261,40 @@ class CRM_Sepa_Logic_Settings {
   }
 
   /**
+   * Return the ID of the contributions' 'In Progress' status.
+   *
+   * @see https://github.com/Project60/org.project60.sepa/issues/632
+   * @see https://lab.civicrm.org/dev/financial/-/issues/201
+   *
+   * @return integer
+   */
+  public static function contributionInProgressStatusId()
+  {
+    static $in_progress_status = null;
+    if ($in_progress_status === null) {
+      // add mitigation for CiviCRM 5.55+
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+        'option_group_id' => 'contribution_status',
+        'name' => 'In Progress',
+        'value' => 5,
+        'label' => ts('In Progress'),
+        'is_active' => TRUE,
+        'component_id' => 'CiviContribute',
+      ]);
+
+      // the look up the status
+      $in_progress_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+      if (empty($in_progress_status)) {
+        throw new Exception("Contribution status 'In Progress' is missing, but required.");
+      }
+      if ($in_progress_status != 5) {
+        Civi::log()->debug("Contribution status 'In Progress' is not value 5. Hope that's fine.");
+      }
+    }
+    return $in_progress_status;
+  }
+
+  /**
    * Acquire async lock
    *
    * This is a mutex that can be kept over various processes,
@@ -286,7 +320,7 @@ class CRM_Sepa_Logic_Settings {
       }
     }
     // NO (VALID) LOCK
-    $locks[$name] = $now + $timeout;
+    $locks[$name] = $now + (int)$timeout;
     CRM_Sepa_Logic_Settings::setSetting($locks, 'sdd_async_batching_lock');
     return TRUE;
   }

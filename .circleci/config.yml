@@ -115,14 +115,11 @@ executors:
         name: mysql
         environment:
           MYSQL_ROOT_PASSWORD: buildkit
-      - image: maildev/maildev
-        name: maildev
 
 jobs:
   build_mysql_5_7:
     executor: civicrm
     steps:
-      - setup
       - checkout
       - run_all
       - run_all:
@@ -130,10 +127,10 @@ jobs:
           version: "stable"
           url: http://localhost:8081
       - run_all:
-          build_name: civi-5.19
-          version: "5.19"
+          build_name: civi-5.50.4
+          version: "5.50.4"
           url: http://localhost:8082
-  build_mariadb_10_2:
+  build_mariadb_10_4:
     executor: civicrm
     docker:
       - image: michaelmcandrew/civicrm-buildkit
@@ -141,14 +138,11 @@ jobs:
         environment:
           TERM: xterm-color
           APACHE_RUN_USER: buildkit
-      - image: mariadb:10.2
+      - image: mariadb:10.4
         name: mysql
         environment:
           MYSQL_ROOT_PASSWORD: buildkit
-      - image: maildev/maildev
-        name: maildev
     steps:
-      - setup
       - checkout
       - run_all
       - run_all:
@@ -156,40 +150,12 @@ jobs:
           version: "stable"
           url: http://localhost:8081
       - run_all:
-          build_name: civi-5.19
-          version: "5.19"
+          build_name: civi-5.50.4
+          version: "5.50.4"
           url: http://localhost:8082
-  build_mariadb_10_3:
-    executor: civicrm
-    docker:
-      - image: michaelmcandrew/civicrm-buildkit
-        name: civicrm
-        environment:
-          TERM: xterm-color
-          APACHE_RUN_USER: buildkit
-      - image: mariadb:10.3
-        name: mysql
-        environment:
-          MYSQL_ROOT_PASSWORD: buildkit
-      - image: maildev/maildev
-        name: maildev
-    steps:
-      - setup
-      - checkout
-      - run_all
-      - run_all:
-          build_name: civi-stable
-          version: "stable"
-          url: http://localhost:8081
-      - run_all:
-          build_name: civi-5.19
-          version: "5.19"
-          url: http://localhost:8082
-
 workflows:
   version: 2
   build:
     jobs:
       - build_mysql_5_7
-      - build_mariadb_10_2
-      - build_mariadb_10_3
+      - build_mariadb_10_4

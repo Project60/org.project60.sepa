@@ -80,7 +80,11 @@ function civicrm_api3_sepa_creditor_delete($params) {
  * @access public
  */
 function civicrm_api3_sepa_creditor_get($params) {
-
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $bao_name = _civicrm_api3_get_BAO(__FUNCTION__);
+  if (!$bao_name) {
+    // explicitly provide the BAO name, due to early calls - see https://github.com/Project60/org.project60.sepa/issues/630
+    $bao_name = 'CRM_Sepa_BAO_SEPACreditor';
+  }
+  return _civicrm_api3_basic_get($bao_name, $params);
 }
 
