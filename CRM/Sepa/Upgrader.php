@@ -473,10 +473,10 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
 
     // add currency
-    $this->ctx->log->info('Adding CUC ("Codice Univoco CBI" for CBIBdySDDReq.00.01.00 standard');
+    $this->ctx->log->info('Adding CUC-code ("Codice Univoco CBI" for CBIBdySDDReq.00.01.00 standard');
     $cuc = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'cuc';");
     if (!$cuc) {
-        $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `cuc` varchar(8) COMMENT 'CUC of the creditor (Codice Univoco CBI)';");
+        $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `cuc` varchar(8) COMMENT 'CUC-code of the creditor (Codice Univoco CBI)';");
     }
     return TRUE;
   }

@@ -175,7 +175,7 @@
 {/htxt}
 
 {htxt id='id-cuc'}
-    <p>{ts}"Codice Univoco CBI" (CUC) of the financial institution of the creditor.{/ts}</p>
+    <p>{ts}CUC-code ("Codice Univoco CBI") of the financial institution of the creditor. It is only required for CBIBdySDDReq SEPA file format.{/ts}</p>
     <p>{ts}<strong>Be careful when changing this!</strong>{/ts}</p>
 {/htxt}
 {/crmScope}
