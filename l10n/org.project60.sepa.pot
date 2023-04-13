@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: org.project60.sepa\n"
-"POT-Creation-Date: 2022-01-14 13:46+0100\n"
+"POT-Creation-Date: 2023-04-13 17:08+0200\n"
 "Language-Team: CiviCRM Translators <civicrm-translators@lists.civicrm.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -97,6 +97,22 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPAMandate.php
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php
+#: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+#: Civi/Sepa/ActionProvider/Action/FindMandate.php sepa.php
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationConfirm.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+msgid "Account Holder"
+msgstr ""
+
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/Form/CreateMandate.php
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
 #: CRM/Sepa/Form/Search/SepaContactSearch.php
@@ -129,6 +145,10 @@ msgstr ""
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "IBAN"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "CUC (only from CBIBdySDDReq)"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPACreditor.php
@@ -307,6 +327,10 @@ msgid "You can only modify RCUR mandates."
 msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Account Holder changed from '%1' to '%2'"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
 msgid "IBAN changed from '%1' to '%2'"
 msgstr ""
 
@@ -356,6 +380,14 @@ msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Campaign changed from '%1' [%2] to '%3' [%4]."
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cycle day changed"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cycle day changed from '%1' to '%2'."
 msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
@@ -594,6 +626,15 @@ msgstr ""
 msgid "If true, BICs are not used for this creditor"
 msgstr ""
 
+#: CRM/Sepa/DAO/SEPACreditor.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "CUC"
+msgstr ""
+
+#: CRM/Sepa/DAO/SEPACreditor.php
+msgid "CUC of the creditor"
+msgstr ""
+
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "SEPAMandates"
 msgstr ""
@@ -676,6 +717,10 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "FK to Contact ID of the debtor"
+msgstr ""
+
+#: CRM/Sepa/DAO/SEPAMandate.php
+msgid "Name of the account holder"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
@@ -904,6 +949,10 @@ msgid "Account"
 msgstr ""
 
 #: CRM/Sepa/Form/CreateMandate.php
+msgid "not required if same as contact"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
 msgid "required"
 msgstr ""
 
@@ -1054,6 +1103,10 @@ msgstr ""
 #: Civi/Sepa/ActionProvider/Action/FindMandate.php
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Recurring"
+msgstr ""
+
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+msgid "account_holder"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
@@ -1296,6 +1349,47 @@ msgstr ""
 msgid "Cannot close transaction group! Error was: '%s'"
 msgstr ""
 
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"%1 orphaned open (pending) SEPA contributions were found in the system, i.e. "
+"they are not part of a SEPA transaction group, and will not be collected any "
+"more. You should delete them by searching for contributions in status "
+"'Pending' with payment instruments RCUR and FRST."
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"WARNING: %1 orphaned active (in Progress) SEPA contributions detected. These "
+"may cause irregularities in the generation of the SEPA collection groups, "
+"and in particular might cause the same installment to be collected multiple "
+"times. You should find them by searching for contributions in status 'in "
+"Progress' with the SEPA payment instruments (e.g. RCUR and FRST), and then "
+"export (to be safe) and delete them."
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"Warning: had to adjusted the status of %1 contribution(s) to 'Pending', as "
+"they are part of an open transaction group."
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid "Adjusted the payment instruments of %1 recurring mandate(s)."
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"The following irregularities have been detected and fixed in your database:"
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid "You can find a detailed log of the changes here: <code>%1</code>"
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid "CiviSEPA Health Check"
+msgstr ""
+
 #: CRM/Sepa/Logic/Queue/Close.php
 msgid "Closing SDD Group(s) [%1]"
 msgstr ""
@@ -1334,6 +1428,10 @@ msgstr ""
 
 #: CRM/Sepa/Logic/Settings.php
 msgid "Thank you"
+msgstr ""
+
+#: CRM/Sepa/Logic/Settings.php
+msgid "In Progress"
 msgstr ""
 
 #: CRM/Sepa/Logic/Status.php
@@ -1719,6 +1817,10 @@ msgid "Collection Day"
 msgstr ""
 
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+msgid "Recurring Contribution ID"
+msgstr ""
+
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
 msgid "bi-monthly"
 msgstr ""
 
@@ -1774,6 +1876,31 @@ msgstr ""
 
 #: Civi/Sepa/ContainerSpecs.php
 msgid "Find SEPA Mandate"
+msgstr ""
+
+#: Civi/Sepa/ContainerSpecs.php
+#: templates/CRM/Contact/Page/View/Summary.sepa.tpl
+msgid "SEPA Mandate"
+msgstr ""
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Creditor"
+msgstr ""
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Transaction Group"
+msgstr ""
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA SDD File"
+msgstr ""
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Contribution Group"
+msgstr ""
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Mandate Link"
 msgstr ""
 
 #: api/v3/SepaTransactionGroup.php
@@ -2266,6 +2393,12 @@ msgid ""
 "If you leave this empty, no (new) one-off mandates can be created any more."
 msgstr ""
 
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"CUC-code (\"Codice Univoco CBI\") of the financial institution of the "
+"creditor. It is only required for CBIBdySDDReq SEPA file format."
+msgstr ""
+
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Creditors"
 msgstr ""
@@ -2368,10 +2501,6 @@ msgid "Support Large Groups"
 msgstr ""
 
 #: templates/CRM/Contact/Page/View/Summary.sepa.tpl
-msgid "SEPA Mandate"
-msgstr ""
-
-#: templates/CRM/Contact/Page/View/Summary.sepa.tpl
 #: templates/CRM/Sepa/Page/DashBoard.tpl templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "Contributions"
 msgstr ""
@@ -2388,10 +2517,6 @@ msgstr ""
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationConfirm.sepa.tpl
 msgid "This payment will be debited from the following account:"
-msgstr ""
-
-#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
-msgid "Account Holder"
 msgstr ""
 
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
@@ -2869,6 +2994,10 @@ msgid "delete pending %1"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "recommended"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid ""
 "You should consider deleting the open contributions. If the recurring "
 "transaction group is deleted, these payments do not make sense any more. "
@@ -3040,6 +3169,12 @@ msgid ""
 "'SEPA'."
 msgstr ""
 
+#: templates/CRM/Sepa/Page/EditMandate.hlp
+msgid ""
+"When you change the cycle day be aware that you might end up collecting "
+"twice in the same month, or miss a collection altogether."
+msgstr ""
+
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "SEPA Recurring Mandate"
 msgstr ""
@@ -3131,6 +3266,18 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Replace for the following reason:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Change Cycle Day"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "New cycle day:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Cyle Day"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
@@ -3281,6 +3428,17 @@ msgstr ""
 msgid "Notes"
 msgstr ""
 
+#: tests/phpunit/CRM/Sepa/BugReproductionTest.php
+#: tests/phpunit/CRM/Sepa/MandateTest.php
+msgid "OOFF Mandate status after closing is incorrect."
+msgstr ""
+
+#: tests/phpunit/CRM/Sepa/BugReproductionTest.php
+msgid ""
+"OOFF contribution status after closing is incorrect, probably related to "
+"SEPA-629"
+msgstr ""
+
 #: tests/phpunit/CRM/Sepa/HookTest.php
 msgid "The create_mandate hook has not been called."
 msgstr ""
@@ -3388,10 +3546,6 @@ msgid "RCUR transaction group status after batching is incorrect."
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF Mandate status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
 msgid "OOFF contribution status after closing is incorrect."
 msgstr ""
 
@@ -3415,16 +3569,16 @@ msgstr ""
 msgid "Mandate status of new mandate is incorrect."
 msgstr ""
 
+#: tests/phpunit/CRM/Sepa/MandateTest.php
+msgid "Mandate account holder after creation is incorrect."
+msgstr ""
+
 #: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
 msgid "The OOFF mandate reference is invalid."
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
 msgid "The RCUR mandate reference is invalid."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
-msgid "There should be a clashing reference"
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/SettingsTest.php
@@ -3436,9 +3590,7 @@ msgid "set/getSetting doesn't work"
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/TestBase.php
-msgid ""
-"The contribution for the mandate is null. That should not be possible at "
-"this point."
+msgid "This mandate has no contribution, even though there should be one."
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/VerifyBicTest.php
