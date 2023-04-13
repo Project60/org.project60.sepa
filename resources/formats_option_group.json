@@ -118,6 +118,15 @@
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"
+    },
+    {
+      "_lookup": ["value"],
+      "_translate": ["label"],
+      "label": "SDD - CBIBdySDDReq.00.01.00",
+      "name": "CBIBdySDDReq_00_01_00",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
     }
   ]
 }

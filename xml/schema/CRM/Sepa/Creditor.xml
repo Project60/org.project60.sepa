@@ -206,4 +206,11 @@
         <comment>If true, BICs are not used for this creditor</comment>
     </field>
 
+    <field>
+        <name>cuc</name>
+        <title>CUC</title>
+        <type>varchar</type>
+        <length>8</length>
+        <comment>CUC of the creditor</comment>
+    </field>
 </table>

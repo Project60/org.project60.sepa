@@ -132,6 +132,12 @@ div.sdd-add-creditor {
           </td>
         </tr>
         <tr>
+          <td class="label">{$form.addcreditor_cuc.label} <a onclick='CRM.help("{ts}CUC{/ts}", {literal}{"id":"id-cuc","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+          <td>
+            {$form.addcreditor_cuc.html}
+          </td>
+        </tr>
+        <tr>
           <td class="label">{$form.addcreditor_pain_version.label} <a onclick='CRM.help("{ts}PAIN Version{/ts}", {literal}{"id":"id-pain","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
           <td>
             {$form.addcreditor_pain_version.html}

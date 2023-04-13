@@ -169,6 +169,7 @@ function fetchCreditor(id, isCopy) {
                     cj("#addcreditor_currency").val(data['currency']);
                     cj("#addcreditor_type").val(data['creditor_type']);
                     cj("#addcreditor_uses_bic").prop("checked", (data['uses_bic'] == "1"));
+                    cj("#addcreditor_cuc").val(data['cuc']);
                     cj("#is_test_creditor").prop("checked", (data['category'] == "TEST"));
                     cj('#addcreditor').show(500);
 
@@ -222,6 +223,7 @@ function updateCreditor() {
         "addcreditor_type":         "creditor_type",
         "addcreditor_creditor_id":  "creditor_id",
         "addcreditor_uses_bic":     "uses_bic",
+        "addcreditor_cuc":          "cuc",
         "custom_txmsg":             "custom_txmsg"};
 
     // update creditor information

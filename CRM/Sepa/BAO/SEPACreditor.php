@@ -120,6 +120,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
           'sepa_file_format_id' => 1,
           'pi_ooff'             => "{$classic_payment_instrument_ids['OOFF']}",
           'pi_rcur'             => "{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}",
+          'cuc'                 => '',
         ]);
       } catch (Exception $ex) {
         throw new Exception("Couldn't create default creditor: " . $ex->getMessage());
