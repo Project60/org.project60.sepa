@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
      `pi_ooff`              varchar(64)         COMMENT 'payment instruments, comma separated, to be used for one-off collections',
      `pi_rcur`              varchar(64)         COMMENT 'payment instruments, comma separated, to be used for recurring collections',
      `uses_bic`             tinyint             COMMENT 'If true, BICs are not used for this creditor',
+     `cuc`                  varchar(8)          COMMENT 'CUC-code of the creditor (Codice Univoco CBI)',
     PRIMARY KEY ( `id` ),
     CONSTRAINT FK_civicrm_sdd_creditor_creditor_id FOREIGN KEY (`creditor_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL,
     CONSTRAINT FK_civicrm_sdd_creditor_country_id  FOREIGN KEY (`country_id`)  REFERENCES `civicrm_country`(`id`) ON DELETE SET NULL
