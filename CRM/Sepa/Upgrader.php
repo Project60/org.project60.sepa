@@ -466,7 +466,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1702() {
+  public function upgrade_1801() {
     $dsn = DB::parseDSN(CIVICRM_DSN);
     $this->ctx->log->info("Adding new 'SDD - CBIBdySDDReq.00.01.00");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
