@@ -16,6 +16,10 @@
       <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
       <Cdtr>
         <Nm>{$creditor.name}</Nm>
+        <PstlAdr>
+          <Ctry>DE</Ctry>
+          <AdrLine>Genthiner Strasse 48, 10785 Berlin</AdrLine>
+        </PstlAdr>
       </Cdtr>
       <CdtrAcct>
         <Id>
@@ -28,34 +32,33 @@
         </FinInstnId>
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
-      <CdtrSchmeId>
-        <Nm>{$creditor.name}</Nm>
-        <Id>
-          <PrvtId>
-            <Othr>
-              <Id>{$creditor.identifier}</Id>
-              <SchmeNm>
-                <Prtry>SEPA</Prtry>
-              </SchmeNm>
-            </Othr>
-          </PrvtId>
-        </Id>
-      </CdtrSchmeId>
 {foreach from=$contributions item="contribution"}
       <DrctDbtTxInf>
         <PmtId>
           <EndToEndId>{$contribution.end2endID}</EndToEndId>
         </PmtId>
-        <InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</InstdAmt>
+        <InstdAmt Ccy="EUR">0.01</InstdAmt>
         <DrctDbtTx>
           <MndtRltdInf>
             <MndtId>{$contribution.reference}</MndtId>
             <DtOfSgntr>{$contribution.date|crmDate:"%Y-%m-%d"}</DtOfSgntr>
           </MndtRltdInf>
+          <CdtrSchmeId>
+            <Id>
+              <PrvtId>
+                <Othr>
+                  <Id>{$creditor.identifier}</Id>
+                  <SchmeNm>
+                    <Prtry>SEPA</Prtry>
+                  </SchmeNm>
+                </Othr>
+              </PrvtId>
+            </Id>
+          </CdtrSchmeId>
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
-            <BIC>{$contribution.bic}</BIC>
+            <BIC>{$creditor.bic}</BIC>
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
