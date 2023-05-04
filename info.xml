@@ -12,8 +12,6 @@
   <version>1.9-dev</version>
   <develStage>dev</develStage>
   <compatibility>
-    <ver>5.19</ver>
-    <ver>5.28</ver>
     <ver>5.43</ver>
   </compatibility>
   <urls>

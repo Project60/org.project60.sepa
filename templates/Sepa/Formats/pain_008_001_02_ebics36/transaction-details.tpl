@@ -18,7 +18,8 @@
         <Nm>{$creditor.name}</Nm>
         <PstlAdr>
           <Ctry>DE</Ctry>
-          <AdrLine>Genthiner Strasse 48, 10785 Berlin</AdrLine>
+          <AdrLine>{if $contribution.street_address}{$contribution.street_address}{else}n/a{/if}</AdrLine>
+          <AdrLine>{if $contribution.postal_code}{$contribution.postal_code}{else}n/a{/if} {if $contribution.city}{$contribution.city}{/if}</AdrLine>
         </PstlAdr>
       </Cdtr>
       <CdtrAcct>
