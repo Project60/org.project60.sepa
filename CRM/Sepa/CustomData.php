@@ -15,7 +15,7 @@
 +--------------------------------------------------------*/
 
 class CRM_Sepa_CustomData {
-  const CUSTOM_DATA_HELPER_VERSION   = 0.7;
+  const CUSTOM_DATA_HELPER_VERSION   = '0.8';
   const CUSTOM_DATA_HELPER_LOG_LEVEL = 0;
   const CUSTOM_DATA_HELPER_LOG_DEBUG = 1;
   const CUSTOM_DATA_HELPER_LOG_INFO  = 3;
@@ -137,7 +137,7 @@ class CRM_Sepa_CustomData {
         $extends_list = array();
         foreach ($data['extends_entity_column_value'] as $activity_type) {
           if (!is_numeric($activity_type)) {
-            $activity_type = CRM_Core_OptionGroup::getValue('activity_type', $activity_type, 'name');
+            $activity_type = self::getOptionValue('activity_type', $activity_type, 'name');
           }
           if ($activity_type) {
             $extends_list[] = $activity_type;
@@ -779,5 +779,64 @@ class CRM_Sepa_CustomData {
     } else {
       return NULL;
     }
+  }
+
+  /**
+   * Get CustomField entity (cached)
+   */
+  public static function getCustomFieldsForGroups($custom_group_names) {
+    self::cacheCustomGroups($custom_group_names);
+    $fields = [];
+    foreach ($custom_group_names as $custom_group_name) {
+      foreach (self::$custom_group_cache[$custom_group_name] as $field_id => $field) {
+        if (is_numeric($field_id)) {
+          $fields[] = $field;
+        }
+      }
+    }
+    return $fields;
+  }
+
+  /**
+   * Get an option value from an option group
+   *
+   * This function was specifically introduced as 1:1 replacement
+   *  for the deprecated CRM_Core_OptionGroup::getValue function
+   *
+   * @param string $groupName
+   *   name of the group
+   *
+   * @param $label
+   *   label/name of the requested option value
+   *
+   * @param string $label_field
+   *   field to look in for the label, e.g. 'label' or 'name'
+   *
+   * @param string $label_type
+   *   *ignored*
+   *
+   * @param string $value_field
+   *   *ignored*
+   *
+   * @return string
+   *   value of the OptionValue entity if found
+   *
+   * @throws Exception
+   */
+  public static function getOptionValue($group_name, $label, $label_field = 'label', $label_type = 'String', $value_field = 'value')
+  {
+    if (empty($label) || empty($group_name)) {
+      return NULL;
+    }
+
+    // build/run API query
+    $value = civicrm_api3('OptionValue', 'getvalue', [
+      'option_group_id' => $group_name,
+      $label_field => $label,
+      'return' => $value_field
+    ]);
+
+    // anything else to do here?
+    return (string) $value;
   }
 }

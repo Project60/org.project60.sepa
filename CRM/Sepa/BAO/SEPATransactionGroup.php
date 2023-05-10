@@ -190,7 +190,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $format = CRM_Sepa_Logic_Format::getFormatForCreditor($txgroup['sdd_creditor_id']);
 
     $creditor = civicrm_api ("SepaCreditor", "getsingle", array("sequential"=>1, "version"=>3, "id"=>$txgroup["sdd_creditor_id"]));
-    // TODO: grouping: $fileFormatGrouping = CRM_Core_OptionGroup::getValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping');
+    // TODO: grouping: $fileFormatGrouping = CRM_Sepa_CustomData::getOptionValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping');
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
       // find an available txgroup reference
