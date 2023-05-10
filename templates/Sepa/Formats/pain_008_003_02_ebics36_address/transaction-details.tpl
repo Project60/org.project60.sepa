@@ -16,6 +16,10 @@
       <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
       <Cdtr>
         <Nm>{$creditor.name}</Nm>
+        <PstlAdr>
+          <Ctry>{$creditor.ctry}</Ctry>
+          <AdrLine>{$creditor.address}</AdrLine>
+        </PstlAdr>
       </Cdtr>
       <CdtrAcct>
         <Id>
@@ -29,7 +33,6 @@
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
       <CdtrSchmeId>
-        <Nm>{$creditor.name}</Nm>
         <Id>
           <PrvtId>
             <Othr>
@@ -41,6 +44,7 @@
           </PrvtId>
         </Id>
       </CdtrSchmeId>
+
 {foreach from=$contributions item="contribution"}
       <DrctDbtTxInf>
         <PmtId>
@@ -60,6 +64,11 @@
         </DbtrAgt>
         <Dbtr>
           <Nm>{$contribution.display_name}</Nm>
+          <PstlAdr>
+            <Ctry>{$contribution.ctry}</Ctry>
+            <AdrLine>{if $contribution.street_address}{$contribution.street_address}{else}n/a{/if}</AdrLine>
+            <AdrLine>{if $contribution.postal_code}{$contribution.postal_code}{else}n/a{/if} {if $contribution.city}{$contribution.city}{/if}</AdrLine>
+          </PstlAdr>
         </Dbtr>
         <DbtrAcct>
           <Id>
@@ -71,4 +80,5 @@
         </RmtInf>
       </DrctDbtTxInf>
 {/foreach}
+
     </PmtInf>

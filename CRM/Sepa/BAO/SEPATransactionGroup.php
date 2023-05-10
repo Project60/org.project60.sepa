@@ -67,6 +67,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     $creditor_id = $group["sdd_creditor_id"];
     $creditor    = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
+    if (!empty($creditor['country_id'])) {
+      $creditor['ctry'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $creditor['country_id'], 'iso_code');
+    }
     $format      = CRM_Sepa_Logic_Format::getFormatForCreditor($creditor_id);
     $template->assign('group',    $group);
     $template->assign('creditor', $creditor);

@@ -16,6 +16,11 @@
       <ReqdColltnDt>{$group.collection_date|crmDate:"%Y-%m-%d"}</ReqdColltnDt>
       <Cdtr>
         <Nm>{$creditor.name}</Nm>
+        <PstlAdr>
+          <Ctry>DE</Ctry>
+          <AdrLine>{if $contribution.street_address}{$contribution.street_address}{else}n/a{/if}</AdrLine>
+          <AdrLine>{if $contribution.postal_code}{$contribution.postal_code}{else}n/a{/if} {if $contribution.city}{$contribution.city}{/if}</AdrLine>
+        </PstlAdr>
       </Cdtr>
       <CdtrAcct>
         <Id>
@@ -28,19 +33,6 @@
         </FinInstnId>
       </CdtrAgt>
       <ChrgBr>SLEV</ChrgBr>
-      <CdtrSchmeId>
-        <Nm>{$creditor.name}</Nm>
-        <Id>
-          <PrvtId>
-            <Othr>
-              <Id>{$creditor.identifier}</Id>
-              <SchmeNm>
-                <Prtry>SEPA</Prtry>
-              </SchmeNm>
-            </Othr>
-          </PrvtId>
-        </Id>
-      </CdtrSchmeId>
 {foreach from=$contributions item="contribution"}
       <DrctDbtTxInf>
         <PmtId>
@@ -52,10 +44,22 @@
             <MndtId>{$contribution.reference}</MndtId>
             <DtOfSgntr>{$contribution.date|crmDate:"%Y-%m-%d"}</DtOfSgntr>
           </MndtRltdInf>
+          <CdtrSchmeId>
+            <Id>
+              <PrvtId>
+                <Othr>
+                  <Id>{$creditor.identifier}</Id>
+                  <SchmeNm>
+                    <Prtry>SEPA</Prtry>
+                  </SchmeNm>
+                </Othr>
+              </PrvtId>
+            </Id>
+          </CdtrSchmeId>
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
-            <BIC>{$contribution.bic}</BIC>
+            <BIC>{$creditor.bic}</BIC>
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
