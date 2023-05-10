@@ -38,7 +38,7 @@
         <PmtId>
           <EndToEndId>{$contribution.end2endID}</EndToEndId>
         </PmtId>
-        <InstdAmt Ccy="EUR">0.01</InstdAmt>
+        <InstdAmt Ccy="{$contribution.currency}">{$contribution.total_amount}</InstdAmt>
         <DrctDbtTx>
           <MndtRltdInf>
             <MndtId>{$contribution.reference}</MndtId>
