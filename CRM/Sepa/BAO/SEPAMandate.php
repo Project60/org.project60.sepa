@@ -701,7 +701,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
    */
   public static function generateModificationActivity($mandate, $subject, $detail_lines) {
     // get / create activity type
-    $activity_type_id = CRM_Core_OptionGroup::getValue('activity_type', 'sdd_update', 'name');
+    $activity_type_id = CRM_Sepa_CustomData::getOptionValue('activity_type', 'sdd_update', 'name');
     if (!$activity_type_id) {
       // create activity type
       civicrm_api3('OptionValue', 'create', array(
@@ -709,7 +709,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         'name'            => 'sdd_update',
         'option_group_id' => 'activity_type',
         ));
-      $activity_type_id = CRM_Core_OptionGroup::getValue('activity_type', 'sdd_update', 'name');
+      $activity_type_id = CRM_Sepa_CustomData::getOptionValue('activity_type', 'sdd_update', 'name');
     }
 
     // compile activity
