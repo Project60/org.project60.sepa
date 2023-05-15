@@ -45,6 +45,6 @@ A recurring mandate consists of three entities:
 
 # Additional statuses
 
-The status ``INVALID`` can be used to track invalid mandates.
+The mandate status ``INVALID`` can be used to track invalid mandates.
 
-The status ``INIT`` can be used for mandates, that need to be activated first, e.g. via a validation by the bank.
+The mandate status ``INIT`` can be used for mandates, that need to be activated first, e.g. via a validation by the bank.
