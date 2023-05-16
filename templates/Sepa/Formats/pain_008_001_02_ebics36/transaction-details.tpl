@@ -59,7 +59,7 @@
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
-            <BIC>{$creditor.bic}</BIC>
+            <BIC>{$contribution.bic}</BIC>
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
