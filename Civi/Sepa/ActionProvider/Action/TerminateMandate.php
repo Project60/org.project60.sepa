@@ -92,7 +92,15 @@ class TerminateMandate extends AbstractAction {
           }
           $terminateDate = new \DateTime();
           \CRM_Sepa_BAO_SEPAMandate::terminateMandate((int) $mandateId, $terminateDate->format("YmdHis"), $cancelReason);
+          // the BAO function terminateMandate does everything aport from set the status to COMPLETE for a RCUR mandate
+          $update = "UPDATE civicrm_sdd_mandate SET status = %1 WHERE id = %2 AND type = %3";
+          $updateParams = [
+            1 => ["COMPLETE", "String"],
+            2 => [(int) $mandateId, "Integer"],
+            3 => ["RCUR", "String"],
+          ];
         }
+        \CRM_Core_DAO::executeQuery($update, $updateParams);
       }
       catch (\CiviCRM_API3_Exception $ex) {
       }
