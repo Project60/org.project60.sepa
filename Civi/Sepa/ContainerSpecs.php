@@ -53,6 +53,14 @@ class ContainerSpecs implements CompilerPassInterface {
           \Civi\ActionProvider\Action\AbstractAction::DATA_RETRIEVAL_TAG,
         ]
       ]);
+      $typeFactoryDefinition->addMethodCall('addAction', [
+        'TerminateMandate',
+        'Civi\Sepa\ActionProvider\Action\TerminateMandate',
+        E::ts('Terminate SEPA Mandate'),
+        [
+          \Civi\ActionProvider\Action\AbstractAction::DATA_RETRIEVAL_TAG,
+        ]
+      ]);
     }
     if ($container->hasDefinition('data_processor_factory')) {
       $dataProcessorFactoryDefinition = $container->getDefinition('data_processor_factory');

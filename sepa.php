@@ -584,6 +584,11 @@ function sepa_civicrm_tabset($tabsetName, &$tabs, $context) {
 function sepa_civicrm_postInstall() {
   _sepa_civix_civicrm_postInstall();
 }
+function sepa_civicrm_xmlMenu(&$files) {
+  foreach (glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
+    $files[] = $file;
+  }}
+
 
 // /**
 //  * Implements hook_civicrm_entityTypes().
