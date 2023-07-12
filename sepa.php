@@ -14,8 +14,9 @@
 
 require_once 'sepa.civix.php';
 
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use \Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use \Symfony\Component\DependencyInjection\ContainerBuilder;
+use \Symfony\Component\Config\Resource\FileResource;
 
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -28,6 +29,10 @@ function sepa_civicrm_container(ContainerBuilder $container) {
   if (class_exists('\Civi\Sepa\ContainerSpecs')) {
     $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs(), PassConfig::TYPE_OPTIMIZE);
   }
+
+  $container->addResource(new FileResource(__FILE__));
+  $container->findDefinition('dispatcher')->addMethodCall('addListener', ['civi.token.list', 'sepa_register_tokens'])->setPublic(TRUE);
+  $container->findDefinition('dispatcher')->addMethodCall('addListener', ['civi.token.eval', 'sepa_evaluate_tokens'])->setPublic(TRUE);
 }
 
 function sepa_civicrm_pageRun( &$page ) {
@@ -36,9 +41,9 @@ function sepa_civicrm_pageRun( &$page ) {
     if (CRM_Core_Permission::check('view sepa mandates')) {
       $page->assign('can_create_mandate', CRM_Core_Permission::check('create sepa mandates') ? '1' : '0');
       $page->assign('can_edit_mandate',   CRM_Core_Permission::check('edit sepa mandates') ? '1' : '0');
-      CRM_Core_Region::instance('page-body')->add(array(
+      CRM_Core_Region::instance('page-body')->add([
         'template' => 'CRM/Contact/Page/View/Summary.sepa.tpl'
-      ));
+      ]);
     }
 
   } elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
@@ -54,39 +59,42 @@ function sepa_civicrm_pageRun( &$page ) {
         $contribution_recur_id = $page->getTemplate()->get_template_vars('contribution_recur_id');
         if (empty($contribution_recur_id)) return;
 
-        $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
+        $mandate = civicrm_api3('SepaMandate', 'getsingle', [
           'entity_table' => 'civicrm_contribution_recur',
-          'entity_id'    => $contribution_recur_id));
+          'entity_id'    => $contribution_recur_id
+        ]);
       }
       else {
         // this is a OOFF contribtion
-        $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
+        $mandate = civicrm_api3('SepaMandate', 'getsingle', [
           'entity_table' => 'civicrm_contribution',
-          'entity_id'    => $contribution_id));
+          'entity_id'    => $contribution_id
+        ]);
       }
 
       // add txgroup information
-      $txgroup_search = civicrm_api3('SepaContributionGroup', 'get', array(
+      $txgroup_search = civicrm_api3('SepaContributionGroup', 'get', [
         'contribution_id' => $contribution_id
-      ));
+      ]);
       if (empty($txgroup_search['id'])) {
-        $mandate['tx_group'] = ts('<i>None</i>', array('domain' => 'org.project60.sepa'));
+        $mandate['tx_group'] = ts('<i>None</i>', ['domain' => 'org.project60.sepa']);
       } else {
         $group = reset($txgroup_search['values']);
         if (empty($group['txgroup_id'])) {
-          $mandate['tx_group'] = ts('<i>Error</i>', array('domain' => 'org.project60.sepa'));
+          $mandate['tx_group'] = ts('<i>Error</i>', ['domain' => 'org.project60.sepa']);
         } else {
-          $mandate['tx_group'] = civicrm_api3('SepaTransactionGroup', 'getvalue', array(
+          $mandate['tx_group'] = civicrm_api3('SepaTransactionGroup', 'getvalue', [
             'return' => 'reference',
-            'id'     => $group['txgroup_id']));
+            'id'     => $group['txgroup_id']
+          ]);
         }
       }
 
       $page->assign('sepa', $mandate);
       $page->assign('can_edit_mandate',   CRM_Core_Permission::check('edit sepa mandates'));
-      CRM_Core_Region::instance('page-body')->add(array(
+      CRM_Core_Region::instance('page-body')->add([
         'template' => 'Sepa/Contribute/Form/ContributionView.tpl'
-      ));
+      ]);
     }
   }
 
@@ -107,7 +115,7 @@ function sepa_civicrm_pageRun( &$page ) {
       $mandate = civicrm_api3("SepaMandate","getsingle", ['id' => $mandate_id]);
 
       // load notes
-      $mandate['notes'] = array();
+      $mandate['notes'] = [];
       if ($mandate['type'] == 'RCUR') {
         $contribution_recur_id = (int) $mandate['entity_id'];
         $mandate_note_query = CRM_Core_DAO::executeQuery("SELECT note FROM civicrm_note WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur' ORDER BY modified_date DESC;");
@@ -118,9 +126,9 @@ function sepa_civicrm_pageRun( &$page ) {
 
       $page->assign("sepa", $mandate);
       $page->assign('can_edit_mandate',   CRM_Core_Permission::check('edit sepa mandates'));
-      CRM_Core_Region::instance('page-body')->add(array(
+      CRM_Core_Region::instance('page-body')->add([
         'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
-      ));
+      ]);
     }
   }
 }
@@ -187,15 +195,15 @@ function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 function sepa_civicrm_summaryActions( &$actions, $contactID ) {
   // add "create SEPA mandate action"
   if (CRM_Core_Permission::check('create sepa mandates')) {
-    $actions['sepa_contribution'] = array(
+    $actions['sepa_contribution'] = [
         'title'           => E::ts("Record SEPA Mandate"),
         'weight'          => 5,
         'ref'             => 'new-sepa-contribution',
         'key'             => 'sepa_contribution',
         'component'       => 'CiviContribute',
         'href'            => CRM_Utils_System::url('civicrm/sepa/createmandate', "reset=1&cid={$contactID}"),
-        'permissions'     => array('access CiviContribute', 'edit contributions')
-      );
+        'permissions'     => ['access CiviContribute', 'edit contributions']
+    ];
   }
 }
 
@@ -206,16 +214,16 @@ function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $t
    switch ($type) {
     case 'relTables':
       // Offer user to merge SEPA Mandates
-      $data['rel_table_sepamandate'] = array(
-          'title'  => ts('SEPA Mandates', array('domain' => 'org.project60.sepa')),
-          'tables' => array('civicrm_sdd_mandate'),
+      $data['rel_table_sepamandate'] = [
+          'title'  => ts('SEPA Mandates', ['domain' => 'org.project60.sepa']),
+          'tables' => ['civicrm_sdd_mandate'],
           'url'    => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=$cid&selectedChild=contribute'),  // '$cid' will be automatically replaced
-      );
+      ];
     break;
 
     case 'cidRefs':
       // this is the only field that needs to be modified
-        $data['civicrm_sdd_mandate'] = array('contact_id');
+        $data['civicrm_sdd_mandate'] = ['contact_id'];
     break;
   }
 }
@@ -307,36 +315,36 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 // totten's addition
 function sepa_civicrm_entityTypes(&$entityTypes) {
   // add my DAO's
-  $entityTypes[] = array(
+  $entityTypes[] = [
       'name' => 'SepaMandate',
       'class' => 'CRM_Sepa_DAO_SEPAMandate',
       'table' => 'civicrm_sdd_mandate',
-  );
-  $entityTypes[] = array(
+  ];
+  $entityTypes[] = [
       'name' => 'SepaCreditor',
       'class' => 'CRM_Sepa_DAO_SEPACreditor',
       'table' => 'civicrm_sdd_creditor',
-  );
-  $entityTypes[] = array(
+  ];
+  $entityTypes[] = [
       'name' => 'SepaTransactionGroup',
       'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
       'table' => 'civicrm_sdd_txgroup',
-  );
-  $entityTypes[] = array(
+  ];
+  $entityTypes[] = [
       'name' => 'SepaSddFile',
       'class' => 'CRM_Sepa_DAO_SEPASddFile',
       'table' => 'civicrm_sdd_file',
-  );
-  $entityTypes[] = array(
+  ];
+  $entityTypes[] = [
       'name' => 'SepaContributionGroup',
       'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
       'table' => 'civicrm_sdd_contribution_txgroup',
-  );
-  $entityTypes[] = array(
+  ];
+  $entityTypes[] = [
       'name' => 'SepaMandateLink',
       'class' => 'CRM_Sepa_DAO_SepaMandateLink',
       'table' => 'civicrm_sdd_entity_mandate',
-  );
+  ];
 }
 
 /**
@@ -350,28 +358,28 @@ function sepa_civicrm_navigationMenu(&$menu) {
   //add menu entry for SEPA Dashboard to Contributions menu
   $sepa_dashboard_url = 'civicrm/sepa';
 
-  _sepa_civix_insert_navigation_menu($menu,'Contributions',array(
-    'label' => ts('CiviSEPA Dashboard',array('domain' => 'org.project60.sepa')),
+  _sepa_civix_insert_navigation_menu($menu,'Contributions', [
+    'label' => ts('CiviSEPA Dashboard', ['domain' => 'org.project60.sepa']),
     'name' => 'CiviSEPA Dashboard',
     'url' => $sepa_dashboard_url,
     'permission' => 'view sepa groups',
     'operator' => NULL,
     'separator' => 2,
     'active' => 1
-  ));
+  ]);
 
   //add menu entry for SEPA settings to Administer>CiviContribute menu
   $sepa_settings_url = 'civicrm/admin/setting/sepa';
 
-  _sepa_civix_insert_navigation_menu($menu, 'Administer/CiviContribute',array (
-        'label' => ts('CiviSEPA Settings',array('domain' => 'org.project60.sepa')),
+  _sepa_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
+        'label' => ts('CiviSEPA Settings', ['domain' => 'org.project60.sepa']),
         'name' => 'CiviSEPA Settings',
         'url' => $sepa_settings_url,
         'permission' => 'administer CiviCRM',
         'operator' => NULL,
         'separator' => 2,
         'active' => 1
-  ));
+  ]);
 
   _sepa_civix_navigationMenu($menu);
 }
@@ -380,17 +388,17 @@ function sepa_civicrm_navigationMenu(&$menu) {
  * Define SEPA permissions
  */
  function sepa_civicrm_permission(&$permissions) {
-  $prefix = ts('CiviSEPA', array('domain' => 'org.project60.sepa')) . ': ';
+  $prefix = ts('CiviSEPA', ['domain' => 'org.project60.sepa']) . ': ';
   // mandate permissions
-  $permissions['create sepa mandates'] = $prefix . ts('Create SEPA mandates', array('domain' => 'org.project60.sepa'));
-  $permissions['view sepa mandates']   = $prefix . ts('View SEPA mandates', array('domain' => 'org.project60.sepa'));
-  $permissions['edit sepa mandates']   = $prefix . ts('Edit SEPA mandates', array('domain' => 'org.project60.sepa'));
-  $permissions['delete sepa mandates'] = $prefix . ts('Delete SEPA mandates', array('domain' => 'org.project60.sepa'));
+  $permissions['create sepa mandates'] = $prefix . ts('Create SEPA mandates', ['domain' => 'org.project60.sepa']);
+  $permissions['view sepa mandates']   = $prefix . ts('View SEPA mandates', ['domain' => 'org.project60.sepa']);
+  $permissions['edit sepa mandates']   = $prefix . ts('Edit SEPA mandates', ['domain' => 'org.project60.sepa']);
+  $permissions['delete sepa mandates'] = $prefix . ts('Delete SEPA mandates', ['domain' => 'org.project60.sepa']);
 
   // transaction group permissions
-  $permissions['view sepa groups']   = $prefix . ts('View SEPA transaction groups', array('domain' => 'org.project60.sepa'));
-  $permissions['batch sepa groups']  = $prefix . ts('Batch SEPA transaction groups', array('domain' => 'org.project60.sepa'));
-  $permissions['delete sepa groups'] = $prefix . ts('Delete SEPA transaction groups', array('domain' => 'org.project60.sepa'));
+  $permissions['view sepa groups']   = $prefix . ts('View SEPA transaction groups', ['domain' => 'org.project60.sepa']);
+  $permissions['batch sepa groups']  = $prefix . ts('Batch SEPA transaction groups', ['domain' => 'org.project60.sepa']);
+  $permissions['delete sepa groups'] = $prefix . ts('Delete SEPA transaction groups', ['domain' => 'org.project60.sepa']);
  }
 
 
@@ -399,10 +407,10 @@ function sepa_civicrm_navigationMenu(&$menu) {
  */
 function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
   // TODO: add more
-  $permissions['sepa_alternative_batching']['received'] = array('batch sepa groups');
-  $permissions['sepa_logic']['received'] = array('batch sepa groups');
-  $permissions['sepa_transaction_group']['toaccgroup'] = array('batch sepa groups');
-  $permissions['sepa_mandate']['get'] = array('view sepa mandates');
+  $permissions['sepa_alternative_batching']['received'] = ['batch sepa groups'];
+  $permissions['sepa_logic']['received'] = ['batch sepa groups'];
+  $permissions['sepa_transaction_group']['toaccgroup'] = ['batch sepa groups'];
+  $permissions['sepa_mandate']['get'] = ['view sepa mandates'];
 }
 
 /**
@@ -434,125 +442,70 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
 
 /**
  * Insert "Last Mandate" tokens
+ * (Deprecated hook)
  */
 function sepa_civicrm_tokens(&$tokens) {
-  $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
+  $prefix = ts("Most Recent SEPA Mandate", ['domain' => 'org.project60.sepa']);
   $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
-  $tokens[$prefix] = array(
-    "$prefix.reference"               => ts('Reference', array('domain' => 'org.project60.sepa')),
-    "$prefix.source"                  => ts('Source', array('domain' => 'org.project60.sepa')),
-    "$prefix.type"                    => ts('Type', array('domain' => 'org.project60.sepa')),
-    "$prefix.status"                  => ts('Status', array('domain' => 'org.project60.sepa')),
-    "$prefix.date"                    => ts('Signature Date (raw)', array('domain' => 'org.project60.sepa')),
-    "$prefix.date_text"               => ts('Signature Date', array('domain' => 'org.project60.sepa')),
-    "$prefix.account_holder"          => ts('Account Holder', array('domain' => 'org.project60.sepa')),
-    "$prefix.iban"                    => ts('IBAN', array('domain' => 'org.project60.sepa')),
-    "$prefix.iban_anonymised"         => ts('IBAN (anonymised)', array('domain' => 'org.project60.sepa')),
-    "$prefix.bic"                     => ts('BIC', array('domain' => 'org.project60.sepa')),
-    "$prefix.amount"                  => ts('Amount (raw)', array('domain' => 'org.project60.sepa')),
-    "$prefix.amount_text"             => ts('Amount', array('domain' => 'org.project60.sepa')),
-    "$prefix.currency"                => ts('Currency', array('domain' => 'org.project60.sepa')),
-    "$prefix.first_collection"        => ts('First Collection Date (raw)', array('domain' => 'org.project60.sepa')),
-    "$prefix.first_collection_text"   => ts('First Collection Date', array('domain' => 'org.project60.sepa')),
-    "$prefix.cycle_day"               => ts('Cycle Day', array('domain' => 'org.project60.sepa')),
-    "$prefix.frequency_interval"      => ts('Interval Multiplier', array('domain' => 'org.project60.sepa')),
-    "$prefix.frequency_unit"          => ts('Interval Unit', array('domain' => 'org.project60.sepa')),
-    "$prefix.frequency"               => ts('Interval', array('domain' => 'org.project60.sepa')),
-  );
+
+  $tokenList = SepaTokensDeprecated::getTokenList();
+  foreach ($tokenList as $token => $tokenDescription) {
+    $tokens[$prefix]["$prefix.$token"] = $tokenDescription;
+  }
+}
+
+function sepa_get_cids_as_array($cids) {
+  if (is_array($cids)) {
+    return $cids;
+  }
+
+  $contained_ids = explode(',', $cids);  // also works on scalars (int)
+  $cids = []; // make $cids into an array
+  foreach ($contained_ids as $cid_string) {
+    $cid = (int) $cid_string;
+    if ($cid) {
+      $cids[] = $cid;
+    }
+  }
+
+  return $cids;
 }
 
 /**
  * Fill "Last Mandate" tokens
+ * (Deprecated hook)
  */
-function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
-  // this could be only one ID, or (potentially) even a comma separated list of IDs
-  if (!is_array($cids)) {
-    $contained_ids = explode(',', $cids);  // also works on scalars (int)
-    $cids = array(); // make $cids into an array
-    foreach ($contained_ids as $cid_string) {
-      $cid = (int) $cid_string;
-      if ($cid) {
-        $cids[] = $cid;
-      }
-    }
+function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = [], $context = null) {
+  $cids = sepa_get_cids_as_array($cids);
+
+  $prefix = ts("Most Recent SEPA Mandate", ['domain' => 'org.project60.sepa']);
+  $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+
+  // No work needed if none of the tokens is used
+  if (!in_array($prefix, array_keys($tokens))) return;
+
+  foreach ($cids as $cid) {
+    SepaTokensDeprecated::fillLastMandateTokenValues($cid, $prefix, $values);
   }
+}
 
-  // make sure there are cids, because otherwise we'd generate invalid SQL (see https://github.com/Project60/org.project60.sepa/issues/399)
-  if (empty($cids) || !is_array($cids)) return;
+function sepa_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e) {
+  $prefix = 'Most_Recent_SEPA_Mandate';
 
-  try { // make sure this doesn't cause any troubles
-    $prefix = ts("Most Recent SEPA Mandate", array('domain' => 'org.project60.sepa'));
-    $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+  $tokenList = SepaTokens::getTokenList();
+  foreach ($tokenList as $token => $tokenDescription) {
+    $e->entity($prefix)->register($token, $tokenDescription);
+  }
+}
 
-    // No work needed if none of the tokens is used
-    if (!in_array($prefix, array_keys($tokens))) return;
+function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
+  $prefix = 'Most_Recent_SEPA_Mandate';
 
-    // FIND most recent SEPA Mandates (per contact)
-    $contact_id_list = implode(',', $cids);
-    $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id IN ($contact_id_list) GROUP BY contact_id;";
-    $result = CRM_Core_DAO::executeQuery($query);
-    while ($result->fetch()) {
-      // load the mandate
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $result->mandate_id));
-
-      // make sure there is an array
-      if (!isset($values[$result->contact_id])) {
-        $values[$result->contact_id] = array();
-      }
-
-      // copy the mandate values
-      $values[$result->contact_id]["$prefix.reference"]       = $mandate['reference'];
-      $values[$result->contact_id]["$prefix.source"]          = $mandate['source'];
-      $values[$result->contact_id]["$prefix.type"]            = $mandate['type'];
-      $values[$result->contact_id]["$prefix.status"]          = $mandate['status'];
-      $values[$result->contact_id]["$prefix.date"]            = $mandate['date'];
-      $values[$result->contact_id]["$prefix.account_holder"]  = $mandate['account_holder'];
-      $values[$result->contact_id]["$prefix.iban"]            = $mandate['iban'];
-      $values[$result->contact_id]["$prefix.iban_anonymised"] = CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']);
-      $values[$result->contact_id]["$prefix.bic"]             = $mandate['bic'];
-
-      // load and copy the contribution information
-      if ($mandate['entity_table'] == 'civicrm_contribution') {
-        $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['entity_id']));
-        $values[$result->contact_id]["$prefix.amount"]           = $contribution['total_amount'];
-        $values[$result->contact_id]["$prefix.currency"]         = $contribution['currency'];
-        $values[$result->contact_id]["$prefix.amount_text"]      = CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']);
-        $values[$result->contact_id]["$prefix.first_collection"] = $contribution['receive_date'];
-
-      } elseif ($mandate['entity_table'] == 'civicrm_contribution_recur') {
-        $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
-        $values[$result->contact_id]["$prefix.amount"]             = $rcontribution['amount'];
-        $values[$result->contact_id]["$prefix.currency"]           = $rcontribution['currency'];
-        $values[$result->contact_id]["$prefix.amount_text"]        = CRM_Utils_Money::format($rcontribution['amount'], $rcontribution['currency']);
-        $values[$result->contact_id]["$prefix.cycle_day"]          = $rcontribution['cycle_day'];
-        $values[$result->contact_id]["$prefix.frequency_interval"] = $rcontribution['frequency_interval'];
-        $values[$result->contact_id]["$prefix.frequency_unit"]     = $rcontribution['frequency_unit'];
-        $values[$result->contact_id]["$prefix.frequency"]          = CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], true);
-
-        // first collection date
-        if (empty($mandate['first_contribution_id'])) {
-          // calculate
-          $calculator = new CRM_Sepa_Logic_NextCollectionDate($mandate['creditor_id']);
-          $values[$result->contact_id]["$prefix.first_collection"] = $calculator->calculateNextCollectionDate($mandate['entity_id']);
-
-        } else {
-          // use date of first contribution
-          $fcontribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['first_contribution_id']));
-          $values[$result->contact_id]["$prefix.first_collection"] = $fcontribution['receive_date'];
-        }
-      }
-
-      // format dates
-      if (!empty($values[$result->contact_id]["$prefix.first_collection"])) {
-        $values[$result->contact_id]["$prefix.first_collection_text"] = CRM_Utils_Date::customFormat($values[$result->contact_id]["$prefix.first_collection"]);
-      }
-      if (!empty($values[$result->contact_id]["$prefix.date"])) {
-        $values[$result->contact_id]["$prefix.date_text"] = CRM_Utils_Date::customFormat($values[$result->contact_id]["$prefix.date"]);
-      }
+  foreach ($e->getRows() as $tokenRow) {
+    if (!empty($row->context['contactId'])) {
+      $row->format('text/html');
+      SepaTokens::fillLastMandateTokenValues($row->context['contactId'], $prefix, $tokenRow);
     }
-
-  } catch (Exception $e) {
-    // probably just a minor issue, see SEPA-461
   }
 }
 
