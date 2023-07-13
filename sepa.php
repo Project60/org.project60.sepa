@@ -448,7 +448,7 @@ function sepa_civicrm_tokens(&$tokens) {
   $prefix = ts("Most Recent SEPA Mandate", ['domain' => 'org.project60.sepa']);
   $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
 
-  $tokenList = SepaTokensDeprecated::getTokenList();
+  $tokenList = CRM_Utils_SepaTokensDeprecated::getTokenList();
   foreach ($tokenList as $token => $tokenDescription) {
     $tokens[$prefix]["$prefix.$token"] = $tokenDescription;
   }
@@ -485,14 +485,14 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = [], $c
   if (!in_array($prefix, array_keys($tokens))) return;
 
   foreach ($cids as $cid) {
-    SepaTokensDeprecated::fillLastMandateTokenValues($cid, $prefix, $values);
+    CRM_Utils_SepaTokensDeprecated::fillLastMandateTokenValues($cid, $prefix, $values);
   }
 }
 
 function sepa_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e) {
   $prefix = 'Most_Recent_SEPA_Mandate';
 
-  $tokenList = SepaTokens::getTokenList();
+  $tokenList = CRM_Utils_SepaTokens::getTokenList();
   foreach ($tokenList as $token => $tokenDescription) {
     $e->entity($prefix)->register($token, $tokenDescription);
   }
@@ -504,7 +504,7 @@ function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
   foreach ($e->getRows() as $tokenRow) {
     if (!empty($row->context['contactId'])) {
       $row->format('text/html');
-      SepaTokens::fillLastMandateTokenValues($row->context['contactId'], $prefix, $tokenRow);
+      CRM_Utils_SepaTokens::fillLastMandateTokenValues($row->context['contactId'], $prefix, $tokenRow);
     }
   }
 }
