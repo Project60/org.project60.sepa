@@ -2,9 +2,9 @@
 
 use CRM_Sepa_ExtensionUtil as E;
 
-class SepaTokensDeprecated {
+class CRM_Utils_SepaTokensDeprecated {
   public static function getTokenList() {
-    return SepaTokens::getTokenList();
+    return CRM_Utils_SepaTokens::getTokenList();
   }
 
   public static function fillLastMandateTokenValues($contactId, $prefix, &$values) {

@@ -2,7 +2,7 @@
 
 use CRM_Sepa_ExtensionUtil as E;
 
-class SepaTokens {
+class CRM_Utils_SepaTokens {
   public static function getTokenList() {
     return [
       'reference'               => E::ts('Reference', ['domain' => 'org.project60.sepa']),
