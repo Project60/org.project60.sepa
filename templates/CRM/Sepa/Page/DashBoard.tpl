@@ -167,7 +167,7 @@
 {/literal}
 
 <script type="text/javascript">
-var received_confirmation_message = "{ts domain="org.project60.sepa"}Do you really want to mark this groups as 'payment received'?{/ts}";
+let received_confirmation_message = `{ts domain="org.project60.sepa"}Do you really want to mark this groups as 'payment received'?{/ts}`;
 
 {literal}
 function mark_received(group_id) {
