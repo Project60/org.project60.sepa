@@ -287,6 +287,10 @@ class CRM_Sepa_Logic_NextCollectionDate {
 
     if ($update_required && self::$currently_edited_recurring_contribution_id) {
       $creditor_id = CRM_Core_DAO::singleValueQuery("SELECT creditor_id FROM civicrm_sdd_mandate WHERE entity_table='civicrm_contribution_recur' AND entity_id = " . self::$currently_edited_recurring_contribution_id);
+      if (empty($creditor_id)) {
+        // this is not a SEPA ContributionRecur
+        return;
+      }
       $updater = new CRM_Sepa_Logic_NextCollectionDate($creditor_id);
       $updater->updateNextCollectionDate(self::$currently_edited_recurring_contribution_id, NULL);
     }
