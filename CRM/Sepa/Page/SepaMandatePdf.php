@@ -149,8 +149,21 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
   }
 
 
-
-  function generatePDF($send = FALSE, $template_id) {
+  /**
+   * Generate pre-notification PDF to download or return
+   *
+   * @param boolean $send
+   *   should the PDF be sent to via email or offered as download?
+   *
+   * @param integer $template_id
+   *   ID of the pre-notification template
+   *
+   * @return false|void
+   *    false iff the process failed (probably because there's no email address with the contact)
+   *
+   * @throws CRM_Core_Exception
+   */
+  function generatePDF($send, $template_id) {
     require_once 'CRM/Utils/PDF/Utils.php';
     $fileName = $this->mandate->reference.".pdf";
     if ($send) {
