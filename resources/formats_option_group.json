@@ -120,7 +120,7 @@
       "is_active": "1"
     },
     {
-      "_lookup": ["value"],
+      "_lookup": ["name"],
       "_translate": ["label"],
       "label": "SDD - CBIBdySDDReq.00.01.00",
       "name": "CBIBdySDDReq_00_01_00",
