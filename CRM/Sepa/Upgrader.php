@@ -487,7 +487,7 @@ class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1803() {
+  public function upgrade_1804() {
     $this->ctx->log->info("Adding new 'SDD - EBICS 3.6 pain formats");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
