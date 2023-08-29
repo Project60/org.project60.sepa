@@ -693,7 +693,7 @@ class CRM_Sepa_Logic_Batching {
       while ($check_date < $collection_date) {
         $day_of_week = date('N', strtotime($check_date));
         if ($day_of_week > 5) $weekend_days_in_notice_period++;
-        $check_date = strtotime("+1 day", strtotime($check_date));
+        $check_date = date('Y-m-d', strtotime("+1 day", strtotime($check_date)));
       }
 
       // add those days to the current collection date, ALSO skipping the (western) weekends hit in the process

@@ -272,4 +272,75 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $this->assertNotSame('Saturday', $dayOfWeek, 'Collection date is not being deferred.');
     $this->assertNotSame('Sunday', $dayOfWeek, 'Collection date is not being deferred.');
   }
+
+  /**
+   * Test that RCUR mandates is still deferred correctly
+   *   with the weekend_defers option enabled
+   */
+  public function testRCURBeingDeferredOnSaturdayWithWeekendDefers()
+  {
+    $this->setSepaConfiguration('exclude_weekends', '1');
+    $this->setSepaConfiguration('weekend_defers', '1');
+
+    $mandateDate = 'next Saturday + 1 week';
+
+    $mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], $mandateDate);
+
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $contribution = $this->getLatestContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+
+    $collectionDate = $transactionGroup['collection_date'];
+    $collectionDate = strtotime($collectionDate);
+    $dayOfWeek = date('l', $collectionDate);
+
+    $this->assertNotSame('Saturday', $dayOfWeek, 'Collection date is not being deferred.');
+    $this->assertNotSame('Sunday', $dayOfWeek, 'Collection date is not being deferred.');
+  }
+
+  /**
+   * Test that RCUR mandates do get deferred more days with the setting on
+   * @see https://github.com/Project60/org.project60.sepa/issues/619
+   */
+  public function testWeekendDefersSetting1()
+  {
+    $this->setSepaConfiguration('exclude_weekends', '1');
+    $this->setSepaConfiguration('weekends_defer', '0');
+    $mandateDate = 'next Saturday + 1 week';
+
+    $mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], $mandateDate);
+
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $contribution = $this->getLatestContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+
+    $collectionDate = $transactionGroup['collection_date'];
+    $collectionDate = strtotime($collectionDate);
+    $dayOfWeek = date('l', $collectionDate);
+
+    $this->assertSame('Monday', $dayOfWeek, 'Collection date is not being deferred to Monday.');
+
+
+
+    // NOW: check with weekend deferral
+    $this->setSepaConfiguration('weekends_defer', '1');
+
+    $mandate2 = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], $mandateDate);
+
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+
+    $contribution2 = $this->getLatestContributionForMandate($mandate2);
+    $transactionGroup2 = $this->getTransactionGroupForContribution($contribution2);
+
+    $collectionDate2 = $transactionGroup2['collection_date'];
+    $collectionDate2 = strtotime($collectionDate2);
+    $dayOfWeek = date('l', $collectionDate2);
+    $this->assertNotSame('Monday', $dayOfWeek, 'Collection date is not being deferred.');
+  }
+
 }
