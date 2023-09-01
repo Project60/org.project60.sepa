@@ -254,6 +254,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
         CRM_Sepa_Logic_Settings::setSetting($allow_mandate_modification, 'allow_mandate_modification');
 
         CRM_Sepa_Logic_Settings::setSetting((isset($values['exclude_weekends'])     ? "1" : "0"), 'exclude_weekends');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['weekends_defer'])       ? "1" : "0"), 'weekends_defer');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_async_batching'])   ? "1" : "0"), 'sdd_async_batching');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_skip_closed'])      ? "1" : "0"), 'sdd_skip_closed');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_no_draft_xml'])     ? "1" : "0"), 'sdd_no_draft_xml');

@@ -308,6 +308,8 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
   {
     $this->setSepaConfiguration('exclude_weekends', '1');
     $this->setSepaConfiguration('weekends_defer', '0');
+    $this->setCreditorConfiguration('batching.RCUR.horizon', 9);
+
     $mandateDate = 'next Saturday + 1 week';
 
     $mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], $mandateDate);
@@ -343,4 +345,39 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $this->assertNotSame('Monday', $dayOfWeek, 'Collection date is not being deferred.');
   }
 
+  /**
+   * 1) weekends_defer OFF: collect next saturday, should be moved to monday
+   * 2) weekends_defer ON:  collect next saturday, should be moved to wednesday
+   *
+   *
+   * @see https://github.com/Project60/org.project60.sepa/issues/619
+   */
+  public function testWeekendDefersSetting2()
+  {
+    // run WITHOUT weekend deferral
+    $this->setSepaConfiguration('exclude_weekends', '1');
+    $this->setSepaConfiguration('weekends_defer', '0');
+
+    $mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], 'next Saturday');
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+    $contribution = $this->getLatestContributionForMandate($mandate);
+    $transactionGroup = $this->getTransactionGroupForContribution($contribution);
+    $collectionDate = strtotime($transactionGroup['collection_date']);
+    $collectionDay = date('l', $collectionDate);
+    $this->assertSame('Monday', $collectionDay, "Collection w/o weekend deferral should be on Monday");
+
+    // run WITH weekend deferral
+    $this->setSepaConfiguration('exclude_weekends', '1');
+    $this->setSepaConfiguration('weekends_defer', '1');
+
+    $mandate2 = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], 'next Saturday');
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $this->executeBatching(self::MANDATE_TYPE_RCUR);
+    $contribution2 = $this->getLatestContributionForMandate($mandate2);
+    $transactionGroup2 = $this->getTransactionGroupForContribution($contribution2);
+    $collectionDate2 = strtotime($transactionGroup2['collection_date']);
+    $collectionDay2 = date('l', $collectionDate2);
+    $this->assertSame('Wednesday', $collectionDay2, "Collection w/o weekend deferral should be on Wednesday");
+  }
 }

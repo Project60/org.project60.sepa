@@ -453,8 +453,9 @@ class CRM_Sepa_Logic_Batching {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
     foreach ($calculated_groups as $collection_date => $mandates) {
-      // check if we need to defer the collection date (e.g. due to bank holidays)
-      self::deferCollectionDate($collection_date, $creditor_id);
+      // check if we need to defer the collection date (e.g. due to bank holidays),
+      //   but don't apply the 'skipped weekends defer more', see SEPA-619
+      self::deferCollectionDate($collection_date, $creditor_id, false);
 
       if (!isset($existing_groups[$collection_date])) {
         // this group does not yet exist -> create
@@ -671,7 +672,7 @@ class CRM_Sepa_Logic_Batching {
   /**
    * Apply any (date-based) defers on the collection date
    */
-  public static function deferCollectionDate(&$collection_date, $creditor_id) {
+  public static function deferCollectionDate(&$collection_date, $creditor_id, $apply_weekends_defer = true) {
     // first check if the weekends are to be excluded
     $exclude_weekends = CRM_Sepa_Logic_Settings::getGenericSetting('exclude_weekends');
     if ($exclude_weekends) {
@@ -686,7 +687,7 @@ class CRM_Sepa_Logic_Batching {
 
     // if the weekends don't count towards deferral days, they need to be added separately
     $weekends_defer = CRM_Sepa_Logic_Settings::getGenericSetting('weekends_defer');
-    if ($weekends_defer) {
+    if ($weekends_defer && $apply_weekends_defer) {
       // count the (western) weekends in the time until collection day (i.e. assuming we'll submit today)
       $check_date = date('Y-m-d');
       $weekend_days_in_notice_period = 0;
@@ -698,9 +699,8 @@ class CRM_Sepa_Logic_Batching {
 
       // add those days to the current collection date, ALSO skipping the (western) weekends hit in the process
       while ($weekend_days_in_notice_period > 0) {
-        // skip (western) weekends
+        // skip/ignore (western) weekends
         while (date('N', strtotime($collection_date)) > 5) {
-          // this is a (western) weekend
           $collection_date = date('Y-m-d', strtotime("+1 day", strtotime($collection_date)));
         }
 
@@ -708,9 +708,8 @@ class CRM_Sepa_Logic_Batching {
         $collection_date = date('Y-m-d', strtotime("+1 day", strtotime($collection_date)));
         $weekend_days_in_notice_period--;
 
-        // skip (western) weekends
+        // skip/ignore (western) weekends
         while (date('N', strtotime($collection_date)) > 5) {
-          // this is a (western) weekend
           $collection_date = date('Y-m-d', strtotime("+1 day", strtotime($collection_date)));
         }
       }
