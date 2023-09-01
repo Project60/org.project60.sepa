@@ -160,7 +160,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
         $this->addElement('checkbox',  'weekends_defer',            E::ts("Weekends defer collection"), "", ($weekends_defer?['checked'=>'checked']:[]));
         $this->addElement('checkbox',  'sdd_async_batching',        E::ts("Large Groups"), "", ($async_batch?array('checked'=>'checked'):[]));
         $this->addElement('checkbox',  'sdd_skip_closed',           E::ts("Only Completed Contributions"), "", ($skip_closed?array('checked'=>'checked'):[]));
-        $this->addElement('checkbox'.  'sdd_no_draft_xml',          E::ts("No XML drafts"), "", ($no_draftxml?array('checked'=>'checked'):[]));
+        $this->addElement('checkbox',  'sdd_no_draft_xml',          E::ts("No XML drafts"), "", ($no_draftxml?array('checked'=>'checked'):[]));
         $this->addElement('text',      'pp_buffer_days',            E::ts("Buffer Days"), ['size' => 2, 'value' => $bffrdays]);
         $this->addElement('hidden',    'edit_creditor_id',          '', ['id' => 'edit_creditor_id']);
         $this->addElement('hidden',    'add_creditor_id',           '', ['id' => 'add_creditor_id']);
