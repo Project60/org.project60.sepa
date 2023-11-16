@@ -50,7 +50,7 @@ class CreateOneOffMandate extends AbstractAction {
         new Specification('contact_id',     'Integer', E::ts('Contact ID'), true),
         new Specification('account_holder', 'String',  E::ts('Account Holder'), true),
         new Specification('iban',           'String',  E::ts('IBAN'), true),
-        new Specification('bic',            'String',  E::ts('BIC'), true),
+        new Specification('bic',            'String',  E::ts('BIC'), false),
         new Specification('reference',      'String',  E::ts('Mandate Reference'), false),
         new Specification('amount',         'Money',   E::ts('Amount'), false),
 

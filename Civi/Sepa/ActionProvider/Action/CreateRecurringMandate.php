@@ -51,7 +51,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
         new Specification('contact_id',     'Integer', E::ts('Contact ID'), true),
         new Specification('account_holder', 'String',  E::ts('Account Holder'), false),
         new Specification('iban',           'String',  E::ts('IBAN'), true),
-        new Specification('bic',            'String',  E::ts('BIC'), true),
+        new Specification('bic',            'String',  E::ts('BIC'), false),
         new Specification('reference',      'String',  E::ts('Mandate Reference'), false),
         new Specification('amount',         'Money',   E::ts('Amount'), false),
 
