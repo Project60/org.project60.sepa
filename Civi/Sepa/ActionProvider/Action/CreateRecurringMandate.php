@@ -16,6 +16,7 @@
 
 namespace Civi\Sepa\ActionProvider\Action;
 
+use Civi\ActionProvider\Exception\ExecutionException;
 use \Civi\ActionProvider\Parameter\ParameterBagInterface;
 use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;
@@ -113,6 +114,12 @@ class CreateRecurringMandate extends CreateOneOffMandate {
         $value = $this->configuration->getParameter("default_{$parameter_name}");
       }
       $mandate_data[$parameter_name] = $value;
+    }
+
+    // Check whether BIC is required, depending on the creditor setting.
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $mandate_data['creditor_id']]);
+    if (!empty($creditor['uses_bic']) && empty($mandate_data['bic'])) {
+      throw new ExecutionException('BIC is required');
     }
 
     // sort out frequency
