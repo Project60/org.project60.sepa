@@ -17,6 +17,7 @@
 namespace Civi\Sepa\ActionProvider\Action;
 
 use \Civi\ActionProvider\Action\AbstractAction;
+use Civi\ActionProvider\Exception\ExecutionException;
 use \Civi\ActionProvider\Parameter\ParameterBagInterface;
 use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;
@@ -50,7 +51,7 @@ class CreateOneOffMandate extends AbstractAction {
         new Specification('contact_id',     'Integer', E::ts('Contact ID'), true),
         new Specification('account_holder', 'String',  E::ts('Account Holder'), false),
         new Specification('iban',           'String',  E::ts('IBAN'), true),
-        new Specification('bic',            'String',  E::ts('BIC'), true),
+        new Specification('bic',            'String',  E::ts('BIC'), false),
         new Specification('reference',      'String',  E::ts('Mandate Reference'), false),
         new Specification('amount',         'Money',   E::ts('Amount'), false),
 
@@ -107,6 +108,12 @@ class CreateOneOffMandate extends AbstractAction {
         $value = $this->configuration->getParameter("default_{$parameter_name}");
       }
       $mandate_data[$parameter_name] = $value;
+    }
+
+    // Check whether BIC is required, depending on the creditor setting.
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $mandate_data['creditor_id']]);
+    if (!empty($creditor['uses_bic']) && empty($mandate_data['bic'])) {
+      throw new ExecutionException('BIC is required');
     }
 
     // create mandate
