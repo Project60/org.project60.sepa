@@ -76,6 +76,10 @@ class ContainerSpecs implements CompilerPassInterface {
         'sepa_contribution_group', 'Civi\Sepa\DataProcessor\Source\SepaContributionGroup', E::ts('SEPA Contribution Group')]);
       $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
         'sepa_mandate_link', 'Civi\Sepa\DataProcessor\Source\SepaMandateLink', E::ts('SEPA Mandate Link')]);
+      $dataProcessorFactoryDefinition->addMethodCall('addjoinType' ,[
+        'sepa_mandate_contribution_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionJoin', E::ts('Join Sepa Mandate on Contribution')]);
+      $dataProcessorFactoryDefinition->addMethodCall('addjoinType' ,[
+        'sepa_mandate_contribution_recur_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionRecurJoin', E::ts('Join Sepa Mandate on Contribution Recur')]);
     }
   }
 }
