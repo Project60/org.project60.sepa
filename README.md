@@ -1,4 +1,4 @@
-*If you are in Europe and want to use CiviCRM to collec recurring (or one-time) contributions, you'll need this extension.*
+*If you are in Europe and want to use CiviCRM to collect recurring (or one-time) contributions, you'll need this extension.*
 
 # SEPA Direct Debit Module
 
