@@ -341,8 +341,8 @@ div.sdd-add-creditor {
        </table>
        <br/>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+    </fieldset>
   </div>
-  </fieldset>
 </div>
 
 {/crmScope}
