@@ -61,9 +61,9 @@ class CreateRecurringMandate extends CreateOneOffMandate {
         new Specification('cycle_day',  'Integer', E::ts('Collection Day'), false, 1,  null, $this->getCollectionDays()),
 
         // basic overrides
-        new Specification('creditor_id',       'Integer', E::ts('Creditor (default)'), false, null, null, $this->getCreditors(), false),
-        new Specification('financial_type_id', 'Integer', E::ts('Financial Type (default)'), false, null, null, $this->getFinancialTypes(), false),
-        new Specification('campaign_id',       'Integer', E::ts('Campaign (default)'), false, null, null, $this->getCampaigns(), false),
+        new Specification('creditor_id',       'Integer', E::ts('Creditor (Leave empty to use default)'), false, null, null, $this->getCreditors(), false),
+        new Specification('financial_type_id', 'Integer', E::ts('Financial Type (Leave empty to use default)'), false, null, null, $this->getFinancialTypes(), false),
+        new Specification('campaign_id',       'Integer', E::ts('Campaign (Leave empty to use default)'), false, null, null, $this->getCampaigns(), false),
 
         // dates
         new Specification('start_date',      'Date', E::ts('Start Date'), false, date('Y-m-d H:i:s')),
