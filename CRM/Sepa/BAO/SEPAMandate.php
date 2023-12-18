@@ -900,8 +900,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       return FALSE;
     }
 
-    $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id = $cid GROUP BY contact_id;";
-    $result = CRM_Core_DAO::executeQuery($query);
+    $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id = %1 GROUP BY contact_id;";
+    $result = CRM_Core_DAO::executeQuery($query,[
+      1 => [$cid, 'Integer']
+    ]);
     if ($result->fetch()) {
       // return the mandate
       return civicrm_api3('SepaMandate', 'getsingle', array('id' => $result->mandate_id));
