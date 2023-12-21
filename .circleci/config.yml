@@ -68,7 +68,7 @@ commands:
       - run: |
           mkdir -p /phpunit
           chown buildkit:buildkit /phpunit
-          su - buildkit -c "cd /buildkit/build/<< parameters.build_name >>/web/sites/default/files/civicrm/ext/$CIRCLE_PROJECT_REPONAME && /buildkit/bin/phpunit8 --log-junit /phpunit/<< parameters.build_name >>/junit.xml"
+          su - buildkit -c "cd /buildkit/build/<< parameters.build_name >>/web/sites/default/files/civicrm/ext/$CIRCLE_PROJECT_REPONAME && /buildkit/bin/phpunit9 --log-junit /phpunit/<< parameters.build_name >>/junit.xml"
   run_all:
     description: "Run all steps"
     parameters:
@@ -111,7 +111,7 @@ executors:
         environment:
           TERM: xterm-color
           APACHE_RUN_USER: buildkit
-      - image: mysql:5.7
+      - image: mysql:10.4
         name: mysql
         environment:
           MYSQL_ROOT_PASSWORD: buildkit
