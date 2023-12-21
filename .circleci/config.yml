@@ -68,7 +68,7 @@ commands:
       - run: |
           mkdir -p /phpunit
           chown buildkit:buildkit /phpunit
-          su - buildkit -c "cd /buildkit/build/<< parameters.build_name >>/web/sites/default/files/civicrm/ext/$CIRCLE_PROJECT_REPONAME && /buildkit/bin/phpunit6 --log-junit /phpunit/<< parameters.build_name >>/junit.xml"
+          su - buildkit -c "cd /buildkit/build/<< parameters.build_name >>/web/sites/default/files/civicrm/ext/$CIRCLE_PROJECT_REPONAME && /buildkit/bin/phpunit8 --log-junit /phpunit/<< parameters.build_name >>/junit.xml"
   run_all:
     description: "Run all steps"
     parameters:
@@ -117,19 +117,6 @@ executors:
           MYSQL_ROOT_PASSWORD: buildkit
 
 jobs:
-  build_mysql_5_7:
-    executor: civicrm
-    steps:
-      - checkout
-      - run_all
-      - run_all:
-          build_name: civi-stable
-          version: "stable"
-          url: http://localhost:8081
-      - run_all:
-          build_name: civi-5.50.4
-          version: "5.50.4"
-          url: http://localhost:8082
   build_mariadb_10_4:
     executor: civicrm
     docker:
@@ -157,5 +144,4 @@ workflows:
   version: 2
   build:
     jobs:
-      - build_mysql_5_7
       - build_mariadb_10_4
