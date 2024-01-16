@@ -8,12 +8,12 @@
     <author>B. Endres</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate></releaseDate>
-  <version>1.10-dev</version>
-  <develStage></develStage>
+  <releaseDate>2024-01-16</releaseDate>
+  <version>1.10-alpha1</version>
+  <develStage>alpha</develStage>
   <compatibility>
     <ver>5.43</ver>
-    <ver>5.60</ver>
+    <ver>5.65</ver>
   </compatibility>
   <urls>
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
@@ -21,7 +21,7 @@
     <url desc="Support">https://github.com/Project60/org.project60.sepa/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <comments>This module is the merge of Xaviers Dutoit's (xavier@tttp.eu) and Bj&#xF6;rn Endres' (endres@systopia.de) Project60 branches.</comments>
+  <comments>This module's origins are Xaviers Dutoit's (xavier@tttp.eu) and Bj&#xF6;rn Endres' (endres@systopia.de) Project60 SEPA branches.</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
