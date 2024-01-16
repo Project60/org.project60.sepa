@@ -895,6 +895,41 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     return $mandate_by_rcontribution_id[$recurring_contribution_id];
   }
 
+  public static function getLastMandateOfContact($cid) {
+    if (empty($cid)) {
+      return FALSE;
+    }
+
+    $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id = %1 GROUP BY contact_id;";
+    $result = CRM_Core_DAO::executeQuery($query,[
+      1 => [$cid, 'Integer']
+    ]);
+    if ($result->fetch()) {
+      // return the mandate
+      return civicrm_api3('SepaMandate', 'getsingle', array('id' => $result->mandate_id));
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  public static function isContributionMandate($mandate) {
+    if ($mandate['entity_table'] == 'civicrm_contribution') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  public static function isContributionRecurMandate($mandate) {
+    if ($mandate['entity_table'] == 'civicrm_contribution_recur') {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
 }
 
 
