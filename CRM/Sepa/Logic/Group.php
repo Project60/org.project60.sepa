@@ -16,7 +16,7 @@
 
 
 /**
- * This class holds all the functions transacleanupction group life cycle
+ * This class holds all the functions of the transaction group life cycle
  */
 class CRM_Sepa_Logic_Group {
 
@@ -145,7 +145,7 @@ class CRM_Sepa_Logic_Group {
    *   - change status from 'In Progress' to 'Completed' for all contributions
    *   - (store/update the bank account information)
    *
-   * @return error message, unless successful
+   * @return string error message, unless successful
    */
   static function received($txgroup_id) {
     // step 0: check lock
