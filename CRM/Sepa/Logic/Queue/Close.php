@@ -225,7 +225,7 @@ class CRM_Sepa_Logic_Queue_Close {
         'mandate_status'         => $query->mandate_status);
     }
 
-    // if ther's nothing to do, stop right here
+    // if there's nothing to do, stop right here
     if (empty($contributions)) return;
 
     // now: first update the contribution status
