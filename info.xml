@@ -12,7 +12,6 @@
   <version>1.10-alpha3</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.43</ver>
     <ver>5.65</ver>
   </compatibility>
   <urls>
@@ -24,14 +23,18 @@
   <comments>This module's origins are Xaviers Dutoit's (xavier@tttp.eu) and Bj&#xF6;rn Endres' (endres@systopia.de) Project60 SEPA branches.</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
+    <psr0 prefix="CRM_" path="."/>
   </classloader>
   <civix>
     <namespace>CRM/Sepa</namespace>
-    <format>22.05.2</format>
+    <format>23.02.1</format>
   </civix>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>entity-types-php@1.0.0</mixin>
   </mixins>
+  <upgrader>CRM_Sepa_Upgrader</upgrader>
 </extension>
