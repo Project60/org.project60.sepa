@@ -43,15 +43,15 @@ class CRM_Utils_SepaTokens {
 
   private static function fillLastMandateCommonTokenValues($mandate, $prefix, \Civi\Token\TokenRow $tokenRow) {
     // copy the mandate values
-    $tokenRow->tokens($prefix, 'reference',        $mandate['reference']);
-    $tokenRow->tokens($prefix, 'source',           $mandate['source']);
-    $tokenRow->tokens($prefix, 'type',             $mandate['type']);
-    $tokenRow->tokens($prefix, 'status',           $mandate['status']);
-    $tokenRow->tokens($prefix, 'date',             $mandate['date']);
+    $tokenRow->tokens($prefix, 'reference',        $mandate['reference'] ?? '');
+    $tokenRow->tokens($prefix, 'source',           $mandate['source'] ?? '');
+    $tokenRow->tokens($prefix, 'type',             $mandate['type'] ?? '');
+    $tokenRow->tokens($prefix, 'status',           $mandate['status'] ?? '');
+    $tokenRow->tokens($prefix, 'date',             $mandate['date'] ?? '');
     //$tokenRow->tokens($prefix, 'account_holder',   $mandate['account_holder']);
-    $tokenRow->tokens($prefix, 'iban',             $mandate['iban']);
+    $tokenRow->tokens($prefix, 'iban',             $mandate['iban'] ?? '');
     $tokenRow->tokens($prefix, 'iban_anonymised',  CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']));
-    $tokenRow->tokens($prefix, 'bic',              $mandate['bic']);
+    $tokenRow->tokens($prefix, 'bic',              $mandate['bic'] ?? '');
 
     if (!empty($mandate['date'])) {
       $tokenRow->tokens($prefix, 'date_text', CRM_Utils_Date::customFormat($mandate['date']));

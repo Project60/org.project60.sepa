@@ -502,9 +502,9 @@ function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
   $prefix = 'Most_Recent_SEPA_Mandate';
 
   foreach ($e->getRows() as $tokenRow) {
-    if (!empty($row->context['contactId'])) {
-      $row->format('text/html');
-      CRM_Utils_SepaTokens::fillLastMandateTokenValues($row->context['contactId'], $prefix, $tokenRow);
+    if (!empty($tokenRow->context['contactId'])) {
+      $tokenRow->format('text/html');
+      CRM_Utils_SepaTokens::fillLastMandateTokenValues($tokenRow->context['contactId'], $prefix, $tokenRow);
     }
   }
 }
