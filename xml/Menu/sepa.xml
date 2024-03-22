@@ -49,6 +49,12 @@
     <access_arguments>batch sepa groups</access_arguments>
   </item>
   <item>
+    <path>civicrm/sepa/mark_received</path>
+    <page_callback>CRM_Sepa_Page_MarkGroupReceived</page_callback>
+    <title>Mark Group Received</title>
+    <access_arguments>batch sepa groups</access_arguments>
+  </item>
+  <item>
     <path>civicrm/sepa/listgroup</path>
     <page_callback>CRM_Sepa_Page_ListGroup</page_callback>
     <title>SEPA transaction group contributions</title>

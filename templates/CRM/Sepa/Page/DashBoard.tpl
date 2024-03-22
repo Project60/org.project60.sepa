@@ -114,7 +114,7 @@
         <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}" class="button button_export">{ts domain="org.project60.sepa"}Download Again{/ts}</a>
         {if $closed_status_id eq $group.status_id}
           {if $group.collection_date|strtotime lt $smarty.now}
-            <a id="mark_received_{$group_id}" onClick="mark_received({$group_id});" class="button button_export">{ts domain="org.project60.sepa"}Mark Received{/ts}</a>
+            <a href="{crmURL p="civicrm/sepa/mark_received" q="group_id=$group_id"}" class="button button_received">{ts domain="org.project60.sepa"}Mark Received{/ts}</a>
           {/if}
         {/if}
       {/if}
@@ -174,7 +174,7 @@ function mark_received(group_id) {
   if (confirm(received_confirmation_message)) {
     cj("#mark_received_" + group_id).hide();
     cj("#busy_" + group_id).show();
-    CRM.api('SepaAlternativeBatching', 'received', {'q': 'civicrm/ajax/rest', 'txgroup_id': group_id},
+    CRM.api3('SepaAlternativeBatching', 'received', {'q': 'civicrm/ajax/rest', 'txgroup_id': group_id},
       {success: function(data) {
         // reload page
         location.reload();
