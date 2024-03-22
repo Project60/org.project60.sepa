@@ -379,46 +379,41 @@ function sepa_civicrm_navigationMenu(&$menu) {
 /**
  * Define SEPA permissions
  */
- function sepa_civicrm_permission(&$permissions) {
-   /**
-    * Define SEPA permissions
-    */
-   function sepa_civicrm_permission(&$permissions) {
-     $prefix = E::ts('CiviSEPA') . ': ';
+function sepa_civicrm_permission(&$permissions) {
+   $prefix = E::ts('CiviSEPA') . ': ';
 
-     // Mandate permissions.
-     $permissions['create sepa mandates'] = [
-       'label' => $prefix . E::ts('Create SEPA mandates'),
-       'description' => E::ts('Allows creating SEPA Direct Debit mandates.'),
-     ];
-     $permissions['view sepa mandates'] = [
-       'label' => $prefix . E::ts('View SEPA mandates'),
-       'description' => E::ts('Allows viewing SEPA Direct Debit mandates'),
-     ];
-     $permissions['edit sepa mandates'] = [
-       'label' => $prefix . E::ts('Edit SEPA mandates'),
-       'description' => E::ts('Allows editing SEPA Direct Debit mandates.'),
-     ];
-     $permissions['delete sepa mandates'] = [
-       'label' => $prefix . E::ts('Delete SEPA mandates'),
-       'description' => E::ts('Allows deleting SEPA Direct Debit mandates'),
-     ];
+   // Mandate permissions.
+   $permissions['create sepa mandates'] = [
+     'label' => $prefix . E::ts('Create SEPA mandates'),
+     'description' => E::ts('Allows creating SEPA Direct Debit mandates.'),
+   ];
+   $permissions['view sepa mandates'] = [
+     'label' => $prefix . E::ts('View SEPA mandates'),
+     'description' => E::ts('Allows viewing SEPA Direct Debit mandates'),
+   ];
+   $permissions['edit sepa mandates'] = [
+     'label' => $prefix . E::ts('Edit SEPA mandates'),
+     'description' => E::ts('Allows editing SEPA Direct Debit mandates.'),
+   ];
+   $permissions['delete sepa mandates'] = [
+     'label' => $prefix . E::ts('Delete SEPA mandates'),
+     'description' => E::ts('Allows deleting SEPA Direct Debit mandates'),
+   ];
 
-     // Transaction group permissions.
-     $permissions['view sepa groups'] = [
-       'label' => $prefix . E::ts('View SEPA transaction groups'),
-       'description' => E::ts('Allows viewing groups of SEPA transactions to be sent to the bank.'),
-     ];
-     $permissions['batch sepa groups'] = [
-       'label' => $prefix . E::ts('Batch SEPA transaction groups'),
-       'description' => E::ts('Allows generating groups of SEPA transactions to be sent to the bank.'),
-     ];
-     $permissions['delete sepa groups'] = [
-       'label' => $prefix . E::ts('Delete SEPA transaction groups'),
-       'description' => E::ts('Allows deleting groups of SEPA transactions to be sent to the bank.'),
-     ];
-   }
- }
+   // Transaction group permissions.
+   $permissions['view sepa groups'] = [
+     'label' => $prefix . E::ts('View SEPA transaction groups'),
+     'description' => E::ts('Allows viewing groups of SEPA transactions to be sent to the bank.'),
+   ];
+   $permissions['batch sepa groups'] = [
+     'label' => $prefix . E::ts('Batch SEPA transaction groups'),
+     'description' => E::ts('Allows generating groups of SEPA transactions to be sent to the bank.'),
+   ];
+   $permissions['delete sepa groups'] = [
+     'label' => $prefix . E::ts('Delete SEPA transaction groups'),
+     'description' => E::ts('Allows deleting groups of SEPA transactions to be sent to the bank.'),
+   ];
+}
 
 
 /**
