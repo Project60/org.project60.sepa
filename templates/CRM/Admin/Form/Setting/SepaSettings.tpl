@@ -320,6 +320,12 @@ div.sdd-add-creditor {
                 {$form.exclude_weekends.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-weekends-defer">
+              <td class="label">{$form.weekends_defer.label} <a onclick='CRM.help("{ts}Weekends Defer Collection{/ts}", {literal}{"id":"id-weekends-defer","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.weekends_defer.html}
+              </td>
+            </tr>
             <tr class="crm-alternative_batching-form-block-skip-closed">
               <td class="label">{$form.sdd_skip_closed.label} <a onclick='CRM.help("{ts}Only Completed Contributions{/ts}", {literal}{"id":"id-skip-closed","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
               <td>
