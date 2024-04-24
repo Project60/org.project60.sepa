@@ -115,6 +115,13 @@
     <p>{ts}Also, if your bank has a more complicated set of bank holidays, you might have to implement that hook.{/ts}</p>
 {/htxt}
 
+{htxt id='id-weekends-defer'}
+    <p>{ts}If you enable the "exclude weekends" option above, the collection will <i>not</i> be scheduled for a (western) weekend (Saturday/Sunday), but fall on the next workday - with respect to the notice period.{/ts}</p>
+    <p>{ts}However, the system would still count the skipped weekend days towards the notice period, unless you enable this option.{/ts}</p>
+    <p>{ts}This option should only be enabled, if the "exclude weekends" option above is enabled, too.{/ts}</p>
+    <p>{ts}It is recommended to delete all open SEPA collection groups when changing the value of this option.{/ts}</p>
+{/htxt}
+
 {htxt id='id-hide-billing'}
     <p>{ts}Hides the otherwise mandatory billing block from the payment processor page.{/ts}</p>
     <p>{ts}This feature is only available from CiviCRM 4.6.10+{/ts}</p>

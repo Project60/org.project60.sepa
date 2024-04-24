@@ -442,18 +442,18 @@ class CRM_Sepa_Logic_Batching {
    * subroutine to create the group/contribution structure as calculated
    * @param $calculated_groups  array [collection_date] -> array(contributions) as calculated
    * @param $existing_groups    array [collection_date] -> array(contributions) as currently present
-   * @param $mode               SEPA mode (OOFF, RCUR, FRST)
-   * @param $type               SEPA type (RCUR, FRST)
-   * @param $notice             notice days
-   * @param $creditor_id        SDD creditor ID
-   * @param $partial_groups     Is this a partial update?
-   * @param $partial_first      Is this the first call in a partial update?
+   * @param $mode               string SEPA mode (OOFF, RCUR, FRST)
+   * @param $type               string SEPA type (RCUR, FRST)
+   * @param $notice             int notice days
+   * @param $creditor_id        int SDD creditor ID
+   * @param $partial_groups     bool Is this a partial update?
+   * @param $partial_first      bool Is this the first call in a partial update?
    */
   protected static function syncGroups($calculated_groups, $existing_groups, $mode, $type, $notice, $creditor_id, $partial_groups=FALSE, $partial_first=FALSE) {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
     foreach ($calculated_groups as $collection_date => $mandates) {
-      // check if we need to defer the collection date (e.g. due to bank holidays)
+      // check if we need to defer the collection date (e.g. due to bank holidays),
       self::deferCollectionDate($collection_date, $creditor_id);
 
       if (!isset($existing_groups[$collection_date])) {
@@ -681,6 +681,38 @@ class CRM_Sepa_Logic_Batching {
         // this is a weekend -> skip to Monday
         $defer_days = 8 - $day_of_week;
         $collection_date = date('Y-m-d', strtotime("+$defer_days day", strtotime($collection_date)));
+      }
+    }
+
+    // if the weekends don't count towards deferral days, they need to be added separately
+    $weekends_defer = CRM_Sepa_Logic_Settings::getGenericSetting('weekends_defer');
+    if ($weekends_defer) {
+
+    }
+      // count the (western) weekends in the time until collection day (i.e. assuming we'll submit today)
+      $check_date = date('Y-m-d');
+      $weekend_days_in_notice_period = 0;
+      while ($check_date < $collection_date) {
+        $day_of_week = date('N', strtotime($check_date));
+        if ($day_of_week > 5) $weekend_days_in_notice_period++;
+        $check_date = date('Y-m-d', strtotime("+1 day", strtotime($check_date)));
+      }
+
+      // add those days to the current collection date, ALSO skipping the (western) weekends hit in the process
+      while ($weekend_days_in_notice_period > 0) {
+        // skip/ignore (western) weekends
+        while (date('N', strtotime($collection_date)) > 5) {
+          $collection_date = date('Y-m-d', strtotime("+1 day", strtotime($collection_date)));
+        }
+
+        // then move date one forward to compensate a weekend in the period
+        $collection_date = date('Y-m-d', strtotime("+1 day", strtotime($collection_date)));
+        $weekend_days_in_notice_period--;
+
+        // skip/ignore (western) weekends
+        while (date('N', strtotime($collection_date)) > 5) {
+          $collection_date = date('Y-m-d', strtotime("+1 day", strtotime($collection_date)));
+        }
       }
     }
 
