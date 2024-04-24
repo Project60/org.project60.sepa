@@ -687,8 +687,6 @@ class CRM_Sepa_Logic_Batching {
     // if the weekends don't count towards deferral days, they need to be added separately
     $weekends_defer = CRM_Sepa_Logic_Settings::getGenericSetting('weekends_defer');
     if ($weekends_defer) {
-
-    }
       // count the (western) weekends in the time until collection day (i.e. assuming we'll submit today)
       $check_date = date('Y-m-d');
       $weekend_days_in_notice_period = 0;
