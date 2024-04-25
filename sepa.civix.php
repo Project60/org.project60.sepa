@@ -92,6 +92,8 @@ function _sepa_civix_civicrm_config($config = NULL) {
   $configured = TRUE;
 
   $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
+  $template->addTemplateDir($extDir);
+
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
   // Based on <compatibility>, this does not currently require mixin/polyfill.php.
