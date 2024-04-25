@@ -158,38 +158,10 @@ function sepa_civicrm_install() {
 }
 
 /**
- * Implementation of hook_civicrm_uninstall
- */
-function sepa_civicrm_uninstall() {
-  //should we delete the tables?
-  return _sepa_civix_civicrm_uninstall();
-}
-
-/**
  * Implementation of hook_civicrm_enable
  */
 function sepa_civicrm_enable() {
   return _sepa_civix_civicrm_enable();
-}
-
-/**
- * Implementation of hook_civicrm_disable
- */
-function sepa_civicrm_disable() {
-  return _sepa_civix_civicrm_disable();
-}
-
-/**
- * Implementation of hook_civicrm_upgrade
- *
- * @param $op string, the type of operation being performed; 'check' or 'enqueue'
- * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
- *
- * @return mixed  based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
- *                for 'enqueue', returns void
- */
-function sepa_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _sepa_civix_civicrm_upgrade($op, $queue);
 }
 
 function sepa_civicrm_summaryActions( &$actions, $contactID ) {
@@ -388,17 +360,39 @@ function sepa_civicrm_navigationMenu(&$menu) {
  * Define SEPA permissions
  */
  function sepa_civicrm_permission(&$permissions) {
-  $prefix = ts('CiviSEPA', ['domain' => 'org.project60.sepa']) . ': ';
-  // mandate permissions
-  $permissions['create sepa mandates'] = $prefix . ts('Create SEPA mandates', ['domain' => 'org.project60.sepa']);
-  $permissions['view sepa mandates']   = $prefix . ts('View SEPA mandates', ['domain' => 'org.project60.sepa']);
-  $permissions['edit sepa mandates']   = $prefix . ts('Edit SEPA mandates', ['domain' => 'org.project60.sepa']);
-  $permissions['delete sepa mandates'] = $prefix . ts('Delete SEPA mandates', ['domain' => 'org.project60.sepa']);
+  $prefix = E::ts('CiviSEPA') . ': ';
 
-  // transaction group permissions
-  $permissions['view sepa groups']   = $prefix . ts('View SEPA transaction groups', ['domain' => 'org.project60.sepa']);
-  $permissions['batch sepa groups']  = $prefix . ts('Batch SEPA transaction groups', ['domain' => 'org.project60.sepa']);
-  $permissions['delete sepa groups'] = $prefix . ts('Delete SEPA transaction groups', ['domain' => 'org.project60.sepa']);
+  // Mandate permissions.
+   $permissions['create sepa mandates'] = [
+     'label' => $prefix . E::ts('Create SEPA mandates'),
+     'description' => E::ts('Allows creating SEPA Direct Debit mandates.'),
+   ];
+   $permissions['view sepa mandates'] = [
+     'label' => $prefix . E::ts('View SEPA mandates'),
+     'description' => E::ts('Allows viewing SEPA Direct Debit mandates'),
+   ];
+   $permissions['edit sepa mandates'] = [
+     'label' => $prefix . E::ts('Edit SEPA mandates'),
+     'description' => E::ts('Allows editing SEPA Direct Debit mandates.'),
+   ];
+   $permissions['delete sepa mandates'] = [
+     'label' => $prefix . E::ts('Delete SEPA mandates'),
+     'description' => E::ts('Allows deleting SEPA Direct Debit mandates'),
+   ];
+
+   // Transaction group permissions.
+   $permissions['view sepa groups'] = [
+     'label' => $prefix . E::ts('View SEPA transaction groups'),
+     'description' => E::ts('Allows viewing groups of SEPA transactions to be sent to the bank.'),
+   ];
+   $permissions['batch sepa groups'] = [
+     'label' => $prefix . E::ts('Batch SEPA transaction groups'),
+     'description' => E::ts('Allows generating groups of SEPA transactions to be sent to the bank.'),
+   ];
+   $permissions['delete sepa groups'] = [
+     'label' => $prefix . E::ts('Delete SEPA transaction groups'),
+     'description' => E::ts('Allows deleting groups of SEPA transactions to be sent to the bank.'),
+   ];
  }
 
 
@@ -502,9 +496,9 @@ function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
   $prefix = 'Most_Recent_SEPA_Mandate';
 
   foreach ($e->getRows() as $tokenRow) {
-    if (!empty($row->context['contactId'])) {
-      $row->format('text/html');
-      CRM_Utils_SepaTokens::fillLastMandateTokenValues($row->context['contactId'], $prefix, $tokenRow);
+    if (!empty($tokenRow->context['contactId'])) {
+      $tokenRow->format('text/html');
+      CRM_Utils_SepaTokens::fillLastMandateTokenValues($tokenRow->context['contactId'], $prefix, $tokenRow);
     }
   }
 }
@@ -529,14 +523,6 @@ function sepa_civicrm_tabset($tabsetName, &$tabs, $context) {
   }
 }
 
-/**
- * Implements hook_civicrm_postInstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
- */
-function sepa_civicrm_postInstall() {
-  _sepa_civix_civicrm_postInstall();
-}
 function sepa_civicrm_xmlMenu(&$files) {
   foreach (glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
     $files[] = $file;

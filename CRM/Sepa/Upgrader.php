@@ -21,7 +21,7 @@ require_once 'CRM/Sepa/CustomData.php';
 /**
  * Collection of upgrade steps.
  */
-class CRM_Sepa_Upgrader extends CRM_Sepa_Upgrader_Base {
+class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Installation
