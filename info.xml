@@ -9,7 +9,7 @@
     <email>endres@systopia.de</email>
   </maintainer>
   <releaseDate>2024-04-25</releaseDate>
-  <version>1.10-beta2</version>
+  <version>1.10-beta3</version>
   <develStage>beta</develStage>
   <compatibility>
     <ver>5.45</ver>
