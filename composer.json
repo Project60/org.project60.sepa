@@ -1,0 +1,12 @@
+{
+    "name": "civicrm/sepa",
+    "type": "civicrm-ext",
+    "description": "SEPA Direct Debit",
+    "license": "AGPL-3.0-only",
+    "authors": [
+        {
+            "name": "SYSTOPIA",
+            "email": "info@systopia.de"
+        }
+    ]
+}
