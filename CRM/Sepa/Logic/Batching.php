@@ -475,7 +475,7 @@ class CRM_Sepa_Logic_Batching {
             'reference'               => $reference,
             'type'                    => $mode,
             'collection_date'         => $collection_date,
-            'latest_submission_date'  => date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
+            'latest_submission_date'  => self::calculateLatestSubmissionDate($collection_date, $notice, $creditor_id),//  date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
             'created_date'            => date('Y-m-d'),
             'status_id'               => $group_status_id_open,
             'sdd_creditor_id'         => $creditor_id,
@@ -656,6 +656,42 @@ class CRM_Sepa_Logic_Batching {
       // this is a x-monthly payment
       return ts("%1.", array(1=>$cycle_day, 'domain' => 'org.project60.sepa'));
     }
+  }
+
+  /**
+   * Calculate the latest
+   * @param int $creditor_id
+   *   the ID of the creditor
+   *
+   * @param string $collection_date
+   *    the date of the scheduled collection
+   *
+   * @param int $notice
+   *    number of notice days requested
+   *
+   * @return string
+   *    date of the latest submission
+   */
+  public static function calculateLatestSubmissionDate($creditor_id, $collection_date, $notice)
+  {
+    // at first simply use collection_date - notice days
+    $latest_submission_date = date('Y-m-d', date('now - {$notice} days'));
+
+    // if the respective option is enabled, the latest submission date has to be moved further up
+    $weekend_defers = (int) CRM_Sepa_Logic_Settings::getSetting('weekend_defers');
+    if ($weekend_defers) {
+      $scan_date = $latest_submission_date;
+      while ($scan_date >= $latest_submission_date) {
+        if ($scan_date is (WEEKEND OR HOLIDAY)) {
+          $latest_submission_date = date('Y-m-d', strtotime('$scan_date - 1 day')
+
+          )
+        }
+      }
+    }
+    #wenkends_included
+    // move back #wenkends_included
+    // move back new weekends_included
   }
 
   /**
