@@ -54,3 +54,7 @@ To add a new SEPA Mandate in this form you click the **Add New SEPA Mandate** bu
 ## How to cancel an existing mandate
 
 ## How to cancel a single collection for a mandate (recurring )
+
+## How to manage chargebacks
+
+Use CiviSEPA's "retry collection" feature to (manually) select the contributions to retry collecting - usually based on date, contribution status, and chargeback reason.
