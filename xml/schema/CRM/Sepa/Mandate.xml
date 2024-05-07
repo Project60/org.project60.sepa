@@ -1,22 +1,25 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>  
+<?xml version="1.0" encoding="iso-8859-1" ?>
 
-<table>  
-  <base>CRM/Sepa</base>  
-  <class>SEPAMandate</class>  
+<table>
+  <base>CRM/Sepa</base>
+  <class>SEPAMandate</class>
   <name>civicrm_sdd_mandate</name>
   <log>true</log>
-  <field>  
-    <name>id</name>  
-    <type>int unsigned</type>  
-    <required>true</required>  
-    <comment>ID</comment>  
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID</comment>
     <add>4.3</add>
     <export>true</export>
-  </field>  
-  <primaryKey>  
-    <name>id</name>  
-    <autoincrement>true</autoincrement>  
-  </primaryKey>  
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
   <field>
     <name>reference</name>
     <export>true</export>
@@ -26,6 +29,9 @@
     <unique>true</unique>
     <comment>A unique mandate reference</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <index>
     <name>reference</name>
@@ -41,6 +47,9 @@
     <length>64</length>
     <comment>Information about the source of registration of the mandate</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 
   <field>
@@ -78,31 +87,43 @@
     <required>true</required>
     <comment>by default now()</comment>
     <add>4.3</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
 
-  <field> 
-    <name>creditor_id</name> 
+  <field>
+    <name>creditor_id</name>
     <title>Creditor ID</title>
-    <type>int unsigned</type> 
+    <type>int unsigned</type>
     <comment>FK to ssd_creditor</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Creator</label>
+    </html>
   </field>
-  <foreignKey> 
-    <name>creditor_id</name> 
-    <table>civicrm_sdd_creditor</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>creditor_id</name>
+    <table>civicrm_sdd_creditor</table>
+    <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
 
-  <field> 
-    <name>contact_id</name> 
+  <field>
+    <name>contact_id</name>
     <title>Contact ID</title>
-    <type>int unsigned</type> 
+    <type>int unsigned</type>
     <comment>FK to Contact ID of the debtor</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Contact</label>
+    </html>
   </field>
-  <foreignKey> 
-    <name>contact_id</name> 
-    <table>civicrm_contact</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
 
@@ -112,6 +133,9 @@
     <length>255</length>
     <comment>Name of the account holder</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 
   <field>
@@ -121,6 +145,9 @@
     <required>false</required>
     <comment>Iban of the debtor</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <index>
     <name>iban</name>
@@ -134,45 +161,52 @@
     <length>11</length>
     <comment>BIC of the debtor</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 
-  <field>  
-    <name>type</name>  
-    <type>varchar</type>  
+  <field>
+    <name>type</name>
+    <type>varchar</type>
     <length>4</length>
-    <required>true</required>  
-    <default>"RCUR"</default> 
+    <required>true</required>
+    <default>"RCUR"</default>
     <comment>RCUR for recurrent (default), OOFF for one-shot</comment>
-  </field> 
+  </field>
 
-  <field>  
-    <name>status</name>  
-    <type>varchar</type>  
+  <field>
+    <name>status</name>
+    <type>varchar</type>
     <length>8</length>
-    <required>true</required>  
-    <default>"INIT"</default> 
+    <required>true</required>
+    <default>"INIT"</default>
     <add>4.3</add>
     <comment>Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, ONHOLD)</comment>
   </field>
-  
+
   <field>
     <name>creation_date</name>
     <title>creation date</title>
     <type>datetime</type>
     <export>true</export>
     <add>4.3</add>
+    <html>
+      <label>Created Date</label>
+      <type>Select Date</type>
+    </html>
   </field>
 
-  <field> 
-    <name>first_contribution_id</name> 
+  <field>
+    <name>first_contribution_id</name>
     <title>First Contribution (to be deprecated)</title>
-    <type>int unsigned</type> 
+    <type>int unsigned</type>
     <comment>FK to civicrm_contribution</comment>
   </field>
-  <foreignKey> 
-    <name>first_contribution_id</name> 
-    <table>civicrm_contribution</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>first_contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
   </foreignKey>
   <field>
     <name>validation_date</name>
