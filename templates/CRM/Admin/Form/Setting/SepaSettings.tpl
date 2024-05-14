@@ -55,7 +55,7 @@ div.sdd-add-creditor {
                 <span><div class="icon edit-icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
               </a>
               <a class="delete button" title="Delete" onclick="deletecreditor({$creditor.id});">
-                <span><div class="icon delete-icon ui-icon-trash"></div>{ts}Delete{/ts}</span>
+                <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}
               </a>
             </td>
           </tr>
