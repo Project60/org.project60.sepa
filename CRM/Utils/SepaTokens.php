@@ -50,7 +50,7 @@ class CRM_Utils_SepaTokens {
     $tokenRow->tokens($prefix, 'date',             $mandate['date'] ?? '');
     //$tokenRow->tokens($prefix, 'account_holder',   $mandate['account_holder']);
     $tokenRow->tokens($prefix, 'iban',             $mandate['iban'] ?? '');
-    $tokenRow->tokens($prefix, 'iban_anonymised',  CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']));
+    $tokenRow->tokens($prefix, 'iban_anonymised',  $mandate['iban'] ? CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']) : '');
     $tokenRow->tokens($prefix, 'bic',              $mandate['bic'] ?? '');
 
     if (!empty($mandate['date'])) {
