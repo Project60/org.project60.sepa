@@ -6,7 +6,7 @@ This branch is currently maintained by Björn Endres (SYSTOPIA, endres@systopia.
 
 Find more documentation [here](https://docs.civicrm.org/civisepa).
 
-**Important:** Please us an [official release](https://github.com/Project60/org.project60.sepa/releases/latest)!
+**Important:** Please use an [official release](https://github.com/Project60/org.project60.sepa/releases/latest)!
 
 # What it can do
 
