@@ -12,7 +12,7 @@ Find more documentation [here](https://docs.civicrm.org/civisepa).
 
 * OOFF and RCUR payments
 * SEPA dashboard gives you great status overview
-* Payment processer for online donations and event registrations with the [SEPA PP Extension](https://github.com/Project60/org.project60.sepapp)
+* Payment processer for online donations and event registrations with the [SEPA PP Extension](https://github.com/Project60/org.project60.sepapp) or [SDDPP](https://github.com/systopia/de.systopia.sddpp).
 * UI to manipulate mandates
 * Automatic BIC lookup if [Little BIC Extension](https://github.com/Project60/org.project60.bic) in installed
 * Full SEPA group life cycle: ``open``-``closed/sent``->``received``
