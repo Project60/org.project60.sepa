@@ -16,12 +16,8 @@ class SepaMandate extends Generic\DAOEntity {
    */
   public static function permissions(): array {
     return [
-      'get' => [
-        'view sepa mandates',
-      ],
-      'update' => [
-        'edit sepa mandates',
-      ],
+      'get' => ['view sepa mandates'],
+      'update' => ['edit sepa mandates'],
     ];
   }
   
