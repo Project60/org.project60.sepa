@@ -53,11 +53,11 @@ jobs:
         uses: "actions/checkout@v3"
         with:
           ref: "${{ github.ref_name }}"
-          path: "de.systopia.contract"
+          path: "st"
       - id: build-ci
         uses: greenpeace-cee/civi-ci@main
         with:
-          extension: de.systopia.contract
+          extension: org.project60.sepa
           civicrm: ${{ matrix.civicrm }}
           php: ${{ matrix.php }}
           build-type: ${{ matrix.build-type }}
@@ -68,15 +68,13 @@ jobs:
         run: |
           PATH="/home/runner/buildkit/bin:$PATH"
           cd "$EXT_DIR"
-          cp -R "$GITHUB_WORKSPACE/de.systopia.contract" "$EXT_DIR/de.systopia.contract"
-          git clone https://github.com/Project60/org.project60.banking.git "$EXT_DIR/org.project60.banking"
-          git clone https://github.com/Project60/org.project60.sepa.git "$EXT_DIR/org.project60.sepa"
-          cv en de.systopia.contract
+          cp -R "$GITHUB_WORKSPACE/org.project60.sepa" "$EXT_DIR/org.project60.sepa"
+          cv en org.project60.sepa
       - id: run-tests
         name: "Run Tests"
         env:
           EXT_DIR: ${{ steps.build-ci.outputs.ext-dir }}
         run: |
           PATH="/home/runner/buildkit/bin:$PATH"
-          cd "$EXT_DIR/de.systopia.contract"
+          cd "$EXT_DIR/org.project60.sepa"
           CIVICRM_UF="UnitTests" phpunit9
