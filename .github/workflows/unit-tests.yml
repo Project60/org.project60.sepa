@@ -1,0 +1,82 @@
+name: "Run unit tests"
+
+on: ["push"]
+
+env:
+  CIVI_CI_CIVICRM: ${{ vars.CIVI_CI_CIVICRM || '["master"]' }}
+  CIVI_CI_MYSQL: ${{ vars.CIVI_CI_MYSQL || '["8.0"]' }}
+  CIVI_CI_OS: ${{ vars.CIVI_CI_OS || '["ubuntu-22.04"]' }}
+  CIVI_CI_PHP: ${{ vars.CIVI_CI_PHP || '["8.1"]' }}
+  CIVI_CI_BUILD_TYPE: ${{ vars.CIVI_CI_BUILD_TYPE || '["drupal-clean"]' }}
+  CIVI_CI_EXCLUDES: ${{ vars.CIVI_CI_EXCLUDES || '' }}
+
+jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.setup-matrix.outputs.matrix }}
+    steps:
+      - id: setup-matrix
+        uses: druzsan/setup-matrix@v2
+        with:
+          matrix: |
+            civicrm: ${{ env.CIVI_CI_CIVICRM }}
+            mysql: ${{ env.CIVI_CI_MYSQL }}
+            os: ${{ env.CIVI_CI_OS }}
+            php: ${{ env.CIVI_CI_PHP }}
+            build-type: ${{ env.CIVI_CI_BUILD_TYPE }}
+            exclude: ${{ env.CIVI_CI_EXCLUDES }}
+
+  run-tests:
+    needs: setup-matrix
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup-matrix.outputs.matrix) }}
+    runs-on: "${{ matrix.os }}"
+
+    services:
+      mysql:
+        image: "mysql:${{ matrix.mysql }}"
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval="10s"
+          --health-timeout="5s"
+          --health-retries="3"
+
+    steps:
+      - id: clone-repo
+        name: "Clone the repository"
+        uses: "actions/checkout@v3"
+        with:
+          ref: "${{ github.ref_name }}"
+          path: "de.systopia.contract"
+      - id: build-ci
+        uses: greenpeace-cee/civi-ci@main
+        with:
+          extension: de.systopia.contract
+          civicrm: ${{ matrix.civicrm }}
+          php: ${{ matrix.php }}
+          build-type: ${{ matrix.build-type }}
+      - id: install-extension
+        name: "Install Extension"
+        env:
+          EXT_DIR: ${{ steps.build-ci.outputs.ext-dir }}
+        run: |
+          PATH="/home/runner/buildkit/bin:$PATH"
+          cd "$EXT_DIR"
+          cp -R "$GITHUB_WORKSPACE/de.systopia.contract" "$EXT_DIR/de.systopia.contract"
+          git clone https://github.com/Project60/org.project60.banking.git "$EXT_DIR/org.project60.banking"
+          git clone https://github.com/Project60/org.project60.sepa.git "$EXT_DIR/org.project60.sepa"
+          cv en de.systopia.contract
+      - id: run-tests
+        name: "Run Tests"
+        env:
+          EXT_DIR: ${{ steps.build-ci.outputs.ext-dir }}
+        run: |
+          PATH="/home/runner/buildkit/bin:$PATH"
+          cd "$EXT_DIR/de.systopia.contract"
+          CIVICRM_UF="UnitTests" phpunit9
