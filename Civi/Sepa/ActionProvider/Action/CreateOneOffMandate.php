@@ -64,6 +64,7 @@ class CreateOneOffMandate extends AbstractAction {
         new Specification('receive_date',    'Date', E::ts('Collection Date'), false, date('Y-m-d H:i:s')),
         new Specification('date',            'Date', E::ts('Signature Date'),  false, date('Y-m-d H:i:s')),
         new Specification('validation_date', 'Date', E::ts('Validation Date'), false, date('Y-m-d H:i:s')),
+        new Specification('creation_date', 'Date', E::ts('Creation Date'), false, date('Y-m-d H:i:s')),
         new Specification('source', 'String', E::ts('Source'), false),
     ]);
   }
@@ -95,7 +96,7 @@ class CreateOneOffMandate extends AbstractAction {
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
     $mandate_data = ['type' => 'OOFF'];
     // add basic fields
-    foreach (['contact_id', 'account_holder', 'iban', 'bic', 'reference', 'amount', 'receive_date', 'date', 'validation_date', 'source'] as $parameter_name) {
+    foreach (['contact_id', 'account_holder', 'iban', 'bic', 'reference', 'amount', 'receive_date', 'date', 'validation_date', 'source', 'creation_date'] as $parameter_name) {
       $value = $parameters->getParameter($parameter_name);
       if (!empty($value)) {
         $mandate_data[$parameter_name] = $value;
@@ -115,6 +116,11 @@ class CreateOneOffMandate extends AbstractAction {
     $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $mandate_data['creditor_id']]);
     if (!empty($creditor['uses_bic']) && empty($mandate_data['bic'])) {
       throw new ExecutionException('BIC is required');
+    }
+    // use default creation date
+    if (!$mandate_data['creation_date']) {
+      $creationDate = new \DateTime();
+      $mandate_data['creation_date'] = $creationDate->format('Y-m-d H:i:s');
     }
 
     // create mandate

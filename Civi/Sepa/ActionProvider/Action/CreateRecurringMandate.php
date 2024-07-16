@@ -70,6 +70,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
         new Specification('start_date',      'Date', E::ts('Start Date'), false, date('Y-m-d H:i:s')),
         new Specification('date',            'Date', E::ts('Signature Date'),  false, date('Y-m-d H:i:s')),
         new Specification('validation_date', 'Date', E::ts('Validation Date'), false, date('Y-m-d H:i:s')),
+        new Specification('creation_date', 'Date', E::ts('Creation Date'), false, date('Y-m-d H:i:s')),
     ]);
   }
 
@@ -101,7 +102,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
     $mandate_data = ['type' => 'RCUR'];
     // add basic fields
-    foreach (['contact_id', 'account_holder', 'iban', 'bic', 'reference', 'amount', 'start_date', 'date', 'validation_date', 'source'] as $parameter_name) {
+    foreach (['contact_id', 'account_holder', 'iban', 'bic', 'reference', 'amount', 'start_date', 'date', 'validation_date', 'source', 'creation_date'] as $parameter_name) {
       $value = $parameters->getParameter($parameter_name);
       if (!empty($value)) {
         $mandate_data[$parameter_name] = $value;
@@ -139,6 +140,11 @@ class CreateRecurringMandate extends CreateOneOffMandate {
     // if not set, calculate the closest cycle day
     if (empty($mandate_data['cycle_day'])) {
       $mandate_data['cycle_day'] = $this->calculateSoonestCycleDay($mandate_data);
+    }
+    // use default creation date
+    if (!$mandate_data['creation_date']) {
+      $creationDate = new \DateTime();
+      $mandate_data['creation_date'] = $creationDate->format('Y-m-d H:i:s');
     }
 
     // create mandate
