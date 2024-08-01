@@ -97,11 +97,13 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     if (isset($result['is_error']) && $result['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't read transaction groups. Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
     } else {
-      $groups = array();
+      $groups = [];
+      $now = date('Y-m-d');
       foreach ($result["values"] as $id => $group) {
         // 'beautify'
         $group['latest_submission_date'] = date('Y-m-d', strtotime($group['latest_submission_date']));
         $group['collection_date'] = date('Y-m-d', strtotime($group['collection_date']));
+        $group['collection_date_in_future'] = ($group['collection_date'] > $now) ? 1 : 0;
         $group['status'] = $status_2_title[$group['status_id']];
         $group['file'] = $this->getFormatFilename($group);
         $group['status_label'] = $status2label[$group['status_id']];
