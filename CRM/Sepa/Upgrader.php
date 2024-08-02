@@ -15,9 +15,7 @@
 +--------------------------------------------------------*/
 
 use CRM_Sepa_ExtensionUtil as E;
-
-require_once 'CRM/Sepa/CustomData.php';
-
+  
 /**
  * Collection of upgrade steps.
  */
