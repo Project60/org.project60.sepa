@@ -180,11 +180,11 @@ class CRM_Sepa_Logic_Queue_Close {
         LEFT JOIN civicrm_contribution       ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
         LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution'
         WHERE civicrm_sdd_contribution_txgroup.txgroup_id = %1
-          AND (civicrm_contribution.contribution_status_id IN (%2))
+          AND (civicrm_contribution.contribution_status_id = %2 OR civicrm_contribution.contribution_status_id = %3)
           AND (civicrm_contribution.contribution_status_id <> %4)
           LIMIT %5", [
             1 => [$this->txgroup['id'], 'Integer'],
-            2 => [implode(',', $this->origin_status_ids), 'Integer'],
+            2 => [$status_pending, 'Integer'],
             3 => [$status_inProgress, 'Integer'],
             4 => [$this->target_status_id, 'Integer'],
             5 => [SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer'],
