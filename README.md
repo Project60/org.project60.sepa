@@ -44,3 +44,5 @@ If you need customised mandate references, exclude certain collection dates, or 
 
 We added an example implementation for your convenience: [org.project60.sepacustom](https://github.com/Project60/sepa_dd/tree/master/org.project60.sepacustom)
 
+## Documentation
+- EN: https://docs.civicrm.org/civisepa/en/latest/
