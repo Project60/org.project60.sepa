@@ -34,7 +34,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     CRM_Utils_System::setTitle(ts('Create SEPA Mandate', array('domain' => 'org.project60.sepa')));
     if (isset($_REQUEST['mandate_type'])) {
       $contact_id = $_REQUEST['contact_id'];
-      $this->assign("back_url", CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=${contact_id}&selectedChild=contribute"));
+      $this->assign("back_url", CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact_id}&selectedChild=contribute"));
 
       $errors = $this->validateParameters($_REQUEST['mandate_type']);
       if (count($errors) > 0) {
