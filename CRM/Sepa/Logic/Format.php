@@ -64,7 +64,7 @@ class CRM_Sepa_Logic_Format {
     if ($file && file_exists($file)) {
       require_once $file;
     } else {
-      throw new Exception(ts("Class format file '{$file}' not found."));
+      throw new Exception("Class format file '{$file}' not found.");
     }
     $format_class = 'CRM_Sepa_Logic_Format_'.$fileFormatName;
     return new $format_class($fileFormatName);

@@ -98,13 +98,13 @@ class CRM_Sepa_Logic_Queue_Update {
         break;
 
       case 'UPDATE':
-        $this->title = ts("Process {$this->mode} mandates (%1-%2)",
-          array(1 => $this->offset, 2 => $this->offset+$this->limit, 'domain' => 'org.project60.sepa'));
+        $this->title = ts("Process %1 mandates (%2-%3)",
+          array(1 => $this->mode, 2 => $this->offset, 3 => $this->offset+$this->limit, 'domain' => 'org.project60.sepa'));
         break;
 
       case 'CLEANUP':
-        $this->title = ts("Cleaning up {$this->mode} groups",
-          array(1 => $this->offset, 2 => $this->offset+$this->limit, 'domain' => 'org.project60.sepa'));
+        $this->title = ts("Cleaning up %1 groups",
+          array(1 => $this->mode, 'domain' => 'org.project60.sepa'));
         break;
 
       case 'FINISH':
