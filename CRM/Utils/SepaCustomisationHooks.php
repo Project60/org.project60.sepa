@@ -48,7 +48,7 @@ class CRM_Utils_SepaCustomisationHooks {
   /**
    * This hook is called when a new transaction group is generated
    *
-   * The default implementation is "TXG-${creditor_id}-${mode}-${collection_date}"
+   * The default implementation is "TXG-{$creditor_id}-{$mode}-{$collection_date}"
    *
    * Be aware the the reference has to be unique. You will have to use suffixes
    *  if your preferred reference is already in use.

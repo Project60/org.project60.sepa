@@ -460,11 +460,11 @@ class CRM_Sepa_Logic_Batching {
         // this group does not yet exist -> create
 
         // find unused reference
-        $reference = "TXG-${creditor_id}-${mode}-${collection_date}";
+        $reference = "TXG-{$creditor_id}-{$mode}-{$collection_date}";
         $counter = 0;
         while (self::referenceExists($reference)) {
           $counter += 1;
-          $reference = "TXG-${creditor_id}-${mode}-${collection_date}--".$counter;
+          $reference = "TXG-{$creditor_id}-{$mode}-{$collection_date}--".$counter;
         }
 
         // call the hook
