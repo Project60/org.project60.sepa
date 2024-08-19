@@ -1,0 +1,34 @@
+version: "3"
+services:
+  civicrm:
+    image: michaelmcandrew/civicrm:${CIVICRM_IMAGE_TAG:-5-drupal}
+    environment:
+      - PROJECT_NAME=test
+      - BASE_URL=http://localhost
+      - CIVICRM_DB_NAME=test
+      - CIVICRM_DB_USER=root
+      - CIVICRM_DB_PASS=secret
+      - CIVICRM_DB_HOST=mysql
+      - CIVICRM_DB_PORT=3306
+      - CIVICRM_SITE_KEY=TEST_KEY
+      - DRUPAL_DB_NAME=test
+      - DRUPAL_DB_USER=root
+      - DRUPAL_DB_PASS=secret
+      - DRUPAL_DB_HOST=mysql
+      - DRUPAL_DB_PORT=3306
+      - PHP_DATE_TIMEZONE=UTC
+      - DEBUG=ON
+      - SMTP_HOST=localhost
+      - SMTP_MAILDOMAIN=example.org
+    volumes:
+      - ../:/var/www/html/sites/default/files/civicrm/ext/org.project60.sepa:${BIND_VOLUME_PERMISSIONS:-ro}
+      - /var/www/html/sites/default/files/civicrm/ext/org.project60.sepa/vendor
+      - /var/www/html/sites/default/files/civicrm/ext/org.project60.sepa/tools/phpunit/vendor
+    # Don't start Apache HTTP Server, but keep container running
+    command: ["tail", "-f", "/dev/null"]
+    stop_signal: SIGKILL
+  mysql:
+    image: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: secret
+      MARIADB_DATABASE: test

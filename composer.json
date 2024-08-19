@@ -1,0 +1,53 @@
+{
+    "name": "systopia/org.project60.sepa",
+    "type": "civicrm-ext",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "SYSTOPIA GmbH",
+            "email": "info@systopia.de",
+            "homepage": "https://www.systopia.de"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "prepend-autoloader": false,
+        "sort-packages": true
+    },
+    "require": {
+    },
+    "scripts": {
+        "composer-phpcs": [
+            "@composer --working-dir=tools/phpcs"
+        ],
+        "composer-phpstan": [
+            "@composer --working-dir=tools/phpstan"
+        ],
+        "composer-phpunit": [
+            "@composer --working-dir=tools/phpunit"
+        ],
+        "composer-tools": [
+            "@composer-phpcs",
+            "@composer-phpstan",
+            "@composer-phpunit"
+        ],
+        "phpcs": [
+            "@php tools/phpcs/vendor/bin/phpcs"
+        ],
+        "phpcbf": [
+            "@php tools/phpcs/vendor/bin/phpcbf"
+        ],
+        "phpstan": [
+            "@php tools/phpstan/vendor/bin/phpstan"
+        ],
+        "phpunit": [
+            "@php tools/phpunit/vendor/bin/simple-phpunit --coverage-text"
+        ],
+        "test": [
+            "@phpcs",
+            "@phpstan",
+            "@phpunit"
+        ]
+    }
+}

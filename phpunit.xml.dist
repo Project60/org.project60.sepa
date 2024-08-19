@@ -1,18 +1,38 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage>
-    <include>
-      <directory phpVersion="8.0.0" phpVersionOperator="&gt;=" suffix=".php">./</directory>
-    </include>
-  </coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         colors="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         forceCoversAnnotation="true"
+         bootstrap="tests/phpunit/bootstrap.php">
+
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0&amp;baselineFile=./tests/ignored-deprecations.json"/>
+  </php>
+
   <testsuites>
-    <testsuite name="CiviSEPA Test Suite">
+    <testsuite name="org.project60.sepa Test Suite">
       <directory>./tests/phpunit</directory>
     </testsuite>
   </testsuites>
+
+  <coverage>
+    <include>
+      <directory suffix=".php">api</directory>
+      <directory suffix=".php">CRM</directory>
+      <directory suffix=".php">Civi</directory>
+    </include>
+    <exclude>
+      <directory>CRM/Sepa/DAO</directory>
+    </exclude>
+  </coverage>
+
   <listeners>
     <listener class="Civi\Test\CiviTestListener">
       <arguments/>
     </listener>
   </listeners>
+
 </phpunit>
