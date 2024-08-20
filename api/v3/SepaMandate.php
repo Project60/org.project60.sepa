@@ -73,6 +73,7 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
  * @return array API result array
  */
 function civicrm_api3_sepa_mandate_createfull($params) {
+    // TODO: Move logic to CRM_Sepa_BAO_SEPAMandate::createfull().
     // TODO: more sanity checks?
 
     // get creditor

@@ -108,6 +108,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     return $dao;
   }
 
+  public static function createfull($params) {
+    // TODO: Copy logic from (old) API3 SepaMandate.createfull.
+  }
+
   static function is_active($mandateStatus) {
     switch ($mandateStatus) {
       case 'INIT' :
