@@ -13,6 +13,8 @@
 | copyright header is strictly prohibited without        |
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
+
+use Civi\Sepa\Util\ContributionUtil;
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -111,7 +113,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'select',
       'payment_instrument_id',
       E::ts('Payment Method'),
-      $this->getPaymentInstrumentList(),
+      ContributionUtil::getPaymentInstrumentList(),
       TRUE,
       array('class' => 'crm-select2')
     );
@@ -121,7 +123,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'select',
         'financial_type_id',
         E::ts('Financial Type'),
-        $this->getFinancialTypeList(),
+        ContributionUtil::getFinancialTypeList(),
         TRUE,
         array('class' => 'crm-select2')
     );
@@ -570,37 +572,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
     }
     return $creditor_list;
-  }
-
-  /**
-   * Get the list of (active) financial types
-   */
-  protected function getFinancialTypeList() {
-    $list = array();
-    $query = civicrm_api3('FinancialType', 'get',array(
-        'is_active'    => 1,
-        'option.limit' => 0,
-        'return'       => 'id,name'
-    ));
-
-    foreach ($query['values'] as $value) {
-      $list[$value['id']] = $value['name'];
-    }
-
-    return $list;
-  }
-
-  /**
-   * Get the list of (CiviSEPA) payment instruments
-   */
-  protected function getPaymentInstrumentList() {
-    $list = array();
-    $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getAllSddPaymentInstruments();
-    foreach ($payment_instruments as $payment_instrument) {
-      $list[$payment_instrument['id']] = $payment_instrument['label'];
-    }
-
-    return $list;
   }
 
   /**

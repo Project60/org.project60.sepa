@@ -111,6 +111,14 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       }
     }
 
+    // Validate financial type.
+    if (
+      is_numeric($params['financial_type_id'] ?? NULL)
+      && !array_key_exists($params['financial_type_id'], \Civi\Sepa\Util\ContributionUtil::getFinancialTypeList())
+    ) {
+      throw new CRM_Core_Exception("No permission for creating SEPA mandates with financial type [{$params['financial_type_id']}].");
+    }
+
     // if BIC is used for this creditor, it is required (see #245)
     if (empty($params['bic'])) {
       if ($creditor['uses_bic']) {
