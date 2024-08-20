@@ -1964,7 +1964,7 @@ msgstr "Lege SEPA-Mandate an"
 
 #: sepa.php
 msgid "View SEPA mandates"
-msgstr "SEPA-Mandtae ansehen"
+msgstr "SEPA-Mandate ansehen"
 
 #: sepa.php
 msgid "Edit SEPA mandates"

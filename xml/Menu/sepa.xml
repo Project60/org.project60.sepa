@@ -79,7 +79,7 @@
     <path>civicrm/sepa/tab</path>
     <page_callback>CRM_Sepa_Page_MandateTab</page_callback>
     <title>SEPA Mandates</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>view sepa mandates</access_arguments>
   </item>
   <item>
     <path>civicrm/sepa/retry</path>
