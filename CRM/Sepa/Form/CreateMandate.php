@@ -54,9 +54,21 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       }
 
       // load mandate
-      $this->old_mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $mandate_id));
+      try {
+        // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
+        $this->old_mandate = \Civi\Api4\SepaMandate::get()
+          ->addWhere('id', '=', $mandate_id)
+          ->execute()
+          ->single();
+      }
+      catch (\Exception $e) {
+        Civi::log()->error($e->getMessage());
+        CRM_Core_Error::statusBounce(
+          E::ts('The mandate to clone/replace from does not exist or you do not have permission for it.'),
+        );
+      }
       if ($this->old_mandate['type'] != 'RCUR') {
-        CRM_Core_Error::fatal(E::ts("You can only replace RCUR mandates"));
+        CRM_Core_Error::statusBounce(E::ts('You can only replace RCUR mandates'));
       }
       $this->contact_id = (int) $this->old_mandate['contact_id'];
 
@@ -64,7 +76,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     }
 
     if (empty($this->contact_id)) {
-      CRM_Core_Error::fatal(E::ts("No contact ID (cid) given."));
+      CRM_Core_Error::statusBounce(E::ts("No contact ID (cid) given."));
     }
 
     // load the contact and set the title

@@ -59,7 +59,6 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'contribution.currency',
         'contribution.cancel_reason'
       )
-      // Use INNER JOIN for Financial ACLs to correctly restrict the result.
       ->addJoin(
         'Contribution AS contribution',
         'INNER',
@@ -120,7 +119,6 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'contribution_recur.currency',
         'contribution_recur.amount'
       )
-      // Use INNER JOIN for Financial ACLs to correctly restrict the result.
       ->addJoin(
         'ContributionRecur AS contribution_recur',
         'INNER',

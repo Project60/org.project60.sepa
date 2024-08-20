@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Api4;
 
+use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
+
 /**
  * Resource entity.
  *
@@ -9,7 +11,12 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class SepaMandate extends Generic\DAOEntity {
-  
+
+  public static function get($checkPermissions = TRUE) {
+    return (new GetAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
   /**
    * @see \Civi\Api4\Generic\AbstractEntity::permissions()
    * @return array[]
@@ -20,5 +27,5 @@ class SepaMandate extends Generic\DAOEntity {
       'update' => ['edit sepa mandates'],
     ];
   }
-  
+
 }
