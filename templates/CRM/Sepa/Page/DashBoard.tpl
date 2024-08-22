@@ -64,6 +64,12 @@
   <div class="clear"></div>
 </div>
 
+{if $financialacls}
+  <div class="help">
+    {ts}Note that only groups with contributions of authorized financial types are being displayed.{/ts}
+  </div>
+{/if}
+
 <table>
   <tr>
     <th>{ts domain="org.project60.sepa"}Group Name{/ts}</th>

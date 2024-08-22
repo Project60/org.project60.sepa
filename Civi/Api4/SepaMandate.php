@@ -4,9 +4,9 @@ namespace Civi\Api4;
 use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
 
 /**
- * Resource entity.
+ * SepaMandate entity.
  *
- * Provided by the CiviCRM Resource Management extension.
+ * Provided by the CiviSEPA extension.
  *
  * @package Civi\Api4
  */

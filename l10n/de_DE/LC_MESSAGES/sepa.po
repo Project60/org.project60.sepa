@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2022-01-14 13:46+0100\n"
+"POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -60,6 +60,7 @@ msgid "Please enter the %s as number (integers only)."
 msgstr "Bitte geben Sie %s als ganze Zahl an."
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
+#: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
 msgid "- select -"
 msgstr "- wählen -"
 
@@ -98,12 +99,28 @@ msgstr "Adresse"
 msgid "Country"
 msgstr "Land"
 
-#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/Form/CreateMandate.php
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
-#: CRM/Sepa/Form/Search/SepaContactSearch.php
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPAMandate.php
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php CRM/Utils/SepaTokens.php
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
-#: Civi/Sepa/ActionProvider/Action/FindMandate.php js/CreateMandate.js sepa.php
+#: Civi/Sepa/ActionProvider/Action/FindMandate.php
+#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationConfirm.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/Sepa/Contribute/Form/ContributionView.tpl
+#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
+msgid "Account Holder"
+msgstr "Kontoinhaber"
+
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/Form/CreateMandate.php
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php CRM/Utils/SepaTokens.php
+#: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+#: Civi/Sepa/ActionProvider/Action/FindMandate.php js/CreateMandate.js
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -117,10 +134,10 @@ msgstr "BIC"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/Form/CreateMandate.php
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
-#: CRM/Sepa/Form/Search/SepaContactSearch.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php CRM/Utils/SepaTokens.php
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
-#: Civi/Sepa/ActionProvider/Action/FindMandate.php js/CreateMandate.js sepa.php
+#: Civi/Sepa/ActionProvider/Action/FindMandate.php js/CreateMandate.js
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
@@ -132,16 +149,21 @@ msgstr "BIC"
 msgid "IBAN"
 msgstr "IBAN"
 
+#: CRM/Admin/Form/Setting/SepaSettings.php
+msgid "CUC (only from CBIBdySDDReq)"
+msgstr "CUC (nur aus CBIBdySDDReq)"
+
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPACreditor.php
 #: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateOOFF.php
-#: CRM/Sepa/Form/Report/SepaMandateRCUR.php sepa.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php CRM/Utils/SepaTokens.php
 msgid "Currency"
 msgstr "Währung"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPAMandate.php
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
-#: CRM/Sepa/Form/Search/SepaContactSearch.php sepa.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php CRM/Utils/SepaTokens.php
+#: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
 #: templates/CRM/Sepa/Page/DashBoard.tpl templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "Type"
 msgstr "Art"
@@ -319,6 +341,10 @@ msgid "You can only modify RCUR mandates."
 msgstr "Sie können nur Mandate mit wiederkehrenden Zahlungen (RCUR) ersetzen."
 
 #: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Account Holder changed from '%1' to '%2'"
+msgstr "Kontoinhaber geändert von '%1' auf '%2'"
+
+#: CRM/Sepa/BAO/SEPAMandate.php
 msgid "IBAN changed from '%1' to '%2'"
 msgstr "IBAN geändert von '%1' auf '%2'"
 
@@ -331,10 +357,8 @@ msgid "Bank details changed"
 msgstr "Bankverbindung geändert"
 
 #: CRM/Sepa/BAO/SEPAMandate.php
-#, fuzzy
-#| msgid "Amount has to be positive."
 msgid "The amount has to be positive."
-msgstr "Betrag muss positiv sein."
+msgstr "Der Betrag muss positiv sein."
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Amount increased"
@@ -371,6 +395,14 @@ msgstr "Kampagne geändert"
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Campaign changed from '%1' [%2] to '%3' [%4]."
 msgstr "Kampagne von '%1' [%2] auf '%3' [%4] geändert."
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cycle day changed"
+msgstr "Einzugstag geändert"
+
+#: CRM/Sepa/BAO/SEPAMandate.php
+msgid "Cycle day changed from '%1' to '%2'."
+msgstr "Einzugstag geändert von '%1' auf '%2'."
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "%1 pending contributions were adjusted as well."
@@ -430,38 +462,42 @@ msgstr "SEPA Zuwendungsgruppen"
 msgid "SEPAContribution Group"
 msgstr "SEPA Zuwendungsgruppe"
 
-#: CRM/Sepa/DAO/SEPAContributionGroup.php
-msgid "primary key"
-msgstr ""
-
-#: CRM/Sepa/DAO/SEPAContributionGroup.php
-#, fuzzy
-#| msgid "Contribution ID"
-msgid "FK to Contribution ID"
-msgstr "Zuwendungs-ID"
-
-#: CRM/Sepa/DAO/SEPAContributionGroup.php
-msgid "FK to civicrm_sdd_txgroup"
-msgstr ""
-
-#: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "SEPA Creditor"
-msgid "SEPACreditors"
-msgstr "SEPA Gläubiger"
-
-#: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "SEPA Creditor"
-msgid "SEPACreditor"
-msgstr "SEPA Gläubiger"
-
-#: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
-#: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
+#: CRM/Sepa/DAO/SEPAContributionGroup.php CRM/Sepa/DAO/SEPACreditor.php
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 #: templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "ID"
 msgstr "ID"
+
+#: CRM/Sepa/DAO/SEPAContributionGroup.php
+msgid "primary key"
+msgstr "Primärschlüssel"
+
+#: CRM/Sepa/DAO/SEPAContributionGroup.php
+#: CRM/Sepa/Form/Report/SepaMandateOOFF.php
+msgid "Contribution ID"
+msgstr "Zuwendungs-ID"
+
+#: CRM/Sepa/DAO/SEPAContributionGroup.php
+msgid "FK to Contribution ID"
+msgstr "Fremdschlüssel zu Zuwendungs-ID"
+
+#: CRM/Sepa/DAO/SEPAContributionGroup.php
+msgid "Txgroup ID"
+msgstr "Transaktionsgruppen-ID"
+
+#: CRM/Sepa/DAO/SEPAContributionGroup.php
+msgid "FK to civicrm_sdd_txgroup"
+msgstr "Fremdschlüssel zu civicrm_sdd_txgroup"
+
+#: CRM/Sepa/DAO/SEPACreditor.php
+msgid "SEPACreditors"
+msgstr "SEPA-Gläubiger"
+
+#: CRM/Sepa/DAO/SEPACreditor.php
+msgid "SEPACreditor"
+msgstr "SEPA-Gläubiger"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Creditor Contact ID"
@@ -469,7 +505,7 @@ msgstr "Gläubiger-Kontakt"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "FK to Contact ID that owns that account"
-msgstr ""
+msgstr "Fremdschlüssel zu Kontakt-ID des Kontoinhabers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "SEPA Creditor identifier"
@@ -480,6 +516,8 @@ msgid ""
 "Provided by the bank. ISO country code+check digit+ZZZ+country specific "
 "identifier"
 msgstr ""
+"Von der Bank bereitgestellt. ISO-Ländercode + Prüfziffer + ZZZ + "
+"länderspezifischer Identifikator"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -488,7 +526,7 @@ msgstr "Name des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "official creditor name, passed to exported files"
-msgstr ""
+msgstr "offizieller Gläubigername, wird exportierten Dateien übergeben"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -496,8 +534,6 @@ msgid "Creditor Label"
 msgstr "Bezeichnung des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "internal label of the creditor"
 msgid "internally used label for the creditor"
 msgstr "Interner Name des Gläubigers"
 
@@ -511,59 +547,49 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Which Country does this address belong to."
-msgstr ""
+msgstr "Zu welchem Land gehört diese Adresse"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 msgid "Iban"
 msgstr "IBAN"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "name of the creditor"
 msgid "Iban of the creditor"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "IBAN des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 msgid "Bic"
 msgstr "BIC"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "name of the creditor"
 msgid "BIC of the creditor"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "BIC des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Mandate numbering prefix"
 msgid "Mandate numering prefix"
-msgstr "Mandats-Prefix"
+msgstr "Mandats-Präfix"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Creditor Identifier"
 msgid "prefix for mandate identifiers"
-msgstr "SEPA Gläubiger-Identifikationsnummer"
+msgstr "Präfix für Mandatsreferenzen"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Currency used by this creditor"
 msgid "currency used by this creditor"
-msgstr "Währung dieses Kreditors"
+msgstr "Währung dieses Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "First Contribution (to be deprecated)"
+msgid "Payment Processor ID"
+msgstr "Zahlungsprozessor-ID"
+
+#: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Payment processor link (to be deprecated)"
-msgstr "Ersteinzug"
+msgstr "Zahlungsprozessor-Link (wird veralten)"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Category purpose of the collection"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Default Creditor"
 msgid "Default value"
 msgstr "Standard-Gläubiger"
 
@@ -607,10 +633,8 @@ msgid "Creditor Type"
 msgstr "Art des Kreditors"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Creditor Type: SEPA (default) or PSP"
 msgid "Type of the creditor, values are SEPA (default) and PSP"
-msgstr "Art des Kreditors: SEPA (Standard) oder PSP "
+msgstr "Art des Gläubigers: SEPA (Standard) oder PSP"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "OOFF Payment Instruments"
@@ -631,26 +655,29 @@ msgid ""
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Currency used by this creditor"
 msgid "If true, BICs are not used for this creditor"
-msgstr "Währung dieses Kreditors"
+msgstr "Falls aktiviert, werden BICs nicht für diesen Gläubiger verwendet"
+
+#: CRM/Sepa/DAO/SEPACreditor.php
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "CUC"
+msgstr ""
+
+#: CRM/Sepa/DAO/SEPACreditor.php
+msgid "CUC of the creditor"
+msgstr "CUC des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "SEPA Mandates"
 msgid "SEPAMandates"
-msgstr "SEPA Mandate"
+msgstr "SEPA-Mandate"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "SEPA Mandate"
 msgid "SEPAMandate"
 msgstr "SEPA-Mandat"
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php
 #: CRM/Sepa/DAO/SEPATransactionGroup.php CRM/Sepa/Form/CreateMandate.php
-#: CRM/Sepa/Form/Search/SepaContactSearch.php sepa.php
+#: CRM/Sepa/Form/Search/SepaContactSearch.php CRM/Utils/SepaTokens.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/CRM/Sepa/Page/MandateTab.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
@@ -659,14 +686,14 @@ msgid "Reference"
 msgstr "Mandatsreferenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "Mandate reference"
 msgid "A unique mandate reference"
-msgstr "Mandatsreferenz"
+msgstr "eine eindeutige Mandatsreferenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
-#: CRM/Sepa/Form/Report/SepaMandateOOFF.php sepa.php
+#: CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Utils/SepaTokens.php
+#: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/Sepa/Contribute/Form/ContributionView.tpl
@@ -714,6 +741,10 @@ msgstr "Gläubiger-ID"
 msgid "FK to ssd_creditor"
 msgstr ""
 
+#: CRM/Sepa/DAO/SEPAMandate.php
+msgid "Creator"
+msgstr "Ersteller"
+
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
 #: CRM/Sepa/Form/Search/SepaContactSearch.php
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
@@ -726,24 +757,30 @@ msgstr "Kontakt ID"
 msgid "FK to Contact ID of the debtor"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "name of the creditor"
-msgid "Iban of the debtor"
-msgstr "Öffentlicher Name des Gläubigers"
+#: CRM/Sepa/DAO/SEPAMandate.php templates/CRM/Sepa/Page/CreateMandate.tpl
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+#: templates/CRM/Sepa/Page/ListGroup.tpl
+msgid "Contact"
+msgstr "Kontakt"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "name of the creditor"
+msgid "Name of the account holder"
+msgstr "Name des Kontoinhabers"
+
+#: CRM/Sepa/DAO/SEPAMandate.php
+msgid "Iban of the debtor"
+msgstr "IBAN des Schuldners"
+
+#: CRM/Sepa/DAO/SEPAMandate.php
 msgid "BIC of the debtor"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "BIC des Schuldners"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "RCUR for recurrent (default), OOFF for one-shot"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/Search/SepaContactSearch.php
-#: Civi/Sepa/ActionProvider/Action/FindMandate.php sepa.php
+#: CRM/Utils/SepaTokens.php Civi/Sepa/ActionProvider/Action/FindMandate.php
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 #: templates/CRM/Sepa/Page/ListGroup.tpl templates/CRM/Sepa/Page/MandateTab.tpl
@@ -762,31 +799,30 @@ msgstr ""
 msgid "creation date"
 msgstr "Erstellungsdatum"
 
+#: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "Created Date"
+msgstr "Erstelldatum"
+
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "First Contribution (to be deprecated)"
 msgstr "Ersteinzug"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "1st contribution"
 msgid "FK to civicrm_contribution"
-msgstr "Erstzuwendung"
+msgstr "Fremdschlüssel zu civicrm_contribution"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "validation date"
 msgstr "Validierungsdatum"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
-#, fuzzy
-#| msgid "SEPA File Format"
 msgid "SEPASdd Files"
-msgstr "SEPA Dateiformat (PAIN)"
+msgstr "SEPASdd-Dateien"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
-#, fuzzy
-#| msgid "SEPA File Format"
 msgid "SEPASdd File"
-msgstr "SEPA Dateiformat (PAIN)"
+msgstr "SEPASdd-Datei"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
 msgid "End-to-end reference for this sdd file."
@@ -797,32 +833,32 @@ msgid "Filename"
 msgstr "Dateiname"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
-#, fuzzy
-#| msgid "name of the creditor"
 msgid "Name of the generated file"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "Name der erzeugten Datei"
 
 #: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "Latest Submission Date"
 msgstr "Spätestes Übertragungsdatum"
 
 #: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "Latest Submission Date"
 msgid "Latest submission date"
 msgstr "Spätestes Übertragungsdatum"
-
-#: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
-msgid "Created Date"
-msgstr "Erstelldatum"
 
 #: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "When was this item created"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPASddFile.php
+msgid "Created ID"
+msgstr "Ersteller-ID"
+
+#: CRM/Sepa/DAO/SEPASddFile.php
 msgid "FK to Contact ID of creator"
 msgstr ""
+
+#: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "Status ID"
+msgstr "Status-ID"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
 msgid "fk to Batch Status options in civicrm_option_values"
@@ -841,16 +877,12 @@ msgid "Tag used to group multiple creditors in this XML file."
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "View SEPA transaction groups"
 msgid "SEPATransaction Groups"
-msgstr "SEPA-Gruppen ansehen"
+msgstr "SEPATransaction-Gruppen"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "View SEPA transaction groups"
 msgid "SEPATransaction Group"
-msgstr "SEPA-Gruppen ansehen"
+msgstr "SEPATransaction-Gruppe"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "End-to-end reference for this tx group."
@@ -869,20 +901,24 @@ msgid "Collection Date"
 msgstr "Einzugsdatum"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "Earliest Collection Date"
 msgid "Target collection date"
-msgstr "Frühester Einzugstermin"
+msgstr "Zieleinzugsdatum"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "fk sepa group Status options in civicrm_option_values"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "Creditor ID"
-msgid "fk to SDD Creditor Id"
+msgid "Sdd Creditor ID"
 msgstr "Gläubiger-ID"
+
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "fk to SDD Creditor Id"
+msgstr "Fremdschlüssel zu Gläubiger-ID"
+
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "Sdd File ID"
+msgstr "Sdd-Datei-ID"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "fk to SDD File Id"
@@ -893,6 +929,8 @@ msgid "SepaMandate ID"
 msgstr "Mandats-ID"
 
 #: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
 msgid "Creation Date"
 msgstr "Erstellungsdatum"
 
@@ -913,6 +951,12 @@ msgstr "Startdatum"
 #: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "End Date"
 msgstr "Enddatum"
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid ""
+"The mandate to clone/replace from does not exist or you do not have "
+"permission for it."
+msgstr ""
 
 #: CRM/Sepa/Form/CreateMandate.php
 msgid "You can only replace RCUR mandates"
@@ -942,10 +986,8 @@ msgid "Creditor"
 msgstr "Kreditor"
 
 #: CRM/Sepa/Form/CreateMandate.php
-#, fuzzy
-#| msgid "Payment Details"
 msgid "Payment Method"
-msgstr "Zahlungsdetails"
+msgstr "Zahlungsmethode"
 
 #: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateOOFF.php
 #: CRM/Sepa/Form/Report/SepaMandateRCUR.php
@@ -976,14 +1018,19 @@ msgid "Account"
 msgstr "Konto"
 
 #: CRM/Sepa/Form/CreateMandate.php
+msgid "not required if same as contact"
+msgstr "nicht benötigt wenn gleich mit Kontakt"
+
+#: CRM/Sepa/Form/CreateMandate.php
 msgid "required"
 msgstr "erforderlich"
 
 #: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Page/CreateMandate.php
+#: CRM/Utils/SepaTokens.php
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
-#: Civi/Sepa/ActionProvider/Action/FindMandate.php sepa.php
+#: Civi/Sepa/ActionProvider/Action/FindMandate.php
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
@@ -1077,6 +1124,7 @@ msgstr "Generic SEPA Mandate Report (org.project60.sepa)"
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
 #: Civi/Sepa/ActionProvider/Action/FindMandate.php
+#: Civi/Sepa/ActionProvider/Action/TerminateMandate.php
 #: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
 #: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
@@ -1087,6 +1135,7 @@ msgstr "Mandatsreferenz"
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
 #: Civi/Sepa/ActionProvider/Action/FindMandate.php
+#: Civi/Sepa/ActionProvider/Action/TerminateMandate.php
 msgid "Mandate ID"
 msgstr "Mandats-ID"
 
@@ -1094,10 +1143,10 @@ msgstr "Mandats-ID"
 msgid "Mandate Status"
 msgstr "Status des Mandats"
 
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php CRM/Utils/SepaTokens.php
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
-#: Civi/Sepa/ActionProvider/Action/FindMandate.php sepa.php
+#: Civi/Sepa/ActionProvider/Action/FindMandate.php
 msgid "Signature Date"
 msgstr "Unterschriftsdatum"
 
@@ -1129,6 +1178,10 @@ msgid "Recurring"
 msgstr "Dauereinzug"
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+msgid "account_holder"
+msgstr ""
+
+#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
 msgid "Contact Name"
 msgstr "Kontaktname"
 
@@ -1148,11 +1201,8 @@ msgstr "SEPA Mandate (Einzeleinzug)"
 msgid "SEPA One-Off Mandate Report (org.project60.sepa)"
 msgstr "SEPA Einzeleinzugs-Mandate (org.project60.sepa)"
 
-#: CRM/Sepa/Form/Report/SepaMandateOOFF.php
-msgid "Contribution ID"
-msgstr "Zuwendungs-ID"
-
 #: CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Form/RetryCollection.php
+#: Civi/Sepa/ActionProvider/Action/TerminateMandate.php
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Cancel Reason"
 msgstr "Änderungsgrund"
@@ -1190,7 +1240,7 @@ msgstr "SEPA Mandate (Dauereinzüge)"
 msgid "SEPA Recurring Mandate Report (org.project60.sepa)"
 msgstr "SEPA Dauereinzugs-Mandate (org.project60.sepa)"
 
-#: CRM/Sepa/Form/Report/SepaMandateRCUR.php sepa.php
+#: CRM/Sepa/Form/Report/SepaMandateRCUR.php CRM/Utils/SepaTokens.php
 msgid "Cycle Day"
 msgstr "Monatstag"
 
@@ -1251,10 +1301,8 @@ msgid "SDD Groups"
 msgstr "SEPA-Gruppen"
 
 #: CRM/Sepa/Form/RetryCollection.php
-#, fuzzy
-#| msgid "Transaction Message"
 msgid "Custom Transaction Message"
-msgstr "Verwendungszweck"
+msgstr "Benutzerdefinierte Transaktionsnachricht"
 
 #: CRM/Sepa/Form/RetryCollection.php templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Note"
@@ -1373,6 +1421,52 @@ msgstr "Dateiformat [%1] nicht vorhanden!"
 msgid "Cannot close transaction group! Error was: '%s'"
 msgstr "Die Gruppe konnte nicht geschlossen werden. Fehler ist: '%s'"
 
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"%1 orphaned open (pending) SEPA contributions were found in the system, i.e. "
+"they are not part of a SEPA transaction group, and will not be collected any "
+"more. You should delete them by searching for contributions in status "
+"'Pending' with payment instruments RCUR and FRST."
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"WARNING: %1 orphaned active (in Progress) SEPA contributions detected. These "
+"may cause irregularities in the generation of the SEPA collection groups, "
+"and in particular might cause the same installment to be collected multiple "
+"times. You should find them by searching for contributions in status 'in "
+"Progress' with the SEPA payment instruments (e.g. RCUR and FRST), and then "
+"export (to be safe) and delete them."
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"Warning: had to adjusted the status of %1 contribution(s) to 'Pending', as "
+"they are part of an open transaction group."
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid "Adjusted the payment instruments of %1 recurring mandate(s)."
+msgstr "Zahlungsmethode von %1 wiederkehrenden Mandaten wurden angepasst."
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid ""
+"The following irregularities have been detected and fixed in your database:"
+msgstr ""
+"Die folgenden Unregelmäßigkeiten wurden erkannt und in der Datenbank behoben:"
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid "You can find a detailed log of the changes here: <code>%1</code>"
+msgstr ""
+
+#: CRM/Sepa/Logic/MandateRepairs.php
+msgid "CiviSEPA Health Check"
+msgstr "CiviSEPA-Selbstkontrolle"
+
+#: CRM/Sepa/Logic/Queue/Close.php
+msgid "Marking SDD Group(s) Received: [%1]"
+msgstr "Markiere SDD-Gruppe(n) als erhalten: [%1]"
+
 #: CRM/Sepa/Logic/Queue/Close.php
 msgid "Closing SDD Group(s) [%1]"
 msgstr "Schließe SEPA-Gruppe(n) [%1]"
@@ -1407,12 +1501,24 @@ msgid "Cleaning up ended mandates"
 msgstr "Beendet Mandate werden bereinigt"
 
 #: CRM/Sepa/Logic/Queue/Update.php
+msgid "Process %1 mandates (%2-%3)"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Update.php
+msgid "Cleaning up %1 groups"
+msgstr ""
+
+#: CRM/Sepa/Logic/Queue/Update.php
 msgid "Lock released"
 msgstr "Sperre aufgehoben"
 
 #: CRM/Sepa/Logic/Settings.php
 msgid "Thank you"
 msgstr "Vielen Dank"
+
+#: CRM/Sepa/Logic/Settings.php
+msgid "In Progress"
+msgstr ""
 
 #: CRM/Sepa/Logic/Status.php
 msgid "Not activated"
@@ -1575,8 +1681,8 @@ msgid "CiviSEPA Dashboard"
 msgstr "CiviSEPA Dashboard"
 
 #: CRM/Sepa/Page/DashBoard.php
-msgid "Couldn't read transaction groups. Error was: '%s'"
-msgstr "Die Gruppen konnten nicht geladen werden. Fehler ist: '%s'"
+msgid "Couldn't read transaction groups. Error was: %1"
+msgstr "Die Gruppen konnten nicht geladen werden. Fehler war: %1"
 
 #: CRM/Sepa/Page/DashBoard.php
 msgid "Unknown batcher mode '%s'. No batching triggered."
@@ -1690,6 +1796,22 @@ msgstr "Die SEPA Gruppe [%s] konnte nicht geladen werden. Fehler ist: '%s'"
 msgid "SEPA Mandates"
 msgstr "SEPA Mandate"
 
+#: CRM/Sepa/Page/MarkGroupReceived.php
+msgid "Mark SEPA group received"
+msgstr "SEPA-Gruppen als erhalten markieren"
+
+#: CRM/Sepa/Page/MarkGroupReceived.php templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "No group_id given!"
+msgstr "Keine Gruppen-ID (group_id) angegeben."
+
+#: CRM/Sepa/Page/MarkGroupReceived.php
+msgid "Cannot mark TEST groups as received."
+msgstr ""
+
+#: CRM/Sepa/Page/MarkGroupReceived.php
+msgid "Couldn't close SDD group #%1.<br/>Error was: %2"
+msgstr "SDD-Gruppe #%1 konnte nicht geschlossen werden. Fehler: %2"
+
 #: CRM/Sepa/Page/SepaFile.php
 msgid "Generate XML File"
 msgstr "Erzeuge XML-Datei"
@@ -1714,10 +1836,6 @@ msgstr "SEPA Standardnachrichtenvorlage PDF"
 msgid "SEPA Direct Debit Payment Information"
 msgstr "SEPA Zahlungsinformationen"
 
-#: CRM/Sepa/Upgrader/Base.php
-msgid "Upgrade %1 to revision %2"
-msgstr ""
-
 #: CRM/Sepa/Upgrader.php
 msgid ""
 "Your CiviSEPA payment processors have been disabled, the code was moved into "
@@ -1733,10 +1851,8 @@ msgstr ""
 "releases\">CiviSEPA Payment Processor</a> Erweiterung."
 
 #: CRM/Sepa/Upgrader.php
-#, fuzzy
-#| msgid "Payment Processor Settings"
 msgid "%1 Payment Processor(s) Disabled!"
-msgstr "Einstellungen Zahlungsprozessor"
+msgstr "%1 Zahlungsprzessor(en) deaktiviert!"
 
 #: CRM/Sepa/Upgrader.php
 msgid ""
@@ -1766,6 +1882,40 @@ msgstr "unregelmäßig"
 #: CRM/Utils/SepaOptionGroupTools.php
 msgid "SEPA Standard (FRST/RCUR)"
 msgstr ""
+
+#: CRM/Utils/SepaTokens.php
+msgid "Signature Date (raw)"
+msgstr "Unterschriftsdatum (unformatiert)"
+
+#: CRM/Utils/SepaTokens.php
+msgid "IBAN (anonymised)"
+msgstr "IBAN (anonymisiert)"
+
+#: CRM/Utils/SepaTokens.php
+msgid "Amount (raw)"
+msgstr "Betrag (unformatiert)"
+
+#: CRM/Utils/SepaTokens.php
+msgid "First Collection Date (raw)"
+msgstr "Datum des ersten Einzugs (unformatiert)"
+
+#: CRM/Utils/SepaTokens.php
+#: templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
+#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
+msgid "First Collection Date"
+msgstr "Erster Einzugstermin"
+
+#: CRM/Utils/SepaTokens.php
+msgid "Interval Multiplier"
+msgstr "Intervallänge"
+
+#: CRM/Utils/SepaTokens.php
+msgid "Interval Unit"
+msgstr "Intervalleinheit"
+
+#: CRM/Utils/SepaTokens.php templates/CRM/Sepa/Page/CreateMandate.tpl
+msgid "Interval"
+msgstr "Turnus"
 
 #: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
@@ -1810,6 +1960,22 @@ msgid "Collection Day"
 msgstr "Einzugstag"
 
 #: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+msgid "Creditor (Leave empty to use default)"
+msgstr "Gläubiger (Leer lassen für Standardwert)"
+
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+msgid "Financial Type (Leave empty to use default)"
+msgstr "Zuwendungsart (Leer lassen für Standardwert)"
+
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+msgid "Campaign (Leave empty to use default)"
+msgstr "Kampagne (Leer lassen für Standardwert)"
+
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+msgid "Recurring Contribution ID"
+msgstr "ID der wiederkehrenden Zuwendung"
+
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
 msgid "bi-monthly"
 msgstr "alle 2 Monate"
 
@@ -1818,8 +1984,6 @@ msgid "as soon as possible"
 msgstr "sobald wie möglich"
 
 #: Civi/Sepa/ActionProvider/Action/FindMandate.php
-#, fuzzy
-#| msgid "One-off"
 msgid "One-Off"
 msgstr "Einmaleinzug"
 
@@ -1857,6 +2021,10 @@ msgstr "Auswahl (falls mehrere gefunden)"
 msgid "Annual Amount"
 msgstr "Jahresbetrag"
 
+#: Civi/Sepa/ActionProvider/Action/TerminateMandate.php
+msgid "Cancel Reason (if no parameter)"
+msgstr "Änderungsgrund (wenn keine Parameter)"
+
 #: Civi/Sepa/ContainerSpecs.php
 msgid "Create SEPA Mandate (One-Off)"
 msgstr "SEPA Mandat (Einzel-Lastschrift) erstellen"
@@ -1868,6 +2036,55 @@ msgstr "SEPA Mandat (Dauerlastschrift) erstellen"
 #: Civi/Sepa/ContainerSpecs.php
 msgid "Find SEPA Mandate"
 msgstr "SEPA-Mandate Finden"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "Terminate SEPA Mandate"
+msgstr "SEPA-Mandat beenden"
+
+#: Civi/Sepa/ContainerSpecs.php
+#: templates/CRM/Contact/Page/View/Summary.sepa.tpl
+msgid "SEPA Mandate"
+msgstr "SEPA-Mandat"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Creditor"
+msgstr "SEPA-Gläubiger"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Transaction Group"
+msgstr "SEPA-Transaktionsgruppe"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA SDD File"
+msgstr "SEPA-SDD-Datei"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Contribution Group"
+msgstr "SEPA-Zuwendungsgruppe"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "SEPA Mandate Link"
+msgstr "SEPA-Mandatsverweis"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "Join Sepa Mandate on Contribution"
+msgstr "SEPA-Mandat mit Zuwendung verbinden (join)"
+
+#: Civi/Sepa/ContainerSpecs.php
+msgid "Join Sepa Mandate on Contribution Recur"
+msgstr "SEPA-Mandat mit wiederkehrender Zuwendung verbinden (join)"
+
+#: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+msgid "Select field"
+msgstr ""
+
+#: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+msgid "Required"
+msgstr "Erforderlich"
+
+#: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+msgid "Not required"
+msgstr "Nicht erforderlich"
 
 #: api/v3/SepaTransactionGroup.php
 msgid "SEPA DD Transaction Batch"
@@ -1945,10 +2162,8 @@ msgid "<i>Error</i>"
 msgstr "<i>Fehler</i>"
 
 #: sepa.php
-#, fuzzy
-#| msgid "Recurring SEPA Mandates"
 msgid "Record SEPA Mandate"
-msgstr "Wiederkehrende SEPA-Mandate"
+msgstr "SEPA-Mandat erfassen"
 
 #: sepa.php
 msgid "CiviSEPA Settings"
@@ -1963,28 +2178,56 @@ msgid "Create SEPA mandates"
 msgstr "Lege SEPA-Mandate an"
 
 #: sepa.php
+msgid "Allows creating SEPA Direct Debit mandates."
+msgstr ""
+
+#: sepa.php
 msgid "View SEPA mandates"
 msgstr "SEPA-Mandate ansehen"
+
+#: sepa.php
+msgid "Allows viewing SEPA Direct Debit mandates"
+msgstr ""
 
 #: sepa.php
 msgid "Edit SEPA mandates"
 msgstr "SEPA-Mandate bearbeiten"
 
 #: sepa.php
+msgid "Allows editing SEPA Direct Debit mandates."
+msgstr ""
+
+#: sepa.php
 msgid "Delete SEPA mandates"
 msgstr "SEPA-Mandate löschen"
+
+#: sepa.php
+msgid "Allows deleting SEPA Direct Debit mandates"
+msgstr ""
 
 #: sepa.php
 msgid "View SEPA transaction groups"
 msgstr "SEPA-Gruppen ansehen"
 
 #: sepa.php
+msgid "Allows viewing groups of SEPA transactions to be sent to the bank."
+msgstr ""
+
+#: sepa.php
 msgid "Batch SEPA transaction groups"
 msgstr "SEPA-Gruppen erzeugen"
 
 #: sepa.php
+msgid "Allows generating groups of SEPA transactions to be sent to the bank."
+msgstr ""
+
+#: sepa.php
 msgid "Delete SEPA transaction groups"
 msgstr "SEPA-Gruppen löschen"
+
+#: sepa.php
+msgid "Allows deleting groups of SEPA transactions to be sent to the bank."
+msgstr ""
 
 #: sepa.php
 msgid ""
@@ -1997,39 +2240,6 @@ msgstr ""
 #: sepa.php
 msgid "Most Recent SEPA Mandate"
 msgstr "Letztes SEPA Mandat"
-
-#: sepa.php
-msgid "Signature Date (raw)"
-msgstr "Unterschriftsdatum (unformatiert)"
-
-#: sepa.php
-msgid "IBAN (anonymised)"
-msgstr "IBAN (anonymisiert)"
-
-#: sepa.php
-msgid "Amount (raw)"
-msgstr "Betrag (unformatiert)"
-
-#: sepa.php
-msgid "First Collection Date (raw)"
-msgstr "Datum des ersten Einzugs (unformatiert)"
-
-#: sepa.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl
-#: templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl
-msgid "First Collection Date"
-msgstr "Erster Einzugstermin"
-
-#: sepa.php
-msgid "Interval Multiplier"
-msgstr "Intervallänge"
-
-#: sepa.php
-msgid "Interval Unit"
-msgstr "Intervalleinheit"
-
-#: sepa.php templates/CRM/Sepa/Page/CreateMandate.tpl
-msgid "Interval"
-msgstr "Turnus"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid ""
@@ -2301,12 +2511,12 @@ msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid ""
-"If you have the <a href=\"https://github.com/Project60/org.project60.bic"
-"\">Little BIC Extension</a> installed, the BIC can be derived automatically "
-"from the IBAN in most cases."
+"If you have the <a href=\"https://github.com/Project60/org.project60."
+"bic\">Little BIC Extension</a> installed, the BIC can be derived "
+"automatically from the IBAN in most cases."
 msgstr ""
-"Wenn Sie die <a href=\"https://github.com/Project60/org.project60.bic"
-"\">Little BIC Extension</a> installiert haben, kann die BIC automatisch "
+"Wenn Sie die <a href=\"https://github.com/Project60/org.project60."
+"bic\">Little BIC Extension</a> installiert haben, kann die BIC automatisch "
 "anhand der IBAN ermittelt werden."
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
@@ -2460,6 +2670,12 @@ msgid ""
 "If you leave this empty, no (new) one-off mandates can be created any more."
 msgstr ""
 
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid ""
+"CUC-code (\"Codice Univoco CBI\") of the financial institution of the "
+"creditor. It is only required for CBIBdySDDReq SEPA file format."
+msgstr ""
+
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Creditors"
 msgstr "Einzugsberechtigte"
@@ -2562,10 +2778,6 @@ msgid "Support Large Groups"
 msgstr "Unterstützung für große SEPA-Gruppen"
 
 #: templates/CRM/Contact/Page/View/Summary.sepa.tpl
-msgid "SEPA Mandate"
-msgstr "SEPA-Mandat"
-
-#: templates/CRM/Contact/Page/View/Summary.sepa.tpl
 #: templates/CRM/Sepa/Page/DashBoard.tpl templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "Contributions"
 msgstr "Zuwendungen"
@@ -2583,10 +2795,6 @@ msgstr "Ich möchte diesen Betrag %1 zahlen."
 #: templates/CRM/Event/Form/RegistrationConfirm.sepa.tpl
 msgid "This payment will be debited from the following account:"
 msgstr "Die Zahlung wird von dem folgenden Bankkonto abgebucht:"
-
-#: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
-msgid "Account Holder"
-msgstr "Kontoinhaber"
 
 #: templates/CRM/Contribute/Form/ContributionConfirm.sepa.tpl
 msgid "Bank Name"
@@ -2646,6 +2854,45 @@ msgstr "Frühester Einzugstermin"
 msgid "You're replacing mandate %1"
 msgstr "Sie ersetzen Mandat %1"
 
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl
+msgid ""
+"Select the ID of the contribution. This could be either on the contribution "
+"source with the field id. Or the any other data source which holds a "
+"contribution ID field."
+msgstr ""
+
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionRecurJoin.tpl
+msgid "Required join"
+msgstr "erforderlicher Join"
+
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl
+msgid ""
+"Required means that both Sepa Mandate Entity ID field and the Contribution "
+"ID need to be set. "
+msgstr ""
+
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl
+msgid "Join on Contribution ID field"
+msgstr "Join auf ID-Feld der Zuwendung"
+
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionRecurJoin.tpl
+msgid ""
+"Select the ID of the contribution recur. This could be either on the "
+"contribution recur source with the field id. Or the contribution source and "
+"field contribution_recur_id."
+msgstr ""
+
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionRecurJoin.tpl
+msgid ""
+"Required means that both Sepa Mandate Entity ID field and the Recurring "
+"Contribution ID need to be set. "
+msgstr ""
+
+#: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionRecurJoin.tpl
+msgid "Join on Contribution Recur ID field"
+msgstr "Join auf ID-Feld der wiederkehrenden Zuwendung"
+
 #: templates/CRM/Sepa/Form/RetryCollection.hlp
 msgid ""
 "Allows you to add a customised transaction message, i.e. the message the "
@@ -2659,12 +2906,12 @@ msgid ""
 msgstr ""
 
 #: templates/CRM/Sepa/Form/RetryCollection.tpl
-#, fuzzy
-#| msgid "Select the transaction groups you want to re-collect."
 msgid ""
 "Select the transaction groups of which you want to re-collect failed "
 "transactions"
-msgstr "Wählen Sie die SEPA-Gruppen aus, die Sie erneut einziehen möchten."
+msgstr ""
+"Wählen Sie die SEPA-Gruppen aus, für die Sie fehlgeschlagene Transaktionen "
+"erneut einziehen möchten."
 
 #: templates/CRM/Sepa/Form/RetryCollection.tpl
 msgid "Add some filters"
@@ -2843,12 +3090,6 @@ msgid "It's very important to select one of the options below."
 msgstr "Bitte unbedingt eine der Optionen unten auswählen."
 
 #: templates/CRM/Sepa/Page/CreateMandate.tpl
-#: templates/CRM/Sepa/Page/EditMandate.tpl
-#: templates/CRM/Sepa/Page/ListGroup.tpl
-msgid "Contact"
-msgstr "Kontakt"
-
-#: templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Replacing Mandate"
 msgstr "Mandat ersetzen"
 
@@ -2929,10 +3170,8 @@ msgid "Total"
 msgstr "Gesamt"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
-#, fuzzy
-#| msgid "Transaction Message"
 msgid "Custom Transaction Message:"
-msgstr "Verwendungszweck"
+msgstr "Benutzerdefinierte Transaktionsnachricht:"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Note:"
@@ -3108,6 +3347,10 @@ msgstr "alle %1 löschen"
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "delete pending %1"
 msgstr "ausstehende %1 löschen"
+
+#: templates/CRM/Sepa/Page/DeleteGroup.tpl
+msgid "recommended"
+msgstr ""
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid ""
@@ -3311,10 +3554,6 @@ msgid "Back"
 msgstr "Zurück"
 
 #: templates/CRM/Sepa/Page/DeleteGroup.tpl
-msgid "No group_id given!"
-msgstr "Keine Gruppen-ID (group_id) angegeben."
-
-#: templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "Transaction group [%1] couldn't be loaded."
 msgstr "SEPA Gruppe [%1] konnte nicht geladen werden."
 
@@ -3337,6 +3576,12 @@ msgid ""
 "'SEPA'."
 msgstr ""
 "Alle Nachrichtenvorlagen die mit 'SEPA' beginnen, werden hier angezeigt."
+
+#: templates/CRM/Sepa/Page/EditMandate.hlp
+msgid ""
+"When you change the cycle day be aware that you might end up collecting "
+"twice in the same month, or miss a collection altogether."
+msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "SEPA Recurring Mandate"
@@ -3433,6 +3678,18 @@ msgstr "Mandat ändern zum:"
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Replace for the following reason:"
 msgstr "Grund der Änderung:"
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Change Cycle Day"
+msgstr "Einzugstag ändern"
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "New cycle day:"
+msgstr "Neuer Einzugstag:"
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Cyle Day"
+msgstr "Einzugstag"
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Adjust Amount"
@@ -3543,6 +3800,12 @@ msgid "This contact has no recorded recurring mandates."
 msgstr "Dieser Kontakt hat keine Mandate mit wiederkehrenden Zahlungen."
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid ""
+"Note that only mandates associated with contributions of authorized "
+"financial types are being displayed."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "One-Off SEPA Mandates"
 msgstr "Einmalige SEPA-Latschriften"
 
@@ -3583,6 +3846,17 @@ msgstr "Fertig"
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Notes"
 msgstr "Notizen"
+
+#: tests/phpunit/CRM/Sepa/BugReproductionTest.php
+#: tests/phpunit/CRM/Sepa/MandateTest.php
+msgid "OOFF Mandate status after closing is incorrect."
+msgstr ""
+
+#: tests/phpunit/CRM/Sepa/BugReproductionTest.php
+msgid ""
+"OOFF contribution status after closing is incorrect, probably related to "
+"SEPA-629"
+msgstr ""
 
 #: tests/phpunit/CRM/Sepa/HookTest.php
 msgid "The create_mandate hook has not been called."
@@ -3691,10 +3965,6 @@ msgid "RCUR transaction group status after batching is incorrect."
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF Mandate status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
 msgid "OOFF contribution status after closing is incorrect."
 msgstr ""
 
@@ -3718,16 +3988,16 @@ msgstr ""
 msgid "Mandate status of new mandate is incorrect."
 msgstr ""
 
+#: tests/phpunit/CRM/Sepa/MandateTest.php
+msgid "Mandate account holder after creation is incorrect."
+msgstr ""
+
 #: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
 msgid "The OOFF mandate reference is invalid."
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
 msgid "The RCUR mandate reference is invalid."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
-msgid "There should be a clashing reference"
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/SettingsTest.php
@@ -3739,9 +4009,7 @@ msgid "set/getSetting doesn't work"
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/TestBase.php
-msgid ""
-"The contribution for the mandate is null. That should not be possible at "
-"this point."
+msgid "This mandate has no contribution, even though there should be one."
 msgstr ""
 
 #: tests/phpunit/CRM/Sepa/VerifyBicTest.php
@@ -3783,6 +4051,9 @@ msgstr ""
 #: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
 msgid "Blocklistet IBAN should fail but did not!"
 msgstr ""
+
+#~ msgid "Couldn't read transaction groups. Error was: '%s'"
+#~ msgstr "Die Gruppen konnten nicht geladen werden. Fehler ist: '%s'"
 
 #~ msgid "Does this creditor use BICs?"
 #~ msgstr "Verwendet dieser Kreditor BICs?"
@@ -3866,9 +4137,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Beendigungsgrund für Mandat [%s] konnte nicht gesetzt werden. Fehler ist: "
 #~ "'%s'"
-
-#~ msgid "Couldn't create note for contribution #%s"
-#~ msgstr "Konnte die Zuwendungsnotiz für [%s] nicht erstellen"
 
 #~ msgid "edit mandate"
 #~ msgstr "Mandat Bearbeiten"

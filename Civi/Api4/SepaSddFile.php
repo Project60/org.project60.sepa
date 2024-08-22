@@ -2,9 +2,9 @@
 namespace Civi\Api4;
 
 /**
- * Resource entity.
+ * SepaSddFile entity.
  *
- * Provided by the CiviCRM Resource Management extension.
+ * Provided by the CiviSEPA extension.
  *
  * @package Civi\Api4
  */

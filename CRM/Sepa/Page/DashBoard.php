@@ -21,7 +21,7 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
+use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
@@ -47,6 +47,12 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     // check permissions
     $this->assign('can_delete', CRM_Core_Permission::check('delete sepa groups'));
     $this->assign('can_batch',  CRM_Core_Permission::check('batch sepa groups'));
+    $this->assign(
+      'financialacls',
+      \CRM_Extension_System::singleton()
+        ->getManager()
+        ->getStatus('financialacls') === \CRM_Extension_Manager::STATUS_INSTALLED
+    );
 
     if (isset($_REQUEST['update'])) {
       $this->callBatcher($_REQUEST['update']);
@@ -83,38 +89,81 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     $this->assign('closed_status_id', CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'));
 
     // now read the details
-    $result = civicrm_api("SepaTransactionGroup", "getdetail", array(
-        "version"       => 3,
-        "sequential"    => 1,
-        "status_ids"    => implode(',', $status_list[$status]),
-        "order_by"      => (($status=='open')?'latest_submission_date':'file.created_date'),
-        ));
-    if (isset($result['is_error']) && $result['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't read transaction groups. Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
-    } else {
+    try {
+      // API4 SepaTransactionGroup.get checks Financial ACLs for corresponding contributions.
+      $sepaTransactionGroups = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->selectRowCount()
+        ->addSelect(
+          'id',
+          'reference',
+          'sdd_file_id',
+          'type',
+          'collection_date',
+          'latest_submission_date',
+          'status_id',
+          'sdd_creditor_id',
+          'sepa_sdd_file.created_date',
+          'SUM(contribution.total_amount) AS total',
+          'COUNT(*) AS nb_contrib',
+          'contribution.currency',
+          'sepa_sdd_file.reference'
+        )
+        ->addJoin(
+          'Contribution AS contribution',
+          'LEFT',
+          'SepaContributionGroup'
+        )
+        ->addJoin(
+          'SepaSddFile AS sepa_sdd_file',
+          'LEFT',
+          ['sdd_file_id', '=', 'sepa_sdd_file.id']
+        )
+        ->addWhere('status_id', 'IN', $status_list[$status])
+        ->addOrderBy('open' === $status ? 'latest_submission_date' : 'sepa_sdd_file.created_date')
+        ->addGroupBy('id')
+        ->addGroupBy('reference')
+        ->addGroupBy('sdd_file_id')
+        ->addGroupBy('type')
+        ->addGroupBy('collection_date')
+        ->addGroupBy('latest_submission_date')
+        ->addGroupBy('status_id')
+        ->addGroupBy('sdd_creditor_id')
+        ->addGroupBy('sepa_sdd_file.created_date')
+        ->addGroupBy('contribution.currency')
+        ->addGroupBy('sepa_sdd_file.reference')
+        ->execute();
       $groups = [];
       $now = date('Y-m-d');
-      foreach ($result["values"] as $id => $group) {
-        // 'beautify'
+      foreach ($sepaTransactionGroups as $group) {
         $group['latest_submission_date'] = date('Y-m-d', strtotime($group['latest_submission_date']));
         $group['collection_date'] = date('Y-m-d', strtotime($group['collection_date']));
         $group['collection_date_in_future'] = ($group['collection_date'] > $now) ? 1 : 0;
         $group['status'] = $status_2_title[$group['status_id']];
+        $group['currency'] = $group['contribution.currency'];
+        $group['file_id'] = $group['sdd_file_id'];
+        $group['file_created_date'] = $group['sepa_sdd_file.created_date'];
+        $group['creditor_id'] = $group['sdd_creditor_id'];
+        $group['file'] = $group['sepa_sdd_file.reference'];
         $group['file'] = $this->getFormatFilename($group);
         $group['status_label'] = $status2label[$group['status_id']];
-        $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60*60*24);
-        if ($group['status']=='closed') {
+        $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60 * 60 * 24);
+        if ('closed' === $group['status']) {
           $group['submit'] = 'closed';
-        } elseif ($group['type'] == 'OOFF') {
+        }
+        elseif ('OOFF' === $group['type']) {
           $group['submit'] = 'soon';
-        } else {
+        }
+        else {
           if ($remaining_days <= -1) {
             $group['submit'] = 'missed';
-          } elseif ($remaining_days <= 1) {
+          }
+          elseif ($remaining_days <= 1) {
             $group['submit'] = 'urgently';
-          } elseif ($remaining_days <= 6) {
+          }
+          elseif ($remaining_days <= 6) {
             $group['submit'] = 'soon';
-          } else {
+          }
+          else {
             $group['submit'] = 'later';
           }
         }
@@ -122,16 +171,22 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage($group['id']);
         $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote($group['id']);
 
-        array_push($groups, $group);
+        $groups[] = $group;
       }
-      $this->assign("groups", $groups);
+      $this->assign('groups', $groups);
+    }
+    catch (CRM_Core_Exception $exception) {
+      CRM_Core_Session::setStatus(
+        E::ts(
+          "Couldn't read transaction groups. Error was: %1",
+          [1 => $result['error_message']]
+        ),
+        E::ts('Error'),
+        'error'
+      );
     }
 
     parent::run();
-  }
-
-  function getTemplateFileName() {
-    return "CRM/Sepa/Page/DashBoard.tpl";
   }
 
   /**

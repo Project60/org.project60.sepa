@@ -783,6 +783,10 @@ msgid "End Date"
 msgstr ""
 
 #: CRM/Sepa/Form/CreateMandate.php
+msgid "The mandate to clone/replace from does not exist or you do not have permission for it."
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
 msgid "You can only replace RCUR mandates"
 msgstr ""
 
@@ -1415,7 +1419,7 @@ msgid "CiviSEPA Dashboard"
 msgstr ""
 
 #: CRM/Sepa/Page/DashBoard.php
-msgid "Couldn't read transaction groups. Error was: '%s'"
+msgid "Couldn't read transaction groups. Error was: %1"
 msgstr ""
 
 #: CRM/Sepa/Page/DashBoard.php
@@ -3048,6 +3052,10 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "This contact has no recorded recurring mandates."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Note that only mandates associated with contributions of authorized financial types are being displayed."
 msgstr ""
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl

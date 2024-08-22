@@ -84,6 +84,9 @@ function civicrm_api3_sepa_transaction_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @deprecated This action will not be ported to APIv4. Use the "Get" action with custom joins and filters instead.
+ */
 function civicrm_api3_sepa_transaction_group_getdetail($params) {
 //  $where = "txgroup.id= txgroup_contrib.txgroup_id AND txgroup_contrib.contribution_id = contrib.id";
   $where = "1";
