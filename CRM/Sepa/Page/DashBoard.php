@@ -31,13 +31,8 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
   function run() {
     CRM_Utils_System::setTitle(ts('CiviSEPA Dashboard', array('domain' => 'org.project60.sepa')));
     // get requested group status
-    if (isset($_REQUEST['status'])) {
-      if ($_REQUEST['status'] != 'open' && $_REQUEST['status'] != 'closed') {
-        $status = 'open';
-      } else {
-        $status = $_REQUEST['status'];
-      }
-    } else {
+    $status = CRM_Utils_Request::retrieve('status', 'String');
+    if ('open' !== $status && 'closed' !== $status) {
       $status = 'open';
     }
 
