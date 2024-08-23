@@ -21,19 +21,27 @@ namespace Civi\Sepa\Api4\Action\SepaTransactionGroup;
 
 use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\SepaContributionGroup;
 
 class GetAction extends DAOGetAction {
 
   public function _run(Result $result) {
-    // Add unique joins for permission checks of Financial ACLs.
     if ($this->getCheckPermissions()) {
-      $contributionAlias = uniqid('contribution_');
+      // Count permissioned contributions (in the join) and the total number of contributions in the transaction group,
+      // and extract those with matching counts, i.e. groups of which the user has permission to view all contributions.
+      $fullyPermissionedTxgroups = SepaContributionGroup::get()
+        ->addSelect(
+          'txgroup_id',
+          'COUNT(contribution.id) AS allowed_contributions',
+          'COUNT(*) AS total_contributions'
+        )
+        ->addJoin('Contribution AS contribution', 'LEFT', ['contribution.id', '=', 'contribution_id'])
+        ->addGroupBy('txgroup_id')
+        ->addHaving('allowed_contributions', '=', 'total_contributions', TRUE)
+        ->execute()
+        ->column('txgroup_id');
       $this
-        ->addJoin(
-          'Contribution AS ' . $contributionAlias,
-          'INNER',
-          'SepaContributionGroup'
-        );
+      ->addWhere('id', 'IN', $fullyPermissionedTxgroups);
     }
     return parent::_run($result);
   }
