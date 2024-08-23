@@ -8,9 +8,9 @@
     <author>B. Endres</author>
     <email>endres@systopia.de</email>
   </maintainer>
-  <releaseDate></releaseDate>
-  <version>1.12-dev</version>
-  <develStage>dev</develStage>
+  <releaseDate>2024-08-49</releaseDate>
+  <version>1.12-alpha1</version>
+  <develStage>alpha</develStage>
   <compatibility>
     <ver>5.75</ver>
     <ver>5.65</ver>
@@ -19,7 +19,7 @@
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
     <url desc="Documentation">https://docs.civicrm.org/civisepa</url>
     <url desc="Support">https://github.com/Project60/org.project60.sepa/issues</url>
-    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <comments>This module's origins are Xaviers Dutoit's (xavier@tttp.eu) and Bj&#xF6;rn Endres' (endres@systopia.de) Project60 SEPA branches.</comments>
   <classloader>
