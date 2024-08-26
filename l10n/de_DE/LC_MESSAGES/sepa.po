@@ -262,8 +262,7 @@ msgstr ""
 #: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php
 #: CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Logic/Status.php
 #: CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php
-#: CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php
-#: CRM/Sepa/Page/ListGroup.php js/SepaSettings.js
+#: CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php js/SepaSettings.js
 msgid "Error"
 msgstr "Fehler"
 
@@ -1789,8 +1788,9 @@ msgid "SEPA Group Contributions"
 msgstr "Zuwendungen der SEPA Gruppe"
 
 #: CRM/Sepa/Page/ListGroup.php
-msgid "Cannot read SEPA transaction group [%s]. Error was: '%s'"
-msgstr "Die SEPA Gruppe [%s] konnte nicht geladen werden. Fehler ist: '%s'"
+msgid "Cannot read SEPA transaction group [%1]. Error was: %2"
+msgstr ""
+"Die SEPA-Transaktionsgruppe [%1] konnte nicht geladen werden. Fehler: %2"
 
 #: CRM/Sepa/Page/MandateTab.php sepa.php
 msgid "SEPA Mandates"
@@ -3150,6 +3150,14 @@ msgid "retry collection"
 msgstr "Einzug erneut versuchen"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid ""
+"Note that only groups with contributions of authorized financial types are "
+"being displayed."
+msgstr ""
+"Beachten Sie, dass nur Gruppen mit Zuwendungen angezeigt werden, für deren "
+"Zuwendungsart Sie die Berechtigung haben."
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Group Name"
 msgstr "Gruppenname"
 
@@ -3804,6 +3812,8 @@ msgid ""
 "Note that only mandates associated with contributions of authorized "
 "financial types are being displayed."
 msgstr ""
+"Beachten Sie, dass nur Mandate mit zugehörigen Zuwendungen angezeigt werden, "
+"für deren Zuwendungsart Sie die Berechtigung haben."
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "One-Off SEPA Mandates"
