@@ -27,6 +27,7 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 * automatic adjustment of late OOFF and RCUR transactions
 * integration with [CiviBanking](https://docs.civicrm.org/banking/en/latest)
 * integration with [Project60 Membership Extension](https://docs.civicrm.org/project60-membership/en/latest/)
+* integration with [FormProcessor Actions](https://civicrm.org/extensions/form-processor)
 
 ## What it can not (yet) do
 * permission management (under development)
