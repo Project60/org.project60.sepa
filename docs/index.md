@@ -20,18 +20,17 @@ Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSE
 * SEPA dashboard gives you great status overview
 * payment processer for online donations and event registrations[*](https://github.com/Project60/org.project60.sepa/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+event+registration+)
 * UI to manipulate mandates
-* automatic BIC lookup if [Little BIC Extension](https://github.com/Project60/org.project60.bic) in installed
+* automatic BIC lookup if [Little BIC Extension](https://github.com/Project60/org.project60.bic) is installed
 * full SEPA group life cycle: 'open'-'closed/sent'->'received'
 * record SEPA payment action and form for contacts
 * manual batching with parameters for notice period and horizon
 * automatic adjustment of late OOFF and RCUR transactions
 * integration with [CiviBanking](https://docs.civicrm.org/banking/en/latest)
+* integration with [Project60 Membership Extension](https://docs.civicrm.org/project60-membership/en/latest/)
 
 ## What it can not (yet) do
-* permission management
-* membership payments
+* permission management (under development)
 * automatic submission to the banks
-
 
 ## Installation
 
