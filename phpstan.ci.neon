@@ -1,0 +1,13 @@
+includes:
+	- phpstan.neon.dist
+
+parameters:
+	scanDirectories:
+		- ci/vendor/civicrm/civicrm-core/CRM/
+	bootstrapFiles:
+		- ci/vendor/autoload.php
+	# Because we test with different versions in CI we have unmatched errors
+	reportUnmatchedIgnoredErrors: false
+	ignoreErrors:
+		# Errors we get when using "prefer-lowest"
+		- '#::getSubscribedEvents\(\) return type has no value type specified in iterable type array.$#'
