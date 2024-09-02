@@ -55,6 +55,4 @@ We added an example implementation for your convenience: [org.project60.sepacust
 
 If you want to customize the transaction message without creating an extension you can use tokens if you install [nl.hollandopensource.sepatxmessagetokens](https://github.com/HollandOpenSource/nl.hollandopensource.sepatxmessagetokens/#nlhollandopensourcesepatxmessagetokens).
 
-## Documentation
-- EN: https://docs.civicrm.org/civisepa/en/latest/
 
