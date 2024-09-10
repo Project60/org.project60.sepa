@@ -508,6 +508,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       }
     }
 
+    // execute updateNextCollectionDate, @see https://github.com/Project60/org.project60.sepa/issues/734
+    $updater = new CRM_Sepa_Logic_NextCollectionDate($mandate['creditor_id']);
+    $updater->updateNextCollectionDate($mandate['entity_id'], $mandate_id);
+
     if ($error_to_ui) {
       CRM_Core_Session::setStatus(ts("New end date set.", array('domain' => 'org.project60.sepa')), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'info');
       CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed.", array('domain' => 'org.project60.sepa')), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'warn');
