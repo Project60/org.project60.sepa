@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_txgroup` (
      `reference`                varchar(64)             COMMENT 'End-to-end reference for this tx group.',
      `type`                     char(4)                 COMMENT 'FRST, RCUR, OOFF or RTRY',
      `collection_date`          datetime                COMMENT 'Target collection date',
+     `financial_type_id`        int unsigned            COMMENT 'Financial type of contained contributions if CiviSEPA is generating groups matching financial types.',
      `latest_submission_date`   datetime                COMMENT 'Latest submission date',
      `created_date`             datetime                COMMENT 'When was this item created',
      `status_id`                int unsigned NOT NULL   COMMENT 'fk to Batch Status options in civicrm_option_values',

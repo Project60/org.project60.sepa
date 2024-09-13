@@ -1,21 +1,21 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>  
+<?xml version="1.0" encoding="iso-8859-1" ?>
 <table>
-  <base>CRM/Sepa</base>  
-  <class>SEPATransactionGroup</class>  
-  <name>civicrm_sdd_txgroup</name>  
+  <base>CRM/Sepa</base>
+  <class>SEPATransactionGroup</class>
+  <name>civicrm_sdd_txgroup</name>
   <log>true</log>
 
-  <field>  
-    <name>id</name>  
-    <type>int unsigned</type>  
-    <required>true</required>  
-    <comment>ID</comment>  
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID</comment>
     <export>true</export>
-  </field>  
-  <primaryKey>  
-    <name>id</name>  
-    <autoincrement>true</autoincrement>  
-  </primaryKey>  
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
 
   <field>
     <name>reference</name>
@@ -41,6 +41,13 @@
     <type>datetime</type>
     <comment>Target collection date</comment>
   </field>
+
+  <field>
+    <name>financial_type_id</name>
+    <type>int unsigned</type>
+    <comment>Financial type of contained contributions if CiviSEPA is generating groups matching financial types.</comment>
+  </field>
+
   <field>
     <name>latest_submission_date</name>
     <type>datetime</type>
@@ -67,10 +74,10 @@
     <fieldName>sdd_creditor_id</fieldName>
     <add>4.3</add>
   </index>
-  <foreignKey> 
-    <name>sdd_creditor_id</name> 
-    <table>civicrm_sdd_creditor</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>sdd_creditor_id</name>
+    <table>civicrm_sdd_creditor</table>
+    <key>id</key>
       <onDelete>SET NULL</onDelete>
   </foreignKey>
 
@@ -83,10 +90,10 @@
     <name>file_id</name>
     <fieldName>sdd_file_id</fieldName>
   </index>
-  <foreignKey> 
-    <name>sdd_file_id</name> 
-    <table>civicrm_sdd_file</table> 
-    <key>id</key> 
+  <foreignKey>
+    <name>sdd_file_id</name>
+    <table>civicrm_sdd_file</table>
+    <key>id</key>
       <onDelete>SET NULL</onDelete>
   </foreignKey>
 
