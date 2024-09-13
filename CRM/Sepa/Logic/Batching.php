@@ -264,17 +264,11 @@ class CRM_Sepa_Logic_Batching {
    * @param $offset       used for segmented updates
    * @param $limit        used for segmented updates
    */
-  static function updateOOFF($creditor_id, $now = 'now', $offset=NULL, $limit=NULL) {
+  static function updateOOFF($creditor_id, $now = 'now', $offset = NULL, $limit = NULL) {
     // check lock
     $lock = CRM_Sepa_Logic_Settings::getLock();
     if (empty($lock)) {
       return "Batching in progress. Please try again later.";
-    }
-
-    if ($offset !== NULL && $limit!==NULL) {
-      $batch_clause = "LIMIT {$limit} OFFSET {$offset}";
-    } else {
-      $batch_clause = "";
     }
 
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
@@ -282,31 +276,26 @@ class CRM_Sepa_Logic_Batching {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $date_limit = date('Y-m-d', strtotime("$now +$horizon days"));
 
-    // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch
-    $sql_query = "
-      SELECT
-        mandate.id                AS mandate_id,
-        mandate.contact_id        AS mandate_contact_id,
-        mandate.entity_id         AS mandate_entity_id,
-        contribution.receive_date AS start_date
-      FROM civicrm_sdd_mandate AS mandate
-      INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id AND mandate.entity_table = 'civicrm_contribution'
-      WHERE contribution.receive_date <= DATE('$date_limit')
-        AND mandate.type = 'OOFF'
-        AND mandate.status = 'OOFF'
-        AND mandate.creditor_id = $creditor_id
-        {$batch_clause};";
-    $results = CRM_Core_DAO::executeQuery($sql_query);
-    $relevant_mandates = array();
-    while ($results->fetch()) {
-      // TODO: sanity checks?
-      $relevant_mandates[$results->mandate_id] = array(
-          'mandate_id'          => $results->mandate_id,
-          'mandate_contact_id'  => $results->mandate_contact_id,
-          'mandate_entity_id'   => $results->mandate_entity_id,
-          'start_date'          => $results->start_date,
-        );
-    }
+    // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch and that have a
+    // corresponding contribution of a financial type the user has access to (implicit condition added by Financial ACLs
+    // extension if enabled).
+    $relevant_mandates = \Civi\Api4\SepaMandate::get(TRUE)
+      ->addSelect('id', 'contact_id', 'entity_id', 'contribution.receive_date', 'contribution.financial_type_id')
+      ->addJoin(
+        'Contribution AS contribution',
+        'INNER',
+        ['entity_table', '=', "'civicrm_contribution'"],
+        ['entity_id', '=', 'contribution.id']
+      )
+      ->addWhere('contribution.receive_date', '<=', $date_limit)
+      ->addWhere('type', '=', 'OOFF')
+      ->addWhere('status', '=', 'OOFF')
+      ->addWhere('creditor_id', '=', $creditor_id)
+      ->setLimit($limit ?? 0)
+      ->setOffset($offset ?? 0)
+      ->execute()
+      ->indexBy('id')
+      ->getArrayCopy();
 
     // step 2: group mandates in collection dates
     $calculated_groups = array();
@@ -314,16 +303,21 @@ class CRM_Sepa_Logic_Batching {
     $latest_collection_date = '';
 
     foreach ($relevant_mandates as $mandate_id => $mandate) {
+      $mandate['mandate_id'] = $mandate['id'];
+      $mandate['mandate_contact_id'] = $mandate['contact_id'];
+      $mandate['mandate_entity_id'] = $mandate['entity_id'];
+      $mandate['start_date'] = $mandate['contribution.receive_date'];
+      $mandate['financial_type_id'] = $mandate['contribution.financial_type_id'];
       $collection_date = date('Y-m-d', strtotime($mandate['start_date']));
       if ($collection_date <= $earliest_collection_date) {
         $collection_date = $earliest_collection_date;
       }
 
-      if (!isset($calculated_groups[$collection_date])) {
-        $calculated_groups[$collection_date] = array();
+      if (!isset($calculated_groups[$collection_date][$mandate['financial_type_id']])) {
+        $calculated_groups[$collection_date][$mandate['financial_type_id']] = [];
       }
 
-      array_push($calculated_groups[$collection_date], $mandate);
+      array_push($calculated_groups[$collection_date][$mandate['financial_type_id']], $mandate);
 
       if ($collection_date > $latest_collection_date) {
         $latest_collection_date = $collection_date;
@@ -331,13 +325,14 @@ class CRM_Sepa_Logic_Batching {
     }
     if (!$latest_collection_date) {
       // nothing to do...
-      return array();
+      return [];
     }
 
     // step 3: find all existing OPEN groups in the horizon
     $sql_query = "
       SELECT
         txgroup.collection_date AS collection_date,
+        txgroup.financial_type_id AS financial_type_id,
         txgroup.id AS txgroup_id
       FROM civicrm_sdd_txgroup AS txgroup
       WHERE txgroup.sdd_creditor_id = $creditor_id
@@ -347,11 +342,20 @@ class CRM_Sepa_Logic_Batching {
     $existing_groups = array();
     while ($results->fetch()) {
       $collection_date = date('Y-m-d', strtotime($results->collection_date));
-      $existing_groups[$collection_date] = $results->txgroup_id;
+      $existing_groups[$collection_date][$results->financial_type_id ?? 0] = $results->txgroup_id;
     }
 
     // step 4: sync calculated group structure with existing (open) groups
-    self::syncGroups($calculated_groups, $existing_groups, 'OOFF', 'OOFF', $ooff_notice, $creditor_id, $offset!==NULL, $offset===0);
+    self::syncGroups(
+      $calculated_groups,
+      $existing_groups,
+      'OOFF',
+      'OOFF',
+      $ooff_notice,
+      $creditor_id,
+      $offset !== NULL,
+      $offset === 0
+    );
 
     $lock->release();
   }
@@ -449,100 +453,114 @@ class CRM_Sepa_Logic_Batching {
    * @param $partial_groups     Is this a partial update?
    * @param $partial_first      Is this the first call in a partial update?
    */
-  protected static function syncGroups($calculated_groups, $existing_groups, $mode, $type, $notice, $creditor_id, $partial_groups=FALSE, $partial_first=FALSE) {
+  protected static function syncGroups(
+    $calculated_groups,
+    $existing_groups,
+    $mode,
+    $type,
+    $notice,
+    $creditor_id,
+    $partial_groups=FALSE,
+    $partial_first=FALSE
+  ) {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
-    foreach ($calculated_groups as $collection_date => $mandates) {
+    foreach ($calculated_groups as $collection_date => $financial_type_groups) {
       // check if we need to defer the collection date (e.g. due to bank holidays)
       self::deferCollectionDate($collection_date, $creditor_id);
 
-      if (!isset($existing_groups[$collection_date])) {
-        // this group does not yet exist -> create
+      // If not using financial type grouping, flatten to a "0" financial type.
+      if (!CRM_Sepa_Logic_Settings::getGenericSetting('sdd_financial_type_grouping')) {
+        $financial_type_groups = [0 => array_merge(...$financial_type_groups)];
+      }
 
-        // find unused reference
-        $reference = "TXG-{$creditor_id}-{$mode}-{$collection_date}";
-        $counter = 0;
-        while (self::referenceExists($reference)) {
-          $counter += 1;
-          $reference = "TXG-{$creditor_id}-{$mode}-{$collection_date}--".$counter;
+      foreach ($financial_type_groups as $financial_type_id => $mandates) {
+        if (0 === $financial_type_id) {
+          $financial_type_id = NULL;
         }
+        if (!isset($existing_groups[$collection_date][$financial_type_id ?? 0])) {
+          // this group does not yet exist -> create
 
-        // call the hook
-        CRM_Utils_SepaCustomisationHooks::modify_txgroup_reference($reference, $creditor_id, $mode, $collection_date);
+          // find unused reference
+          $reference = self::getTransactionGroupReference($creditor_id, $mode, $collection_date, $financial_type_id);
 
-        $group = civicrm_api('SepaTransactionGroup', 'create', array(
+          $group = civicrm_api('SepaTransactionGroup', 'create', array(
             'version'                 => 3,
             'reference'               => $reference,
             'type'                    => $mode,
             'collection_date'         => $collection_date,
+            'financial_type_id'       => $financial_type_id,
             'latest_submission_date'  => date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
             'created_date'            => date('Y-m-d'),
             'status_id'               => $group_status_id_open,
             'sdd_creditor_id'         => $creditor_id,
-            ));
-        if (!empty($group['is_error'])) {
-          // TODO: Error handling
-          Civi::log()->debug("org.project60.sepa: batching:syncGroups/createGroup ".$group['error_message']);
+          ));
+          if (!empty($group['is_error'])) {
+            // TODO: Error handling
+            Civi::log()->debug("org.project60.sepa: batching:syncGroups/createGroup ".$group['error_message']);
+          }
         }
-      } else {
-        $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date], 'status_id' => $group_status_id_open));
-        if (!empty($group['is_error'])) {
-          // TODO: Error handling
-          Civi::log()->debug("org.project60.sepa: batching:syncGroups/getGroup ".$group['error_message']);
+        else {
+          $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date][$financial_type_id ?? 0], 'status_id' => $group_status_id_open));
+          if (!empty($group['is_error'])) {
+            // TODO: Error handling
+            Civi::log()->debug("org.project60.sepa: batching:syncGroups/getGroup ".$group['error_message']);
+          }
+          unset($existing_groups[$collection_date][$financial_type_id ?? 0]);
         }
-        unset($existing_groups[$collection_date]);
-      }
 
-      // now we have the right group. Prepare some parameters...
-      $group_id = $group['id'];
-      $entity_ids = array();
-      foreach ($mandates as $mandate) {
-        // remark: "mandate_entity_id" in this case means the contribution ID
-        if (empty($mandate['mandate_entity_id'])) {
-          // this shouldn't happen
-          Civi::log()->debug("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
-        } else {
-          array_push($entity_ids, $mandate['mandate_entity_id']);
+        // now we have the right group. Prepare some parameters...
+        $group_id = $group['id'];
+        $entity_ids = [];
+        foreach ($mandates as $mandate) {
+          // remark: "mandate_entity_id" in this case means the contribution ID
+          if (empty($mandate['mandate_entity_id'])) {
+            // this shouldn't happen
+            Civi::log()->debug("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
+          }
+          else {
+            array_push($entity_ids, $mandate['mandate_entity_id']);
+          }
         }
-      }
-      if (count($entity_ids)<=0) continue;
+        if (count($entity_ids)<=0) continue;
 
-      // now, filter out the entity_ids that are are already in a non-open group
-      //   (DO NOT CHANGE CLOSED GROUPS!)
-      $entity_ids_list = implode(',', $entity_ids);
-      $already_sent_contributions = CRM_Core_DAO::executeQuery("
+        // now, filter out the entity_ids that are are already in a non-open group
+        //   (DO NOT CHANGE CLOSED GROUPS!)
+        $entity_ids_list = implode(',', $entity_ids);
+        $already_sent_contributions = CRM_Core_DAO::executeQuery("
         SELECT contribution_id
         FROM civicrm_sdd_contribution_txgroup
         LEFT JOIN civicrm_sdd_txgroup ON civicrm_sdd_contribution_txgroup.txgroup_id = civicrm_sdd_txgroup.id
         WHERE contribution_id IN ($entity_ids_list)
          AND  civicrm_sdd_txgroup.status_id <> $group_status_id_open;");
-      while ($already_sent_contributions->fetch()) {
-        $index = array_search($already_sent_contributions->contribution_id, $entity_ids);
-        if ($index !== false) unset($entity_ids[$index]);
-      }
-      if (count($entity_ids)<=0) continue;
-
-      // remove all the unwanted entries from our group
-      $entity_ids_list = implode(',', $entity_ids);
-      if (!$partial_groups || $partial_first) {
-        CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id NOT IN ($entity_ids_list);");
-      }
-
-      // remove all our entries from other groups, if necessary
-      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id!=$group_id AND contribution_id IN ($entity_ids_list);");
-
-      // now check which ones are already in our group...
-      $existing = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id IN ($entity_ids_list);");
-      while ($existing->fetch()) {
-        // remove from entity ids, if in there:
-        if(($key = array_search($existing->contribution_id, $entity_ids)) !== false) {
-          unset($entity_ids[$key]);
+        while ($already_sent_contributions->fetch()) {
+          $index = array_search($already_sent_contributions->contribution_id, $entity_ids);
+          if ($index !== false) unset($entity_ids[$index]);
         }
-      }
+        if (count($entity_ids)<=0) continue;
 
-      // the remaining must be added
-      foreach ($entity_ids as $entity_id) {
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES ($group_id, $entity_id);");
+        // remove all the unwanted entries from our group
+        $entity_ids_list = implode(',', $entity_ids);
+        if (!$partial_groups || $partial_first) {
+          CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id NOT IN ($entity_ids_list);");
+        }
+
+        // remove all our entries from other groups, if necessary
+        CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id!=$group_id AND contribution_id IN ($entity_ids_list);");
+
+        // now check which ones are already in our group...
+        $existing = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id IN ($entity_ids_list);");
+        while ($existing->fetch()) {
+          // remove from entity ids, if in there:
+          if(($key = array_search($existing->contribution_id, $entity_ids)) !== false) {
+            unset($entity_ids[$key]);
+          }
+        }
+
+        // the remaining must be added
+        foreach ($entity_ids as $entity_id) {
+          CRM_Core_DAO::executeQuery("INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES ($group_id, $entity_id);");
+        }
       }
     }
 
@@ -560,6 +578,36 @@ class CRM_Sepa_Logic_Batching {
     $query = civicrm_api('SepaTransactionGroup', 'getsingle', array('reference'=>$reference, 'version'=>3));
     // this should return an error, if the group exists
     return !(isset($query['is_error']) && $query['is_error']);
+  }
+
+  public static function getTransactionGroupReference(
+    int $creditorId,
+    string $mode,
+    string $collectionDate,
+    ?int $financialTypeId = NULL
+  ): string {
+    $defaultReference = "TXG-{$creditorId}-{$mode}-{$collectionDate}";
+    if (isset($financialTypeId)) {
+      $defaultReference .= "-{$financialTypeId}";
+    }
+
+    $counter = 0;
+    $reference = $defaultReference;
+    while (self::referenceExists($reference)) {
+      $counter += 1;
+      $reference = "{$defaultReference}--".$counter;
+    }
+
+    // Call the hook.
+    CRM_Utils_SepaCustomisationHooks::modify_txgroup_reference(
+      $reference,
+      $creditorId,
+      $mode,
+      $collectionDate,
+      $financialTypeId
+    );
+
+    return $reference;
   }
 
   /**
