@@ -338,6 +338,12 @@ div.sdd-add-creditor {
                 {$form.sdd_async_batching.html}
               </td>
             </tr>
+            <tr class="crm-alternative_batching-form-block-financial-type-grouping">
+              <td class="label">{$form.sdd_financial_type_grouping.label} <a onclick='CRM.help("{ts}Groups by Financial Types{/ts}", {literal}{"id":"id-financial-type-grouping","file":"CRM\/Admin\/Form\/Setting\/SepaSettings"}{/literal}); return false;' href="#" title="{ts}Help{/ts}" class="helpicon">&nbsp;</a></td>
+              <td>
+                {$form.sdd_financial_type_grouping.html}
+              </td>
+            </tr>
        </table>
        <br/>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

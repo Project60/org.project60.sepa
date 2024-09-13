@@ -150,6 +150,11 @@
     <p>{ts}This option will activate a runner page with a progress bar for these critical processes. There shouldn't be any timeouts, but you have to keep that open until it's done.{/ts}</p>
 {/htxt}
 
+{htxt id='id-financial-type-grouping'}
+    <p>{ts}Whether to group transactions by financial types additionally.{/ts}</p>
+    <p>{ts}Enable this settings if you use the Financial ACLs extension, as transaction groups with mixed financial type contributions can cause issues with overlapping Financial ACLs' permissions.{/ts}</p>
+{/htxt}
+
 {htxt id='id-creditor-type'}
     <p>{ts}Always use <code>SEPA</code> if you want to do SEPA style direct debit.{/ts}</p>
     <p>{ts}<code>PSP</code> can help you to use this extension for other direct debit systems or payment service providers (PSP), but all SEPA style validations and tools are then disabled.{/ts}</p>
