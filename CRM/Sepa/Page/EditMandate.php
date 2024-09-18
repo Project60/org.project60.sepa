@@ -24,8 +24,6 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
-
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
@@ -65,10 +63,17 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
 
     // first, load the mandate
-    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
-    if (isset($mandate['is_error']) && $mandate['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
-      die(sprintf(ts("Cannot find mandate [%s].", array('domain' => 'org.project60.sepa')), $mandate_id));
+    try {
+      // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addWhere('id', '=', $mandate_id)
+        ->execute()
+        ->single();
+    }
+    catch (Exception $exception) {
+      CRM_Core_Error::statusBounce(
+        E::ts("Cannot read mandate [%1]. Error was: '%2'", [1 => $mandate_id, 2 => $exception->getMessage()])
+      );
     }
 
     // load the contribution
