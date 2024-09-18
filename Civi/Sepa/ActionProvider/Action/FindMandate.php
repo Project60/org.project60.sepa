@@ -20,6 +20,7 @@ use \Civi\ActionProvider\Parameter\ParameterBagInterface;
 use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;
 
+use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
 class FindMandate extends CreateRecurringMandate {
@@ -106,37 +107,37 @@ class FindMandate extends CreateRecurringMandate {
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output)
   {
     // compile search query
-    $mandate_search = [];
+    $mandatesQuery = SepaMandate::get(TRUE);
     if (!empty($this->configuration->getParameter('creditor_id'))) {
-      $mandate_search['creditor_id'] = ['IN' => $this->configuration->getParameter('creditor_id')];
+      $mandatesQuery->addWhere('creditor_id', 'IN', $this->configuration->getParameter('creditor_id'));
     }
     if (!empty($this->configuration->getParameter('type'))) {
-      $mandate_search['type'] = $this->configuration->getParameter('type');
+      $mandatesQuery->addWhere('type', '=', $this->configuration->getParameter('type'));
     }
     if (!empty($this->configuration->getParameter('active'))) {
-      $mandate_search['status'] = ['IN' => ['FRST', 'RCUR', 'OOFF', 'INIT']];
+      $mandatesQuery->addWhere('status', 'IN', ['FRST', 'RCUR', 'OOFF', 'INIT']);
     }
     if (!empty($parameters->getParameter('contact_id'))) {
-      $mandate_search['contact_id'] = $parameters->getParameter('contact_id');
+      $mandatesQuery->addWhere('contact_id', '=', $parameters->getParameter('contact_id'));
     }
     if (!empty($parameters->getParameter('account_holder'))) {
-      $mandate_search['account_holder'] = $parameters->getParameter('account_holder');
+      $mandatesQuery->addWhere('account_holder', '=', $parameters->getParameter('account_holder'));
     }
     if (!empty($parameters->getParameter('iban'))) {
-      $mandate_search['iban'] = $parameters->getParameter('iban');
+      $mandatesQuery->addWhere('iban', '=', $parameters->getParameter('iban'));
     }
     if (!empty($parameters->getParameter('reference'))) {
-      $mandate_search['reference'] = $parameters->getParameter('reference');
+      $mandatesQuery->addWhere('reference', '=', $parameters->getParameter('reference'));
     }
 
     // add order
-    $mandate_search['option.sort']  = $this->configuration->getParameter('pick');
-    $mandate_search['option.limit'] = 1;
+    $mandatesQuery->addOrderBy($this->configuration->getParameter('pick'));
+    // TODO: Shouldn't this use single()?
+    $mandatesQuery->setLimit(1);
 
     // search mandate
-    $result = \civicrm_api3('SepaMandate', 'get', $mandate_search);
-    if ($result['count']) {
-      $mandate = reset($result['values']);
+    $mandate = $mandatesQuery->execute()->first();
+    if (isset($mandate)) {
       $output->setParameter('id', $mandate['id']);
       $output->setParameter('reference', $mandate['reference']);
       $output->setParameter('type', $mandate['type']);
