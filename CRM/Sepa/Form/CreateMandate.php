@@ -614,14 +614,15 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $known_accounts = array('' => E::ts("new account"));
 
     // get data from SepaMandates
-    $mandates = civicrm_api3('SepaMandate', 'get', array(
-      'contact_id'   => $this->contact_id,
-      'status'       => array('IN' => array('RCUR', 'COMPLETE', 'SENT')),
-      'option.limit' => 0,
-      'return'       => 'iban,bic,reference',
-      'option.sort'  => 'id desc'
-    ));
-    foreach ($mandates['values'] as $mandate) {
+    // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
+    $mandates = \Civi\Api4\SepaMandate::get(TRUE)
+      ->addSelect('iban', 'bic', 'reference')
+      ->addWhere('contact_id', '=', $this->contact_id)
+      ->addWhere('status', 'IN', ['RCUR', 'COMPLETE', 'SENT'])
+      ->addOrderBy('id', 'DESC')
+      ->execute()
+      ->indexBy('id');
+    foreach ($mandates as $mandate) {
       $key = "{$mandate['iban']}/{$mandate['bic']}";
       if (!isset($known_accounts[$key])) {
         $known_accounts[$key] = "{$mandate['iban']} ({$mandate['reference']})";
