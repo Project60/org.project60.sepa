@@ -266,6 +266,7 @@ class CRM_Sepa_Logic_Batching {
     $sql_query = "
       SELECT
         txgroup.collection_date AS collection_date,
+        txgroup.financial_type_id AS financial_type_id,
         txgroup.id AS txgroup_id
       FROM civicrm_sdd_txgroup AS txgroup
       WHERE txgroup.type = '$mode'
@@ -275,7 +276,7 @@ class CRM_Sepa_Logic_Batching {
     $existing_groups = [];
     while ($results->fetch()) {
       $collection_date = date('Y-m-d', strtotime($results->collection_date));
-      $existing_groups[$collection_date] = $results->txgroup_id;
+      $existing_groups[$collection_date][$results->financial_type_id ?? 0] = $results->txgroup_id;
     }
 
     // step 6: sync calculated group structure with existing (open) groups
