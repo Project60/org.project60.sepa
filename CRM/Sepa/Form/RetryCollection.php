@@ -222,11 +222,11 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
    */
   protected function getGroupList() {
     $txgroup_list = array();
-    $txgroup_query = civicrm_api3('SepaTransactionGroup', 'get', array(
-        'option.limit' => 0,
-        'type'         => array('IN' => array('RCUR', 'FRST')),
-        'return'       => 'reference,id'));
-    foreach ($txgroup_query['values'] as $txgroup) {
+    $txgroup_query = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+      ->addSelect('reference', 'id')
+      ->addWhere('type', 'IN', ['RCUR', 'FRST'])
+      ->execute();
+    foreach ($txgroup_query as $txgroup) {
       $txgroup_list[$txgroup['id']] = $txgroup['reference'];
     }
     return $txgroup_list;

@@ -242,9 +242,14 @@ continue;
 function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   // first, load the txgroup
   $txgroup_id = $params['txgroup_id'];
-  $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id, 'version' => 3));
-  if (isset($txgroup['is_error']) && $txgroup['is_error']) {
-    return civicrm_api3_create_error("Cannot read transaction group ".$txgroup_id);
+  try {
+    $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+      ->addWhere('id', '=', $txgroup_id)
+      ->execute()
+      ->single();
+  }
+  catch (Exception $exception)  {
+    return civicrm_api3_create_error('Cannot read transaction group ' . $txgroup_id);
   }
 
   if (isset($txgroup['sdd_file_id'])) {

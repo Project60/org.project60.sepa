@@ -469,9 +469,11 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     try {
       $mandate = civicrm_api3('SepaMandate', 'createfull', $mandate_data);
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
-          'id'     => $mandate['id'],
-          'return' => 'reference,id,type'));
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addSelect('reference', 'id', 'type')
+        ->addWhere('id', '=', $mandate['id'])
+        ->execute()
+        ->single();
 
       // if we get here, everything went o.k.
       CRM_Core_Session::setStatus(E::ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", array(
@@ -483,7 +485,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
       // terminate old mandate, of requested
       if (!empty($values['replace'])) {
-        $rpl_mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $values['replace']));
+        $rpl_mandate = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addWhere('id', '=', $values['replace'])
+          ->execute()
+          ->single();
 
         CRM_Sepa_BAO_SEPAMandate::terminateMandate(
             $values['replace'],

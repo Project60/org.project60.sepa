@@ -115,8 +115,13 @@ function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
   for ($n=0; $n < 10; $n++) {
     $reference_candidate = sprintf($reference, $n);
     // check if it exists
-    $mandate = civicrm_api('SepaMandate', 'getsingle', array('version' => 3, 'reference' => $reference_candidate));
-    if (isset($mandate['is_error']) && $mandate['is_error']) {
+    try {
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addWhere('reference', '=', $reference_candidate)
+        ->execute()
+        ->single();
+    }
+    catch (Exception $exception) {
       // does not exist! take it!
       $mandate_parameters['reference'] = $reference_candidate;
       return;

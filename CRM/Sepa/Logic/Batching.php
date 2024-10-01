@@ -541,10 +541,16 @@ class CRM_Sepa_Logic_Batching {
           }
         }
         else {
-          $group = civicrm_api('SepaTransactionGroup', 'getsingle', array('version' => 3, 'id' => $existing_groups[$collection_date][$financial_type_id ?? 0], 'status_id' => $group_status_id_open));
-          if (!empty($group['is_error'])) {
+          try {
+            $group = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+              ->addWhere('id', '=', $existing_groups[$collection_date][$financial_type_id ?? 0])
+              ->addWhere('status_id', '=', $group_status_id_open)
+              ->execute()
+              ->single();
+          }
+          catch (Exception $exception) {
             // TODO: Error handling
-            Civi::log()->debug("org.project60.sepa: batching:syncGroups/getGroup ".$group['error_message']);
+            Civi::log()->debug('org.project60.sepa: batching:syncGroups/getGroup ' . $exception->getMessage());
           }
           unset($existing_groups[$collection_date][$financial_type_id ?? 0]);
         }
@@ -615,9 +621,17 @@ class CRM_Sepa_Logic_Batching {
    * Check if a transaction group reference is already in use
    */
   public static function referenceExists($reference) {
-    $query = civicrm_api('SepaTransactionGroup', 'getsingle', array('reference'=>$reference, 'version'=>3));
-    // this should return an error, if the group exists
-    return !(isset($query['is_error']) && $query['is_error']);
+    try {
+      $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->addWhere('reference', '=', $reference)
+        ->execute()
+        ->single();
+      $exists = TRUE;
+    }
+    catch (Exception $exception) {
+      $exists = FALSE;
+    }
+    return $exists;
   }
 
   public static function getTransactionGroupReference(
@@ -718,10 +732,12 @@ class CRM_Sepa_Logic_Batching {
       if (!empty($rcontribution['mandate_first_executed'])) {
         $date = $rcontribution['mandate_first_executed'];
       } else {
-        $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
-            'entity_table' => 'civicrm_contribution_recur',
-            'entity_id'    => $rcontribution['id'],
-            'return'       => 'status'));
+        $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addSelect('status')
+          ->addWhere('entity_table', '=', 'civicrm_contribution_recur')
+          ->addWhere('entity_id', '=', $rcontribution['id'])
+          ->execute()
+          ->single();
 
         if ($mandate['status'] == 'RCUR') {
           // support for RCUR without first contribution
