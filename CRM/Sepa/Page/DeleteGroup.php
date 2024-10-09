@@ -51,7 +51,7 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
         );
         $this->assign('txgroup', $txgroup);
       }
-      catch (Exception $exception) {
+      catch (\CRM_Core_Exception $exception) {
         // skip the parts below
         $_REQUEST['confirmed'] = 'error';
       }

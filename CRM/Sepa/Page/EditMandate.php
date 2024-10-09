@@ -70,7 +70,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       CRM_Core_Error::statusBounce(
         E::ts("Cannot read mandate [%1]. Error was: '%2'", [1 => $mandate_id, 2 => $exception->getMessage()])
       );

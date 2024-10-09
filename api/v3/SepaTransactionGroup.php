@@ -248,7 +248,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
       ->execute()
       ->single();
   }
-  catch (Exception $exception)  {
+  catch (\CRM_Core_Exception $exception)  {
     return civicrm_api3_create_error('Cannot read transaction group ' . $txgroup_id);
   }
 

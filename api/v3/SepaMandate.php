@@ -448,7 +448,7 @@ function civicrm_api3_sepa_mandate_modify($params) {
         ->execute()
         ->single()['id'];
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       return civicrm_api3_create_error("Couldn't identify mandate with reference '{$params['reference']}'.");
     }
   }
@@ -530,7 +530,7 @@ function civicrm_api3_sepa_mandate_terminate($params) {
         ->execute()
         ->single()['id'];
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       return civicrm_api3_create_error("Couldn't identify mandate with reference '{$params['reference']}'.");
     }
   }

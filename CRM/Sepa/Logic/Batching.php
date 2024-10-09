@@ -548,7 +548,7 @@ class CRM_Sepa_Logic_Batching {
               ->execute()
               ->single();
           }
-          catch (Exception $exception) {
+          catch (\CRM_Core_Exception $exception) {
             // TODO: Error handling
             Civi::log()->debug('org.project60.sepa: batching:syncGroups/getGroup ' . $exception->getMessage());
           }
@@ -628,7 +628,7 @@ class CRM_Sepa_Logic_Batching {
         ->single();
       $exists = TRUE;
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       $exists = FALSE;
     }
     return $exists;

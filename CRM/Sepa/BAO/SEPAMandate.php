@@ -23,7 +23,6 @@
 
 use CRM_Sepa_ExtensionUtil as E;
 
-
 /**
  * Class contains functions for Sepa mandates
  */
@@ -384,7 +383,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       $lock->release();
 
       $error_message = E::ts("Cannot read mandate [%1]. Error was: '%2'", [1 => $mandate_id, 2 => $exception->getMessage()]);

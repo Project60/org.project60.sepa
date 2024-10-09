@@ -152,7 +152,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
           }
         }
       }
-      catch (Exception $exception) {
+      catch (\CRM_Core_Exception $exception) {
         CRM_Core_Session::setStatus(
           E::ts('Cannot load group #%1', [1 => $group_id]) . '<br />'
           . E::ts('Error was: %1', [1 => $group['error_message']]),

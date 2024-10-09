@@ -335,7 +335,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       CRM_Core_Session::setStatus(
         E::ts("Couldn't load mandate #%1", [1 => $mandate_id]),
         E::ts('Error'),

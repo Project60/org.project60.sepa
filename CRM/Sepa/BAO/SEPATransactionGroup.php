@@ -291,7 +291,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (CRM_Core_Exception $exception) {
       return $exception->getMessage();
     }
     return $txgroup;
@@ -320,7 +320,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       return "Transaction group [$txgroup_id] could not be loaded. Error was: " . $exception->getMessage();
     }
 

@@ -121,7 +121,7 @@ function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       // does not exist! take it!
       $mandate_parameters['reference'] = $reference_candidate;
       return;

@@ -50,7 +50,7 @@ class CRM_Sepa_Logic_Group {
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       $lock->release();
       return 'Cannot find transaction group ' . $txgroup_id;
     }
@@ -180,7 +180,7 @@ class CRM_Sepa_Logic_Group {
         ->execute()
         ->single();
     }
-    catch (Exception $exception) {
+    catch (\CRM_Core_Exception $exception) {
       $lock->release();
       return 'Cannot find transaction group ' . $txgroup_id;
     }
