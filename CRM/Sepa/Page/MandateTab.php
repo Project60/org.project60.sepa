@@ -15,6 +15,8 @@
 +--------------------------------------------------------*/
 
 use CRM_Sepa_ExtensionUtil as E;
+use Civi\Api4\SepaMandate;
+use Civi\Api4\Contribution;
 
 class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
 
@@ -23,156 +25,189 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
    */
   public function run() {
     CRM_Utils_System::setTitle(E::ts('SEPA Mandates'));
-    $contact_id = CRM_Utils_Request::retrieve('cid', 'Integer');
+    $contactId = CRM_Utils_Request::retrieve('cid', 'Integer');
     $this->assign('date_format', '%Y-%m-%d');
-    $this->assign('contact_id', $contact_id);
-
-
-    // ==============================
-    // ==            OOFF          ==
-    // ==============================
-    $ooff_list = array();
-    $ooff_query = "
-      SELECT
-        civicrm_sdd_mandate.id             AS mandate_id,
-        civicrm_contribution.id            AS contribution_id,
-        civicrm_contribution.receive_date  AS receive_date,
-        civicrm_sdd_mandate.status         AS status,
-        civicrm_sdd_mandate.reference      AS reference,
-        civicrm_financial_type.name        AS financial_type,
-        civicrm_campaign.title             AS campaign,
-        civicrm_contribution.total_amount  AS total_amount,
-        civicrm_contribution.currency      AS currency,
-        civicrm_contribution.cancel_reason AS cancel_reason,
-        IF(civicrm_sdd_mandate.status IN ('OOFF'), 'sepa-active', 'sepa-inactive')
-                                           AS class
-      FROM civicrm_sdd_mandate
-      LEFT JOIN civicrm_contribution   ON civicrm_contribution.id = civicrm_sdd_mandate.entity_id
-      LEFT JOIN civicrm_financial_type ON civicrm_financial_type.id = civicrm_contribution.financial_type_id
-      LEFT JOIN civicrm_campaign       ON civicrm_campaign.id = civicrm_contribution.campaign_id
-      WHERE civicrm_sdd_mandate.contact_id = %1
-        AND civicrm_sdd_mandate.type = 'OOFF'
-        AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution'";
-
-    $ooff_mandates = CRM_Core_DAO::executeQuery($ooff_query,
-      array( 1 => array($contact_id, 'Integer')));
-
-    while ($ooff_mandates->fetch()) {
-      $ooff = array(
-        'receive_date'   => $ooff_mandates->receive_date,
-        'status_raw'     => $ooff_mandates->status,
-        'status'         => CRM_Sepa_Logic_Status::translateMandateStatus($ooff_mandates->status, TRUE),
-        'reference'      => $ooff_mandates->reference,
-        'financial_type' => $ooff_mandates->financial_type,
-        'campaign'       => $ooff_mandates->campaign,
-        'total_amount'   => $ooff_mandates->total_amount,
-        'currency'       => $ooff_mandates->currency,
-        'cancel_reason'  => $ooff_mandates->cancel_reason,
-        'class'          => $ooff_mandates->class,
-      );
-
-      // add links
-      $ooff['view_link'] = CRM_Utils_System::url('civicrm/contact/view/contribution', "reset=1&id={$ooff_mandates->contribution_id}&cid={$contact_id}&action=view&context=contribution");
-      if (CRM_Core_Permission::check('edit sepa mandates')) {
-        $ooff['edit_link'] = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$ooff_mandates->mandate_id}");
-      }
-
-      $ooff_list[] = $ooff;
-    }
-    $this->assign('ooffs', $ooff_list);
-
-
-    // ==============================
-    // ==            RCUR          ==
-    // ==============================
-    $rcur_list = array();
-    $rcur_query = "
-      SELECT
-        civicrm_sdd_mandate.id                                  AS mandate_id,
-        civicrm_contribution_recur.id                           AS rcur_id,
-        civicrm_contribution_recur.start_date                   AS start_date,
-        civicrm_contribution_recur.end_date                     AS end_date,
-        civicrm_contribution_recur.next_sched_contribution_date AS next_collection_date,
-        last.receive_date                                       AS last_collection_date,
-        last.cancel_reason                                      AS last_cancel_reason,
-        civicrm_sdd_mandate.status                              AS status,
-        civicrm_sdd_mandate.reference                           AS reference,
-        cancel_reason.note                                      AS cancel_reason,
-        civicrm_financial_type.name                             AS financial_type,
-        civicrm_campaign.title                                  AS campaign,
-        civicrm_sdd_mandate.reference                           AS reference,
-        civicrm_contribution_recur.frequency_interval           AS frequency_interval,
-        civicrm_contribution_recur.frequency_unit               AS frequency_unit,
-        civicrm_contribution_recur.cycle_day                    AS cycle_day,
-        civicrm_contribution_recur.currency                     AS currency,
-        civicrm_contribution_recur.amount                       AS amount,
-        IF(civicrm_sdd_mandate.status IN ('FRST', 'RCUR'), 'sepa-active', 'sepa-inactive')
-                                                                AS class
-      FROM civicrm_sdd_mandate
-      LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
-      LEFT JOIN civicrm_financial_type     ON civicrm_financial_type.id = civicrm_contribution_recur.financial_type_id
-      LEFT JOIN civicrm_campaign           ON civicrm_campaign.id = civicrm_contribution_recur.campaign_id
-      LEFT JOIN civicrm_contribution last  ON last.receive_date = (SELECT MAX(receive_date) FROM civicrm_contribution
-                                                                   WHERE contribution_recur_id = civicrm_contribution_recur.id
-                                                                     AND contribution_status_id != 2)
-      LEFT JOIN civicrm_note cancel_reason ON cancel_reason.entity_id = civicrm_contribution_recur.id
-                                            AND cancel_reason.entity_table = 'civicrm_contribution_recur'
-                                            AND cancel_reason.subject = 'cancel_reason'
-      WHERE civicrm_sdd_mandate.contact_id = %1
-        AND civicrm_sdd_mandate.type = 'RCUR'
-        AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
-      GROUP BY civicrm_sdd_mandate.id
-      ORDER BY civicrm_contribution_recur.start_date DESC, civicrm_sdd_mandate.id DESC;";
-
-    $mandate_ids = array();
-
-    CRM_Core_DAO::disableFullGroupByMode();
-    $rcur_mandates = CRM_Core_DAO::executeQuery($rcur_query,
-      array(1 => array($contact_id, 'Integer'))
+    $this->assign('contact_id', $contactId);
+    $this->assign(
+      'financialacls',
+      \CRM_Extension_System::singleton()
+        ->getManager()
+        ->getStatus('financialacls') === \CRM_Extension_Manager::STATUS_INSTALLED
     );
-    CRM_Core_DAO::reenableFullGroupByMode();
+    $this->assign(
+      'permissions',
+      [
+        'create' => CRM_Core_Permission::check('create sepa mandates'),
+        'view' => CRM_Core_Permission::check('view sepa mandates'),
+        'edit' => CRM_Core_Permission::check('edit sepa mandates'),
+        'delete' => CRM_Core_Permission::check('delete sepa mandates'),
+      ]
+    );
 
-    while ($rcur_mandates->fetch()) {
-      $rcur = array(
-        'mandate_id'           => $rcur_mandates->mandate_id,
-        'start_date'           => $rcur_mandates->start_date,
-        'cycle_day'            => $rcur_mandates->cycle_day,
-        'status_raw'           => $rcur_mandates->status,
-        'reference'            => $rcur_mandates->reference,
-        'financial_type'       => $rcur_mandates->financial_type,
-        'campaign'             => $rcur_mandates->campaign,
-        'status'               => CRM_Sepa_Logic_Status::translateMandateStatus($rcur_mandates->status, TRUE),
-        'frequency'            => CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcur_mandates->frequency_interval, $rcur_mandates->frequency_unit, TRUE),
-        'next_collection_date' => $rcur_mandates->next_collection_date,
-        'last_collection_date' => $rcur_mandates->last_collection_date,
-        'cancel_reason'        => $rcur_mandates->cancel_reason,
-        'last_cancel_reason'   => $rcur_mandates->last_cancel_reason,
-        'reference'            => $rcur_mandates->reference,
-        'end_date'             => $rcur_mandates->end_date,
-        'currency'             => $rcur_mandates->currency,
-        'amount'               => $rcur_mandates->amount,
-        'class'                => $rcur_mandates->class
-      );
+    // Retrieve OOFF mandates.
+    $ooffList = [];
+    $ooffMandates = SepaMandate::get(TRUE)
+      ->addSelect(
+        'id',
+        'contribution.id',
+        'contribution.receive_date',
+        'status',
+        'reference',
+        'contribution.financial_type_id:name',
+        'campaign.title',
+        'contribution.total_amount',
+        'contribution.currency',
+        'contribution.cancel_reason'
+      )
+      ->addJoin(
+        'Contribution AS contribution',
+        'INNER',
+        ['entity_table', '=', '"civicrm_contribution"'],
+        ['entity_id', '=', 'contribution.id']
+      )
+      ->addJoin(
+        'Campaign AS campaign',
+        'LEFT',
+        ['campaign.id', '=', 'contribution.campaign_id']
+      )
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('type', '=', 'OOFF')
+      ->execute();
+    foreach ($ooffMandates as $ooffMandate) {
+      $ooffList[] = [
+        'receive_date' => $ooffMandate['contribution.receive_date'],
+        'status_raw' => $ooffMandate['status'],
+        'status' => CRM_Sepa_Logic_Status::translateMandateStatus($ooffMandate['status'], TRUE),
+        'reference' => $ooffMandate['reference'],
+        'financial_type' => $ooffMandate['contribution.financial_type_id:name'],
+        'campaign' => $ooffMandate['campaign.title'],
+        'total_amount' => $ooffMandate['contribution.total_amount'],
+        'currency' => $ooffMandate['contribution.currency'],
+        'cancel_reason' => $ooffMandate['contribution.cancel_reason'],
+        'class' => 'OOFF' === $ooffMandate['status'] ? 'sepa-active' : 'sepa-inactive',
+        'view_link' => CRM_Utils_System::url(
+          'civicrm/contact/view/contribution',
+          "reset=1&id={$ooffMandate['contribution.id']}&cid={$contactId}&action=view&context=contribution"
+        ),
+        'edit_link' => CRM_Utils_System::url(
+          'civicrm/sepa/xmandate',
+          "mid={$ooffMandate['id']}"
+        ),
+      ];
+    }
+    $this->assign('ooffs', $ooffList);
 
-      // calculate annual amount
-      if ($rcur_mandates->frequency_unit == 'year') {
-        $rcur['total_amount'] = $rcur_mandates->amount / $rcur_mandates->frequency_interval;
-      } elseif ($rcur_mandates->frequency_unit == 'month') {
-        $rcur['total_amount'] = $rcur_mandates->amount * 12.0 / $rcur_mandates->frequency_interval;
+
+    // Retrieve RCUR mandates.
+    $rcurList = [];
+    $rcurMandates = SepaMandate::get(TRUE)
+      ->addSelect(
+        'id',
+        'contribution_recur.id',
+        'contribution_recur.start_date',
+        'contribution_recur.end_date',
+        'contribution_recur.next_sched_contribution_date',
+        'last_contribution.cancel_reason',
+        'status',
+        'reference',
+        'GROUP_FIRST(cancel_reason.note) AS cancel_reason',
+        'contribution_recur.financial_type_id:name',
+        'campaign.title',
+        'contribution_recur.frequency_interval',
+        'contribution_recur.frequency_unit',
+        'contribution_recur.cycle_day',
+        'contribution_recur.currency',
+        'contribution_recur.amount'
+      )
+      ->addJoin(
+        'ContributionRecur AS contribution_recur',
+        'INNER',
+        ['entity_id', '=', 'contribution_recur.id'],
+        ['entity_table', '=', '"civicrm_contribution_recur"']
+      )
+      ->addJoin(
+        'Note AS cancel_reason',
+        'LEFT',
+        ['cancel_reason.entity_id', '=', 'contribution_recur.id'],
+        ['cancel_reason.entity_table', '=', '"civicrm_contribution_recur"'],
+        ['cancel_reason.subject', '=', '"cancel_reason"']
+      )
+      ->addJoin(
+        'Campaign AS campaign',
+        'LEFT',
+        ['campaign.id', '=', 'contribution_recur.campaign_id']
+      )
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('type', '=', 'RCUR')
+      ->addWhere('entity_table', '=', 'civicrm_contribution_recur')
+      ->addOrderBy('contribution_recur.start_date', 'DESC')
+      ->addOrderBy('id', 'DESC')
+      ->addGroupBy('id')
+      ->execute();
+
+    foreach ($rcurMandates as $rcurMandate) {
+      $lastInstallment = Contribution::get()
+        ->addSelect('receive_date', 'cancel_reason')
+        ->addWhere('contribution_recur_id', '=', $rcurMandate['contribution_recur.id'])
+        ->addWhere('contribution_status_id:name', '!=', 'Pending')
+        ->addOrderBy('receive_date', 'DESC')
+        ->setLimit(1)
+        ->execute()
+        ->first();
+      $rcurRow = [
+        'mandate_id' => $rcurMandate['id'],
+        'start_date' => $rcurMandate['contribution_recur.start_date'],
+        'cycle_day' => $rcurMandate['contribution_recur.cycle_day'],
+        'status_raw' => $rcurMandate['status'],
+        'reference' => $rcurMandate['reference'],
+        'financial_type' => $rcurMandate['contribution_recur.financial_type_id:name'],
+        'campaign' => $rcurMandate['campaign.title'],
+        'status' => CRM_Sepa_Logic_Status::translateMandateStatus($rcurMandate['status'], TRUE),
+        'frequency' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(
+          $rcurMandate['contribution_recur.frequency_interval'],
+          $rcurMandate['contribution_recur.frequency_unit'],
+          TRUE
+        ),
+        'next_collection_date' => $rcurMandate['contribution_recur.next_sched_contribution_date'],
+        'last_collection_date' => $lastInstallment['receive_date'] ?? NULL,
+        'cancel_reason' => $rcur_mandates['cancel_reason'],
+        'last_cancel_reason' => $lastInstallment['cancel_reason'] ?? NULL,
+        'end_date' => $rcurMandate['contribution_recur.end_date'],
+        'currency' => $rcurMandate['contribution_recur.currency'],
+        'amount' => $rcurMandate['contribution_recur.amount'],
+        'class' => in_array($rcurMandate['status'], ['FRST', 'RCUR'])
+          ? 'sepa-active'
+          : 'sepa-inactive',
+      ];
+
+      // Calculate annual amount.
+      if ('year' === $rcurMandate['contribution_recur.frequency_unit']) {
+        $rcurRow['total_amount'] =
+          $rcurMandate['contribution_recur.amount'] / $rcurMandate['contribution_recur.frequency_interval'];
+      } elseif ('month' === $rcurMandate['contribution_recur.frequency_unit']) {
+        $rcurRow['total_amount'] =
+          $rcurMandate['contribution_recur.amount'] * 12.0 / $rcurMandate['contribution_recur.frequency_interval'];
       }
 
-      // add links
-      $rcur['view_link'] = CRM_Utils_System::url('civicrm/contact/view/contributionrecur', "reset=1&id={$rcur_mandates->rcur_id}&cid={$contact_id}&context=contribution");
+      // Add links.
+      $rcurRow['view_link'] = CRM_Utils_System::url(
+        'civicrm/contact/view/contributionrecur',
+        "reset=1&id={$rcurMandate['contribution_recur.id']}&cid={$contactId}&context=contribution");
       if (CRM_Core_Permission::check('edit sepa mandates')) {
-        $rcur['edit_link'] = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$rcur_mandates->mandate_id}");
+        $rcurRow['edit_link'] = CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$rcurMandate['id']}");
       }
 
-      $rcur_list[$rcur_mandates->mandate_id] = $rcur;
+      $rcurList[$rcurMandate['id']] = $rcurRow;
     }
 
-    // add cancellation info
-    if (!empty($rcur_list)) {
-      $mandate_id_list = implode(',', array_keys($rcur_list));
+    // Add cancellation info.
+    // TODO: Transform into APIv4 query.
+    //       This currently generates a string of "0" (for pending/in progress/completed contributions) and "1" for
+    //       other status and counts trailing "1"s, passing the number of failed last installments to the template.
+    //       As this does not disclose contribution information that has not yet been fetched via the API, no additional
+    //       ACL bypassing is being done here.
+    if (!empty($rcurList)) {
+      $mandate_id_list = implode(',', array_keys($rcurList));
       $fail_sequence = "
         SELECT
          civicrm_sdd_mandate.id AS mandate_id,
@@ -196,12 +231,12 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       while ($fail_query->fetch()) {
         if (preg_match("#(?<last_fails>1+)$#", $fail_query->fail_sequence, $match)) {
           $last_sequence = $match['last_fails'];
-          $rcur_list[$fail_query->mandate_id]['fail_sequence'] = strlen($last_sequence);
+          $rcurList[$fail_query->mandate_id]['fail_sequence'] = strlen($last_sequence);
         }
       }
     }
 
-    $this->assign('rcurs', $rcur_list);
+    $this->assign('rcurs', $rcurList);
 
     parent::run();
   }

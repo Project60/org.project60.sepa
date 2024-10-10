@@ -22,6 +22,7 @@ use \Civi\ActionProvider\Parameter\ParameterBagInterface;
 use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;
 
+use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
 class CreateOneOffMandate extends AbstractAction {
@@ -126,7 +127,11 @@ class CreateOneOffMandate extends AbstractAction {
     // create mandate
     try {
       $mandate = \civicrm_api3('SepaMandate', 'createfull', $mandate_data);
-      $mandate = \civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate['id'], 'return' => 'id,reference']);
+      $mandate = SepaMandate::get(TRUE)
+        ->addSelect('id', 'reference')
+        ->addWhere('id', '=', $mandate['id'])
+        ->execute()
+        ->single();
       $output->setParameter('mandate_id', $mandate['id']);
       $output->setParameter('mandate_reference', $mandate['reference']);
       $output->setParameter('error', '');

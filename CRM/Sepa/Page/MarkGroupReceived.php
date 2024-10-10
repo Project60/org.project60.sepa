@@ -38,7 +38,10 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     }
 
     // get the group
-    $group = civicrm_api3('SepaTransactionGroup', 'getsingle', ['id' => $group_id]);
+    $group = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+      ->addWhere('id', '=', $group_id)
+      ->execute()
+      ->single();
     $this->assign('txgroup', $group);
 
     // check whether this is a group created by a test creditor

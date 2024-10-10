@@ -60,9 +60,9 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @access public
    */
-  static function modify_txgroup_reference(&$reference, $creditor_id, $mode, $collection_date) {
-    $names = ['reference', 'creditor_id', 'mode', 'collection_date'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $reference, $creditor_id, $mode, $collection_date, self::$null, self::$null, 'civicrm_modify_txgroup_reference');
+  static function modify_txgroup_reference(&$reference, $creditor_id, $mode, $collection_date, $financial_type_id) {
+    $names = ['reference', 'creditor_id', 'mode', 'collection_date', 'financial_type_id'];
+    return CRM_Utils_Hook::singleton()->invoke($names, $reference, $creditor_id, $mode, $collection_date, $financial_type_id, self::$null, 'civicrm_modify_txgroup_reference');
   }
 
 

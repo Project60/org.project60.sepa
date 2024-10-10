@@ -184,8 +184,13 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    * @return int id of the sepa file entity created, or an error message string
    */
   static function createFile($txgroup_id, $override = false) {
-    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
-    if (isset($txgroup['is_error']) && $txgroup['is_error']) {
+    try {
+      $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->addWhere('id', '=', $txgroup_id)
+        ->execute()
+        ->single();
+    }
+    catch (CRM_Core_Exception $exception) {
       return "Cannot find transaction group ".$txgroup_id;
     }
 
@@ -252,7 +257,10 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    * @return an update array with the txgroup or a string with an error message
    */
   static function adjustCollectionDate($txgroup_id, $latest_submission_date) {
-    $txgroup = civicrm_api3('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id));
+    $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+      ->addWhere('id', '=', $txgroup_id)
+      ->execute()
+      ->single();
     if ($txgroup['type'] == 'RTRY') {
       $txgroup['type'] = 'RCUR';
     }
@@ -277,12 +285,16 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     }
 
     // reload the item
-    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('version'=>3, 'id'=>$txgroup_id));
-    if (!empty($txgroup['is_error'])) {
-      return $txgroup['error_message'];
-    } else {
-      return $txgroup;
+    try {
+      $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->addWhere('id', '=', $txgroup_id)
+        ->execute()
+        ->single();
     }
+    catch (CRM_Core_Exception $exception) {
+      return $exception->getMessage();
+    }
+    return $txgroup;
   }
 
 
@@ -302,9 +314,14 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    */
   static function deleteGroup($txgroup_id, $delete_contributions_mode = 'no') {
     // load the group
-    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id, 'version' => 3));
-    if (!empty($txgroup['is_error'])) {
-      return "Transaction group [$txgroup_id] could not be loaded. Error was: ".$txgroup['error_message'];
+    try {
+      $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->addWhere('id', '=', $txgroup_id)
+        ->execute()
+        ->single();
+    }
+    catch (\CRM_Core_Exception $exception) {
+      return "Transaction group [$txgroup_id] could not be loaded. Error was: " . $exception->getMessage();
     }
 
     // first, delete the contents of this group

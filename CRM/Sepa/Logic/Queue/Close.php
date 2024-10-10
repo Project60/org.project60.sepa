@@ -48,14 +48,17 @@ class CRM_Sepa_Logic_Queue_Close {
     $is_received_runner = $target_contribution_status == (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
     // fetch the groups
-    $txgroup_query = civicrm_api3('SepaTransactionGroup', 'get', array(
-      'id'           => ['IN' => $txgroup_ids],
-      'option.limit' => 0
-      ));
+    $txgroups = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+      ->addWhere('id', 'IN', $txgroup_ids)
+      ->execute();
 
-    $group_status_id_busy = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry');
+    $group_status_id_busy = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Batch_BAO_Batch',
+      'status_id',
+      'Data Entry'
+    );
 
-    foreach ($txgroup_query['values'] as $txgroup) {
+    foreach ($txgroups as $txgroup) {
       // first: set group status to busy
 
       $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $group_status_id_busy));

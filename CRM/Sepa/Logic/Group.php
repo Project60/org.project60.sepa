@@ -44,10 +44,15 @@ class CRM_Sepa_Logic_Group {
     }
     $status_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
-    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
-    if (isset($txgroup['is_error']) && $txgroup['is_error']) {
+    try {
+      $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->addWhere('id', '=', $txgroup_id)
+        ->execute()
+        ->single();
+    }
+    catch (\CRM_Core_Exception $exception) {
       $lock->release();
-      return "Cannot find transaction group ".$txgroup_id;
+      return 'Cannot find transaction group ' . $txgroup_id;
     }
     $collection_date = $txgroup['collection_date'];
 
@@ -169,10 +174,15 @@ class CRM_Sepa_Logic_Group {
       return civicrm_api3_create_error("Status 'Pending', 'Completed' or 'In Progress' does not exist!");
 
     // step 0: load the group object
-    $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
-    if (!empty($txgroup['is_error'])) {
+    try {
+      $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->addWhere('id', '=', $txgroup_id)
+        ->execute()
+        ->single();
+    }
+    catch (\CRM_Core_Exception $exception) {
       $lock->release();
-      return "Cannot find transaction group ".$txgroup_id;
+      return 'Cannot find transaction group ' . $txgroup_id;
     }
 
     // check status
