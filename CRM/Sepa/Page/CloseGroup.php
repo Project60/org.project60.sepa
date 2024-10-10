@@ -27,17 +27,15 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
   function run() {
     CRM_Utils_System::setTitle(E::ts('Close SEPA Group'));
-    $group_id = (int) CRM_Utils_Request::retrieve('group_id', 'Integer');
+    $group_id = CRM_Utils_Request::retrieve('group_id', 'Integer');
     $status = CRM_Utils_Request::retrieve('status', 'String');
-    if (isset($group_id)) {
-      if (isset($status) && ('missed' === $status || 'invalid' === $status || 'closed' === $status)) {
+    if (is_int($group_id)) {
+      if ('missed' === $status || 'invalid' === $status || 'closed' === $status) {
         $this->assign('status', $status);
       }
       else {
         $status = '';
       }
-
-      $group_id = (int) CRM_Utils_Request::retrieve('group_id', 'Integer');
       $this->assign('txgid', $group_id);
 
       // LOAD/CREATE THE TXFILE

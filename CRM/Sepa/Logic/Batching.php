@@ -547,65 +547,92 @@ class CRM_Sepa_Logic_Batching {
               ->addWhere('status_id', '=', $group_status_id_open)
               ->execute()
               ->single();
+
+            // now we have the right group. Prepare some parameters...
+            $group_id = $group['id'];
+            $entity_ids = [];
+            foreach ($mandates as $mandate) {
+              // remark: "mandate_entity_id" in this case means the contribution ID
+              if (empty($mandate['mandate_entity_id'])) {
+                // this shouldn't happen
+                Civi::log()->debug("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
+              }
+              else {
+                array_push($entity_ids, $mandate['mandate_entity_id']);
+              }
+            }
+            if (count($entity_ids)<=0) continue;
+
+            // now, filter out the entity_ids that are are already in a non-open group
+            //   (DO NOT CHANGE CLOSED GROUPS!)
+            $entity_ids_list = implode(',', $entity_ids);
+            $already_sent_contributions = CRM_Core_DAO::executeQuery(
+              <<<SQL
+              SELECT contribution_id
+              FROM civicrm_sdd_contribution_txgroup
+              LEFT JOIN civicrm_sdd_txgroup ON civicrm_sdd_contribution_txgroup.txgroup_id = civicrm_sdd_txgroup.id
+              WHERE contribution_id IN ($entity_ids_list)
+              AND  civicrm_sdd_txgroup.status_id <> $group_status_id_open;
+              SQL
+            );
+            while ($already_sent_contributions->fetch()) {
+              $index = array_search($already_sent_contributions->contribution_id, $entity_ids);
+              if ($index !== false) unset($entity_ids[$index]);
+            }
+            if (count($entity_ids)<=0) continue;
+
+            // remove all the unwanted entries from our group
+            $entity_ids_list = implode(',', $entity_ids);
+            if (!$partial_groups || $partial_first) {
+              CRM_Core_DAO::executeQuery(
+                <<<SQL
+                DELETE FROM civicrm_sdd_contribution_txgroup
+                  WHERE
+                    txgroup_id=$group_id
+                    AND contribution_id NOT IN ($entity_ids_list);
+                SQL
+              );
+            }
+
+            // remove all our entries from other groups, if necessary
+            CRM_Core_DAO::executeQuery(
+              <<<SQL
+              DELETE FROM civicrm_sdd_contribution_txgroup
+                WHERE txgroup_id!=$group_id
+                AND contribution_id IN ($entity_ids_list);
+              SQL
+            );
+
+            // now check which ones are already in our group...
+            $existing = CRM_Core_DAO::executeQuery(
+              <<<SQL
+              SELECT *
+              FROM civicrm_sdd_contribution_txgroup
+              WHERE txgroup_id=$group_id
+              AND contribution_id IN ($entity_ids_list);
+              SQL
+            );
+            while ($existing->fetch()) {
+              // remove from entity ids, if in there:
+              if(($key = array_search($existing->contribution_id, $entity_ids)) !== false) {
+                unset($entity_ids[$key]);
+              }
+            }
+
+            // the remaining must be added
+            foreach ($entity_ids as $entity_id) {
+              CRM_Core_DAO::executeQuery(
+                <<<SQL
+                INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES ($group_id, $entity_id);
+                SQL
+              );
+            }
           }
           catch (\CRM_Core_Exception $exception) {
             // TODO: Error handling
             Civi::log()->debug('org.project60.sepa: batching:syncGroups/getGroup ' . $exception->getMessage());
           }
           unset($existing_groups[$collection_date][$financial_type_id ?? 0]);
-        }
-
-        // now we have the right group. Prepare some parameters...
-        $group_id = $group['id'];
-        $entity_ids = [];
-        foreach ($mandates as $mandate) {
-          // remark: "mandate_entity_id" in this case means the contribution ID
-          if (empty($mandate['mandate_entity_id'])) {
-            // this shouldn't happen
-            Civi::log()->debug("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
-          }
-          else {
-            array_push($entity_ids, $mandate['mandate_entity_id']);
-          }
-        }
-        if (count($entity_ids)<=0) continue;
-
-        // now, filter out the entity_ids that are are already in a non-open group
-        //   (DO NOT CHANGE CLOSED GROUPS!)
-        $entity_ids_list = implode(',', $entity_ids);
-        $already_sent_contributions = CRM_Core_DAO::executeQuery("
-        SELECT contribution_id
-        FROM civicrm_sdd_contribution_txgroup
-        LEFT JOIN civicrm_sdd_txgroup ON civicrm_sdd_contribution_txgroup.txgroup_id = civicrm_sdd_txgroup.id
-        WHERE contribution_id IN ($entity_ids_list)
-         AND  civicrm_sdd_txgroup.status_id <> $group_status_id_open;");
-        while ($already_sent_contributions->fetch()) {
-          $index = array_search($already_sent_contributions->contribution_id, $entity_ids);
-          if ($index !== false) unset($entity_ids[$index]);
-        }
-        if (count($entity_ids)<=0) continue;
-
-        // remove all the unwanted entries from our group
-        $entity_ids_list = implode(',', $entity_ids);
-        if (!$partial_groups || $partial_first) {
-          CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id NOT IN ($entity_ids_list);");
-        }
-
-        // remove all our entries from other groups, if necessary
-        CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id!=$group_id AND contribution_id IN ($entity_ids_list);");
-
-        // now check which ones are already in our group...
-        $existing = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id=$group_id AND contribution_id IN ($entity_ids_list);");
-        while ($existing->fetch()) {
-          // remove from entity ids, if in there:
-          if(($key = array_search($existing->contribution_id, $entity_ids)) !== false) {
-            unset($entity_ids[$key]);
-          }
-        }
-
-        // the remaining must be added
-        foreach ($entity_ids as $entity_id) {
-          CRM_Core_DAO::executeQuery("INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES ($group_id, $entity_id);");
         }
       }
     }
@@ -621,17 +648,11 @@ class CRM_Sepa_Logic_Batching {
    * Check if a transaction group reference is already in use
    */
   public static function referenceExists($reference) {
-    try {
-      $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+    return \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->selectRowCount()
         ->addWhere('reference', '=', $reference)
         ->execute()
-        ->single();
-      $exists = TRUE;
-    }
-    catch (\CRM_Core_Exception $exception) {
-      $exists = FALSE;
-    }
-    return $exists;
+        ->count() === 1;
   }
 
   public static function getTransactionGroupReference(

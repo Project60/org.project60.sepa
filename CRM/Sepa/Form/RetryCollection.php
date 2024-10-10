@@ -221,15 +221,12 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
    * Get the list of creditors
    */
   protected function getGroupList() {
-    $txgroup_list = array();
-    $txgroup_query = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+    return \Civi\Api4\SepaTransactionGroup::get(TRUE)
       ->addSelect('reference', 'id')
       ->addWhere('type', 'IN', ['RCUR', 'FRST'])
-      ->execute();
-    foreach ($txgroup_query as $txgroup) {
-      $txgroup_list[$txgroup['id']] = $txgroup['reference'];
-    }
-    return $txgroup_list;
+      ->execute()
+      ->indexBy('id')
+      ->column('reference');
   }
 
   /*

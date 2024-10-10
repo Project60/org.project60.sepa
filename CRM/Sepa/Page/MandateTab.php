@@ -46,7 +46,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
 
     // Retrieve OOFF mandates.
     $ooffList = [];
-    $ooffMandates = SepaMandate::get()
+    $ooffMandates = SepaMandate::get(TRUE)
       ->addSelect(
         'id',
         'contribution.id',
@@ -100,7 +100,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
 
     // Retrieve RCUR mandates.
     $rcurList = [];
-    $rcurMandates = SepaMandate::get()
+    $rcurMandates = SepaMandate::get(TRUE)
       ->addSelect(
         'id',
         'contribution_recur.id',
@@ -152,7 +152,8 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         ->addWhere('contribution_status_id:name', '!=', 'Pending')
         ->addOrderBy('receive_date', 'DESC')
         ->setLimit(1)
-        ->execute();
+        ->execute()
+        ->first();
       $rcurRow = [
         'mandate_id' => $rcurMandate['id'],
         'start_date' => $rcurMandate['contribution_recur.start_date'],
@@ -168,9 +169,9 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
           TRUE
         ),
         'next_collection_date' => $rcurMandate['contribution_recur.next_sched_contribution_date'],
-        'last_collection_date' => $lastInstallment->first()['receive_date'] ?? NULL,
+        'last_collection_date' => $lastInstallment['receive_date'] ?? NULL,
         'cancel_reason' => $rcur_mandates['cancel_reason'],
-        'last_cancel_reason' => $lastInstallment->first()['cancel_reason'] ?? NULL,
+        'last_cancel_reason' => $lastInstallment['cancel_reason'] ?? NULL,
         'end_date' => $rcurMandate['contribution_recur.end_date'],
         'currency' => $rcurMandate['contribution_recur.currency'],
         'amount' => $rcurMandate['contribution_recur.amount'],

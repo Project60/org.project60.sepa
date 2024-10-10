@@ -56,7 +56,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       // load mandate
       try {
         // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
-        $this->old_mandate = \Civi\Api4\SepaMandate::get()
+        $this->old_mandate = \Civi\Api4\SepaMandate::get(TRUE)
           ->addWhere('id', '=', $mandate_id)
           ->execute()
           ->single();
@@ -625,8 +625,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       ->addWhere('contact_id', '=', $this->contact_id)
       ->addWhere('status', 'IN', ['RCUR', 'COMPLETE', 'SENT'])
       ->addOrderBy('id', 'DESC')
-      ->execute()
-      ->indexBy('id');
+      ->execute();
     foreach ($mandates as $mandate) {
       $key = "{$mandate['iban']}/{$mandate['bic']}";
       if (!isset($known_accounts[$key])) {
