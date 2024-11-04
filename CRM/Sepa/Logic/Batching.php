@@ -111,7 +111,6 @@ class CRM_Sepa_Logic_Batching {
       ->setLimit($limit)
       ->setOffset($offset)
       ->execute()
-      ->indexBy('id')
       ->getArrayCopy();
 
     foreach ($relevant_mandates as &$mandate) {
