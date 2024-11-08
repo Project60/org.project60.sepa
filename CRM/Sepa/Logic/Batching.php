@@ -333,7 +333,6 @@ class CRM_Sepa_Logic_Batching {
       ->setLimit($limit ?? 0)
       ->setOffset($offset ?? 0)
       ->execute()
-      ->indexBy('id')
       ->getArrayCopy();
 
     // step 2: group mandates in collection dates
@@ -341,7 +340,7 @@ class CRM_Sepa_Logic_Batching {
     $earliest_collection_date = date('Y-m-d', strtotime("$now +$ooff_notice days"));
     $latest_collection_date = '';
 
-    foreach ($relevant_mandates as $mandate_id => $mandate) {
+    foreach ($relevant_mandates as $mandate) {
       $mandate['mandate_id'] = $mandate['id'];
       $mandate['mandate_contact_id'] = $mandate['contact_id'];
       $mandate['mandate_entity_id'] = $mandate['entity_id'];
