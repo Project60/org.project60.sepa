@@ -17,4 +17,13 @@ class SepaTransactionGroup extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  public static function permissions(): array {
+    return [
+      'get' => ['view sepa groups'],
+      'create' => ['batch sepa groups'],
+      'update' => ['batch sepa groups'],
+      'delete' => ['delete sepa groups'],
+    ];
+  }
+
 }
