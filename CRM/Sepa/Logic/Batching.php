@@ -480,6 +480,56 @@ class CRM_Sepa_Logic_Batching {
    **                                                                        **
    ****************************************************************************/
 
+  public static function getOrCreateTransactionGroup(
+    int $creditor_id,
+    string $mode,
+    string $collection_date,
+    int $financial_type_id,
+    int $notice,
+    array &$existing_groups
+  ): int {
+    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+
+    if (!isset($existing_groups[$collection_date][$financial_type_id ?? 0])) {
+      // this group does not yet exist -> create
+
+      // find unused reference
+      $reference = self::getTransactionGroupReference($creditor_id, $mode, $collection_date, $financial_type_id);
+
+      $group = civicrm_api('SepaTransactionGroup', 'create', array(
+        'version'                 => 3,
+        'reference'               => $reference,
+        'type'                    => $mode,
+        'collection_date'         => $collection_date,
+        'financial_type_id'       => $financial_type_id,
+        'latest_submission_date'  => date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
+        'created_date'            => date('Y-m-d'),
+        'status_id'               => $group_status_id_open,
+        'sdd_creditor_id'         => $creditor_id,
+      ));
+      if (!empty($group['is_error'])) {
+        // TODO: Error handling
+        Civi::log()->debug("org.project60.sepa: batching:syncGroups/createGroup ".$group['error_message']);
+      }
+    }
+    else {
+      try {
+        $group = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+          ->addWhere('id', '=', $existing_groups[$collection_date][$financial_type_id ?? 0])
+          ->addWhere('status_id', '=', $group_status_id_open)
+          ->execute()
+          ->single();
+      }
+      catch (\CRM_Core_Exception $exception) {
+        // TODO: Error handling
+        Civi::log()->debug('org.project60.sepa: batching:syncGroups/getGroup ' . $exception->getMessage());
+      }
+      unset($existing_groups[$collection_date][$financial_type_id ?? 0]);
+    }
+
+    return (int) $group['id'];
+  }
+
   /**
    * subroutine to create the group/contribution structure as calculated
    * @param $calculated_groups  array [collection_date] -> array(contributions) as calculated
@@ -516,121 +566,100 @@ class CRM_Sepa_Logic_Batching {
         if (0 === $financial_type_id) {
           $financial_type_id = NULL;
         }
-        if (!isset($existing_groups[$collection_date][$financial_type_id ?? 0])) {
-          // this group does not yet exist -> create
 
-          // find unused reference
-          $reference = self::getTransactionGroupReference($creditor_id, $mode, $collection_date, $financial_type_id);
+        $group_id = self::getOrCreateTransactionGroup(
+          (int) $creditor_id,
+          $mode,
+          $collection_date,
+          $financial_type_id,
+          (int) $notice,
+          $existing_groups
+        );
 
-          $group = civicrm_api('SepaTransactionGroup', 'create', array(
-            'version'                 => 3,
-            'reference'               => $reference,
-            'type'                    => $mode,
-            'collection_date'         => $collection_date,
-            'financial_type_id'       => $financial_type_id,
-            'latest_submission_date'  => date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
-            'created_date'            => date('Y-m-d'),
-            'status_id'               => $group_status_id_open,
-            'sdd_creditor_id'         => $creditor_id,
-          ));
-          if (!empty($group['is_error'])) {
-            // TODO: Error handling
-            Civi::log()->debug("org.project60.sepa: batching:syncGroups/createGroup ".$group['error_message']);
+        // now we have the right group. Prepare some parameters...
+        $entity_ids = [];
+        foreach ($mandates as $mandate) {
+          // remark: "mandate_entity_id" in this case means the contribution ID
+          if (empty($mandate['mandate_entity_id'])) {
+            // this shouldn't happen
+            Civi::log()
+              ->debug("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
+          }
+          else {
+            array_push($entity_ids, $mandate['mandate_entity_id']);
           }
         }
-        else {
-          try {
-            $group = \Civi\Api4\SepaTransactionGroup::get(TRUE)
-              ->addWhere('id', '=', $existing_groups[$collection_date][$financial_type_id ?? 0])
-              ->addWhere('status_id', '=', $group_status_id_open)
-              ->execute()
-              ->single();
+        if (count($entity_ids) <= 0) {
+          continue;
+        }
 
-            // now we have the right group. Prepare some parameters...
-            $group_id = $group['id'];
-            $entity_ids = [];
-            foreach ($mandates as $mandate) {
-              // remark: "mandate_entity_id" in this case means the contribution ID
-              if (empty($mandate['mandate_entity_id'])) {
-                // this shouldn't happen
-                Civi::log()->debug("org.project60.sepa: batching:syncGroups mandate with bad mandate_entity_id ignored:" . $mandate['mandate_id']);
-              }
-              else {
-                array_push($entity_ids, $mandate['mandate_entity_id']);
-              }
-            }
-            if (count($entity_ids)<=0) continue;
-
-            // now, filter out the entity_ids that are are already in a non-open group
-            //   (DO NOT CHANGE CLOSED GROUPS!)
-            $entity_ids_list = implode(',', $entity_ids);
-            $already_sent_contributions = CRM_Core_DAO::executeQuery(
-              <<<SQL
+        // now, filter out the entity_ids that are are already in a non-open group
+        //   (DO NOT CHANGE CLOSED GROUPS!)
+        $entity_ids_list = implode(',', $entity_ids);
+        $already_sent_contributions = CRM_Core_DAO::executeQuery(
+          <<<SQL
               SELECT contribution_id
               FROM civicrm_sdd_contribution_txgroup
               LEFT JOIN civicrm_sdd_txgroup ON civicrm_sdd_contribution_txgroup.txgroup_id = civicrm_sdd_txgroup.id
               WHERE contribution_id IN ($entity_ids_list)
               AND  civicrm_sdd_txgroup.status_id <> $group_status_id_open;
               SQL
-            );
-            while ($already_sent_contributions->fetch()) {
-              $index = array_search($already_sent_contributions->contribution_id, $entity_ids);
-              if ($index !== false) unset($entity_ids[$index]);
-            }
-            if (count($entity_ids)<=0) continue;
+        );
+        while ($already_sent_contributions->fetch()) {
+          $index = array_search($already_sent_contributions->contribution_id, $entity_ids);
+          if ($index !== FALSE) {
+            unset($entity_ids[$index]);
+          }
+        }
+        if (count($entity_ids) <= 0) {
+          continue;
+        }
 
-            // remove all the unwanted entries from our group
-            $entity_ids_list = implode(',', $entity_ids);
-            if (!$partial_groups || $partial_first) {
-              CRM_Core_DAO::executeQuery(
-                <<<SQL
+        // remove all the unwanted entries from our group
+        $entity_ids_list = implode(',', $entity_ids);
+        if (!$partial_groups || $partial_first) {
+          CRM_Core_DAO::executeQuery(
+            <<<SQL
                 DELETE FROM civicrm_sdd_contribution_txgroup
                   WHERE
                     txgroup_id=$group_id
                     AND contribution_id NOT IN ($entity_ids_list);
                 SQL
-              );
-            }
+          );
+        }
 
-            // remove all our entries from other groups, if necessary
-            CRM_Core_DAO::executeQuery(
-              <<<SQL
+        // remove all our entries from other groups, if necessary
+        CRM_Core_DAO::executeQuery(
+          <<<SQL
               DELETE FROM civicrm_sdd_contribution_txgroup
                 WHERE txgroup_id!=$group_id
                 AND contribution_id IN ($entity_ids_list);
               SQL
-            );
+        );
 
-            // now check which ones are already in our group...
-            $existing = CRM_Core_DAO::executeQuery(
-              <<<SQL
+        // now check which ones are already in our group...
+        $existing = CRM_Core_DAO::executeQuery(
+          <<<SQL
               SELECT *
               FROM civicrm_sdd_contribution_txgroup
               WHERE txgroup_id=$group_id
               AND contribution_id IN ($entity_ids_list);
               SQL
-            );
-            while ($existing->fetch()) {
-              // remove from entity ids, if in there:
-              if(($key = array_search($existing->contribution_id, $entity_ids)) !== false) {
-                unset($entity_ids[$key]);
-              }
-            }
+        );
+        while ($existing->fetch()) {
+          // remove from entity ids, if in there:
+          if (($key = array_search($existing->contribution_id, $entity_ids)) !== FALSE) {
+            unset($entity_ids[$key]);
+          }
+        }
 
-            // the remaining must be added
-            foreach ($entity_ids as $entity_id) {
-              CRM_Core_DAO::executeQuery(
-                <<<SQL
+        // the remaining must be added
+        foreach ($entity_ids as $entity_id) {
+          CRM_Core_DAO::executeQuery(
+            <<<SQL
                 INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES ($group_id, $entity_id);
                 SQL
-              );
-            }
-          }
-          catch (\CRM_Core_Exception $exception) {
-            // TODO: Error handling
-            Civi::log()->debug('org.project60.sepa: batching:syncGroups/getGroup ' . $exception->getMessage());
-          }
-          unset($existing_groups[$collection_date][$financial_type_id ?? 0]);
+          );
         }
       }
     }
