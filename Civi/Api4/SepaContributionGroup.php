@@ -30,4 +30,15 @@ use Civi\Api4\Generic\DAOEntity;
  */
 class SepaContributionGroup extends Generic\DAOEntity {
   use Generic\Traits\EntityBridge;
+
+  public static function permissions(): array {
+    return [
+      'get' => ['view sepa groups'],
+      'create' => ['batch sepa groups'],
+      'update' => ['batch sepa groups'],
+      'delete' => [
+        ['batch sepa groups', 'delete sepa groups'],
+      ],
+    ];
+  }
 }
