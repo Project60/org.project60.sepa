@@ -41,4 +41,5 @@ class SepaContributionGroup extends Generic\DAOEntity {
       ],
     ];
   }
+
 }
