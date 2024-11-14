@@ -179,7 +179,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       CRM_Core_Session::setStatus(
         E::ts(
           "Couldn't read transaction groups. Error was: %1",
-          [1 => $result['error_message']]
+          [1 => $exception->getMessage()]
         ),
         E::ts('Error'),
         'error'
