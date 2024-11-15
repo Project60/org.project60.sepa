@@ -484,7 +484,7 @@ class CRM_Sepa_Logic_Batching {
     int $creditor_id,
     string $mode,
     string $collection_date,
-    int $financial_type_id,
+    ?int $financial_type_id,
     int $notice,
     array &$existing_groups
   ): int {
@@ -501,6 +501,7 @@ class CRM_Sepa_Logic_Batching {
         'reference'               => $reference,
         'type'                    => $mode,
         'collection_date'         => $collection_date,
+        // Financial type may be NULL if not grouping by financial type.
         'financial_type_id'       => $financial_type_id,
         'latest_submission_date'  => date('Y-m-d', strtotime("-$notice days", strtotime($collection_date))),
         'created_date'            => date('Y-m-d'),
@@ -563,15 +564,11 @@ class CRM_Sepa_Logic_Batching {
       }
 
       foreach ($financial_type_groups as $financial_type_id => $mandates) {
-        if (0 === $financial_type_id) {
-          $financial_type_id = NULL;
-        }
-
         $group_id = self::getOrCreateTransactionGroup(
           (int) $creditor_id,
           $mode,
           $collection_date,
-          $financial_type_id,
+          0 === $financial_type_id ? NULL : $financial_type_id,
           (int) $notice,
           $existing_groups
         );
