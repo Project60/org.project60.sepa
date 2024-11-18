@@ -1,18 +1,23 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage>
-    <include>
-      <directory phpVersion="8.0.0" phpVersionOperator="&gt;=" suffix=".php">./</directory>
-    </include>
-  </coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" colors="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache" backupStaticProperties="false">
   <testsuites>
     <testsuite name="CiviSEPA Test Suite">
       <directory>./tests/phpunit</directory>
     </testsuite>
   </testsuites>
-  <listeners>
-    <listener class="Civi\Test\CiviTestListener">
-      <arguments/>
-    </listener>
-  </listeners>
+  <filter>
+    <whitelist>
+      <directory suffix=".php">api</directory>
+      <directory suffix=".php">CRM</directory>
+      <directory suffix=".php">Civi</directory>
+      <exclude>
+        <directory>CRM/Sepa/DAO</directory>
+      </exclude>
+    </whitelist>
+  </filter>
+  <source>
+    <include>
+      <directory phpVersion="8.0.0" phpVersionOperator="&gt;=" suffix=".php">./</directory>
+    </include>
+  </source>
 </phpunit>
