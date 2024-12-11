@@ -91,6 +91,8 @@ class FindMandate extends CreateRecurringMandate {
       new Specification('start_date',        'Date',    E::ts('Start Date'), false, null, null, null, false),
       new Specification('date',              'Date',    E::ts('Signature Date'), false, null, null, null, false),
       new Specification('validation_date',   'Date',    E::ts('Validation Date'), false, null, null, null, false),
+      new Specification('contribution_id', 'Integer', E::ts('Contribution ID (One-off)'), false, null, null, null, false),
+      new Specification('contribution_recur_id', 'Integer', E::ts('Recurring Contribution ID'), false, null, null, null, false),
     ]);
   }
 
@@ -159,6 +161,7 @@ class FindMandate extends CreateRecurringMandate {
           $output->setParameter('financial_type_id', $recurring_contribution['financial_type_id']);
           $output->setParameter('campaign_id', \CRM_Utils_Array::value('campaign_id', $recurring_contribution));
           $output->setParameter('start_date', $recurring_contribution['start_date']);
+          $output->setParameter('contribution_recur_id', $recurring_contribution['id']);
 
           // some need to be calculated
           $frequency = 0; // frequency is 'how ofter per year'
@@ -183,6 +186,7 @@ class FindMandate extends CreateRecurringMandate {
           $output->setParameter('cycle_day', null);
           $output->setParameter('frequency', 0);
           $output->setParameter('annual_amount', null);
+          $output->setParameter('contribution_id', $contribution['id']);
           break;
 
         default:
