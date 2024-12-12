@@ -84,6 +84,9 @@ function civicrm_api3_sepa_transaction_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @deprecated This action will not be ported to APIv4. Use the "Get" action with custom joins and filters instead.
+ */
 function civicrm_api3_sepa_transaction_group_getdetail($params) {
 //  $where = "txgroup.id= txgroup_contrib.txgroup_id AND txgroup_contrib.contribution_id = contrib.id";
   $where = "1";
@@ -239,9 +242,14 @@ continue;
 function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   // first, load the txgroup
   $txgroup_id = $params['txgroup_id'];
-  $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id' => $txgroup_id, 'version' => 3));
-  if (isset($txgroup['is_error']) && $txgroup['is_error']) {
-    return civicrm_api3_create_error("Cannot read transaction group ".$txgroup_id);
+  try {
+    $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+      ->addWhere('id', '=', $txgroup_id)
+      ->execute()
+      ->single();
+  }
+  catch (\CRM_Core_Exception $exception)  {
+    return civicrm_api3_create_error('Cannot read transaction group ' . $txgroup_id);
   }
 
   if (isset($txgroup['sdd_file_id'])) {

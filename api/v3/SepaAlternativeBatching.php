@@ -130,7 +130,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
   } else {
     $creditors = array();
     foreach ($creditor_query['values'] as $creditor) {
-        $creditors[] = $creditor['id'];
+        $creditors[] = (int) $creditor['id'];
     }
   }
 

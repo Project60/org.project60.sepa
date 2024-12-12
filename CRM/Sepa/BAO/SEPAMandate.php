@@ -21,6 +21,7 @@
  *
  */
 
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Class contains functions for Sepa mandates
@@ -48,9 +49,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
         // new mandate, use the default creditor
         $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
         $params['creditor_id'] = $default_creditor->id;
-      } else {
+      }
+      else {
         // existing mandate, get creditor
-        $params['creditor_id'] = civicrm_api3('SepaMandate', 'getvalue', array ('id' => $params['id'], 'return' => 'creditor_id'));
+        $params['creditor_id'] = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addSelect('creditor_id')
+          ->addWhere('id', '=', $params['id'])
+          ->execute()
+          ->single()['creditor_id'];
       }
     }
     $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix,creditor_type'));
@@ -371,16 +377,22 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
      // first, load the mandate
-    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
-    if (isset($mandate['is_error'])) {
+    try {
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addWhere('id', '=', $mandate_id)
+        ->execute()
+        ->single();
+    }
+    catch (\CRM_Core_Exception $exception) {
       $lock->release();
 
-      $error_message = sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']);
+      $error_message = E::ts("Cannot read mandate [%1]. Error was: '%2'", [1 => $mandate_id, 2 => $exception->getMessage()]);
       if ($error_to_ui) {
         CRM_Core_Session::setStatus($error_message, ts('Error'), 'error');
         return FALSE;
-      } else {
-        throw new Exception($error_message);
+      }
+      else {
+        throw new CRM_Core_Exception($error_message);
       }
     }
 
@@ -546,7 +558,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     // load the mandate
-    $mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $mandate_id));
+    $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+      ->addWhere('id', '=', $mandate_id)
+      ->execute()
+      ->single();
     if ($mandate['type'] != 'RCUR') {
       $lock->release();
       throw new Exception(ts("You can only modify RCUR mandates.", array('domain' => 'org.project60.sepa')));
@@ -906,7 +921,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     ]);
     if ($result->fetch()) {
       // return the mandate
-      return civicrm_api3('SepaMandate', 'getsingle', array('id' => $result->mandate_id));
+      return \Civi\Api4\SepaMandate::get(TRUE)
+        ->addWhere('id', '=', $result->mandate_id)
+        ->execute()
+        ->single();
     }
     else {
       return FALSE;

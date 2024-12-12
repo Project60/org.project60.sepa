@@ -21,11 +21,13 @@
 {/literal}
 
 {* add new mandate button *}
-<div>
-  <a id="sepa_payment_extra_button" class="button crm-popup" href="{crmURL p="civicrm/sepa/createmandate" q="action=update&cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add new SEPA Mandate{/ts}</span></a>
-  <br/>
-  <br/>
-</div>
+{if $permissions.create}
+  <div>
+    <a id="sepa_payment_extra_button" class="button crm-popup" href="{crmURL p="civicrm/sepa/createmandate" q="action=update&cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add new SEPA Mandate{/ts}</span></a>
+    <br/>
+    <br/>
+  </div>
+{/if}
 
 {if $rcurs}
 <h3>{ts domain="org.project60.sepa"}Recurring SEPA Mandates{/ts}</h3>
@@ -56,15 +58,20 @@
       <td>{$rcur.total_amount|crmMoney:$rcur.currency}</td>
       <td>
         {$rcur.last_collection_date|crmDate:$date_format}
-        {foreach from=$rcur.fail_sequence item=fail}
-          <div class="icon red-icon ui-icon-alert" title="{$rcur.last_cancel_reason}"/>
-        {/foreach}
+        {* Show as many warnings as last installments have failed. *}
+        {if $rcur.fail_sequence}
+          {for $i=1 to $rcur.fail_sequence}
+            <div class="icon red-icon ui-icon-alert" title="{$rcur.last_cancel_reason}"/>
+          {/for}
+        {/if}
       <td>{$rcur.next_collection_date|crmDate:$date_format}</td>
       <td>{$rcur.end_date|crmDate:$date_format}</td>
       <td>
         <span>
-          <a href="{$rcur.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
-          {if $rcur.edit_link}
+          {if $permissions.view}
+            <a href="{$rcur.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
+          {/if}
+          {if $permissions.edit && $rcur.edit_link}
             <a href="{$rcur.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
           {/if}
         </span>
@@ -76,6 +83,9 @@
 {else}
 <div id="help">
 {ts domain="org.project60.sepa"}This contact has no recorded recurring mandates.{/ts}
+{if $financialacls}
+  {ts domain="org.project60.sepa"}Note that only mandates associated with contributions of authorized financial types are being displayed.{/ts}
+{/if}
 </div>
 {/if}
 
@@ -103,8 +113,10 @@
       <td>{$ooff.total_amount|crmMoney:$ooff.currency}</td>
       <td>
         <span>
-          <a href="{$ooff.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
-          {if $ooff.edit_link}
+          {if $permissions.view}
+            <a href="{$ooff.view_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
+          {/if}
+          {if $permissions.edit && $ooff.edit_link}
             <a href="{$ooff.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
           {/if}
         </span>
@@ -116,6 +128,9 @@
 {else}
 <div id="help">
 {ts domain="org.project60.sepa"}This contact has no recorded one-off mandates.{/ts}
+{if $financialacls}
+  {ts domain="org.project60.sepa"}Note that only mandates associated with contributions of authorized financial types are being displayed.{/ts}
+{/if}
 </div>
 {/if}
 

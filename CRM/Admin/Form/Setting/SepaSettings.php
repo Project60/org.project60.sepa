@@ -132,6 +132,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
 
         // look up some values
         $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
+        $financial_type_grouping = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_financial_type_grouping');
         $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
         $no_draftxml = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_no_draft_xml');
         $excld_we = CRM_Sepa_Logic_Settings::getGenericSetting('exclude_weekends');
@@ -157,6 +158,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
         $this->addElement('checkbox',   'is_test_creditor',         E::ts("Is a Test Creditor"), "", array('value' =>'0'));
         $this->addElement('checkbox',   'exclude_weekends',         E::ts("Exclude Weekends"), "", ($excld_we?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'sdd_async_batching',       E::ts("Large Groups"), "", ($async_batch?array('checked'=>'checked'):array()));
+        $this->addElement('checkbox',   'sdd_financial_type_grouping', E::ts('Groups by Financial Types'), "", ($financial_type_grouping?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'sdd_skip_closed',          E::ts("Only Completed Contributions"), "", ($skip_closed?array('checked'=>'checked'):array()));
         $this->addElement('checkbox',   'sdd_no_draft_xml',         E::ts("No XML drafts"), "", ($no_draftxml?array('checked'=>'checked'):array()));
         $this->addElement('text',       'pp_buffer_days',           E::ts("Buffer Days"), array('size' => 2, 'value' => $bffrdays));
@@ -252,6 +254,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
 
         CRM_Sepa_Logic_Settings::setSetting((isset($values['exclude_weekends'])     ? "1" : "0"), 'exclude_weekends');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_async_batching'])   ? "1" : "0"), 'sdd_async_batching');
+        CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_financial_type_grouping'])  ? "1" : "0"), 'sdd_financial_type_grouping');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_skip_closed'])      ? "1" : "0"), 'sdd_skip_closed');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_no_draft_xml'])     ? "1" : "0"), 'sdd_no_draft_xml');
         CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_buffer_days'])       ? (int) $values['pp_buffer_days'] : "0"), 'pp_buffer_days');

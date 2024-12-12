@@ -76,7 +76,11 @@ class CRM_Sepa_Logic_PaymentInstruments {
       return null;
     } else {
       // get the creditor ID
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', ['return' => 'creditor_id,type,status', 'id' => $mandate_id]);
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addSelect('creditor_id', 'type', 'status')
+        ->addWhere('id', '=', $mandate_id)
+        ->execute()
+        ->single();
       return self::getPaymentInstrumentsForCreditor($mandate['creditor_id'], $mandate['type']);
     }
   }

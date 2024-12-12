@@ -13,6 +13,8 @@
 | copyright header is strictly prohibited without        |
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
+
+use Civi\Sepa\Util\ContributionUtil;
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -52,9 +54,21 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       }
 
       // load mandate
-      $this->old_mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $mandate_id));
+      try {
+        // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
+        $this->old_mandate = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addWhere('id', '=', $mandate_id)
+          ->execute()
+          ->single();
+      }
+      catch (\Exception $e) {
+        Civi::log()->error($e->getMessage());
+        CRM_Core_Error::statusBounce(
+          E::ts('The mandate to clone/replace from does not exist or you do not have permission for it.'),
+        );
+      }
       if ($this->old_mandate['type'] != 'RCUR') {
-        CRM_Core_Error::fatal(E::ts("You can only replace RCUR mandates"));
+        CRM_Core_Error::statusBounce(E::ts('You can only replace RCUR mandates'));
       }
       $this->contact_id = (int) $this->old_mandate['contact_id'];
 
@@ -62,7 +76,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     }
 
     if (empty($this->contact_id)) {
-      CRM_Core_Error::fatal(E::ts("No contact ID (cid) given."));
+      CRM_Core_Error::statusBounce(E::ts("No contact ID (cid) given."));
     }
 
     // load the contact and set the title
@@ -111,7 +125,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'select',
       'payment_instrument_id',
       E::ts('Payment Method'),
-      $this->getPaymentInstrumentList(),
+      ContributionUtil::getPaymentInstrumentList(),
       TRUE,
       array('class' => 'crm-select2')
     );
@@ -121,7 +135,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'select',
         'financial_type_id',
         E::ts('Financial Type'),
-        $this->getFinancialTypeList(),
+        ContributionUtil::getFinancialTypeList(),
         TRUE,
         array('class' => 'crm-select2')
     );
@@ -455,9 +469,11 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     try {
       $mandate = civicrm_api3('SepaMandate', 'createfull', $mandate_data);
-      $mandate = civicrm_api3('SepaMandate', 'getsingle', array(
-          'id'     => $mandate['id'],
-          'return' => 'reference,id,type'));
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addSelect('reference', 'id', 'type')
+        ->addWhere('id', '=', $mandate['id'])
+        ->execute()
+        ->single();
 
       // if we get here, everything went o.k.
       CRM_Core_Session::setStatus(E::ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", array(
@@ -469,7 +485,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
       // terminate old mandate, of requested
       if (!empty($values['replace'])) {
-        $rpl_mandate = civicrm_api3('SepaMandate', 'getsingle', array('id' => $values['replace']));
+        $rpl_mandate = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addWhere('id', '=', $values['replace'])
+          ->execute()
+          ->single();
 
         CRM_Sepa_BAO_SEPAMandate::terminateMandate(
             $values['replace'],
@@ -575,37 +594,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   /**
    * Get the list of (active) financial types
    */
-  protected function getFinancialTypeList() {
-    $list = array();
-    $query = civicrm_api3('FinancialType', 'get',array(
-        'is_active'    => 1,
-        'option.limit' => 0,
-        'return'       => 'id,name'
-    ));
-
-    foreach ($query['values'] as $value) {
-      $list[$value['id']] = $value['name'];
-    }
-
-    return $list;
-  }
-
-  /**
-   * Get the list of (CiviSEPA) payment instruments
-   */
-  protected function getPaymentInstrumentList() {
-    $list = array();
-    $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getAllSddPaymentInstruments();
-    foreach ($payment_instruments as $payment_instrument) {
-      $list[$payment_instrument['id']] = $payment_instrument['label'];
-    }
-
-    return $list;
-  }
-
-  /**
-   * Get the list of (active) financial types
-   */
   protected function getCampaignList() {
     $list = array('' => E::ts("- none -"));
     $query = civicrm_api3('Campaign', 'get',array(
@@ -631,14 +619,14 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $known_accounts = array('' => E::ts("new account"));
 
     // get data from SepaMandates
-    $mandates = civicrm_api3('SepaMandate', 'get', array(
-      'contact_id'   => $this->contact_id,
-      'status'       => array('IN' => array('RCUR', 'COMPLETE', 'SENT')),
-      'option.limit' => 0,
-      'return'       => 'iban,bic,reference',
-      'option.sort'  => 'id desc'
-    ));
-    foreach ($mandates['values'] as $mandate) {
+    // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
+    $mandates = \Civi\Api4\SepaMandate::get(TRUE)
+      ->addSelect('iban', 'bic', 'reference')
+      ->addWhere('contact_id', '=', $this->contact_id)
+      ->addWhere('status', 'IN', ['RCUR', 'COMPLETE', 'SENT'])
+      ->addOrderBy('id', 'DESC')
+      ->execute();
+    foreach ($mandates as $mandate) {
       $key = "{$mandate['iban']}/{$mandate['bic']}";
       if (!isset($known_accounts[$key])) {
         $known_accounts[$key] = "{$mandate['iban']} ({$mandate['reference']})";

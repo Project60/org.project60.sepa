@@ -15,7 +15,7 @@
 +--------------------------------------------------------*/
 
 use CRM_Sepa_ExtensionUtil as E;
-  
+
 /**
  * Collection of upgrade steps.
  */
@@ -489,6 +489,26 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $this->ctx->log->info("Adding new 'SDD - EBICS 3.6 pain formats");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+    return TRUE;
+  }
+
+  public function upgrade_11301() {
+    $this->ctx->log->info('Adding financial_type_id column to civicrm_sdd_txgroup table.');
+    $column = CRM_Core_DAO::singleValueQuery(
+      <<<SQL
+      SHOW COLUMNS FROM `civicrm_sdd_txgroup` LIKE 'financial_type_id';
+      SQL
+    );
+    if (!$column) {
+      $this->executeSql(
+        <<<SQL
+        ALTER TABLE civicrm_sdd_txgroup
+          ADD COLUMN `financial_type_id`
+            int unsigned
+          COMMENT 'Financial type of contained contributions if CiviSEPA is generating groups matching financial types.';
+        SQL
+      );
+    }
     return TRUE;
   }
 }

@@ -21,6 +21,7 @@ use \Civi\ActionProvider\Parameter\ParameterBagInterface;
 use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;
 
+use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
 class CreateRecurringMandate extends CreateOneOffMandate {
@@ -150,7 +151,11 @@ class CreateRecurringMandate extends CreateOneOffMandate {
     // create mandate
     try {
       $mandate = \civicrm_api3('SepaMandate', 'createfull', $mandate_data);
-      $mandate = \civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate['id'], 'return' => 'id,reference,entity_id']);
+      $mandate = SepaMandate::get(TRUE)
+        ->addSelect('id', 'reference', 'entity_id')
+        ->addWhere('id', '=', $mandate['id'])
+        ->execute()
+        ->single();
       $output->setParameter('mandate_id', $mandate['id']);
       $output->setParameter('recurring_contribution_id', $mandate['entity_id']);
       $output->setParameter('mandate_reference', $mandate['reference']);
