@@ -132,7 +132,7 @@ class CRM_Sepa_Logic_Batching {
         'rc_currency' => $mandate['contribution_recur.currency'],
         'rc_financial_type_id' => $mandate['contribution_recur.financial_type_id'],
         'rc_contribution_status_id' => $mandate['contribution_recur.contribution_status_id'],
-        'rc_campaign_id' => $mandate['contribution_recur.campaign_id'],
+        'rc_campaign_id' => $mandate['contribution_recur.campaign_id'] ?? NULL,
         'rc_payment_instrument_id' => $mandate['contribution_recur.payment_instrument_id'],
         'rc_is_test' => $mandate['contribution_recur.is_test'],
       ];
