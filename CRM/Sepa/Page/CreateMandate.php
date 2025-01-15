@@ -28,6 +28,8 @@
 require_once 'CRM/Core/Page.php';
 require_once 'packages/php-iban-1.4.0/php-iban.php';
 
+use CRM_Sepa_ExtensionUtil as E;
+
 class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
   function run() {
@@ -327,9 +329,18 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
    * Will prepare the form by cloning the data from the given mandate
    */
   function prepareClonedData($mandate_id) {
-    $mandate = civicrm_api('SepaMandate', 'getsingle', array('id'=>$mandate_id, 'version'=>3));
-    if (isset($mandate['is_error']) && $mandate['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Couldn't load mandate #%s", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+    try {
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addWhere('id', '=', $mandate)
+        ->execute()
+        ->single();
+    }
+    catch (\CRM_Core_Exception $exception) {
+      CRM_Core_Session::setStatus(
+        E::ts("Couldn't load mandate #%1", [1 => $mandate_id]),
+        E::ts('Error'),
+        'error'
+      );
       return;
     }
 
@@ -440,15 +451,20 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     }
 
     // check reference
-    if (!empty($_REQUEST['reference'])) {
+    $reference = CRM_Utils_Request::retrieve('reference', 'String');
+    if (!empty($reference)) {
       // check if it is formally correct
-      if (!preg_match("/^[A-Z0-9\\-]{4,35}$/", $_REQUEST['reference'])) {
+      if (!preg_match("/^[A-Z0-9\\-]{4,35}$/", $reference)) {
         $errors['reference'] = ts("Reference has to be an upper case alphanumeric string between 4 and 35 characters long.", array('domain' => 'org.project60.sepa'));
       } else {
         // check if the reference is taken
-        $count = civicrm_api3('SepaMandate', 'getcount', array("reference" => $_REQUEST['reference']));
+        $count = \Civi\Api4\SepaMandate::get(TRUE)
+          ->selectRowCount()
+          ->addWhere('reference', '=', $reference)
+          ->execute()
+          ->countMatched();
         if ($count > 0) {
-          $errors['reference'] = ts("This reference is already in use.", array('domain' => 'org.project60.sepa'));
+          $errors['reference'] = E::ts('This reference is already in use.');
         }
       }
     }

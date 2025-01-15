@@ -261,6 +261,16 @@ class CRM_Sepa_Logic_Settings {
   }
 
   /**
+   * Whether the "Financial ACLs" Core extension is installed. The extension introduces financial type-specific
+   * permissions for CRUD actions on contributions, which CiviSEPA is respecting for displaying mandates, etc.
+   */
+  public static function isFinancialaclsInstalled(): bool {
+    return \CRM_Extension_System::singleton()
+        ->getManager()
+        ->getStatus('financialacls') === \CRM_Extension_Manager::STATUS_INSTALLED;
+  }
+
+  /**
    * Return the ID of the contributions' 'In Progress' status.
    *
    * @see https://github.com/Project60/org.project60.sepa/issues/632

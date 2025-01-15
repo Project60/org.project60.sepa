@@ -46,7 +46,8 @@ function sepa_civicrm_pageRun( &$page ) {
       ]);
     }
 
-  } elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
+  }
+  elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
     if (CRM_Core_Permission::check('view sepa mandates')) {
       $contribution_id = $page->getTemplate()->get_template_vars('id');
@@ -59,34 +60,40 @@ function sepa_civicrm_pageRun( &$page ) {
         $contribution_recur_id = $page->getTemplate()->get_template_vars('contribution_recur_id');
         if (empty($contribution_recur_id)) return;
 
-        $mandate = civicrm_api3('SepaMandate', 'getsingle', [
-          'entity_table' => 'civicrm_contribution_recur',
-          'entity_id'    => $contribution_recur_id
-        ]);
+        $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addWhere('entity_table', '=', 'civicrm_contribution_recur')
+          ->addWhere('entity_id', '=', $contribution_recur_id)
+          ->execute()
+          ->single();
       }
       else {
         // this is a OOFF contribtion
-        $mandate = civicrm_api3('SepaMandate', 'getsingle', [
-          'entity_table' => 'civicrm_contribution',
-          'entity_id'    => $contribution_id
-        ]);
+        $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addWhere('entity_table', '=', 'civicrm_contribution')
+          ->addWhere('entity_id', '=', $contribution_id)
+          ->execute()
+          ->single();
       }
 
       // add txgroup information
-      $txgroup_search = civicrm_api3('SepaContributionGroup', 'get', [
-        'contribution_id' => $contribution_id
-      ]);
-      if (empty($txgroup_search['id'])) {
+      $txgroup_search = \Civi\Api4\SepaContributionGroup::get(TRUE)
+        ->addWhere('contribution_id', '=', $contribution_id)
+        ->execute()
+        ->indexBy('id');
+      if ($txgroup_search->count() === 0) {
         $mandate['tx_group'] = ts('<i>None</i>', ['domain' => 'org.project60.sepa']);
-      } else {
-        $group = reset($txgroup_search['values']);
+      }
+      else {
+        $group = $txgroup_search->first();
         if (empty($group['txgroup_id'])) {
           $mandate['tx_group'] = ts('<i>Error</i>', ['domain' => 'org.project60.sepa']);
-        } else {
-          $mandate['tx_group'] = civicrm_api3('SepaTransactionGroup', 'getvalue', [
-            'return' => 'reference',
-            'id'     => $group['txgroup_id']
-          ]);
+        }
+        else {
+          $mandate['tx_group'] = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+            ->addSelect('reference')
+            ->addWhere('id', '=', $group['txgroup_id'])
+            ->execute()
+            ->single()['reference'];
         }
       }
 
@@ -112,7 +119,10 @@ function sepa_civicrm_pageRun( &$page ) {
         // this is not a SEPA recurring contribution
         return;
       }
-      $mandate = civicrm_api3("SepaMandate","getsingle", ['id' => $mandate_id]);
+      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addWhere('id', '=', $mandate_id)
+        ->execute()
+        ->single();
 
       // load notes
       $mandate['notes'] = [];

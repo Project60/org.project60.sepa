@@ -178,7 +178,7 @@ msgstr ""
 msgid "Cannot close mandate [%s], batching in progress!"
 msgstr ""
 
-#: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Logic/Status.php CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php CRM/Sepa/Page/ListGroup.php js/SepaSettings.js
+#: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Logic/Status.php CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php js/SepaSettings.js
 msgid "Error"
 msgstr ""
 
@@ -780,6 +780,10 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateRCUR.php templates/CRM/Sepa/Page/CreateMandate.tpl templates/CRM/Sepa/Page/EditMandate.tpl templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "End Date"
+msgstr ""
+
+#: CRM/Sepa/Form/CreateMandate.php
+msgid "The mandate to clone/replace from does not exist or you do not have permission for it."
 msgstr ""
 
 #: CRM/Sepa/Form/CreateMandate.php
@@ -1415,7 +1419,7 @@ msgid "CiviSEPA Dashboard"
 msgstr ""
 
 #: CRM/Sepa/Page/DashBoard.php
-msgid "Couldn't read transaction groups. Error was: '%s'"
+msgid "Couldn't read transaction groups. Error was: %1"
 msgstr ""
 
 #: CRM/Sepa/Page/DashBoard.php
@@ -1515,7 +1519,7 @@ msgid "SEPA Group Contributions"
 msgstr ""
 
 #: CRM/Sepa/Page/ListGroup.php
-msgid "Cannot read SEPA transaction group [%s]. Error was: '%s'"
+msgid "Cannot read SEPA transaction group [%1]. Error was: %2"
 msgstr ""
 
 #: CRM/Sepa/Page/MandateTab.php sepa.php
@@ -2547,6 +2551,10 @@ msgid "retry collection"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
+msgid "Note that only groups with contributions of authorized financial types are being displayed."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Group Name"
 msgstr ""
 
@@ -3048,6 +3056,10 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "This contact has no recorded recurring mandates."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/MandateTab.tpl
+msgid "Note that only mandates associated with contributions of authorized financial types are being displayed."
 msgstr ""
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl

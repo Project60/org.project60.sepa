@@ -22,6 +22,7 @@ use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;
 
 use Civi\FormProcessor\API\Exception;
+use Civi\Sepa\DataProcessor\Source\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
 class TerminateMandate extends AbstractAction {
@@ -79,10 +80,11 @@ class TerminateMandate extends AbstractAction {
     if ($mandateReference) {
       // find mandate ID with reference
       try {
-        $mandateId = civicrm_api3('SepaMandate', 'getvalue', [
-          'return' => "id",
-          'reference' => $mandateReference,
-        ]);
+        $mandateId = \Civi\Api4\SepaMandate::get(TRUE)
+          ->addSelect('id')
+          ->addWhere('reference', '=', $mandateReference)
+          ->execute()
+          ->single()['id'];
         if ($mandateId) {
           $output->setParameter('mandate_id', $mandateId);
           // terminate mandate with cancel reason from parameter if provided else condiguration cancel reason

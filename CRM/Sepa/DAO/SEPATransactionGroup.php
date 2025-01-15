@@ -68,6 +68,16 @@ class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Core_DAO {
   public $collection_date;
 
   /**
+   * Financial type of contained contributions if CiviSEPA is generating groups
+   * matching financial types.
+   *
+   * @var int|string|null
+   *   (SQL type: int unsigned)
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $financial_type_id;
+
+  /**
    * Latest submission date
    *
    * @var string|null
@@ -227,6 +237,25 @@ class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Core_DAO {
             'token' => FALSE,
           ],
           'where' => 'civicrm_sdd_txgroup.collection_date',
+          'table_name' => 'civicrm_sdd_txgroup',
+          'entity' => 'SEPATransactionGroup',
+          'bao' => 'CRM_Sepa_DAO_SEPATransactionGroup',
+          'localizable' => 0,
+          'add' => NULL,
+        ],
+        'financial_type_id' => [
+          'name' => 'financial_type_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => E::ts('Financial Type ID'),
+          'description' => E::ts('Financial type of contained contributions if CiviSEPA is generating groups matching financial types.'),
+          'required' => FALSE,
+          'usage' => [
+            'import' => FALSE,
+            'export' => FALSE,
+            'duplicate_matching' => FALSE,
+            'token' => FALSE,
+          ],
+          'where' => 'civicrm_sdd_txgroup.financial_type_id',
           'table_name' => 'civicrm_sdd_txgroup',
           'entity' => 'SEPATransactionGroup',
           'bao' => 'CRM_Sepa_DAO_SEPATransactionGroup',

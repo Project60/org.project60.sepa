@@ -111,6 +111,14 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       }
     }
 
+    // Validate financial type.
+    if (
+      is_numeric($params['financial_type_id'] ?? NULL)
+      && !array_key_exists($params['financial_type_id'], \Civi\Sepa\Util\ContributionUtil::getFinancialTypeList())
+    ) {
+      throw new CRM_Core_Exception("No permission for creating SEPA mandates with financial type [{$params['financial_type_id']}].");
+    }
+
     // if BIC is used for this creditor, it is required (see #245)
     if (empty($params['bic'])) {
       if ($creditor['uses_bic']) {
@@ -433,10 +441,14 @@ function civicrm_api3_sepa_mandate_modify($params) {
 
   // look up mandate ID if only reference is given
   if (empty($params['mandate_id']) && !empty($params['reference'])) {
-    $mandate = civicrm_api3('SepaMandate', 'get', array('reference' => $params['reference'], 'return' => 'id'));
-    if ($mandate['id']) {
-      $params['mandate_id'] = $mandate['id'];
-    } else {
+    try {
+      $params['mandate_id'] = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addSelect('id')
+        ->addWhere('reference', '=', $params['reference'])
+        ->execute()
+        ->single()['id'];
+    }
+    catch (\CRM_Core_Exception $exception) {
       return civicrm_api3_create_error("Couldn't identify mandate with reference '{$params['reference']}'.");
     }
   }
@@ -511,10 +523,14 @@ function _civicrm_api3_sepa_mandate_modify_spec(&$params) {
 function civicrm_api3_sepa_mandate_terminate($params) {
   // look up mandate ID if only reference is given
   if (empty($params['mandate_id']) && !empty($params['reference'])) {
-    $mandate = civicrm_api3('SepaMandate', 'get', array('reference' => $params['reference'], 'return' => 'id'));
-    if ($mandate['id']) {
-      $params['mandate_id'] = $mandate['id'];
-    } else {
+    try {
+      $params['mandate_id'] = \Civi\Api4\SepaMandate::get(TRUE)
+        ->addSelect('id')
+        ->addWhere('reference', '=', $params['reference'])
+        ->execute()
+        ->single()['id'];
+    }
+    catch (\CRM_Core_Exception $exception) {
       return civicrm_api3_create_error("Couldn't identify mandate with reference '{$params['reference']}'.");
     }
   }

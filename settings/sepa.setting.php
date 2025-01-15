@@ -273,6 +273,17 @@ return array(
     'is_contact' => 0,
     'description' => 'Enables asychronous batching',
   ),
+  'sdd_financial_type_grouping' => array(
+    'group_name' => 'SEPA Direct Debit Preferences',
+    'group' => 'org.project60',
+    'name' => 'sdd_financial_type_grouping',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Groups by Financial Types.',
+  ),
   'sdd_skip_closed' => array(
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
