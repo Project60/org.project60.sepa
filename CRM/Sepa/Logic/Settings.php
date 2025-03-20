@@ -197,21 +197,6 @@ class CRM_Sepa_Logic_Settings {
     return $mandates;
   }
 
-
-  /**
-   * Get a batching lock
-   *
-   * the lock is needed so that only one relevant process can access the
-   * SEPA data structures at a time
-   *
-   * @return CRM_Utils_SepaSafeLock object, or NULL if acquisition timed out
-   */
-  static function getLock() {
-    $timeout = CRM_Sepa_Logic_Settings::getSetting('batching.UPDATE.lock.timeout');
-    return CRM_Utils_SepaSafeLock::acquireLock('org.project60.sepa.batching.update', $timeout);
-  }
-
-
   /**
    * Reads the default creditor from the settings
    * Will only return a creditor if it exists and if it's active
@@ -310,12 +295,12 @@ class CRM_Sepa_Logic_Settings {
    * This is a mutex that can be kept over various processes,
    * Caution: this is not completely thread-safe
    *
-   * @param $name    lock name
-   * @param $timeout lock timeout in seconds
-   * @param $renew   TRUE if you want to renew the lock (make sure it's yours!)
-   * @return TRUE if lock could be acquired
+   * @param string $name lock name
+   * @param int $timeout lock timeout in seconds
+   * @param bool $renew TRUE if you want to renew the lock (make sure it's yours!)
+   * @return bool TRUE if lock could be acquired
    */
-  public static function acquireAsyncLock($name, $timeout, $renew = FALSE) {
+  public static function acquireAsyncLock(string $name, int $timeout, bool $renew = FALSE): bool {
     $now = time();
     $locks = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching_lock');
     if (!is_array($locks)) {
@@ -324,15 +309,27 @@ class CRM_Sepa_Logic_Settings {
     }
     if (!$renew && !empty($locks[$name])) {
       $lock_valid_until = $locks[$name];
-      if ($lock_valid_until > $now) {
+      if ($lock_valid_until >= $now) {
         // CURRENT LOCK STILL VALID
         return FALSE;
       }
     }
     // NO (VALID) LOCK
-    $locks[$name] = $now + (int)$timeout;
+    $locks[$name] = $now + $timeout;
     CRM_Sepa_Logic_Settings::setSetting($locks, 'sdd_async_batching_lock');
     return TRUE;
+  }
+
+  public static function isAsyncLockFree(string $name): bool {
+    $now = time();
+    $locks = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching_lock');
+    if (!isset($locks[$name])) {
+      return TRUE;
+    }
+
+    $lock_valid_until = $locks[$name];
+
+    return $lock_valid_until < time();
   }
 
   /**
@@ -341,10 +338,10 @@ class CRM_Sepa_Logic_Settings {
    * This is a mutex that can be kept over various processes,
    * Caution: this is not completely thread-safe
    *
-   * @param $name    lock name
-   * @param $timeout lock timeout in seconds
+   * @param string $name lock name
+   * @param int $timeout lock timeout in seconds
    */
-  public static function renewAsyncLock($name, $timeout) {
+  public static function renewAsyncLock(string $name, int $timeout): bool {
     return self::acquireAsyncLock($name, $timeout, TRUE);
   }
 
