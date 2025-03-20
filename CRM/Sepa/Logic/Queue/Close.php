@@ -16,6 +16,7 @@
 
 define('SDD_CLOSE_RUNNER_BATCH_SIZE', 100);
 
+use Civi\Sepa\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -123,18 +124,12 @@ class CRM_Sepa_Logic_Queue_Close {
     switch ($this->mode) {
       case 'update_contribution':
         // this one needs a lock
-        $exception = NULL;
-        $lock = CRM_Sepa_Logic_Settings::getLock();
-        if (empty($lock)) {
+        $lock = SepaBatchLockManager::getInstance()->getLock();
+        if (!$lock->acquire()) {
           throw new Exception("Batching in progress. Please try again later.");
         }
-        try {
-          $this->updateContributions();
-        } catch (Exception $e) {
-          $exception = $e; // store and throw later
-        }
-        $lock->release();
-        if ($exception) throw $exception;
+
+        $this->updateContributions();
         break;
 
       case 'create_xml':
@@ -334,5 +329,3 @@ class CRM_Sepa_Logic_Queue_Close {
     }
   }
 }
-
-
