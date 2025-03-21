@@ -14,7 +14,7 @@
 
 require_once 'sepa.civix.php';
 
-use Civi\Sepa\SepaBatchLockManager;
+use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
