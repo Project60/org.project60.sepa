@@ -660,8 +660,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
       }
     }
 
-
-
     // finally: generate acitivity
     if (!empty($changes_details)) {
       if (count($changes_subjects) == 1) {
@@ -775,7 +773,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     $result = civicrm_api("ContributionRecur", "create", $query);
     if (!empty($result['is_error'])) {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $result['error_message'], array('domain' => 'org.project60.sepa')), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
-      $lock->release();
       return FALSE;
     }
 

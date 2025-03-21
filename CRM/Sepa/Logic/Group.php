@@ -47,7 +47,6 @@ class CRM_Sepa_Logic_Group {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $txgroup = civicrm_api('SepaTransactionGroup', 'getsingle', array('id'=>$txgroup_id, 'version'=>3));
     if (isset($txgroup['is_error']) && $txgroup['is_error']) {
-      $lock->release();
       return "Cannot find transaction group ".$txgroup_id;
     }
     $collection_date = $txgroup['collection_date'];
