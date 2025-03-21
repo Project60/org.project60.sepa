@@ -21,7 +21,7 @@
  *
  */
 
-use Civi\Sepa\SepaBatchLockManager;
+use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {

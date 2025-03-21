@@ -14,7 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-use Civi\Sepa\SepaBatchLockManager;
+use Civi\Sepa\Lock\SepaBatchLockManager;
 
 /**
  * This class holds all the functions of the transaction group life cycle

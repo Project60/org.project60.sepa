@@ -15,7 +15,7 @@
 
 declare(strict_types = 1);
 
-namespace Civi\Sepa;
+namespace Civi\Sepa\Lock;
 
 use Civi\Core\Lock\LockManager;
 
@@ -40,12 +40,15 @@ final class SepaBatchLockManager {
   /**
    * Lock will be acquired until script terminates.
    */
-  public function acquire(?int $timeout = NULL, int $flags = 0): bool {
-    return $this->getPrivateLock()->acquire($timeout, $flags);
+  public function acquire(?int $timeout = NULL, ?string $asyncLockId = NULL): bool {
+    return $this->getPrivateLock()->acquire($timeout, $asyncLockId);
   }
 
   public function getLock(): SepaBatchLock {
-    return new SepaBatchLock($this->lockManager->create(self::LOCK_NAME), $this->getDefaultLockTimeout());
+    return new SepaBatchLock(
+      $this->lockManager->create(self::LOCK_NAME),
+      new SepaAsyncBatchLock(self::LOCK_NAME),
+      $this->getDefaultLockTimeout());
   }
 
   private function getDefaultLockTimeout(): int {
