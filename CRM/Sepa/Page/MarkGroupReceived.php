@@ -53,13 +53,13 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     }
 
     // run the 'mark received' process
-    $this->closeGroup($group_id);
+    $this->markGroupAsReceived($group_id);
 
     // go back to the dashboard
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed'));
   }
 
-  private function closeGroup(int $groupId): void {
+  private function markGroupAsReceived(int $groupId): void {
     if (!SepaBatchLockManager::getInstance()->acquire(0)) {
       CRM_Core_Session::setStatus(E::ts('Cannot close group, another update is in progress!'), '', 'error');
 

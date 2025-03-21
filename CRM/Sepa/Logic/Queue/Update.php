@@ -139,7 +139,8 @@ class CRM_Sepa_Logic_Queue_Update {
       case 'UPDATE':
         if ($this->mode === 'OOFF') {
           CRM_Sepa_Logic_Batching::updateOOFF($this->creditorId, 'now', $this->offset, $this->limit);
-        } else {
+        }
+        else {
           CRM_Sepa_Logic_Batching::updateRCUR($this->creditorId, $this->mode, 'now', $this->offset, $this->limit);
         }
 

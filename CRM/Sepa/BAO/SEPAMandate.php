@@ -678,8 +678,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if (!empty($changes_details)) {
       if (count($changes_subjects) == 1) {
         self::generateModificationActivity($mandate, $changes_subjects[0], $changes_details);
-      } else {
-        $subject = ts('Multiple changes', ['domain' => 'org.project60.sepa']);
+      }
+      else {
+        $subject = E::ts('Multiple changes');
         self::generateModificationActivity($mandate, $subject, $changes_details);
       }
     }
