@@ -14,6 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use Civi\Sepa\Lock\SepaBatchLockManager;
 
 /**
  * This class holds all the functions of the transaction group life cycle
@@ -28,8 +29,8 @@ class CRM_Sepa_Logic_Group {
    */
   static function close($txgroup_id) {
     // step 0: check lock
-    $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (empty($lock)) {
+    $lock = SepaBatchLockManager::getInstance()->getLock();
+    if (!$lock->acquire()) {
       return "Batching in progress. Please try again later.";
     }
 
@@ -51,11 +52,8 @@ class CRM_Sepa_Logic_Group {
         ->single();
     }
     catch (\CRM_Core_Exception $exception) {
-      $lock->release();
       return 'Cannot find transaction group ' . $txgroup_id;
     }
-    $collection_date = $txgroup['collection_date'];
-
 
     // step 2: update the mandates
     if ($txgroup['type']=='OOFF') {
@@ -105,7 +103,6 @@ class CRM_Sepa_Logic_Group {
       // AFAIK there's nothing to do for RTRYs...
 
     } else {
-      $lock->release();
       return "Group type '".$txgroup['type']."' not yet supported.";
     }
 
@@ -124,7 +121,6 @@ class CRM_Sepa_Logic_Group {
     // step 4: create the sepa file
     $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
     if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
-      $lock->release();
       return "Cannot create sepa xml file for group ".$txgroup_id;
     }
 
@@ -134,11 +130,8 @@ class CRM_Sepa_Logic_Group {
           'status_id'               => $group_status_id_closed,
           'version'                 => 3));
     if (isset($result['is_error']) && $result['is_error']) {
-      $lock->release();
       sprintf(ts("Cannot close transaction group! Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']);
     }
-
-    $lock->release();
   }
 
 
@@ -154,8 +147,8 @@ class CRM_Sepa_Logic_Group {
    */
   static function received($txgroup_id) {
     // step 0: check lock
-    $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (empty($lock)) {
+    $lock = SepaBatchLockManager::getInstance()->getLock();
+    if (!$lock->acquire()) {
       return "Batching in progress. Please try again later.";
     }
 
@@ -181,13 +174,11 @@ class CRM_Sepa_Logic_Group {
         ->single();
     }
     catch (\CRM_Core_Exception $exception) {
-      $lock->release();
       return 'Cannot find transaction group ' . $txgroup_id;
     }
 
     // check status
     if ($txgroup['status_id'] != $group_status_id_closed) {
-      $lock->release();
       return "Transaction group ".$txgroup_id." is not 'closed'.";
     }
 
@@ -240,17 +231,13 @@ class CRM_Sepa_Logic_Group {
     // step 3.2: update group status
     $result = civicrm_api('SepaTransactionGroup', 'create', array('id'=>$txgroup_id, 'status_id'=>$group_status_id_received, 'version'=>3));
     if (!empty($result['is_error'])) {
-      $lock->release();
       return "Cannot update transaction group status for ID ".$txgroup_id;
     }
 
     // check if there was problems
     if ($error_count) {
-      $lock->release();
       return "$error_count contributions could not be updated to status 'completed'.";
     }
-
-    $lock->release();
   }
 
 

@@ -14,6 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -30,8 +31,8 @@ class CRM_Sepa_Logic_Batching {
    */
   static function updateRCUR($creditor_id, $mode, $now = 'now', $offset=NULL, $limit=NULL) {
     // check lock
-    $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (empty($lock)) {
+    $lock = SepaBatchLockManager::getInstance()->getLock();
+    if (!$lock->acquire()) {
       return "Batching in progress. Please try again later.";
     }
 
@@ -49,7 +50,6 @@ class CRM_Sepa_Logic_Batching {
     $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor_id, $mode);
     $payment_instrument_id_list = implode(',', array_keys($payment_instruments));
     if (empty($payment_instrument_id_list)) {
-      $lock->release();
       return; // disabled
     }
 
@@ -289,8 +289,6 @@ class CRM_Sepa_Logic_Batching {
       NULL !== $offset,
       0 === $offset
     );
-
-    $lock->release();
   }
 
 
@@ -305,8 +303,8 @@ class CRM_Sepa_Logic_Batching {
    */
   static function updateOOFF($creditor_id, $now = 'now', $offset = NULL, $limit = NULL) {
     // check lock
-    $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (empty($lock)) {
+    $lock = SepaBatchLockManager::getInstance()->getLock();
+    if (!$lock->acquire()) {
       return "Batching in progress. Please try again later.";
     }
 
@@ -394,8 +392,6 @@ class CRM_Sepa_Logic_Batching {
       $offset !== NULL,
       $offset === 0
     );
-
-    $lock->release();
   }
 
 
@@ -405,8 +401,8 @@ class CRM_Sepa_Logic_Batching {
    */
   static function closeEnded() {
     // check lock
-    $lock = CRM_Sepa_Logic_Settings::getLock();
-    if (empty($lock)) {
+    $lock = SepaBatchLockManager::getInstance()->getLock();
+    if (!$lock->acquire()) {
       return "Batching in progress. Please try again later.";
     }
 
@@ -449,7 +445,6 @@ class CRM_Sepa_Logic_Batching {
         'status'                  => 'COMPLETE',
         'version'                 => 3));
       if (isset($change_mandate['is_error']) && $change_mandate['is_error']) {
-        $lock->release();
         return sprintf("Couldn't set mandate '%s' to 'complete. Error was: '%s'", $mandates_to_end['mandate_id'], $change_mandate['error_message']);
       }
 
@@ -460,12 +455,9 @@ class CRM_Sepa_Logic_Batching {
         'currency'                => $mandate_to_end['currency'],
         'version'                 => 3));
       if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
-        $lock->release();
         return sprintf("Couldn't set recurring contribution '%s' to 'complete. Error was: '%s'", $mandates_to_end['recur_id'], $change_rcur['error_message']);
       }
     }
-
-    $lock->release();
   }
 
 

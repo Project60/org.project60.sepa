@@ -16,6 +16,7 @@
 
 define('SDD_CLOSE_RUNNER_BATCH_SIZE', 100);
 
+use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -23,20 +24,38 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_Logic_Queue_Close {
 
-  public $title                = null;
-  protected $txgroup           = null;
-  protected $target_status_id  = null;
-  protected $origin_status_ids = null;
-  protected $group_name        = null;
-  protected $counter           = null;
+  public string $title;
+
+  private string $asyncLockId;
+
+  private ?int $counter;
+
+  private string $mode;
+
+  /**
+   * @phpstan-var array<string, mixed>
+   */
+  private array $txgroup;
+
+  private int $targetStatusId;
 
   /**
    * Use the CRM_Queue_Runner to close a SDD group as 'closed' (i.e. submitted) or 'received',
    *   depending on the target_group_status/target_contribution_status
    *
    * This call doesn't return, and redirects to the runner instead
+   *
+   * @phpstan-param list<int> $txgroup_ids
    */
-  public static function launchCloseRunner($txgroup_ids, $target_group_status, $target_contribution_status) {
+  public static function launchCloseRunner(array $txgroup_ids, int $target_group_status, int $target_contribution_status): void {
+    $asyncLockId = uniqid('', TRUE);
+    if (!SepaBatchLockManager::getInstance()->acquire(0, $asyncLockId)) {
+      CRM_Core_Session::setStatus(E::ts('Cannot close group, another update is in progress!'), E::ts('Error'), 'error');
+      $redirect_url = CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed');
+      CRM_Utils_System::redirect($redirect_url);
+      return; // shouldn't be necessary
+    }
+
     // create a queue
     $queue = CRM_Queue_Service::singleton()->create([
       'type'  => 'Sql',
@@ -61,20 +80,20 @@ class CRM_Sepa_Logic_Queue_Close {
     foreach ($txgroups as $txgroup) {
       // first: set group status to busy
 
-      $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $group_status_id_busy));
+      $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $group_status_id_busy, $asyncLockId));
 
       // count the contributions and create an appropriate amount of items
       $contribution_count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(contribution_id) FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id={$txgroup['id']}");
       $contribution_count += SDD_CLOSE_RUNNER_BATCH_SIZE; // security margin
       for ($offset=0; $offset <= $contribution_count; $offset += SDD_CLOSE_RUNNER_BATCH_SIZE) {
-        $queue->createItem(new CRM_Sepa_Logic_Queue_Close('update_contribution', $txgroup, $target_contribution_status, $offset));
+        $queue->createItem(new CRM_Sepa_Logic_Queue_Close('update_contribution', $txgroup, $target_contribution_status, $asyncLockId, $offset));
       }
 
       // finally: render XML and mark the group
       if ($is_received_runner) {
-        $queue->createItem(new CRM_Sepa_Logic_Queue_Close('create_xml', $txgroup, $target_group_status));
+        $queue->createItem(new CRM_Sepa_Logic_Queue_Close('create_xml', $txgroup, $target_group_status, $asyncLockId));
       }
-      $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $target_group_status));
+      $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $target_group_status, $asyncLockId));
     }
 
     // create a runner and launch it
@@ -94,17 +113,18 @@ class CRM_Sepa_Logic_Queue_Close {
   }
 
 
-  protected function __construct($mode, $txgroup, $target_status_id, $counter = NULL) {
-    $this->mode             = $mode;
-    $this->txgroup          = $txgroup;
-    $this->target_status_id = $target_status_id;
-    $this->counter          = $counter;
+  protected function __construct(string $mode, array $txgroup, int $targetStatusId, string $asyncLockId, ?int $counter = NULL) {
+    $this->mode = $mode;
+    $this->txgroup = $txgroup;
+    $this->targetStatusId = $targetStatusId;
+    $this->asyncLockId = $asyncLockId;
+    $this->counter = $counter;
 
     // set title
     switch ($this->mode) {
       case 'update_contribution':
         $this->title = E::ts("Updating contributions in group '%1'... (%2)",
-                             [1 => $txgroup['reference'], 2 => $counter]);
+                             [1 => $txgroup['reference'], 2 => $this->counter]);
         break;
 
       case 'set_group_status':
@@ -122,22 +142,21 @@ class CRM_Sepa_Logic_Queue_Close {
     }
   }
 
-  public function run($context) {
+  public function run($context): bool {
+    $lock = SepaBatchLockManager::getInstance()->getLock();
+    if (!$lock->acquire(10, $this->asyncLockId)) {
+      throw new \RuntimeException('Unable to acquire lock');
+    }
+
     switch ($this->mode) {
       case 'update_contribution':
         // this one needs a lock
-        $exception = NULL;
-        $lock = CRM_Sepa_Logic_Settings::getLock();
-        if (empty($lock)) {
+        $lock = SepaBatchLockManager::getInstance()->getLock();
+        if (!$lock->acquire()) {
           throw new Exception("Batching in progress. Please try again later.");
         }
-        try {
-          $this->updateContributions();
-        } catch (Exception $e) {
-          $exception = $e; // store and throw later
-        }
-        $lock->release();
-        if ($exception) throw $exception;
+
+        $this->updateContributions();
         break;
 
       case 'create_xml':
@@ -151,7 +170,7 @@ class CRM_Sepa_Logic_Queue_Close {
         // simply change the status
         civicrm_api3('SepaTransactionGroup', 'create', [
           'id'        => $this->txgroup['id'],
-          'status_id' => $this->target_status_id,
+          'status_id' => $this->targetStatusId,
           ]);
         break;
 
@@ -189,7 +208,7 @@ class CRM_Sepa_Logic_Queue_Close {
             1 => [$this->txgroup['id'], 'Integer'],
             2 => [$status_pending, 'Integer'],
             3 => [$status_inProgress, 'Integer'],
-            4 => [$this->target_status_id, 'Integer'],
+            4 => [$this->targetStatusId, 'Integer'],
             5 => [SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer'],
           ]);
 
@@ -211,7 +230,7 @@ class CRM_Sepa_Logic_Queue_Close {
             1 => array($this->txgroup['id'], 'Integer'),
             2 => array($status_pending, 'Integer'),
             3 => array($status_inProgress, 'Integer'),
-            4 => array($this->target_status_id, 'Integer'),
+            4 => array($this->targetStatusId, 'Integer'),
             5 => array(SDD_CLOSE_RUNNER_BATCH_SIZE, 'Integer')));
 
     } else {
@@ -298,7 +317,7 @@ class CRM_Sepa_Logic_Queue_Close {
       // this would cause SQL errors
       return;
     }
-    if ($this->target_status_id == $status_inProgress) {
+    if ($this->targetStatusId == $status_inProgress) {
       // this status cannot be set via the API -> use SQL
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN ({$contribution_id_list});");
 
@@ -313,29 +332,9 @@ class CRM_Sepa_Logic_Queue_Close {
       foreach ($contributions as $contribution) {
         civicrm_api3('Contribution', 'create', array(
             'id'                       => $contribution['id'],
-            'contribution_status_id'   => $this->target_status_id,
+            'contribution_status_id'   => $this->targetStatusId,
             'receive_date'             => date('YmdHis', strtotime($this->txgroup['collection_date']))));
       }
     }
   }
-
-  /**
-   * Sets/overrides the acceptable contributions' origin status IDs. If a contribution in the group does
-   *  not match one of these states, it will not be updated.
-   *
-   * @param array $contribution_status_ids
-   *   list of contribution status IDs
-   *
-   * @return void
-   */
-  public function setOriginStatusIds($contribution_status_ids)
-  {
-    if (is_array($contribution_status_ids)) {
-      $this->origin_status_ids = $contribution_status_ids;
-    } else {
-      $this->origin_status_ids = [$contribution_status_ids];
-    }
-  }
 }
-
-

@@ -1,5 +1,3 @@
 #!/bin/sh
 
-l10n_tools="../civi_l10n_tools"
-
-${l10n_tools}/bin/create-pot-files-extensions.sh org.project60.sepa ./ l10n
+civistrings -o l10n/org.project60.sepa.pot api/ Civi/ CRM/ js/ resources/ templates/ sepa.php

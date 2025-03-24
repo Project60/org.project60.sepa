@@ -131,6 +131,10 @@ msgid "Large Groups"
 msgstr ""
 
 #: CRM/Admin/Form/Setting/SepaSettings.php templates/CRM/Admin/Form/Setting/SepaSettings.tpl
+msgid "Groups by Financial Types"
+msgstr ""
+
+#: CRM/Admin/Form/Setting/SepaSettings.php templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Only Completed Contributions"
 msgstr ""
 
@@ -178,7 +182,7 @@ msgstr ""
 msgid "Cannot close mandate [%s], batching in progress!"
 msgstr ""
 
-#: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Logic/Status.php CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php js/SepaSettings.js
+#: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Logic/Queue/Close.php CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Logic/Status.php CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/CreateMandate.php CRM/Sepa/Page/DashBoard.php CRM/Sepa/Page/EditMandate.php js/SepaSettings.js
 msgid "Error"
 msgstr ""
 
@@ -196,6 +200,10 @@ msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot terminate mandate [%s], batching in progress!"
+msgstr ""
+
+#: CRM/Sepa/BAO/SEPAMandate.php CRM/Sepa/Page/EditMandate.php
+msgid "Cannot read mandate [%1]. Error was: '%2'"
 msgstr ""
 
 #: CRM/Sepa/BAO/SEPAMandate.php
@@ -747,6 +755,14 @@ msgid "Target collection date"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "Financial Type ID"
+msgstr ""
+
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "Financial type of contained contributions if CiviSEPA is generating groups matching financial types."
+msgstr ""
+
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "fk sepa group Status options in civicrm_option_values"
 msgstr ""
 
@@ -1206,6 +1222,10 @@ msgstr ""
 msgid "CiviSEPA Health Check"
 msgstr ""
 
+#: CRM/Sepa/Logic/Queue/Close.php CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/MarkGroupReceived.php
+msgid "Cannot close group, another update is in progress!"
+msgstr ""
+
 #: CRM/Sepa/Logic/Queue/Close.php
 msgid "Marking SDD Group(s) Received: [%1]"
 msgstr ""
@@ -1226,7 +1246,7 @@ msgstr ""
 msgid "Compiling XML for group '%1'"
 msgstr ""
 
-#: CRM/Sepa/Logic/Queue/Update.php
+#: CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Page/DashBoard.php
 msgid "Cannot run update, another update is in progress!"
 msgstr ""
 
@@ -1326,6 +1346,30 @@ msgstr ""
 msgid "Close SEPA Group"
 msgstr ""
 
+#: CRM/Sepa/Page/CloseGroup.php
+msgid "Cannot load creditor."
+msgstr ""
+
+#: CRM/Sepa/Page/CloseGroup.php
+msgid "Error was: %1"
+msgstr ""
+
+#: CRM/Sepa/Page/CloseGroup.php
+msgid "Cannot delete file #%1"
+msgstr ""
+
+#: CRM/Sepa/Page/CloseGroup.php
+msgid "Cannot load group #%1"
+msgstr ""
+
+#: CRM/Sepa/Page/CloseGroup.php
+msgid "Cannot load for group #%1"
+msgstr ""
+
+#: CRM/Sepa/Page/CloseGroup.php
+msgid "Cannot close group #%1"
+msgstr ""
+
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Create SEPA Mandate"
 msgstr ""
@@ -1371,7 +1415,7 @@ msgid "Couldn't find any creditors."
 msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
-msgid "Couldn't load mandate #%s"
+msgid "Couldn't load mandate #%1"
 msgstr ""
 
 #: CRM/Sepa/Page/CreateMandate.php
@@ -1440,10 +1484,6 @@ msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Unkown action '%s'. Ignored."
-msgstr ""
-
-#: CRM/Sepa/Page/EditMandate.php
-msgid "Cannot find mandate [%s]."
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
@@ -1674,7 +1714,7 @@ msgstr ""
 msgid "Campaign (Leave empty to use default)"
 msgstr ""
 
-#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+#: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php Civi/Sepa/ActionProvider/Action/FindMandate.php
 msgid "Recurring Contribution ID"
 msgstr ""
 
@@ -1720,6 +1760,10 @@ msgstr ""
 
 #: Civi/Sepa/ActionProvider/Action/FindMandate.php templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "Annual Amount"
+msgstr ""
+
+#: Civi/Sepa/ActionProvider/Action/FindMandate.php
+msgid "Contribution ID (One-off)"
 msgstr ""
 
 #: Civi/Sepa/ActionProvider/Action/TerminateMandate.php
@@ -2116,6 +2160,14 @@ msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid "This option will activate a runner page with a progress bar for these critical processes. There shouldn't be any timeouts, but you have to keep that open until it's done."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "Whether to group transactions by financial types additionally."
+msgstr ""
+
+#: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
+msgid "Enable this settings if you use the Financial ACLs extension, as transaction groups with mixed financial type contributions can cause issues with overlapping Financial ACLs' permissions."
 msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
@@ -3100,201 +3152,5 @@ msgstr ""
 
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Notes"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/BugReproductionTest.php tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF Mandate status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/BugReproductionTest.php
-msgid "OOFF contribution status after closing is incorrect, probably related to SEPA-629"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/HookTest.php
-msgid "The create_mandate hook has not been called."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/HookTest.php
-msgid "The mandate reference is not the generated one."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/HookTest.php
-msgid "The modify_txgroup_reference hook has not been called."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/HookTest.php
-msgid "The transaction group reference is not the generated one."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/HookTest.php
-msgid "The installment_created hook has not been called (correctly)."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "There should be no transaction group be associated with the mandate after terminating."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "It must not be allowed to terminate the mandate after the group has been closed."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "The mandate has been illegally terminated after closing."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "The mandate status has been illegally touched after closing."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "A new contribution has been created for a terminated mandate."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "The mandate has been incorrectly terminated."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "The mandate is not in the transaction group anymore but should be."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "The end date is not correct."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTerminationTest.php
-msgid "The mandate has been incorrectly regrouped."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF Mandate after creation is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF contribution after creation is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR Mandate after creation is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR contribution after creation is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF Mandate status after batching is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF contribution status after batching is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF transaction group status after batching is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR Mandate status after batching is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR contribution status after batching is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR transaction group status after batching is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF contribution status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "OOFF transaction group status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR Mandate status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR contribution status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "RCUR transaction group status after closing is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "Mandate status of new mandate is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/MandateTest.php
-msgid "Mandate account holder after creation is incorrect."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
-msgid "The OOFF mandate reference is invalid."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/ReferenceGenerationTest.php
-msgid "The RCUR mandate reference is invalid."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/SettingsTest.php
-msgid "set/getGenericSetting doesn't work"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/SettingsTest.php
-msgid "set/getSetting doesn't work"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/TestBase.php
-msgid "This mandate has no contribution, even though there should be one."
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyBicTest.php
-msgid "Invalid BIC location detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyBicTest.php
-msgid "Wrong BIC for IBAN detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyBicTest.php
-msgid "Nonexistent BIC detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyBicTest.php
-msgid "Incorrect BIC detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Incorrect IBAN detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Incorrect bank code detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Incorrect IBAN checksum detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Incorrect IBAN length detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Incorrect char in IBAN detection fails!"
-msgstr ""
-
-#: tests/phpunit/CRM/Sepa/VerifyIbanTest.php
-msgid "Blocklistet IBAN should fail but did not!"
 msgstr ""
 

@@ -21,6 +21,7 @@
  *
  */
 
+use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
@@ -105,48 +106,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
           }
 
           if ('closed' === $status && !$isTestGroup) {
-            // CLOSE THE GROUP:
-            $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
-            if ($async_batch) {
-              // call the closing runner
-              $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
-              if ($skip_closed) {
-                $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey(
-                  'CRM_Contribute_BAO_Contribution',
-                  'contribution_status_id',
-                  'Completed'
-                );
-                $target_group_status = (int) CRM_Core_PseudoConstant::getKey(
-                  'CRM_Batch_BAO_Batch',
-                  'status_id',
-                  'Received'
-                );
-              }
-              else {
-                $target_contribution_status = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
-                $target_group_status = (int) CRM_Core_PseudoConstant::getKey(
-                  'CRM_Batch_BAO_Batch',
-                  'status_id',
-                  'Closed'
-                );
-              }
-              // this call doesn't return (redirect to runner)
-              CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$group_id], $target_group_status, $target_contribution_status);
-            }
-
-            $result = civicrm_api('SepaAlternativeBatching', 'close', [
-              'version' => 3,
-              'txgroup_id' => $group_id,
-            ]);
-            if ($result['is_error']) {
-              CRM_Core_Session::setStatus(
-                E::ts('Cannot close group #%1', [1 => $group_id]) . '<br />'
-                . E::ts('Error was: %1', [1 => $result['error_message']]),
-                E::ts('Error'),
-                'error'
-              );
-            }
-            $this->createDownloadLink($group_id);
+            $this->closeGroup($group_id);
           }
         }
       }
@@ -185,6 +145,56 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
       $this->assign('file_link', CRM_Utils_System::url('civicrm/sepa/xml', "id=$file_id"));
       $this->assign('file_name', $xmlfile['filename']);
     }
+  }
+
+  private function closeGroup(int $groupId): void {
+    if (!SepaBatchLockManager::getInstance()->acquire(0)) {
+      CRM_Core_Session::setStatus(E::ts('Cannot close group, another update is in progress!'), '', 'error');
+
+      return;
+    }
+
+    $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
+    if ($async_batch) {
+      // call the closing runner
+      $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
+      if ($skip_closed) {
+        $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey(
+          'CRM_Contribute_BAO_Contribution',
+          'contribution_status_id',
+          'Completed'
+        );
+        $target_group_status = (int) CRM_Core_PseudoConstant::getKey(
+          'CRM_Batch_BAO_Batch',
+          'status_id',
+          'Received'
+        );
+      }
+      else {
+        $target_contribution_status = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+        $target_group_status = (int) CRM_Core_PseudoConstant::getKey(
+          'CRM_Batch_BAO_Batch',
+          'status_id',
+          'Closed'
+        );
+      }
+      // this call doesn't return (redirect to runner)
+      CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$groupId], $target_group_status, $target_contribution_status);
+    }
+
+    $result = civicrm_api('SepaAlternativeBatching', 'close', [
+      'version' => 3,
+      'txgroup_id' => $groupId,
+    ]);
+    if ($result['is_error']) {
+      CRM_Core_Session::setStatus(
+        E::ts('Cannot close group #%1', [1 => $groupId]) . '<br />'
+        . E::ts('Error was: %1', [1 => $result['error_message']]),
+        E::ts('Error'),
+        'error'
+      );
+    }
+    $this->createDownloadLink($groupId);
   }
 
 }

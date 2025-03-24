@@ -14,31 +14,35 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-define('SDD_UPDATE_RUNNER_BATCH_SIZE', 250);
-define('SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT', 600);
-
+use Civi\Sepa\Lock\SepaBatchLockManager;
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Queue Item for updating a sepa group
  */
 class CRM_Sepa_Logic_Queue_Update {
 
-  public $title          = NULL;
-  protected $cmd         = NULL;
-  protected $mode        = NULL;
-  protected $creditor_id = NULL;
-  protected $offset      = NULL;
-  protected $limit       = NULL;
+  private const BATCH_SIZE = 250;
+
+  public string $title;
+  private string $cmd;
+  private string $mode;
+  private $creditorId;
+  private ?int $offset;
+  private ?int $limit;
+
+  private string $asyncLockId;
 
   /**
    * Use CRM_Queue_Runner to do the SDD group update
    * This doesn't return, but redirects to the runner
    */
-  public static function launchUpdateRunner($mode) {
-    if (!CRM_Sepa_Logic_Settings::acquireAsyncLock('sdd_async_update_lock', SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT)) {
-      CRM_Core_Session::setStatus(ts("Cannot run update, another update is in progress!", array('domain' => 'org.project60.sepa')), ts('Error'), 'error');
-      $redirect_url = CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active');
-      CRM_Utils_System::redirect($redirect_url);
+  public static function launchUpdateRunner(string $mode): void {
+    $asyncLockId = uniqid('', TRUE);
+    if (!SepaBatchLockManager::getInstance()->acquire(0, $asyncLockId)) {
+      CRM_Core_Session::setStatus(E::ts('Cannot run update, another update is in progress!'), E::ts('Error'), 'error');
+      $redirectUrl = CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active');
+      CRM_Utils_System::redirect($redirectUrl);
       return; // shouldn't be necessary
     }
     // create a queue
@@ -49,24 +53,24 @@ class CRM_Sepa_Logic_Queue_Update {
     ));
 
     // first thing: close outdated groups
-    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('PREPARE', $mode));
-    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLOSE', $mode));
+    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('PREPARE', $mode, $asyncLockId));
+    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLOSE', $mode, $asyncLockId));
 
     // then iterate through all creditors
     $creditors = civicrm_api3('SepaCreditor', 'get', array('option.limit' => 0));
     foreach ($creditors['values'] as $creditor) {
       $sdd_modes = ($mode=='RCUR') ? array('FRST','RCUR') : array('OOFF');
       foreach ($sdd_modes as $sdd_mode) {
-        $count = self::getMandateCount($creditor['id'], $sdd_mode) + SDD_UPDATE_RUNNER_BATCH_SIZE; // safety margin
-        for ($offset=0; $offset < $count; $offset+=SDD_UPDATE_RUNNER_BATCH_SIZE) {
+        $count = self::getMandateCount($creditor['id'], $sdd_mode) + self::BATCH_SIZE; // safety margin
+        for ($offset=0; $offset < $count; $offset+=self::BATCH_SIZE) {
           // add an item for each batch
-          $queue->createItem(new CRM_Sepa_Logic_Queue_Update('UPDATE', $sdd_mode, $creditor['id'], $offset, SDD_UPDATE_RUNNER_BATCH_SIZE));
+          $queue->createItem(new CRM_Sepa_Logic_Queue_Update('UPDATE', $sdd_mode, $asyncLockId, $creditor['id'], $offset, self::BATCH_SIZE));
         }
-        $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLEANUP', $sdd_mode));
+        $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLEANUP', $sdd_mode, $asyncLockId));
       }
     }
 
-    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('FINISH', $mode));
+    $queue->createItem(new CRM_Sepa_Logic_Queue_Update('FINISH', $mode, $asyncLockId));
 
     // create a runner and launch it
     $runner = new CRM_Queue_Runner(array(
@@ -80,12 +84,13 @@ class CRM_Sepa_Logic_Queue_Update {
   }
 
 
-  protected function __construct($cmd, $mode, $creditor_id = NULL, $offset = NULL, $limit = NULL) {
-    $this->cmd         = $cmd;
-    $this->mode        = $mode;
-    $this->creditor_id = $creditor_id;
-    $this->offset      = $offset;
-    $this->limit       = $limit;
+  protected function __construct(string $cmd, string $mode, string $asyncLockId, $creditorId = NULL, ?int $offset = NULL, ?int $limit = NULL) {
+    $this->cmd = $cmd;
+    $this->mode = $mode;
+    $this->asyncLockId = $asyncLockId;
+    $this->creditorId = $creditorId;
+    $this->offset = $offset;
+    $this->limit = $limit;
 
     // set title
     switch ($this->cmd) {
@@ -116,7 +121,12 @@ class CRM_Sepa_Logic_Queue_Update {
       }
   }
 
-  public function run($context) {
+  public function run($context): bool {
+    $lock = SepaBatchLockManager::getInstance()->getLock();
+    if (!$lock->acquire(10, $this->asyncLockId)) {
+      throw new \RuntimeException('Unable to acquire lock');
+    }
+
     switch ($this->cmd) {
       case 'PREPARE':
         // nothing to do
@@ -124,16 +134,16 @@ class CRM_Sepa_Logic_Queue_Update {
 
       case 'CLOSE':
         CRM_Sepa_Logic_Batching::closeEnded();
-        CRM_Sepa_Logic_Settings::renewAsyncLock('sdd_async_update_lock', SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT);
         break;
 
       case 'UPDATE':
-        if ($this->mode == 'OOFF') {
-          CRM_Sepa_Logic_Batching::updateOOFF($this->creditor_id, 'now', $this->offset, $this->limit);
-        } else {
-          CRM_Sepa_Logic_Batching::updateRCUR($this->creditor_id, $this->mode, 'now', $this->offset, $this->limit);
+        if ($this->mode === 'OOFF') {
+          CRM_Sepa_Logic_Batching::updateOOFF($this->creditorId, 'now', $this->offset, $this->limit);
         }
-        CRM_Sepa_Logic_Settings::renewAsyncLock('sdd_async_update_lock', SDD_UPDATE_RUNNER_BATCH_LOCK_TIMOUT);
+        else {
+          CRM_Sepa_Logic_Batching::updateRCUR($this->creditorId, $this->mode, 'now', $this->offset, $this->limit);
+        }
+
         break;
 
       case 'CLEANUP':
@@ -141,7 +151,7 @@ class CRM_Sepa_Logic_Queue_Update {
         break;
 
       case 'FINISH':
-        CRM_Sepa_Logic_Settings::releaseAsyncLock('sdd_async_update_lock');
+        $lock->release($this->asyncLockId);
         break;
 
       default:
@@ -179,5 +189,3 @@ class CRM_Sepa_Logic_Queue_Update {
     }
   }
 }
-
-
