@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Project60 SEPA DD\n"
-"POT-Creation-Date: 2022-01-14 13:46+0100\n"
+"POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Bjoern Endres <Bjoern.Endres@didonai.com>\n"
 "Language-Team: Project60 <endres@systopia.de>\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -331,10 +331,8 @@ msgid "Bank details changed"
 msgstr "Bankverbindung geändert"
 
 #: CRM/Sepa/BAO/SEPAMandate.php
-#, fuzzy
-#| msgid "Amount has to be positive."
 msgid "The amount has to be positive."
-msgstr "Betrag muss positiv sein."
+msgstr "Der Betrag muss positiv sein."
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Amount increased"
@@ -432,29 +430,23 @@ msgstr "SEPA Zuwendungsgruppe"
 
 #: CRM/Sepa/DAO/SEPAContributionGroup.php
 msgid "primary key"
-msgstr ""
+msgstr "Primärschlüssel"
 
 #: CRM/Sepa/DAO/SEPAContributionGroup.php
-#, fuzzy
-#| msgid "Contribution ID"
 msgid "FK to Contribution ID"
-msgstr "Zuwendungs-ID"
+msgstr "Fremdschlüssel zu Zuwendungs-ID"
 
 #: CRM/Sepa/DAO/SEPAContributionGroup.php
 msgid "FK to civicrm_sdd_txgroup"
-msgstr ""
+msgstr "Fremdschlüssel zu civicrm_sdd_txgroup"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "SEPA Creditor"
 msgid "SEPACreditors"
-msgstr "SEPA Gläubiger"
+msgstr "SEPA-Gläubiger"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "SEPA Creditor"
 msgid "SEPACreditor"
-msgstr "SEPA Gläubiger"
+msgstr "SEPA-Gläubiger"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 #: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
@@ -469,7 +461,7 @@ msgstr "Gläubiger-Kontakt"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "FK to Contact ID that owns that account"
-msgstr ""
+msgstr "Fremdschlüssel zu Kontakt-ID des Kontoinhabers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "SEPA Creditor identifier"
@@ -480,6 +472,8 @@ msgid ""
 "Provided by the bank. ISO country code+check digit+ZZZ+country specific "
 "identifier"
 msgstr ""
+"Von der Bank bereitgestellt. ISO-Ländercode + Prüfziffer + ZZZ + "
+"länderspezifischer Identifikator"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -488,7 +482,7 @@ msgstr "Name des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "official creditor name, passed to exported files"
-msgstr ""
+msgstr "offizieller Gläubigername, wird exportierten Dateien übergeben"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -496,8 +490,6 @@ msgid "Creditor Label"
 msgstr "Bezeichnung des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "internal label of the creditor"
 msgid "internally used label for the creditor"
 msgstr "Interner Name des Gläubigers"
 
@@ -511,59 +503,45 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Which Country does this address belong to."
-msgstr ""
+msgstr "Zu welchem Land gehört diese Adresse"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 msgid "Iban"
 msgstr "IBAN"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "name of the creditor"
 msgid "Iban of the creditor"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "IBAN des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 msgid "Bic"
 msgstr "BIC"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "name of the creditor"
 msgid "BIC of the creditor"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "BIC des Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Mandate numbering prefix"
 msgid "Mandate numering prefix"
-msgstr "Mandats-Prefix"
+msgstr "Mandats-Präfix"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Creditor Identifier"
 msgid "prefix for mandate identifiers"
-msgstr "SEPA Gläubiger-Identifikationsnummer"
+msgstr "Präfix für Mandatsreferenzen"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Currency used by this creditor"
 msgid "currency used by this creditor"
-msgstr "Währung dieses Kreditors"
+msgstr "Währung dieses Gläubigers"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "First Contribution (to be deprecated)"
 msgid "Payment processor link (to be deprecated)"
-msgstr "Ersteinzug"
+msgstr "Zahlungsprozessor-Link (wird veralten)"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Category purpose of the collection"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Default Creditor"
 msgid "Default value"
 msgstr "Standard-Gläubiger"
 
@@ -607,10 +585,8 @@ msgid "Creditor Type"
 msgstr "Art des Kreditors"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Creditor Type: SEPA (default) or PSP"
 msgid "Type of the creditor, values are SEPA (default) and PSP"
-msgstr "Art des Kreditors: SEPA (Standard) oder PSP "
+msgstr "Art des Gläubigers: SEPA (Standard) oder PSP"
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "OOFF Payment Instruments"
@@ -631,20 +607,14 @@ msgid ""
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
-#, fuzzy
-#| msgid "Currency used by this creditor"
 msgid "If true, BICs are not used for this creditor"
-msgstr "Währung dieses Kreditors"
+msgstr "Falls aktiviert, werden BICs nicht für diesen Gläubiger verwendet"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "SEPA Mandates"
 msgid "SEPAMandates"
-msgstr "SEPA Mandate"
+msgstr "SEPA-Mandate"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "SEPA Mandate"
 msgid "SEPAMandate"
 msgstr "SEPA-Mandat"
 
@@ -659,10 +629,8 @@ msgid "Reference"
 msgstr "Mandatsreferenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "Mandate reference"
 msgid "A unique mandate reference"
-msgstr "Mandatsreferenz"
+msgstr "eine eindeutige Mandatsreferenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
@@ -727,16 +695,16 @@ msgid "FK to Contact ID of the debtor"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "name of the creditor"
-msgid "Iban of the debtor"
-msgstr "Öffentlicher Name des Gläubigers"
+msgid "Name of the account holder"
+msgstr "Name des Kontoinhabers"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "name of the creditor"
+msgid "Iban of the debtor"
+msgstr "IBAN des Schuldners"
+
+#: CRM/Sepa/DAO/SEPAMandate.php
 msgid "BIC of the debtor"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "BIC des Schuldners"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "RCUR for recurrent (default), OOFF for one-shot"
@@ -767,26 +735,20 @@ msgid "First Contribution (to be deprecated)"
 msgstr "Ersteinzug"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-#, fuzzy
-#| msgid "1st contribution"
 msgid "FK to civicrm_contribution"
-msgstr "Erstzuwendung"
+msgstr "Fremdschlüssel zu civicrm_contribution"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "validation date"
 msgstr "Validierungsdatum"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
-#, fuzzy
-#| msgid "SEPA File Format"
 msgid "SEPASdd Files"
-msgstr "SEPA Dateiformat (PAIN)"
+msgstr "SEPASdd-Dateien"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
-#, fuzzy
-#| msgid "SEPA File Format"
 msgid "SEPASdd File"
-msgstr "SEPA Dateiformat (PAIN)"
+msgstr "SEPASdd-Datei"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
 msgid "End-to-end reference for this sdd file."
@@ -797,18 +759,14 @@ msgid "Filename"
 msgstr "Dateiname"
 
 #: CRM/Sepa/DAO/SEPASddFile.php
-#, fuzzy
-#| msgid "name of the creditor"
 msgid "Name of the generated file"
-msgstr "Öffentlicher Name des Gläubigers"
+msgstr "Name der erzeugten Datei"
 
 #: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "Latest Submission Date"
 msgstr "Spätestes Übertragungsdatum"
 
 #: CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "Latest Submission Date"
 msgid "Latest submission date"
 msgstr "Spätestes Übertragungsdatum"
 
@@ -841,16 +799,12 @@ msgid "Tag used to group multiple creditors in this XML file."
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "View SEPA transaction groups"
 msgid "SEPATransaction Groups"
-msgstr "SEPA-Gruppen ansehen"
+msgstr "SEPATransaction-Gruppen"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "View SEPA transaction groups"
 msgid "SEPATransaction Group"
-msgstr "SEPA-Gruppen ansehen"
+msgstr "SEPATransaction-Gruppe"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "End-to-end reference for this tx group."
@@ -869,20 +823,24 @@ msgid "Collection Date"
 msgstr "Einzugsdatum"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "Earliest Collection Date"
 msgid "Target collection date"
-msgstr "Frühester Einzugstermin"
+msgstr "Zieleinzugsdatum"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "fk sepa group Status options in civicrm_option_values"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-#, fuzzy
-#| msgid "Creditor ID"
-msgid "fk to SDD Creditor Id"
+msgid "Sdd Creditor ID"
 msgstr "Gläubiger-ID"
+
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "fk to SDD Creditor Id"
+msgstr "Fremdschlüssel zu Gläubiger-ID"
+
+#: CRM/Sepa/DAO/SEPATransactionGroup.php
+msgid "Sdd File ID"
+msgstr "Sdd-Datei-ID"
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
 msgid "fk to SDD File Id"
@@ -942,10 +900,8 @@ msgid "Creditor"
 msgstr "Kreditor"
 
 #: CRM/Sepa/Form/CreateMandate.php
-#, fuzzy
-#| msgid "Payment Details"
 msgid "Payment Method"
-msgstr "Zahlungsdetails"
+msgstr "Zahlungsmethode"
 
 #: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateOOFF.php
 #: CRM/Sepa/Form/Report/SepaMandateRCUR.php
@@ -1251,10 +1207,8 @@ msgid "SDD Groups"
 msgstr "SEPA-Gruppen"
 
 #: CRM/Sepa/Form/RetryCollection.php
-#, fuzzy
-#| msgid "Transaction Message"
 msgid "Custom Transaction Message"
-msgstr "Verwendungszweck"
+msgstr "Benutzerdefinierte Transaktionsnachricht"
 
 #: CRM/Sepa/Form/RetryCollection.php templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Note"
@@ -1389,10 +1343,10 @@ msgstr "Aktualisiere Status von Gruppe '%1'"
 msgid "Compiling XML for group '%1'"
 msgstr "Erzeuge XML für Gruppe '%1'"
 
-#: CRM/Sepa/Logic/Queue/Update.php
+#: CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Page/DashBoard.php
 msgid "Cannot run update, another update is in progress!"
 msgstr ""
-"Aktualisierung nicht möglich da bereits eine andere Aktualisierung läuft. "
+"Aktualisierung nicht möglich, da bereits eine andere Aktualisierung läuft!"
 
 #: CRM/Sepa/Logic/Queue/Update.php
 msgid "Updating %1 SEPA Groups"
@@ -1523,8 +1477,8 @@ msgid "Couldn't find any creditors."
 msgstr "Keine Gläubiger eingerichtet."
 
 #: CRM/Sepa/Page/CreateMandate.php
-msgid "Couldn't load mandate #%s"
-msgstr "Mandat [%s] konnte nicht geladen werden."
+msgid "Couldn't load mandate #%1"
+msgstr "Mandat #%1 konnte nicht geladen werden"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Mandate #%s seems to be broken!"
@@ -1733,10 +1687,8 @@ msgstr ""
 "releases\">CiviSEPA Payment Processor</a> Erweiterung."
 
 #: CRM/Sepa/Upgrader.php
-#, fuzzy
-#| msgid "Payment Processor Settings"
 msgid "%1 Payment Processor(s) Disabled!"
-msgstr "Einstellungen Zahlungsprozessor"
+msgstr "%1 Zahlungsprzessor(en) deaktiviert!"
 
 #: CRM/Sepa/Upgrader.php
 msgid ""
@@ -1818,8 +1770,6 @@ msgid "as soon as possible"
 msgstr "sobald wie möglich"
 
 #: Civi/Sepa/ActionProvider/Action/FindMandate.php
-#, fuzzy
-#| msgid "One-off"
 msgid "One-Off"
 msgstr "Einmaleinzug"
 
@@ -1945,10 +1895,8 @@ msgid "<i>Error</i>"
 msgstr "<i>Fehler</i>"
 
 #: sepa.php
-#, fuzzy
-#| msgid "Recurring SEPA Mandates"
 msgid "Record SEPA Mandate"
-msgstr "Wiederkehrende SEPA-Mandate"
+msgstr "SEPA-Mandat erfassen"
 
 #: sepa.php
 msgid "CiviSEPA Settings"
@@ -1964,7 +1912,7 @@ msgstr "Lege SEPA-Mandate an"
 
 #: sepa.php
 msgid "View SEPA mandates"
-msgstr "SEPA-Mandtae ansehen"
+msgstr "SEPA-Mandate ansehen"
 
 #: sepa.php
 msgid "Edit SEPA mandates"
@@ -2301,12 +2249,12 @@ msgstr ""
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid ""
-"If you have the <a href=\"https://github.com/Project60/org.project60.bic"
-"\">Little BIC Extension</a> installed, the BIC can be derived automatically "
-"from the IBAN in most cases."
+"If you have the <a href=\"https://github.com/Project60/org.project60."
+"bic\">Little BIC Extension</a> installed, the BIC can be derived "
+"automatically from the IBAN in most cases."
 msgstr ""
-"Wenn Sie die <a href=\"https://github.com/Project60/org.project60.bic"
-"\">Little BIC Extension</a> installiert haben, kann die BIC automatisch "
+"Wenn Sie die <a href=\"https://github.com/Project60/org.project60."
+"bic\">Little BIC Extension</a> installiert haben, kann die BIC automatisch "
 "anhand der IBAN ermittelt werden."
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
@@ -2659,12 +2607,12 @@ msgid ""
 msgstr ""
 
 #: templates/CRM/Sepa/Form/RetryCollection.tpl
-#, fuzzy
-#| msgid "Select the transaction groups you want to re-collect."
 msgid ""
 "Select the transaction groups of which you want to re-collect failed "
 "transactions"
-msgstr "Wählen Sie die SEPA-Gruppen aus, die Sie erneut einziehen möchten."
+msgstr ""
+"Wählen Sie die SEPA-Gruppen aus, für die Sie fehlgeschlagene Transaktionen "
+"erneut einziehen möchten."
 
 #: templates/CRM/Sepa/Form/RetryCollection.tpl
 msgid "Add some filters"
@@ -2929,10 +2877,8 @@ msgid "Total"
 msgstr "Gesamt"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
-#, fuzzy
-#| msgid "Transaction Message"
 msgid "Custom Transaction Message:"
-msgstr "Verwendungszweck"
+msgstr "Benutzerdefinierte Transaktionsnachricht:"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Note:"

@@ -24,6 +24,7 @@
 
 require_once 'CRM/Core/Page.php';
 
+use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
@@ -49,25 +50,35 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     }
 
     // run the 'mark received' process
+    $this->markGroupAsReceived($group_id);
+
+    // go back to the dashboard
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed'));
+  }
+
+  private function markGroupAsReceived(int $groupId): void {
+    if (!SepaBatchLockManager::getInstance()->acquire(0)) {
+      CRM_Core_Session::setStatus(E::ts('Cannot close group, another update is in progress!'), '', 'error');
+
+      return;
+    }
+
     $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
     if ($async_batch) {
       // execute through runner:
       $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
-      CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$group_id], $target_group_status, $target_contribution_status);
-
+      CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$groupId], $target_group_status, $target_contribution_status);
     } else {
       // execute via API
       try {
-        civicrm_api3('SepaAlternativeBatching', 'received', ['txgroup_id' => $group_id]);
+        civicrm_api3('SepaAlternativeBatching', 'received', ['txgroup_id' => $groupId]);
       } catch (Exception $exception) {
         $error_message = $exception->getMessage();
         CRM_Core_Session::setStatus(E::ts("Couldn't close SDD group #%1.<br/>Error was: %2",
-                                          [1 => $group_id, 2 => $error_message]));
+          [1 => $groupId, 2 => $error_message]));
       }
     }
-
-    // go back to the dashboard
-    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed'));
   }
+
 }

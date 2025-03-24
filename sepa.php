@@ -14,11 +14,11 @@
 
 require_once 'sepa.civix.php';
 
-use \Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use \Symfony\Component\DependencyInjection\ContainerBuilder;
-use \Symfony\Component\Config\Resource\FileResource;
-
+use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Implements hook_civicrm_container()
@@ -33,6 +33,8 @@ function sepa_civicrm_container(ContainerBuilder $container) {
   $container->addResource(new FileResource(__FILE__));
   $container->findDefinition('dispatcher')->addMethodCall('addListener', ['civi.token.list', 'sepa_register_tokens'])->setPublic(TRUE);
   $container->findDefinition('dispatcher')->addMethodCall('addListener', ['civi.token.eval', 'sepa_evaluate_tokens'])->setPublic(TRUE);
+
+  $container->autowire(SepaBatchLockManager::class)->setPublic(TRUE);
 }
 
 function sepa_civicrm_pageRun( &$page ) {

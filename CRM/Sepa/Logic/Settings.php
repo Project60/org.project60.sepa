@@ -197,21 +197,6 @@ class CRM_Sepa_Logic_Settings {
     return $mandates;
   }
 
-
-  /**
-   * Get a batching lock
-   *
-   * the lock is needed so that only one relevant process can access the
-   * SEPA data structures at a time
-   *
-   * @return CRM_Utils_SepaSafeLock object, or NULL if acquisition timed out
-   */
-  static function getLock() {
-    $timeout = CRM_Sepa_Logic_Settings::getSetting('batching.UPDATE.lock.timeout');
-    return CRM_Utils_SepaSafeLock::acquireLock('org.project60.sepa.batching.update', $timeout);
-  }
-
-
   /**
    * Reads the default creditor from the settings
    * Will only return a creditor if it exists and if it's active
@@ -292,68 +277,6 @@ class CRM_Sepa_Logic_Settings {
       }
     }
     return $in_progress_status;
-  }
-
-  /**
-   * Acquire async lock
-   *
-   * This is a mutex that can be kept over various processes,
-   * Caution: this is not completely thread-safe
-   *
-   * @param $name    lock name
-   * @param $timeout lock timeout in seconds
-   * @param $renew   TRUE if you want to renew the lock (make sure it's yours!)
-   * @return TRUE if lock could be acquired
-   */
-  public static function acquireAsyncLock($name, $timeout, $renew = FALSE) {
-    $now = time();
-    $locks = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching_lock');
-    if (!is_array($locks)) {
-      // data invalid -> reset
-      $locks = array();
-    }
-    if (!$renew && !empty($locks[$name])) {
-      $lock_valid_until = $locks[$name];
-      if ($lock_valid_until > $now) {
-        // CURRENT LOCK STILL VALID
-        return FALSE;
-      }
-    }
-    // NO (VALID) LOCK
-    $locks[$name] = $now + (int)$timeout;
-    CRM_Sepa_Logic_Settings::setSetting($locks, 'sdd_async_batching_lock');
-    return TRUE;
-  }
-
-  /**
-   * Renew async lock (make sure it's yours!)
-   *
-   * This is a mutex that can be kept over various processes,
-   * Caution: this is not completely thread-safe
-   *
-   * @param $name    lock name
-   * @param $timeout lock timeout in seconds
-   */
-  public static function renewAsyncLock($name, $timeout) {
-    return self::acquireAsyncLock($name, $timeout, TRUE);
-  }
-
-  /**
-   * Release a async lock.
-   *  This method does NOT check whether you acquired the lock in the first place!!
-   *
-   * Caution: this is not completely thread-safe
-   *
-   * @return TRUE if lock could be acquired
-   */
-  public static function releaseAsyncLock($name) {
-    $locks = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching_lock');
-    if (!is_array($locks)) {
-      // data invalid -> reset
-      $locks = array();
-    }
-    $locks[$name] = 0;
-    CRM_Sepa_Logic_Settings::setSetting($locks, 'sdd_async_batching_lock');
   }
 
 }

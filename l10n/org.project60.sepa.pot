@@ -1202,6 +1202,10 @@ msgstr ""
 msgid "CiviSEPA Health Check"
 msgstr ""
 
+#: CRM/Sepa/Logic/Queue/Close.php CRM/Sepa/Page/CloseGroup.php CRM/Sepa/Page/MarkGroupReceived.php
+msgid "Cannot close group, another update is in progress!"
+msgstr ""
+
 #: CRM/Sepa/Logic/Queue/Close.php
 msgid "Marking SDD Group(s) Received: [%1]"
 msgstr ""
@@ -1222,7 +1226,7 @@ msgstr ""
 msgid "Compiling XML for group '%1'"
 msgstr ""
 
-#: CRM/Sepa/Logic/Queue/Update.php
+#: CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Page/DashBoard.php
 msgid "Cannot run update, another update is in progress!"
 msgstr ""
 

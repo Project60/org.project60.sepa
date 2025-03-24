@@ -21,7 +21,8 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
+use Civi\Sepa\Lock\SepaBatchLockManager;
+use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
@@ -142,7 +143,13 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
   /**
    * call the batching API
    */
-  function callBatcher($mode) {
+  function callBatcher(string $mode): void {
+    if (!SepaBatchLockManager::getInstance()->acquire(0)) {
+      CRM_Core_Session::setStatus(E::ts('Cannot run update, another update is in progress!'), '', 'error');
+
+      return;
+    }
+
     $async_batching = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
     if ($async_batching) {
       // use the runner rather that the API (this doesn't return)
@@ -158,7 +165,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => 'RCUR'));
 
     } else {
-      CRM_Core_Session::setStatus(sprintf(ts("Unknown batcher mode '%s'. No batching triggered.", array('domain' => 'org.project60.sepa')), $mode), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+      CRM_Core_Session::setStatus(sprintf(E::ts("Unknown batcher mode '%s'. No batching triggered."), $mode), E::ts('Error'), 'error');
     }
   }
 
