@@ -15,7 +15,7 @@
 +--------------------------------------------------------*/
 
 use CRM_Sepa_ExtensionUtil as E;
-  
+
 /**
  * Collection of upgrade steps.
  */
