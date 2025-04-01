@@ -122,8 +122,7 @@ class CRM_Sepa_Logic_Queue_Update {
   }
 
   public function run($context): bool {
-    $lock = SepaBatchLockManager::getInstance()->getLock();
-    if (!$lock->acquire(10, $this->asyncLockId)) {
+    if (!SepaBatchLockManager::getInstance()->acquire(10, $this->asyncLockId)) {
       throw new \RuntimeException('Unable to acquire lock');
     }
 
@@ -151,7 +150,7 @@ class CRM_Sepa_Logic_Queue_Update {
         break;
 
       case 'FINISH':
-        $lock->release($this->asyncLockId);
+        SepaBatchLockManager::getInstance()->release($this->asyncLockId);
         break;
 
       default:
