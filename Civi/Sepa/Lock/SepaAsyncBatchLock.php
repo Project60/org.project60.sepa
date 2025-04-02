@@ -118,7 +118,7 @@ final class SepaAsyncBatchLock {
         throw new \RuntimeException("Couldn't remove {$this->lockFilePath}");
       }
     }
-    else if (FALSE === file_put_contents($this->lockFilePath, $id)) {
+    elseif (FALSE === file_put_contents($this->lockFilePath, $id)) {
       throw new \RuntimeException("Couldn't write {$this->lockFilePath}");
     }
   }
