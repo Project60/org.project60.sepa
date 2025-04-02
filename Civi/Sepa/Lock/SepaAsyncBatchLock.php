@@ -31,10 +31,10 @@ final class SepaAsyncBatchLock {
 
   private ?string $acquiredId = NULL;
 
-  private string $lockFile;
+  private string $lockFilePath;
 
-  public function __construct(string $lockFile) {
-    $this->lockFile = $lockFile;
+  public function __construct(string $lockFilePath) {
+    $this->lockFilePath = $lockFilePath;
   }
 
   public function acquire(string $id): bool {
@@ -61,14 +61,14 @@ final class SepaAsyncBatchLock {
    *   is free.
    */
   public function getAcquireTime(): ?int {
-    if (!file_exists($this->lockFile)) {
+    if (!file_exists($this->lockFilePath)) {
       return NULL;
     }
 
-    clearstatcache(TRUE, $this->lockFile);
-    $time = filemtime($this->lockFile);
+    clearstatcache(TRUE, $this->lockFilePath);
+    $time = filemtime($this->lockFilePath);
     if (FALSE === $time) {
-      throw new \RuntimeException("Couldn't get modification time of {$this->lockFile}");
+      throw new \RuntimeException("Couldn't get modification time of {$this->lockFilePath}");
     }
 
     return $time;
@@ -96,13 +96,13 @@ final class SepaAsyncBatchLock {
   }
 
   private function getAsyncLockId(): ?string {
-    if (!file_exists($this->lockFile)) {
+    if (!file_exists($this->lockFilePath)) {
       return NULL;
     }
 
-    $id = file_get_contents($this->lockFile);
+    $id = file_get_contents($this->lockFilePath);
     if (FALSE === $id) {
-      throw new \RuntimeException("Couldn't read {$this->lockFile}");
+      throw new \RuntimeException("Couldn't read {$this->lockFilePath}");
     }
 
     return $id;
@@ -114,12 +114,12 @@ final class SepaAsyncBatchLock {
   private function setAsyncLock(?string $id): void {
     $this->acquiredId = $id;
     if (NULL === $this->acquiredId) {
-      if (!unlink($this->lockFile)) {
-        throw new \RuntimeException("Couldn't remove {$this->lockFile}");
+      if (!unlink($this->lockFilePath)) {
+        throw new \RuntimeException("Couldn't remove {$this->lockFilePath}");
       }
     }
-    else if (FALSE === file_put_contents($this->lockFile, $id)) {
-      throw new \RuntimeException("Couldn't write {$this->lockFile}");
+    else if (FALSE === file_put_contents($this->lockFilePath, $id)) {
+      throw new \RuntimeException("Couldn't write {$this->lockFilePath}");
     }
   }
 
