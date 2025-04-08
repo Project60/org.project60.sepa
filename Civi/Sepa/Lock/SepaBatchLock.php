@@ -27,6 +27,8 @@ use Civi\Core\Lock\LockInterface;
  */
 final class SepaBatchLock {
 
+  private static int $instanceCount = 0;
+
   private SepaAsyncBatchLock $asyncLock;
 
   private LockInterface $civiLock;
@@ -34,9 +36,17 @@ final class SepaBatchLock {
   private int $defaultTimeout;
 
   public function __construct(LockInterface $civiLock, SepaAsyncBatchLock $asyncLock, int $defaultTimeout) {
+    self::$instanceCount++;
     $this->civiLock = $civiLock;
     $this->asyncLock = $asyncLock;
     $this->defaultTimeout = $defaultTimeout;
+  }
+
+  public function __destruct() {
+    self::$instanceCount--;
+    if (self::$instanceCount === 0) {
+      $this->civiLock->release();
+    }
   }
 
   public function acquire(?int $timeout = NULL, ?string $asyncLockId = NULL): bool {
@@ -58,17 +68,31 @@ final class SepaBatchLock {
       return TRUE;
     }
 
-    if ($this->asyncLock->isFree()) {
+    $asyncLockAcquireTime = $this->asyncLock->getAcquireTime();
+    if (NULL === $asyncLockAcquireTime || $this->asyncLock->isAcquired()) {
       return TRUE;
     }
 
-    // There is a small chance that the CiviCRM lock is acquired during a page
-    // switch when doing an async run. Thus, we release the lock wait a short
-    // time to give a possible async run the possibility to acquire the lock
-    // again. If the lock isn't acquired then, there's no async update running,
-    // but the async lock wasn't released for some reason.
+    /*
+     * It is possible that the CiviCRM lock is acquired when during a queue
+     * execution an HTTP request was finished and the next one is not running,
+     * yet. Thus, we release the lock and wait some time to give a queue item
+     * the possibility to acquire the lock again. If the async lock time isn't
+     * changed, but the async lock wasn't released for some reason.
+     */
     $this->civiLock->release();
-    sleep(3);
+    for ($i = 0; $i < 5; ++$i) {
+      sleep(1);
+      $newAsyncLockAcquireTime = $this->asyncLock->getAcquireTime();
+      if (NULL === $newAsyncLockAcquireTime) {
+        // Async lock is free now.
+        break;
+      }
+      if ($asyncLockAcquireTime !== $newAsyncLockAcquireTime) {
+        return FALSE;
+      }
+    }
+
     if (!$this->civiLock->acquire(0)) {
       return FALSE;
     }
@@ -78,16 +102,9 @@ final class SepaBatchLock {
     return TRUE;
   }
 
-  public function release(?string $asyncLockId = NULL): bool {
-    $civiLockRelease = $this->civiLock->release();
-
-    return (NULL === $asyncLockId || $this->asyncLock->release($asyncLockId))
-      && (NULL === $civiLockRelease || (bool) $civiLockRelease);
-  }
-
   public function isAcquired(?string $asyncLockId = NULL): bool {
     return $this->civiLock->isAcquired()
-      && (NULL === $asyncLockId || $this->asyncLock->isAcquired($asyncLockId));
+      && ($this->asyncLock->isAcquired($asyncLockId) || (NULL === $asyncLockId && $this->asyncLock->isFree()));
   }
 
 }

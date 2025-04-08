@@ -17,17 +17,23 @@ declare(strict_types = 1);
 
 namespace Civi\Sepa\Lock;
 
+use Civi\Core\Lock\LockInterface;
 use Civi\Core\Lock\LockManager;
 
 final class SepaBatchLockManager {
 
   private const LOCK_NAME = 'data.sepa.batch';
 
+  private ?SepaAsyncBatchLock $asyncLock = NULL;
+
+  private ?LockInterface $civiLock = NULL;
+
   private ?int $defaultLockTimeout = NULL;
+
+  private ?SepaBatchLock $lock = NULL;
 
   private LockManager $lockManager;
 
-  private ?SepaBatchLock $lock;
 
   public static function getInstance(): self {
     return \Civi::service(self::class);
@@ -45,15 +51,30 @@ final class SepaBatchLockManager {
   }
 
   public function getLock(): SepaBatchLock {
-    return new SepaBatchLock(
-      $this->lockManager->create(self::LOCK_NAME),
-      new SepaAsyncBatchLock(self::LOCK_NAME),
+    return $this->lock ??= new SepaBatchLock(
+      $this->civiLock ??= $this->lockManager->create(self::LOCK_NAME),
+      $this->getAsyncLock(),
       $this->getDefaultLockTimeout());
+  }
+
+  public function release(string $asyncLockId): bool {
+    $rv = $this->getAsyncLock()->release($asyncLockId);
+    $this->asyncLock = NULL;
+    $this->civiLock = NULL;
+    $this->lock = NULL;
+
+    return $rv;
   }
 
   private function getDefaultLockTimeout(): int {
     return $this->defaultLockTimeout ??=
       (int) (\CRM_Sepa_Logic_Settings::getSetting('batching.UPDATE.lock.timeout') ?? 0);
+  }
+
+  private function getAsyncLock(): SepaAsyncBatchLock {
+    return $this->asyncLock ??= new SepaAsyncBatchLock(
+      \Civi::paths()->getPath('[civicrm.files]/custom') . '/civisepa_' . self::LOCK_NAME . '.lock'
+    );
   }
 
   private function getPrivateLock(): SepaBatchLock {

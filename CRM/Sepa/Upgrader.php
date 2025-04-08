@@ -511,4 +511,10 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     }
     return TRUE;
   }
+
+  public function upgrade_11302(): bool {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_setting WHERE name='sdd_async_batching_lock'");
+
+    return TRUE;
+  }
 }
