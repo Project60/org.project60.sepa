@@ -29,29 +29,30 @@ namespace Civi\Sepa\Lock;
  */
 final class SepaAsyncBatchLock {
 
-  private string $name;
+  private ?string $acquiredId = NULL;
 
-  public function __construct(string $name) {
-    $this->name = $name;
+  private string $lockFilePath;
+
+  public function __construct(string $lockFilePath) {
+    $this->lockFilePath = $lockFilePath;
   }
 
   public function acquire(string $id): bool {
-    $locks = $this->getAsyncLocks();
-    if (($locks[$this->name]['id'] ?? $id) !== $id) {
+    if (($this->getAsyncLockId() ?? $id) !== $id) {
       return FALSE;
     }
 
-    $locks[$this->name] = [
-      'id' => $id,
-      'acquireTime' => time(),
-    ];
-    $this->setAsyncLocks($locks);
+    $this->setAsyncLock($id);
 
     return TRUE;
   }
 
-  public function isAcquired(string $id): bool {
-    return ($this->getAsyncLock()['id'] ?? NULL) === $id;
+  public function isAcquired(?string $id = NULL): bool {
+    if ($id === NULL) {
+      return NULL !== $this->acquiredId && $this->acquiredId === $this->getAsyncLockId();
+    }
+
+    return $this->acquiredId === $id && $this->getAsyncLockId() === $id;
   }
 
   /**
@@ -60,21 +61,29 @@ final class SepaAsyncBatchLock {
    *   is free.
    */
   public function getAcquireTime(): ?int {
-    return $this->getAsyncLock()['acquireTime'] ?? NULL;
+    if (!file_exists($this->lockFilePath)) {
+      return NULL;
+    }
+
+    clearstatcache(TRUE, $this->lockFilePath);
+    $time = filemtime($this->lockFilePath);
+    if (FALSE === $time) {
+      throw new \RuntimeException("Couldn't get modification time of {$this->lockFilePath}");
+    }
+
+    return $time;
   }
 
   public function isFree(): bool {
-    return $this->getAcquireTime() === NULL;
+    return NULL === $this->acquiredId && $this->getAcquireTime() === NULL;
   }
 
   public function release(string $id): bool {
-    $locks = $this->getAsyncLocks();
-    if (($locks[$this->name]['id'] ?? $id) !== $id) {
+    if (($this->getAsyncLockId() ?? $id) !== $id) {
       return FALSE;
     }
 
-    unset($locks[$this->name]);
-    $this->setAsyncLocks($locks);
+    $this->setAsyncLock(NULL);
 
     return TRUE;
   }
@@ -83,30 +92,35 @@ final class SepaAsyncBatchLock {
    * Releases the lock without specifying the ID.
    */
   public function releaseAny(): void {
-    $locks = $this->getAsyncLocks();
-    unset($locks[$this->name]);
-    $this->setAsyncLocks($locks);
+    $this->setAsyncLock(NULL);
   }
 
-  /**
-   * @phpstan-return array{id: string, acquireTime: int}|null
-   */
-  private function getAsyncLock(): ?array {
-    return $this->getAsyncLocks()[$this->name] ?? NULL;
-  }
+  private function getAsyncLockId(): ?string {
+    if (!file_exists($this->lockFilePath)) {
+      return NULL;
+    }
 
-  /**
-   * @phpstan-return array<string, array{id: string, acquireTime: int}>
-   */
-  private function getAsyncLocks(): array {
-    return \CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching_lock') ?? [];
+    $id = file_get_contents($this->lockFilePath);
+    if (FALSE === $id) {
+      throw new \RuntimeException("Couldn't read {$this->lockFilePath}");
+    }
+
+    return $id;
   }
 
   /**
    * @phpstan-param array<string, array{id: string, acquireTime: int}> $locks
    */
-  private function setAsyncLocks(array $locks): void {
-    \CRM_Sepa_Logic_Settings::setGenericSetting($locks, 'sdd_async_batching_lock');
+  private function setAsyncLock(?string $id): void {
+    $this->acquiredId = $id;
+    if (NULL === $this->acquiredId) {
+      if (!unlink($this->lockFilePath)) {
+        throw new \RuntimeException("Couldn't remove {$this->lockFilePath}");
+      }
+    }
+    elseif (FALSE === file_put_contents($this->lockFilePath, $id)) {
+      throw new \RuntimeException("Couldn't write {$this->lockFilePath}");
+    }
   }
 
 }

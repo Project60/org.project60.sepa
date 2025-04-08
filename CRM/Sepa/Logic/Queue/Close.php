@@ -91,6 +91,8 @@ class CRM_Sepa_Logic_Queue_Close {
         $queue->createItem(new CRM_Sepa_Logic_Queue_Close('create_xml', $txgroup, $target_group_status, $asyncLockId));
       }
       $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $target_group_status, $asyncLockId));
+
+      $queue->createItem(new CRM_Sepa_Logic_Queue_Close('FINISH', $txgroup, $target_group_status, $asyncLockId));
     }
 
     // create a runner and launch it
@@ -134,14 +136,17 @@ class CRM_Sepa_Logic_Queue_Close {
                              [1 => $txgroup['reference']]);
         break;
 
+      case 'FINISH':
+        $this->title = E::ts('Lock released');
+        break;
+
       default:
         $this->title = "Unknown";
     }
   }
 
   public function run($context): bool {
-    $lock = SepaBatchLockManager::getInstance()->getLock();
-    if (!$lock->acquire(10, $this->asyncLockId)) {
+    if (!SepaBatchLockManager::getInstance()->acquire(10, $this->asyncLockId)) {
       throw new \RuntimeException('Unable to acquire lock');
     }
 
@@ -169,6 +174,10 @@ class CRM_Sepa_Logic_Queue_Close {
           'id'        => $this->txgroup['id'],
           'status_id' => $this->targetStatusId,
           ]);
+        break;
+
+      case 'FINISH':
+        SepaBatchLockManager::getInstance()->release($this->asyncLockId);
         break;
 
       default:
