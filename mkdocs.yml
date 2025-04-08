@@ -1,7 +1,7 @@
 site_name: CiviSEPA
 site_description: SEPA Direct Debit Extension
 repo_url: https://github.com/Project60/org.project60.sepa
-theme: 
+theme:
   name: material
 
 nav:
@@ -10,13 +10,14 @@ nav:
 - A basic configuration that will work: config-example.md
 - Terminology: terminology.md
 - How To Guide: how-to.md
+- Locking: locking.md
 
 markdown_extensions:
   - attr_list
   - admonition
   - def_list
   - codehilite
-  - toc: 
+  - toc:
       permalink: true
   - pymdownx.superfences
   - pymdownx.inlinehilite
