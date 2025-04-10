@@ -113,7 +113,9 @@ class CRM_Sepa_Logic_Batching {
       ->execute()
       ->getArrayCopy();
 
-    foreach ($relevant_mandates as &$mandate) {
+    $mandates_by_nextdate = [];
+    foreach ($relevant_mandates as $mandate) {
+      // TODO: Use API attribute names in subsequent code instead of copying to legacy name elements.
       $mandate += [
         'mandate_id' => $mandate['id'],
         'mandate_contact_id' => $mandate['contact_id'],
@@ -136,11 +138,8 @@ class CRM_Sepa_Logic_Batching {
         'rc_payment_instrument_id' => $mandate['contribution_recur.payment_instrument_id'],
         'rc_is_test' => $mandate['contribution_recur.is_test'],
       ];
-    }
 
-    // RCUR-STEP 2: calculate next execution date
-    $mandates_by_nextdate = [];
-    foreach ($relevant_mandates as $mandate) {
+      // RCUR-STEP 2: calculate next execution date
       $next_date = self::getNextExecutionDate($mandate, $now, ($mode=='FRST'));
       if (NULL === $next_date || $next_date > $latest_date) {
         continue;
@@ -153,6 +152,7 @@ class CRM_Sepa_Logic_Batching {
       }
       array_push($mandates_by_nextdate[$next_date][$mandate['rc_financial_type_id']], $mandate);
     }
+
     // apply any deferrals:
     $collection_dates = array_keys($mandates_by_nextdate);
     foreach ($collection_dates as $collection_date) {
@@ -339,11 +339,13 @@ class CRM_Sepa_Logic_Batching {
     $latest_collection_date = '';
 
     foreach ($relevant_mandates as $mandate) {
+      // TODO: Use API attribute names in subsequent code instead of copying to legacy name elements.
       $mandate['mandate_id'] = $mandate['id'];
       $mandate['mandate_contact_id'] = $mandate['contact_id'];
       $mandate['mandate_entity_id'] = $mandate['entity_id'];
       $mandate['start_date'] = $mandate['contribution.receive_date'];
       $mandate['financial_type_id'] = $mandate['contribution.financial_type_id'];
+      
       $collection_date = date('Y-m-d', strtotime($mandate['start_date']));
       if ($collection_date <= $earliest_collection_date) {
         $collection_date = $earliest_collection_date;
