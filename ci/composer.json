@@ -1,0 +1,15 @@
+{
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "civicrm/composer-compile-plugin": false,
+            "civicrm/composer-downloads-plugin": true,
+            "cweagans/composer-patches": true
+        },
+        "sort-packages": true
+    },
+    "require": {
+        "civicrm/civicrm-core": "^5.75"
+    }
+}
