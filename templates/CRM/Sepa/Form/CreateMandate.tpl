@@ -29,7 +29,7 @@
 
     <div class="crm-section">
       <div class="label">{$form.rpl_end_date.label}</div>
-      <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='rpl_end_date'}</div>
+      <div class="content">{$form.rpl_end_date.html}</div>
       <div class="clear"></div>
     </div>
 
@@ -117,7 +117,7 @@
     <div class="crm-section">
       <div class="label">{$form.ooff_date.label}</div>
       <div class="content">
-          {include file="CRM/common/jcalendar.tpl" elementName='ooff_date'}
+          {$form.ooff_date.html}
           <a id="sdd_ooff_earliest" class="sdd-earliest"></a>
       </div>
       <div class="clear"></div>
@@ -129,7 +129,7 @@
     <div class="crm-section">
       <div class="label">{$form.rcur_start_date.label}</div>
       <div class="content">
-          {include file="CRM/common/jcalendar.tpl" elementName='rcur_start_date'}
+          {$form.rcur_start_date.html}
           <a id="sdd_rcur_earliest" class="sdd-earliest"></a>
       </div>
       <div class="clear"></div>
@@ -143,7 +143,7 @@
 
     <div class="crm-section">
       <div class="label">{$form.rcur_end_date.label}</div>
-      <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='rcur_end_date'}</div>
+      <div class="content">{$form.rcur_end_date.html}</div>
       <div class="clear"></div>
     </div>
   </div>
@@ -162,9 +162,9 @@
     <div class="clear"></div>
   </div>
 
-    <div class="crm-section" style="display: none;">
-        <div class="content">{include file="CRM/common/jcalendar.tpl" elementName='sdd_converter'}</div>
-    </div>
+  <div class="crm-section" style="display: none;">
+    <div class="content">{$form.sdd_converter.html}</div>
+  </div>
 </div>
 
 
