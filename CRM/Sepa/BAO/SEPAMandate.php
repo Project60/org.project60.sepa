@@ -474,10 +474,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     // find already created contributions that are now obsolete...
     $obsolete_ids = array();
     $deleted_ids = array();
+    $newEndDate = date('Y-m-d', $new_end_date);
     $obsolete_query = "
     SELECT id
     FROM civicrm_contribution
-    WHERE receive_date > '$new_end_date_str'
+    WHERE receive_date > '$newEndDate'
       AND contribution_recur_id = $contribution_id
       AND contribution_status_id = $contribution_id_pending;";
     $obsolete_ids_query = CRM_Core_DAO::executeQuery($obsolete_query);
