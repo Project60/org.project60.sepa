@@ -12,7 +12,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-cj(document).ready(function() {
+(function($, _, ts) {
+  $(document).ready(function($) {
     /**
      * Identify and get the jQuery field for the given value
      */
@@ -30,7 +31,9 @@ cj(document).ready(function() {
 
         // flash the field a little bit to indicate change
         sdd_getF(fieldname).parent().fadeOut(50).fadeIn(50);
-        sdd_recalculate_fields();
+        if (recalculate) {
+            sdd_recalculate_fields();
+        }
     }
 
     /**
@@ -38,14 +41,8 @@ cj(document).ready(function() {
      *  using the sdd_converter element
      */
     function sdd_formatDate(date) {
-        cj("#sdd-create-mandate")
-            .find("[name^=sdd_converter].hasDatepicker")
-            .datepicker('setDate', date);
-
-        return cj("#sdd-create-mandate")
-            .find("[name^=sdd_converter_display]").val();
+        return CRM.utils.formatDate(date);
     }
-
 
     // logic to hide OOFF/RCUR fields
     function sdd_change_type() {
@@ -162,9 +159,10 @@ cj(document).ready(function() {
             // no date set yet?
             sdd_setDate('rcur_start_date', rcur_earliest);
         }
+
         cj("#sdd_rcur_earliest")
-            .attr('date', rcur_earliest)
-            .text(ts("earliest: %1", {1: sdd_formatDate(rcur_earliest), domain: 'org.project60.sepa'}));
+            .data('date', rcur_earliest)
+            .text(ts("earliest: %1", {1: CRM.utils.formatDate(rcur_earliest)}));
 
         // CALCULATE SUMMARY TEXT
         let text = ts("<i>Not enough information</i>", {'domain':'org.project60.sepa'});
@@ -286,9 +284,9 @@ cj(document).ready(function() {
     // attach earliest link handlers
     cj("#sdd-create-mandate").find("a.sdd-earliest").click(function() {
         if (cj(this).attr('id') == 'sdd_rcur_earliest') {
-            sdd_setDate('rcur_start_date', new Date(cj(this).attr('date')));
+            sdd_setDate('rcur_start_date', $(this).data('date'));
         } else {
-            sdd_setDate('ooff_date', new Date(cj(this).attr('date')));
+            sdd_setDate('ooff_date', $(this).data('date'));
         }
     });
 
@@ -299,4 +297,5 @@ cj(document).ready(function() {
 
     // trigger the whole thing once
     sdd_creditor_changed();
-});
+  });
+})(CRM.$, CRM._, CRM.ts('org.project60.sepa'));
