@@ -95,11 +95,14 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         E::ts('Installment Amount'),
         array('size' => 6, 'style' => 'text-align:center;'));
 
-    $this->addDate(
+    $this->add(
+        'datepicker',
         'collection_date',
         E::ts('Collection Date'),
+        ['formatType' => 'activityDate'],
         TRUE,
-        array('formatType' => 'activityDate'));
+        ['time' => FALSE]
+    );
 
     $this->add(
       'text',
@@ -138,7 +141,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
 
     // process from-to dates
     if ($values['date_range'] != 'custom') {
-      list($values['date_from'], $values['date_to']) = explode('-', $values['date_range']);
+      [$values['date_from'], $values['date_to']] = explode('-', $values['date_range']);
     }
 
     // generate the new group
