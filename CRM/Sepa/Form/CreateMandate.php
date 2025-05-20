@@ -216,7 +216,8 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts("Replacement Date"),
         ['formatType' => 'activityDate'],
         $this->replace_id,
-        ['time' => FALSE]);
+        ['time' => FALSE]
+    );
 
     // add the replacement/cancel reason
     $this->add(
@@ -233,7 +234,8 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts("Collection Date"),
         ['formatType' => 'activityDate'],
         FALSE,
-        ['time' => FALSE]);
+        ['time' => FALSE]
+    );
 
     // add RCUR fields
     // add start date
@@ -242,7 +244,8 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts("Start Date"),
         ['formatType' => 'activityDate'],
         FALSE,
-        ['time' => FALSE]);
+        ['time' => FALSE]
+    );
 
     // add collection day
     $this->add(
@@ -270,10 +273,18 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts("End Date"),
         ['formatType' => 'activityDate'],
         FALSE,
-        ['time' => FALSE]);
+        ['time' => FALSE]
+    );
 
     // finally, add a date field just as a converter
-    $this->add('datepicker', 'sdd_converter', 'just for date conversion', ['formatType' => 'activityDate'], FALSE, ['time' => FALSE]);
+    $this->add(
+      'datepicker',
+      'sdd_converter',
+      'just for date conversion',
+      ['formatType' => 'activityDate'],
+      FALSE,
+      ['time' => FALSE]
+    );
 
     // inject JS logic
     CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/CreateMandate.js');
