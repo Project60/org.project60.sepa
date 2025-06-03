@@ -19,7 +19,7 @@
 			{capture assign=group_text}
 			<font size="+1">{ts domain="org.project60.sepa"}Group '%s' <b>is now closed</b> and cannot be changed any more.{/ts}</font>
 			{/capture}
-			<p>{$group_text|sprintf:$txgroup.reference}</p>
+			<p>{$txgroup.reference|string_format:$group_text}</p>
 			{if $allow_xml}
 				<p><font size="+0.5">{ts domain="org.project60.sepa"}The money should be on its way{/ts}</font></p>
 			{else}
