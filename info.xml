@@ -13,7 +13,6 @@
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.75</ver>
-    <ver>5.65</ver>
   </compatibility>
   <urls>
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
