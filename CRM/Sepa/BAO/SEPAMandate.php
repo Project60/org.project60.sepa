@@ -21,65 +21,69 @@
  *
  */
 
+use Civi\Api4\SepaCreditor;
+use Civi\Api4\SepaMandate;
+use Civi\Core\Event\PreEvent;
+use Civi\Core\HookInterface;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Class contains functions for Sepa mandates
  */
-class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
+class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookInterface {
 
   /**
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   *
-   * @return object       CRM_Core_BAO_SEPAMandate object on success, null otherwise
-   * @access public
-   * @static (I do apologize, I don't want to)
+   * @throws \CRM_Core_Exception
    */
-  static function add(&$params) {
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if (!in_array($event->action, ['create', 'edit'], TRUE)) {
+      return;
+    }
 
-    // handle 'normal' creation process including hooks
-    $hook = empty($params['id']) ? 'create' : 'edit';
-
-    // run the PRE hook
-    CRM_Utils_Hook::pre($hook, 'SepaMandate', CRM_Utils_Array::value('id', $params), $params);
+    $params = &$event->params;
 
     // load the creditor
     if (empty($params['creditor_id'])) {
-      if (empty($params['id'])) {
+      if ('create' === $event->action) {
         // new mandate, use the default creditor
         $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
         $params['creditor_id'] = $default_creditor->id;
       }
       else {
         // existing mandate, get creditor
-        $params['creditor_id'] = \Civi\Api4\SepaMandate::get(TRUE)
-          ->addSelect('creditor_id')
-          ->addWhere('id', '=', $params['id'])
-          ->execute()
-          ->single()['creditor_id'];
+        $params['creditor_id'] =
+          SepaMandate::get(TRUE)->addSelect('creditor_id')->addWhere(
+            'id',
+            '=',
+            $params['id']
+          )->execute()->single()['creditor_id'];
       }
     }
-    $creditor = civicrm_api3 ('SepaCreditor', 'getsingle', array ('id' => $params['creditor_id'], 'return' => 'mandate_prefix,creditor_type'));
+    $creditor = SepaCreditor::get(FALSE)
+      ->setSelect(['mandate_prefix', 'creditor_type'])
+      ->addWhere('id', '=', $params['creditor_id'])
+      ->execute()
+      ->single();
 
-    if (empty($params['id'])) {
+    if ('create' === $event->action) {
       // we are creating a NEW MANDATE...
 
       // call the hook
       CRM_Utils_SepaCustomisationHooks::create_mandate($params);
 
       // set a default (signature) date
-      if (empty($params["date"])) {
-        $params["date"] = date("YmdHis");
+      if (empty($params['date'])) {
+        $params['date'] = date('YmdHis');
       }
 
       // make sure it has a reference
       if (empty($params['reference'])) {
         // If no mandate reference was supplied by the caller nor the customisation hook, create a nice default one.
-        $dao = new CRM_Core_DAO();
-        $database = $dao->database();
-        $uuid = CRM_Core_DAO::singleValueQuery("SELECT CONV(UUID_SHORT(), 10, 36)");
-        $params['reference'] = $creditor['mandate_prefix'] . '-' . $params['creditor_id'] . '-' . $params['type'] . '-' . date("Y") . '-' . $uuid;
+        $uuid = CRM_Core_DAO::singleValueQuery('SELECT CONV(UUID_SHORT(), 10, 36)');
+        $params['reference'] =
+          $creditor['mandate_prefix'] . '-' . $params['creditor_id'] . '-' .
+          $params['type'] . '-' . date('Y') . '-' . $uuid;
       }
     }
 
@@ -87,32 +91,38 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     if (!empty($params['iban'])) {
       $params['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($params['iban'], $creditor['creditor_type']);
       $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type']);
-      if ($iban_error) throw new CRM_Core_Exception($iban_error . ': ' . $params['iban']);
+      if ($iban_error) {
+        throw new CRM_Core_Exception($iban_error . ': ' . $params['iban']);
+      }
     }
 
     if (!empty($params['bic'])) {
       $params['bic'] = CRM_Sepa_Logic_Verification::formatBIC($params['bic'], $creditor['creditor_type']);
       $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type']);
-      if ($bic_error) throw new CRM_Core_Exception($bic_error . ':' . $params['bic']);
+      if ($bic_error) {
+        throw new CRM_Core_Exception($bic_error . ':' . $params['bic']);
+      }
     }
 
     if (isset($params['reference']) && strlen($params['reference']) > 0) {
       $reference_error = CRM_Sepa_Logic_Verification::verifyReference($params['reference'], $creditor['creditor_type']);
-      if ($reference_error) throw new CRM_Core_Exception($reference_error . ':' . $params['reference']);
-    }
-
-    // create the DAO object
-    $dao = new CRM_Sepa_DAO_SEPAMandate();
-    $dao->copyValues($params);
-    if (self::is_active(CRM_Utils_Array::value('status', $params))) {
-      if ($dao->validation_date == NULL) {
-        $dao->validation_date = date("YmdHis");
+      if ($reference_error) {
+        throw new CRM_Core_Exception($reference_error . ':' . $params['reference']);
       }
     }
-    $dao->save();
 
-    CRM_Utils_Hook::post($hook, 'SepaMandate', $dao->id, $dao);
-    return $dao;
+    if (!isset($params['validation_date'])) {
+      $status = $params['status'] ?? NULL;
+      if (NULL === $status && 'edit' === $event->action) {
+        $status = SepaMandate::get(FALSE)->addSelect('status')->addWhere(
+            'id', '=', $params['id']
+          )->execute()->single()['status'];
+      }
+
+      if (self::is_active($status)) {
+        $params['validation_date'] = date('YmdHis');
+      }
+    }
   }
 
   static function is_active($mandateStatus) {
@@ -131,7 +141,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
   /**
    * getContract() returns the contribution or recurring contribution this mandate uses as a contract
    */
-  function getContract() {
+  private function getContract() {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
     switch ($etp) {
@@ -374,7 +384,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
 
      // first, load the mandate
     try {
-      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+      $mandate = SepaMandate::get(TRUE)
         ->addWhere('id', '=', $mandate_id)
         ->execute()
         ->single();
@@ -548,7 +558,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     }
 
     // load the mandate
-    $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+    $mandate = SepaMandate::get(TRUE)
       ->addWhere('id', '=', $mandate_id)
       ->execute()
       ->single();
@@ -893,7 +903,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate {
     ]);
     if ($result->fetch()) {
       // return the mandate
-      return \Civi\Api4\SepaMandate::get(TRUE)
+      return SepaMandate::get(TRUE)
         ->addWhere('id', '=', $result->mandate_id)
         ->execute()
         ->single();
