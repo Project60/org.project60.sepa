@@ -37,6 +37,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * @throws \CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if ('delete' === $event->action) {
+      return;
+    }
+
     $params = &$event->params;
 
     // load the creditor
@@ -107,8 +111,17 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       }
     }
 
-    if (self::is_active($params['status'] ?? NULL)) {
-      $params['validation_date'] ??= date('YmdHis');
+    if (!isset($params['validation_date'])) {
+      $status = $params['status'] ?? NULL;
+      if (NULL === $status && 'edit' === $event->action) {
+        $status = SepaMandate::get(FALSE)->addSelect('status')->addWhere(
+            'id', '=', $params['id']
+          )->execute()->single()['status'];
+      }
+
+      if (self::is_active($status)) {
+        $params['validation_date'] = date('YmdHis');
+      }
     }
   }
 
