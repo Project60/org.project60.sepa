@@ -37,7 +37,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * @throws \CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(PreEvent $event): void {
-    if ('delete' === $event->action) {
+    if (!in_array($event->action, ['create', 'edit'], TRUE)) {
       return;
     }
 
