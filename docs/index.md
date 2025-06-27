@@ -1,58 +1,123 @@
+# Introduction
 
-If your organisation is in Europe and uses CiviCRM to manage recurring contributions, you will need this extension.
+CiviSEPA is a comprehensive CiviCRM extension that enables SEPA-compliant direct debit processing for European organizations. Whether you're managing membership fees, processing donations, or handling recurring contributions, CiviSEPA provides the tools you need for efficient, automated payment collection.
 
-## Introduction to SEPA
-SEPA is EU regulation. It describes under what conditions organisations in the European Union can collect money from their contacts bank accounts through direct debit and on the basis of a mutual agreement (called a "mandate") between organisation and contact. 
+## What is SEPA?
 
-## CiviSEPA
-CiviSEPA is a CiviCRM extension that enables SEPA compliant direct debit actions with your constituents.
+SEPA (Single Euro Payments Area) is a European Union regulation that standardizes direct debit payments across EU member states. It allows organizations to collect payments directly from supporters' bank accounts through a mutual agreement called a "mandate."
 
-This branch is currently maintained by Xavier Dutoit (TTTP, xavier@tttp.eu) and Björn Endres (SYSTOPIA, endres@systopia.de).
+**Key SEPA concepts:**
+- **Mandate**: Written authorization from the debtor allowing you to collect payments
+- **Direct Debit**: Automatic collection of funds from a bank account
+- **SEPA compliance**: Adherence to EU regulations for payment processing
 
-View this extension in the [Extension Directory](https://civicrm.org/extensions/civisepa-sepa-direct-debit-extension).
+## What CiviSEPA Does
 
-Find more documentation on http://wiki.civicrm.org/confluence/display/CRM/CiviSEPA
+CiviSEPA transforms CiviCRM into a powerful SEPA direct debit management system, handling the complete payment lifecycle from mandate creation to bank reconciliation.
 
-**Important:** Please download a [official release](https://github.com/Project60/org.project60.sepa/releases)! Don't use the ``master`` branch unless you want bleeding edge and you know what you're doing.
+### Core Functionality
 
-## What it can do
-* OOFF and RCUR payments
-* SEPA dashboard gives you great status overview
-* payment processer for online donations and event registrations[*](https://github.com/Project60/org.project60.sepa/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+event+registration+)
-* UI to manipulate mandates
-* automatic BIC lookup if [Little BIC Extension](https://github.com/Project60/org.project60.bic) is installed
-* full SEPA group life cycle: 'open'-'closed/sent'->'received'
-* record SEPA payment action and form for contacts
-* manual batching with parameters for notice period and horizon
-* automatic adjustment of late OOFF and RCUR transactions
-* integration with [CiviBanking](https://docs.civicrm.org/banking/en/latest)
-* integration with [Project60 Membership Extension](https://docs.civicrm.org/project60-membership/en/latest/)
-* integration with [FormProcessor Actions](https://civicrm.org/extensions/form-processor)
+**Mandate Management**
+- Create and manage SEPA mandates for contacts
+- Support for both one-time (OOFF) and recurring (RCUR) payments
+- Automatic mandate reference generation with customization options
+- Full mandate lifecycle tracking from active to completed status
 
-## What it can not (yet) do
-* permission management (under development)
-* automatic submission to the banks
+**Payment Processing**
+- Automated payment batching based on collection dates
+- Smart grouping by payment type (first, recurring, one-off)
+- Bank-ready XML file generation in multiple PAIN formats
+- Comprehensive payment status tracking and reconciliation
 
-## Installation
+**Dashboard & Monitoring**
+- Real-time overview of all payment groups and their status
+- Visual indicators for urgent actions and deadlines
+- Detailed reporting on mandates, collections, and failures
+- Batch management with manual and automated processing options
 
-This extension needs to be installed manually into CiviCRM. It is not (yet) available from the built-in extensions catalog.
+### Key Benefits
 
-First, download an official release archive from the [release page](https://github.com/Project60/org.project60.sepa/releases). Unpack the archive and move the directory `org.project60.sepa` into your extensions directory (e.g., `.../civicrm/ext/`; you can find the exact location in your CiviCRM settings (Administer/System Settings/Directories)).
+**For Organizations**
+- **Reduced administrative overhead**: Automated payment processing eliminates manual collection tasks
+- **Improved cash flow**: Predictable, recurring revenue through automated collections
+- **SEPA compliance**: Built-in compliance with EU direct debit regulations
+- **Comprehensive reporting**: Detailed insights into payment patterns and failures
 
-Next, open the extensions page in the CiviCRM settings (Administer/System Settings/Extensions). Find the extension `SEPA Direct Debit` in the "Extensions" tab and click on "Install". The extension will be set up.
+**For Supporters**
+- **Convenient giving**: Set-and-forget recurring donations or membership payments
+- **Flexible payment options**: Support for various frequencies and amounts
+- **Transparent process**: Clear mandate terms and payment notifications
 
-Finally, you will have to update your database scheme. CiviCRM will prompt you to do so in a pop-up. Alternatively, you will find a prompt in the "System Status" in the admin console. Once you updated your database, the extension will be ready for use.
+## Use Cases
 
+### Membership Organizations
+- **Recurring membership fees**: Automated annual or monthly membership renewals
+- **Tiered memberships**: Different payment amounts based on membership levels
+- **Grace period handling**: Automatic management of failed payments and member status
 
-## Customisation
-If you need customised mandate references, exclude certain collection dates, or add a custom transaction message to the collection, you want to create a sepa customization extension implementing the following hooks:
+### Fundraising
+- **Recurring donations**: Monthly or quarterly donor programs
+- **Campaign-specific giving**: Dedicated mandates for specific fundraising campaigns
+- **Major gift processing**: Secure handling of large one-time donations
 
-* `civicrm_create_mandate` - to generate custom mandate reference numbers
-* `civicrm_defer_collection_date` - to avoid days when your bank won't accept collections. (Version 1.2+ can skip weekends w/o this hook)
-* `civicrm_modify_txmessage` - to customize the transaction message (Version 1.2+ can set a generic message w/o this hook)
+## Integration Ecosystem
 
-We added an example implementation for your convenience: [org.project60.sepacustom](https://github.com/Project60/sepa_dd/tree/master/org.project60.sepacustom)
+CiviSEPA works seamlessly with the broader CiviCRM ecosystem:
 
-If you want to customize the transaction message without creating an extension you can use tokens if you install [nl.hollandopensource.sepatxmessagetokens](https://github.com/HollandOpenSource/nl.hollandopensource.sepatxmessagetokens/#nlhollandopensourcesepatxmessagetokens).
+**Core CiviCRM Integration**
+- Full integration with Contributions, Memberships, and Events
+- Support for CiviCRM's financial types and accounting features
+- Compatible with CiviCRM's reporting and dashboard systems
 
+**Essential Extensions**
+- **CiviBanking**: Automated bank statement import and payment matching
+- **Little BIC Extension**: Automatic bank code lookup for mandate creation
+- **Form Processor**: External form integration for mandate updates
 
+**Specialized Integrations**
+- **Twingle API**: Seamless integration with Twingle donation forms
+- **sepacustom**: Framework for organization-specific customizations
+
+**Payment Processing**
+- **SEPA Payment Processor** (separate extension): Online payment processing for events and contributions
+- **PSP-SEPA**: Integration with external payment service providers
+
+## Requirements
+
+### Technical Requirements
+- **CiviCRM**: Version 5.75 or higher
+- **PHP**: Compatible with CiviCRM's PHP requirements
+- **Database**: MySQL/MariaDB with automatic schema updates
+- **Server**: Standard CiviCRM hosting requirements
+
+### SEPA Requirements
+- **Legal entity**: Must be a legitimate organization authorized to collect payments
+- **Bank account**: European bank account capable of SEPA direct debit processing
+- **Creditor identifier**: SEPA creditor ID from your bank or national authority
+
+## Getting Started
+
+The typical CiviSEPA implementation follows these steps:
+
+1. **Installation**: Install CiviSEPA from the CiviCRM Extension Directory
+2. **Configuration**: Set up creditor information and banking parameters
+3. **Testing**: Create test mandates and validate the complete workflow
+4. **Integration**: Connect with banking systems and complementary extensions
+5. **Training**: Educate staff on daily operations and troubleshooting
+6. **Go-live**: Begin processing real payments with proper monitoring
+
+## Support and Development
+
+**Maintenance**: CiviSEPA is actively maintained by SYSTOPIA with contributions from the broader CiviCRM community.
+
+**Professional Support**: For implementation assistance, customization, or enterprise support, contact SYSTOPIA at info@systopia.de.
+
+**Community Resources**:
+- [GitHub Repository](https://github.com/Project60/org.project60.sepa): Source code and issue tracking
+- [Extension Directory](https://civicrm.org/extensions/civisepa-sepa-direct-debit-extension): Official extension listing
+
+**Contributing**: CiviSEPA welcomes community contributions through GitHub pull requests, documentation improvements, and testing feedback.
+
+---
+
+*Ready to get started? Continue to the [Administration](administration.md) section for installation and configuration instructions.*
