@@ -251,8 +251,6 @@ class CRM_Sepa_Logic_Batching {
 
     // step 6: sync calculated group structure with existing (open) groups
     self::syncGroups($mandates_by_nextdate, $existing_groups, $mode, 'RCUR', $rcur_notice, $creditor_id, $offset!==NULL, $offset===0);
-
-    $lock->release();
   }
 
 
@@ -353,8 +351,6 @@ class CRM_Sepa_Logic_Batching {
 
     // step 4: sync calculated group structure with existing (open) groups
     self::syncGroups($calculated_groups, $existing_groups, 'OOFF', 'OOFF', $ooff_notice, $creditor_id, $offset!==NULL, $offset===0);
-
-    $lock->release();
   }
 
 
