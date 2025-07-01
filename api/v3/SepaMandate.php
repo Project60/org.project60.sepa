@@ -301,7 +301,7 @@ function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
     'name'         => 'end_date',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
-    'title'        => 'Start of collection (only for RCUR)',
+    'title'        => 'End of collection (only for RCUR)',
   );
   $params['frequency_interval'] = array(
     'name'         => 'frequency_interval',
