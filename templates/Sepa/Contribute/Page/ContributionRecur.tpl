@@ -32,6 +32,7 @@
             <tr><td class="label">{ts domain="org.project60.sepa"}1st contribution{/ts}</td><td><a href="{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=view&id=$fcid&cid=$cid"}">{$sepa.first_contribution_id}</a></td></tr>
         </table>
     </div>
+    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='SepaMandate' cid=false entityID=$sepa.id}
 </div>
 
 {if $can_edit_mandate}
