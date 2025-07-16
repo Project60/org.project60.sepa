@@ -35,6 +35,7 @@
         <tr><td class="label">{ts domain="org.project60.sepa"}Validation date{/ts}</td><td>{$sepa.validation_date}</td></tr>
       </table>
     </div>
+    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='SepaMandate' cid=false entityID=$sepa.id}
   </div>
 </div>
 </td></tr></tbody></table>
