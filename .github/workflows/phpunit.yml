@@ -1,0 +1,37 @@
+name: PHPUnit
+
+on:
+  pull_request:
+    paths:
+      - '**.php'
+      - composer.json
+      - tools/phpunit/composer.json
+      - phpunit.xml.dist
+      - tests/docker-prepare.sh
+
+env:
+  # On github CI machine creating the "/vendor" volume fails otherwise with: read-only file system: unknown
+  BIND_VOLUME_PERMISSIONS: rw
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        civicrm-image-tags: [ '5-drupal', '5.75-drupal-php8.1' ]
+    name: PHPUnit with Docker image michaelmcandrew/civicrm:${{ matrix.civicrm-image-tags }}
+    env:
+      CIVICRM_IMAGE_TAG: ${{ matrix.civicrm-image-tags }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Pull images
+      run: docker compose -f tests/docker-compose.yml pull --quiet
+    - name: Start containers
+      run: docker compose -f tests/docker-compose.yml up -d
+    - name: Prepare environment
+      run: docker compose -f tests/docker-compose.yml exec civicrm sites/default/files/civicrm/ext/org.project60.sepa/tests/docker-prepare.sh
+    - name: Run PHPUnit
+      run: docker compose -f tests/docker-compose.yml exec civicrm sites/default/files/civicrm/ext/org.project60.sepa/tests/docker-phpunit.sh
+    - name: Remove containers
+      run: docker compose -f tests/docker-compose.yml down -v
