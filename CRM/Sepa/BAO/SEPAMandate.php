@@ -903,7 +903,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     ]);
     if ($result->fetch()) {
       // return the mandate
-      return SepaMandate::get(TRUE)
+      return SepaMandate::get(FALSE)
         ->addWhere('id', '=', $result->mandate_id)
         ->execute()
         ->single();
