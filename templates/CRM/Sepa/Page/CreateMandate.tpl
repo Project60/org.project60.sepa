@@ -68,15 +68,15 @@
 		</tr>
 		<tr>	<!-- MANDATE REFERENCE -->
 			<td>{ts domain="org.project60.sepa"}Mandate Reference{/ts}:</td>
-			<td><input name="reference" type="text" size="34" value="{$reference}" placeholder="{ts domain="org.project60.sepa"}not required, will be generated{/ts}"/></td>
+			<td><input name="reference" type="text" size="34" value="{$reference}" placeholder="{ts escape='htmlattribute' domain="org.project60.sepa"}not required, will be generated{/ts}"/></td>
 		</tr>
 		<tr>	<!-- SOURCE -->
 			<td>{ts domain="org.project60.sepa"}Source{/ts}:</td>
-			<td><input name="source" type="text" value="{$source}" placeholder="{ts domain="org.project60.sepa"}not required{/ts}"/></td>
+			<td><input name="source" type="text" value="{$source}" placeholder="{ts escape='htmlattribute' domain="org.project60.sepa"}not required{/ts}"/></td>
 		</tr>
 		<tr>	<!-- NOTE -->
 			<td id="mandate_note_label">{ts domain="org.project60.sepa"}Note{/ts}:</td>
-			<td><input name="note" type="text" size="32" value="{$note}" placeholder="{ts domain="org.project60.sepa"}not required{/ts}"/></td>
+			<td><input name="note" type="text" size="32" value="{$note}" placeholder="{ts escape='htmlattribute' domain="org.project60.sepa"}not required{/ts}"/></td>
 		</tr>
 
 		<tr><td colspan="4"><hr></td></tr>
@@ -183,7 +183,7 @@
 			<td></td>
 		</tr>
 	</table>
-	<input type="submit" value="{ts domain="org.project60.sepa"}create{/ts}" />
+	<input type="submit" value="{ts escape='htmlattribute' domain="org.project60.sepa"}create{/ts}" />
 </form>
 
 {else}
@@ -202,10 +202,10 @@
 		{ts domain="org.project60.sepa"}Reference is{/ts}: <font face="Courier New, monospace">{$reference}</font></h2>
 	{/if}
 	<br/><br/>
-	<a href="{$back_url}" class="view button" title="{ts domain="org.project60.sepa"}back to contact{/ts}">
+	<a href="{$back_url}" class="view button" title="{ts escape='htmlattribute' domain="org.project60.sepa"}back to contact{/ts}">
 		<span><div class="icon preview-icon"></div>{ts domain="org.project60.sepa"}view contact{/ts}</span>
 	</a>
-	<a href="{$mandate_url}" class="view button" title="{ts domain="org.project60.sepa"}view mandate{/ts}">
+	<a href="{$mandate_url}" class="view button" title="{ts escape='htmlattribute' domain="org.project60.sepa"}view mandate{/ts}">
 		<span><div class="icon preview-icon"></div>{ts domain="org.project60.sepa"}view mandate{/ts}</span>
 	</a>
 {/if}

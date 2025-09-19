@@ -222,8 +222,8 @@
 	{ts domain="org.project60.sepa"}Are you sure this is what you want to do?{/ts}
 </p>
 <div class="crm-submit-buttons">
-	<input id="ok_button" class="button button_close" type="button" value="{ts domain="org.project60.sepa"}Yes{/ts}" />
-	<input id="cancel_button" class="button button_close" type="button" value="{ts domain="org.project60.sepa"}No{/ts}" />
+	<input id="ok_button" class="button button_close" type="button" value="{ts escape='htmlattribute' domain="org.project60.sepa"}Yes{/ts}" />
+	<input id="cancel_button" class="button button_close" type="button" value="{ts escape='htmlattribute' domain="org.project60.sepa"}No{/ts}" />
 </div>
 </form>
 
