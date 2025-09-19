@@ -20,6 +20,7 @@ use \Civi\ActionProvider\Parameter\ParameterBagInterface;
 use \Civi\ActionProvider\Parameter\Specification;
 use \Civi\ActionProvider\Parameter\SpecificationBag;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -59,7 +60,7 @@ class FindMandate extends CreateRecurringMandate {
     return new SpecificationBag([
         // required fields
         new Specification('contact_id',     'Integer', E::ts('Contact ID'), false),
-        new Specification('account_holder', 'String', E::ts('Account Holder'), false),
+        new Specification('account_holder', 'String',  E::ts('Account Holder'), false),
         new Specification('iban',           'String',  E::ts('IBAN'), false),
         new Specification('reference',      'String',  E::ts('Mandate Reference'), false),
     ]);
@@ -108,8 +109,9 @@ class FindMandate extends CreateRecurringMandate {
    */
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output)
   {
-    // compile search query
+    // compile the find mandate query
     $mandatesQuery = SepaMandate::get(TRUE);
+    $mandatesQuery->addSelect('ID', 'DATE', );
     if (!empty($this->configuration->getParameter('creditor_id'))) {
       $mandatesQuery->addWhere('creditor_id', 'IN', $this->configuration->getParameter('creditor_id'));
     }
@@ -133,13 +135,24 @@ class FindMandate extends CreateRecurringMandate {
     }
 
     // add order
-    $mandatesQuery->addOrderBy($this->configuration->getParameter('pick'));
-    // TODO: Shouldn't this use single()?
+    $order = $this->configuration->getParameter('pick');
+    if (!empty($order)) {
+      [$field, $direction] = explode(' ', $order);
+      $mandatesQuery->addOrderBy($field, strtoupper($direction));
+    }
+
+    // add limit
     $mandatesQuery->setLimit(1);
 
-    // search mandate
-    $mandate = $mandatesQuery->execute()->first();
-    if (isset($mandate)) {
+    // find the mandate
+    try {
+      $mandates = $mandatesQuery->execute();
+    } catch (\CRM_Core_Exception $e) {
+      \Civi::log()->error("Error while finding your mandate: " . $e->getMessage());
+      throw $e;
+    }
+    if ($mandates->count() > 0) {
+      $mandate = $mandates->first();
       $output->setParameter('id', $mandate['id']);
       $output->setParameter('reference', $mandate['reference']);
       $output->setParameter('type', $mandate['type']);
@@ -194,6 +207,8 @@ class FindMandate extends CreateRecurringMandate {
           // this shouldn't happen
           break;
       }
+    } else {
+      // no mandate found, i.e. no mandate created yet
     }
   }
 }
