@@ -17,7 +17,7 @@
   <ul id="actions">
   {if $status eq 'closed'}
     <li>
-      <a title="{ts domain="org.project60.sepa"}show active groups{/ts}" class="search button" href="{$show_open_url}">
+      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}show active groups{/ts}" class="search button" href="{$show_open_url}">
         <span>
           <div class="icon inform-icon"></div>
           {ts domain="org.project60.sepa"}show active groups{/ts}
@@ -26,7 +26,7 @@
     </li>
   {else}
     <li>
-      <a title="{ts domain="org.project60.sepa"}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
+      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
         <span>
           <div class="icon inform-icon"></div>
           {ts domain="org.project60.sepa"}show closed groups{/ts}
@@ -35,7 +35,7 @@
     <li>
     {if $can_batch}
     <li>
-      <a title="{ts domain="org.project60.sepa"}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
+      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
         <span>
           <div class="icon refresh-icon ui-icon-refresh"></div>
           {ts domain="org.project60.sepa"}update one-off{/ts}
@@ -43,7 +43,7 @@
       </a>
     </li>
     <li>
-      <a title="{ts domain="org.project60.sepa"}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
+      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
         <span>
           <div class="icon refresh-icon ui-icon-refresh"></div>
           {ts domain="org.project60.sepa"}update recurring{/ts}
@@ -51,7 +51,7 @@
       </a>
     </li>
       <li>
-        <a title="{ts domain="org.project60.sepa"}retry collection{/ts}" class="refresh button" href="{$batch_retry}">
+        <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}retry collection{/ts}" class="refresh button" href="{$batch_retry}">
         <span>
           <div class="icon refresh-icon  ui-icon-circle-plus"></div>
           {ts domain="org.project60.sepa"}retry collection{/ts}
@@ -87,8 +87,8 @@
   <tr bgcolor="#FF0000" class="status_{$group.status_id} submit_{$group.submit}" data-id="{$group.id}" data-type="{$group.type}">
     <td title="id {$group.id}" class="nb_contrib">
       {$group.reference}
-      {if $group.transaction_message}<span class="crm-i fa-envelope-o" title="{ts domain="org.project60.sepa"}Custom Transaction Message:{/ts} {$group.transaction_message}"></span>{/if}
-      {if $group.transaction_note}<span class="crm-i fa-sticky-note" title="{ts domain="org.project60.sepa"}Note:{/ts} {$group.transaction_note}"></span>{/if}
+      {if $group.transaction_message}<span class="crm-i fa-envelope-o" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Custom Transaction Message:{/ts} {$group.transaction_message}"></span>{/if}
+      {if $group.transaction_note}<span class="crm-i fa-sticky-note" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Note:{/ts} {$group.transaction_note}"></span>{/if}
     </td>
     <td>
       {$group.status_label}

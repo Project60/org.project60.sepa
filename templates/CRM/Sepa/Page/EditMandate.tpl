@@ -111,7 +111,7 @@
             {if $can_modify}{if $contribution.cycle_day}{if $sepa.status eq 'FRST' or $sepa.status eq 'RCUR' or $sepa.status eq 'INIT'}<tr>
               <td class="label" style="vertical-align: middle;"><a class="button" onclick="mandate_action_change_cycle_day();">{ts domain="org.project60.sepa"}Change Cycle Day{/ts}</td>
               <td>
-                  {ts domain="org.project60.sepa"}New cycle day:{/ts}<a id='template_help' onclick='CRM.help("{ts domain="org.project60.sepa"}Cyle Day{/ts}", {literal}{"id":"id-change-cycleday-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>&nbsp;
+                  {ts domain="org.project60.sepa"}New cycle day:{/ts}<a id='template_help' onclick='CRM.help("{ts escape='htmlattribute' domain="org.project60.sepa"}Cyle Day{/ts}", {literal}{"id":"id-change-cycleday-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>&nbsp;
                   <select name="new_cycle_day" id="new_cycle_day" class="crm-form-select">
                     {foreach from=$cycle_days item=cycle_day_label key=cycle_day_value}
                       <option value="{$cycle_day_value}" {if ($cycle_day_value == $contribution.cycle_day_raw)}selected="selected"{/if}>{$cycle_day_label}</option>
@@ -138,7 +138,7 @@
                     {ts domain="org.project60.sepa"}Will generate a Prenotification PDF with this mandate's data.{/ts}
                     <br/>
                     {if !empty($sepa_templates)}
-                    {ts domain="org.project60.sepa"}Select the template to be used:{/ts}<a id='template_help' onclick='CRM.help("{ts domain="org.project60.sepa"}Template{/ts}", {literal}{"id":"id-template-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>
+                    {ts domain="org.project60.sepa"}Select the template to be used:{/ts}<a id='template_help' onclick='CRM.help("{ts escape='htmlattribute' domain="org.project60.sepa"}Template{/ts}", {literal}{"id":"id-template-help","file":"CRM\/Sepa\/Page\/EditMandate"}{/literal}); return false;' href="#" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Help{/ts}" class="helpicon">&nbsp;</a>
                     &nbsp;
                     <select id="sepa_tpl_select" style="">
                         {foreach from=$sepa_templates item=item}
