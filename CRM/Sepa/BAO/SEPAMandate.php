@@ -51,9 +51,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
         $params['creditor_id'] = $default_creditor->id;
       }
       else {
+        // check permission only if the user does not have the permission to 
+        $checkPermissions = !CRM_Core_Permission::check('make online contributions');
         // existing mandate, get creditor
         $params['creditor_id'] =
-          SepaMandate::get(FALSE)->addSelect('creditor_id')->addWhere(
+          SepaMandate::get($checkPermissions)->setDebug(true)->addSelect('creditor_id')->addWhere(
             'id',
             '=',
             $params['id']
@@ -902,8 +904,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       1 => [$cid, 'Integer']
     ]);
     if ($result->fetch()) {
+      $checkPermissions = !CRM_Core_Permission::check('make online contributions');
       // return the mandate
-      return SepaMandate::get(FALSE)
+      return SepaMandate::get(TRUE)
         ->addWhere('id', '=', $result->mandate_id)
         ->execute()
         ->single();
