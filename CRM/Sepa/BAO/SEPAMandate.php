@@ -52,12 +52,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       }
       else {
         // existing mandate, get creditor
-        $params['creditor_id'] =
-          SepaMandate::get(TRUE)->addSelect('creditor_id')->addWhere(
-            'id',
-            '=',
-            $params['id']
-          )->execute()->single()['creditor_id'];
+        $params['creditor_id'] = SepaMandate::get(FALSE)
+          ->addSelect('creditor_id')
+          ->addWhere('id', '=', $params['id'])
+          ->execute()
+          ->single()['creditor_id'];
       }
     }
     $creditor = SepaCreditor::get(FALSE)
