@@ -52,14 +52,14 @@ function sepa_civicrm_pageRun( &$page ) {
   elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
     // single contribuion view
     if (CRM_Core_Permission::check('view sepa mandates')) {
-      $contribution_id = $page->getTemplate()->get_template_vars('id');
+      $contribution_id = $page->getTemplate()->getTemplateVars('id');
       if (empty($contribution_id) || !CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id)) {
         return; // not a SEPA contribution
       }
 
-      if ($page->getTemplate()->get_template_vars('contribution_recur_id')) {
+      if ($page->getTemplate()->getTemplateVars('contribution_recur_id')) {
         // This is an installment of a recurring contribution.
-        $contribution_recur_id = $page->getTemplate()->get_template_vars('contribution_recur_id');
+        $contribution_recur_id = $page->getTemplate()->getTemplateVars('contribution_recur_id');
         if (empty($contribution_recur_id)) return;
 
         $mandate = \Civi\Api4\SepaMandate::get(TRUE)
@@ -110,7 +110,7 @@ function sepa_civicrm_pageRun( &$page ) {
   elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
     // recurring contribution view
     if (CRM_Core_Permission::check('view sepa mandates')) {
-      $recur = $page->getTemplate()->get_template_vars("recur");
+      $recur = $page->getTemplate()->getTemplateVars("recur");
       if (empty($recur['id'])) {
         return; // nothing to do here
       }
