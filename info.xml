@@ -12,8 +12,7 @@
   <version>1.13.0-beta1</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.75</ver>
-    <ver>5.69</ver>
+    <ver>5.70</ver>
   </compatibility>
   <urls>
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
