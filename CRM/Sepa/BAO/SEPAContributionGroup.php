@@ -38,7 +38,7 @@ class CRM_Sepa_BAO_SEPAContributionGroup extends CRM_Sepa_DAO_SEPAContributionGr
    */
   static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'SepaContributionGroup', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'SepaContributionGroup', $params['id'] ?? NULL, $params);
 
     $dao = new CRM_Sepa_DAO_SEPAContributionGroup();
     $dao->copyValues($params);

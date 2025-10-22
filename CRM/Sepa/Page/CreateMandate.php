@@ -517,7 +517,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
    * test if this page is called as a popup
    */
   protected function isPopup() {
-    return CRM_Utils_Array::value('snippet', $_REQUEST);
+    return $_REQUEST['snippet'] ?? NULL;
   }
 
   /**

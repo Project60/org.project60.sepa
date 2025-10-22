@@ -58,7 +58,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    */
   public static function getSddPaymentInstrumentID($sdd_name) {
     $all_pis = self::getSddPaymentInstruments();
-    return CRM_Utils_Array::value($sdd_name, $all_pis);
+    return $all_pis[$sdd_name] ?? NULL;
   }
 
   /**
@@ -226,7 +226,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
       // collect OOFF payment instruments
       foreach ($creditors as $creditor) {
         $creditor_id = (int) $creditor['id'];
-        $creditor_pi_ooff = CRM_Utils_Array::value('pi_ooff', $creditor, '');
+        $creditor_pi_ooff = $creditor['pi_ooff'] ?? '';
         foreach (explode(',', $creditor_pi_ooff) as $pi_value) {
           $pi_id = (int) $pi_value;
           if ($pi_id) {
@@ -237,7 +237,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
       // collect RCUR payment instruments
       foreach ($creditors as $creditor) {
-        $creditor_pi_rcur = CRM_Utils_Array::value('pi_rcur', $creditor, '');
+        $creditor_pi_rcur = $creditor['pi_rcur'] ?? '';
         foreach (explode(',', $creditor_pi_rcur) as $pi_value) {
           if (strstr($pi_value, '-')) {
             // this is a frst-rcur combo
@@ -295,7 +295,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
   {
     // get the creditor
     $creditors = self::getAllSddCreditors();
-    $creditor = CRM_Utils_Array::value($creditor_id, $creditors);
+    $creditor = $creditors[$creditor_id] ?? NULL;
     if (!$creditor) {
       return []; // creditor not found
     }
@@ -367,7 +367,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
     }
 
     $creditors = self::getAllSddCreditors();
-    $creditor = CRM_Utils_Array::value($creditor_id, $creditors);
+    $creditor = $creditors[$creditor_id] ?? NULL;
     if (!$creditor) {
       $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
       return $recurring_contribution_pi; // creditor not found
@@ -430,7 +430,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
       // get the creditor data
       $creditors = self::getAllSddCreditors();
-      $creditor = CRM_Utils_Array::value($creditor_id, $creditors);
+      $creditor = $creditors[$creditor_id] ?? NULL;
       if ($creditor) {
         foreach (explode(',', $creditor['pi_rcur']) as $pi_spec) {
           if (strstr($pi_spec, '-')) {

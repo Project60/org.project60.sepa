@@ -160,7 +160,7 @@ class FindMandate extends CreateRecurringMandate {
           $output->setParameter('amount', $recurring_contribution['amount']);
           $output->setParameter('cycle_day', $recurring_contribution['cycle_day']);
           $output->setParameter('financial_type_id', $recurring_contribution['financial_type_id']);
-          $output->setParameter('campaign_id', \CRM_Utils_Array::value('campaign_id', $recurring_contribution));
+          $output->setParameter('campaign_id', $recurring_contribution['campaign_id'] ?? NULL);
           $output->setParameter('start_date', $recurring_contribution['start_date']);
           $output->setParameter('contribution_recur_id', $recurring_contribution['id']);
 

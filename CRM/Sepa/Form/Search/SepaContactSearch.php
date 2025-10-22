@@ -141,7 +141,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
     $count  = 1;
 
     // add reference
-    $reference = CRM_Utils_Array::value('reference', $this->_formValues);
+    $reference = $this->_formValues['reference'] ?? NULL;
     if ($reference) {
       $wheres[] = "mandate.reference LIKE %{$count}";
       $params[$count] = array($reference, 'String');
@@ -149,7 +149,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
     }
 
     // add iban
-    $iban = CRM_Utils_Array::value('iban', $this->_formValues);
+    $iban = $this->_formValues['iban'] ?? NULL;
     if ($iban) {
       $wheres[] = "mandate.iban LIKE %{$count}";
       $params[$count] = array($iban, 'String');

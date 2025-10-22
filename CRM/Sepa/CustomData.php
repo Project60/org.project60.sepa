@@ -229,7 +229,7 @@ class CRM_Sepa_CustomData {
         'options'    => array('limit' => 2));
 
     foreach ($data['_lookup'] as $lookup_key) {
-      $lookup_query[$lookup_key] = CRM_Utils_Array::value($lookup_key, $data, '');
+      $lookup_query[$lookup_key] = $data[$lookup_key] ?? '';
     }
 
     $this->log(self::CUSTOM_DATA_HELPER_LOG_DEBUG, "LOOKUP {$entity_type}: " . json_encode($lookup_query));
@@ -721,7 +721,7 @@ class CRM_Sepa_CustomData {
         return $field_data['value'];
       } else {
         // unlikely, but worth a shot:
-        return CRM_Utils_Array::value("custom_{$field_id}", $params, NULL);
+        return $params["custom_{$field_id}"] ?? NULL;
       }
     }
     return NULL;
@@ -769,12 +769,12 @@ class CRM_Sepa_CustomData {
       $group_specs = self::getGroupSpecs($field_specs['custom_group_id']);
       return               [
           'value'           => $value,
-          'type'            => CRM_Utils_Array::value('data_type', $field_specs, 'String'),
+          'type'            => $field_specs['data_type'] ?? 'String',
           'custom_field_id' => $field_id,
-          'custom_group_id' => CRM_Utils_Array::value('custom_group_id', $field_specs, NULL),
-          'table_name'      => CRM_Utils_Array::value('table_name', $group_specs, NULL),
-          'column_name'     => CRM_Utils_Array::value('column_name', $field_specs, NULL),
-          'is_multiple'     => CRM_Utils_Array::value('is_multiple', $group_specs, 0),
+          'custom_group_id' => $field_specs['custom_group_id'] ?? NULL,
+          'table_name'      => $group_specs['table_name'] ?? NULL,
+          'column_name'     => $field_specs['column_name'] ?? NULL,
+          'is_multiple'     => $group_specs['is_multiple'] ?? 0,
       ];
     } else {
       return NULL;

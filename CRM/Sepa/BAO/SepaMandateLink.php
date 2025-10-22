@@ -207,7 +207,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
       $params['creation_date'] = date('YmdHis');
     }
 
-    CRM_Utils_Hook::pre($hook, 'SepaMandateLink', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'SepaMandateLink', $params['id'] ?? NULL, $params);
 
     $dao = new CRM_Sepa_BAO_SepaMandateLink();
     $dao->copyValues($params);

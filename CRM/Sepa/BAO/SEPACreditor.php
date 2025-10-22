@@ -36,7 +36,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
    */
   static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'SepaCreditor', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'SepaCreditor', $params['id'] ?? NULL, $params);
 
     // add default payment instruments for a new creditor if none provided
     if (empty($params['id']) && !isset($params['pi_ooff']) && !isset($params['pi_rcur'])) {
