@@ -38,7 +38,7 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
         'option_group_id' => 'contribution_status',
         'value' => self::CONTRIBUTION_STATUS_IN_PROGRESS,
       ]);
-    } catch (CiviCRM_API3_Exception $ex) {
+    } catch (CRM_Core_Exception $ex) {
       // this means the status is already missing, no harm done
     }
 

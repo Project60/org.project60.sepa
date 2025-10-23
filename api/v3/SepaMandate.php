@@ -98,16 +98,16 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 
       } elseif (count($eligible_payment_instruments) == 0) {
         // no payment instrument -> disabled
-        throw new CiviCRM_API3_Exception("{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
+        throw new CRM_Core_Exception("{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
       } else {
         // unclear which one to take
-        throw new CiviCRM_API3_Exception("You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
+        throw new CRM_Core_Exception("You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
       }
 
     } else {
       // a payment instrument is set, verify that it's allowed
       if (!array_key_exists($params['payment_instrument_id'], $eligible_payment_instruments)) {
-        throw new CiviCRM_API3_Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}].");
+        throw new CRM_Core_Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}].");
       }
     }
 

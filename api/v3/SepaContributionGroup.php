@@ -89,7 +89,7 @@ function _civicrm_api3_sepa_contribution_group_getdetail_spec (&$params) {
 function civicrm_api3_sepa_contribution_group_getdetail($params) {
   $group = (int) $params["id"];
   if (!$group)
-    throw new API_Exception("Incorrect or missing value for group id");
+    throw new CRM_Core_Exception("Incorrect or missing value for group id");
   $sql = "
     SELECT
       contribution_id,

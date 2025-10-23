@@ -62,7 +62,7 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
         $membershipEndDate->modify('+1 day');
       }
       $next_collection_date = $membershipEndDate->format('Y-m-d');
-    } catch (CiviCRM_API3_Exception $e) {
+    } catch (CRM_Core_Exception $e) {
       // No membership found.
       // Do not alter the date.
     }
