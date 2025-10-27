@@ -109,7 +109,7 @@ class CRM_Sepa_Logic_Queue_Close {
       'title'     => $runner_title,
       'queue'     => $queue,
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      'onEndUrl'  => CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed'),
+      'onEndUrl'  => CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed', FALSE, NULL, FALSE),
     ]);
     $runner->runAllViaWeb(); // does not return
   }

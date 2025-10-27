@@ -78,7 +78,7 @@ class CRM_Sepa_Logic_Queue_Update {
       'queue'     => $queue,
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       // 'onEnd'     => array('CRM_Admin_Page_ExtensionsUpgrade', 'onEnd'),
-      'onEndUrl'  => CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'),
+      'onEndUrl'  => CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active', FALSE, NULL, FALSE),
     ));
     $runner->runAllViaWeb(); // does not return
   }
