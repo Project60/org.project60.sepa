@@ -328,7 +328,7 @@ class CRM_Sepa_Logic_MandateRepairs {
                 'financial_type_id' => $case->financial_type_id, // just to avoid warnings in unit tests
               ]);
               $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}]");
-            } catch (CiviCRM_API3_Exception $ex) {
+            } catch (CRM_Core_Exception $ex) {
               // this is probably an issue with interference with other processes, but we HAVE to fix this:
               CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2",
                 [

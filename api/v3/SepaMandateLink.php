@@ -88,7 +88,7 @@ function _civicrm_api3_sepa_mandate_link_create_spec(&$spec) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 
 function civicrm_api3_sepa_mandate_link_create($params) {
@@ -100,7 +100,7 @@ function civicrm_api3_sepa_mandate_link_create($params) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_sepa_mandate_link_delete($params) {
   return _civicrm_api3_basic_delete('CRM_Sepa_BAO_SepaMandateLink', $params);
@@ -111,7 +111,7 @@ function civicrm_api3_sepa_mandate_link_delete($params) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_sepa_mandate_link_get($params) {
   return _civicrm_api3_basic_get('CRM_Sepa_BAO_SepaMandateLink', $params);
@@ -169,7 +169,7 @@ function _civicrm_api3_sepa_mandate_link_getactive_spec(&$spec) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_sepa_mandate_link_getactive($params) {
   try {
@@ -181,6 +181,6 @@ function civicrm_api3_sepa_mandate_link_getactive($params) {
         $params['date'] ?? 'now');
     return civicrm_api3_create_success($result);
   } catch (Exception $ex) {
-    throw new API_Exception($ex->getMessage());
+    throw new CRM_Core_Exception($ex->getMessage());
   }
 }

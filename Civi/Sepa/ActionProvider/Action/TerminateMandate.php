@@ -104,7 +104,7 @@ class TerminateMandate extends AbstractAction {
         }
         \CRM_Core_DAO::executeQuery($update, $updateParams);
       }
-      catch (\CiviCRM_API3_Exception $ex) {
+      catch (\CRM_Core_Exception $ex) {
       }
     }
   }

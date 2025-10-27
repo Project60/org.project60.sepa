@@ -35,7 +35,7 @@ class CRM_Sepa_Logic_ContributionProtector implements API_Wrapper {
       }
 
       if ($error) {
-        throw new API_Exception($error);
+        throw new CRM_Core_Exception($error);
       }
     }
 
