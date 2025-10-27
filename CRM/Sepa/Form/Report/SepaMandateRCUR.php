@@ -232,37 +232,37 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     // add amount from either OOFF or RCUR
     if ($fieldName == 'total_amount_collected') {
       $this->_columnHeaders['total_amount_collected']['title'] = $field['title'];
-      $this->_columnHeaders['total_amount_collected']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['total_amount_collected']['type']  = $field['type'] ?? NULL;
       return "(SELECT/*NO_ROW_COUNT*/ SUM(total_amount) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (1) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_amount_collected";
     }
 
     if ($fieldName == 'total_count_collected') {
       $this->_columnHeaders['total_count_collected']['title'] = $field['title'];
-      $this->_columnHeaders['total_count_collected']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['total_count_collected']['type']  = $field['type'] ?? NULL;
       return "(SELECT/*NO_ROW_COUNT*/ COUNT(id) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (1) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_count_collected";
     }
 
     if ($fieldName == 'total_count_failed') {
       $this->_columnHeaders['total_count_failed']['title'] = $field['title'];
-      $this->_columnHeaders['total_count_failed']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['total_count_failed']['type']  = $field['type'] ?? NULL;
       return "(SELECT/*NO_ROW_COUNT*/ COUNT(id) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (3,4) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_count_failed";
     }
 
     if ($fieldName == 'contribution_count') {
       $this->_columnHeaders['contribution_count']['title'] = $field['title'];
-      $this->_columnHeaders['contribution_count']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['contribution_count']['type']  = $field['type'] ?? NULL;
       return "COUNT({$this->_aliases['civicrm_contribution']}.id) AS contribution_count";
     }
 
     if ($fieldName == 'cancel_reasons') {
       $this->_columnHeaders['cancel_reasons']['title'] = $field['title'];
-      $this->_columnHeaders['cancel_reasons']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['cancel_reasons']['type']  = $field['type'] ?? NULL;
       return "GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||') AS cancel_reasons";
     }
 
     if ($fieldName == 'cycle_interval') {
       $this->_columnHeaders['cycle_interval']['title'] = $field['title'];
-      $this->_columnHeaders['cycle_interval']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['cycle_interval']['type']  = $field['type'] ?? NULL;
       return "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval, CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit)) AS cycle_interval";
     }
 
@@ -300,13 +300,13 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
    */
   protected function _getWhereClause($fieldName, $field) {
     if ($fieldName == 'cycle_interval') {
-      $cycle_intervals = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
+      $cycle_intervals = $this->_params["{$fieldName}_value"] ?? NULL;
       if (in_array("'12 month'", $cycle_intervals)) {
         $cycle_intervals[] = "'1 year'"; // the database could have both: '1 year' and '12 month'...
       }
-      $clause = $this->whereClause($field, CRM_Utils_Array::value("{$fieldName}_op", $this->_params), $cycle_intervals,
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+      $clause = $this->whereClause($field, $this->_params["{$fieldName}_op"] ?? NULL, $cycle_intervals,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       $subquery = "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval, CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit))";
       $clause = preg_replace('/cycle_interval/', $subquery, $clause);
@@ -314,13 +314,13 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     }
 
     if ($fieldName == 'total_amount_collected') {
-      $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+      $op = $this->_params["{$fieldName}_op"] ?? NULL;
       if ($op) {
         $clause = $this->whereClause($field,
           $op,
-          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          $this->_params["{$fieldName}_value"] ?? NULL,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
       $subquery = "(SELECT SUM(total_amount) FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id = 1)";
@@ -329,13 +329,13 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     }
 
     if ($fieldName == 'total_count_collected') {
-      $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+      $op = $this->_params["{$fieldName}_op"] ?? NULL;
       if ($op) {
         $clause = $this->whereClause($field,
           $op,
-          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          $this->_params["{$fieldName}_value"] ?? NULL,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
       $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id = 1)";
@@ -344,13 +344,13 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     }
 
     if ($fieldName == 'total_count_failed') {
-      $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+      $op = $this->_params["{$fieldName}_op"] ?? NULL;
       if ($op) {
         $clause = $this->whereClause($field,
           $op,
-          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          $this->_params["{$fieldName}_value"] ?? NULL,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
       $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id IN (3,4))";
@@ -359,13 +359,13 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     }
 
     if ($fieldName == 'cancel_reasons') {
-      $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+      $op = $this->_params["{$fieldName}_op"] ?? NULL;
       if ($op) {
         $clause = $this->whereClause($field,
           $op,
-          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          $this->_params["{$fieldName}_value"] ?? NULL,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
       $subquery = "(SELECT GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||') FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id IN (3,4))";
@@ -398,16 +398,16 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
 
     foreach ($rows as $rowNum => $row) {
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_financial_type_id', $row)) {
+      if ($value = $row['civicrm_contribution_recur_financial_type_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_recur_financial_type_id'] = $contributionTypes[$value];
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_status_id', $row)) {
+      if ($value = $row['civicrm_contribution_recur_contribution_status_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = $contributionStatus[$value];
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_page_id', $row)) {
+      if ($value = $row['civicrm_contribution_recur_contribution_page_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_page_id'] = $contributionPages[$value];
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+      if ($value = $row['civicrm_contribution_contribution_status_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
       }
 
@@ -433,7 +433,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_recur_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_recur_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_recur_campaign_id'] = CRM_Utils_Array::value($value, $campaigns, '');
+          $rows[$rowNum]['civicrm_contribution_recur_campaign_id'] = $campaigns[$value] ?? '';
         }
       }
     }

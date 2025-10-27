@@ -37,7 +37,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    */
   static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'SepaTransactionGroup', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'SepaTransactionGroup', $params['id'] ?? NULL, $params);
 
     $dao = new CRM_Sepa_DAO_SEPATransactionGroup();
     $dao->copyValues($params);

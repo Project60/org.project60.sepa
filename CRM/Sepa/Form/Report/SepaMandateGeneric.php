@@ -259,21 +259,21 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     // add amount from either OOFF or RCUR
     if ($fieldName == 'amount') {
       $this->_columnHeaders['amount']['title'] = $field['title'];
-      $this->_columnHeaders['amount']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['amount']['type']  = $field['type'] ?? NULL;
       return "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.total_amount, civicrm_contribution_recur.amount) AS amount";
     }
 
     // add status from either OOFF or RCUR
     if ($fieldName == 'status_id') {
       $this->_columnHeaders['status_id']['title'] = $field['title'];
-      $this->_columnHeaders['status_id']['type']  = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders['status_id']['type']  = $field['type'] ?? NULL;
       return "IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.contribution_status_id, civicrm_contribution_recur.contribution_status_id) AS status_id";
     }
 
     // Fallback: generic selector
-    if (CRM_Utils_Array::value('required', $field) || CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
+    if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
       $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-      $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
       return "{$field['dbAlias']} as {$tableName}_{$fieldName}";
     }
 
@@ -305,10 +305,10 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     if ($fieldName == 'status_id') {
       if (!empty($this->_params["{$fieldName}_value"])) {
         $base_clause = $this->whereClause($field,
-            CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
-            CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-            CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-            CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+            $this->_params["{$fieldName}_op"] ?? NULL,
+            $this->_params["{$fieldName}_value"] ?? NULL,
+            $this->_params["{$fieldName}_min"] ?? NULL,
+            $this->_params["{$fieldName}_max"] ?? NULL
           );
 
         // since either OOFF or RCUR is always NULL, we can just use OR...
@@ -334,10 +334,10 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     elseif ($fieldName == 'amount') {
       if (!empty($this->_params["{$fieldName}_value"])) {
         $base_clause = $this->whereClause($field,
-            CRM_Utils_Array::value("{$fieldName}_op", $this->_params),
-            CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-            CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-            CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+            $this->_params["{$fieldName}_op"] ?? NULL,
+            $this->_params["{$fieldName}_value"] ?? NULL,
+            $this->_params["{$fieldName}_min"] ?? NULL,
+            $this->_params["{$fieldName}_max"] ?? NULL
           );
 
         // since either OOFF or RCUR is always NULL, we can just use OR...
@@ -347,22 +347,22 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
       }
     }
 
-    elseif (CRM_Utils_Array::value('operatorType', $field) & CRM_Utils_Type::T_DATE) {
-      $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-      $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-      $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+    elseif (($field['operatorType'] ?? NULL) & CRM_Utils_Type::T_DATE) {
+      $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+      $from     = $this->_params["{$fieldName}_from"] ?? NULL;
+      $to       = $this->_params["{$fieldName}_to"] ?? NULL;
 
       $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
     }
 
     else {
-      $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+      $op = $this->_params["{$fieldName}_op"] ?? NULL;
       if ($op) {
         $clause = $this->whereClause($field,
           $op,
-          CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-          CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+          $this->_params["{$fieldName}_value"] ?? NULL,
+          $this->_params["{$fieldName}_min"] ?? NULL,
+          $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
     }
@@ -437,7 +437,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         // in previous row
         $repeatFound = FALSE;
         foreach ($row as $colName => $colVal) {
-          if (CRM_Utils_Array::value($colName, $checkList) &&
+          if (!empty($checkList[$colName]) &&
             is_array($checkList[$colName]) &&
             in_array($colVal, $checkList[$colName])
           ) {

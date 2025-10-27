@@ -37,7 +37,7 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
    */
   static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'SepaSddFile', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'SepaSddFile', $params['id'] ?? NULL, $params);
 
     $dao = new CRM_Sepa_DAO_SEPASddFile();
     $dao->copyValues($params);

@@ -174,11 +174,11 @@ function _civicrm_api3_sepa_mandate_link_getactive_spec(&$spec) {
 function civicrm_api3_sepa_mandate_link_getactive($params) {
   try {
     $result = CRM_Sepa_BAO_SepaMandateLink::getActiveLinks(
-        CRM_Utils_Array::value('mandate_id', $params, NULL),
-        CRM_Utils_Array::value('class', $params, NULL),
-        CRM_Utils_Array::value('entity_id', $params, NULL),
-        CRM_Utils_Array::value('entity_table', $params, NULL),
-        CRM_Utils_Array::value('date', $params, 'now'));
+        $params['mandate_id'] ?? NULL,
+        $params['class'] ?? NULL,
+        $params['entity_id'] ?? NULL,
+        $params['entity_table'] ?? NULL,
+        $params['date'] ?? 'now');
     return civicrm_api3_create_success($result);
   } catch (Exception $ex) {
     throw new API_Exception($ex->getMessage());

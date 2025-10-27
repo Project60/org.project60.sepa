@@ -219,7 +219,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
       }
     } elseif ($op == 'create') {
       self::$currently_edited_mandate_id = $objectId;
-      $type = CRM_Utils_Array::value('type', self::$currently_edited_mandate_params);
+      $type = self::$currently_edited_mandate_params['type'] ?? NULL;
       $update_required = ($type == 'RCUR');
     }
 
@@ -259,7 +259,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
     $update_required = FALSE;
     if ($op == 'edit') {
       if (empty(self::$currently_edited_recurring_contribution_params['next_sched_contribution_date'])) {
-        $type = CRM_Utils_Array::value('type', self::$currently_edited_recurring_contribution_params);
+        $type = self::$currently_edited_recurring_contribution_params['type'] ?? NULL;
 
         $relevant_changes = array('frequency_unit', 'frequency_interval', 'start_date', 'end_date', 'cancel_date', 'contribution_status_id', 'cycle_day');
         foreach ($relevant_changes as $critical_attribute) {
@@ -278,7 +278,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
 
       // if (empty(self::$currently_edited_recurring_contribution_params['next_sched_contribution_date'])) {
       //   // we want to calculate this for all RCUR mandates:
-      //   $type = CRM_Utils_Array::value('type', self::$currently_edited_recurring_contribution_params);
+      //   $type = self::$currently_edited_recurring_contribution_params['type'] ?? NULL;
       //   $update_required = ($type == 'RCUR');
       // } else {
       //   // if the date is passed, no need to calculate

@@ -543,8 +543,8 @@ function civicrm_api3_sepa_mandate_terminate($params) {
   try {
     $success = CRM_Sepa_BAO_SEPAMandate::terminateMandate(
       $params['mandate_id'],
-      date('Y-m-d', strtotime(CRM_Utils_Array::value('end_date', $params, 'today'))),
-      CRM_Utils_Array::value('cancel_reason', $params),
+      date('Y-m-d', strtotime($params['end_date'] ?? 'today')),
+      $params['cancel_reason'] ?? NULL,
       FALSE);
     if ($success) {
       return civicrm_api3_create_success();

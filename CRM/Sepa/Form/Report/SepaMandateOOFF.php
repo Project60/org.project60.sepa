@@ -176,13 +176,13 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
 
     foreach ($rows as $rowNum => $row) {
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
+      if ($value = $row['civicrm_contribution_financial_type_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+      if ($value = $row['civicrm_contribution_contribution_status_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_page_id', $row)) {
+      if ($value = $row['civicrm_contribution_contribution_page_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];
       }
 
@@ -200,7 +200,7 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = CRM_Utils_Array::value($value, $campaigns, '');
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $campaigns[$value] ?? '';
         }
       }
     }
