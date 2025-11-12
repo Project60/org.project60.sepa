@@ -27,13 +27,16 @@
           <ClrSysMmbId>
             <MmbId>{$creditor.iid}</MmbId>
           </ClrSysMmbId>
+          <Othr>
+            <Id>{$creditor.esr_teilnehmernummer}</Id>
+          </Othr>
         </FinInstnId>
       </CdtrAgt>
       <CdtrSchmeId>
         <Id>
           <PrvtId>
             <Othr>
-              <Id>{$creditor.identifier}</Id>
+              <Id>{$creditor.lsv_id}</Id>
               <SchmeNm>
                 <Prtry>CHLS</Prtry>
               </SchmeNm>

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\SepaCreditor;
+
 /**
  * Implementation of pain.008.001.02 CH-TA LSV+.
  *
@@ -23,7 +25,12 @@
  */
 class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_Format {
 
-  private static function calcEsrCheckNumber(string $referenceNumber): int
+  /**
+   * @var array<int, string>
+   */
+  private array $creditorIdentifiers = [];
+
+  private static function calcEsrCheckDigit(string $referenceNumber): int
   {
     static $checkList = [0, 9, 4, 6, 8, 2, 7, 1, 3, 5];
     $transferNumber = 0;
@@ -32,6 +39,21 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
     }
 
     return (10 - $transferNumber) % 10;
+  }
+
+  /**
+   * @return array{string, string, string}
+   *   LSV+-Identifikation, ESR-Teilnehmernummer, ESR-Referenznummerpräfix
+   */
+  private static function explodeCreditorIdentifier(string $identifier): array {
+    [$lsvId, $esrTeilnehmernummer, $esrPrefix] = explode('/', $identifier) + [NULL, NULL, NULL];
+    if (NULL === $esrPrefix) {
+      throw new \InvalidArgumentException(
+        'Creditor identifier has to be in this form: LSV+-Identifikation/ESR-Teilnehmernummer/ESR-Referenznummerpräfix'
+      );
+    }
+
+    return [$lsvId, $esrTeilnehmernummer, $esrPrefix];
   }
 
   /**
@@ -52,41 +74,60 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
   private static function getIid(string $iban, ?string $bic): string {
     if (str_starts_with($bic ?? '', 'RAIFCH')) {
       // The IBANs of Raiffeisen Bank doesn't always contain a valid IDD. For
-      // Raiffeisen the IID of the headquarters has to be used instead.
-      return '80000';
+      // Raiffeisen the IID 80800 has to be used instead.
+      return '80800';
     }
 
     return self::extractIidFromIban($iban);
   }
 
-  public function assignExtraVariables($template) {
+  public function assignExtraVariables($template): void {
     $creditor = $template->getTemplateVars('creditor');
     if (!isset($creditor['iban'])) {
       throw new \InvalidArgumentException('Creditor IBAN is missing');
     }
 
     $creditor['iid'] = self::getIid($creditor['iban'], $creditor['bic']);
+
+    [$lsvId, $esrTeilnehmernummer, $esrPrefix] = self::explodeCreditorIdentifier($creditor['identifier']);
+    $creditor['lsv_id'] = $lsvId;
+    $creditor['esr_teilnehmernummer'] = $esrTeilnehmernummer;
+
     $template->assign('creditor', $creditor);
   }
 
-  public function extendTransaction(&$txn, $creditor_id): void {
+  public function extendTransaction(&$txn, $creditorId): void {
     if (!isset($txn['iban'])) {
       throw new \InvalidArgumentException('Transaction IBAN is missing');
     }
 
     $txn['iid'] = self::getIid($txn['iban'], $txn['bic']);
-    $txn['esr'] = $this->generateEsr($txn);
+    $txn['esr'] = $this->generateEsr($txn, $creditorId);
+  }
+
+  private function getCreditorIdentifier(int $creditorId): string {
+    return $this->creditorIdentifiers[$creditorId] ??= SepaCreditor::get(FALSE)
+      ->addSelect('identifier')
+      ->addWhere('id', '=', $creditorId)
+      ->execute()
+      ->single()['identifier'];
   }
 
   /**
    * @return string
    *   A string of length 27 containing:
-   *   <Contact ID><filling zeros><Invoice ID or Contribution ID><check digit>
+   *   <ESR prefix><filling zeros><Contact ID>00<Invoice ID or Contribution ID><check digit>
    */
-  private function generateEsr(array $txn): string {
+  private function generateEsr(array $txn, int $creditorId): string {
+    $creditorIdentifier = $this->getCreditorIdentifier($creditorId);
+    [$lsvId, $esrTeilnehmernummer, $esrPrefix] = self::explodeCreditorIdentifier($creditorIdentifier);
+
+    $prefixLen = strlen($esrPrefix);
     $contactIdStr = (string) $txn['contact_id'];
+    // Separate contact ID and invoice ID/contribution ID with "00".
+    $contactIdStr .= '00';
     $contactIdLen = strlen($contactIdStr);
-    $maxInvoiceIdLen = 26 - $contactIdLen;
+    $maxInvoiceIdLen = 26 - $prefixLen - $contactIdLen;
     if (preg_match("/^[0-9]{1,$maxInvoiceIdLen}\$/", $txn['invoice_id'] ?? '') === 1) {
       $invoiceId = $txn['invoice_id'];
     }
@@ -94,10 +135,10 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
       $invoiceId = (string) $txn['contribution_id'];
     }
 
-    $zeroCount = 26 - $contactIdLen - strlen($invoiceId);
-    $referenceNumber = $contactIdStr . str_repeat('0', $zeroCount) . $invoiceId;
+    $zeroCount = 26 - $prefixLen - $contactIdLen - strlen($invoiceId);
+    $referenceNumber = $esrPrefix . str_repeat('0', $zeroCount) . $contactIdStr . $invoiceId;
 
-    return $referenceNumber . self::calcEsrCheckNumber($referenceNumber);
+    return $referenceNumber . self::calcEsrCheckDigit($referenceNumber);
   }
 
 }

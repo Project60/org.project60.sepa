@@ -12,7 +12,7 @@
         <Id>
           <OrgId>
             <Othr>
-              <Id>{$creditor.identifier}</Id>
+              <Id>{$creditor.lsv_id}</Id>
             </Othr>
           </OrgId>
         </Id>
