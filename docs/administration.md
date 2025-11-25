@@ -75,6 +75,20 @@ Notice Days (RCUR First): 5
 Notice Days (RCUR Follow-up): 2
 ```
 
+#### Format Specific Notes
+
+##### pain.008.001.02 CH-TA LSV+
+
+The creditor ID for this format has to be entered in this form (i.e. the three
+values separated by `/`):
+
+```
+LSV+-Identifikation/ESR-Teilnehmernummer/ESR-Referenznummernpräfix
+```
+
+Please note the [decommissioning](https://www.six-group.com/de/products-services/banking-services/billing-and-payments/direct-debits/lsv-decommissioning.html)
+of the corresponding direct debit procedure.
+
 ### Batching Settings
 
 Configure how CiviSEPA groups payments for bank submission:

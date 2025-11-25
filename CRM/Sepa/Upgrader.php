@@ -517,4 +517,12 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
 
     return TRUE;
   }
+
+  public function upgrade_11303(): bool {
+    $this->ctx->log->info("SIX Interbank pain.008.001.02 CH-TA LSV+ format");
+    $customData = new CRM_Sepa_CustomData(E::LONG_NAME);
+    $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+
+    return TRUE;
+  }
 }

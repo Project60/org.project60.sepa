@@ -92,6 +92,16 @@
       "is_active": "1"
     },
     {
+      "_lookup": ["name"],
+      "_translate": ["label"],
+      "label": "pain.008.001.02 CH-TA LSV+",
+      "description": "SIX Interbank CH-TA LSV+",
+      "name": "pain_008_001_02_CH_TA_LSV",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
+    },
+    {
       "_lookup": ["value"],
       "_translate": ["label"],
       "label": "pain.008.003.02 with Address (EBICS-3.0)",

@@ -56,7 +56,7 @@ class CRM_Sepa_Logic_Format {
    *
    * @throws Exception
    */
-  public static function loadFormatClass($fileFormatName) {
+  public static function loadFormatClass($fileFormatName): static {
     $s              = DIRECTORY_SEPARATOR;
     $fileFormatName = self::sanitizeFileFormat($fileFormatName);
 
@@ -74,7 +74,7 @@ class CRM_Sepa_Logic_Format {
    * Lets the format add extra information to each individual
    *  transaction (contribution + extra data)
    */
-  public function extendTransaction(&$txn, $creditor_id) {
+  public function extendTransaction(array &$txn, int $creditor_id) {
     // nothing to do here, but overwritten by some formats
   }
 
@@ -181,7 +181,7 @@ class CRM_Sepa_Logic_Format {
   /**
    * gives the option of setting extra variables to the template
    */
-  public function assignExtraVariables($template) {
+  public function assignExtraVariables(\CRM_Core_Smarty $template) {
     $template->assign('fileFormat', $this->fileFormatName);
     // nothing to do here
   }
