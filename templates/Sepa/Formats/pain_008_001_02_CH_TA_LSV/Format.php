@@ -78,8 +78,8 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
   private static function getIid(string $iban, ?string $bic): string {
     if (str_starts_with($bic ?? '', 'RAIFCH')) {
       // The IBANs of Raiffeisen Bank doesn't always contain a valid IID. For
-      // Raiffeisen the IID 80800 has to be used instead.
-      return '80800';
+      // Raiffeisen the IID 80808 has to be used instead.
+      return '80808';
     }
 
     return self::extractIidFromIban($iban);
