@@ -72,7 +72,7 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
       throw new \InvalidArgumentException(sprintf('Could not extract IID from IBAN "%s"', $iban));
     }
 
-    return $iid;
+    return ltrim($iid, '0');
   }
 
   private static function getIid(string $iban, ?string $bic): string {
