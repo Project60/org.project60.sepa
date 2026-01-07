@@ -72,14 +72,14 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
       throw new \InvalidArgumentException(sprintf('Could not extract IID from IBAN "%s"', $iban));
     }
 
-    return $iid;
+    return ltrim($iid, '0');
   }
 
   private static function getIid(string $iban, ?string $bic): string {
     if (str_starts_with($bic ?? '', 'RAIFCH')) {
       // The IBANs of Raiffeisen Bank doesn't always contain a valid IID. For
-      // Raiffeisen the IID 80800 has to be used instead.
-      return '80800';
+      // Raiffeisen the IID 80808 has to be used instead.
+      return '80808';
     }
 
     return self::extractIidFromIban($iban);
@@ -120,27 +120,17 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
   /**
    * @return string
    *   A string of length 27 containing:
-   *   <ESR prefix><filling zeros><Contact ID>00<Invoice ID or Contribution ID><check digit>
+   *   <ESR prefix><filling zeros><Contribution ID><check digit>
    */
   private function generateEsr(array $txn, int $creditorId): string {
     $creditorIdentifier = $this->getCreditorIdentifier($creditorId);
     [$lsvId, $esrTeilnehmernummer, $esrPrefix] = self::explodeCreditorIdentifier($creditorIdentifier);
 
     $prefixLen = strlen($esrPrefix);
-    $contactIdStr = (string) $txn['contact_id'];
-    // Separate contact ID and invoice ID/contribution ID with "00".
-    $contactIdStr .= '00';
-    $contactIdLen = strlen($contactIdStr);
-    $maxInvoiceIdLen = 26 - $prefixLen - $contactIdLen;
-    if (preg_match("/^[0-9]{1,$maxInvoiceIdLen}\$/", $txn['invoice_id'] ?? '') === 1) {
-      $invoiceId = $txn['invoice_id'];
-    }
-    else {
-      $invoiceId = (string) $txn['contribution_id'];
-    }
+    $contributionId = (string) $txn['contribution_id'];
 
-    $zeroCount = 26 - $prefixLen - $contactIdLen - strlen($invoiceId);
-    $referenceNumber = $esrPrefix . str_repeat('0', $zeroCount) . $contactIdStr . $invoiceId;
+    $zeroCount = 26 - $prefixLen - strlen($contributionId);
+    $referenceNumber = $esrPrefix . str_repeat('0', $zeroCount) . $contributionId;
 
     return $referenceNumber . self::calcEsrCheckDigit($referenceNumber);
   }
