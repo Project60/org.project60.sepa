@@ -7,7 +7,6 @@ nav:
   - Introduction: index.md
   - Administration: administration.md
   - Usage: usage.md
-  - Development: development.md
   - Terminology: terminology.md
 markdown_extensions:
   - attr_list
