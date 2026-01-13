@@ -45,6 +45,6 @@ the database lock is acquired, the file-based lock is released and the change is
 executed.
 
 For implementation details see
-[`SepaBatchLockManager`](../Civi/Sepa/Lock/SepaBatchLockManager.php),
-[`SepaBatchLock`](../Civi/Sepa/Lock/SepaBatchLock.php), and
-[`SepaAsyncBatchLock`](../Civi/Sepa/Lock/SepaAsyncBatchLock.php).
+[`SepaBatchLockManager`](https://github.com/Project60/org.project60.sepa/blob/master/Civi/Sepa/Lock/SepaBatchLockManager.php),
+[`SepaBatchLock`](https://github.com/Project60/org.project60.sepa/blob/master/Civi/Sepa/Lock/SepaBatchLock.php), and
+[`SepaAsyncBatchLock`](https://github.com/Project60/org.project60.sepa/blob/master/Civi/Sepa/Lock/SepaAsyncBatchLock.php).
