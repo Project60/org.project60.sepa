@@ -185,7 +185,7 @@ class CRM_Sepa_Logic_Verification {
 
     // calculate the amount of unchanged characters at the beginning and the end.
     //   while anonymising at least 2/3 of the string
-    $reveal_count = min(4, strlen($iban) / 3);
+    $reveal_count = (int) round(min(4, strlen($iban) / 3));
     $anonymised_count = strlen($iban) - 2 * $reveal_count;
 
     // compile anonymised string
