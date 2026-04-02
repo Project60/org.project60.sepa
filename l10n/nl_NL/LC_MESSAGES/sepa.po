@@ -27,7 +27,7 @@ msgid "One-off horizon"
 msgstr "Eenmalige horizon"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "One-off&nbsp;notice&nbsp;days"
+msgid "One-off notice days"
 msgstr "Eenmalige&nbsp;aankondiging&nbsp;dagen"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
@@ -39,11 +39,11 @@ msgid "Recurring grace"
 msgstr "Terugkerend uitstel"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (follow-up)"
+msgid "Recurring notice days (follow-up)"
 msgstr "Terugkerende&nbsp;aankondiging&nbsp;dagen (vervolg)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (initial)"
+msgid "Recurring notice days (initial)"
 msgstr "Terugkerende&nbsp;aankondiging&nbsp;dagen (initieel)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php

@@ -35,7 +35,7 @@ msgid "One-off horizon"
 msgstr "Horizon unique"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "One-off&nbsp;notice&nbsp;days"
+msgid "One-off notice days"
 msgstr "Jours&nbsp;de&nbsp;préavis&nbsp;ponctuels"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
@@ -47,11 +47,11 @@ msgid "Recurring grace"
 msgstr "Grâce périodique"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (follow-up)"
+msgid "Recurring notice days (follow-up)"
 msgstr "Jours&nbsp;de&nbsp;préavis&nbsp;périodiques (suivi)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (initial)"
+msgid "Recurring notice days (initial)"
 msgstr "Jours&nbsp;de&nbsp;préavis&nbsp;périodiques (initial)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php

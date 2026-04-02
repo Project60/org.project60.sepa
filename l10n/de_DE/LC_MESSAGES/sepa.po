@@ -22,7 +22,7 @@ msgid "One-off horizon"
 msgstr "Einmaleinzug Horizont"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "One-off&nbsp;notice&nbsp;days"
+msgid "One-off notice days"
 msgstr "Tage&nbsp;Einzeleinzug"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
@@ -34,11 +34,11 @@ msgid "Recurring grace"
 msgstr "Dauereinzug Toleranz"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (follow-up)"
+msgid "Recurring notice days (follow-up)"
 msgstr "Tage&nbsp;Dauereinzug&nbsp;(folge)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (initial)"
+msgid "Recurring notice days (initial)"
 msgstr "Tage&nbsp;Dauereinzug&nbsp;(erstmalig)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
