@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -22,8 +22,8 @@ msgid "One-off horizon"
 msgstr "Einmaleinzug Horizont"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "One-off&nbsp;notice&nbsp;days"
-msgstr "Tage&nbsp;Einzeleinzug"
+msgid "One-off notice days"
+msgstr "Tage Einzeleinzug"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Recurring horizon"
@@ -34,12 +34,12 @@ msgid "Recurring grace"
 msgstr "Dauereinzug Toleranz"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (follow-up)"
-msgstr "Tage&nbsp;Dauereinzug&nbsp;(folge)"
+msgid "Recurring notice days (follow-up)"
+msgstr "Tage Dauereinzug (folge)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
-msgid "Recurring&nbsp;notice&nbsp;days (initial)"
-msgstr "Tage&nbsp;Dauereinzug&nbsp;(erstmalig)"
+msgid "Recurring notice days (initial)"
+msgstr "Tage Dauereinzug (erstmalig)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -189,7 +189,7 @@ msgstr "BICs Verwenden"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Is a Test Creditor"
-msgstr "ist Test-Einzugsberechtigter"
+msgstr "Ist Test-Einzugsberechtigter"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
@@ -208,7 +208,7 @@ msgstr "Gruppen nach Zuwendungsarten"
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Only Completed Contributions"
-msgstr "Nur abgeschlossene Zuwendungen?"
+msgstr "Nur abgeschlossene Zuwendungen"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "No XML drafts"
@@ -279,7 +279,7 @@ msgstr "Das Mandat [%s] konnte nicht gelesen werden. Fehler ist: '%s'"
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Cannot close mandate [%s], it's alread batched in a non-open group!"
 msgstr ""
-"Mandate [%s] kann nicht geschlossen werden, es ist Teil einer geschlossenen "
+"Mandat [%s] kann nicht geschlossen werden, es ist Teil einer geschlossenen "
 "Gruppe."
 
 #: CRM/Sepa/BAO/SEPAMandate.php
@@ -371,7 +371,7 @@ msgstr "Der Betrag muss positiv sein."
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Amount increased"
-msgstr "Betrag erhöht\t"
+msgstr "Betrag erhöht"
 
 #: CRM/Sepa/BAO/SEPAMandate.php
 msgid "Amount increased from %1 to %2"
@@ -556,7 +556,7 @@ msgstr ""
 
 #: CRM/Sepa/DAO/SEPACreditor.php
 msgid "Which Country does this address belong to."
-msgstr "Zu welchem Land gehört diese Adresse"
+msgstr "Zu welchem Land diese Adresse gehört."
 
 #: CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php
 msgid "Iban"
@@ -696,7 +696,7 @@ msgstr "Mandatsreferenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php
 msgid "A unique mandate reference"
-msgstr "eine eindeutige Mandatsreferenz"
+msgstr "Eine eindeutige Mandatsreferenz"
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/Form/CreateMandate.php
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
@@ -1178,7 +1178,7 @@ msgstr "Zuwendungstatus"
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
 msgid "Any"
-msgstr "beliebig"
+msgstr "Beliebig"
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
 msgid "One-off"
@@ -1295,7 +1295,7 @@ msgstr "Gesamtzahl fehlgeschlagener/abgebrochener Zuwendungen"
 
 #: CRM/Sepa/Form/Report/SepaMandateRCUR.php
 msgid "Matching Contribution Count"
-msgstr "Anzahl der zugehörigen Zuwendungen "
+msgstr "Anzahl der zugehörigen Zuwendungen"
 
 #: CRM/Sepa/Form/RetryCollection.php
 msgid "Retry Collection of Failed DDs"
@@ -1569,7 +1569,7 @@ msgstr "IBAN ist auf der Blockliste"
 
 #: CRM/Sepa/Logic/Verification.php js/SepaSettings.js
 msgid "IBAN is not correct"
-msgstr "IBAN ist nicht korrekt."
+msgstr "IBAN ist nicht korrekt"
 
 #: CRM/Sepa/Logic/Verification.php
 msgid "Please remove leading IBAN"
@@ -1641,7 +1641,7 @@ msgstr "Keine Kampagne"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Couldn't load campaign list."
-msgstr "Liste der Kampagnen konnte nicht geladen werden"
+msgstr "Liste der Kampagnen konnte nicht geladen werden."
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "enter new account"
@@ -1689,7 +1689,7 @@ msgstr "Diese Mandatsreferenz existiert bereits"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "Incorrect date format"
-msgstr "Falsches Datumsformat."
+msgstr "Falsches Datumsformat"
 
 #: CRM/Sepa/Page/CreateMandate.php
 msgid "End date cannot be earlier than start date."
@@ -1737,7 +1737,7 @@ msgstr "Konnte Creditor [%s] nicht lesen. Fehler ist: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "None"
-msgstr "keine"
+msgstr "Keine"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Mandate [%1] was validated/activated."
@@ -1750,7 +1750,7 @@ msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Error deleting mandate: '%s'"
-msgstr "Fehler beim Löschen des Mandats: '%s' "
+msgstr "Fehler beim Löschen des Mandats: '%s'"
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Cannot find contributions. Error was: '%s'"
@@ -1822,7 +1822,7 @@ msgstr "SEPA-Gruppen als erhalten markieren"
 
 #: CRM/Sepa/Page/MarkGroupReceived.php templates/CRM/Sepa/Page/DeleteGroup.tpl
 msgid "No group_id given!"
-msgstr "Keine Gruppen-ID (group_id) angegeben."
+msgstr "Keine Gruppen-ID (group_id) angegeben"
 
 #: CRM/Sepa/Page/MarkGroupReceived.php
 msgid "Cannot mark TEST groups as received."
@@ -1842,7 +1842,7 @@ msgstr "Die gewählte Nachrichtenvorlage (%d) existiert nicht"
 
 #: CRM/Sepa/Page/SepaMandatePdf.php
 msgid "Error sending %s: Contact doesn't have an email."
-msgstr "Fehler beim Senden %s: Der Kontakt hat keine Email-Adresse"
+msgstr "Fehler beim Senden %s: Der Kontakt hat keine Email-Adresse."
 
 #: CRM/Sepa/Page/SepaMandatePdf.php
 msgid "SEPA default email template."
@@ -2612,7 +2612,7 @@ msgstr ""
 "So soll vermeiden werden, dass man versehentlich vergisst, die SEPA-Gruppe "
 "nach dem Übermitteln an die Bank zu schließen. Dafür kann man aber keine "
 "Änderungen mehr vornehmen, falls die Bank die Lastschriftdatei nicht "
-"akzeptiert. "
+"akzeptiert."
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.hlp
 msgid ""
@@ -2727,7 +2727,7 @@ msgstr "Löschen"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "No creditors found"
-msgstr "Keine Gläubiger gefunden."
+msgstr "Keine Gläubiger gefunden"
 
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
 msgid "Add"
@@ -2889,7 +2889,7 @@ msgstr ""
 #: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl
 #: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionRecurJoin.tpl
 msgid "Required join"
-msgstr "erforderlicher Join"
+msgstr "Erforderlicher Join"
 
 #: templates/CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl
 msgid ""
@@ -3236,7 +3236,7 @@ msgstr "Verpasst"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Submission date has passed!"
-msgstr "Übermittlungsdatum ist verstrichen"
+msgstr "Übermittlungsdatum ist verstrichen!"
 
 #: templates/CRM/Sepa/Page/DashBoard.tpl
 msgid "Urgent"

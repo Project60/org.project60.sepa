@@ -30,22 +30,22 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form
        $this->config_fields = array(
                          array('cycledays',              ts('Cycle Day(s)', array('domain' => 'org.project60.sepa')), array('size' => 6)),
                          array('batching.OOFF.horizon',  ts('One-off horizon', array('domain' => 'org.project60.sepa')), array('size' => 2)),
-                         array('batching.OOFF.notice',   ts('One-off&nbsp;notice&nbsp;days', array('domain' => 'org.project60.sepa')), array('size' => 2)),
+                         array('batching.OOFF.notice',   ts('One-off notice days', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('batching.RCUR.horizon',  ts('Recurring horizon', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('batching.RCUR.grace',    ts('Recurring grace', array('domain' => 'org.project60.sepa')), array('size' => 2)),
-                         array('batching.RCUR.notice',   ts('Recurring&nbsp;notice&nbsp;days (follow-up)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
-                         array('batching.FRST.notice',   ts('Recurring&nbsp;notice&nbsp;days (initial)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
+                         array('batching.RCUR.notice',   ts('Recurring notice days (follow-up)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
+                         array('batching.FRST.notice',   ts('Recurring notice days (initial)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('batching.UPDATE.lock.timeout', ts('Update lock timeout', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('custom_txmsg', ts('Transaction Message', array('domain' => 'org.project60.sepa')), array('size' => 60, 'placeholder' => CRM_Sepa_Logic_Settings::getGenericSetting('custom_txmsg'))));
 
       $this->custom_fields = array(
                          array('custom_cycledays',       ts('Cycle Day(s)', array('domain' => 'org.project60.sepa')), array('size' => 6)),
                          array('custom_OOFF_horizon',    ts('One-off horizon', array('domain' => 'org.project60.sepa')), array('size' => 2)),
-                         array('custom_OOFF_notice',     ts('One-off&nbsp;notice&nbsp;days', array('domain' => 'org.project60.sepa')), array('size' => 2)),
+                         array('custom_OOFF_notice',     ts('One-off notice days', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('custom_RCUR_horizon',    ts('Recurring horizon', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('custom_RCUR_grace',      ts('Recurring grace', array('domain' => 'org.project60.sepa')), array('size' => 2)),
-                         array('custom_RCUR_notice',     ts('Recurring&nbsp;notice&nbsp;days (follow-up)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
-                         array('custom_FRST_notice',     ts('Recurring&nbsp;notice&nbsp;days (initial)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
+                         array('custom_RCUR_notice',     ts('Recurring notice days (follow-up)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
+                         array('custom_FRST_notice',     ts('Recurring notice days (initial)', array('domain' => 'org.project60.sepa')), array('size' => 2)),
                          array('custom_update_lock_timeout', ts('Update lock timeout', array('domain' => 'org.project60.sepa')), array('size' => 2)));
     }
 
