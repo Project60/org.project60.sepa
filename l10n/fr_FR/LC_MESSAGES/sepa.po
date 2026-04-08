@@ -12,7 +12,7 @@
 # Usha Matisson <matisson@makoa.fr>, 2022
 # Philippe SAMPONT <PhilippeS@cncd.be>, 2022
 # Guillaume Sorel <serviceclient@all-in-appli.com>, 2022
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: sepa\n"
@@ -36,7 +36,7 @@ msgstr "Horizon unique"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "One-off notice days"
-msgstr "Jours&nbsp;de&nbsp;préavis&nbsp;ponctuels"
+msgstr "Jours de préavis ponctuels"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Recurring horizon"
@@ -48,11 +48,11 @@ msgstr "Grâce périodique"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Recurring notice days (follow-up)"
-msgstr "Jours&nbsp;de&nbsp;préavis&nbsp;périodiques (suivi)"
+msgstr "Jours de préavis périodiques (suivi)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Recurring notice days (initial)"
-msgstr "Jours&nbsp;de&nbsp;préavis&nbsp;périodiques (initial)"
+msgstr "Jours de préavis périodiques (initial)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl

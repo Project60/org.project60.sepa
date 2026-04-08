@@ -4,7 +4,7 @@
 # make sure you license it to CiviCRM LLC under Academic Free License 3.0.
 # Translators:
 # HanV <han.velthuis@home.nl>, 2021
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: sepa\n"
@@ -28,7 +28,7 @@ msgstr "Eenmalige horizon"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "One-off notice days"
-msgstr "Eenmalige&nbsp;aankondiging&nbsp;dagen"
+msgstr "Eenmalige aankondiging dagen"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Recurring horizon"
@@ -40,11 +40,11 @@ msgstr "Terugkerend uitstel"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Recurring notice days (follow-up)"
-msgstr "Terugkerende&nbsp;aankondiging&nbsp;dagen (vervolg)"
+msgstr "Terugkerende aankondiging dagen (vervolg)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 msgid "Recurring notice days (initial)"
-msgstr "Terugkerende&nbsp;aankondiging&nbsp;dagen (initieel)"
+msgstr "Terugkerende aankondiging dagen (initieel)"
 
 #: CRM/Admin/Form/Setting/SepaSettings.php
 #: templates/CRM/Admin/Form/Setting/SepaSettings.tpl
