@@ -17,12 +17,10 @@
 namespace Civi\Sepa\ActionProvider\Action;
 
 use Civi\ActionProvider\Action\AbstractAction;
-use \Civi\ActionProvider\Parameter\ParameterBagInterface;
-use \Civi\ActionProvider\Parameter\Specification;
-use \Civi\ActionProvider\Parameter\SpecificationBag;
+use Civi\ActionProvider\Parameter\ParameterBagInterface;
+use Civi\ActionProvider\Parameter\Specification;
+use Civi\ActionProvider\Parameter\SpecificationBag;
 
-use Civi\FormProcessor\API\Exception;
-use Civi\Sepa\DataProcessor\Source\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
 class TerminateMandate extends AbstractAction {
@@ -30,7 +28,7 @@ class TerminateMandate extends AbstractAction {
   /**
    * Returns the specification of the configuration options for the actual action.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getConfigurationSpecification() {
     return new SpecificationBag([
@@ -42,13 +40,13 @@ class TerminateMandate extends AbstractAction {
   /**
    * Returns the specification of the parameters of the actual action.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getParameterSpecification() {
     return new SpecificationBag([
         // required fields
-        new Specification('reference', 'String', E::ts('Mandate Reference'), TRUE),
-        new Specification('cancel_reason', 'String', E::ts('Cancel Reason')),
+      new Specification('reference', 'String', E::ts('Mandate Reference'), TRUE),
+      new Specification('cancel_reason', 'String', E::ts('Cancel Reason')),
     ]);
   }
 
@@ -57,7 +55,7 @@ class TerminateMandate extends AbstractAction {
    *
    * This function could be overridden by child classes.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getOutputSpecification() {
     return new SpecificationBag([
@@ -68,9 +66,9 @@ class TerminateMandate extends AbstractAction {
   /**
    * Run the action
    *
-   * @param ParameterBagInterface $parameters
+   * @param \Civi\ActionProvider\Parameter\ParameterBagInterface $parameters
    *   The parameters to this action.
-   * @param ParameterBagInterface $output
+   * @param \Civi\ActionProvider\Parameter\ParameterBagInterface $output
    *   The parameters this action can send back
    * @return void
    * @throws \Exception
@@ -93,13 +91,13 @@ class TerminateMandate extends AbstractAction {
             $cancelReason = $this->configuration->getParameter('config_cancel_reason');
           }
           $terminateDate = new \DateTime();
-          \CRM_Sepa_BAO_SEPAMandate::terminateMandate((int) $mandateId, $terminateDate->format("YmdHis"), $cancelReason);
+          \CRM_Sepa_BAO_SEPAMandate::terminateMandate((int) $mandateId, $terminateDate->format('YmdHis'), $cancelReason);
           // the BAO function terminateMandate does everything aport from set the status to COMPLETE for a RCUR mandate
-          $update = "UPDATE civicrm_sdd_mandate SET status = %1 WHERE id = %2 AND type = %3";
+          $update = 'UPDATE civicrm_sdd_mandate SET status = %1 WHERE id = %2 AND type = %3';
           $updateParams = [
-            1 => ["COMPLETE", "String"],
-            2 => [(int) $mandateId, "Integer"],
-            3 => ["RCUR", "String"],
+            1 => ['COMPLETE', 'String'],
+            2 => [(int) $mandateId, 'Integer'],
+            3 => ['RCUR', 'String'],
           ];
         }
         \CRM_Core_DAO::executeQuery($update, $updateParams);
@@ -108,4 +106,5 @@ class TerminateMandate extends AbstractAction {
       }
     }
   }
+
 }

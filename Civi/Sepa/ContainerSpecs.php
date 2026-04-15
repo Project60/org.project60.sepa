@@ -35,7 +35,7 @@ class ContainerSpecs implements CompilerPassInterface {
         E::ts('Create SEPA Mandate (One-Off)'),
         [
           \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
-        ]
+        ],
       ]);
       $typeFactoryDefinition->addMethodCall('addAction', [
         'SepaMandateRCUR',
@@ -43,7 +43,7 @@ class ContainerSpecs implements CompilerPassInterface {
         E::ts('Create SEPA Mandate (Recurring)'),
         [
           \Civi\ActionProvider\Action\AbstractAction::SINGLE_CONTACT_ACTION_TAG,
-        ]
+        ],
       ]);
       $typeFactoryDefinition->addMethodCall('addAction', [
         'FindMandate',
@@ -51,7 +51,7 @@ class ContainerSpecs implements CompilerPassInterface {
         E::ts('Find SEPA Mandate'),
         [
           \Civi\ActionProvider\Action\AbstractAction::DATA_RETRIEVAL_TAG,
-        ]
+        ],
       ]);
       $typeFactoryDefinition->addMethodCall('addAction', [
         'TerminateMandate',
@@ -59,27 +59,36 @@ class ContainerSpecs implements CompilerPassInterface {
         E::ts('Terminate SEPA Mandate'),
         [
           \Civi\ActionProvider\Action\AbstractAction::DATA_RETRIEVAL_TAG,
-        ]
+        ],
       ]);
     }
     if ($container->hasDefinition('data_processor_factory')) {
       $dataProcessorFactoryDefinition = $container->getDefinition('data_processor_factory');
       $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_mandate', 'Civi\Sepa\DataProcessor\Source\SepaMandate', E::ts('SEPA Mandate')]);
+        'sepa_mandate', 'Civi\Sepa\DataProcessor\Source\SepaMandate', E::ts('SEPA Mandate'),
+      ]);
       $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_creditor', 'Civi\Sepa\DataProcessor\Source\SepaCreditor', E::ts('SEPA Creditor')]);
+        'sepa_creditor', 'Civi\Sepa\DataProcessor\Source\SepaCreditor', E::ts('SEPA Creditor'),
+      ]);
       $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_transaction_group', 'Civi\Sepa\DataProcessor\Source\SepaTransactionGroup', E::ts('SEPA Transaction Group')]);
+        'sepa_transaction_group', 'Civi\Sepa\DataProcessor\Source\SepaTransactionGroup', E::ts('SEPA Transaction Group'),
+      ]);
       $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_sdd_file', 'Civi\Sepa\DataProcessor\Source\SepaSddFile', E::ts('SEPA SDD File')]);
+        'sepa_sdd_file', 'Civi\Sepa\DataProcessor\Source\SepaSddFile', E::ts('SEPA SDD File'),
+      ]);
       $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_contribution_group', 'Civi\Sepa\DataProcessor\Source\SepaContributionGroup', E::ts('SEPA Contribution Group')]);
+        'sepa_contribution_group', 'Civi\Sepa\DataProcessor\Source\SepaContributionGroup', E::ts('SEPA Contribution Group'),
+      ]);
       $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_mandate_link', 'Civi\Sepa\DataProcessor\Source\SepaMandateLink', E::ts('SEPA Mandate Link')]);
-      $dataProcessorFactoryDefinition->addMethodCall('addjoinType' ,[
-        'sepa_mandate_contribution_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionJoin', E::ts('Join Sepa Mandate on Contribution')]);
-      $dataProcessorFactoryDefinition->addMethodCall('addjoinType' ,[
-        'sepa_mandate_contribution_recur_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionRecurJoin', E::ts('Join Sepa Mandate on Contribution Recur')]);
+        'sepa_mandate_link', 'Civi\Sepa\DataProcessor\Source\SepaMandateLink', E::ts('SEPA Mandate Link'),
+      ]);
+      $dataProcessorFactoryDefinition->addMethodCall('addjoinType', [
+        'sepa_mandate_contribution_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionJoin', E::ts('Join Sepa Mandate on Contribution'),
+      ]);
+      $dataProcessorFactoryDefinition->addMethodCall('addjoinType', [
+        'sepa_mandate_contribution_recur_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionRecurJoin', E::ts('Join Sepa Mandate on Contribution Recur'),
+      ]);
     }
   }
+
 }

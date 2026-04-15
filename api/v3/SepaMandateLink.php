@@ -25,62 +25,62 @@ use CRM_Sepa_ExtensionUtil as E;
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
  */
 function _civicrm_api3_sepa_mandate_link_create_spec(&$spec) {
-  $spec['id'] = array(
-      'name'         => 'id',
-      'api.required' => 1,
-      'type'         => CRM_Utils_Type::T_INT,
-      'title'        => 'SepaMandateLink ID',
-      'description'  => 'ID of existing SepaMandateLink entity',
-  );
-  $spec['mandate_id'] = array(
-      'name'         => 'mandate_id',
-      'api.required' => 1,
-      'type'         => CRM_Utils_Type::T_INT,
-      'title'        => 'Mandate ID',
-      'description'  => 'SepaMandate this link relates to',
-  );
-  $spec['entity_id'] = array(
-      'name'         => 'entity_id',
-      'api.required' => 1,
-      'type'         => CRM_Utils_Type::T_INT,
-      'title'        => 'Entity ID',
-      'description'  => 'Linked entity ID',
-  );
-  $spec['entity_table'] = array(
-      'name'         => 'entity_table',
-      'api.required' => 1,
-      'type'         => CRM_Utils_Type::T_STRING,
-      'title'        => 'Entity Table',
-      'description'  => 'Linked entity table name',
-  );
-  $spec['class'] = array(
-      'name'         => 'class',
-      'api.required' => 1,
-      'type'         => CRM_Utils_Type::T_STRING,
-      'title'        => 'Link Class',
-      'description'  => 'Link class string, e.g. "REPLACES" or "MEMBERSHIP". No more than 16 characters',
-  );
-  $spec['is_active'] = array(
-      'name'         => 'is_active',
-      'api.default'  => 1,
-      'type'         => CRM_Utils_Type::T_BOOLEAN,
-      'title'        => 'Is Active?',
-      'description'  => 'Is the link currently active?',
-  );
-  $spec['start_date'] = array(
-      'name'         => 'start_date',
-      'api.required' => 0,
-      'type'         => CRM_Utils_Type::T_DATE,
-      'title'        => '(Start) Date',
-      'description'  => 'When did this link relationship happen or start?',
-  );
-  $spec['end_date'] = array(
-      'name'         => 'end_date',
-      'api.required' => 0,
-      'type'         => CRM_Utils_Type::T_DATE,
-      'title'        => 'End Date',
-      'description'  => 'When did this link relationship end?',
-  );
+  $spec['id'] = [
+    'name'         => 'id',
+    'api.required' => 1,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'SepaMandateLink ID',
+    'description'  => 'ID of existing SepaMandateLink entity',
+  ];
+  $spec['mandate_id'] = [
+    'name'         => 'mandate_id',
+    'api.required' => 1,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Mandate ID',
+    'description'  => 'SepaMandate this link relates to',
+  ];
+  $spec['entity_id'] = [
+    'name'         => 'entity_id',
+    'api.required' => 1,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Entity ID',
+    'description'  => 'Linked entity ID',
+  ];
+  $spec['entity_table'] = [
+    'name'         => 'entity_table',
+    'api.required' => 1,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'Entity Table',
+    'description'  => 'Linked entity table name',
+  ];
+  $spec['class'] = [
+    'name'         => 'class',
+    'api.required' => 1,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'Link Class',
+    'description'  => 'Link class string, e.g. "REPLACES" or "MEMBERSHIP". No more than 16 characters',
+  ];
+  $spec['is_active'] = [
+    'name'         => 'is_active',
+    'api.default'  => 1,
+    'type'         => CRM_Utils_Type::T_BOOLEAN,
+    'title'        => 'Is Active?',
+    'description'  => 'Is the link currently active?',
+  ];
+  $spec['start_date'] = [
+    'name'         => 'start_date',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_DATE,
+    'title'        => '(Start) Date',
+    'description'  => 'When did this link relationship happen or start?',
+  ];
+  $spec['end_date'] = [
+    'name'         => 'end_date',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_DATE,
+    'title'        => 'End Date',
+    'description'  => 'When did this link relationship end?',
+  ];
 }
 
 /**
@@ -90,7 +90,6 @@ function _civicrm_api3_sepa_mandate_link_create_spec(&$spec) {
  * @return array API result descriptor
  * @throws CRM_Core_Exception
  */
-
 function civicrm_api3_sepa_mandate_link_create($params) {
   return _civicrm_api3_basic_create('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
@@ -117,7 +116,6 @@ function civicrm_api3_sepa_mandate_link_get($params) {
   return _civicrm_api3_basic_get('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
 
-
 /**
  * SepaMandateLink.getactive API specification
  *
@@ -126,43 +124,42 @@ function civicrm_api3_sepa_mandate_link_get($params) {
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
  */
 function _civicrm_api3_sepa_mandate_link_getactive_spec(&$spec) {
-  $spec['mandate_id'] = array(
-      'name'         => 'mandate_id',
-      'api.required' => 0,
-      'type'         => CRM_Utils_Type::T_INT,
-      'title'        => 'Mandate ID',
-      'description'  => 'SepaMandate this link relates to',
-  );
-  $spec['entity_id'] = array(
-      'name'         => 'entity_id',
-      'api.required' => 0,
-      'type'         => CRM_Utils_Type::T_INT,
-      'title'        => 'Entity ID',
-      'description'  => 'Entity this link relates to',
-  );
-  $spec['entity_table'] = array(
-      'name'         => 'entity_table',
-      'api.required' => 0,
-      'type'         => CRM_Utils_Type::T_STRING,
-      'title'        => 'Entity Table',
-      'description'  => 'Entity this link relates to',
-  );
-  $spec['class'] = array(
-      'name'         => 'class',
-      'api.required' => 0,
-      'type'         => CRM_Utils_Type::T_STRING,
-      'title'        => 'Link Class(es)',
-      'description'  => 'Link class string, or array, or comma-separated',
-  );
-  $spec['date'] = array(
-      'name'         => 'date',
-      'api.required' => 0,
-      'type'         => CRM_Utils_Type::T_DATE,
-      'title'        => 'Date',
-      'description'  => 'What point in time are we looking at? Default: now',
-  );
+  $spec['mandate_id'] = [
+    'name'         => 'mandate_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Mandate ID',
+    'description'  => 'SepaMandate this link relates to',
+  ];
+  $spec['entity_id'] = [
+    'name'         => 'entity_id',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_INT,
+    'title'        => 'Entity ID',
+    'description'  => 'Entity this link relates to',
+  ];
+  $spec['entity_table'] = [
+    'name'         => 'entity_table',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'Entity Table',
+    'description'  => 'Entity this link relates to',
+  ];
+  $spec['class'] = [
+    'name'         => 'class',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_STRING,
+    'title'        => 'Link Class(es)',
+    'description'  => 'Link class string, or array, or comma-separated',
+  ];
+  $spec['date'] = [
+    'name'         => 'date',
+    'api.required' => 0,
+    'type'         => CRM_Utils_Type::T_DATE,
+    'title'        => 'Date',
+    'description'  => 'What point in time are we looking at? Default: now',
+  ];
 }
-
 
 /**
  * SepaMandateLink.getactive API
@@ -180,7 +177,8 @@ function civicrm_api3_sepa_mandate_link_getactive($params) {
         $params['entity_table'] ?? NULL,
         $params['date'] ?? 'now');
     return civicrm_api3_create_success($result);
-  } catch (Exception $ex) {
+  }
+  catch (Exception $ex) {
     throw new CRM_Core_Exception($ex->getMessage());
   }
 }

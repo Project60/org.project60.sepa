@@ -26,7 +26,7 @@ use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
-  function run() {
+  public function run() {
     CRM_Utils_System::setTitle(E::ts('Close SEPA Group'));
     $group_id = CRM_Utils_Request::retrieve('group_id', 'Integer');
     $status = CRM_Utils_Request::retrieve('status', 'String');

@@ -43,26 +43,28 @@ class CRM_Sepa_Logic_Queue_Update {
       CRM_Core_Session::setStatus(E::ts('Cannot run update, another update is in progress!'), E::ts('Error'), 'error');
       $redirectUrl = CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active');
       CRM_Utils_System::redirect($redirectUrl);
-      return; // shouldn't be necessary
+      // shouldn't be necessary
+      return;
     }
     // create a queue
-    $queue = CRM_Queue_Service::singleton()->create(array(
+    $queue = CRM_Queue_Service::singleton()->create([
       'type'  => 'Sql',
       'name'  => 'sdd_update',
       'reset' => TRUE,
-    ));
+    ]);
 
     // first thing: close outdated groups
     $queue->createItem(new CRM_Sepa_Logic_Queue_Update('PREPARE', $mode, $asyncLockId));
     $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLOSE', $mode, $asyncLockId));
 
     // then iterate through all creditors
-    $creditors = civicrm_api3('SepaCreditor', 'get', array('option.limit' => 0));
+    $creditors = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
     foreach ($creditors['values'] as $creditor) {
-      $sdd_modes = ($mode=='RCUR') ? array('FRST','RCUR') : array('OOFF');
+      $sdd_modes = ($mode == 'RCUR') ? ['FRST', 'RCUR'] : ['OOFF'];
       foreach ($sdd_modes as $sdd_mode) {
-        $count = self::getMandateCount($creditor['id'], $sdd_mode) + self::BATCH_SIZE; // safety margin
-        for ($offset=0; $offset < $count; $offset+=self::BATCH_SIZE) {
+        // safety margin
+        $count = self::getMandateCount($creditor['id'], $sdd_mode) + self::BATCH_SIZE;
+        for ($offset = 0; $offset < $count; $offset += self::BATCH_SIZE) {
           // add an item for each batch
           $queue->createItem(new CRM_Sepa_Logic_Queue_Update('UPDATE', $sdd_mode, $asyncLockId, $creditor['id'], $offset, self::BATCH_SIZE));
         }
@@ -73,16 +75,16 @@ class CRM_Sepa_Logic_Queue_Update {
     $queue->createItem(new CRM_Sepa_Logic_Queue_Update('FINISH', $mode, $asyncLockId));
 
     // create a runner and launch it
-    $runner = new CRM_Queue_Runner(array(
-      'title'     => ts("Updating %1 SEPA Groups", array(1 => $mode, 'domain' => 'org.project60.sepa')),
+    $runner = new CRM_Queue_Runner([
+      'title'     => ts('Updating %1 SEPA Groups', [1 => $mode, 'domain' => 'org.project60.sepa']),
       'queue'     => $queue,
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       // 'onEnd'     => array('CRM_Admin_Page_ExtensionsUpgrade', 'onEnd'),
       'onEndUrl'  => CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active', FALSE, NULL, FALSE),
-    ));
-    $runner->runAllViaWeb(); // does not return
+    ]);
+    // does not return
+    $runner->runAllViaWeb();
   }
-
 
   protected function __construct(string $cmd, string $mode, string $asyncLockId, $creditorId = NULL, ?int $offset = NULL, ?int $limit = NULL) {
     $this->cmd = $cmd;
@@ -95,30 +97,30 @@ class CRM_Sepa_Logic_Queue_Update {
     // set title
     switch ($this->cmd) {
       case 'PREPARE':
-        $this->title = ts("Preparing to clean up ended mandates", array('domain' => 'org.project60.sepa'));
+        $this->title = ts('Preparing to clean up ended mandates', ['domain' => 'org.project60.sepa']);
         break;
 
       case 'CLOSE':
-        $this->title = ts("Cleaning up ended mandates", array('domain' => 'org.project60.sepa'));
+        $this->title = ts('Cleaning up ended mandates', ['domain' => 'org.project60.sepa']);
         break;
 
       case 'UPDATE':
-        $this->title = ts("Process %1 mandates (%2-%3)",
-          array(1 => $this->mode, 2 => $this->offset, 3 => $this->offset+$this->limit, 'domain' => 'org.project60.sepa'));
+        $this->title = ts('Process %1 mandates (%2-%3)',
+          [1 => $this->mode, 2 => $this->offset, 3 => $this->offset + $this->limit, 'domain' => 'org.project60.sepa']);
         break;
 
       case 'CLEANUP':
-        $this->title = ts("Cleaning up %1 groups",
-          array(1 => $this->mode, 'domain' => 'org.project60.sepa'));
+        $this->title = ts('Cleaning up %1 groups',
+          [1 => $this->mode, 'domain' => 'org.project60.sepa']);
         break;
 
       case 'FINISH':
-        $this->title = ts("Lock released", array('domain' => 'org.project60.sepa'));
+        $this->title = ts('Lock released', ['domain' => 'org.project60.sepa']);
         break;
 
       default:
-        $this->title = "Unknown";
-      }
+        $this->title = 'Unknown';
+    }
   }
 
   public function run($context): bool {
@@ -160,8 +162,6 @@ class CRM_Sepa_Logic_Queue_Update {
     return TRUE;
   }
 
-
-
   /**
    * determine the count of mandates to be investigated
    */
@@ -177,7 +177,8 @@ class CRM_Sepa_Logic_Queue_Update {
           AND mandate.type = 'OOFF'
           AND mandate.status = 'OOFF'
           AND mandate.creditor_id = $creditor_id;");
-    } else {
+    }
+    else {
       return CRM_Core_DAO::singleValueQuery("
         SELECT
           COUNT(mandate.id)
@@ -187,4 +188,5 @@ class CRM_Sepa_Logic_Queue_Update {
           AND mandate.creditor_id = $creditor_id;");
     }
   }
+
 }

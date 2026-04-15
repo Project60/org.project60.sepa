@@ -37,30 +37,33 @@ function sepa_civicrm_container(ContainerBuilder $container) {
   $container->autowire(SepaBatchLockManager::class)->setPublic(TRUE);
 }
 
-function sepa_civicrm_pageRun( &$page ) {
-  if (get_class($page) == "CRM_Contact_Page_View_Summary") {
+function sepa_civicrm_pageRun(&$page) {
+  if (get_class($page) == 'CRM_Contact_Page_View_Summary') {
     // mods for summary view
     if (CRM_Core_Permission::check('view sepa mandates')) {
       $page->assign('can_create_mandate', CRM_Core_Permission::check('create sepa mandates') ? '1' : '0');
-      $page->assign('can_edit_mandate',   CRM_Core_Permission::check('edit sepa mandates') ? '1' : '0');
+      $page->assign('can_edit_mandate', CRM_Core_Permission::check('edit sepa mandates') ? '1' : '0');
       CRM_Core_Region::instance('page-body')->add([
-        'template' => 'CRM/Contact/Page/View/Summary.sepa.tpl'
+        'template' => 'CRM/Contact/Page/View/Summary.sepa.tpl',
       ]);
     }
 
   }
-  elseif (get_class($page) == "CRM_Contribute_Page_Tab") {
+  elseif (get_class($page) == 'CRM_Contribute_Page_Tab') {
     // single contribuion view
     if (CRM_Core_Permission::check('view sepa mandates')) {
       $contribution_id = $page->getTemplate()->getTemplateVars('id');
       if (empty($contribution_id) || !CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id)) {
-        return; // not a SEPA contribution
+        // not a SEPA contribution
+        return;
       }
 
       if ($page->getTemplate()->getTemplateVars('contribution_recur_id')) {
         // This is an installment of a recurring contribution.
         $contribution_recur_id = $page->getTemplate()->getTemplateVars('contribution_recur_id');
-        if (empty($contribution_recur_id)) return;
+        if (empty($contribution_recur_id)) {
+          return;
+        }
 
         $mandate = \Civi\Api4\SepaMandate::get(TRUE)
           ->addWhere('entity_table', '=', 'civicrm_contribution_recur')
@@ -100,19 +103,20 @@ function sepa_civicrm_pageRun( &$page ) {
       }
 
       $page->assign('sepa', $mandate);
-      $page->assign('can_edit_mandate',   CRM_Core_Permission::check('edit sepa mandates'));
+      $page->assign('can_edit_mandate', CRM_Core_Permission::check('edit sepa mandates'));
       CRM_Core_Region::instance('page-body')->add([
-        'template' => 'Sepa/Contribute/Form/ContributionView.tpl'
+        'template' => 'Sepa/Contribute/Form/ContributionView.tpl',
       ]);
     }
   }
 
-  elseif ( get_class($page) == "CRM_Contribute_Page_ContributionRecur") {
+  elseif (get_class($page) == 'CRM_Contribute_Page_ContributionRecur') {
     // recurring contribution view
     if (CRM_Core_Permission::check('view sepa mandates')) {
-      $recur = $page->getTemplate()->getTemplateVars("recur");
+      $recur = $page->getTemplate()->getTemplateVars('recur');
       if (empty($recur['id'])) {
-        return; // nothing to do here
+        // nothing to do here
+        return;
       }
 
       // find mandate
@@ -136,16 +140,16 @@ function sepa_civicrm_pageRun( &$page ) {
         }
       }
 
-      $page->assign("sepa", $mandate);
-      $page->assign('can_edit_mandate',   CRM_Core_Permission::check('edit sepa mandates'));
+      $page->assign('sepa', $mandate);
+      $page->assign('can_edit_mandate', CRM_Core_Permission::check('edit sepa mandates'));
       CRM_Core_Region::instance('page-body')->add([
-        'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl'
+        'template' => 'Sepa/Contribute/Page/ContributionRecur.tpl',
       ]);
     }
   }
 }
 
-function sepa_civicrm_buildForm ( $formName, &$form ) {
+function sepa_civicrm_buildForm ($formName, &$form) {
   // restrict payment instrument use if necessary
   CRM_Sepa_Logic_PaymentInstruments::restrictPaymentInstrumentsInForm($formName, $form);
 }
@@ -164,7 +168,7 @@ function sepa_civicrm_install() {
   $config = CRM_Core_Config::singleton();
   //create the tables
   $sqlfile = dirname(__FILE__) . '/sql/sepa.sql';
-  CRM_Utils_File::sourceSQLFile($config->dsn, $sqlfile, NULL, false);
+  CRM_Utils_File::sourceSQLFile($config->dsn, $sqlfile, NULL, FALSE);
 
   return _sepa_civix_civicrm_install();
 }
@@ -176,17 +180,17 @@ function sepa_civicrm_enable() {
   return _sepa_civix_civicrm_enable();
 }
 
-function sepa_civicrm_summaryActions( &$actions, $contactID ) {
+function sepa_civicrm_summaryActions(&$actions, $contactID) {
   // add "create SEPA mandate action"
   if (CRM_Core_Permission::check('create sepa mandates')) {
     $actions['sepa_contribution'] = [
-        'title'           => E::ts("Record SEPA Mandate"),
-        'weight'          => 5,
-        'ref'             => 'new-sepa-contribution',
-        'key'             => 'sepa_contribution',
-        'component'       => 'CiviContribute',
-        'href'            => CRM_Utils_System::url('civicrm/sepa/createmandate', "reset=1&cid={$contactID}"),
-        'permissions'     => ['access CiviContribute', 'edit contributions']
+      'title'           => E::ts('Record SEPA Mandate'),
+      'weight'          => 5,
+      'ref'             => 'new-sepa-contribution',
+      'key'             => 'sepa_contribution',
+      'component'       => 'CiviContribute',
+      'href'            => CRM_Utils_System::url('civicrm/sepa/createmandate', "reset=1&cid={$contactID}"),
+      'permissions'     => ['access CiviContribute', 'edit contributions'],
     ];
   }
 }
@@ -194,21 +198,22 @@ function sepa_civicrm_summaryActions( &$actions, $contactID ) {
 /**
  *  Support SEPA mandates in merge operations
  */
-function sepa_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL ) {
-   switch ($type) {
+function sepa_civicrm_merge ($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
+  switch ($type) {
     case 'relTables':
       // Offer user to merge SEPA Mandates
       $data['rel_table_sepamandate'] = [
-          'title'  => ts('SEPA Mandates', ['domain' => 'org.project60.sepa']),
-          'tables' => ['civicrm_sdd_mandate'],
-          'url'    => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=$cid&selectedChild=contribute'),  // '$cid' will be automatically replaced
+        'title'  => ts('SEPA Mandates', ['domain' => 'org.project60.sepa']),
+        'tables' => ['civicrm_sdd_mandate'],
+      // '$cid' will be automatically replaced
+        'url'    => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=$cid&selectedChild=contribute'),
       ];
-    break;
+      break;
 
     case 'cidRefs':
       // this is the only field that needs to be modified
-        $data['civicrm_sdd_mandate'] = ['contact_id'];
-    break;
+      $data['civicrm_sdd_mandate'] = ['contact_id'];
+      break;
   }
 }
 
@@ -255,7 +260,8 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
     if ($op == 'create' || $op == 'edit') {
       if ($objectName == 'SepaMandate') {
         CRM_Sepa_Logic_NextCollectionDate::processMandatePreEdit($op, $objectName, $id, $params);
-      } else {
+      }
+      else {
         CRM_Sepa_Logic_NextCollectionDate::processRecurPreEdit($op, $objectName, $id, $params);
       }
     }
@@ -265,10 +271,11 @@ function sepa_civicrm_pre($op, $objectName, $id, &$params) {
    * prevent the user to delete a (recurring) contribution when there's a mandate attached.
    * this is only a last resort, most UI actions leading to this should've been disabled
    */
-  if ($op=='delete' && ($objectName=='Contribution' || $objectName=='ContributionRecur')) {
-    if ($objectName=='Contribution') {
+  if ($op == 'delete' && ($objectName == 'Contribution' || $objectName == 'ContributionRecur')) {
+    if ($objectName == 'Contribution') {
       $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution');
-    } else {
+    }
+    else {
       $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution_recur');
     }
 
@@ -289,80 +296,83 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     if ($op == 'create' || $op == 'edit') {
       if ($objectName == 'SepaMandate') {
         CRM_Sepa_Logic_NextCollectionDate::processMandatePostEdit($op, $objectName, $objectId, $objectRef);
-      } else {
+      }
+      else {
         CRM_Sepa_Logic_NextCollectionDate::processRecurPostEdit($op, $objectName, $objectId, $objectRef);
       }
     }
   }
 }
 
-// totten's addition
+/**
+ * totten's addition
+ */
 function sepa_civicrm_entityTypes(&$entityTypes) {
   // add my DAO's
   $entityTypes[] = [
-      'name' => 'SepaMandate',
-      'class' => 'CRM_Sepa_DAO_SEPAMandate',
-      'table' => 'civicrm_sdd_mandate',
+    'name' => 'SepaMandate',
+    'class' => 'CRM_Sepa_DAO_SEPAMandate',
+    'table' => 'civicrm_sdd_mandate',
   ];
   $entityTypes[] = [
-      'name' => 'SepaCreditor',
-      'class' => 'CRM_Sepa_DAO_SEPACreditor',
-      'table' => 'civicrm_sdd_creditor',
+    'name' => 'SepaCreditor',
+    'class' => 'CRM_Sepa_DAO_SEPACreditor',
+    'table' => 'civicrm_sdd_creditor',
   ];
   $entityTypes[] = [
-      'name' => 'SepaTransactionGroup',
-      'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
-      'table' => 'civicrm_sdd_txgroup',
+    'name' => 'SepaTransactionGroup',
+    'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
+    'table' => 'civicrm_sdd_txgroup',
   ];
   $entityTypes[] = [
-      'name' => 'SepaSddFile',
-      'class' => 'CRM_Sepa_DAO_SEPASddFile',
-      'table' => 'civicrm_sdd_file',
+    'name' => 'SepaSddFile',
+    'class' => 'CRM_Sepa_DAO_SEPASddFile',
+    'table' => 'civicrm_sdd_file',
   ];
   $entityTypes[] = [
-      'name' => 'SepaContributionGroup',
-      'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
-      'table' => 'civicrm_sdd_contribution_txgroup',
+    'name' => 'SepaContributionGroup',
+    'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
+    'table' => 'civicrm_sdd_contribution_txgroup',
   ];
   $entityTypes[] = [
-      'name' => 'SepaMandateLink',
-      'class' => 'CRM_Sepa_DAO_SepaMandateLink',
-      'table' => 'civicrm_sdd_entity_mandate',
+    'name' => 'SepaMandateLink',
+    'class' => 'CRM_Sepa_DAO_SepaMandateLink',
+    'table' => 'civicrm_sdd_entity_mandate',
   ];
 }
 
 /**
-* Implementation of hook_civicrm_config
-*/
+ * Implementation of hook_civicrm_config
+ */
 
 /**
-* Implementation of hook_civicrm_navigationMenu
-*/
+ * Implementation of hook_civicrm_navigationMenu
+ */
 function sepa_civicrm_navigationMenu(&$menu) {
   //add menu entry for SEPA Dashboard to Contributions menu
   $sepa_dashboard_url = 'civicrm/sepa';
 
-  _sepa_civix_insert_navigation_menu($menu,'Contributions', [
+  _sepa_civix_insert_navigation_menu($menu, 'Contributions', [
     'label' => ts('CiviSEPA Dashboard', ['domain' => 'org.project60.sepa']),
     'name' => 'CiviSEPA Dashboard',
     'url' => $sepa_dashboard_url,
     'permission' => 'view sepa groups',
     'operator' => NULL,
     'separator' => 2,
-    'active' => 1
+    'active' => 1,
   ]);
 
   //add menu entry for SEPA settings to Administer>CiviContribute menu
   $sepa_settings_url = 'civicrm/admin/setting/sepa';
 
   _sepa_civix_insert_navigation_menu($menu, 'Administer/CiviContribute', [
-        'label' => ts('CiviSEPA Settings', ['domain' => 'org.project60.sepa']),
-        'name' => 'CiviSEPA Settings',
-        'url' => $sepa_settings_url,
-        'permission' => 'administer CiviCRM',
-        'operator' => NULL,
-        'separator' => 2,
-        'active' => 1
+    'label' => ts('CiviSEPA Settings', ['domain' => 'org.project60.sepa']),
+    'name' => 'CiviSEPA Settings',
+    'url' => $sepa_settings_url,
+    'permission' => 'administer CiviCRM',
+    'operator' => NULL,
+    'separator' => 2,
+    'active' => 1,
   ]);
 
   _sepa_civix_navigationMenu($menu);
@@ -371,42 +381,41 @@ function sepa_civicrm_navigationMenu(&$menu) {
 /**
  * Define SEPA permissions
  */
- function sepa_civicrm_permission(&$permissions) {
+function sepa_civicrm_permission(&$permissions) {
   $prefix = E::ts('CiviSEPA') . ': ';
 
   // Mandate permissions.
-   $permissions['create sepa mandates'] = [
-     'label' => $prefix . E::ts('Create SEPA mandates'),
-     'description' => E::ts('Allows creating SEPA Direct Debit mandates.'),
-   ];
-   $permissions['view sepa mandates'] = [
-     'label' => $prefix . E::ts('View SEPA mandates'),
-     'description' => E::ts('Allows viewing SEPA Direct Debit mandates'),
-   ];
-   $permissions['edit sepa mandates'] = [
-     'label' => $prefix . E::ts('Edit SEPA mandates'),
-     'description' => E::ts('Allows editing SEPA Direct Debit mandates.'),
-   ];
-   $permissions['delete sepa mandates'] = [
-     'label' => $prefix . E::ts('Delete SEPA mandates'),
-     'description' => E::ts('Allows deleting SEPA Direct Debit mandates'),
-   ];
+  $permissions['create sepa mandates'] = [
+    'label' => $prefix . E::ts('Create SEPA mandates'),
+    'description' => E::ts('Allows creating SEPA Direct Debit mandates.'),
+  ];
+  $permissions['view sepa mandates'] = [
+    'label' => $prefix . E::ts('View SEPA mandates'),
+    'description' => E::ts('Allows viewing SEPA Direct Debit mandates'),
+  ];
+  $permissions['edit sepa mandates'] = [
+    'label' => $prefix . E::ts('Edit SEPA mandates'),
+    'description' => E::ts('Allows editing SEPA Direct Debit mandates.'),
+  ];
+  $permissions['delete sepa mandates'] = [
+    'label' => $prefix . E::ts('Delete SEPA mandates'),
+    'description' => E::ts('Allows deleting SEPA Direct Debit mandates'),
+  ];
 
-   // Transaction group permissions.
-   $permissions['view sepa groups'] = [
-     'label' => $prefix . E::ts('View SEPA transaction groups'),
-     'description' => E::ts('Allows viewing groups of SEPA transactions to be sent to the bank.'),
-   ];
-   $permissions['batch sepa groups'] = [
-     'label' => $prefix . E::ts('Batch SEPA transaction groups'),
-     'description' => E::ts('Allows generating groups of SEPA transactions to be sent to the bank.'),
-   ];
-   $permissions['delete sepa groups'] = [
-     'label' => $prefix . E::ts('Delete SEPA transaction groups'),
-     'description' => E::ts('Allows deleting groups of SEPA transactions to be sent to the bank.'),
-   ];
- }
-
+  // Transaction group permissions.
+  $permissions['view sepa groups'] = [
+    'label' => $prefix . E::ts('View SEPA transaction groups'),
+    'description' => E::ts('Allows viewing groups of SEPA transactions to be sent to the bank.'),
+  ];
+  $permissions['batch sepa groups'] = [
+    'label' => $prefix . E::ts('Batch SEPA transaction groups'),
+    'description' => E::ts('Allows generating groups of SEPA transactions to be sent to the bank.'),
+  ];
+  $permissions['delete sepa groups'] = [
+    'label' => $prefix . E::ts('Delete SEPA transaction groups'),
+    'description' => E::ts('Allows deleting groups of SEPA transactions to be sent to the bank.'),
+  ];
+}
 
 /**
  * Set permission to the API calls
@@ -424,23 +433,28 @@ function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissi
  *
  * make sure, people don't create (broken) payment with SDD payment instrument, but w/o mandates
  */
-function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$errors ) {
+function sepa_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   if ($formName == 'CRM_Contribute_Form_Contribution') {
     // we'll just focus on the payment_instrument_id
-    if (empty($fields['payment_instrument_id'])) return;
+    if (empty($fields['payment_instrument_id'])) {
+      return;
+    }
 
     // find the contribution id
     $contribution_id = $form->getVar('_id');
-    if (empty($contribution_id)) return;
+    if (empty($contribution_id)) {
+      return;
+    }
 
     // if this contribution has no mandate, it should not have the classic sepa PIs
     $mandate_id = CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id);
     if (!$mandate_id) {
       $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
       if (isset($payment_instruments[$fields['payment_instrument_id']])) {
-        $errors['payment_instrument_id'] = E::ts("This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.");
+        $errors['payment_instrument_id'] = E::ts('This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.');
       }
-    } else {
+    }
+    else {
       // TODO: restrict to the PIs the creditor allows?
     }
   }
@@ -451,8 +465,9 @@ function sepa_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$erro
  * (Deprecated hook)
  */
 function sepa_civicrm_tokens(&$tokens) {
-  $prefix = ts("Most Recent SEPA Mandate", ['domain' => 'org.project60.sepa']);
-  $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+  $prefix = ts('Most Recent SEPA Mandate', ['domain' => 'org.project60.sepa']);
+  // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+  $prefix = str_replace(' ', '_', $prefix);
 
   $tokenList = CRM_Utils_SepaTokensDeprecated::getTokenList();
   foreach ($tokenList as $token => $tokenDescription) {
@@ -465,8 +480,10 @@ function sepa_get_cids_as_array($cids) {
     return $cids;
   }
 
-  $contained_ids = explode(',', $cids);  // also works on scalars (int)
-  $cids = []; // make $cids into an array
+  // also works on scalars (int)
+  $contained_ids = explode(',', $cids);
+  // make $cids into an array
+  $cids = [];
   foreach ($contained_ids as $cid_string) {
     $cid = (int) $cid_string;
     if ($cid) {
@@ -481,14 +498,17 @@ function sepa_get_cids_as_array($cids) {
  * Fill "Last Mandate" tokens
  * (Deprecated hook)
  */
-function sepa_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = [], $context = null) {
+function sepa_civicrm_tokenValues(&$values, $cids, $job = NULL, $tokens = [], $context = NULL) {
   $cids = sepa_get_cids_as_array($cids);
 
-  $prefix = ts("Most Recent SEPA Mandate", ['domain' => 'org.project60.sepa']);
-  $prefix = str_replace(' ', '_', $prefix); // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+  $prefix = ts('Most Recent SEPA Mandate', ['domain' => 'org.project60.sepa']);
+  // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
+  $prefix = str_replace(' ', '_', $prefix);
 
   // No work needed if none of the tokens is used
-  if (!in_array($prefix, array_keys($tokens))) return;
+  if (!in_array($prefix, array_keys($tokens))) {
+    return;
+  }
 
   foreach ($cids as $cid) {
     CRM_Utils_SepaTokensDeprecated::fillLastMandateTokenValues($cid, $prefix, $values);
@@ -538,8 +558,8 @@ function sepa_civicrm_tabset($tabsetName, &$tabs, $context) {
 function sepa_civicrm_xmlMenu(&$files) {
   foreach (glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
     $files[] = $file;
-  }}
-
+  }
+}
 
 // /**
 //  * Implements hook_civicrm_entityTypes().

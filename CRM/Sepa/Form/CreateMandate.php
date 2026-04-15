@@ -24,15 +24,15 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
-  protected $create_mode = 'create'; // or 'clone' or 'replace'
-  protected $contact_id  = null;
-  protected $replace_id  = null;
-  protected $clone_id    = null;
-  protected $rpl_date    = null;
-  protected $rpl_reason  = null;
-  protected $old_mandate = null;
-  protected $old_contrib = null;
-
+  // or 'clone' or 'replace'
+  protected $create_mode = 'create';
+  protected $contact_id  = NULL;
+  protected $replace_id  = NULL;
+  protected $clone_id    = NULL;
+  protected $rpl_date    = NULL;
+  protected $rpl_reason  = NULL;
+  protected $old_mandate = NULL;
+  protected $old_contrib = NULL;
 
   public function buildQuickForm() {
     // get parameters
@@ -48,7 +48,8 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       if ($this->replace_id) {
         $this->create_mode = 'replace';
         $mandate_id = $this->replace_id;
-      } else {
+      }
+      else {
         $this->create_mode = 'clone';
         $mandate_id = $this->clone_id;
       }
@@ -72,33 +73,40 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       }
       $this->contact_id = (int) $this->old_mandate['contact_id'];
 
-      $this->old_contrib = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $this->old_mandate['entity_id']));
+      $this->old_contrib = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $this->old_mandate['entity_id']]);
     }
 
     if (empty($this->contact_id)) {
-      CRM_Core_Error::statusBounce(E::ts("No contact ID (cid) given."));
+      CRM_Core_Error::statusBounce(E::ts('No contact ID (cid) given.'));
     }
 
     // load the contact and set the title
-    $contact_name = civicrm_api3('Contact', 'getvalue', array(
-        'id'     => $this->contact_id,
-        'return' => 'display_name'));
+    $contact_name = civicrm_api3('Contact', 'getvalue', [
+      'id'     => $this->contact_id,
+      'return' => 'display_name',
+    ]);
     switch ($this->create_mode) {
       case 'clone':
-        CRM_Utils_System::setTitle(E::ts("Clone SEPA Mandate for Contact [%1]: %2", array(
-            1 => $this->contact_id, 2 => $contact_name)));
+        CRM_Utils_System::setTitle(E::ts('Clone SEPA Mandate for Contact [%1]: %2', [
+          1 => $this->contact_id,
+          2 => $contact_name,
+        ]));
         break;
 
       case 'replace':
-        CRM_Utils_System::setTitle(E::ts("Replace SEPA Mandate for Contact [%1]: %2", array(
-            1 => $this->contact_id, 2 => $contact_name)));
+        CRM_Utils_System::setTitle(E::ts('Replace SEPA Mandate for Contact [%1]: %2', [
+          1 => $this->contact_id,
+          2 => $contact_name,
+        ]));
         $this->assign('replace_mandate_reference', $this->old_mandate['reference']);
         break;
 
       default:
       case 'create':
-        CRM_Utils_System::setTitle(E::ts("Create new SEPA Mandate for Contact [%1]: %2", array(
-            1 => $this->contact_id, 2 => $contact_name)));
+        CRM_Utils_System::setTitle(E::ts('Create new SEPA Mandate for Contact [%1]: %2', [
+          1 => $this->contact_id,
+          2 => $contact_name,
+        ]));
         break;
 
     }
@@ -117,7 +125,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       E::ts('Creditor'),
       $this->getCreditorList($js_vars['creditor_data']),
       TRUE,
-       array('class' => 'crm-select2')
+       ['class' => 'crm-select2']
     );
 
     // add payment instrument
@@ -127,7 +135,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       E::ts('Payment Method'),
       ContributionUtil::getPaymentInstrumentList(),
       TRUE,
-      array('class' => 'crm-select2')
+      ['class' => 'crm-select2']
     );
 
     // add financial type
@@ -137,7 +145,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts('Financial Type'),
         ContributionUtil::getFinancialTypeList(),
         TRUE,
-        array('class' => 'crm-select2')
+        ['class' => 'crm-select2']
     );
 
     // add campaign
@@ -147,7 +155,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts('Campaign'),
         $this->getCampaignList(),
         FALSE,
-        array('class' => 'crm-select2')
+        ['class' => 'crm-select2']
     );
 
     // add mandate reference
@@ -155,7 +163,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'reference',
         E::ts('Reference'),
-        array('placeholder' => E::ts("not required, will be generated"), 'size' => '34')
+        ['placeholder' => E::ts('not required, will be generated'), 'size' => '34']
     );
 
     // add source field
@@ -163,7 +171,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'source',
         E::ts('Source'),
-        array('placeholder' => E::ts("not required"), 'size' => '64')
+        ['placeholder' => E::ts('not required'), 'size' => '64']
     );
 
     // add bank account selector
@@ -173,7 +181,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts('Account'),
         $this->getKnownBankAccounts(),
         FALSE,
-        array('class' => 'crm-select2 huge')
+        ['class' => 'crm-select2 huge']
     );
 
     // add account_holder field
@@ -181,7 +189,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'account_holder',
         E::ts('Account Holder'),
-        array('placeholder' => E::ts("not required if same as contact"), 'size' => '32')
+        ['placeholder' => E::ts('not required if same as contact'), 'size' => '32']
     );
 
     // add iban field
@@ -189,7 +197,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'iban',
         E::ts('IBAN'),
-        array('placeholder' => E::ts("required"), 'size' => '32'),
+        ['placeholder' => E::ts('required'), 'size' => '32'],
         TRUE
     );
 
@@ -198,7 +206,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'bic',
         E::ts('BIC'),
-        array('placeholder' => E::ts("required"), 'size' => '14'),
+        ['placeholder' => E::ts('required'), 'size' => '14'],
         FALSE
     );
 
@@ -207,7 +215,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'amount',
         ts('Amount'),
         TRUE,
-        array('class' => 'tiny')
+        ['class' => 'tiny']
     );
 
     // add currency field
@@ -217,7 +225,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts('Currency'),
         $this->getCurrencyList(),
         TRUE,
-        array('class' => 'tiny')
+        ['class' => 'tiny']
     );
 
     // add 'replaces' fields
@@ -227,7 +235,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     // add the replace date
     $this->add('datepicker',
         'rpl_end_date',
-        E::ts("Replacement Date"),
+        E::ts('Replacement Date'),
         ['formatType' => 'activityDate'],
         $this->replace_id,
         ['time' => FALSE]
@@ -238,14 +246,14 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'rpl_cancel_reason',
         E::ts('Replacement Reason'),
-        array('placeholder' => E::ts("required"), 'class'=> 'huge'),
+        ['placeholder' => E::ts('required'), 'class' => 'huge'],
         $this->replace_id);
 
     // add OOFF fields
     // add collection date
     $this->add('datepicker',
         'ooff_date',
-        E::ts("Collection Date"),
+        E::ts('Collection Date'),
         ['formatType' => 'activityDate'],
         FALSE,
         ['time' => FALSE]
@@ -255,7 +263,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     // add start date
     $this->add('datepicker',
         'rcur_start_date',
-        E::ts("Start Date"),
+        E::ts('Start Date'),
         ['formatType' => 'activityDate'],
         FALSE,
         ['time' => FALSE]
@@ -266,9 +274,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'select',
         'cycle_day',
         E::ts('Day of Month'),
-        range(1,31),
+        range(1, 31),
         FALSE,
-        array()
+        []
     );
 
     // add interval
@@ -278,13 +286,13 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         E::ts('Frequency'),
         $this->getFrequencyList(),
         FALSE,
-        array()
+        []
     );
 
     // add end_date
     $this->add('datepicker',
         'rcur_end_date',
-        E::ts("End Date"),
+        E::ts('End Date'),
         ['formatType' => 'activityDate'],
         FALSE,
         ['time' => FALSE]
@@ -304,22 +312,21 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/CreateMandate.js');
     if (function_exists('bic_civicrm_install')) {
       $config = CRM_Core_Config::singleton();
-      $js_vars['busy_icon_url'] = $config->resourceBase . "i/loading.gif";
+      $js_vars['busy_icon_url'] = $config->resourceBase . 'i/loading.gif';
       CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/LittleBicLookup.js');
     }
     CRM_Core_Resources::singleton()->addVars('p60sdd', $js_vars);
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'submit',
         'name' => E::ts('Create'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     parent::buildQuickForm();
   }
-
 
   /**
    * Set the defaults
@@ -344,12 +351,15 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       // calculate and set interval
       if ($this->old_contrib['frequency_unit'] == 'month') {
         $defaults['interval'] = 12 / $this->old_contrib['frequency_interval'];
-      } elseif ($this->old_contrib['frequency_unit'] == 'year') {
+      }
+      elseif ($this->old_contrib['frequency_unit'] == 'year') {
         $defaults['interval'] = $this->old_contrib['frequency_interval'];
-      } else {
+      }
+      else {
         $defaults['interval'] = 1;
-        CRM_Core_Session::setStatus(E::ts("Incompatible frequency unit '%1' in mandate.", array(
-            1 => $this->old_contrib['frequency_unit'])), E::ts("Warning"), 'warning');
+        CRM_Core_Session::setStatus(E::ts("Incompatible frequency unit '%1' in mandate.", [
+          1 => $this->old_contrib['frequency_unit'],
+        ]), E::ts('Warning'), 'warning');
       }
 
       if ($this->create_mode == 'replace') {
@@ -358,7 +368,8 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           $formatted_date = CRM_Utils_Date::setDateDefaults($this->rpl_date, 'activityDateTime');
           $defaults['rcur_start_date'] = $formatted_date[0];
           $defaults['rpl_end_date'] = $formatted_date[0];
-        } else {
+        }
+        else {
           $formatted_date = CRM_Utils_Date::setDateDefaults(date('YmdHis'), 'activityDateTime');
           $defaults['rpl_end_date'] = $formatted_date[0];
         }
@@ -368,7 +379,8 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           $defaults['rpl_cancel_reason'] = trim($this->rpl_reason);
         }
       }
-    } else {
+    }
+    else {
       // set default creditor
       $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
       if ($default_creditor_id) {
@@ -386,7 +398,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     parent::validate();
 
     // load creditor, check mode
-    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $this->_submitValues['creditor_id']));
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $this->_submitValues['creditor_id']]);
     $creditor_mode = empty($creditor['creditor_type']) ? 'SEPA' : $creditor['creditor_type'];
 
     // validate IBAN
@@ -406,9 +418,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     if ($creditor_mode == 'SEPA') {
       if (empty($this->_submitValues['bic'])) {
         if ($creditor['uses_bic']) {
-          $bic_error = E::ts("BIC is required");
+          $bic_error = E::ts('BIC is required');
         }
-      } else {
+      }
+      else {
         $bic_error = CRM_Sepa_Logic_Verification::verifyBIC(
             CRM_Sepa_Logic_Verification::formatBIC(
                 $this->_submitValues['bic'],
@@ -423,24 +436,26 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     // validate amount
     if ($this->_submitValues['amount'] <= 0.0) {
-      $this->_errors['amount'] = E::ts("Amount has to be positive.");
+      $this->_errors['amount'] = E::ts('Amount has to be positive.');
     }
 
     // validate the reference
     if (strlen($this->_submitValues['reference']) > 0) {
       if ($creditor_mode == 'SEPA') {
         $reference_error = CRM_Sepa_Logic_Verification::verifyReference($this->_submitValues['reference']);
-      } else {
+      }
+      else {
         $reference_error = CRM_Sepa_Logic_Verification::verifyReference($this->_submitValues['reference'], $creditor_mode);
       }
       if ($reference_error) {
         $this->_errors['reference'] = $reference_error;
-      } else {
+      }
+      else {
         // check if the reference is available
-        $in_use = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_sdd_mandate WHERE reference = %1",
-            array(1 => array($this->_submitValues['reference'], 'String')));
+        $in_use = CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_sdd_mandate WHERE reference = %1',
+            [1 => [$this->_submitValues['reference'], 'String']]);
         if ($in_use) {
-          $this->_errors['reference'] = E::ts("Already in use");
+          $this->_errors['reference'] = E::ts('Already in use');
         }
 
       }
@@ -448,7 +463,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     return (0 == count($this->_errors));
   }
-
 
   /**
    * Create the mandate
@@ -458,28 +472,28 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     // create a new mandate
     $type = $values['interval'] ? 'RCUR' : 'OOFF';
-    $mandate_data = array(
-        'type'                      => $type,
-        'creation_date'             => date('YmdHis'),
-        'creditor_id'               => $values['creditor_id'],
-        'contact_id'                => $values['cid'],
-        'campaign_id'               => $values['campaign_id'],
-        'financial_type_id'         => $values['financial_type_id'],
-        'payment_instrument_id'     => $values['payment_instrument_id'],
-        'currency'                  => $values['currency'],
-        'account_holder'            => $values['account_holder'],
-        'iban'                      => $values['iban'],
-        'bic'                       => empty($values['bic']) ? 'NOTPROVIDED' : $values['bic'],
-        'cycle_day'                 => $values['cycle_day'],
-        'amount'                    => $values['amount'],
-        'frequency_interval'        => $type == 'RCUR' ? 12 / $values['interval'] : 0,
-        'frequency_unit'            => 'month',
-        'reference'                 => $values['reference'],
-        'source'                    => $values['source'],
-        'receive_date'              => $type == 'OOFF' ? CRM_Utils_Date::processDate($values['ooff_date']) : '',
-        'start_date'                => $type == 'RCUR' ? CRM_Utils_Date::processDate($values['rcur_start_date']) : '',
-        'end_date'                  => empty($values['rcur_end_date']) ? '' : CRM_Utils_Date::processDate($values['rcur_end_date']),
-    );
+    $mandate_data = [
+      'type'                      => $type,
+      'creation_date'             => date('YmdHis'),
+      'creditor_id'               => $values['creditor_id'],
+      'contact_id'                => $values['cid'],
+      'campaign_id'               => $values['campaign_id'],
+      'financial_type_id'         => $values['financial_type_id'],
+      'payment_instrument_id'     => $values['payment_instrument_id'],
+      'currency'                  => $values['currency'],
+      'account_holder'            => $values['account_holder'],
+      'iban'                      => $values['iban'],
+      'bic'                       => empty($values['bic']) ? 'NOTPROVIDED' : $values['bic'],
+      'cycle_day'                 => $values['cycle_day'],
+      'amount'                    => $values['amount'],
+      'frequency_interval'        => $type == 'RCUR' ? 12 / $values['interval'] : 0,
+      'frequency_unit'            => 'month',
+      'reference'                 => $values['reference'],
+      'source'                    => $values['source'],
+      'receive_date'              => $type == 'OOFF' ? CRM_Utils_Date::processDate($values['ooff_date']) : '',
+      'start_date'                => $type == 'RCUR' ? CRM_Utils_Date::processDate($values['rcur_start_date']) : '',
+      'end_date'                  => empty($values['rcur_end_date']) ? '' : CRM_Utils_Date::processDate($values['rcur_end_date']),
+    ];
 
     try {
       $mandate = civicrm_api3('SepaMandate', 'createfull', $mandate_data);
@@ -490,11 +504,12 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         ->single();
 
       // if we get here, everything went o.k.
-      CRM_Core_Session::setStatus(E::ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", array(
-          1 => $mandate['reference'],
-          2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}"),
-          3 => $mandate['type'])),
-          E::ts("Success"),
+      CRM_Core_Session::setStatus(E::ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", [
+        1 => $mandate['reference'],
+        2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}"),
+        3 => $mandate['type'],
+      ]),
+          E::ts('Success'),
           'info');
 
       // terminate old mandate, of requested
@@ -515,19 +530,21 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
             CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'));
 
         /*CRM_Core_Session::setStatus(E::ts("Mandate <a href=\"%2\">%1</a> was scheduled to end on %3", array(
-            1 => $rpl_mandate['reference'],
-            2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$rpl_mandate['id']}"),
-            3 => CRM_Utils_Date::formatDate($values['rpl_end_date'], 'activityDate'))),
-            E::ts("Success"),
-            'info'); */
+        1 => $rpl_mandate['reference'],
+        2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$rpl_mandate['id']}"),
+        3 => CRM_Utils_Date::formatDate($values['rpl_end_date'], 'activityDate'))),
+        E::ts("Success"),
+        'info'); */
       }
 
-    } catch (Exception $ex) {
+    }
+    catch (Exception $ex) {
       // there was a problem: create error message
-      CRM_Core_Session::setStatus(E::ts("Failed to create %1 mandate. Error was: %2", array(
-          1 => $type,
-          2 => $ex->getMessage())),
-          E::ts("Error"),
+      CRM_Core_Session::setStatus(E::ts('Failed to create %1 mandate. Error was: %2', [
+        1 => $type,
+        2 => $ex->getMessage(),
+      ]),
+          E::ts('Error'),
           'error');
     }
 
@@ -549,8 +566,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     parent::postProcess();
   }
 
-
-
   // ############################# HELPER FUNCTIONS #############################
 
   /**
@@ -567,15 +582,16 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       // add default flag
       if ($creditor['id'] == $default_creditor_id) {
         $creditor['is_default'] = 1;
-      } else {
+      }
+      else {
         $creditor['is_default'] = 0;
       }
 
       // add cycle days
-      $creditor['cycle_days'] = CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor['id']);
-      $creditor['buffer_days'] = (int) CRM_Sepa_Logic_Settings::getSetting("pp_buffer_days");
-      $creditor['ooff_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting("batching.OOFF.notice", $creditor['id']);
-      $creditor['frst_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $creditor['id']);
+      $creditor['cycle_days'] = CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor['id']);
+      $creditor['buffer_days'] = (int) CRM_Sepa_Logic_Settings::getSetting('pp_buffer_days');
+      $creditor['ooff_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.notice', $creditor['id']);
+      $creditor['frst_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $creditor['id']);
 
       // add FRST/OOFF payment instruments
       $creditor['pi_ooff_options'] = $creditor['pi_rcur_options'] = [];
@@ -598,7 +614,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    * @return array of eligible creditors
    */
   protected function getCreditorList($creditors) {
-    $creditor_list = array();
+    $creditor_list = [];
     foreach ($creditors as $creditor) {
       $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
     }
@@ -609,13 +625,13 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    * Get the list of (active) financial types
    */
   protected function getCampaignList() {
-    $list = array('' => E::ts("- none -"));
-    $query = civicrm_api3('Campaign', 'get',array(
-        'is_active'    => 1,
-        'option.limit' => 0,
-        'option.sort'  => 'title asc',
-        'return'       => 'id,title'
-    ));
+    $list = ['' => E::ts('- none -')];
+    $query = civicrm_api3('Campaign', 'get', [
+      'is_active'    => 1,
+      'option.limit' => 0,
+      'option.sort'  => 'title asc',
+      'return'       => 'id,title',
+    ]);
 
     foreach ($query['values'] as $value) {
       $list[$value['id']] = $value['title'];
@@ -630,7 +646,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    *  - known CiviBanking accounts
    */
   protected function getKnownBankAccounts() {
-    $known_accounts = array('' => E::ts("new account"));
+    $known_accounts = ['' => E::ts('new account')];
 
     // get data from SepaMandates
     // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
@@ -649,31 +665,32 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     // get data from CiviBanking (if installed)
     if (class_exists('CRM_Banking_BAO_BankAccountReference')) {
-      $iban_reference_type_id = civicrm_api3('OptionValue', 'getvalue', array(
-          'return'          => 'id',
-          'option_group_id' => 'civicrm_banking.reference_types',
-          'value'           => 'IBAN',
-      ));
+      $iban_reference_type_id = civicrm_api3('OptionValue', 'getvalue', [
+        'return'          => 'id',
+        'option_group_id' => 'civicrm_banking.reference_types',
+        'value'           => 'IBAN',
+      ]);
 
       if ($iban_reference_type_id) {
-        $accounts = civicrm_api3('BankingAccount', 'get', array(
-            'contact_id'   => $this->contact_id,
-            'option.limit' => 0,
-            'return'       => 'id,data_parsed',
-            'sequential'   => 0,
-        ));
+        $accounts = civicrm_api3('BankingAccount', 'get', [
+          'contact_id'   => $this->contact_id,
+          'option.limit' => 0,
+          'return'       => 'id,data_parsed',
+          'sequential'   => 0,
+        ]);
 
         if (empty($accounts['values'])) {
-          $account_references = array('values' => array());
-        } else {
-          $account_references = civicrm_api3('BankingAccountReference', 'get', array(
-              'ba_id'             => array('IN' => array_keys($accounts['values'])),
-              'reference_type_id' => $iban_reference_type_id,
-              'option.limit'      => 0,
-              'return'            => 'reference,ba_id',
-              'sequential'        => 1,
-              'option.sort'       => 'id desc'
-          ));
+          $account_references = ['values' => []];
+        }
+        else {
+          $account_references = civicrm_api3('BankingAccountReference', 'get', [
+            'ba_id'             => ['IN' => array_keys($accounts['values'])],
+            'reference_type_id' => $iban_reference_type_id,
+            'option.limit'      => 0,
+            'return'            => 'reference,ba_id',
+            'sequential'        => 1,
+            'option.sort'       => 'id desc',
+          ]);
         }
 
         foreach ($account_references['values'] as $account_reference) {
@@ -684,7 +701,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           $account_already_in_list = FALSE;
           if ($bic) {
             $account_already_in_list = isset($known_accounts[$key]);
-          } else { // no BIC? we'll have to search
+            // no BIC? we'll have to search
+          }
+          else {
             foreach ($known_accounts as $existing_key => $value) {
               if ($key == substr($existing_key, 0, strlen($key))) {
                 $account_already_in_list = TRUE;
@@ -693,7 +712,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
             }
           }
           if (!$account_already_in_list) {
-            $account_name = empty($account_data['name']) ? E::ts("CiviBanking") : "'{$account_data['name']}'";
+            $account_name = empty($account_data['name']) ? E::ts('CiviBanking') : "'{$account_data['name']}'";
             $known_accounts[$key] = "{$account_reference['reference']} ({$account_name})";
           }
         }
@@ -716,12 +735,13 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    * @return array list of frequency to title
    */
   protected function getFrequencyList() {
-    return array(
-        '0'  => E::ts("One-time only (OOFF)"),
-        '12' => CRM_Utils_SepaOptionGroupTools::getFrequencyText( 1, 'month', TRUE),
-        '4'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText( 3, 'month', TRUE),
-        '2'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText( 6, 'month', TRUE),
-        '1'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(12, 'month', TRUE),
-    );
+    return [
+      '0'  => E::ts('One-time only (OOFF)'),
+      '12' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(1, 'month', TRUE),
+      '4'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(3, 'month', TRUE),
+      '2'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(6, 'month', TRUE),
+      '1'  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(12, 'month', TRUE),
+    ];
   }
+
 }

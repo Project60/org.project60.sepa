@@ -52,7 +52,7 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
   /**
    * Load the fields from this entity.
    *
-   * @param DataSpecification $dataSpecification
+   * @param \Civi\DataProcessor\DataSpecification\DataSpecification $dataSpecification
    * @param array $fieldsToSkip
    *
    * @throws \Civi\DataProcessor\DataSpecification\FieldExistsException
@@ -64,15 +64,16 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
 
   protected function getEntityTables(): array {
     if (!$this->entityTables) {
-      $this->entityTables = array();
+      $this->entityTables = [];
       $allTables = CRM_Core_DAO_AllCoreTables::getCoreTables();
-      foreach($allTables as $entity_table => $daoClass) {
+      foreach ($allTables as $entity_table => $daoClass) {
         try {
           $r = new ReflectionMethod($daoClass, 'getEntityTitle');
           if ($r->getDeclaringClass()->getName() == $daoClass) {
-            $this->entityTables[$entity_table] = call_user_func([$daoClass,'getEntityTitle']);
+            $this->entityTables[$entity_table] = call_user_func([$daoClass, 'getEntityTitle']);
           }
-        } catch (ReflectionException $e) {
+        }
+        catch (ReflectionException $e) {
         }
         if (!isset($this->entityTables[$entity_table])) {
           $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getBriefName($daoClass);
@@ -82,4 +83,5 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
     }
     return $this->entityTables;
   }
+
 }

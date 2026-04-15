@@ -46,13 +46,13 @@ class ContributionUtil {
    *   An array of financial type names, keyed by their ID.
    */
   public static function getFinancialTypeList(): array {
-  // Check permissions for financial types for evaluating Financial ACLs.
-  return FinancialType::get()
-    ->addSelect('id', 'name')
-    ->addWhere('is_active', '=', TRUE)
-    ->execute()
-    ->indexBy('id')
-    ->column('name');
-}
+    // Check permissions for financial types for evaluating Financial ACLs.
+    return FinancialType::get()
+      ->addSelect('id', 'name')
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->indexBy('id')
+      ->column('name');
+  }
 
 }

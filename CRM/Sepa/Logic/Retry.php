@@ -32,8 +32,9 @@ class CRM_Sepa_Logic_Retry {
     // make sure there is a collection date
     if (empty($params['collection_date'])) {
       // TODO: use notice period
-      $collection_date  = date('Y-m-d', strtotime("now +3 days"));
-    } else {
+      $collection_date = date('Y-m-d', strtotime('now +3 days'));
+    }
+    else {
       $collection_date = date('Y-m-d', strtotime($params['collection_date']));
     }
 
@@ -43,7 +44,7 @@ class CRM_Sepa_Logic_Retry {
     $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
     // first: fetch contributions and group by creditor
-    $contributions_by_creditor = array();
+    $contributions_by_creditor = [];
     $contributions_found = self::getRetryContributions($params);
     foreach ($contributions_found as $contribution) {
       $contributions_by_creditor[$contribution['creditor_id']][] = $contribution;
@@ -52,7 +53,7 @@ class CRM_Sepa_Logic_Retry {
     // create RTRY group(s)
     foreach ($contributions_by_creditor as $creditor_id => $contributions) {
       // get some info
-      $notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.RCUR.notice", $creditor_id);
+      $notice = (int) CRM_Sepa_Logic_Settings::getSetting('batching.RCUR.notice', $creditor_id);
 
       // create new group's reference
       $reference = "TXG-{$creditor_id}-RTRY-{$collection_date}";
@@ -64,15 +65,15 @@ class CRM_Sepa_Logic_Retry {
       CRM_Utils_SepaCustomisationHooks::modify_txgroup_reference($reference, $creditor_id, 'RTRY', $collection_date, $financial_type_id = NULL);
 
       // create new group
-      $group = civicrm_api3('SepaTransactionGroup', 'create', array(
-          'reference'               => $reference,
-          'type'                    => 'RTRY',
-          'collection_date'         => $collection_date,
-          'latest_submission_date'  => date('Y-m-d', strtotime("-{$notice} days", strtotime($collection_date))),
-          'created_date'            => date('Y-m-d'),
-          'status_id'               => $group_status_id_open,
-          'sdd_creditor_id'         => $creditor_id,
-      ));
+      $group = civicrm_api3('SepaTransactionGroup', 'create', [
+        'reference'               => $reference,
+        'type'                    => 'RTRY',
+        'collection_date'         => $collection_date,
+        'latest_submission_date'  => date('Y-m-d', strtotime("-{$notice} days", strtotime($collection_date))),
+        'created_date'            => date('Y-m-d'),
+        'status_id'               => $group_status_id_open,
+        'sdd_creditor_id'         => $creditor_id,
+      ]);
 
       // create contributions
       foreach ($contributions as $contribution_data) {
@@ -83,9 +84,11 @@ class CRM_Sepa_Logic_Retry {
         $contribution = civicrm_api3('Contribution', 'create', $contribution_data);
 
         // add contribution to tx_group
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES (%1, %2);",
-            array( 1 => array($group['id'],        'Integer'),
-                   2 => array($contribution['id'], 'Integer')));
+        CRM_Core_DAO::executeQuery('INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES (%1, %2);',
+            [
+              1 => [$group['id'], 'Integer'],
+              2 => [$contribution['id'], 'Integer'],
+            ]);
 
         // finally: call our installment_created Hook
         CRM_Utils_SepaCustomisationHooks::installment_created($contribution_data['mandate_id'], $contribution_data['contribution_recur_id'], $contribution['id']);
@@ -127,7 +130,7 @@ class CRM_Sepa_Logic_Retry {
    * @throws Exception
    */
   public static function getRetryContributions($params) {
-    $contribution_query_sql = self::getQuery("
+    $contribution_query_sql = self::getQuery('
       contribution.id                     AS contribution_id,
       contribution.total_amount           AS total_amount,
       contribution.currency               AS currency,
@@ -139,22 +142,22 @@ class CRM_Sepa_Logic_Retry {
       contribution.contribution_status_id AS contribution_status_id,
       contribution.financial_type_id      AS financial_type_id,
       contribution.campaign_id            AS campaign_id
-      ", $params);
+      ', $params);
     $contributions_raw = CRM_Core_DAO::executeQuery($contribution_query_sql);
-    $contributions = array();
+    $contributions = [];
     while ($contributions_raw->fetch()) {
-      $contributions[] = array(
-          'id'                    => (int) $contributions_raw->contribution_id,
-          'total_amount'          => $contributions_raw->total_amount,
-          'currency'              => $contributions_raw->currency,
-          'contact_id'            => $contributions_raw->contact_id,
-          'source'                => $contributions_raw->source,
-          'creditor_id'           => $contributions_raw->creditor_id,
-          'mandate_id'            => $contributions_raw->mandate_id,
-          'financial_type_id'     => $contributions_raw->financial_type_id,
-          'contribution_recur_id' => $contributions_raw->contribution_recur_id,
-          'campaign_id'           => $contributions_raw->campaign_id,
-      );
+      $contributions[] = [
+        'id'                    => (int) $contributions_raw->contribution_id,
+        'total_amount'          => $contributions_raw->total_amount,
+        'currency'              => $contributions_raw->currency,
+        'contact_id'            => $contributions_raw->contact_id,
+        'source'                => $contributions_raw->source,
+        'creditor_id'           => $contributions_raw->creditor_id,
+        'mandate_id'            => $contributions_raw->mandate_id,
+        'financial_type_id'     => $contributions_raw->financial_type_id,
+        'contribution_recur_id' => $contributions_raw->contribution_recur_id,
+        'campaign_id'           => $contributions_raw->campaign_id,
+      ];
     }
 
     return $contributions;
@@ -174,7 +177,7 @@ class CRM_Sepa_Logic_Retry {
    * @param $params array see SepaLogic.get_retry_stats API call
    */
   public static function getStats($params) {
-    $stats_query_sql = self::getQuery("
+    $stats_query_sql = self::getQuery('
       COUNT(contribution.id)                             AS contribution_count,
       SUM(contribution.total_amount)                     AS total_amount,
       GROUP_CONCAT(DISTINCT(contribution.currency))      AS currency,
@@ -183,32 +186,33 @@ class CRM_Sepa_Logic_Retry {
       GROUP_CONCAT(DISTINCT(ctxg.txgroup_id))            AS txgroup_list,
       GROUP_CONCAT(DISTINCT(contribution.cancel_reason)) AS cancel_reason_list,
       GROUP_CONCAT(DISTINCT(CONCAT(rcontrib.frequency_interval, rcontrib.frequency_unit)))
-                                                         AS frequencies", $params);
+                                                         AS frequencies', $params);
     $stats_raw = CRM_Core_DAO::executeQuery($stats_query_sql);
     $stats_raw->fetch();
-    $stats = array(
-        'contribution_count' => (int) $stats_raw->contribution_count,
-        'total_amount'       => $stats_raw->total_amount,
-        'contact_count'      => (int) $stats_raw->contact_count,
-        'creditor_list'      => $stats_raw->creditor_list,
-        'txgroup_list'       => $stats_raw->txgroup_list,
-        'cancel_reason_list' => $stats_raw->cancel_reason_list,
-        'frequencies'        => $stats_raw->frequencies
-    );
+    $stats = [
+      'contribution_count' => (int) $stats_raw->contribution_count,
+      'total_amount'       => $stats_raw->total_amount,
+      'contact_count'      => (int) $stats_raw->contact_count,
+      'creditor_list'      => $stats_raw->creditor_list,
+      'txgroup_list'       => $stats_raw->txgroup_list,
+      'cancel_reason_list' => $stats_raw->cancel_reason_list,
+      'frequencies'        => $stats_raw->frequencies,
+    ];
 
     // add currencies
     $currencies = explode(',', $stats_raw->currency);
     if (count($currencies) == 1) {
       $stats['currency'] = $stats_raw->currency;
-    } else {
+    }
+    else {
       $stats['currency'] = '';
     }
 
     // convert frequencies
     $frequencies = explode(',', $stats['frequencies']);
-    $stats['frequencies'] = array();
+    $stats['frequencies'] = [];
     foreach ($frequencies as $frequency) {
-      if (preg_match("#^(?P<interval>[0-9]+)(?P<unit>(month|year))$#", $frequency, $match)) {
+      if (preg_match('#^(?P<interval>[0-9]+)(?P<unit>(month|year))$#', $frequency, $match)) {
         $freq = 1.0;
         if ($match['unit'] == 'month') {
           $freq *= 12.0;
@@ -238,17 +242,18 @@ class CRM_Sepa_Logic_Retry {
     $group_status_id_received = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
 
     // then: some general conditions
-    $where_clauses = array();
-    $where_clauses[] = "contribution.is_test = 0";
-    $where_clauses[] = "contact.is_deleted = 0";
+    $where_clauses = [];
+    $where_clauses[] = 'contribution.is_test = 0';
+    $where_clauses[] = 'contact.is_deleted = 0';
     $where_clauses[] = "txg.status_id IN ({$group_status_id_closed},{$group_status_id_received})";
     $where_clauses[] = "mandate.type = 'RCUR'";
     $where_clauses[] = "mandate.status IN ('RCUR', 'FRST')";
 
     // CONDITION: contribution_status_id
     if (empty($params['contribution_status_list'])) {
-      $where_clauses[] = "contribution.contribution_status_id IN (3,4,7)";
-    } else {
+      $where_clauses[] = 'contribution.contribution_status_id IN (3,4,7)';
+    }
+    else {
       $contribution_status_ids = array_map('intval', $params['contribution_status_list']);
       $contribution_status_list = implode(',', $contribution_status_ids);
       $where_clauses[] = "contribution.contribution_status_id IN ({$contribution_status_list})";
@@ -259,7 +264,8 @@ class CRM_Sepa_Logic_Retry {
       $date_from = strtotime($params['date_from']);
       if ($date_from) {
         $where_clauses[] = "DATE(txg.collection_date) >= DATE('" . date('Y-m-d', $date_from) . "')";
-      } else {
+      }
+      else {
         throw new Exception("Cannot parse date '{$params['date_from']}'");
       }
     }
@@ -269,7 +275,8 @@ class CRM_Sepa_Logic_Retry {
       $date_to = strtotime($params['date_to']);
       if ($date_to) {
         $where_clauses[] = "DATE(txg.collection_date) <= DATE('" . date('Y-m-d', $date_to) . "')";
-      } else {
+      }
+      else {
         throw new Exception("Cannot parse date '{$params['date_to']}'");
       }
     }
@@ -308,18 +315,19 @@ class CRM_Sepa_Logic_Retry {
       if (!is_array($cancel_reason_list)) {
         $cancel_reason_list = explode(',', $cancel_reason_list);
       }
-      $where_clauses[] = "contribution.cancel_reason IN (" . CRM_Core_DAO::escapeStrings($cancel_reason_list) . ")";
+      $where_clauses[] = 'contribution.cancel_reason IN (' . CRM_Core_DAO::escapeStrings($cancel_reason_list) . ')';
     }
 
     // CONDITION: frequencies
     if (!empty($params['frequencies'])) {
-      $frequency_clauses = array();
+      $frequency_clauses = [];
       $frequencies = self::getIDList($params['frequencies'], FALSE);
       foreach ($frequencies as $frequency) {
         if ($frequency == 1) {
           $frequency_clauses[] = "(rcontrib.frequency_interval = 12 && rcontrib.frequency_unit = 'month')";
           $frequency_clauses[] = "(rcontrib.frequency_interval = 1  && rcontrib.frequency_unit = 'year')";
-        } else {
+        }
+        else {
           $interval = 12 / $frequency;
           $frequency_clauses[] = "(rcontrib.frequency_interval = {$interval} && rcontrib.frequency_unit = 'month')";
         }
@@ -328,7 +336,7 @@ class CRM_Sepa_Logic_Retry {
     }
 
     // finally: compile the query SQL:
-    $where_clause_sql = "(" . implode(') AND (', $where_clauses) . ')';
+    $where_clause_sql = '(' . implode(') AND (', $where_clauses) . ')';
     $stats_query_sql = "
     SELECT {$select_clause}
     FROM civicrm_contribution contribution
@@ -349,7 +357,7 @@ class CRM_Sepa_Logic_Retry {
    * @param $string
    */
   protected static function getIDList($elements, $as_string = FALSE) {
-    $result = array();
+    $result = [];
     if (!is_array($elements)) {
       $elements = explode(',', $elements);
     }
@@ -358,8 +366,10 @@ class CRM_Sepa_Logic_Retry {
     }
     if ($as_string) {
       return implode(',', $result);
-    } else {
+    }
+    else {
       return $result;
     }
   }
+
 }

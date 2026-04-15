@@ -19,8 +19,6 @@ declare(strict_types = 1);
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\DAOEntity;
-
 /**
  * SepaContributionGroup entity.
  *

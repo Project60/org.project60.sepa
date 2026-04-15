@@ -44,12 +44,12 @@ abstract class AbstractMandateJoin extends SimpleJoin {
   abstract protected function getEntityTable(): string;
 
   /**
-   * @var AbstractProcessorType
+   * @var \Civi\DataProcessor\ProcessorType\AbstractProcessorType
    */
   protected $dataProcessor;
 
   /**
-   * @param AbstractProcessorType $dataProcessor
+   * @param \Civi\DataProcessor\ProcessorType\AbstractProcessorType $dataProcessor
    * @return \Civi\DataProcessor\DataFlow\MultipleDataFlows\JoinInterface
    * @throws \Exception
    */
@@ -59,14 +59,13 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     return $this;
   }
 
-
   /**
    * Returns true when this join has additional configuration
    *
    * @return bool
    */
   public function hasConfiguration(): bool {
-    return true;
+    return TRUE;
   }
 
   /**
@@ -74,17 +73,17 @@ abstract class AbstractMandateJoin extends SimpleJoin {
    * the fields on the form with this function.
    *
    * @param \CRM_Core_Form $form
-   * @param SourceInterface $joinFromSource
-   * @param SourceInterface[] $joinableToSources
+   * @param \Civi\DataProcessor\Source\SourceInterface $joinFromSource
+   * @param \Civi\DataProcessor\Source\SourceInterface[] $joinableToSources
    * @param array $joinConfiguration
    *   The current join configuration
    */
-  public function buildConfigurationForm(CRM_Core_Form $form, SourceInterface $joinFromSource, $joinableToSources, $joinConfiguration=array()) {
-    $leftFieldCallback = null;
-    $lookForRightSddEntityIdField = true;
+  public function buildConfigurationForm(CRM_Core_Form $form, SourceInterface $joinFromSource, $joinableToSources, $joinConfiguration = []) {
+    $leftFieldCallback = NULL;
+    $lookForRightSddEntityIdField = TRUE;
     if ($joinFromSource->getDataFlow() instanceof SqlTableDataFlow && $joinFromSource->getDataFlow()->getTable() == 'civicrm_sdd_mandate') {
       $leftFieldCallback = [$this, 'filterEntityIdField'];
-      $lookForRightSddEntityIdField = false;
+      $lookForRightSddEntityIdField = FALSE;
     }
     $leftFields = [];
     try {
@@ -103,11 +102,11 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     catch (CRM_Core_Exception $e) {
     }
 
-    $rightFields = array();
-    foreach($joinableToSources as $joinToSource) {
+    $rightFields = [];
+    foreach ($joinableToSources as $joinToSource) {
       try {
         if ($lookForRightSddEntityIdField && $joinToSource->getDataFlow() instanceof SqlTableDataFlow && $joinToSource->getDataFlow()
-            ->getTable() == 'civicrm_sdd_mandate') {
+          ->getTable() == 'civicrm_sdd_mandate') {
           $rightFields = array_merge($rightFields, CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource($joinToSource, $joinToSource->getSourceTitle() . ' :: ', $joinToSource->getSourceName() . '::', [
             $this,
             'filterEntityIdField',
@@ -144,12 +143,12 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     catch (CRM_Core_Exception $e) {
     }
 
-    $defaults = array();
+    $defaults = [];
     if (isset($joinConfiguration['left_field'])) {
       $defaults['left_field'] = $joinConfiguration['left_field'];
     }
     if (isset($joinConfiguration['right_prefix'])) {
-      $defaults['right_field'] = $joinConfiguration['right_prefix']."::".$joinConfiguration['right_field'];
+      $defaults['right_field'] = $joinConfiguration['right_prefix'] . '::' . $joinConfiguration['right_field'];
     }
     if (!isset($joinConfiguration['mandate_join_type'])) {
       $joinConfiguration['mandate_join_type'] = 'LEFT';
@@ -165,16 +164,16 @@ abstract class AbstractMandateJoin extends SimpleJoin {
    */
   public function filterEntityIdField(FieldSpecification $field): bool {
     if ($field->getName() == 'entity_id') {
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   }
 
   /**
    * Process the submitted values and create a configuration array
    *
    * @param $submittedValues
-   * @param SourceInterface $joinFromSource
+   * @param \Civi\DataProcessor\Source\SourceInterface $joinFromSource
    * @return array
    */
   public function processConfiguration($submittedValues, SourceInterface $joinFromSource): array {
@@ -202,16 +201,16 @@ abstract class AbstractMandateJoin extends SimpleJoin {
    */
   public function worksWithDataFlow(AbstractDataFlow $dataFlow): bool {
     if (!$dataFlow instanceof SqlDataFlow) {
-      return false;
+      return FALSE;
     }
     $this->initialize();
     if ($dataFlow->getTableAlias() == $this->left_table) {
-      return true;
+      return TRUE;
     }
     if ($dataFlow->getTableAlias() == $this->right_table) {
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   }
 
   /**
@@ -247,7 +246,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
       }
 
       $joinClauses[] = "($leftColumnName = $rightColumnName AND $mandateTableAlias.`entity_table` = '" . $this->getEntityTable() . "')";
-      $joinClause = "ON (" . implode(" OR ", $joinClauses) . ")";
+      $joinClause = 'ON (' . implode(' OR ', $joinClauses) . ')';
     }
     if ($sourceDataFlowDescription->getDataFlow() instanceof SqlDataFlow) {
       $tablePart = $sourceDataFlowDescription->getDataFlow()->getTableStatement();
@@ -256,7 +255,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     $dataFlow = $sourceDataFlowDescription->getDataFlow();
     if ($dataFlow  instanceof  SqlDataFlow) {
       $whereClauses = $dataFlow->getWhereClauses(TRUE, FALSE);
-      foreach($whereClauses as $whereClause) {
+      foreach ($whereClauses as $whereClause) {
         if ($whereClause && $whereClause->isJoinClause()) {
           $this->filterClauses[] = $whereClause;
           $dataFlow->removeWhereClause($whereClause);
@@ -265,7 +264,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     }
     $extraClause = Sql::generateConditionStatement($this->filterClauses);
     if (strlen($extraClause)) {
-      $extraClause = " AND ".$extraClause;
+      $extraClause = ' AND ' . $extraClause;
     }
 
     return "$this->type JOIN $tablePart $joinClause $extraClause";

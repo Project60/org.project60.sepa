@@ -30,15 +30,12 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase
-{
-
+class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase {
 
   /**
    * Test a simple set/retrieve setting
    */
-  public function testGenericSetRetrieve()
-  {
+  public function testGenericSetRetrieve() {
     $old_value = CRM_Sepa_Logic_Settings::getGenericSetting('batching.FRST.notice');
     $new_value = rand(1, 364);
 
@@ -56,8 +53,7 @@ class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase
   /**
    * Test a simple set/retrieve setting
    */
-  public function testSimpleSetRetrieve()
-  {
+  public function testSimpleSetRetrieve() {
     $old_value = CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice');
     $new_value = rand(1, 364);
 
@@ -75,8 +71,7 @@ class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase
   /**
    * Test a simple set/retrieve setting
    */
-  public function testSetRetrieveOverride()
-  {
+  public function testSetRetrieveOverride() {
     $old_value = CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice');
     $new_general_value  = rand(1, 364);
     $new_creditor_value = $new_general_value + 1;
@@ -87,21 +82,19 @@ class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase
     CRM_Sepa_Logic_Settings::setSetting($new_creditor_value, 'batching.FRST.notice', $creditor_id);
     $this->assertEquals($new_general_value, CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice'), E::ts("set/getSetting doesn't work"));
     $this->assertEquals($new_general_value, CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', 0), E::ts("set/getSetting doesn't work"));
-    $this->assertEquals($new_creditor_value, CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice',$creditor_id), E::ts("set/getSetting doesn't work"));
+    $this->assertEquals($new_creditor_value, CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $creditor_id), E::ts("set/getSetting doesn't work"));
 
     // restore setting
     CRM_Sepa_Logic_Settings::setSetting($old_value, 'batching.FRST.notice');
   }
 
-
   /**
    * Test a simple set/retrieve setting
    */
-  public function testDefaultCreditor()
-  {
+  public function testDefaultCreditor() {
     $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
-    $this->assertNotNull($default_creditor, "Default creditor is not available");
-    $this->assertNotNull($default_creditor->id, "Default creditor is broken");
+    $this->assertNotNull($default_creditor, 'Default creditor is not available');
+    $this->assertNotNull($default_creditor->id, 'Default creditor is broken');
   }
 
 }

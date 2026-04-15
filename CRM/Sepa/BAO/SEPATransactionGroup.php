@@ -27,15 +27,14 @@
  */
 class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGroup {
 
-
   /**
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
    *
    * @return object       CRM_Core_BAO_SEPATransactionGroup object on success, null otherwise
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaTransactionGroup', $params['id'] ?? NULL, $params);
 
@@ -47,35 +46,35 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     return $dao;
   }
 
-  function generateXML ($id = null) {
+  public function generateXML ($id = NULL) {
     $template = CRM_Core_Smarty::singleton();
     if ($id) {
-      $this->id=$id;
+      $this->id = $id;
     }
-    if (empty ($this->id)) {
-      CRM_Core_Error::fatal("missing id of the transaction group");
+    if (empty($this->id)) {
+      CRM_Core_Error::fatal('missing id of the transaction group');
     }
-    $r=array();
-    $this->total=0;
-    $this->nbtransactions=0;
+    $r = [];
+    $this->total = 0;
+    $this->nbtransactions = 0;
 
-    $group = civicrm_api3("SepaTransactionGroup","getsingle", array('id' => $this->id));
+    $group = civicrm_api3('SepaTransactionGroup', 'getsingle', ['id' => $this->id]);
     if ($group['type'] == 'RTRY') {
       // RTRY groups (repeated collection attempt of failed debits) still have to be RCUR in the file
       $group['type'] = 'RCUR';
     }
 
-    $creditor_id = $group["sdd_creditor_id"];
-    $creditor    = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $creditor_id));
+    $creditor_id = $group['sdd_creditor_id'];
+    $creditor    = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $creditor_id]);
     if (!empty($creditor['country_id'])) {
       $creditor['ctry'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $creditor['country_id'], 'iso_code');
     }
-    $format      = CRM_Sepa_Logic_Format::getFormatForCreditor($creditor_id);
-    $template->assign('group',    $group);
+    $format = CRM_Sepa_Logic_Format::getFormatForCreditor($creditor_id);
+    $template->assign('group', $group);
     $template->assign('creditor', $creditor);
 
-    $queryParams= array (1=>array($this->id, 'Positive'));
-    $query="
+    $queryParams = [1 => [$this->id, 'Positive']];
+    $query = "
       SELECT
         c.id AS cid,
         c.id AS contribution_id,
@@ -107,7 +106,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       WHERE g.txgroup_id = %1
         AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
-      GROUP BY c.id"; //and not cancelled
+//and not cancelled
+      GROUP BY c.id";
 
     CRM_Core_DAO::disableFullGroupByMode();
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -117,50 +117,57 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     //dear dear, it might work, but seems to be highly dependant of the system running it, without any way to know what is available, or if the setting was done properly #phpeature
 
     while ($contrib->fetch()) {
-      $t         = $contrib->toArray();
-      $t['id']   = $t['cid'];  // see https://github.com/Project60/org.project60.sepa/issues/385
+      $t = $contrib->toArray();
+      // see https://github.com/Project60/org.project60.sepa/issues/385
+      $t['id'] = $t['cid'];
 
       // SEPA-specific modifications and information on the IBAN.
       if ($creditor['creditor_type'] == 'SEPA') {
-        $t["iban"] = str_replace(array(' ','-'), '', $t["iban"]);
-        $t['ctry'] = substr($t["iban"], 0, 2);
+        $t['iban'] = str_replace([' ', '-'], '', $t['iban']);
+        $t['ctry'] = substr($t['iban'], 0, 2);
       }
 
       // make some fields comply with SEPA standards
-      if (!empty($t["account_holder"])) {
-        $t["display_name"] = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["account_holder"]);
-      } else {
-        $t["display_name"] = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["display_name"]);
+      if (!empty($t['account_holder'])) {
+        $t['display_name'] = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t['account_holder']);
       }
-      $t["street_address"] = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["street_address"]);
-      $t["postal_code"]    = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["postal_code"]);
-      $t["city"]           = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t["city"]);
+      else {
+        $t['display_name'] = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t['display_name']);
+      }
+      $t['street_address'] = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t['street_address']);
+      $t['postal_code']    = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t['postal_code']);
+      $t['city']           = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t['city']);
 
       // create an individual transaction message
-      $t["message"] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor, $this->id);
+      $t['message'] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor, $this->id);
 
       // create an individual EndToEndId
-      $end2endID = $t['id']; // that's the old default
+      // that's the old default
+      $end2endID = $t['id'];
       CRM_Utils_SepaCustomisationHooks::modify_endtoendid($end2endID, $t, $creditor);
-      $t["end2endID"] = $end2endID;
+      $t['end2endID'] = $end2endID;
 
       // let the format extend the transaction record
       $format->extendTransaction($t, $creditor_id);
 
       $r[] = $t;
-      if ($creditor_id == null) {
+      if ($creditor_id == NULL) {
         $creditor_id = $contrib->creditor_id;
-      } elseif ($contrib->creditor_id == null) { // it shouldn't happen.
+        // it shouldn't happen.
+      }
+      elseif ($contrib->creditor_id == NULL) {
         $contrib->creditor_id = $creditor_id;
-      } elseif ($creditor_id != $contrib->creditor_id){
+      }
+      elseif ($creditor_id != $contrib->creditor_id) {
         throw new Exception("Mixed creditors ({$creditor_id} != {$contrib->creditor_id}) in the group - contribution {$contrib->id}");
       }
       $this->total += $contrib->total_amount;
       $this->nbtransactions++;
     }
-    $template->assign("total", number_format($this->total, 2, '.', '')); // SEPA-432: two-digit decimals
-    $template->assign("nbtransactions", $this->nbtransactions);
-    $template->assign("contributions", $r);
+    // SEPA-432: two-digit decimals
+    $template->assign('total', number_format($this->total, 2, '.', ''));
+    $template->assign('nbtransactions', $this->nbtransactions);
+    $template->assign('contributions', $r);
 
     // load file format class
     $fileFormatName = CRM_Core_PseudoConstant::getName('CRM_Sepa_BAO_SEPACreditor', 'sepa_file_format_id', $creditor['sepa_file_format_id']);
@@ -174,7 +181,6 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     return $fileFormat->characterEncode($content);
   }
 
-
   /**
    * This method will create the SDD file for the given group
    *
@@ -183,7 +189,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    *
    * @return int id of the sepa file entity created, or an error message string
    */
-  static function createFile($txgroup_id, $override = false) {
+  public static function createFile($txgroup_id, $override = FALSE) {
     try {
       $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
         ->addWhere('id', '=', $txgroup_id)
@@ -191,13 +197,13 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         ->single();
     }
     catch (CRM_Core_Exception $exception) {
-      return "Cannot find transaction group ".$txgroup_id;
+      return 'Cannot find transaction group ' . $txgroup_id;
     }
 
     // get file format
     $format = CRM_Sepa_Logic_Format::getFormatForCreditor($txgroup['sdd_creditor_id']);
 
-    $creditor = civicrm_api ("SepaCreditor", "getsingle", array("sequential"=>1, "version"=>3, "id"=>$txgroup["sdd_creditor_id"]));
+    $creditor = civicrm_api('SepaCreditor', 'getsingle', ['sequential' => 1, 'version' => 3, 'id' => $txgroup['sdd_creditor_id']]);
     // TODO: grouping: $fileFormatGrouping = CRM_Sepa_CustomData::getOptionValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping');
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
@@ -208,39 +214,41 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
       while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
         // i.e. available_name is already taken, modify it
-        $available_name = $name.'--'.$counter;
+        $available_name = $name . '--' . $counter;
         $counter += 1;
-        if ($counter>1000) {
-          return "Cannot create file! Unable to find an available file reference.";
+        if ($counter > 1000) {
+          return 'Cannot create file! Unable to find an available file reference.';
         }
       }
 
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
 
       // now that we found an available reference, create the file
-      $sepa_file = civicrm_api('SepaSddFile', 'create', array(
-            'version'                 => 3,
-            'reference'               => $available_name,
+      $sepa_file = civicrm_api('SepaSddFile', 'create', [
+        'version'                 => 3,
+        'reference'               => $available_name,
             /// TODO: grouping: 'filename'                => $fileFormatGrouping ? $available_name.'.'.$fileFormatGrouping : $available_name.'.xml',
-            'filename'                => $format->getFilename($available_name),
-            'latest_submission_date'  => $txgroup['latest_submission_date'],
-            'created_date'            => date('YmdHis'),
-            'created_id'              => CRM_Core_Session::singleton()->get('userID'),
-            'status_id'               => $group_status_id_closed)
+        'filename'                => $format->getFilename($available_name),
+        'latest_submission_date'  => $txgroup['latest_submission_date'],
+        'created_date'            => date('YmdHis'),
+        'created_id'              => CRM_Core_Session::singleton()->get('userID'),
+        'status_id'               => $group_status_id_closed,
+      ]
         );
       if (isset($sepa_file['is_error']) && $sepa_file['is_error']) {
-        return sprintf(ts("Cannot create file! Error was: '%s'", array('domain' => 'org.project60.sepa')), $sepa_file['error_message']);
-      } else {
+        return sprintf(ts("Cannot create file! Error was: '%s'", ['domain' => 'org.project60.sepa']), $sepa_file['error_message']);
+      }
+      else {
 
         // update the txgroup object
-          $result = civicrm_api('SepaTransactionGroup', 'create', array(
-                'id'                      => $txgroup_id,
-                'sdd_file_id'             => $sepa_file['id'],
-                'version'                 => 3));
-          if (isset($result['is_error']) && $result['is_error']) {
-            sprintf(ts("Cannot update transaction group! Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']);
-          }
-
+        $result = civicrm_api('SepaTransactionGroup', 'create', [
+          'id'                      => $txgroup_id,
+          'sdd_file_id'             => $sepa_file['id'],
+          'version'                 => 3,
+        ]);
+        if (isset($result['is_error']) && $result['is_error']) {
+          sprintf(ts("Cannot update transaction group! Error was: '%s'", ['domain' => 'org.project60.sepa']), $result['error_message']);
+        }
 
         return $sepa_file['id'];
       }
@@ -256,7 +264,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    *
    * @return an update array with the txgroup or a string with an error message
    */
-  static function adjustCollectionDate($txgroup_id, $latest_submission_date) {
+  public static function adjustCollectionDate($txgroup_id, $latest_submission_date) {
     $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
       ->addWhere('id', '=', $txgroup_id)
       ->execute()
@@ -267,7 +275,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     $test_date_parse = strtotime($latest_submission_date);
     if (empty($test_date_parse)) {
-      return "Bad date adjustment given!";
+      return 'Bad date adjustment given!';
     }
 
     $notice_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.{$txgroup['type']}.notice", $txgroup['sdd_creditor_id']);
@@ -275,11 +283,12 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     CRM_Sepa_Logic_Batching::deferCollectionDate($new_collection_date, $txgroup['sdd_creditor_id']);
     $new_latest_submission_date = date('YmdHis', strtotime("$latest_submission_date"));
 
-    $result = civicrm_api('SepaTransactionGroup', 'create', array(
+    $result = civicrm_api('SepaTransactionGroup', 'create', [
       'version'                => 3,
       'id'                     => $txgroup_id,
       'collection_date'        => $new_collection_date,
-      'latest_submission_date' => $new_latest_submission_date));
+      'latest_submission_date' => $new_latest_submission_date,
+    ]);
     if (!empty($result['is_error'])) {
       return $result['error_message'];
     }
@@ -297,7 +306,6 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     return $txgroup;
   }
 
-
   /**
    * This method will delete a transaction group
    *
@@ -310,9 +318,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    *                                      'all'  -  delete them all
    *
    * @return an array (contribution_id => error message) that have been deleted or a string with an error message.
-   *            an error message of 'ok' means deletion succesfull
+   *   an error message of 'ok' means deletion succesfull
    */
-  static function deleteGroup($txgroup_id, $delete_contributions_mode = 'no') {
+  public static function deleteGroup($txgroup_id, $delete_contributions_mode = 'no') {
     // load the group
     try {
       $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
@@ -326,13 +334,16 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
     // first, delete the contents of this group
     if ($delete_contributions_mode == 'no') {
-      $contributions_deleted = array();
-    } elseif ($delete_contributions_mode == 'open') {
+      $contributions_deleted = [];
+    }
+    elseif ($delete_contributions_mode == 'open') {
       $status_id_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
       $contributions_deleted = self::_deleteGroupContents($txgroup_id, $txgroup['type'], "civicrm_contribution.contribution_status_id = $status_id_pending");
-    } elseif ($delete_contributions_mode == 'all') {
-      $contributions_deleted = self::_deleteGroupContents($txgroup_id, $txgroup['type'], "TRUE");
-    } else {
+    }
+    elseif ($delete_contributions_mode == 'all') {
+      $contributions_deleted = self::_deleteGroupContents($txgroup_id, $txgroup['type'], 'TRUE');
+    }
+    else {
       return "Undefined deleteGroup mode '$delete_contributions_mode'. Ignored.";
     }
 
@@ -341,23 +352,23 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     CRM_Core_DAO::executeQuery($detach_contributions);
 
     // then delete the group itself
-    $result = civicrm_api('SepaTransactionGroup', 'delete', array('id' => $txgroup_id, 'version' => 3));
+    $result = civicrm_api('SepaTransactionGroup', 'delete', ['id' => $txgroup_id, 'version' => 3]);
     if (empty($result['is_error'])) {
       return $contributions_deleted;
-    } else {
-      return "Transaction group [$txgroup_id] could not be deleted. Error was: ".$result['error_message'];
+    }
+    else {
+      return "Transaction group [$txgroup_id] could not be deleted. Error was: " . $result['error_message'];
     }
   }
-
 
   /**
    * Helper method to delete a txgroup along with all the contents that match the selector
    */
-  static function _deleteGroupContents($txgroup_id, $type, $selector) {
+  public static function _deleteGroupContents($txgroup_id, $type, $selector) {
     $txgroup_id = (int) $txgroup_id;
-    $deleted_contributions = array();
+    $deleted_contributions = [];
 
-    if ($type=='OOFF') {
+    if ($type == 'OOFF') {
       // delete the mandates first
       $query = "
       SELECT
@@ -378,9 +389,10 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         $contribution_id = (int) $results->contribution_id;
         // delete the mandate
         if (empty($results->mandate_id)) {
-          $deleted_contributions[$contribution_id] = "No mandate found!";
-        } else {
-          $delete = civicrm_api('SepaMandate', 'delete', array('id' => $results->mandate_id, 'version' => 3));
+          $deleted_contributions[$contribution_id] = 'No mandate found!';
+        }
+        else {
+          $delete = civicrm_api('SepaMandate', 'delete', ['id' => $results->mandate_id, 'version' => 3]);
           if (!empty($delete['is_error'])) {
             $deleted_contributions[$contribution_id] = $delete['error_message'];
           }
@@ -405,16 +417,18 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       if (isset($deleted_contributions[$results->contribution_id])) {
         // there has already been an error -> skip
         continue;
-      } else {
+      }
+      else {
         // remove contribution from mandate.first_contribution_id
         $contribution_id = (int) $results->contribution_id;
         CRM_Core_DAO::executeQuery("UPDATE civicrm_sdd_mandate SET first_contribution_id = NULL WHERE first_contribution_id = $contribution_id;");
 
         // delete the contribution
-        $delete = civicrm_api('Contribution', 'delete', array('id' => $contribution_id, 'version' => 3));
+        $delete = civicrm_api('Contribution', 'delete', ['id' => $contribution_id, 'version' => 3]);
         if (empty($delete['is_error'])) {
-          $deleted_contributions[$contribution_id] = "ok";
-        } else {
+          $deleted_contributions[$contribution_id] = 'ok';
+        }
+        else {
           $deleted_contributions[$contribution_id] = $delete['error_message'];
         }
       }
@@ -485,7 +499,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         AND entity_id = %1
         AND `subject` = %2",
       [
-        1 => [(int)$groupId, 'Integer'],
+        1 => [(int) $groupId, 'Integer'],
         2 => [$subject, 'String'],
       ]
     );
@@ -494,7 +508,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       return $queryResult->note;
     }
     else {
-      return null;
+      return NULL;
     }
   }
 
@@ -516,7 +530,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         AND entity_id = %1
         AND `subject` = %2",
       [
-        1 => [(int)$groupId, 'Integer'],
+        1 => [(int) $groupId, 'Integer'],
         2 => [$subject, 'String'],
       ]
     );
@@ -528,10 +542,11 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       VALUES
         ('civicrm_sdd_txgroup', %1, %2, %3)",
       [
-        1 => [(int)$groupId, 'Integer'],
+        1 => [(int) $groupId, 'Integer'],
         2 => [$subject, 'String'],
         3 => [$note, 'String'],
       ]
     );
   }
+
 }

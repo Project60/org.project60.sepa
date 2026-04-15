@@ -16,11 +16,11 @@
 
 namespace Civi\Sepa\ActionProvider\Action;
 
-use \Civi\ActionProvider\Action\AbstractAction;
+use Civi\ActionProvider\Action\AbstractAction;
 use Civi\ActionProvider\Exception\ExecutionException;
-use \Civi\ActionProvider\Parameter\ParameterBagInterface;
-use \Civi\ActionProvider\Parameter\Specification;
-use \Civi\ActionProvider\Parameter\SpecificationBag;
+use Civi\ActionProvider\Parameter\ParameterBagInterface;
+use Civi\ActionProvider\Parameter\Specification;
+use Civi\ActionProvider\Parameter\SpecificationBag;
 
 use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
@@ -30,43 +30,43 @@ class CreateOneOffMandate extends AbstractAction {
   /**
    * Returns the specification of the configuration options for the actual action.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getConfigurationSpecification() {
     return new SpecificationBag([
-        new Specification('default_creditor_id',       'Integer', E::ts('Creditor (default)'), true, null, null, $this->getCreditors(), false),
-        new Specification('default_financial_type_id', 'Integer', E::ts('Financial Type (default)'), true, null, null, $this->getFinancialTypes(), false),
-        new Specification('default_campaign_id',       'Integer', E::ts('Campaign (default)'), false, null, null, $this->getCampaigns(), false),
-        new Specification('default_amount',            'Money',   E::ts('Amount (default)'), true),
+      new Specification('default_creditor_id', 'Integer', E::ts('Creditor (default)'), TRUE, NULL, NULL, $this->getCreditors(), FALSE),
+      new Specification('default_financial_type_id', 'Integer', E::ts('Financial Type (default)'), TRUE, NULL, NULL, $this->getFinancialTypes(), FALSE),
+      new Specification('default_campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
+      new Specification('default_amount', 'Money', E::ts('Amount (default)'), TRUE),
     ]);
   }
 
   /**
    * Returns the specification of the parameters of the actual action.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getParameterSpecification() {
     return new SpecificationBag([
         // required fields
-        new Specification('contact_id',     'Integer', E::ts('Contact ID'), true),
-        new Specification('account_holder', 'String',  E::ts('Account Holder'), false),
-        new Specification('iban',           'String',  E::ts('IBAN'), true),
-        new Specification('bic',            'String',  E::ts('BIC'), false),
-        new Specification('reference',      'String',  E::ts('Mandate Reference'), false),
-        new Specification('amount',         'Money',   E::ts('Amount'), false),
+      new Specification('contact_id', 'Integer', E::ts('Contact ID'), TRUE),
+      new Specification('account_holder', 'String', E::ts('Account Holder'), FALSE),
+      new Specification('iban', 'String', E::ts('IBAN'), TRUE),
+      new Specification('bic', 'String', E::ts('BIC'), FALSE),
+      new Specification('reference', 'String', E::ts('Mandate Reference'), FALSE),
+      new Specification('amount', 'Money', E::ts('Amount'), FALSE),
 
         // basic overrides
-        new Specification('creditor_id',       'Integer', E::ts('Creditor (default)'), false, null, null, $this->getCreditors(), false),
-        new Specification('financial_type_id', 'Integer', E::ts('Financial Type (default)'), false, null, null, $this->getFinancialTypes(), false),
-        new Specification('campaign_id',       'Integer', E::ts('Campaign (default)'), false, null, null, $this->getCampaigns(), false),
+      new Specification('creditor_id', 'Integer', E::ts('Creditor (default)'), FALSE, NULL, NULL, $this->getCreditors(), FALSE),
+      new Specification('financial_type_id', 'Integer', E::ts('Financial Type (default)'), FALSE, NULL, NULL, $this->getFinancialTypes(), FALSE),
+      new Specification('campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
 
         // dates
-        new Specification('receive_date',    'Date', E::ts('Collection Date'), false, date('Y-m-d H:i:s')),
-        new Specification('date',            'Date', E::ts('Signature Date'),  false, date('Y-m-d H:i:s')),
-        new Specification('validation_date', 'Date', E::ts('Validation Date'), false, date('Y-m-d H:i:s')),
-        new Specification('creation_date', 'Date', E::ts('Creation Date'), false, date('Y-m-d H:i:s')),
-        new Specification('source', 'String', E::ts('Source'), false),
+      new Specification('receive_date', 'Date', E::ts('Collection Date'), FALSE, date('Y-m-d H:i:s')),
+      new Specification('date', 'Date', E::ts('Signature Date'), FALSE, date('Y-m-d H:i:s')),
+      new Specification('validation_date', 'Date', E::ts('Validation Date'), FALSE, date('Y-m-d H:i:s')),
+      new Specification('creation_date', 'Date', E::ts('Creation Date'), FALSE, date('Y-m-d H:i:s')),
+      new Specification('source', 'String', E::ts('Source'), FALSE),
     ]);
   }
 
@@ -75,23 +75,23 @@ class CreateOneOffMandate extends AbstractAction {
    *
    * This function could be overridden by child classes.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getOutputSpecification() {
     return new SpecificationBag([
-      new Specification('mandate_id',        'Integer', E::ts('Mandate ID'), false, null, null, null, false),
-      new Specification('mandate_reference', 'String',  E::ts('Mandate Reference'), false, null, null, null, false),
-      new Specification('error',             'String',  E::ts('Error Message (if creation failed)'), false, null, null, null, false),
+      new Specification('mandate_id', 'Integer', E::ts('Mandate ID'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification('mandate_reference', 'String', E::ts('Mandate Reference'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification('error', 'String', E::ts('Error Message (if creation failed)'), FALSE, NULL, NULL, NULL, FALSE),
     ]);
   }
 
   /**
    * Run the action
    *
-   * @param ParameterBagInterface $parameters
+   * @param \Civi\ActionProvider\Parameter\ParameterBagInterface $parameters
    *   The parameters to this action.
-   * @param ParameterBagInterface $output
-   * 	 The parameters this action can send back
+   * @param \Civi\ActionProvider\Parameter\ParameterBagInterface $output
+   *      The parameters this action can send back
    * @return void
    */
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
@@ -136,14 +136,13 @@ class CreateOneOffMandate extends AbstractAction {
       $output->setParameter('mandate_reference', $mandate['reference']);
       $output->setParameter('error', '');
 
-    } catch (\Exception $ex) {
+    }
+    catch (\Exception $ex) {
       $output->setParameter('mandate_id', '');
       $output->setParameter('mandate_reference', '');
       $output->setParameter('error', $ex->getMessage());
     }
   }
-
-
 
   /**
    * Get a list of all creditors
@@ -163,9 +162,10 @@ class CreateOneOffMandate extends AbstractAction {
   protected function getFinancialTypes() {
     $list = [];
     $query = \civicrm_api3('FinancialType', 'get', [
-        'option.limit' => 0,
-        'is_enabled'   => 1,
-        'return'       => 'id,name']);
+      'option.limit' => 0,
+      'is_enabled'   => 1,
+      'return'       => 'id,name',
+    ]);
     foreach ($query['values'] as $entity) {
       $list[$entity['id']] = $entity['name'];
     }
@@ -178,12 +178,14 @@ class CreateOneOffMandate extends AbstractAction {
   protected function getCampaigns() {
     $list = [];
     $query = \civicrm_api3('Campaign', 'get', [
-        'option.limit' => 0,
-        'is_active'    => 1,
-        'return'       => 'id,title']);
+      'option.limit' => 0,
+      'is_active'    => 1,
+      'return'       => 'id,title',
+    ]);
     foreach ($query['values'] as $entity) {
       $list[$entity['id']] = $entity['title'];
     }
     return $list;
   }
+
 }

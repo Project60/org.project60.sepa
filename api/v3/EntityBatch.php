@@ -21,14 +21,13 @@
  *
  */
 
-
 /**
  * Allowed @params array keys are:
  *
  * @example SepaCreditorCreate.php Standard Create Example
  *
  * @return array API result array
- * {@getfields entity_batch_create}
+ *   {@getfields entity_batch_create}
  * @access public
  */
 function civicrm_api3_entity_batch_create($params) {
@@ -49,7 +48,7 @@ function _civicrm_api3_entity_batch_create_spec(&$params) {
 /**
  * Deletes an existing SepaCreditor
  *
- * @param  array  $params
+ * @param  array $params
  *
  * @example SepaCreditorDelete.php Standard Delete Example
  *
@@ -71,11 +70,10 @@ function civicrm_api3_entity_batch_delete($params) {
  * @param  array $params  an associative array of name/value pairs.
  *
  * @return  array api result array
- * {@getfields entity_batch_get}
+ *   {@getfields entity_batch_get}
  * @access public
  */
 function civicrm_api3_entity_batch_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
