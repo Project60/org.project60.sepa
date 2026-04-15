@@ -21,7 +21,6 @@
  *
  */
 
-
 /**
  * Add an SepaSddFile for a contact
  *
@@ -30,7 +29,7 @@
  * @example SepaSddFileCreate.php Standard Create Example
  *
  * @return array API result array
- * {@getfields sepa_sdd_file_create}
+ *   {@getfields sepa_sdd_file_create}
  * @access public
  */
 function civicrm_api3_sepa_sdd_file_create($params) {
@@ -46,19 +45,19 @@ function civicrm_api3_sepa_sdd_file_create($params) {
 function _civicrm_api3_sepa_sdd_file_create_spec(&$params) {
   $params['reference']['api.required'] = 1;
   $params['filename']['api.required'] = 1;
-  $params['created_date']['api.default'] = "now";
-  $params['created_id']['api.default'] = "user_contact_id";
+  $params['created_date']['api.default'] = 'now';
+  $params['created_id']['api.default'] = 'user_contact_id';
 }
 
 /**
  * Deletes an existing SepaSddFile
  *
- * @param  array  $params
+ * @param  array $params
  *
  * @example SepaSddFileDelete.php Standard Delete Example
  *
  * @return boolean | error  true if successfull, error otherwise
- * {@getfields sepa_sdd_file_delete}
+ *   {@getfields sepa_sdd_file_delete}
  * @access public
  */
 function civicrm_api3_sepa_sdd_file_delete($params) {
@@ -76,7 +75,7 @@ function civicrm_api3_sepa_sdd_file_delete($params) {
  * @param  array $params  an associative array of name/value pairs.
  *
  * @return  array api result array
- * {@getfields sepa_sdd_file_get}
+ *   {@getfields sepa_sdd_file_get}
  * @access public
  */
 function civicrm_api3_sepa_sdd_file_get($params) {
@@ -89,7 +88,7 @@ function _civicrm_api3_sepa_sdd_file_generatexml_spec(&$params) {
 }
 
 function civicrm_api3_sepa_sdd_file_generatexml($params) {
-//fetch the file, then the group
+  //fetch the file, then the group
   $file = new CRM_Sepa_BAO_SEPASddFile();
-  $file->generateXML($params["id"]);
+  $file->generateXML($params['id']);
 }

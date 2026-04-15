@@ -44,7 +44,7 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
   /**
    * Load the fields from this entity.
    *
-   * @param DataSpecification $dataSpecification
+   * @param \Civi\DataProcessor\DataSpecification\DataSpecification $dataSpecification
    * @param array $fieldsToSkip
    *
    * @throws \Civi\DataProcessor\DataSpecification\FieldExistsException
@@ -57,4 +57,5 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
       'OOFF' => 'OOFF',
     ];
   }
+
 }

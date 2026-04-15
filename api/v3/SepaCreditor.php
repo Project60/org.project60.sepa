@@ -21,7 +21,6 @@
  *
  */
 
-
 /**
  * Add an SepaCreditor for a contact
  *
@@ -30,7 +29,7 @@
  * @example SepaCreditorCreate.php Standard Create Example
  *
  * @return array API result array
- * {@getfields sepa_creditor_create}
+ *   {@getfields sepa_creditor_create}
  * @access public
  */
 function civicrm_api3_sepa_creditor_create($params) {
@@ -45,20 +44,20 @@ function civicrm_api3_sepa_creditor_create($params) {
  */
 function _civicrm_api3_sepa_creditor_create_spec(&$params) {
   // TODO a 'clever' default should be introduced
-  $params['mandate_prefix']['api.default'] = "SEPA";
-  $params['identifier']['api.default'] = "FIXME";
-  $params['name']['api.default'] = "FIXME";
+  $params['mandate_prefix']['api.default'] = 'SEPA';
+  $params['identifier']['api.default'] = 'FIXME';
+  $params['name']['api.default'] = 'FIXME';
 }
 
 /**
  * Deletes an existing SepaCreditor
  *
- * @param  array  $params
+ * @param  array $params
  *
  * @example SepaCreditorDelete.php Standard Delete Example
  *
  * @return boolean | error  true if successfull, error otherwise
- * {@getfields sepa_creditor_delete}
+ *   {@getfields sepa_creditor_delete}
  * @access public
  */
 function civicrm_api3_sepa_creditor_delete($params) {
@@ -76,7 +75,7 @@ function civicrm_api3_sepa_creditor_delete($params) {
  * @param  array $params  an associative array of name/value pairs.
  *
  * @return  array api result array
- * {@getfields sepa_creditor_get}
+ *   {@getfields sepa_creditor_get}
  * @access public
  */
 function civicrm_api3_sepa_creditor_get($params) {
@@ -87,4 +86,3 @@ function civicrm_api3_sepa_creditor_get($params) {
   }
   return _civicrm_api3_basic_get($bao_name, $params);
 }
-

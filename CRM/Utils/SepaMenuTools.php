@@ -29,8 +29,8 @@ class CRM_Utils_SepaMenuTools {
    * It will consider the IDs from the database,
    *  as well as the 'volatile' ones already injected into the menu
    */
-  static function createUniqueNavID($menu) {
-    $max_stored_navId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_navigation");
+  public static function createUniqueNavID($menu) {
+    $max_stored_navId = CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_navigation');
     $max_current_navId = self::getMaxNavID($menu);
     return max($max_stored_navId, $max_current_navId) + 1;
   }
@@ -38,7 +38,7 @@ class CRM_Utils_SepaMenuTools {
   /**
    * crawls the menu tree to find the (currently) biggest navID
    */
-  static function getMaxNavID($menu) {
+  public static function getMaxNavID($menu) {
     $max_id = 1;
     foreach ($menu as $entry) {
       $max_id = max($max_id, $entry['attributes']['navID']);
@@ -50,24 +50,25 @@ class CRM_Utils_SepaMenuTools {
     return $max_id;
   }
 
-
   /**
    * Add the given menu item to the CiviCRM navigation menu if it does not exist yet.
    * @param array parent_params the params array into whose 'child' attribute the new item will be added.
    * @param array $attributes the attributes array to be added to the navigation menu
    */
-  static function addNavigationMenuEntry(&$parent_params, $menu_entry_attributes) {
+  public static function addNavigationMenuEntry(&$parent_params, $menu_entry_attributes) {
     // see if it is already in the menu...
-    $menu_item_search = array('url' => $menu_entry_attributes['url']);
-    $menu_items = array();
+    $menu_item_search = ['url' => $menu_entry_attributes['url']];
+    $menu_items = [];
     CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
 
     if (empty($menu_items)) {
       // it's not already contained, so we want to add it to the menu
 
       // insert at the bottom
-      $parent_params['child'][] = array(
-          'attributes' => $menu_entry_attributes);
+      $parent_params['child'][] = [
+        'attributes' => $menu_entry_attributes,
+      ];
     }
   }
+
 }

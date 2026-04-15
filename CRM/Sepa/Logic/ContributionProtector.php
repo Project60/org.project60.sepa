@@ -30,7 +30,8 @@ class CRM_Sepa_Logic_ContributionProtector implements API_Wrapper {
       $error = FALSE;
       if ($apiRequest['entity'] == 'Contribution') {
         $error = self::isProtected($apiRequest['params']['id'], 'civicrm_contribution');
-      } elseif ($apiRequest['entity'] == 'ContributionRecur') {
+      }
+      elseif ($apiRequest['entity'] == 'ContributionRecur') {
         $error = self::isProtected($apiRequest['params']['id'], 'civicrm_contribution_recur');
       }
 
@@ -42,7 +43,7 @@ class CRM_Sepa_Logic_ContributionProtector implements API_Wrapper {
     return $apiRequest;
   }
 
-   /**
+  /**
    * alter the result before returning it to the caller.
    */
   public function toApiOutput($apiRequest, $result) {
@@ -63,10 +64,11 @@ class CRM_Sepa_Logic_ContributionProtector implements API_Wrapper {
         $protected = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_sdd_mandate WHERE entity_id={$entity_id} AND entity_table='{$entity_table}';");
         if ($protected) {
           // TODO: use ts() parameters
-          return sprintf(ts("You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!", array('domain' => 'org.project60.sepa')), $protected);
+          return sprintf(ts('You cannot delete this contribution because it is connected to SEPA mandate [%s]. Delete the mandate instead!', ['domain' => 'org.project60.sepa']), $protected);
         }
       }
     }
     return FALSE;
   }
+
 }

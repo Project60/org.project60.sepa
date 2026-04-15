@@ -41,7 +41,7 @@ class GetAction extends DAOGetAction {
         ->execute()
         ->column('txgroup_id');
       $this
-      ->addWhere('id', 'IN', $fullyPermissionedTxgroups);
+        ->addWhere('id', 'IN', $fullyPermissionedTxgroups);
     }
     return parent::_run($result);
   }

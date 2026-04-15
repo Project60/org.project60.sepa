@@ -27,7 +27,7 @@ class MandateContributionRecurJoin extends AbstractMandateJoin {
    * @return false|string
    */
   public function getConfigurationTemplateFileName():? string {
-    return "CRM/Sepa/Form/DataProcessor/Join//MandateContributionRecurJoin.tpl";
+    return 'CRM/Sepa/Form/DataProcessor/Join//MandateContributionRecurJoin.tpl';
   }
 
   protected function getEntityTable(): string {

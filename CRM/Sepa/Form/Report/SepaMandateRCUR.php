@@ -38,197 +38,197 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     unset($this->_columns['civicrm_sdd_mandate']['filters']['amount']);
 
     // cycle days
-    $cycle_days = array();
-    for ($i=1; $i <= 31; $i++) {
+    $cycle_days = [];
+    for ($i = 1; $i <= 31; $i++) {
       $cycle_days[(string) $i] = (string) $i;
     }
 
     // cycle intervals
-    $cycle_intervals = array(
-      "'1 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('1',  'month', TRUE),
-      "'3 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('3',  'month', TRUE),
-      "'4 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('4',  'month', TRUE),
-      "'6 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('6',  'month', TRUE),
+    $cycle_intervals = [
+      "'1 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('1', 'month', TRUE),
+      "'3 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('3', 'month', TRUE),
+      "'4 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('4', 'month', TRUE),
+      "'6 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('6', 'month', TRUE),
       "'12 month'" => CRM_Utils_SepaOptionGroupTools::getFrequencyText('12', 'month', TRUE),
-      );
+    ];
 
-    $this->_columns['civicrm_contribution_recur'] = array(
+    $this->_columns['civicrm_contribution_recur'] = [
       'dao' => 'CRM_Contribute_BAO_ContributionRecur',
-      'fields' => array(
-        'financial_type_id' => array(
-          'title' => ts('Financial Type', array('domain' => 'org.project60.sepa')),
+      'fields' => [
+        'financial_type_id' => [
+          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
           'default' => TRUE,
-        ),
-        'campaign_id' => array(
-          'title' => ts('Campaign', array('domain' => 'org.project60.sepa')),
-        ),
-        'cycle_day' => array(
-          'title' => ts('Cycle Day', array('domain' => 'org.project60.sepa')),
-        ),
-        'recurring_contribution_status_id' => array(
+        ],
+        'campaign_id' => [
+          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
+        ],
+        'cycle_day' => [
+          'title' => ts('Cycle Day', ['domain' => 'org.project60.sepa']),
+        ],
+        'recurring_contribution_status_id' => [
           'name'  => 'recurring_contribution_status_id',
-          'title' => ts('Recurring Contribution Status', array('domain' => 'org.project60.sepa')),
-        ),
-        'start_date' => array(
-          'title' => ts('Start Date', array('domain' => 'org.project60.sepa')),
-        ),
-        'end_date' => array(
-          'title' => ts('End Date', array('domain' => 'org.project60.sepa')),
-        ),
-        'cancel_reasons' => array(
-          'title' => ts('Cancel Reason(s)', array('domain' => 'org.project60.sepa')),
-        ),
-        'currency' => array(
-          'title' => ts('Currency', array('domain' => 'org.project60.sepa')),
+          'title' => ts('Recurring Contribution Status', ['domain' => 'org.project60.sepa']),
+        ],
+        'start_date' => [
+          'title' => ts('Start Date', ['domain' => 'org.project60.sepa']),
+        ],
+        'end_date' => [
+          'title' => ts('End Date', ['domain' => 'org.project60.sepa']),
+        ],
+        'cancel_reasons' => [
+          'title' => ts('Cancel Reason(s)', ['domain' => 'org.project60.sepa']),
+        ],
+        'currency' => [
+          'title' => ts('Currency', ['domain' => 'org.project60.sepa']),
           'required' => TRUE,
           'no_display' => TRUE,
-        ),
-        'trxn_id' => array(
-          'title' => ts('Transaction ID', array('domain' => 'org.project60.sepa')),
-        ),
-        'installment_amount' => array(
+        ],
+        'trxn_id' => [
+          'title' => ts('Transaction ID', ['domain' => 'org.project60.sepa']),
+        ],
+        'installment_amount' => [
           'dbAlias' => 'amount',
-          'title' => ts('Installment Amount', array('domain' => 'org.project60.sepa')),
-        ),
-        'cycle_interval' => array(
-          'title' => ts('Cycle Interval', array('domain' => 'org.project60.sepa')),
-        ),
-      ),
-      'filters' => array(
-        'start_date' => array(
-          'title' => ts('Start Date', array('domain' => 'org.project60.sepa')),
+          'title' => ts('Installment Amount', ['domain' => 'org.project60.sepa']),
+        ],
+        'cycle_interval' => [
+          'title' => ts('Cycle Interval', ['domain' => 'org.project60.sepa']),
+        ],
+      ],
+      'filters' => [
+        'start_date' => [
+          'title' => ts('Start Date', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
-        ),
-        'end_date' => array(
-          'title' => ts('End Date', array('domain' => 'org.project60.sepa')),
+        ],
+        'end_date' => [
+          'title' => ts('End Date', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
-        ),
-        'financial_type_id' => array(
-          'title' => ts('Financial Type', array('domain' => 'org.project60.sepa')),
+        ],
+        'financial_type_id' => [
+          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::financialType(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'cycle_interval' => array(
+        ],
+        'cycle_interval' => [
           'dbAlias' => 'cycle_interval',
-          'title' => ts('Cycle Interval', array('domain' => 'org.project60.sepa')),
+          'title' => ts('Cycle Interval', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $cycle_intervals,
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'cycle_day' => array(
-          'title' => ts('Cycle Days', array('domain' => 'org.project60.sepa')),
+        ],
+        'cycle_day' => [
+          'title' => ts('Cycle Days', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $cycle_days,
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'campaign_id' => array(
-          'title' => ts('Campaign', array('domain' => 'org.project60.sepa')),
+        ],
+        'campaign_id' => [
+          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Campaign_BAO_Campaign::getCampaigns(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'recurring_contribution_status_id' => array(
-          'title' => ts('Recurring Contribution Status', array('domain' => 'org.project60.sepa')),
+        ],
+        'recurring_contribution_status_id' => [
+          'title' => ts('Recurring Contribution Status', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'cancel_reasons' => array(
+        ],
+        'cancel_reasons' => [
           'dbAlias' => 'cancel_reasons',
           'type' => CRM_Utils_Type::T_STRING,
           'operatorType' => CRM_Report_Form::OP_STRING,
-          'title' => ts('Cancel Reason(s)', array('domain' => 'org.project60.sepa')),
-        ),
-        'installment_amount' => array(
+          'title' => ts('Cancel Reason(s)', ['domain' => 'org.project60.sepa']),
+        ],
+        'installment_amount' => [
           'dbAlias' => 'amount',
-          'title' => ts('Installment Amount', array('domain' => 'org.project60.sepa')),
+          'title' => ts('Installment Amount', ['domain' => 'org.project60.sepa']),
           'type'  => CRM_Utils_Type::T_FLOAT,
           'operatorType' => CRM_Report_Form::OP_FLOAT,
-        ),
-      ),
-      'order_bys' => array(
-        'financial_type_id' => array('title' => ts('Financial Type', array('domain' => 'org.project60.sepa'))),
-        'recurring_contribution_status_id' => array('title' => ts('Recurring Contribution Status', array('domain' => 'org.project60.sepa'))),
-      ),
+        ],
+      ],
+      'order_bys' => [
+        'financial_type_id' => ['title' => ts('Financial Type', ['domain' => 'org.project60.sepa'])],
+        'recurring_contribution_status_id' => ['title' => ts('Recurring Contribution Status', ['domain' => 'org.project60.sepa'])],
+      ],
       'grouping' => 'rcontri-fields',
-    );
+    ];
 
     // add aggregated contribution fields
-    $this->_columns['civicrm_contribution'] = array(
+    $this->_columns['civicrm_contribution'] = [
       'dao' => 'CRM_Contribute_DAO_Contribution',
-      'fields' => array(
-        'total_amount_collected' => array(
-          'title' => ts('Total Amount Collected', array('domain' => 'org.project60.sepa')),
-        ),
-        'total_count_collected' => array(
-          'title' => ts('Total Count of Collected Contributions', array('domain' => 'org.project60.sepa')),
-        ),
-        'total_count_failed' => array(
-          'title' => ts('Total Count of Failed/Cancelled Contribution', array('domain' => 'org.project60.sepa')),
-        ),
-        'contribution_count' => array(
-          'title' => ts('Matching Contribution Count', array('domain' => 'org.project60.sepa')),
-        ),
-      ),
-      'filters' => array(
-        'contribution_status_id' => array(
-          'title' => ts('Contribution Status', array('domain' => 'org.project60.sepa')),
+      'fields' => [
+        'total_amount_collected' => [
+          'title' => ts('Total Amount Collected', ['domain' => 'org.project60.sepa']),
+        ],
+        'total_count_collected' => [
+          'title' => ts('Total Count of Collected Contributions', ['domain' => 'org.project60.sepa']),
+        ],
+        'total_count_failed' => [
+          'title' => ts('Total Count of Failed/Cancelled Contribution', ['domain' => 'org.project60.sepa']),
+        ],
+        'contribution_count' => [
+          'title' => ts('Matching Contribution Count', ['domain' => 'org.project60.sepa']),
+        ],
+      ],
+      'filters' => [
+        'contribution_status_id' => [
+          'title' => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'total_amount_collected' => array(
+        ],
+        'total_amount_collected' => [
           'dbAlias' => 'total_amount_collected',
-          'title'   => ts('Total Amount Collected', array('domain' => 'org.project60.sepa')),
+          'title'   => ts('Total Amount Collected', ['domain' => 'org.project60.sepa']),
           'type'    => CRM_Utils_Type::T_FLOAT,
           'operatorType' => CRM_Report_Form::OP_FLOAT,
-        ),
-        'total_count_collected' => array(
+        ],
+        'total_count_collected' => [
           'dbAlias' => 'total_count_collected',
-          'title'   => ts('Total Count of Collected Contributions', array('domain' => 'org.project60.sepa')),
+          'title'   => ts('Total Count of Collected Contributions', ['domain' => 'org.project60.sepa']),
           'type'    => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_INT,
-        ),
-        'total_count_failed' => array(
+        ],
+        'total_count_failed' => [
           'dbAlias' => 'total_count_failed',
-          'title'   => ts('Total Count of Failed/Cancelled Contribution', array('domain' => 'org.project60.sepa')),
+          'title'   => ts('Total Count of Failed/Cancelled Contribution', ['domain' => 'org.project60.sepa']),
           'type'    => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_INT,
-        ),
-        'receive_date' => array(
-          'title' => ts('Contribution Collection Date', array('domain' => 'org.project60.sepa')),
+        ],
+        'receive_date' => [
+          'title' => ts('Contribution Collection Date', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
-        ),
-      ),
-      'order_bys' => array(
-        'contribution_count' => array(
+        ],
+      ],
+      'order_bys' => [
+        'contribution_count' => [
           'dbAlias' => 'contribution_count',
-          'title' => ts('Matching Contribution Count', array('domain' => 'org.project60.sepa')),
-          ),
-        'total_amount_collected' => array(
+          'title' => ts('Matching Contribution Count', ['domain' => 'org.project60.sepa']),
+        ],
+        'total_amount_collected' => [
           'dbAlias' => 'total_amount_collected',
-          'title' => ts('Total Amount Collected', array('domain' => 'org.project60.sepa')),
-        ),
-        'total_count_collected' => array(
+          'title' => ts('Total Amount Collected', ['domain' => 'org.project60.sepa']),
+        ],
+        'total_count_collected' => [
           'dbAlias' => 'total_count_collected',
-          'title' => ts('Total Count of Collected Contributions', array('domain' => 'org.project60.sepa')),
-        ),
-        'total_count_failed' => array(
+          'title' => ts('Total Count of Collected Contributions', ['domain' => 'org.project60.sepa']),
+        ],
+        'total_count_failed' => [
           'dbAlias' => 'total_count_failed',
-          'title' => ts('Total Count of Failed/Cancelled Contribution', array('domain' => 'org.project60.sepa')),
-        ),
-      ),
-    );
+          'title' => ts('Total Count of Failed/Cancelled Contribution', ['domain' => 'org.project60.sepa']),
+        ],
+      ],
+    ];
   }
 
   /**
    * Override select clauses for some fields
    */
-  function _getSelectClause($fieldName, $field, $tableName) {
+  public function _getSelectClause($fieldName, $field, $tableName) {
     // add amount from either OOFF or RCUR
     if ($fieldName == 'total_amount_collected') {
       $this->_columnHeaders['total_amount_collected']['title'] = $field['title'];
@@ -272,7 +272,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
   /**
    * override FROM clause
    */
-  function from() {
+  public function from() {
     $this->_from = NULL;
     $this->_from = "
          FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
@@ -294,7 +294,6 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_sdd_mandate']}.id";
   }
 
-
   /**
    * internal function to generate where clauses
    */
@@ -302,7 +301,8 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     if ($fieldName == 'cycle_interval') {
       $cycle_intervals = $this->_params["{$fieldName}_value"] ?? NULL;
       if (in_array("'12 month'", $cycle_intervals)) {
-        $cycle_intervals[] = "'1 year'"; // the database could have both: '1 year' and '12 month'...
+        // the database could have both: '1 year' and '12 month'...
+        $cycle_intervals[] = "'1 year'";
       }
       $clause = $this->whereClause($field, $this->_params["{$fieldName}_op"] ?? NULL, $cycle_intervals,
           $this->_params["{$fieldName}_min"] ?? NULL,
@@ -387,7 +387,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
   /**
    * Prep data for display
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // first, let the generic code work through the data
     parent::alterDisplay($rows);
 
@@ -438,4 +438,5 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       }
     }
   }
+
 }

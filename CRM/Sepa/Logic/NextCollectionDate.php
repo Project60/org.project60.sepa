@@ -22,7 +22,8 @@
  */
 class CRM_Sepa_Logic_NextCollectionDate {
 
-  /** fields for Mandate/RecurringContribution edit/create event processing */
+  /**
+   * fields for Mandate/RecurringContribution edit/create event processing */
   protected static $currently_edited_mandate_id = NULL;
   protected static $currently_edited_mandate_params = NULL;
   protected static $currently_edited_recurring_contribution_id = NULL;
@@ -31,9 +32,9 @@ class CRM_Sepa_Logic_NextCollectionDate {
   protected $now;
   protected $creditor_id;
 
-  function __construct($creditor_id = NULL, $mode = 'RCUR') {
+  public function __construct($creditor_id = NULL, $mode = 'RCUR') {
     if (empty($creditor_id)) {
-      $creditor_id =(int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
+      $creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
     }
     $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.{$mode}.grace", $creditor_id);
     $rcur_notice  = (int) CRM_Sepa_Logic_Settings::getSetting("batching.{$mode}.notice", $creditor_id);
@@ -72,7 +73,8 @@ class CRM_Sepa_Logic_NextCollectionDate {
     $next_sched_contribution_date = $this->calculateNextCollectionDate($contribution_recur_id);
     if ($next_sched_contribution_date) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution_recur SET next_sched_contribution_date = '{$next_sched_contribution_date}' WHERE id = {$contribution_recur_id}");
-    } else {
+    }
+    else {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution_recur SET next_sched_contribution_date = NULL WHERE id = {$contribution_recur_id}");
     }
   }
@@ -103,7 +105,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
       WHERE civicrm_contribution_recur.id = {$contribution_recur_id}");
     if ($query->fetch()) {
       $mode = $query->status;
-      $mandate = array(
+      $mandate = [
         'cycle_day'              => $query->cycle_day,
         'frequency_interval'     => $query->frequency_interval,
         'frequency_unit'         => $query->frequency_unit,
@@ -111,8 +113,8 @@ class CRM_Sepa_Logic_NextCollectionDate {
         'mandate_first_executed' => $query->mandate_first_executed,
         'end_date'               => $query->end_date,
         'cancel_date'            => $query->cancel_date,
-        );
-      return CRM_Sepa_Logic_Batching::getNextExecutionDate($mandate, $this->now, ($mode=='FRST'));
+      ];
+      return CRM_Sepa_Logic_Batching::getNextExecutionDate($mandate, $this->now, ($mode == 'FRST'));
     }
   }
 
@@ -126,14 +128,16 @@ class CRM_Sepa_Logic_NextCollectionDate {
     // PREPARE: generate the right identification snippets
     $txgroup_id = (int) $txgroup_id;
     if (!empty($txgroup_id)) {
-      $joins = "LEFT JOIN civicrm_contribution ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
-                LEFT JOIN civicrm_sdd_contribution_txgroup ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id";
+      $joins = 'LEFT JOIN civicrm_contribution ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
+                LEFT JOIN civicrm_sdd_contribution_txgroup ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id';
       $where = "civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
-    } elseif (!empty($contribution_id_list)) {
-      $joins = "LEFT JOIN civicrm_contribution ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id";
+    }
+    elseif (!empty($contribution_id_list)) {
+      $joins = 'LEFT JOIN civicrm_contribution ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id';
       $where = 'civicrm_contribution.id IN (' . implode(',', $contribution_id_list) . ')';
-    } else {
-      Civi::log()->debug("org.project60.sepa: advanceNextCollectionDate failed - no identifier given.");
+    }
+    else {
+      Civi::log()->debug('org.project60.sepa: advanceNextCollectionDate failed - no identifier given.');
       return;
     }
 
@@ -155,10 +159,9 @@ class CRM_Sepa_Logic_NextCollectionDate {
     }
     $last_collection_date = strtotime($info_query->receive_date);
     while (date('d', $last_collection_date) != $info_query->cycle_day) {
-      $last_collection_date = strtotime("-1 day", $last_collection_date);
+      $last_collection_date = strtotime('-1 day', $last_collection_date);
     }
     $last_collection_date = date('YmdHis', $last_collection_date);
-
 
     // FIRST: set all to the last collection date, so we can rule out
     //  dropped/skipped instances with older dates
@@ -170,7 +173,8 @@ class CRM_Sepa_Logic_NextCollectionDate {
     CRM_Core_DAO::executeQuery($update_query_sql);
 
     // SECONDLY: advance all values by one period
-    $periods = array('month' => 'MONTH', 'year' => 'YEAR'); // TODO: more?
+    // TODO: more?
+    $periods = ['month' => 'MONTH', 'year' => 'YEAR'];
     foreach ($periods as $civi_unit => $sql_unit) {
       $advance_query_sql = "
         UPDATE civicrm_contribution_recur
@@ -192,7 +196,6 @@ class CRM_Sepa_Logic_NextCollectionDate {
     // DONE
   }
 
-
   /**
    * preparation for self::processMandatePostEdit
    */
@@ -211,13 +214,14 @@ class CRM_Sepa_Logic_NextCollectionDate {
 
     $update_required = FALSE;
     if ($op == 'edit') {
-      $relevant_changes = array('status', 'is_enabled', 'first_contribution_id', 'type', 'entity_id', 'type', 'creditor_id');
+      $relevant_changes = ['status', 'is_enabled', 'first_contribution_id', 'type', 'entity_id', 'type', 'creditor_id'];
       foreach ($relevant_changes as $critical_attribute) {
         if (array_key_exists($critical_attribute, self::$currently_edited_mandate_params)) {
           $update_required = TRUE;
         }
       }
-    } elseif ($op == 'create') {
+    }
+    elseif ($op == 'create') {
       self::$currently_edited_mandate_id = $objectId;
       $type = self::$currently_edited_mandate_params['type'] ?? NULL;
       $update_required = ($type == 'RCUR');
@@ -227,8 +231,9 @@ class CRM_Sepa_Logic_NextCollectionDate {
       // get creditor_id
       if (!empty(self::$currently_edited_mandate_params['creditor_id'])) {
         $creditor_id = self::$currently_edited_mandate_params['creditor_id'];
-      } else {
-        $creditor_id = CRM_Core_DAO::singleValueQuery("SELECT creditor_id FROM civicrm_sdd_mandate WHERE id = " . self::$currently_edited_mandate_id);
+      }
+      else {
+        $creditor_id = CRM_Core_DAO::singleValueQuery('SELECT creditor_id FROM civicrm_sdd_mandate WHERE id = ' . self::$currently_edited_mandate_id);
       }
       $updater = new CRM_Sepa_Logic_NextCollectionDate($creditor_id);
       $updater->updateNextCollectionDate(NULL, self::$currently_edited_mandate_id);
@@ -238,7 +243,6 @@ class CRM_Sepa_Logic_NextCollectionDate {
     self::$currently_edited_mandate_params = NULL;
     self::$currently_edited_mandate_id = NULL;
   }
-
 
   /**
    * preparation for self::processRecurPostEdit
@@ -261,16 +265,18 @@ class CRM_Sepa_Logic_NextCollectionDate {
       if (empty(self::$currently_edited_recurring_contribution_params['next_sched_contribution_date'])) {
         $type = self::$currently_edited_recurring_contribution_params['type'] ?? NULL;
 
-        $relevant_changes = array('frequency_unit', 'frequency_interval', 'start_date', 'end_date', 'cancel_date', 'contribution_status_id', 'cycle_day');
+        $relevant_changes = ['frequency_unit', 'frequency_interval', 'start_date', 'end_date', 'cancel_date', 'contribution_status_id', 'cycle_day'];
         foreach ($relevant_changes as $critical_attribute) {
           if (array_key_exists($critical_attribute, self::$currently_edited_recurring_contribution_params)) {
             $update_required = TRUE;
           }
         }
-      } else {
+      }
+      else {
         // if the date is passed, no need to calculate
       }
-    } elseif ($op == 'create') {
+    }
+    elseif ($op == 'create') {
       self::$currently_edited_recurring_contribution_id = $objectId;
 
       // we won't deal with recurring contribution upon creation,
@@ -299,4 +305,5 @@ class CRM_Sepa_Logic_NextCollectionDate {
     self::$currently_edited_recurring_contribution_params = NULL;
     self::$currently_edited_recurring_contribution_id = NULL;
   }
+
 }

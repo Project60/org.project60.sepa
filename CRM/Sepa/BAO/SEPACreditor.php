@@ -26,15 +26,14 @@
  */
 class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
 
-
   /**
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
    *
    * @return object       CRM_Core_BAO_SEPACreditor object on success, null otherwise
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaCreditor', $params['id'] ?? NULL, $params);
 
@@ -65,30 +64,43 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
    * @deprecated this is not used by this extension, will be removed in CiviSEPA >= 1.6
    */
   public static function initialiseMandateData($creditor_id, &$mandate_data) {
-    if (empty($creditor_id) || empty($mandate_data['id']) || empty($mandate_data['type'])) return;
+    if (empty($creditor_id) || empty($mandate_data['id']) || empty($mandate_data['type'])) {
+      return;
+    }
 
-    $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id'=>$creditor_id));
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $creditor_id]);
     if (empty($creditor['mandate_active'])) {
       // mandate is being created as 'not activated'
       $mandate_data['is_enabled'] = 0;
-      if (empty($mandate_data['creation_date']))   $mandate_data['creation_date'] = date('YmdHis');
+      if (empty($mandate_data['creation_date'])) {
+        $mandate_data['creation_date'] = date('YmdHis');
+      }
 
       if ($mandate_data['type'] == 'RCUR') {
         $mandate_data['status'] = 'INIT';
-      } elseif ($mandate_data['type'] == 'OOFF') {
+      }
+      elseif ($mandate_data['type'] == 'OOFF') {
         $mandate_data['status'] = 'INIT';
       }
 
-    } else {
+    }
+    else {
       // mandate is activated right away
       $mandate_data['is_enabled'] = 1;
-      if (empty($mandate_data['date']))            $mandate_data['date']            = date('YmdHis');
-      if (empty($mandate_data['creation_date']))   $mandate_data['creation_date']   = date('YmdHis');
-      if (empty($mandate_data['validation_date'])) $mandate_data['validation_date'] = date('YmdHis');
+      if (empty($mandate_data['date'])) {
+        $mandate_data['date'] = date('YmdHis');
+      }
+      if (empty($mandate_data['creation_date'])) {
+        $mandate_data['creation_date'] = date('YmdHis');
+      }
+      if (empty($mandate_data['validation_date'])) {
+        $mandate_data['validation_date'] = date('YmdHis');
+      }
 
       if ($mandate_data['type'] == 'RCUR') {
         $mandate_data['status'] = 'FRST';
-      } elseif ($mandate_data['type'] == 'OOFF') {
+      }
+      elseif ($mandate_data['type'] == 'OOFF') {
         $mandate_data['status'] = 'OOFF';
       }
     }
@@ -122,10 +134,11 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
           'pi_rcur'             => "{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}",
           'cuc'                 => '',
         ]);
-      } catch (Exception $ex) {
+      }
+      catch (Exception $ex) {
         throw new Exception("Couldn't create default creditor: " . $ex->getMessage());
       }
     }
   }
-}
 
+}

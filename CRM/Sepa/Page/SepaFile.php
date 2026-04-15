@@ -23,12 +23,13 @@
 require_once 'CRM/Core/Page.php';
 
 class CRM_Sepa_Page_SepaFile extends CRM_Core_Page {
-  function run() {
-    // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
-    CRM_Utils_System::setTitle(ts('Generate XML File', array('domain' => 'org.project60.sepa')));
 
-    $id = (int)CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    if ($id>0) {
+  public function run() {
+    // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
+    CRM_Utils_System::setTitle(ts('Generate XML File', ['domain' => 'org.project60.sepa']));
+
+    $id = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    if ($id > 0) {
       //fetch the file, then the group
       $file = new CRM_Sepa_BAO_SEPASddFile();
       $xml = $file->generateXML($id);
@@ -36,12 +37,14 @@ class CRM_Sepa_Page_SepaFile extends CRM_Core_Page {
       //header('Content-Type: text/plain; charset=utf-8');
       echo $xml;
       CRM_Utils_System::civiExit();
-    } else {
+    }
+    else {
 
-      CRM_Core_Error::fatal("missing parameter. you need id");
+      CRM_Core_Error::fatal('missing parameter. you need id');
       return;
     }
 
     parent::run();
   }
+
 }

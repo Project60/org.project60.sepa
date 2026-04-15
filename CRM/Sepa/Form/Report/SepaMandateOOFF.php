@@ -37,111 +37,111 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
     unset($this->_columns['civicrm_sdd_mandate']['fields']['amount']);
     unset($this->_columns['civicrm_sdd_mandate']['filters']['amount']);
 
-    $this->_columns['civicrm_contribution'] = array(
+    $this->_columns['civicrm_contribution'] = [
       'dao' => 'CRM_Contribute_DAO_Contribution',
-      'fields' => array(
-        'contribution_id' => array(
+      'fields' => [
+        'contribution_id' => [
           'name' => 'id',
           'no_display' => TRUE,
           'required' => TRUE,
-        ),
-        'list_contri_id' => array(
+        ],
+        'list_contri_id' => [
           'name' => 'id',
-          'title' => ts('Contribution ID', array('domain' => 'org.project60.sepa')),
-        ),
-        'financial_type_id' => array(
-          'title' => ts('Financial Type', array('domain' => 'org.project60.sepa')),
+          'title' => ts('Contribution ID', ['domain' => 'org.project60.sepa']),
+        ],
+        'financial_type_id' => [
+          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
           'default' => TRUE,
-        ),
-        'campaign_id' => array(
-          'title' => ts('Campaign', array('domain' => 'org.project60.sepa')),
-        ),
-        'contribution_status_id' => array(
-          'title' => ts('Contribution Status', array('domain' => 'org.project60.sepa')),
-        ),
-        'cancel_reason' => array(
-          'title' => ts('Cancel Reason', array('domain' => 'org.project60.sepa')),
-        ),
-        'contribution_page_id' => array(
-          'title' => ts('Contribution Page', array('domain' => 'org.project60.sepa')),
-        ),
-        'source' => array(
-          'title' => ts('Source', array('domain' => 'org.project60.sepa')),
-        ),
-        'currency' => array(
-          'title' => ts('Currency', array('domain' => 'org.project60.sepa')),
+        ],
+        'campaign_id' => [
+          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
+        ],
+        'contribution_status_id' => [
+          'title' => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
+        ],
+        'cancel_reason' => [
+          'title' => ts('Cancel Reason', ['domain' => 'org.project60.sepa']),
+        ],
+        'contribution_page_id' => [
+          'title' => ts('Contribution Page', ['domain' => 'org.project60.sepa']),
+        ],
+        'source' => [
+          'title' => ts('Source', ['domain' => 'org.project60.sepa']),
+        ],
+        'currency' => [
+          'title' => ts('Currency', ['domain' => 'org.project60.sepa']),
           'required' => TRUE,
           'no_display' => TRUE,
-        ),
+        ],
         'trxn_id' => NULL,
-        'receive_date' => array(
-          'title'   => ts('Contribution Collection Date', array('domain' => 'org.project60.sepa')),
-          'default' => TRUE
-          ),
+        'receive_date' => [
+          'title'   => ts('Contribution Collection Date', ['domain' => 'org.project60.sepa']),
+          'default' => TRUE,
+        ],
         'receipt_date' => NULL,
-        'total_amount' => array(
-          'title' => ts('Amount', array('domain' => 'org.project60.sepa')),
+        'total_amount' => [
+          'title' => ts('Amount', ['domain' => 'org.project60.sepa']),
           'type'    => CRM_Utils_Type::T_FLOAT,
-        ),
-        'fee_amount' => array(
-          'title' => ts('Fee Amount', array('domain' => 'org.project60.sepa')),
+        ],
+        'fee_amount' => [
+          'title' => ts('Fee Amount', ['domain' => 'org.project60.sepa']),
           'type'    => CRM_Utils_Type::T_FLOAT,
-        ),
-        'net_amount' => array(
-          'title' => ts('Net Amount', array('domain' => 'org.project60.sepa')),
+        ],
+        'net_amount' => [
+          'title' => ts('Net Amount', ['domain' => 'org.project60.sepa']),
           'type'    => CRM_Utils_Type::T_FLOAT,
-        ),
-      ),
-      'filters' => array(
-        'receive_date' => array(
-          'title' => ts('Contribution Collection Date', array('domain' => 'org.project60.sepa')),
-          'operatorType' => CRM_Report_Form::OP_DATE
-        ),
-        'financial_type_id' => array(
-          'title' => ts('Financial Type', array('domain' => 'org.project60.sepa')),
+        ],
+      ],
+      'filters' => [
+        'receive_date' => [
+          'title' => ts('Contribution Collection Date', ['domain' => 'org.project60.sepa']),
+          'operatorType' => CRM_Report_Form::OP_DATE,
+        ],
+        'financial_type_id' => [
+          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::financialType(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'campaign_id' => array(
-          'title' => ts('Campaign', array('domain' => 'org.project60.sepa')),
+        ],
+        'campaign_id' => [
+          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Campaign_BAO_Campaign::getCampaigns(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'contribution_page_id' => array(
-          'title' => ts('Contribution Page', array('domain' => 'org.project60.sepa')),
+        ],
+        'contribution_page_id' => [
+          'title' => ts('Contribution Page', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionPage(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'contribution_status_id' => array(
-          'title' => ts('Contribution Status', array('domain' => 'org.project60.sepa')),
+        ],
+        'contribution_status_id' => [
+          'title' => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
-        ),
-        'cancel_reason' => array(
+        ],
+        'cancel_reason' => [
           'name' => 'cancel_reason',
           'type' => CRM_Utils_Type::T_STRING,
           'operatorType' => CRM_Report_Form::OP_STRING,
           'title' => ts('Cancel Reason'),
-        ),
-        'total_amount' => array('title' => ts('Contribution Amount'), array('domain' => 'org.project60.sepa')),
-      ),
-      'order_bys' => array(
-        'financial_type_id' => array('title' => ts('Financial Type', array('domain' => 'org.project60.sepa'))),
-        'contribution_status_id' => array('title' => ts('Contribution Status', array('domain' => 'org.project60.sepa'))),
-        'receive_date' => array('title' => ts('Receive Date', array('domain' => 'org.project60.sepa'))),
-      ),
+        ],
+        'total_amount' => ['title' => ts('Contribution Amount'), ['domain' => 'org.project60.sepa']],
+      ],
+      'order_bys' => [
+        'financial_type_id' => ['title' => ts('Financial Type', ['domain' => 'org.project60.sepa'])],
+        'contribution_status_id' => ['title' => ts('Contribution Status', ['domain' => 'org.project60.sepa'])],
+        'receive_date' => ['title' => ts('Receive Date', ['domain' => 'org.project60.sepa'])],
+      ],
       'grouping' => 'contri-fields',
-    );
+    ];
   }
 
   /**
    * override FROM clause
    */
-  function from() {
+  public function from() {
     $this->_from = NULL;
     $this->_from = "
          FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
@@ -154,7 +154,6 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
          ";
   }
 
-
   /**
    * internal function to generate where clauses
    */
@@ -165,7 +164,7 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
   /**
    * Prep data for display
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // first, let the generic code work through the data
     parent::alterDisplay($rows);
 
@@ -205,4 +204,5 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
       }
     }
   }
+
 }

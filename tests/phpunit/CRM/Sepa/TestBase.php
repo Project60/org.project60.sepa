@@ -35,8 +35,7 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface
-{
+class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
   use Api3TestTrait {
     callAPISuccess as protected traitCallAPISuccess;
   }
@@ -46,8 +45,9 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   const MANDATE_TYPE_OOFF = 'OOFF';
   const MANDATE_TYPE_RCUR = 'RCUR';
-  const MANDATE_TYPE_FRST = 'FRST';  // fixme: this is *NOT* a mandate _type_ but only a mandate status
-                                     // (while RCUR and OOFF are mandate types)
+  // fixme: this is *NOT* a mandate _type_ but only a mandate status
+  const MANDATE_TYPE_FRST = 'FRST';
+  // (while RCUR and OOFF are mandate types)
 
   const MANDATE_STATUS_SENT = 'SENT';
   const MANDATE_STATUS_INVALID = 'INVALID';
@@ -88,27 +88,25 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   protected $testCreditorId;
 
-  #region PHPUnit Framework implementation
-
-  public function setUpHeadless(): Civi\Test\CiviEnvBuilder
-  {
+  /**
+   * #region PHPUnit Framework implementation
+   */
+  public function setUpHeadless(): Civi\Test\CiviEnvBuilder {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
     return \Civi\Test::headless()
-        ->installMe(__DIR__)
-        ->apply();
+      ->installMe(__DIR__)
+      ->apply();
   }
 
-  public function setUp(): void
-  {
+  public function setUp(): void {
     parent::setUp();
     $this->testCreditorId = $this->setUpCreditor();
 
     // TODO: Should we make sure that there are no mandates and groups open?
   }
 
-  public function tearDown(): void
-  {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
@@ -119,8 +117,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Set up a test creditor and return it's ID.
    */
-  private function setUpCreditor(): string
-  {
+  private function setUpCreditor(): string {
     // make sure there is at least one...
     CRM_Sepa_BAO_SEPACreditor::addDefaultCreditorIfMissing();
 
@@ -140,9 +137,10 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
       [
         'id' => $creditorId,
         'creditor_type' => 'SEPA',
-        'uses_bic' => false,
+        'uses_bic' => FALSE,
         'currency'  => 'EUR',
-        'category' => null, // It must NOT be a test creditor!
+    // It must NOT be a test creditor!
+        'category' => NULL,
         'pi_ooff' => $classic_payment_instrument_ids['OOFF'],
         'pi_rcur' => "{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}",
       ]
@@ -152,13 +150,13 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
     CRM_Sepa_Logic_Settings::setGenericSetting($creditorId, 'batching_default_creditor');
 
     // set some basic config
-    CRM_Sepa_Logic_Settings::setGenericSetting('2',  'batching.OOFF.notice');
+    CRM_Sepa_Logic_Settings::setGenericSetting('2', 'batching.OOFF.notice');
     CRM_Sepa_Logic_Settings::setGenericSetting('20', 'batching.OOFF.horizon');
 
-    CRM_Sepa_Logic_Settings::setGenericSetting('2',  'batching.FRST.notice');
-    CRM_Sepa_Logic_Settings::setGenericSetting('2',  'batching.RCUR.notice');
+    CRM_Sepa_Logic_Settings::setGenericSetting('2', 'batching.FRST.notice');
+    CRM_Sepa_Logic_Settings::setGenericSetting('2', 'batching.RCUR.notice');
     CRM_Sepa_Logic_Settings::setGenericSetting('20', 'batching.RCUR.horizon');
-    CRM_Sepa_Logic_Settings::setGenericSetting('1',  'batching.RCUR.grace');
+    CRM_Sepa_Logic_Settings::setGenericSetting('1', 'batching.RCUR.grace');
 
     return $creditorId;
   }
@@ -177,13 +175,12 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @return integer
    *   new creditor ID
    */
-  protected function getCustomCreditor($params)
-  {
+  protected function getCustomCreditor($params) {
     // load the default creditor
     $creditor_template = $this->callAPISuccess('SepaCreditor', 'getsingle', ['id' => $this->testCreditorId]);
     unset($creditor_template['id']);
     unset($creditor_template['creditor_id']);
-    $creditor_template['name'] = "creditor-" . CRM_Core_DAO::singleValueQuery("SELECT MAX(id) + 2 FROM civicrm_sdd_creditor");
+    $creditor_template['name'] = 'creditor-' . CRM_Core_DAO::singleValueQuery('SELECT MAX(id) + 2 FROM civicrm_sdd_creditor');
 
     // add custom data
     foreach ($params as $key => $value) {
@@ -205,8 +202,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    *
    * @return array|int
    */
-  protected function callAPISuccess(string $entity, string $action, array $params, $checkAgainst = NULL)
-  {
+  protected function callAPISuccess(string $entity, string $action, array $params, $checkAgainst = NULL) {
     $result = $this->traitCallAPISuccess($entity, $action, $params, $checkAgainst);
     if (is_array($result)) {
       unset($result['xdebug']);
@@ -217,19 +213,17 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Assert that an exception of a specific type (or it's child classes) is thrown when calling a function.
    */
-  protected function assertException(string $exceptionType, callable $function, string $message = '')
-  {
+  protected function assertException(string $exceptionType, callable $function, string $message = '') {
     // convert to phpunit6 exception types
     $exceptionType = preg_replace('/_/', '\\', $exceptionType);
-    try
-    {
+    try {
       $function();
     }
-    catch (Exception $e)
-    {
+    catch (Exception $e) {
       if ($e instanceof $exceptionType) {
         return;
-      } else{
+      }
+      else {
         $this->fail($message);
       }
     }
@@ -239,11 +233,12 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Assert that two date strings or date and time strings have the same date.
    */
-  protected function assertSameDate(string $expectedDateOrDateTime, string $actualDateOrDateTime, string $message = ''): void
-  {
-    $lengthOfDate = 8; // 4 (the year) + 2 (the month) + 2 (the day) NOTE: This will break in the year 10000.
+  protected function assertSameDate(string $expectedDateOrDateTime, string $actualDateOrDateTime, string $message = ''): void {
+    // 4 (the year) + 2 (the month) + 2 (the day) NOTE: This will break in the year 10000.
+    $lengthOfDate = 8;
 
-    $cleanedDateA = preg_replace('/[^0-9]/', '', $expectedDateOrDateTime); // Remove everything that is not a number.
+    // Remove everything that is not a number.
+    $cleanedDateA = preg_replace('/[^0-9]/', '', $expectedDateOrDateTime);
     $cleanedDateB = preg_replace('/[^0-9]/', '', $actualDateOrDateTime);
 
     $dateA = substr($cleanedDateA, 0, $lengthOfDate);
@@ -260,8 +255,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * Create a contact and return it's ID.
    * @return string The Id of the created contact.
    */
-  protected function createContact(): string
-  {
+  protected function createContact(): string {
     $contact = $this->callAPISuccess(
       'Contact',
       'create',
@@ -285,8 +279,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param string $key The settings key.
    * @param mixed $value The settings value.
    */
-  protected function setCreditorConfiguration(string $key, $value): void
-  {
+  protected function setCreditorConfiguration(string $key, $value): void {
     // Fetch the active/default creditor:
     $creditorId = $this->callAPISuccessGetValue(
       'SepaCreditor',
@@ -311,19 +304,15 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param string $key The settings key.
    * @param mixed $value The settings value.
    */
-  protected function setSepaConfiguration(string $key, $value): void
-  {
+  protected function setSepaConfiguration(string $key, $value): void {
     CRM_Sepa_Logic_Settings::setSetting($value, $key);
   }
-
-
 
   /**
    * Add an IBAN to the blocklist.
    * @param string $iban The IBAN.
    */
-  protected function addIbanToBlocklist(string $iban): void
-  {
+  protected function addIbanToBlocklist(string $iban): void {
     $existsAlready = $this->callAPISuccessGetCount(
       'OptionValue',
       [
@@ -332,8 +321,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
       ]
     );
 
-    if (!$existsAlready)
-    {
+    if (!$existsAlready) {
       $this->callAPISuccess(
         'OptionValue',
         'create',
@@ -352,33 +340,31 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param string $collectionDate A string parsable by strtotime to set the (first) collection date.
    * @return array The mandate.
    */
-  protected function createMandate(array $parameters, string $collectionDate = 'now'): array
-  {
+  protected function createMandate(array $parameters, string $collectionDate = 'now'): array {
     // default parameters
-    $parameters['contact_id']        = array_key_exists('contact_id', $parameters)        ? $parameters['contact_id']        : $this->createContact();
-    $parameters['iban']              = array_key_exists('iban', $parameters)              ? $parameters['iban']              : self::TEST_IBAN;
-    $parameters['amount']            = array_key_exists('amount', $parameters)            ? $parameters['amount']            : 8;
+    $parameters['contact_id']        = array_key_exists('contact_id', $parameters) ? $parameters['contact_id'] : $this->createContact();
+    $parameters['iban']              = array_key_exists('iban', $parameters) ? $parameters['iban'] : self::TEST_IBAN;
+    $parameters['amount']            = array_key_exists('amount', $parameters) ? $parameters['amount'] : 8;
     $parameters['financial_type_id'] = array_key_exists('financial_type_id', $parameters) ? $parameters['financial_type_id'] : 1;
-    $parameters['creditor_id']       = array_key_exists('creditor_id', $parameters)       ? $parameters['creditor_id']       : CRM_Sepa_Logic_Settings::defaultCreditor()->id;
-    $parameters['account_holder']    = array_key_exists('account_holder', $parameters)    ? $parameters['account_holder']    : "";
+    $parameters['creditor_id']       = array_key_exists('creditor_id', $parameters) ? $parameters['creditor_id'] : CRM_Sepa_Logic_Settings::defaultCreditor()->id;
+    $parameters['account_holder']    = array_key_exists('account_holder', $parameters) ? $parameters['account_holder'] : '';
 
-    if ($parameters['type'] == self::MANDATE_TYPE_OOFF)
-    {
+    if ($parameters['type'] == self::MANDATE_TYPE_OOFF) {
       $parameters['receive_date'] = array_key_exists('receive_date', $parameters) ? $parameters['receive_date'] : $collectionDate;
     }
-    else
-    {
-      $parameters['start_date']         = array_key_exists('start_date', $parameters)         ? $parameters['start_date']         : $collectionDate;
-      $parameters['frequency_unit']     = array_key_exists('frequency_unit', $parameters)     ? $parameters['frequency_unit']     : 'month';
+    else {
+      $parameters['start_date']         = array_key_exists('start_date', $parameters) ? $parameters['start_date'] : $collectionDate;
+      $parameters['frequency_unit']     = array_key_exists('frequency_unit', $parameters) ? $parameters['frequency_unit'] : 'month';
       $parameters['frequency_interval'] = array_key_exists('frequency_interval', $parameters) ? $parameters['frequency_interval'] : 1;
 
       // set the cycle day to the next possible collection date
-      $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting("batching.FRST.notice", $parameters['creditor_id']);
+      $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $parameters['creditor_id']);
       $earliest_start_date  = date('Y-m-d', strtotime("now + {$frst_notice_days} days"));
       $requested_start_date = date('Y-m-d', strtotime($collectionDate));
       if ($requested_start_date < $earliest_start_date) {
         $parameters['cycle_day'] = date('j', strtotime($earliest_start_date));
-      } else {
+      }
+      else {
         $parameters['cycle_day'] = date('j', strtotime($requested_start_date));
       }
     }
@@ -400,8 +386,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param array $mandate The mandate to terminate.
    * @param string $endDate A string parsable by strtotime. If it differs from 'today' only the end date is set and the mandate not terminated.
    */
-  protected function terminateMandate(array $mandate, string $endDate = 'today'): void
-  {
+  protected function terminateMandate(array $mandate, string $endDate = 'today'): void {
     $this->callAPISuccess(
       'SepaMandate',
       'terminate',
@@ -416,9 +401,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * Execute batching for mandates, resulting in the creation of a group.
    * @param string $type The type of the mandates to batch, possible values can be found in the class constants as "MANDATE_TYPE_X".
    * @param string $nowOverwrite A string parsable by strtotime to overwrite the current time used for batching.
-  */
-  protected function executeBatching(string $type, string $nowOverwrite = 'now'): void
-  {
+   */
+  protected function executeBatching(string $type, string $nowOverwrite = 'now'): void {
     $this->callAPISuccess(
       'SepaAlternativeBatching',
       'update',
@@ -432,13 +416,12 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Close a transaction group of the given ID.
    */
-  protected function closeTransactionGroup(string $groupId): void
-  {
+  protected function closeTransactionGroup(string $groupId): void {
     $this->callAPISuccess(
       'SepaAlternativeBatching',
       'close',
       [
-        'txgroup_id' =>  $groupId,
+        'txgroup_id' => $groupId,
       ]
     );
   }
@@ -446,13 +429,11 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Close a list of transaction groups.
    */
-  protected function closeTransactionGroups(array $groups): void
-  {
+  protected function closeTransactionGroups(array $groups): void {
     // NOTE: The Sepa API does not support "IN" statements. That's why we have
     //       to call the API once for every transaction group...
 
-    foreach ($groups as $group)
-    {
+    foreach ($groups as $group) {
       $this->closeTransactionGroup($group['id']);
     }
   }
@@ -460,8 +441,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Get a mandate by it's ID.
    */
-  protected function getMandate(string $mandateId): array
-  {
+  protected function getMandate(string $mandateId): array {
     $mandate = $this->callAPISuccessGetSingle(
       'SepaMandate',
       [
@@ -469,7 +449,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
       ]
     );
 
-      return $mandate;
+    return $mandate;
   }
 
   /**
@@ -479,20 +459,17 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    *
    * @return array|null contribution data
    */
-  protected function getLatestContributionForMandate(array $mandate, $can_be_null = false)
-  {
+  protected function getLatestContributionForMandate(array $mandate, $can_be_null = FALSE) {
     $mandateType = $mandate['type'];
 
     // Check if the mandate type is supported:
-    if (!in_array($mandateType, [self::MANDATE_TYPE_OOFF, self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST]))
-    {
+    if (!in_array($mandateType, [self::MANDATE_TYPE_OOFF, self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST])) {
       throw new Exception('For this mandate type can no contribution be determined.');
     }
 
-    $contribution = null;
+    $contribution = NULL;
 
-    if ($mandateType == self::MANDATE_TYPE_OOFF)
-    {
+    if ($mandateType == self::MANDATE_TYPE_OOFF) {
       // If it is an OOFF mandate, we simply have the contribution ID given in the mandate's entity_id.
 
       $contribution = $this->callAPISuccessGetSingle(
@@ -502,8 +479,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
         ]
       );
     }
-    else if (in_array($mandateType, [self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST]))
-    {
+    elseif (in_array($mandateType, [self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST])) {
       // If it is an RCUR/FRST mandate, we need to get the contribution from the recurring contribution given in the mandate's entity_id.
       // There could be multiple contributions attached, so we return the latest one.
 
@@ -521,13 +497,13 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
       if ($contributions['count'] == 0) {
         $contribution = NULL;
-      } else {
+      }
+      else {
         $contribution = reset($contributions['values']);
       }
 
     }
-    else
-    {
+    else {
       throw new Exception('For this mandate type can no contribution be determined.');
     }
 
@@ -548,12 +524,10 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * Get the recurring contribution for a given RCUR/FRST mandate.
    * @param array $mandate The RCUR or FRST mandate to get the contribution for.
    */
-  protected function getRecurringContributionForMandate(array $mandate): array
-  {
+  protected function getRecurringContributionForMandate(array $mandate): array {
     // Only RCUR/FRST mandates are allowed:
-    if (!in_array($mandate['type'], [self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST]))
-    {
-       throw new Exception('For this mandate type can no recurring contribution be determined.');
+    if (!in_array($mandate['type'], [self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST])) {
+      throw new Exception('For this mandate type can no recurring contribution be determined.');
     }
 
     $recurringContribution = $this->callAPISuccessGetSingle(
@@ -571,8 +545,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param string $type The mandate type of the group to search for, possible values can be found in the class constants as "MANDATE_TYPE_X".
    * @return array The transaction group.
    */
-  protected function getActiveTransactionGroup(string $type): array
-  {
+  protected function getActiveTransactionGroup(string $type): array {
     $group = $this->callAPISuccessGetSingle(
       'SepaTransactionGroup',
       [
@@ -589,8 +562,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param string $type The mandate type of the groups to search for, possible values can be found in the class constants as "MANDATE_TYPE_X".
    * @return array[] The list of transaction groups.
    */
-  protected function getActiveTransactionGroups(string $type): array
-  {
+  protected function getActiveTransactionGroups(string $type): array {
     $result = $this->callAPISuccess(
       'SepaTransactionGroup',
       'get',
@@ -609,8 +581,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * Get a transaction group by ID.
    * @return array The transaction group.
    */
-  protected function getTransactionGroup(string $groupId): array
-  {
+  protected function getTransactionGroup(string $groupId): array {
     $group = $this->callAPISuccessGetSingle(
       'SepaTransactionGroup',
       [
@@ -625,8 +596,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * Get the transaction group that is associated with the given contribution.
    * @return array The transaction group.
    */
-  protected function getTransactionGroupForContribution(array $contribution): array
-  {
+  protected function getTransactionGroupForContribution(array $contribution): array {
     $contributionId = $contribution['id'];
 
     $groupId = $this->callAPISuccessGetValue(

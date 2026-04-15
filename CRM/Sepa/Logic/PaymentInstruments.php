@@ -29,7 +29,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    */
   public static function clearCaches() {
     self::$sdd_creditors = NULL;
-    self::$sdd_payment_instruments = null;
+    self::$sdd_payment_instruments = NULL;
   }
 
   /**
@@ -73,8 +73,9 @@ class CRM_Sepa_Logic_PaymentInstruments {
   public static function getSDDPaymentInstrumentsForContribution($contribution_id) {
     $mandate_id = CRM_Sepa_BAO_SEPAMandate::getContributionMandateID($contribution_id);
     if (!$mandate_id) {
-      return null;
-    } else {
+      return NULL;
+    }
+    else {
       // get the creditor ID
       $mandate = \Civi\Api4\SepaMandate::get(TRUE)
         ->addSelect('creditor_id', 'type', 'status')
@@ -94,9 +95,10 @@ class CRM_Sepa_Logic_PaymentInstruments {
    */
   public static function getSDDPaymentInstrumentForContribution($contribution_id) {
     if (!array_key_exists($contribution_id, self::$contribution_id_to_pi)) {
-      $contribution_pi = civicrm_api3('Contribution', 'getvalue', array(
+      $contribution_pi = civicrm_api3('Contribution', 'getvalue', [
         'return' => 'payment_instrument_id',
-        'id'     => $contribution_id));
+        'id'     => $contribution_id,
+      ]);
 
       $payment_instruments = self::getSddPaymentInstruments();
       foreach ($payment_instruments as $payment_instrument) {
@@ -110,7 +112,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
       // no match
       self::$contribution_id_to_pi[$contribution_id] = NULL;
       return NULL;
-    } else {
+    }
+    else {
 
       return self::$contribution_id_to_pi[$contribution_id];
     }
@@ -144,7 +147,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
       return FALSE;
 
-    } elseif (!empty($contribution['id'])) {
+    }
+    elseif (!empty($contribution['id'])) {
       // if the ID is known, we can look it up
       $sdd_instrument = self::getSDDPaymentInstrumentForContribution($contribution['id']);
       return $sdd_instrument != NULL;
@@ -154,13 +158,12 @@ class CRM_Sepa_Logic_PaymentInstruments {
     return FALSE;
   }
 
-
   /**
    * Restrict payment instruments in some UI forms
    */
   public static function restrictPaymentInstrumentsInForm($formName, $form) {
     if ($formName == 'CRM_Contribute_Form_Contribution') {
-      $mandate = null;
+      $mandate = NULL;
       if ($form->_id) {
         // this is an edit, so see if this is a CiviSEPA contribution
         $mandate = CRM_Sepa_BAO_SEPAMandate::getMandateFor($form->_id);
@@ -170,8 +173,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
         // this is a CiviSEPA contribution, leave only the allowed PIs
         $allowed_pis = self::getPaymentInstrumentsForCreditor($mandate['creditor_id'], $mandate['type']);
 
-        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_keep'   => array_keys($allowed_pis)));
-        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_remove' => null));
+        CRM_Core_Resources::singleton()->addVars('sdd', ['pis_keep' => array_keys($allowed_pis)]);
+        CRM_Core_Resources::singleton()->addVars('sdd', ['pis_remove' => NULL]);
 
       }
       else {
@@ -180,8 +183,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
         $pi_ids[] = self::getSddPaymentInstrumentID('FRST');
         $pi_ids[] = self::getSddPaymentInstrumentID('OOFF');
 
-        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_keep'   => NULL));
-        CRM_Core_Resources::singleton()->addVars('sdd', array('pis_remove' => $pi_ids));
+        CRM_Core_Resources::singleton()->addVars('sdd', ['pis_keep' => NULL]);
+        CRM_Core_Resources::singleton()->addVars('sdd', ['pis_remove' => $pi_ids]);
       }
 
       // inject JS file
@@ -193,7 +196,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    * Get a list of all CiviSEPA creditors
    *
    * @return array
-   *  [id => creditor data]
+   *   [id => creditor data]
    */
   public static function getAllSddCreditors() {
     if (self::$sdd_creditors === NULL) {
@@ -214,8 +217,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    * @return array
    *   id => [name, label, id]
    */
-  public static function getAllSddPaymentInstruments()
-  {
+  public static function getAllSddPaymentInstruments() {
     if (self::$sdd_payment_instruments === NULL) {
       self::$sdd_payment_instruments = [];
 
@@ -251,7 +253,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
               $pi_ids[] = $pi_rcur;
             }
 
-          } else {
+          }
+          else {
             // this is a simple pi
             $pi_id = (int) $pi_value;
             if ($pi_id) {
@@ -279,7 +282,6 @@ class CRM_Sepa_Logic_PaymentInstruments {
     return self::$sdd_payment_instruments;
   }
 
-
   /**
    * Get the payment instruments used for the given creditor
    *
@@ -289,15 +291,15 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *    one of ['OOFF', 'FRST', 'RCUR']
    *
    * @return array
-   *    list of payment instrument data
+   *   list of payment instrument data
    */
-  public static function getPaymentInstrumentsForCreditor($creditor_id, $type)
-  {
+  public static function getPaymentInstrumentsForCreditor($creditor_id, $type) {
     // get the creditor
     $creditors = self::getAllSddCreditors();
     $creditor = $creditors[$creditor_id] ?? NULL;
     if (!$creditor) {
-      return []; // creditor not found
+      // creditor not found
+      return [];
     }
 
     // now extract the IDs as defined by the creditor
@@ -305,23 +307,27 @@ class CRM_Sepa_Logic_PaymentInstruments {
     if (isset($creditor['pi_ooff']) && $type == 'OOFF') {
       $payment_instrument_ids = explode(',', $creditor['pi_ooff']);
 
-    } elseif (isset($creditor['pi_rcur']) && ($type == 'FRST' || $type == 'RCUR')) {
+    }
+    elseif (isset($creditor['pi_rcur']) && ($type == 'FRST' || $type == 'RCUR')) {
       foreach (explode(',', $creditor['pi_rcur']) as $pi_spec) {
         if (strstr($pi_spec, '-')) {
           // this is a frst-rcur combo
           $frst_rcur = explode('-', $pi_spec, 2);
           if ($type == 'FRST') {
             $payment_instrument_ids[] = (int) $frst_rcur[0];
-          } else {
+          }
+          else {
             $payment_instrument_ids[] = (int) $frst_rcur[1];
           }
-        } else {
+        }
+        else {
           // this is one simple type
           $payment_instrument_ids[] = (int) $pi_spec;
         }
       }
 
-    } else {
+    }
+    else {
       if (!in_array($type, ['OOFF', 'FRST', 'RCUR'])) {
         Civi::log()->warning("Invalid type '{$type}' passed to CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor()");
       }
@@ -352,8 +358,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    * @param boolean $is_first
    *   is the next installment the first contribution?
    */
-  public static function getInstallmentPaymentInstrument($creditor_id, $recurring_contribution_pi, $is_first)
-  {
+  public static function getInstallmentPaymentInstrument($creditor_id, $recurring_contribution_pi, $is_first) {
     if (!$is_first) {
       // in the RCUR case, this is simple: it's the same as the recurring contribution
       return $recurring_contribution_pi;
@@ -370,7 +375,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
     $creditor = $creditors[$creditor_id] ?? NULL;
     if (!$creditor) {
       $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
-      return $recurring_contribution_pi; // creditor not found
+      // creditor not found
+      return $recurring_contribution_pi;
     }
 
     // we found our creditor
@@ -383,7 +389,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
             $cache[$creditor_id][$recurring_contribution_pi] = $frst_rcur[0];
             return $frst_rcur[0];
           }
-        } else {
+        }
+        else {
           // if this matches an individual PI, we're also happy
           if ($pi_spec == $recurring_contribution_pi) {
             $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
@@ -413,7 +420,6 @@ class CRM_Sepa_Logic_PaymentInstruments {
     ];
   }
 
-
   /**
    * Return a list of FRST-RCUR payment instrument tuples for the given creditor
    *
@@ -421,7 +427,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *    the creditor used
    *
    * @return array
-   *    [FRST-PI-id => RCUR-PI-id]
+   *   [FRST-PI-id => RCUR-PI-id]
    */
   public static function getFrst2RcurMapping($creditor_id) {
     static $creditor2frst_rcur_map = [];
@@ -457,12 +463,13 @@ class CRM_Sepa_Logic_PaymentInstruments {
    */
   public static function getClassicSepaPaymentInstruments() {
     static $classic_payment_instrument_ids = NULL;
-    if ($classic_payment_instrument_ids === null) {
+    if ($classic_payment_instrument_ids === NULL) {
       $classic_payment_instrument_ids = [];
       $classic_payment_instruments = civicrm_api3('OptionValue', 'get', [
         'option_group_id' => 'payment_instrument',
         'name'            => ['IN' => ['OOFF', 'FRST', 'RCUR']],
-        'return'          => 'name,value']);
+        'return'          => 'name,value',
+      ]);
       foreach ($classic_payment_instruments['values'] as $classic_payment_instrument) {
         $classic_payment_instrument_ids[$classic_payment_instrument['name']] = $classic_payment_instrument['value'];
       }
@@ -470,8 +477,10 @@ class CRM_Sepa_Logic_PaymentInstruments {
 
     if (count($classic_payment_instrument_ids) <> 3) {
       throw new Exception("Missing classic SEPA payment instruments ('OOFF', 'FRST', 'RCUR')");
-    } else {
+    }
+    else {
       return $classic_payment_instrument_ids;
     }
   }
+
 }

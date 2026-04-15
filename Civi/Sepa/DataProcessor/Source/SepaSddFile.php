@@ -39,4 +39,5 @@ class SepaSddFile extends AbstractCivicrmEntitySource {
   protected function getTable(): string {
     return 'civicrm_sdd_file';
   }
+
 }
