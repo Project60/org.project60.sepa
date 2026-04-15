@@ -1,0 +1,20 @@
+# Copy this file to phpstan.neon and replace {VENDOR_DIR} with the appropriate
+# path.
+
+includes:
+	- phpstan.neon.dist
+
+parameters:
+	scanDirectories:
+		- {VENDOR_DIR}/civicrm/civicrm-core/CRM
+	bootstrapFiles:
+		- {VENDOR_DIR}/autoload.php
+
+# For installations without composer (e.g. as WordPress plugin),
+# replace the parameters section above with the following configuration:
+#
+#parameters:
+#	scanDirectories:
+#		- {CIVICRM_DIR}/CRM
+#	bootstrapFiles:
+#		- {CIVICRM_DIR}/vendor/autoload.php
