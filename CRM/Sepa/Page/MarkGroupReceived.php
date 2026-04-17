@@ -79,6 +79,7 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
         civicrm_api3('SepaAlternativeBatching', 'received', ['txgroup_id' => $groupId]);
       }
       catch (Exception $exception) {
+        // @ignoreException
         $error_message = $exception->getMessage();
         CRM_Core_Session::setStatus(E::ts("Couldn't close SDD group #%1.<br/>Error was: %2",
           [1 => $groupId, 2 => $error_message]));

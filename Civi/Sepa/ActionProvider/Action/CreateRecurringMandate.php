@@ -161,6 +161,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
       $output->setParameter('mandate_reference', $mandate['reference']);
     }
     catch (\Exception $ex) {
+      // @ignoreException
       $output->setParameter('mandate_id', '');
       $output->setParameter('recurring_contribution_id', '');
       $output->setParameter('mandate_reference', '');

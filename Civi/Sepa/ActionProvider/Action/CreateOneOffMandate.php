@@ -138,6 +138,7 @@ class CreateOneOffMandate extends AbstractAction {
 
     }
     catch (\Exception $ex) {
+      // @ignoreException
       $output->setParameter('mandate_id', '');
       $output->setParameter('mandate_reference', '');
       $output->setParameter('error', $ex->getMessage());

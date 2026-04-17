@@ -111,6 +111,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
 
@@ -129,6 +130,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
 
@@ -172,6 +174,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
 
@@ -190,6 +193,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
 
@@ -245,6 +249,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
 
@@ -263,6 +268,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
   }
@@ -287,6 +293,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
 
@@ -305,6 +312,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
   }
@@ -333,6 +341,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
       );
     }
     catch (Exception $ex) {
+      // @ignoreException
       $this->assertTrue(TRUE, 'This worked as expected');
     }
 
