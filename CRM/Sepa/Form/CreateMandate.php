@@ -340,7 +340,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       // set all parameters to the mandate-to-be-replaced
       $defaults['creditor_id']       = $this->old_mandate['creditor_id'];
       $defaults['financial_type_id'] = $this->old_contrib['financial_type_id'];
-      $defaults['campaign_id']       = CRM_Utils_Array::value('campaign_id', $this->old_contrib, '');
+      $defaults['campaign_id']       = $this->old_contrib['campaign_id'] ?? '';
       $defaults['account_holder']    = $this->old_mandate['account_holder'];
       $defaults['iban']              = $this->old_mandate['iban'];
       $defaults['bic']               = $this->old_mandate['bic'];
@@ -559,7 +559,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$values['cid']}&selectedChild=sepa"));
     }
     // this is not a popup -> redirect
-    if (!CRM_Utils_Array::value('snippet', $_REQUEST)) {
+    if (!($_REQUEST['snippet'] ?? null)) {
       CRM_Utils_System::redirect(CRM_Core_Session::singleton()->readUserContext());
     }
 
@@ -696,7 +696,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         foreach ($account_references['values'] as $account_reference) {
           $account = $accounts['values'][$account_reference['ba_id']];
           $account_data = json_decode($account['data_parsed'], TRUE);
-          $bic = CRM_Utils_Array::value('BIC', $account_data, CRM_Utils_Array::value('bic', $account_data, ''));
+          $bic = $account_data['BIC'] ?? $account_data['bic'] ?? '';
           $key = "{$account_reference['reference']}/{$bic}";
           $account_already_in_list = FALSE;
           if ($bic) {

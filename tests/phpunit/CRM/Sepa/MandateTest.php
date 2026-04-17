@@ -235,20 +235,28 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
 
     // the status should be FRST, and first_contribution_id empty
     $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], E::ts('Mandate status of new mandate is incorrect.'));
-    $this->assertEmpty(CRM_Utils_Array::value('first_contribution_id', $mandate), 'first_contribution_id should not be set yet.');
+    $this->assertEmpty(
+      $mandate['first_contribution_id'] ?? null,
+      'first_contribution_id should not be set yet.'
+    );
 
     // batch & check
     $this->executeBatching(self::MANDATE_TYPE_FRST);
     $batchedMandate = $this->getMandate($mandate['id']);
     $this->assertSame(self::MANDATE_TYPE_FRST, $batchedMandate['status'], E::ts('Mandate status of new mandate is incorrect.'));
-    $this->assertEmpty(CRM_Utils_Array::value('first_contribution_id', $batchedMandate), 'first_contribution_id should not be set yet.');
+    $this->assertArrayNotHasKey('first_contribution_id', $batchedMandate);
+    $this->assertEmpty(
+      $batchedMandate['first_contribution_id'] ?? null,
+      'first_contribution_id should not be set yet.'
+    );
 
     // close & check
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
     $this->closeTransactionGroup($transactionGroup['id']);
     $rcurMandate = $this->getMandate($mandate['id']);
     $this->assertSame(self::MANDATE_TYPE_RCUR, $rcurMandate['status'], E::ts('Mandate status of new mandate is incorrect.'));
-    $this->assertNotEmpty(CRM_Utils_Array::value('first_contribution_id', $rcurMandate), 'first_contribution_id should be set now.');
+    $this->assertArrayHasKey('first_contribution_id', $rcurMandate);
+    $this->assertNotEmpty($rcurMandate['first_contribution_id'],'first_contribution_id should be set now.');
   }
 
   /**

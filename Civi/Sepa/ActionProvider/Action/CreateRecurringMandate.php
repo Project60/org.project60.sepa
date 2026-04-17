@@ -214,7 +214,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
     }
 
     // get start date
-    $date = strtotime(\CRM_Utils_Array::value('start_date', $mandate_data, date('Y-m-d')));
+    $date = strtotime($mandate_data['start_date'] ?? date('Y-m-d'));
 
     // get cycle days
     $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor_id);
