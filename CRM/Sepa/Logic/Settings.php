@@ -254,6 +254,7 @@ class CRM_Sepa_Logic_Settings {
       return empty($result['is_error']);
     }
     catch (Exception $e) {
+      // @ignoreException
       return FALSE;
     }
   }
