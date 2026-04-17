@@ -132,7 +132,6 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       case 'INVALID':
         return FALSE;
 
-      break;
       default:
         return TRUE;
     }
@@ -150,13 +149,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
         $recur->get('id', $eid);
         return $recur;
 
-      break;
       case 'civicrm_contribution':
         $contr = new CRM_Contribute_BAO_Contribution();
         $contr->get('id', $eid);
         return $contr;
 
-      break;
       default:
         echo 'Huh ? ' . $etp;
     }
@@ -178,13 +175,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
         $contr->get('contribution_recur_id', $eid);
         return $contr;
 
-      break;
       case 'civicrm_contribution':
         $contr = new CRM_Contribute_BAO_Contribution();
         $contr->get('id', $eid);
         return $contr;
 
-      break;
       default:
         echo 'Huh ? ' . $etp;
     }
