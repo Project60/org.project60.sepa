@@ -31,8 +31,12 @@ function sepa_civicrm_container(ContainerBuilder $container) {
   }
 
   $container->addResource(new FileResource(__FILE__));
-  $container->findDefinition('dispatcher')->addMethodCall('addListener', ['civi.token.list', 'sepa_register_tokens'])->setPublic(TRUE);
-  $container->findDefinition('dispatcher')->addMethodCall('addListener', ['civi.token.eval', 'sepa_evaluate_tokens'])->setPublic(TRUE);
+  $container->findDefinition('dispatcher')
+    ->addMethodCall('addListener', ['civi.token.list', 'sepa_register_tokens'])
+    ->setPublic(TRUE);
+  $container->findDefinition('dispatcher')
+    ->addMethodCall('addListener', ['civi.token.eval', 'sepa_evaluate_tokens'])
+    ->setPublic(TRUE);
 
   $container->autowire(SepaBatchLockManager::class)->setPublic(TRUE);
 }
@@ -134,7 +138,9 @@ function sepa_civicrm_pageRun(&$page) {
       $mandate['notes'] = [];
       if ($mandate['type'] == 'RCUR') {
         $contribution_recur_id = (int) $mandate['entity_id'];
-        $mandate_note_query = CRM_Core_DAO::executeQuery("SELECT note FROM civicrm_note WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur' ORDER BY modified_date DESC;");
+        $mandate_note_query = CRM_Core_DAO::executeQuery(
+          "SELECT note FROM civicrm_note WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur' ORDER BY modified_date DESC;"
+        );
         while ($mandate_note_query->fetch()) {
           $mandate['notes'][] = $mandate_note_query->note;
         }
@@ -149,7 +155,7 @@ function sepa_civicrm_pageRun(&$page) {
   }
 }
 
-function sepa_civicrm_buildForm ($formName, &$form) {
+function sepa_civicrm_buildForm($formName, &$form) {
   // restrict payment instrument use if necessary
   CRM_Sepa_Logic_PaymentInstruments::restrictPaymentInstrumentsInForm($formName, $form);
 }
@@ -176,21 +182,21 @@ function sepa_civicrm_install() {
 /**
  * Implementation of hook_civicrm_enable
  */
-function sepa_civicrm_enable() {
-  return _sepa_civix_civicrm_enable();
+function sepa_civicrm_enable(): void {
+  _sepa_civix_civicrm_enable();
 }
 
 function sepa_civicrm_summaryActions(&$actions, $contactID) {
   // add "create SEPA mandate action"
   if (CRM_Core_Permission::check('create sepa mandates')) {
     $actions['sepa_contribution'] = [
-      'title'           => E::ts('Record SEPA Mandate'),
-      'weight'          => 5,
-      'ref'             => 'new-sepa-contribution',
-      'key'             => 'sepa_contribution',
-      'component'       => 'CiviContribute',
-      'href'            => CRM_Utils_System::url('civicrm/sepa/createmandate', "reset=1&cid={$contactID}"),
-      'permissions'     => ['access CiviContribute', 'edit contributions'],
+      'title' => E::ts('Record SEPA Mandate'),
+      'weight' => 5,
+      'ref' => 'new-sepa-contribution',
+      'key' => 'sepa_contribution',
+      'component' => 'CiviContribute',
+      'href' => CRM_Utils_System::url('civicrm/sepa/createmandate', "reset=1&cid={$contactID}"),
+      'permissions' => ['access CiviContribute', 'edit contributions'],
     ];
   }
 }
@@ -198,15 +204,15 @@ function sepa_civicrm_summaryActions(&$actions, $contactID) {
 /**
  *  Support SEPA mandates in merge operations
  */
-function sepa_civicrm_merge ($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
+function sepa_civicrm_merge($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
   switch ($type) {
     case 'relTables':
       // Offer user to merge SEPA Mandates
       $data['rel_table_sepamandate'] = [
-        'title'  => ts('SEPA Mandates', ['domain' => 'org.project60.sepa']),
+        'title' => ts('SEPA Mandates', ['domain' => 'org.project60.sepa']),
         'tables' => ['civicrm_sdd_mandate'],
-      // '$cid' will be automatically replaced
-        'url'    => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=$cid&selectedChild=contribute'),
+        // '$cid' will be automatically replaced
+        'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=$cid&selectedChild=contribute'),
       ];
       break;
 
@@ -451,7 +457,9 @@ function sepa_civicrm_validateForm($formName, &$fields, &$files, &$form, &$error
     if (!$mandate_id) {
       $payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
       if (isset($payment_instruments[$fields['payment_instrument_id']])) {
-        $errors['payment_instrument_id'] = E::ts('This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.');
+        $errors['payment_instrument_id'] = E::ts(
+          'This contribution has no mandate and cannot simply be changed to a SEPA payment instrument.'
+        );
       }
     }
     else {
@@ -541,15 +549,18 @@ function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
  * Will inject the SepaMandate tab
  */
 function sepa_civicrm_tabset($tabsetName, &$tabs, $context) {
-  if ($tabsetName == 'civicrm/contact/view' &&
-    (empty($context['contact_id']) || CRM_Core_Permission::check('view sepa mandates'))
+  if ($tabsetName == 'civicrm/contact/view'
+    && (empty($context['contact_id'])
+      || CRM_Core_Permission::check(
+        'view sepa mandates'
+      ))
   ) {
     $tabs[] = [
-      'id'     => 'sepa',
-      'url'    => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$context['contact_id']}"),
-      'title'  => E::ts('SEPA Mandates'),
-      'count'  => CRM_Sepa_Page_MandateTab::getMandateCount($context['contact_id']),
-      'icon'   => 'crm-i fa-bank',
+      'id' => 'sepa',
+      'url' => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$context['contact_id']}"),
+      'title' => E::ts('SEPA Mandates'),
+      'count' => CRM_Sepa_Page_MandateTab::getMandateCount($context['contact_id']),
+      'icon' => 'crm-i fa-bank',
       'weight' => 20,
     ];
   }
