@@ -68,6 +68,7 @@ class CRM_Utils_SepaTokensDeprecated {
       }
     }
     catch (Exception $e) {
+      // @ignoreException
       // probably just a minor issue, see SEPA-461
     }
   }

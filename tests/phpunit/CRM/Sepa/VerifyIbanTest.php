@@ -173,6 +173,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase {
       $this->fail(E::ts('Blocklistet IBAN should fail but did not!'));
     }
     catch (Exception $ex) {
+      // @ignoreException
       // this is expected
     }
   }

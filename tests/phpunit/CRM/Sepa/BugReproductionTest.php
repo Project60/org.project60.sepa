@@ -41,6 +41,7 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
       ]);
     }
     catch (CRM_Core_Exception $ex) {
+      // @ignoreException
       // this means the status is already missing, no harm done
     }
 
