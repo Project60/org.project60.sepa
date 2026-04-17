@@ -189,9 +189,6 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         return FALSE;
       }
       $params['subject'] = 'SEPA ' . $fileName;
-      if (!CRM_Utils_Array::value('attachments', $instanceInfo)) {
-        $instanceInfo['attachments'] = [];
-      }
       $params['attachments'][] = [
         'fullPath' => $pdfFullFilename,
         'mime_type' => 'application/pdf',
