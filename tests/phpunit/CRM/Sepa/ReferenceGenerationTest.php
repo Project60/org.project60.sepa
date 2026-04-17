@@ -127,6 +127,7 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase {
 
     }
     catch (Throwable $ex) {
+      // @ignoreException
       // ok, it failed - let's check if it's the right failure
       $this->assertStringStartsWith(
         'Failure in api call for SepaMandate createfull:  DB Error: already exists',
@@ -163,6 +164,7 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase {
 
     }
     catch (Throwable $ex) {
+      // @ignoreException
       // ok, it failed - let's check if it's the right failure
       $this->assertStringStartsWith(
         'Failure in api call for SepaMandate createfull:  DB Error: already exists',
