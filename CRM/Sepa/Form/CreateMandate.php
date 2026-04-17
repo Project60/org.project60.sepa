@@ -63,6 +63,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           ->single();
       }
       catch (\Exception $e) {
+        // @ignoreException
         Civi::log()->error($e->getMessage());
         CRM_Core_Error::statusBounce(
           E::ts('The mandate to clone/replace from does not exist or you do not have permission for it.'),
@@ -539,6 +540,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     }
     catch (Exception $ex) {
+      // @ignoreException
       // there was a problem: create error message
       CRM_Core_Session::setStatus(E::ts('Failed to create %1 mandate. Error was: %2', [
         1 => $type,

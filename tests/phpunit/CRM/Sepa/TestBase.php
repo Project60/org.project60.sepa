@@ -220,6 +220,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
       $function();
     }
     catch (Exception $e) {
+      // @ignoreException
       if ($e instanceof $exceptionType) {
         return;
       }

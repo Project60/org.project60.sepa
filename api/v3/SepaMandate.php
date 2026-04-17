@@ -483,6 +483,7 @@ function civicrm_api3_sepa_mandate_modify($params) {
     return civicrm_api3_create_success($changes);
   }
   catch (Exception $e) {
+    // @ignoreException
     return civicrm_api3_create_error($e->getMessage());
   }
 }
@@ -575,7 +576,7 @@ function civicrm_api3_sepa_mandate_terminate($params) {
 
   }
   catch (Exception $e) {
-
+    // @ignoreException
     return civicrm_api3_create_error($e->getMessage());
   }
 }
