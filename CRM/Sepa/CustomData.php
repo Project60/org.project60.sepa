@@ -830,7 +830,7 @@ class CRM_Sepa_CustomData {
    * This function was specifically introduced as 1:1 replacement
    *  for the deprecated CRM_Core_OptionGroup::getValue function
    *
-   * @param string $groupName
+   * @param string $group_name
    *   name of the group
    *
    * @param $label

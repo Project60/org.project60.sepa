@@ -72,7 +72,7 @@ class CRM_Utils_SepaCustomisationHooks {
    *  debtor, even an individualised one (like "Thank you, Hans!")
    *
    * @param string $txmessage    the message that will go with the transaction. Modify or extend
-   * @param array $cinfo
+   * @param array $contribution
    * @param array $creditor
    *
    * @access public
@@ -88,7 +88,7 @@ class CRM_Utils_SepaCustomisationHooks {
    * You can implement this hook to generate a custom EndToEndId
    *
    * @param string $end2endID    the PAIN EndToEndId being used for this transaction
-   * @param array $cinfo
+   * @param array $contribution
    * @param array $creditor
    *
    * @access public
