@@ -90,6 +90,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
       $leftFields = CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource($joinFromSource, '', '', $leftFieldCallback);
     }
     catch (Exception $e) {
+      // @ignoreException
     }
 
     try {
@@ -100,6 +101,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
       ]);
     }
     catch (CRM_Core_Exception $e) {
+      // @ignoreException
     }
 
     $rightFields = [];
@@ -117,6 +119,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
         }
       }
       catch (Exception $e) {
+        // @ignoreException
       }
     }
 
@@ -128,6 +131,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
       ]);
     }
     catch (CRM_Core_Exception $e) {
+      // @ignoreException
     }
 
     try {
@@ -141,6 +145,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
       ]);
     }
     catch (CRM_Core_Exception $e) {
+      // @ignoreException
     }
 
     $defaults = [];

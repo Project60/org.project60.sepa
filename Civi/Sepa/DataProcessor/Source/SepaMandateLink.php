@@ -74,6 +74,7 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
           }
         }
         catch (ReflectionException $e) {
+          // @ignoreException
         }
         if (!isset($this->entityTables[$entity_table])) {
           $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getBriefName($daoClass);

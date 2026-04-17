@@ -103,6 +103,7 @@ class TerminateMandate extends AbstractAction {
         \CRM_Core_DAO::executeQuery($update, $updateParams);
       }
       catch (\CRM_Core_Exception $ex) {
+        // @ignoreException
       }
     }
   }
