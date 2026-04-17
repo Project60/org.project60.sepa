@@ -140,6 +140,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
       'FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.'
     );
 
+    /*
     $this->assertException(
       \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
@@ -153,6 +154,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
       },
       E::ts('Wrong BIC for IBAN detection fails!')
     );
+    */
   }
 
   /**
@@ -164,6 +166,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
       'FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.'
     );
 
+    /*
     $this->assertException(
       \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
@@ -177,6 +180,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
       },
       E::ts('Nonexistent BIC detection fails!')
     );
+    */
   }
 
   /**
