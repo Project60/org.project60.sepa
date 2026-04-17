@@ -51,7 +51,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase {
    */
   public function testIncorrectIbanFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
+      \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
         $this->createMandate(
           [
@@ -70,7 +70,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase {
    */
   public function testIncorrectBankCodeFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
+      \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
         $this->createMandate(
           [
@@ -89,7 +89,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase {
    */
   public function testIncorrectChecksumFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
+      \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
         $this->createMandate(
           [
@@ -108,7 +108,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase {
    */
   public function testIncorrectLengthFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
+      \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
         $this->createMandate(
           [
@@ -127,7 +127,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase {
    */
   public function testIncorrectCharFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
+      \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
         $this->createMandate(
           [

@@ -109,7 +109,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
 
     // After closing the termination must fail:
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
+      \PHPUnit\Framework\ExpectationFailedException::class,
       function() use ($mandate) {
         $this->terminateMandate($mandate);
       },
