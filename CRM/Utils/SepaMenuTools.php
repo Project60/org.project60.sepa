@@ -52,8 +52,8 @@ class CRM_Utils_SepaMenuTools {
 
   /**
    * Add the given menu item to the CiviCRM navigation menu if it does not exist yet.
-   * @param array parent_params the params array into whose 'child' attribute the new item will be added.
-   * @param array $attributes the attributes array to be added to the navigation menu
+   * @param array $parent_params the params array into whose 'child' attribute the new item will be added.
+   * @param array $menu_entry_attributes the attributes array to be added to the navigation menu
    */
   public static function addNavigationMenuEntry(&$parent_params, $menu_entry_attributes) {
     // see if it is already in the menu...

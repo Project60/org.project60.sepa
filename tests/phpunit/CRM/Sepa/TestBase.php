@@ -337,7 +337,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   /**
    * Create a mandate.
-   * @param string $mandateType The type of the mandate, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @param array $parameters mandateParameters
    * @param string $collectionDate A string parsable by strtotime to set the (first) collection date.
    * @return array The mandate.
    */

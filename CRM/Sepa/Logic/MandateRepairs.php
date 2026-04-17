@@ -437,10 +437,8 @@ class CRM_Sepa_Logic_MandateRepairs {
   }
 
   /**
-   * Run all mandate repairs for the given IDs
-   *
-   * @param array $mandate_ids
-   *    list of the mandate IDs to be used
+   * @param string $mandate_selector
+   *    selector for the Repair-Logic
    *
    * @return void
    */
