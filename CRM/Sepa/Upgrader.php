@@ -369,7 +369,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
       // @ignoreException
       // We have a problem if the old payment instruments have been disabled
       $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
-      CRM_Core_Session::setStatus($message, E::ts('Missing payment instruments!', [1 => $use_count]), 'warn');
+      CRM_Core_Session::setStatus($message, E::ts('Missing payment instruments!'), 'warn');
       Civi::log()->warning($message);
     }
 
@@ -424,7 +424,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
       // @ignoreException
       // We have a problem if the old payment instruments have been disabled
       $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
-      CRM_Core_Session::setStatus($message, E::ts('Missing payment instruments!', [1 => $use_count]), 'warn');
+      CRM_Core_Session::setStatus($message, E::ts('Missing payment instruments!'), 'warn');
       Civi::log()->warning($message);
     }
 
