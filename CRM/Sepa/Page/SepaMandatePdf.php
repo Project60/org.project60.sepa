@@ -27,11 +27,15 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
   /**
    * Lookup and get a message template
+   *
+   * @param $id
+   * @return array
+   * @throws CRM_Core_Exception
    */
-  public function getMessage ($id) {
-    $msg = civicrm_api('MessageTemplate', 'getSingle', ['version' => 3, 'id' => $id]);
+  public function getMessage ($id): array {
+    $msg = civicrm_api3('MessageTemplate', 'getSingle', ['version' => 3, 'id' => $id]);
     if (array_key_exists('is_error', $msg)) {
-      return CRM_Core_Error::fatal(sprintf(ts('The selected message template does not exist (%d)', ['domain' => 'org.project60.sepa']), $id));
+      throw new \CRM_Core_Exception('The selected message template does not exist: '.$id);
     };
 
     return $msg;
@@ -43,7 +47,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     }
 
     // use the API to load a extensive contact information bulk
-    $contact = civicrm_api('Contact', 'getsingle', ['id' => $contact_id, 'version' => 3]);
+    $contact = civicrm_api3('Contact', 'getsingle', ['id' => $contact_id, 'version' => 3]);
 
     // ... add some missing fields
     $bao = new CRM_Contact_BAO_Contact();
@@ -121,7 +125,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         break;
 
       default:
-        return CRM_Core_Error::fatal("We don't know how to handle mandates for " . $mandate->entity_table);
+        throw new \CRM_Core_Exception("We don't know how to handle mandates for ".$mandate->entity_table);
     }
 
     // add creditor information
@@ -221,12 +225,10 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $api->SepaMandate->get(['reference' => $reference]);
     }
     else {
-      CRM_Core_Error::fatal('missing parameter. you need id or ref of the mandate');
-      return;
+      throw new \CRM_Core_Exception('missing parameter. you need id or ref of the mandate');
     }
     if ($api->is_error()) {
-      CRM_Core_Error::fatal($api->errorMsg());
-      return;
+      throw new \CRM_Core_Exception($api->errorMsg());
     }
     $this->generateHTML($api->values[0], $template);
     if (!$action) {
@@ -254,7 +256,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
     foreach ($default_templates as $template_name => $template_title) {
       // find the template's entry in the option group
-      $template_entry = civicrm_api('OptionValue', 'getsingle', [
+      $template_entry = civicrm_api3('OptionValue', 'getsingle', [
         'version'           => 3,
         'option_group_name' => 'msg_tpl_workflow_contribution',
         'name'              => $template_name,
@@ -265,7 +267,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       }
 
       // find the template itself
-      $template = civicrm_api('MessageTemplate', 'get', [
+      $template = civicrm_api3('MessageTemplate', 'get', [
         'version'           => 3,
         'workflow_id'       => $template_entry['id'],
       ]);
@@ -286,7 +288,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
           Civi::log()->debug("org.project60.sepa: Couldn't find default template date at '$filepath'");
           continue;
         }
-        $result = civicrm_api('MessageTemplate', 'create', [
+        $result = civicrm_api3('MessageTemplate', 'create', [
           'version'     => 3,
           'workflow_id' => $template_entry['id'],
           'msg_title'   => $template_title,

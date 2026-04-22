@@ -27,7 +27,7 @@ class CRM_Sepa_Page_Mandate extends CRM_Core_Page {
 
   public function run() {
 
-    $r = civicrm_api('ContributionRecur', 'getfull', ['version' => 3]);
+    $r = civicrm_api3('ContributionRecur', 'getfull', ['version' => 3]);
     $this->assign('contributions', $r);
 
     parent::run();

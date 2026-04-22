@@ -124,13 +124,13 @@ class CRM_Sepa_Logic_Group {
     CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
 
     // step 4: create the sepa file
-    $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', ['txgroup_id' => $txgroup_id, 'version' => 3]);
+    $xmlfile = civicrm_api3('SepaAlternativeBatching', 'createxml', ['txgroup_id' => $txgroup_id, 'version' => 3]);
     if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
       return 'Cannot create sepa xml file for group ' . $txgroup_id;
     }
 
     // step 5: close the txgroup object
-    $result = civicrm_api('SepaTransactionGroup', 'create', [
+    $result = civicrm_api3('SepaTransactionGroup', 'create', [
       'id'                      => $txgroup_id,
       'status_id'               => $group_status_id_closed,
       'version'                 => 3,
@@ -218,7 +218,7 @@ class CRM_Sepa_Logic_Group {
     while ($contribution->fetch()) {
       // update status for $contribution->contribution_id
       //   and set receive_date to collection_date (see https://github.com/Project60/sepa_dd/issues/190)
-      $result = civicrm_api('Contribution', 'create', [
+      $result = civicrm_api3('Contribution', 'create', [
         'version'                  => 3,
         'id'                       => $contribution->contribution_id,
         'contribution_status_id'   => $status_closed,
@@ -235,7 +235,7 @@ class CRM_Sepa_Logic_Group {
     CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
 
     // step 3.2: update group status
-    $result = civicrm_api('SepaTransactionGroup', 'create', ['id' => $txgroup_id, 'status_id' => $group_status_id_received, 'version' => 3]);
+    $result = civicrm_api3('SepaTransactionGroup', 'create', ['id' => $txgroup_id, 'status_id' => $group_status_id_received, 'version' => 3]);
     if (!empty($result['is_error'])) {
       return 'Cannot update transaction group status for ID ' . $txgroup_id;
     }

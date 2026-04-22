@@ -65,7 +65,7 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
   protected function getEntityTables(): array {
     if (!$this->entityTables) {
       $this->entityTables = [];
-      $allTables = CRM_Core_DAO_AllCoreTables::getCoreTables();
+      $allTables = CRM_Core_DAO_AllCoreTables::tables();
       foreach ($allTables as $entity_table => $daoClass) {
         try {
           $r = new ReflectionMethod($daoClass, 'getEntityTitle');
@@ -77,7 +77,7 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
           // @ignoreException
         }
         if (!isset($this->entityTables[$entity_table])) {
-          $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getBriefName($daoClass);
+          $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoClass);
         }
       }
       asort($this->entityTables);

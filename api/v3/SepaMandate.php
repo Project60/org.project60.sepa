@@ -181,7 +181,7 @@ function civicrm_api3_sepa_mandate_createfull($params) {
   }
 
   // create the contribution
-  $contribution = civicrm_api($contribution_entity, 'create', $create_contribution);
+  $contribution = civicrm_api3($contribution_entity, 'create', $create_contribution);
   if (!empty($contribution['is_error'])) {
     return $contribution;
   }
@@ -193,10 +193,10 @@ function civicrm_api3_sepa_mandate_createfull($params) {
   $create_mandate['version'] = 3;
   $create_mandate['entity_table'] = $contribution_table;
   $create_mandate['entity_id'] = $contribution['id'];
-  $mandate = civicrm_api('SepaMandate', 'create', $create_mandate);
+  $mandate = civicrm_api3('SepaMandate', 'create', $create_mandate);
   if (!empty($mandate['is_error'])) {
     // this didn't work, so we also have to roll back the created contribution
-    $delete = civicrm_api($contribution_entity, 'delete', ['id' => $contribution['id'], 'version' => 3]);
+    $delete = civicrm_api3($contribution_entity, 'delete', ['id' => $contribution['id'], 'version' => 3]);
     if (!empty($delete['is_error'])) {
       Civi::log()->debug("org.project60.sepa: createfull couldn't roll back created contribution: " . $delete['error_message']);
     }

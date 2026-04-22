@@ -1,3 +1,6 @@
+includes:
+	- phpstan-baseline.neon
+
 parameters:
 	paths:
 		- api
@@ -15,6 +18,8 @@ parameters:
 	scanDirectories:
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/src/Framework
 		- mixin
+		- ../dataprocessor/
+		- ../action-provider
 	bootstrapFiles:
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/vendor/autoload.php
 		- phpstanBootstrap.php
@@ -42,4 +47,11 @@ parameters:
 	ignoreErrors:
 		# Note paths are prefixed with "*/" to work with inspections in PHPStorm because of:
 		# https://youtrack.jetbrains.com/issue/WI-63891/PHPStan-ignoreErrors-configuration-isnt-working-with-inspections
+
+		# False positive caused by incorrect/ambiguous Core PHPDoc in TokenValueEvent::getRows().
+		# Upstream fix proposed in Core PR https://github.com/civicrm/civicrm-core/pull/35441.
+		# Remove this ignore once the Core fix is released in the minimum supported CiviCRM version.
+		-
+			message: '#Access to property \$context on an unknown class Civi\\Token\\Event\\TokenRow#'
+			path: sepa.php
 	tmpDir: .phpstan
