@@ -59,7 +59,8 @@ class CRM_Utils_SepaMenuTools {
     // see if it is already in the menu...
     $menu_item_search = ['url' => $menu_entry_attributes['url']];
     $menu_items = [];
-    CRM_Core_BAO_Navigation::retrieve($menu_item_search, $menu_items);
+    $menu_item_search['domain_id'] = CRM_Core_Config::domainID();
+    CRM_Core_BAO_Navigation::commonRetrieve($menu_item_search, $menu_items);
 
     if (empty($menu_items)) {
       // it's not already contained, so we want to add it to the menu

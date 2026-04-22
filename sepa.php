@@ -536,6 +536,7 @@ function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e) {
   $prefix = 'Most_Recent_SEPA_Mandate';
 
   foreach ($e->getRows() as $tokenRow) {
+    // @phpstan-ignore-next-line False positive caused by CiviCRM core PHPDoc bug in TokenValueEvent::getRows().
     if (!empty($tokenRow->context['contactId'])) {
       $tokenRow->format('text/html');
       CRM_Utils_SepaTokens::fillLastMandateTokenValues($tokenRow->context['contactId'], $prefix, $tokenRow);

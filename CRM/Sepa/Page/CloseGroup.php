@@ -49,7 +49,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
         $this->assign('txgroup', $group);
 
         // check whether this is a group created by a test creditor
-        $creditor = civicrm_api('SepaCreditor', 'getsingle', [
+        $creditor = civicrm_api3('SepaCreditor', 'getsingle', [
           'version' => 3,
           'id' => $group['sdd_creditor_id'],
         ]);
@@ -88,7 +88,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
             // delete old txfile
             if (!empty($group['sdd_file_id'])) {
-              $result = civicrm_api('SepaSddFile', 'delete', [
+              $result = civicrm_api3('SepaSddFile', 'delete', [
                 'id' => $group['sdd_file_id'],
                 'version' => 3,
               ]);
@@ -127,7 +127,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
    * generate an XML download link and assign to the template
    */
   protected function createDownloadLink($group_id) {
-    $xmlfile = civicrm_api(
+    $xmlfile = civicrm_api3(
       'SepaAlternativeBatching',
       'createxml',
       ['txgroup_id' => $group_id, 'override' => TRUE, 'version' => 3]
@@ -182,7 +182,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
       CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$groupId], $target_group_status, $target_contribution_status);
     }
 
-    $result = civicrm_api('SepaAlternativeBatching', 'close', [
+    $result = civicrm_api3('SepaAlternativeBatching', 'close', [
       'version' => 3,
       'txgroup_id' => $groupId,
     ]);

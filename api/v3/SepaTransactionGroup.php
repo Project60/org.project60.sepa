@@ -167,7 +167,7 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
   if (!$group) {
     throw new CRM_Core_Exception('Incorrect or missing value for group id');
   }
-  $contribs = civicrm_api('sepa_contribution_group', 'getdetail', $params);
+  $contribs = civicrm_api3('sepa_contribution_group', 'getdetail', $params);
 
   foreach ($contribs['values'] as $old) {
     if (!$old['recur_id']) {
@@ -205,7 +205,7 @@ function civicrm_api3_sepa_transaction_group_createnext ($params) {
     ++$counter;
     continue;
      */
-    $result = civicrm_api('contribution', 'create', $new);
+    $result = civicrm_api3('contribution', 'create', $new);
     if ($result['is_error']) {
       $output[] = $result['error_message'];
       ++$errors;
@@ -254,7 +254,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   }
 
   if (isset($txgroup['sdd_file_id'])) {
-    $sdd_file = civicrm_api('SepaSddFile', 'getsingle', ['id' => $txgroup['sdd_file_id'], 'version' => 3]);
+    $sdd_file = civicrm_api3('SepaSddFile', 'getsingle', ['id' => $txgroup['sdd_file_id'], 'version' => 3]);
     if (isset($sdd_file['is_error']) && $sdd_file['is_error']) {
       return civicrm_api3_create_error('Cannot read sdd file ' . $txgroup['sdd_file_id']);
     }
@@ -330,7 +330,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
     'exported_date'         => $sdd_file['created_date'],
     'version'               => 3,
   ];
-  $batch_create = civicrm_api('Batch', 'create', $batch);
+  $batch_create = civicrm_api3('Batch', 'create', $batch);
   if (isset($batch_create['is_error']) && $batch_create['is_error']) {
     return civicrm_api3_create_error('Cannot create batch for SEPA transaction group ' . $txgroup_id);
   }

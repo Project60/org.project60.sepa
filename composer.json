@@ -18,10 +18,19 @@
         "platform": {
         }
     },
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "https://lab.civicrm.org/extensions/dataprocessor.git"
+      }
+    ],
     "require": {
         "php": "^8.1",
         "civicrm/civicrm-core": ">=5.76",
         "civicrm/civicrm-packages": ">=5.76"
+    },
+    "require-dev": {
+        "civicrm/dataprocessor": "dev-master"
     },
     "autoload": {
         "classmap": ["ComposerHelper.php"]

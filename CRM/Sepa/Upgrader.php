@@ -331,8 +331,8 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1508() {
     $this->ctx->log->info('Make sure the new action-provider actions are available.');
     // run twice, classloader/psr-4 prefixes/angular is a tricky combination
-    CRM_Core_Invoke::rebuildMenuAndCaches();
-    CRM_Core_Invoke::rebuildMenuAndCaches();
+    $this->rebuildMenuAndCaches();
+    $this->rebuildMenuAndCaches();
     return TRUE;
   }
 
@@ -417,7 +417,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
        */
 
       // make sure we rebuild caches anyway
-      CRM_Core_Invoke::rebuildMenuAndCaches();
+      $this->rebuildMenuAndCaches();
 
     }
     catch (Exception $ex) {
@@ -529,6 +529,31 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
 
     return TRUE;
+  }
+
+  /**
+   * Helper for replacing deprecated core method
+   * @return void
+   */
+  private function rebuildMenuAndCaches()
+  {
+    Civi::rebuild([
+      'ext' => TRUE,
+      'files' => TRUE,
+      'tables' => TRUE,
+      'sessions' => FALSE,
+      'metadata' => TRUE,
+      'navigation' => TRUE,
+      'router' => TRUE,
+      'system' => TRUE,
+      'userjob' => TRUE,
+      'perms' => TRUE,
+      'strings' => TRUE,
+      'settings' => TRUE,
+      'cases' => TRUE,
+      'triggers' => FALSE,
+      'entities' => TRUE,
+    ])->execute();
   }
 
 }

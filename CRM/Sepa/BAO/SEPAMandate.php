@@ -292,7 +292,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // if not passed by param, load the mandate
     if ($mandate == NULL || $mandate_id != $mandate['id']) {
-      $mandate = civicrm_api('SepaMandate', 'getsingle', ['id' => $mandate_id, 'version' => 3]);
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id, 'version' => 3]);
       if (isset($mandate['is_error'])) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", ['domain' => 'org.project60.sepa']), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
         return FALSE;
@@ -327,7 +327,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // NOW: cancel this mandate
     // first: cancel the mandate entity
-    $result = civicrm_api('SepaMandate', 'create', [
+    $result = civicrm_api3('SepaMandate', 'create', [
       'version'   => 3,
       'id'        => $mandate_id,
       'status'    => 'INVALID',
@@ -338,7 +338,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // then: cancel the associated contribution
     $contribution_id_cancelled = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled');
-    $result = civicrm_api('Contribution', 'create', [
+    $result = civicrm_api3('Contribution', 'create', [
       'version'                   => 3,
       'id'                        => $contribution_id,
       'contribution_status_id'    => $contribution_id_cancelled,
@@ -417,7 +417,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // load the contribution
     $contribution_id = $mandate['entity_id'];
-    $contribution = civicrm_api('ContributionRecur', 'getsingle', ['id' => $contribution_id, 'version' => 3]);
+    $contribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $contribution_id, 'version' => 3]);
     if (isset($contribution['is_error']) && $contribution['is_error']) {
       $error_message = sprintf(ts("Cannot read contribution [%s]. Error was: '%s'", ['domain' => 'org.project60.sepa']), $contribution_id, $contribution['error_message']);
       if ($error_to_ui) {
@@ -457,7 +457,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       $query['cancel_date'] = $query['end_date'];
     }
 
-    $result = civicrm_api('ContributionRecur', 'create', $query);
+    $result = civicrm_api3('ContributionRecur', 'create', $query);
     if (isset($result['is_error']) && $result['is_error']) {
       $error_message = sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'", ['domain' => 'org.project60.sepa']), $contribution_id, $result['error_message']);
       if ($error_to_ui) {
@@ -503,7 +503,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // ...and delete them:
     foreach ($obsolete_ids as $obsolete_id) {
-      $delete_result = civicrm_api('Contribution', 'delete', ['id' => $obsolete_id, 'version' => 3]);
+      $delete_result = civicrm_api3('Contribution', 'delete', ['id' => $obsolete_id, 'version' => 3]);
       if (isset($delete_result['is_error']) && $delete_result['is_error']) {
         CRM_Core_Session::setStatus(sprintf(ts("Cannot delete scheduled contribution [%s]. Error was: '%s'", ['domain' => 'org.project60.sepa']), $obsolete_id, $delete_result['error_message']), ts('Error'), 'warn');
       }
@@ -519,7 +519,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // finally, let the API close the mandate if end_date is now
     if ($new_end_date <= $today) {
-      $close_result = civicrm_api('SepaAlternativeBatching', 'closeended', ['version' => 3]);
+      $close_result = civicrm_api3('SepaAlternativeBatching', 'closeended', ['version' => 3]);
       if (isset($close_result['is_error']) && $close_result['is_error']) {
         if ($error_to_ui) {
           CRM_Core_Session::setStatus(sprintf(ts("Closing Mandate failed. Error was: '%s'", ['domain' => 'org.project60.sepa']), $close_result['error_message']), ts('Error'), 'warn');
@@ -770,7 +770,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     }
 
     // first, load the mandate
-    $mandate = civicrm_api('SepaMandate', 'getsingle', ['id' => $mandate_id, 'version' => 3]);
+    $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id, 'version' => 3]);
     if (isset($mandate['is_error'])) {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", ['domain' => 'org.project60.sepa']), $mandate_id, $mandate['error_message']), ts('Error', ['domain' => 'org.project60.sepa']), 'error');
       return FALSE;
@@ -784,7 +784,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // load the contribution
     $contribution_id = $mandate['entity_id'];
-    $contribution = civicrm_api('ContributionRecur', 'getsingle', ['id' => $contribution_id, 'version' => 3]);
+    $contribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $contribution_id, 'version' => 3]);
     if (isset($contribution['is_error']) && $contribution['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
       return FALSE;
@@ -810,7 +810,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       'amount'    => $adjusted_amount,
       'currency'  => $contribution['currency'],
     ];
-    $result = civicrm_api('ContributionRecur', 'create', $query);
+    $result = civicrm_api3('ContributionRecur', 'create', $query);
     if (!empty($result['is_error'])) {
       CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'", ['domain' => 'org.project60.sepa']), $contribution_id, $result['error_message'], ['domain' => 'org.project60.sepa']), ts('Error', ['domain' => 'org.project60.sepa']), 'error');
       return FALSE;
@@ -832,7 +832,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // ...and adjust them:
     foreach ($contributions2adjust as $contribution2adjust_id) {
-      $update_result = civicrm_api('Contribution', 'create', [
+      $update_result = civicrm_api3('Contribution', 'create', [
         'version'                => 3,
         'id'                     => $contribution2adjust_id,
         'total_amount'           => $adjusted_amount,

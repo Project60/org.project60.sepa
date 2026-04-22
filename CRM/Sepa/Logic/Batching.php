@@ -230,7 +230,7 @@ class CRM_Sepa_Logic_Batching {
               'is_test'                             => $mandate['rc_is_test'],
               'payment_instrument_id'               => $installment_pi,
             ];
-            $contribution = civicrm_api('Contribution', 'create', $contribution_data);
+            $contribution = civicrm_api3('Contribution', 'create', $contribution_data);
             if (empty($contribution['is_error'])) {
               // Success! Call the post_create hook
               CRM_Utils_SepaCustomisationHooks::installment_created($mandate['mandate_id'], $recur_id, $contribution['id']);
@@ -436,7 +436,7 @@ class CRM_Sepa_Logic_Batching {
 
     // then, end them one by one
     foreach ($mandates_to_end as $mandate_to_end) {
-      $change_mandate = civicrm_api('SepaMandate', 'create', [
+      $change_mandate = civicrm_api3('SepaMandate', 'create', [
         'id'                      => $mandate_to_end['mandate_id'],
         'date'                    => $mandate_to_end['date'],
         'creation_date'           => $mandate_to_end['creation_date'],
@@ -448,7 +448,7 @@ class CRM_Sepa_Logic_Batching {
         return sprintf("Couldn't set mandate '%s' to 'complete. Error was: '%s'", $mandates_to_end['mandate_id'], $change_mandate['error_message']);
       }
 
-      $change_rcur = civicrm_api('ContributionRecur', 'create', [
+      $change_rcur = civicrm_api3('ContributionRecur', 'create', [
         'id'                      => $mandate_to_end['recur_id'],
         'contribution_status_id'  => $contribution_status_closed,
         'modified_date'           => date('YmdHis'),
@@ -482,7 +482,7 @@ class CRM_Sepa_Logic_Batching {
       // find unused reference
       $reference = self::getTransactionGroupReference($creditor_id, $mode, $collection_date, $financial_type_id);
 
-      $group = civicrm_api('SepaTransactionGroup', 'create', [
+      $group = civicrm_api3('SepaTransactionGroup', 'create', [
         'version'                 => 3,
         'reference'               => $reference,
         'type'                    => $mode,

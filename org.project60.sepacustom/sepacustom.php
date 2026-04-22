@@ -87,10 +87,10 @@ function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
 
   // load contribution
   if ($mandate_parameters['entity_table']=='civicrm_contribution') {
-    $contribution = civicrm_api('Contribution', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
+    $contribution = civicrm_api3('Contribution', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
     $interval = '00';   // one-time
   } else if ($mandate_parameters['entity_table']=='civicrm_contribution_recur') {
-    $contribution = civicrm_api('ContributionRecur', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
+    $contribution = civicrm_api3('ContributionRecur', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
     if ($contribution['frequency_unit']=='month') {
       $interval = sprintf('%02d', 12/$contribution['frequency_interval']);
     } else if ($contribution['frequency_unit']=='year') {
