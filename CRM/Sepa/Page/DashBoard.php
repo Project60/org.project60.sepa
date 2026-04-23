@@ -89,6 +89,13 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     }
     $this->assign('closed_status_id', CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'));
 
+    $order_field = 'sepa_sdd_file.created_date';
+    $order_direction = 'DESC';
+    if ('open' === $status) {
+      $order_field = 'latest_submission_date';
+      $order_direction = 'ASC';
+    }
+
     // now read the details
     try {
       // API4 SepaTransactionGroup.get checks Financial ACLs for corresponding contributions.
@@ -120,7 +127,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
           ['sdd_file_id', '=', 'sepa_sdd_file.id']
         )
         ->addWhere('status_id', 'IN', $status_list[$status])
-        ->addOrderBy('open' === $status ? 'latest_submission_date' : 'sepa_sdd_file.created_date')
+        ->addOrderBy($order_field, $order_direction)
         ->addGroupBy('id')
         ->addGroupBy('reference')
         ->addGroupBy('sdd_file_id')
