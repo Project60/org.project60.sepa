@@ -896,14 +896,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       return FALSE;
     }
 
-    $dao = CRM_Core_DAO::executeQuery(
-      "SELECT * FROM civicrm_sdd_mandate WHERE contact_id = %1 ORDER BY id DESC LIMIT 1",
-      [1 => [$cid, 'Integer']]
-    );
-    if ($dao->fetch()) {
-      return $dao->toArray();
-    }
-    return FALSE;
+    return SepaMandate::get(FALSE)
+        ->addWhere('contact_id', '=', $cid)
+        ->addOrderBy('id', 'DESC')
+        ->setLimit(1)
+        ->execute()
+        ->first() ?? FALSE;
   }
 
   public static function isContributionMandate($mandate) {
