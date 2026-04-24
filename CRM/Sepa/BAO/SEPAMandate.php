@@ -896,20 +896,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       return FALSE;
     }
 
-    $query = "SELECT contact_id, MAX(id) AS mandate_id FROM civicrm_sdd_mandate WHERE contact_id = %1 GROUP BY contact_id;";
-    $result = CRM_Core_DAO::executeQuery($query,[
-      1 => [$cid, 'Integer']
-    ]);
-    if ($result->fetch()) {
-      // return the mandate
-      return SepaMandate::get(TRUE)
-        ->addWhere('id', '=', $result->mandate_id)
+    return SepaMandate::get(FALSE)
+        ->addWhere('contact_id', '=', $cid)
+        ->addOrderBy('id', 'DESC')
+        ->setLimit(1)
         ->execute()
-        ->single();
-    }
-    else {
-      return FALSE;
-    }
+        ->first() ?? FALSE;
   }
 
   public static function isContributionMandate($mandate) {
