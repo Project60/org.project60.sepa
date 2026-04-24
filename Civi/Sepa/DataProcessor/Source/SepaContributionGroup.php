@@ -39,4 +39,5 @@ class SepaContributionGroup extends AbstractCivicrmEntitySource {
   protected function getTable(): string {
     return 'civicrm_sdd_contribution_txgroup';
   }
+
 }

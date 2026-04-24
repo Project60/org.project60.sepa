@@ -21,7 +21,6 @@
  *
  */
 
-
 /**
  * Add an SepaTransactionGroup for a contact
  *
@@ -30,7 +29,7 @@
  * @example SepaTransactionGroupCreate.php Standard Create Example
  *
  * @return array API result array
- * {@getfields sepa_transaction_group_create}
+ *   {@getfields sepa_transaction_group_create}
  * @access public
  */
 function civicrm_api3_sepa_transaction_group_create($params) {
@@ -46,7 +45,8 @@ function civicrm_api3_sepa_transaction_group_create($params) {
 function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
   $params['reference']['api.required'] = 1;
   $params['type']['api.required'] = 1;
-  $params['status_id']['api.default'] = 2; //Close
+  //Close
+  $params['status_id']['api.default'] = 2;
   $params['sdd_creditor_id']['api.required'] = 1;
   $params['created_date']['api.default'] = 'now';
 }
@@ -54,12 +54,12 @@ function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
 /**
  * Deletes an existing SepaTransactionGroup
  *
- * @param  array  $params
+ * @param  array $params
  *
  * @example SepaTransactionGroupDelete.php Standard Delete Example
  *
  * @return boolean | error  true if successfull, error otherwise
- * {@getfields sepa_transaction_group_delete}
+ *   {@getfields sepa_transaction_group_delete}
  * @access public
  */
 function civicrm_api3_sepa_transaction_group_delete($params) {
@@ -77,7 +77,7 @@ function civicrm_api3_sepa_transaction_group_delete($params) {
  * @param  array $params  an associative array of name/value pairs.
  *
  * @return  array api result array
- * {@getfields sepa_transaction_group_get}
+ *   {@getfields sepa_transaction_group_get}
  * @access public
  */
 function civicrm_api3_sepa_transaction_group_get($params) {
@@ -88,28 +88,28 @@ function civicrm_api3_sepa_transaction_group_get($params) {
  * @deprecated This action will not be ported to APIv4. Use the "Get" action with custom joins and filters instead.
  */
 function civicrm_api3_sepa_transaction_group_getdetail($params) {
-//  $where = "txgroup.id= txgroup_contrib.txgroup_id AND txgroup_contrib.contribution_id = contrib.id";
-  $where = "1";
-  $orderby = "ORDER BY txgroup.latest_submission_date ASC";
-  if (array_key_exists("id",$params)) {
-    $group = (int) $params["id"];
+  //  $where = "txgroup.id= txgroup_contrib.txgroup_id AND txgroup_contrib.contribution_id = contrib.id";
+  $where = '1';
+  $orderby = 'ORDER BY txgroup.latest_submission_date ASC';
+  if (array_key_exists('id', $params)) {
+    $group = (int) $params['id'];
     $where .= " AND txgroup.id = $group ";
   }
-  if (array_key_exists("file_id",$params)) {
-    $file_id = (int) $params["file_id"];
+  if (array_key_exists('file_id', $params)) {
+    $file_id = (int) $params['file_id'];
     $where .= " AND sdd_file_id = $file_id ";
   }
-  if (array_key_exists("status_ids",$params)) {
-    $status_ids = $params["status_ids"];
+  if (array_key_exists('status_ids', $params)) {
+    $status_ids = $params['status_ids'];
     $where .= " AND txgroup.status_id IN ($status_ids) ";
   }
-  if (array_key_exists("order_by",$params)) {
-    if ($params["order_by"] == 'file.created_date') {
-      $orderby = "ORDER BY civicrm_sdd_file.created_date DESC";
+  if (array_key_exists('order_by', $params)) {
+    if ($params['order_by'] == 'file.created_date') {
+      $orderby = 'ORDER BY civicrm_sdd_file.created_date DESC';
     }
   }
 
-  $sql="
+  $sql = "
     SELECT
       txgroup.id,
       txgroup.reference,
@@ -133,105 +133,106 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
     $orderby;";
 
   $dao = CRM_Core_DAO::executeQuery($sql);
-  $result= array();
-  $total =0;
+  $result = [];
+  $total = 0;
   while ($dao->fetch()) {
     $result[] = $dao->toArray();
     $total += $dao->total;
   }
-  return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = array("total_amount"=>$total));
+  return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = ['total_amount' => $total]);
 }
-
 
 function _civicrm_api3_sepa_transaction_group_close_spec (&$params) {
   $params['id']['api.required'] = 1;
 }
 
 function civicrm_api3_sepa_transaction_group_close($params) {
-  $result=array();
+  $result = [];
   // a single query much better for perf, but no hook called. To be revised later?
-  $sql="update civicrm_contribution as contrib, civicrm_sdd_contribution_txgroup
+  $sql = 'update civicrm_contribution as contrib, civicrm_sdd_contribution_txgroup
     set contribution_status_id=1
-    where contribution_id = contrib.id and txgroup_id=%1";
-  $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['id'], 'Integer')));
-  return civicrm_api3_sepa_transaction_group_create (array("id"=>$params['id'],'status_id'=>2));
+    where contribution_id = contrib.id and txgroup_id=%1';
+  $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$params['id'], 'Integer']]);
+  return civicrm_api3_sepa_transaction_group_create(['id' => $params['id'], 'status_id' => 2]);
 }
-
 
 function _civicrm_api3_sepa_transaction_group_createnext_spec (&$params) {
   $params['id']['api.required'] = 1;
 }
 
 function civicrm_api3_sepa_transaction_group_createnext ($params) {
-  $errors=$counter=0;
-  $values=array();
-  $group = (int) $params["id"];
-  if (!$group)
-    throw new CRM_Core_Exception("Incorrect or missing value for group id");
-  $contribs = civicrm_api("sepa_contribution_group","getdetail", $params);
+  $errors = $counter = 0;
+  $values = [];
+  $group = (int) $params['id'];
+  if (!$group) {
+    throw new CRM_Core_Exception('Incorrect or missing value for group id');
+  }
+  $contribs = civicrm_api3('sepa_contribution_group', 'getdetail', $params);
 
-  foreach ($contribs["values"] as $old) {
-    if (!$old['recur_id'])
-      throw new CRM_Core_Exception("Trying to create next payment for non-recurrent contribution?");
-    $date = strtotime(substr($old["receive_date"], 0, 10));
-    $next_collectionDate = strtotime ("+". $old["frequency_interval"] . " ".$old["frequency_unit"],$date);
+  foreach ($contribs['values'] as $old) {
+    if (!$old['recur_id']) {
+      throw new CRM_Core_Exception('Trying to create next payment for non-recurrent contribution?');
+    }
+    $date = strtotime(substr($old['receive_date'], 0, 10));
+    $next_collectionDate = strtotime('+' . $old['frequency_interval'] . ' ' . $old['frequency_unit'], $date);
     $next_collectionDate = date('YmdHis', $next_collectionDate);
     $new = $old;
-    $new["hash"] = md5(uniqid(rand(), true));
-    $new["source"] = "SEPA recurring contribution";
-    unset($new["id"]);
-    unset($new["contribution_id"]);
-    $new["receive_date"] = $next_collectionDate;
-    $new["contribution_status_id"]= 2;
-    $new["contribution_recur_id"] = $new["recur_id"];
-    unset($new["recur_id"]);
+    $new['hash'] = md5(uniqid(rand(), TRUE));
+    $new['source'] = 'SEPA recurring contribution';
+    unset($new['id']);
+    unset($new['contribution_id']);
+    $new['receive_date'] = $next_collectionDate;
+    $new['contribution_status_id'] = 2;
+    $new['contribution_recur_id'] = $new['recur_id'];
+    unset($new['recur_id']);
 
     /*
-       CRM_Core_DAO::executeQuery("
-       UPDATE civicrm_contribution_recur
-       SET next_sched_contribution = %1
-       WHERE id = %2
-       ", array(
-       1 => array($next_collectionDate, 'String'),
-       2 => array($new["contribution_recur_id"], 'Integer')
-       )
-       );
+    CRM_Core_DAO::executeQuery("
+    UPDATE civicrm_contribution_recur
+    SET next_sched_contribution = %1
+    WHERE id = %2
+    ", array(
+    1 => array($next_collectionDate, 'String'),
+    2 => array($new["contribution_recur_id"], 'Integer')
+    )
+    );
      */
-    $new["version"] =3;
-    $new["sequential"] =1;
+    $new['version'] = 3;
+    $new['sequential'] = 1;
 
-/*
-$total += $new["total_amount"];
-++$counter;
-continue;
-*/
-    $result = civicrm_api('contribution', 'create',$new);
+    /*
+    $total += $new["total_amount"];
+    ++$counter;
+    continue;
+     */
+    $result = civicrm_api3('contribution', 'create', $new);
     if ($result['is_error']) {
       $output[] = $result['error_message'];
       ++$errors;
       continue;
-    } else {
+    }
+    else {
       ++$counter;
-      $total += $result["total_amount"];
+      $total += $result['total_amount'];
       $mandate = new CRM_Sepa_BAO_SEPAMandate();
       $contrib = new CRM_Contribute_BAO_Contribution();
-      $contrib->get('id', $result["id"]);//it sucks to have to fetch again, just to get the BAO
-//      $mandate->get('id', $old["mandate_id"]);
-//      $values[] = $result["values"];
-      $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor ($contrib, $old["creditor_id"],$old["payment_instrument_id"]);
+      //it sucks to have to fetch again, just to get the BAO
+      $contrib->get('id', $result['id']);
+      //      $mandate->get('id', $old["mandate_id"]);
+      //      $values[] = $result["values"];
+      $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor($contrib, $old['creditor_id'], $old['payment_instrument_id']);
       $values = $group->toArray();
     }
   }
   if (!$errors) {
-    $values["nb_contrib"] = $counter;
-    $values["total"]=$total;
-    return civicrm_api3_create_success(array($values), $params, 'address', $contrib);
-  } else {
-    civicrm_api3_create_error("Could not create ".$errors. " new contributions",$output);
+    $values['nb_contrib'] = $counter;
+    $values['total'] = $total;
+    return civicrm_api3_create_success([$values], $params, 'address', $contrib);
+  }
+  else {
+    civicrm_api3_create_error('Could not create ' . $errors . ' new contributions', $output);
   }
 }
-
-
 
 /**
  * This API call creates a corresponding accounting batch for a SEPA group
@@ -248,19 +249,21 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
       ->execute()
       ->single();
   }
-  catch (\CRM_Core_Exception $exception)  {
+  catch (\CRM_Core_Exception $exception) {
     return civicrm_api3_create_error('Cannot read transaction group ' . $txgroup_id);
   }
 
   if (isset($txgroup['sdd_file_id'])) {
-    $sdd_file = civicrm_api('SepaSddFile', 'getsingle', array('id' => $txgroup['sdd_file_id'], 'version' => 3));
+    $sdd_file = civicrm_api3('SepaSddFile', 'getsingle', ['id' => $txgroup['sdd_file_id'], 'version' => 3]);
     if (isset($sdd_file['is_error']) && $sdd_file['is_error']) {
-      return civicrm_api3_create_error("Cannot read sdd file ".$txgroup['sdd_file_id']);
+      return civicrm_api3_create_error('Cannot read sdd file ' . $txgroup['sdd_file_id']);
     }
-  } else {
-    $sdd_file = array(
-        'created_id' => CRM_Core_Session::singleton()->get('userID'),
-        'created_date' => date('YmdHis'));
+  }
+  else {
+    $sdd_file = [
+      'created_id' => CRM_Core_Session::singleton()->get('userID'),
+      'created_date' => date('YmdHis'),
+    ];
   }
 
   // gather information on the group
@@ -277,57 +280,61 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
 
   $contributions_query = CRM_Core_DAO::executeQuery($contributions_query_sql);
 
-  $transactions = array();
-  $contributions_missing_transaction = array();
+  $transactions = [];
+  $contributions_missing_transaction = [];
   $total = 0.0;
   while ($contributions_query->fetch()) {
     if ($contributions_query->financial_trxn_id) {
       array_push($transactions, $contributions_query->financial_trxn_id);
       $total += $contributions_query->amount;
-    } else {
+    }
+    else {
       array_push($contributions_missing_transaction, $contributions_query->contribution_id);
     }
   }
 
   // find a name
-  $name = $wanted_name = 'SEPA '.$txgroup['reference'];
+  $name = $wanted_name = 'SEPA ' . $txgroup['reference'];
   $counter = 0;
   while (CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_batch WHERE title='$name';")->fetch()) {
     $counter++;
-    $name = $wanted_name.'_'.$counter;
+    $name = $wanted_name . '_' . $counter;
   }
 
   // get type id
   $type_id = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'type_id', 'SEPA DD Transaction Batch');
   if (!$type_id) {
     // create SEPA type entry if not exists
-    $value_spec = array('name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch', array('domain' => 'org.project60.sepa')), 'is_active' => 1);
+    $value_spec = ['name' => 'SEPA DD Transaction Batch', 'label' => ts('SEPA DD Transaction Batch', ['domain' => 'org.project60.sepa']), 'is_active' => 1];
     $action = CRM_Core_Action::ADD;
-    $type_id = CRM_Core_OptionValue::addOptionValue($value_spec, 'batch_type', $action, null)->value;
+    $type_id = CRM_Core_OptionValue::addOptionValue($value_spec, 'batch_type', $action, NULL)->value;
   }
 
   // then, finally, create the accounting group
-  $description = sprintf(ts('This group corresponds to <a href="%s">SEPA transaction group [%s]</a>', array('domain' => 'org.project60.sepa')),
+  $description = sprintf(ts('This group corresponds to <a href="%s">SEPA transaction group [%s]</a>', ['domain' => 'org.project60.sepa']),
       CRM_Utils_System::url('civicrm/sepa/listgroup', "group_id=$txgroup_id"), $txgroup_id);
 
-  $batch = array( 'title'                 => $name,
-                  'description'           => $description,
-                  'created_id'            => $sdd_file['created_id'],
-                  'created_date'          => $txgroup['created_date'],
-                  'modified_id'           => CRM_Core_Session::singleton()->get('userID'),
-                  'modified_date'         => date('YmdHis'),
-                  'status_id'             => $txgroup['status_id'],
-                  'type_id'               => $type_id,
-                  'mode_id'               => (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'mode_id', 'Automatic Batch'),
-                  'total'                 => $total,
-                  'item_count'            => count($transactions),
-                  'payment_instrument_id' => (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $txgroup['type']),
-                  'exported_date'         => $sdd_file['created_date'],
-                  'version'               => 3);
-  $batch_create = civicrm_api('Batch', 'create', $batch);
+  $batch = [
+    'title'                 => $name,
+    'description'           => $description,
+    'created_id'            => $sdd_file['created_id'],
+    'created_date'          => $txgroup['created_date'],
+    'modified_id'           => CRM_Core_Session::singleton()->get('userID'),
+    'modified_date'         => date('YmdHis'),
+    'status_id'             => $txgroup['status_id'],
+    'type_id'               => $type_id,
+    'mode_id'               => (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'mode_id', 'Automatic Batch'),
+    'total'                 => $total,
+    'item_count'            => count($transactions),
+    'payment_instrument_id' => (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $txgroup['type']),
+    'exported_date'         => $sdd_file['created_date'],
+    'version'               => 3,
+  ];
+  $batch_create = civicrm_api3('Batch', 'create', $batch);
   if (isset($batch_create['is_error']) && $batch_create['is_error']) {
-    return civicrm_api3_create_error("Cannot create batch for SEPA transaction group ".$txgroup_id);
-  } else {
+    return civicrm_api3_create_error('Cannot create batch for SEPA transaction group ' . $txgroup_id);
+  }
+  else {
     $batch_id = $batch_create['id'];
     if (count($contributions_missing_transaction)) {
       $batch_create['contributions_missing_transaction'] = $contributions_missing_transaction;
@@ -345,4 +352,3 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
 function _civicrm_api3_sepa_transaction_group_toaccgroup_spec(&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
-

@@ -25,9 +25,9 @@ use CRM_Sepa_ExtensionUtil as E;
 class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
 
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(E::ts("Retry Collection of Failed DDs"));
+    CRM_Utils_System::setTitle(E::ts('Retry Collection of Failed DDs'));
 
-    $js_vars = array();
+    $js_vars = [];
 
     // add form elements
     $this->add(
@@ -45,7 +45,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         E::ts('Creditor(s)'),
         $creditor_list,
         FALSE,
-        array('class' => 'crm-select2', 'multiple' => 'multiple'));
+        ['class' => 'crm-select2', 'multiple' => 'multiple']);
 
     $txgroup_list = $this->getGroupList();
     $js_vars['txgroup_list'] = $txgroup_list;
@@ -55,15 +55,15 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         E::ts('SDD Groups'),
         $txgroup_list,
         FALSE,
-        array('class' => 'crm-select2', 'multiple' => 'multiple'));
+        ['class' => 'crm-select2', 'multiple' => 'multiple']);
 
     $this->add(
         'select',
         'cancel_reason_list',
         E::ts('Cancel Reason'),
-        array(),
+        [],
         FALSE,
-        array('class' => 'crm-select2', 'multiple' => 'multiple'));
+        ['class' => 'crm-select2', 'multiple' => 'multiple']);
 
     $this->add(
         'select',
@@ -71,7 +71,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         E::ts('Contribution Status'),
         $this->getContributionStatusList(),
         FALSE,
-        array('class' => 'crm-select2', 'multiple' => 'multiple'));
+        ['class' => 'crm-select2', 'multiple' => 'multiple']);
 
     $frequency_list = $this->getFrequencyList();
     $js_vars['frequencies'] = $frequency_list;
@@ -81,19 +81,19 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         E::ts('Frequency'),
         $frequency_list,
         FALSE,
-        array('class' => 'crm-select2', 'multiple' => 'multiple'));
+        ['class' => 'crm-select2', 'multiple' => 'multiple']);
 
     $this->add(
         'text',
         'amount_min',
         E::ts('Installment Amount'),
-        array('size' => 6, 'style' => 'text-align:center;'));
+        ['size' => 6, 'style' => 'text-align:center;']);
 
     $this->add(
         'text',
         'amount_max',
         E::ts('Installment Amount'),
-        array('size' => 6, 'style' => 'text-align:center;'));
+        ['size' => 6, 'style' => 'text-align:center;']);
 
     $this->add(
         'datepicker',
@@ -118,13 +118,13 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
       ['class' => 'huge']
     );
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'submit',
         'name' => E::ts('Generate'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     // inject JS file
     CRM_Core_Resources::singleton()->addVars('p60sdd', $js_vars);
@@ -137,7 +137,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $values = $this->exportValues();
 
     // format some values
-    $values['collection_date'] = CRM_Utils_Date::processDate($values['collection_date'], null, null, 'YmdHis');
+    $values['collection_date'] = CRM_Utils_Date::processDate($values['collection_date'], NULL, NULL, 'YmdHis');
 
     // process from-to dates
     if ($values['date_range'] != 'custom') {
@@ -157,7 +157,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
    * Get the presets for the date field
    */
   protected function getDateRangePresets() {
-    $presets = array();
+    $presets = [];
     // add "this month"
     $presets[date('Ym01000000') . '-now'] = E::ts('This Month');
 
@@ -185,7 +185,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 month'));
     $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
     $presets["{$from}-{$to}"] = E::ts('Last Calendar Month');
-    $this->setDefaults(array('date_range' => "{$from}-{$to}"));
+    $this->setDefaults(['date_range' => "{$from}-{$to}"]);
 
     // add last two months
     $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 2 month'));
@@ -202,26 +202,32 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     return $presets;
   }
 
-  /*
+  /**
+   *
    * Get the list of creitors
+   *
    */
   protected function getCreditorList() {
-    $creditor_list = array();
-    $creditor_query = civicrm_api3('SepaCreditor', 'get', array(
+    $creditor_list = [];
+    $creditor_query = civicrm_api3('SepaCreditor', 'get', [
       'option.limit' => 0,
-      'return'       => 'name,label,id'));
+      'return'       => 'name,label,id',
+    ]);
     foreach ($creditor_query['values'] as $creditor) {
       if (empty($creditor['label'])) {
         $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['name']}";
-      } else {
+      }
+      else {
         $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";
       }
     }
     return $creditor_list;
   }
 
-  /*
+  /**
+   *
    * Get the list of creditors
+   *
    */
   protected function getGroupList() {
     return \Civi\Api4\SepaTransactionGroup::get(TRUE)
@@ -232,30 +238,33 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
       ->column('reference');
   }
 
-  /*
+  /**
+   *
    * Get the list of creditors
+   *
    */
   protected function getFrequencyList() {
-    return array(
-        "1" => E::ts("annually"),
-        "2" => E::ts("semi-annually"),
-//        "3" => E::ts("3-monthly"),
-        "4" => E::ts("quarterly"),
-//        "6" => E::ts("bi-monthly"),
-        "12" => E::ts("monthly"),
-    );
+    return [
+      '1' => E::ts('annually'),
+      '2' => E::ts('semi-annually'),
+    //        "3" => E::ts("3-monthly"),
+      '4' => E::ts('quarterly'),
+    //        "6" => E::ts("bi-monthly"),
+      '12' => E::ts('monthly'),
+    ];
   }
 
   protected function getContributionStatusList() {
     $contribution_status_list = [];
     $query = civicrm_api3('OptionValue', 'get', [
-        'option_group_id' => 'contribution_status',
-        'option.limit'    => 0,
-        'return'          => 'value,label'
+      'option_group_id' => 'contribution_status',
+      'option.limit'    => 0,
+      'return'          => 'value,label',
     ]);
     foreach ($query['values'] as $contribution_status) {
       $contribution_status_list[$contribution_status['value']] = $contribution_status['label'];
     }
     return $contribution_status_list;
   }
+
 }

@@ -30,10 +30,9 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
-{
-  public function setUp(): void
-  {
+class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
+
+  public function setUp(): void {
     parent::setUp();
 
     $this->setCreditorConfiguration('batching.OOFF.horizon', 31);
@@ -44,8 +43,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    * Test the legal termination of an OOFF mandate.
    * @see Case_ID T01
    */
-  public function testOOFFLegalTerminate()
-  {
+  public function testOOFFLegalTerminate() {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
@@ -66,8 +64,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->assertSame(self::MANDATE_STATUS_INVALID, $terminatedMandate['status']);
     $this->assertException(
       Exception::class,
-      function() use ($contribution)
-      {
+      function() use ($contribution) {
         $this->getTransactionGroupForContribution($contribution);
       },
       E::ts('There should be no transaction group be associated with the mandate after terminating.')
@@ -83,8 +80,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->assertSame(self::MANDATE_STATUS_INVALID, $mandateForRetesting['status']);
     $this->assertException(
       Exception::class,
-      function() use ($contributionForRetesting)
-      {
+      function() use ($contributionForRetesting) {
         $this->getTransactionGroupForContribution($contributionForRetesting);
       },
       E::ts('The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.')
@@ -95,8 +91,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    * Test the illegal termination of an OOFF mandate after it has been closed..
    * @see Case_ID T02
    */
-  public function testOOFFTerminateAfterClosingFails()
-  {
+  public function testOOFFTerminateAfterClosingFails() {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
@@ -114,9 +109,8 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
 
     // After closing the termination must fail:
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function() use ($mandate)
-      {
+      \PHPUnit\Framework\ExpectationFailedException::class,
+      function() use ($mandate) {
         $this->terminateMandate($mandate);
       },
       E::ts('It must not be allowed to terminate the mandate after the group has been closed.')
@@ -140,8 +134,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    * Test the termination of an RCUR mandate.
    * @see Case_ID T03
    */
-  public function testRCURTerminate()
-  {
+  public function testRCURTerminate() {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_RCUR,
@@ -163,8 +156,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $this->assertSame(self::MANDATE_STATUS_COMPLETE, $terminatedMandate['status']);
     $this->assertException(
       Exception::class,
-      function() use ($contribution)
-      {
+      function() use ($contribution) {
         $this->getTransactionGroupForContribution($contribution);
       },
       E::ts('There should be no transaction group be associated with the mandate after terminating.')
@@ -177,7 +169,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
     $mandateForRetesting = $this->getMandate($mandate['id']);
     $this->assertSame(self::MANDATE_STATUS_COMPLETE, $mandateForRetesting['status']);
 
-    $contributionForRetesting = $this->getLatestContributionForMandate($mandateForRetesting, true);
+    $contributionForRetesting = $this->getLatestContributionForMandate($mandateForRetesting, TRUE);
     $this->assertNULL($contributionForRetesting, E::ts('A new contribution has been created for a terminated mandate.'));
   }
 
@@ -185,8 +177,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
    * Test the termination of an RCUR mandate after it's collection date.
    * @see Case_ID T04
    */
-  public function testRCURTerminateAfterCollectionDate()
-  {
+  public function testRCURTerminateAfterCollectionDate() {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_RCUR,
@@ -232,4 +223,5 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase
       E::ts('The mandate has been incorrectly regrouped.')
     );
   }
+
 }

@@ -3,6 +3,7 @@
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Utils_SepaTokens {
+
   public static function getTokenList() {
     return [
       'reference'               => E::ts('Reference', ['domain' => 'org.project60.sepa']),
@@ -43,15 +44,15 @@ class CRM_Utils_SepaTokens {
 
   private static function fillLastMandateCommonTokenValues($mandate, $prefix, \Civi\Token\TokenRow $tokenRow) {
     // copy the mandate values
-    $tokenRow->tokens($prefix, 'reference',        $mandate['reference'] ?? '');
-    $tokenRow->tokens($prefix, 'source',           $mandate['source'] ?? '');
-    $tokenRow->tokens($prefix, 'type',             $mandate['type'] ?? '');
-    $tokenRow->tokens($prefix, 'status',           $mandate['status'] ?? '');
-    $tokenRow->tokens($prefix, 'date',             $mandate['date'] ?? '');
+    $tokenRow->tokens($prefix, 'reference', $mandate['reference'] ?? '');
+    $tokenRow->tokens($prefix, 'source', $mandate['source'] ?? '');
+    $tokenRow->tokens($prefix, 'type', $mandate['type'] ?? '');
+    $tokenRow->tokens($prefix, 'status', $mandate['status'] ?? '');
+    $tokenRow->tokens($prefix, 'date', $mandate['date'] ?? '');
     //$tokenRow->tokens($prefix, 'account_holder',   $mandate['account_holder']);
-    $tokenRow->tokens($prefix, 'iban',             $mandate['iban'] ?? '');
-    $tokenRow->tokens($prefix, 'iban_anonymised',  $mandate['iban'] ? CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']) : '');
-    $tokenRow->tokens($prefix, 'bic',              $mandate['bic'] ?? '');
+    $tokenRow->tokens($prefix, 'iban', $mandate['iban'] ?? '');
+    $tokenRow->tokens($prefix, 'iban_anonymised', $mandate['iban'] ? CRM_Sepa_Logic_Verification::anonymiseIBAN($mandate['iban']) : '');
+    $tokenRow->tokens($prefix, 'bic', $mandate['bic'] ?? '');
 
     if (!empty($mandate['date'])) {
       $tokenRow->tokens($prefix, 'date_text', CRM_Utils_Date::customFormat($mandate['date']));
@@ -59,10 +60,10 @@ class CRM_Utils_SepaTokens {
   }
 
   private static function fillLastMandateContributionTokenValues($mandate, $prefix, \Civi\Token\TokenRow $tokenRow) {
-    $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['entity_id']));
-    $tokenRow->tokens($prefix, 'amount',           $contribution['total_amount']);
-    $tokenRow->tokens($prefix, 'currency',         $contribution['currency']);
-    $tokenRow->tokens($prefix, 'amount_text',      CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']));
+    $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $mandate['entity_id']]);
+    $tokenRow->tokens($prefix, 'amount', $contribution['total_amount']);
+    $tokenRow->tokens($prefix, 'currency', $contribution['currency']);
+    $tokenRow->tokens($prefix, 'amount_text', CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']));
 
     if (!empty($contribution['receive_date'])) {
       $formattedDate = CRM_Utils_Date::customFormat($contribution['receive_date']);
@@ -71,14 +72,14 @@ class CRM_Utils_SepaTokens {
   }
 
   private static function fillLastMandateContributionRecurTokenValues($mandate, $prefix, \Civi\Token\TokenRow $tokenRow) {
-    $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
-    $tokenRow->tokens($prefix, 'amount',             $rcontribution['amount']);
-    $tokenRow->tokens($prefix, 'currency',           $rcontribution['currency']);
-    $tokenRow->tokens($prefix, 'amount_text',        CRM_Utils_Money::format($rcontribution['amount'], $rcontribution['currency']));
-    $tokenRow->tokens($prefix, 'cycle_day',          $rcontribution['cycle_day']);
+    $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id']]);
+    $tokenRow->tokens($prefix, 'amount', $rcontribution['amount']);
+    $tokenRow->tokens($prefix, 'currency', $rcontribution['currency']);
+    $tokenRow->tokens($prefix, 'amount_text', CRM_Utils_Money::format($rcontribution['amount'], $rcontribution['currency']));
+    $tokenRow->tokens($prefix, 'cycle_day', $rcontribution['cycle_day']);
     $tokenRow->tokens($prefix, 'frequency_interval', $rcontribution['frequency_interval']);
-    $tokenRow->tokens($prefix, 'frequency_unit',     $rcontribution['frequency_unit']);
-    $tokenRow->tokens($prefix, 'frequency',          CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], true));
+    $tokenRow->tokens($prefix, 'frequency_unit', $rcontribution['frequency_unit']);
+    $tokenRow->tokens($prefix, 'frequency', CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], TRUE));
 
     // first collection date
     if (empty($mandate['first_contribution_id'])) {
@@ -88,7 +89,7 @@ class CRM_Utils_SepaTokens {
     }
     else {
       // use date of first contribution
-      $fcontribution = civicrm_api3('Contribution', 'getsingle', array('id' => $mandate['first_contribution_id']));
+      $fcontribution = civicrm_api3('Contribution', 'getsingle', ['id' => $mandate['first_contribution_id']]);
       $firstCollectionDate = $fcontribution['receive_date'];
     }
 
@@ -97,4 +98,5 @@ class CRM_Utils_SepaTokens {
       $tokenRow->tokens($prefix, 'first_collection', $formattedDate);
     }
   }
+
 }

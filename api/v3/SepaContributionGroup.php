@@ -21,7 +21,6 @@
  *
  */
 
-
 /**
  * Add an SepaContributionGroup for a contact
  *
@@ -30,7 +29,7 @@
  * @example SepaContributionGroupCreate.php Standard Create Example
  *
  * @return array API result array
- * {@getfields sepa_contribution_group_create}
+ *   {@getfields sepa_contribution_group_create}
  * @access public
  */
 function civicrm_api3_sepa_contribution_group_create($params) {
@@ -51,12 +50,12 @@ function _civicrm_api3_sepa_contribution_group_create_spec(&$params) {
 /**
  * Deletes an existing SepaContributionGroup
  *
- * @param  array  $params
+ * @param  array $params
  *
  * @example SepaContributionGroupDelete.php Standard Delete Example
  *
  * @return boolean | error  true if successfull, error otherwise
- * {@getfields sepa_contribution_group_delete}
+ *   {@getfields sepa_contribution_group_delete}
  * @access public
  */
 function civicrm_api3_sepa_contribution_group_delete($params) {
@@ -74,7 +73,7 @@ function civicrm_api3_sepa_contribution_group_delete($params) {
  * @param  array $params  an associative array of name/value pairs.
  *
  * @return  array api result array
- * {@getfields sepa_contribution_group_get}
+ *   {@getfields sepa_contribution_group_get}
  * @access public
  */
 function civicrm_api3_sepa_contribution_group_get($params) {
@@ -87,9 +86,10 @@ function _civicrm_api3_sepa_contribution_group_getdetail_spec (&$params) {
 }
 
 function civicrm_api3_sepa_contribution_group_getdetail($params) {
-  $group = (int) $params["id"];
-  if (!$group)
-    throw new CRM_Core_Exception("Incorrect or missing value for group id");
+  $group = (int) $params['id'];
+  if (!$group) {
+    throw new CRM_Core_Exception('Incorrect or missing value for group id');
+  }
   $sql = "
     SELECT
       contribution_id,
@@ -119,13 +119,11 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
       AND mandate.status IN ('FRST','OOFF','RCUR')
   ";
   $dao = CRM_Core_DAO::executeQuery($sql);
-  $result= array();
-  $total =0;
+  $result = [];
+  $total = 0;
   while ($dao->fetch()) {
     $result[] = $dao->toArray();
     $total += $dao->total_amount;
   }
-  return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = array("total_amount"=>$total));
+  return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = ['total_amount' => $total]);
 }
-
-

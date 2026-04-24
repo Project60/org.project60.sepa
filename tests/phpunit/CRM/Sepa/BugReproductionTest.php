@@ -23,33 +23,35 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
-{
-  // simulate CiviCRM >
-  public function setUp(): void
-  {
+class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
+
+  /**
+   * simulate CiviCRM >
+   */
+  public function setUp(): void {
     parent::setUp();
 
     // simulate a newly installed CiviCRM 5.54+, which has no 'In Progress' contribution status
-    $contribution_in_progress_status = null;
+    $contribution_in_progress_status = NULL;
     try {
       // get status (if it exists) and delete it
       $contribution_in_progress_status = civicrm_api3('OptionValue', 'getsingle', [
         'option_group_id' => 'contribution_status',
         'value' => self::CONTRIBUTION_STATUS_IN_PROGRESS,
       ]);
-    } catch (CRM_Core_Exception $ex) {
+    }
+    catch (CRM_Core_Exception $ex) {
+      // @ignoreException
       // this means the status is already missing, no harm done
     }
 
     if ($contribution_in_progress_status) {
       // the status is there (older civicrm version): delete it to simulate a newer version
       civicrm_api3('OptionValue', 'delete', [
-        'id' => $contribution_in_progress_status['id']
+        'id' => $contribution_in_progress_status['id'],
       ]);
     }
   }
-
 
   /**
    * Verify that but #629 is fixed:
@@ -69,8 +71,7 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
    *
    * @see https://github.com/Project60/org.project60.sepa/issues/629
    */
-  public function testBug629()
-  {
+  public function testBug629() {
     $this->setSepaConfiguration('exclude_weekends', '0');
     $this->setCreditorConfiguration('batching.RCUR.grace', 5);
     $this->setCreditorConfiguration('batching.RCUR.horizon', 20);
@@ -83,13 +84,14 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
 
     // NOW mess up the recurring contribution in a way that likely caused #629:
     //  give the recurring contribution the FRST payment instrument
-    $recurring_contribution = $this->civicrm_api('ContributionRecur', 'getsingle', [
+    $recurring_contribution = $this->civicrm_api3('ContributionRecur', 'getsingle', [
       'id' => $monthly_mandate['entity_id'],
-      'version' => 3]);
+      'version' => 3,
+    ]);
     $pi_mapping_reversed = array_flip(CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($monthly_mandate['creditor_id']));
     $wrong_payment_instrument_id = $pi_mapping_reversed[$recurring_contribution['payment_instrument_id']];
 
-    $this->civicrm_api('ContributionRecur', 'create', [
+    $this->civicrm_api3('ContributionRecur', 'create', [
       'id' => $monthly_mandate['entity_id'],
       'payment_instrument_id' => $wrong_payment_instrument_id,
       'contribution_status_id' => self::CONTRIBUTION_STATUS_PENDING,
@@ -131,7 +133,6 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
     $this->assertTrue(isset($contributions[$contribution['id']]), "A new contribution was generated, but it shouldn't have.");
   }
 
-
   /**
    * Verify that but #632 is fixed:
    *  The status CONTRIBUTION_STATUS_PENDING is not shipped with the CiviCRM 5.54+ (?)
@@ -141,8 +142,7 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
    * @see https://github.com/Project60/org.project60.sepa/issues/632
    * @see https://lab.civicrm.org/dev/financial/-/issues/201
    */
-  public function testBug632()
-  {
+  public function testBug632() {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
@@ -169,4 +169,5 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase
       E::ts('OOFF contribution status after closing is incorrect, probably related to SEPA-629')
     );
   }
+
 }

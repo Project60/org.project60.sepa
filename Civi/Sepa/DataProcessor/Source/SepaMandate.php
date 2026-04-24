@@ -55,28 +55,28 @@ class SepaMandate extends AbstractCivicrmEntitySource {
    * @return array
    */
   public function getDefaultConfiguration(): array {
-    return array(
-      'filter' => array(
-        'entity_table' => array (
+    return [
+      'filter' => [
+        'entity_table' => [
           'op' => 'IN',
           'value' => ['civicrm_contribution_recur'],
-        ),
-        'type' => array(
+        ],
+        'type' => [
           'op' => 'IN',
           'value' => ['RCUR'],
-        ),
-        'status' => array(
+        ],
+        'status' => [
           'op' => 'NOT IN',
           'value' => ['INVALID', 'COMPLETE', 'ONHOLD'],
-        ),
-      )
-    );
+        ],
+      ],
+    ];
   }
 
   /**
    * Load the fields from this entity.
    *
-   * @param DataSpecification $dataSpecification
+   * @param \Civi\DataProcessor\DataSpecification\DataSpecification $dataSpecification
    * @param array $fieldsToSkip
    *
    * @throws \Civi\DataProcessor\DataSpecification\FieldExistsException
@@ -99,20 +99,23 @@ class SepaMandate extends AbstractCivicrmEntitySource {
       'ONHOLD' => 'ONHOLD',
     ];
   }
+
   protected function getEntityTables(): array {
     if (!$this->entityTables) {
-      $this->entityTables = array();
-      $allTables = CRM_Core_DAO_AllCoreTables::getCoreTables();
-      foreach($allTables as $entity_table => $daoClass) {
+      $this->entityTables = [];
+      $allTables = CRM_Core_DAO_AllCoreTables::tables();
+      foreach ($allTables as $entity_table => $daoClass) {
         try {
           $r = new ReflectionMethod($daoClass, 'getEntityTitle');
           if ($r->getDeclaringClass()->getName() == $daoClass) {
-            $this->entityTables[$entity_table] = call_user_func([$daoClass,'getEntityTitle']);
+            $this->entityTables[$entity_table] = call_user_func([$daoClass, 'getEntityTitle']);
           }
-        } catch (ReflectionException $e) {
+        }
+        catch (ReflectionException $e) {
+          // @ignoreException
         }
         if (!isset($this->entityTables[$entity_table])) {
-          $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getBriefName($daoClass);
+          $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoClass);
         }
       }
       asort($this->entityTables);

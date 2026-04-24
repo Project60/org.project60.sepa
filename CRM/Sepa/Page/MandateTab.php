@@ -97,7 +97,6 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
     }
     $this->assign('ooffs', $ooffList);
 
-
     // Retrieve RCUR mandates.
     $rcurList = [];
     $rcurMandates = SepaMandate::get(TRUE)
@@ -176,15 +175,16 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'currency' => $rcurMandate['contribution_recur.currency'],
         'amount' => $rcurMandate['contribution_recur.amount'],
         'class' => in_array($rcurMandate['status'], ['FRST', 'RCUR'])
-          ? 'sepa-active'
-          : 'sepa-inactive',
+        ? 'sepa-active'
+        : 'sepa-inactive',
       ];
 
       // Calculate annual amount.
       if ('year' === $rcurMandate['contribution_recur.frequency_unit']) {
         $rcurRow['total_amount'] =
           $rcurMandate['contribution_recur.amount'] / $rcurMandate['contribution_recur.frequency_interval'];
-      } elseif ('month' === $rcurMandate['contribution_recur.frequency_unit']) {
+      }
+      elseif ('month' === $rcurMandate['contribution_recur.frequency_unit']) {
         $rcurRow['total_amount'] =
           $rcurMandate['contribution_recur.amount'] * 12.0 / $rcurMandate['contribution_recur.frequency_interval'];
       }
@@ -229,7 +229,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       CRM_Core_DAO::reenableFullGroupByMode();
 
       while ($fail_query->fetch()) {
-        if (preg_match("#(?<last_fails>1+)$#", $fail_query->fail_sequence, $match)) {
+        if (preg_match('#(?<last_fails>1+)$#', $fail_query->fail_sequence, $match)) {
           $last_sequence = $match['last_fails'];
           $rcurList[$fail_query->mandate_id]['fail_sequence'] = strlen($last_sequence);
         }
@@ -250,7 +250,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         SELECT COUNT(id) FROM civicrm_sdd_mandate
         WHERE contact_id = %1
           AND status IN ('FRST', 'RCUR', 'OOFF', 'INIT');",
-            array( 1 => array($contact_id, 'Integer')));
+            [1 => [$contact_id, 'Integer']]);
   }
 
 }

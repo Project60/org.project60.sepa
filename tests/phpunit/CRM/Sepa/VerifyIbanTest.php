@@ -21,8 +21,7 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
-{
+class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase {
   const TEST_IBAN_2 = 'DE02100100100006820101';
   const TEST_IBAN_INCORRECT_CONTENT = 'DE12300105171814696324';
   const TEST_IBAN_INCORRECT_BANK_CODE = 'DE02470501980001802057';
@@ -37,8 +36,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    * Test that a valid IBAN works.
    * @see Case_ID V03
    */
-  public function testValidIban()
-  {
+  public function testValidIban() {
     $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
@@ -47,17 +45,14 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
     );
   }
 
-
   /**
    * Test that an IBAN with incorrect content (but correct format) fails.
    * @see Case_ID V03
    */
-  public function testIncorrectIbanFails()
-  {
+  public function testIncorrectIbanFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function ()
-      {
+      \PHPUnit\Framework\ExpectationFailedException::class,
+      function () {
         $this->createMandate(
           [
             'type' => self::MANDATE_TYPE_OOFF,
@@ -73,12 +68,10 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    * Test that an IBAN with incorrect bank code fails.
    * @see Case_ID V03
    */
-  public function testIncorrectBankCodeFails()
-  {
+  public function testIncorrectBankCodeFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function ()
-      {
+      \PHPUnit\Framework\ExpectationFailedException::class,
+      function () {
         $this->createMandate(
           [
             'type' => self::MANDATE_TYPE_OOFF,
@@ -94,12 +87,10 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    * Test that an IBAN with an incorrect checksum fails.
    * @see Case_ID V03
    */
-  public function testIncorrectChecksumFails()
-  {
+  public function testIncorrectChecksumFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function ()
-      {
+      \PHPUnit\Framework\ExpectationFailedException::class,
+      function () {
         $this->createMandate(
           [
             'type' => self::MANDATE_TYPE_OOFF,
@@ -115,12 +106,10 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    * Test that an IBAN with incorrect length fails.
    * @see Case_ID V03
    */
-  public function testIncorrectLengthFails()
-  {
+  public function testIncorrectLengthFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function ()
-      {
+      \PHPUnit\Framework\ExpectationFailedException::class,
+      function () {
         $this->createMandate(
           [
             'type' => self::MANDATE_TYPE_OOFF,
@@ -136,12 +125,10 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    * Test that an IBAN with forbidden chars fails.
    * @see Case_ID V03
    */
-  public function testIncorrectCharFails()
-  {
+  public function testIncorrectCharFails() {
     $this->assertException(
-      PHPUnit_Framework_ExpectationFailedException::class,
-      function ()
-      {
+      \PHPUnit\Framework\ExpectationFailedException::class,
+      function () {
         $this->createMandate(
           [
             'type' => self::MANDATE_TYPE_OOFF,
@@ -157,8 +144,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    * Test that a PSP creator accepts incorrect IBANs.
    * @see Case_ID V04
    */
-  public function testPspCreatorAcceptsIncorrectIban()
-  {
+  public function testPspCreatorAcceptsIncorrectIban() {
     $this->setCreditorConfiguration('creditor_type', 'PSP');
 
     $this->createMandate(
@@ -173,8 +159,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    * Test that an IBAN put on the blocklist will fail.
    * @see Case_ID V05
    */
-  public function testBlocklistedIbanFails()
-  {
+  public function testBlocklistedIbanFails() {
     $this->addIbanToBlocklist(self::TEST_IBAN);
 
     // should be using $this->assertException but there's something off here
@@ -186,7 +171,9 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
         ]
       );
       $this->fail(E::ts('Blocklistet IBAN should fail but did not!'));
-    } catch (Exception $ex) {
+    }
+    catch (Exception $ex) {
+      // @ignoreException
       // this is expected
     }
   }
@@ -198,8 +185,7 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
    *       test will go sure in the case someone removes the default test entry.
    * @see Case_ID V05
    */
-  public function testValidIbanWhenOtherIbanIsBlocklisted()
-  {
+  public function testValidIbanWhenOtherIbanIsBlocklisted() {
     $this->addIbanToBlocklist(self::TEST_IBAN_2);
 
     $this->createMandate(
@@ -209,4 +195,5 @@ class CRM_Sepa_VerifyIbanTest extends CRM_Sepa_TestBase
       ]
     );
   }
+
 }

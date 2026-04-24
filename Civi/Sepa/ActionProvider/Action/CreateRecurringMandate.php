@@ -17,9 +17,9 @@
 namespace Civi\Sepa\ActionProvider\Action;
 
 use Civi\ActionProvider\Exception\ExecutionException;
-use \Civi\ActionProvider\Parameter\ParameterBagInterface;
-use \Civi\ActionProvider\Parameter\Specification;
-use \Civi\ActionProvider\Parameter\SpecificationBag;
+use Civi\ActionProvider\Parameter\ParameterBagInterface;
+use Civi\ActionProvider\Parameter\Specification;
+use Civi\ActionProvider\Parameter\SpecificationBag;
 
 use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
@@ -29,49 +29,49 @@ class CreateRecurringMandate extends CreateOneOffMandate {
   /**
    * Returns the specification of the configuration options for the actual action.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getConfigurationSpecification() {
     return new SpecificationBag([
-        new Specification('default_creditor_id',       'Integer', E::ts('Creditor (default)'), true, null, null, $this->getCreditors(), false),
-        new Specification('default_financial_type_id', 'Integer', E::ts('Financial Type (default)'), true, null, null, $this->getFinancialTypes(), false),
-        new Specification('default_campaign_id',       'Integer', E::ts('Campaign (default)'), false, null, null, $this->getCampaigns(), false),
-        new Specification('default_frequency',         'Integer', E::ts('Frequency (default)'), true, 12, null, $this->getFrequencies()),
-        new Specification('default_cycle_day',         'Integer', E::ts('Collection Day (default)'), false, 0, null, $this->getCollectionDays()),
-        new Specification('buffer_days',               'Integer', E::ts('Buffer Days'), true, 7),
+      new Specification('default_creditor_id', 'Integer', E::ts('Creditor (default)'), TRUE, NULL, NULL, $this->getCreditors(), FALSE),
+      new Specification('default_financial_type_id', 'Integer', E::ts('Financial Type (default)'), TRUE, NULL, NULL, $this->getFinancialTypes(), FALSE),
+      new Specification('default_campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
+      new Specification('default_frequency', 'Integer', E::ts('Frequency (default)'), TRUE, 12, NULL, $this->getFrequencies()),
+      new Specification('default_cycle_day', 'Integer', E::ts('Collection Day (default)'), FALSE, 0, NULL, $this->getCollectionDays()),
+      new Specification('buffer_days', 'Integer', E::ts('Buffer Days'), TRUE, 7),
     ]);
   }
 
   /**
    * Returns the specification of the parameters of the actual action.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getParameterSpecification() {
     return new SpecificationBag([
         // required fields
-        new Specification('contact_id',     'Integer', E::ts('Contact ID'), true),
-        new Specification('account_holder', 'String',  E::ts('Account Holder'), false),
-        new Specification('iban',           'String',  E::ts('IBAN'), true),
-        new Specification('bic',            'String',  E::ts('BIC'), false),
-        new Specification('reference',      'String',  E::ts('Mandate Reference'), false),
-        new Specification('source',      'String',  E::ts('Source'), false),
-        new Specification('amount',         'Money',   E::ts('Amount'), false),
+      new Specification('contact_id', 'Integer', E::ts('Contact ID'), TRUE),
+      new Specification('account_holder', 'String', E::ts('Account Holder'), FALSE),
+      new Specification('iban', 'String', E::ts('IBAN'), TRUE),
+      new Specification('bic', 'String', E::ts('BIC'), FALSE),
+      new Specification('reference', 'String', E::ts('Mandate Reference'), FALSE),
+      new Specification('source', 'String', E::ts('Source'), FALSE),
+      new Specification('amount', 'Money', E::ts('Amount'), FALSE),
 
         // recurring information
-        new Specification('frequency',  'Integer', E::ts('Frequency'),      false, 12, null, $this->getFrequencies()),
-        new Specification('cycle_day',  'Integer', E::ts('Collection Day'), false, 1,  null, $this->getCollectionDays()),
+      new Specification('frequency', 'Integer', E::ts('Frequency'), FALSE, 12, NULL, $this->getFrequencies()),
+      new Specification('cycle_day', 'Integer', E::ts('Collection Day'), FALSE, 1, NULL, $this->getCollectionDays()),
 
         // basic overrides
-        new Specification('creditor_id',       'Integer', E::ts('Creditor (Leave empty to use default)'), false, null, null, $this->getCreditors(), false),
-        new Specification('financial_type_id', 'Integer', E::ts('Financial Type (Leave empty to use default)'), false, null, null, $this->getFinancialTypes(), false),
-        new Specification('campaign_id',       'Integer', E::ts('Campaign (Leave empty to use default)'), false, null, null, $this->getCampaigns(), false),
+      new Specification('creditor_id', 'Integer', E::ts('Creditor (Leave empty to use default)'), FALSE, NULL, NULL, $this->getCreditors(), FALSE),
+      new Specification('financial_type_id', 'Integer', E::ts('Financial Type (Leave empty to use default)'), FALSE, NULL, NULL, $this->getFinancialTypes(), FALSE),
+      new Specification('campaign_id', 'Integer', E::ts('Campaign (Leave empty to use default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
 
         // dates
-        new Specification('start_date',      'Date', E::ts('Start Date'), false, date('Y-m-d H:i:s')),
-        new Specification('date',            'Date', E::ts('Signature Date'),  false, date('Y-m-d H:i:s')),
-        new Specification('validation_date', 'Date', E::ts('Validation Date'), false, date('Y-m-d H:i:s')),
-        new Specification('creation_date', 'Date', E::ts('Creation Date'), false, date('Y-m-d H:i:s')),
+      new Specification('start_date', 'Date', E::ts('Start Date'), FALSE, date('Y-m-d H:i:s')),
+      new Specification('date', 'Date', E::ts('Signature Date'), FALSE, date('Y-m-d H:i:s')),
+      new Specification('validation_date', 'Date', E::ts('Validation Date'), FALSE, date('Y-m-d H:i:s')),
+      new Specification('creation_date', 'Date', E::ts('Creation Date'), FALSE, date('Y-m-d H:i:s')),
     ]);
   }
 
@@ -80,24 +80,24 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    *
    * This function could be overridden by child classes.
    *
-   * @return SpecificationBag specs
+   * @return \Civi\ActionProvider\Parameter\SpecificationBag specs
    */
   public function getOutputSpecification() {
     return new SpecificationBag([
-      new Specification('mandate_id',        'Integer', E::ts('Mandate ID'), false, null, null, null, false),
-      new Specification('mandate_reference', 'String',  E::ts('Mandate Reference'), false, null, null, null, false),
-      new Specification('recurring_contribution_id',        'Integer', E::ts('Recurring Contribution ID'), false, null, null, null, false),
-      new Specification('error',             'String',  E::ts('Error Message (if creation failed)'), false, null, null, null, false),
+      new Specification('mandate_id', 'Integer', E::ts('Mandate ID'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification('mandate_reference', 'String', E::ts('Mandate Reference'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification('recurring_contribution_id', 'Integer', E::ts('Recurring Contribution ID'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification('error', 'String', E::ts('Error Message (if creation failed)'), FALSE, NULL, NULL, NULL, FALSE),
     ]);
   }
 
   /**
    * Run the action
    *
-   * @param ParameterBagInterface $parameters
+   * @param \Civi\ActionProvider\Parameter\ParameterBagInterface $parameters
    *   The parameters to this action.
-   * @param ParameterBagInterface $output
-   * 	 The parameters this action can send back
+   * @param \Civi\ActionProvider\Parameter\ParameterBagInterface $output
+   *      The parameters this action can send back
    * @return void
    */
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
@@ -159,7 +159,9 @@ class CreateRecurringMandate extends CreateOneOffMandate {
       $output->setParameter('mandate_id', $mandate['id']);
       $output->setParameter('recurring_contribution_id', $mandate['entity_id']);
       $output->setParameter('mandate_reference', $mandate['reference']);
-    } catch (\Exception $ex) {
+    }
+    catch (\Exception $ex) {
+      // @ignoreException
       $output->setParameter('mandate_id', '');
       $output->setParameter('recurring_contribution_id', '');
       $output->setParameter('mandate_reference', '');
@@ -172,11 +174,11 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    */
   protected function getFrequencies() {
     return [
-        1  => E::ts("annually"),
-        2  => E::ts("semi-annually"),
-        4  => E::ts("quarterly"),
-        6  => E::ts("bi-monthly"),
-        12 => E::ts("monthly"),
+      1  => E::ts('annually'),
+      2  => E::ts('semi-annually'),
+      4  => E::ts('quarterly'),
+      6  => E::ts('bi-monthly'),
+      12 => E::ts('monthly'),
     ];
   }
 
@@ -184,51 +186,54 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    * Get list of collection days
    */
   protected function getCollectionDays() {
-    $list = range(0,28);
+    $list = range(0, 28);
     $options = array_combine($list, $list);
-    $options[0] = E::ts("as soon as possible");
+    $options[0] = E::ts('as soon as possible');
     return $options;
   }
 
-    /**
-     * Select the cycle day from the given creditor,
-     *  that allows for the soonest collection given the buffer time
-     *
-     * @param array $mandate_data
-     *      all data known about the mandate
-     *
-     */
+  /**
+   * Select the cycle day from the given creditor,
+   *  that allows for the soonest collection given the buffer time
+   *
+   * @param array $mandate_data
+   *      all data known about the mandate
+   *
+   */
   protected function calculateSoonestCycleDay($mandate_data) {
-      // get creditor ID
-      $creditor_id = (int) $mandate_data['creditor_id'];
-      if (!$creditor_id) {
-          $default_creditor = \CRM_Sepa_Logic_Settings::defaultCreditor();
-          if ($default_creditor) {
-              $creditor_id = $default_creditor->id;
-          } else {
-              \Civi::log()->notice("CreateRecurringMandate action: No creditor, and no default creditor set! Using cycle day 1");
-              return 1;
-          }
+    // get creditor ID
+    $creditor_id = (int) $mandate_data['creditor_id'];
+    if (!$creditor_id) {
+      $default_creditor = \CRM_Sepa_Logic_Settings::defaultCreditor();
+      if ($default_creditor) {
+        $creditor_id = $default_creditor->id;
       }
-
-      // get start date
-      $date = strtotime(\CRM_Utils_Array::value('start_date', $mandate_data, date('Y-m-d')));
-
-      // get cycle days
-      $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor_id);
-
-      // iterate through the days until we hit a cycle day
-      for ($i = 0; $i < 31; $i++) {
-        if (in_array(date('j', $date), $cycle_days)) {
-            // we found our cycle_day!
-            return date('j', $date);
-        } else {
-            // no? try the next one...
-            $date = strtotime("+ 1 day", $date);
-        }
+      else {
+        \Civi::log()->notice('CreateRecurringMandate action: No creditor, and no default creditor set! Using cycle day 1');
+        return 1;
       }
+    }
 
-      // no hit? that shouldn't happen...
-      return 1;
+    // get start date
+    $date = strtotime($mandate_data['start_date'] ?? date('Y-m-d'));
+
+    // get cycle days
+    $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor_id);
+
+    // iterate through the days until we hit a cycle day
+    for ($i = 0; $i < 31; $i++) {
+      if (in_array(date('j', $date), $cycle_days)) {
+        // we found our cycle_day!
+        return date('j', $date);
+      }
+      else {
+        // no? try the next one...
+        $date = strtotime('+ 1 day', $date);
+      }
+    }
+
+    // no hit? that shouldn't happen...
+    return 1;
   }
+
 }

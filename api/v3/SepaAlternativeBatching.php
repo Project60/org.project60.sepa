@@ -25,16 +25,16 @@
  * This function will close a transaction group,
  * and perform the necessary logical changes to the mandates contained
  */
-
 function civicrm_api3_sepa_alternative_batching_close($params) {
   if (!is_numeric($params['txgroup_id'])) {
-    return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
+    return civicrm_api3_create_error('Required field txgroup_id was not properly set.');
   }
 
   $error_message = CRM_Sepa_Logic_Group::close($params['txgroup_id']);
   if (empty($error_message)) {
     return civicrm_api3_create_success();
-  } else {
+  }
+  else {
     return civicrm_api3_create_error($error_message);
   }
 }
@@ -43,21 +43,23 @@ function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
 
-
-/*
+/**
+ *
  * This method will create the SDD file for the given group
  *
  * @param txgroup_id  the transaction group for which the file should be created
  * @param override    if true, will override an already existing file and create a new one
+ *
  */
 function civicrm_api3_sepa_alternative_batching_createxml($params) {
-  $override = (isset($params['override'])) ? $params['override'] : false;
+  $override = (isset($params['override'])) ? $params['override'] : FALSE;
 
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
   if (is_numeric($result)) {
     // this was succesfull -> load the sepa file
-    return civicrm_api('SepaSddFile', 'getsingle', array('id'=>$result, 'version'=>3));
-  } else {
+    return civicrm_api3('SepaSddFile', 'getsingle', ['id' => $result, 'version' => 3]);
+  }
+  else {
     // there was an error:
     civicrm_api3_create_error($result);
   }
@@ -66,8 +68,6 @@ function civicrm_api3_sepa_alternative_batching_createxml($params) {
 function civicrm_api3_sepa_alternative_batching_createxml_spec(&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
-
-
 
 /**
  * API CALL TO MARK TXGROUPs AS 'RECEIVED':
@@ -79,13 +79,14 @@ function civicrm_api3_sepa_alternative_batching_createxml_spec(&$params) {
  */
 function civicrm_api3_sepa_alternative_batching_received($params) {
   if (!is_numeric($params['txgroup_id'])) {
-    return civicrm_api3_create_error("Required field txgroup_id was not properly set.");
+    return civicrm_api3_create_error('Required field txgroup_id was not properly set.');
   }
 
   $error = CRM_Sepa_Logic_Group::received((int) $params['txgroup_id']);
   if (empty($error)) {
     return civicrm_api3_create_success();
-  } else {
+  }
+  else {
     return civicrm_api3_create_error($error);
   }
 }
@@ -93,9 +94,6 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
 function _civicrm_api3_sepa_alternative_batching_received_spec (&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
-
-
-
 
 /**
  * API CALL TO CLOSE MANDATES THAT ENDED
@@ -107,13 +105,11 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
   $error = CRM_Sepa_Logic_Batching::closeEnded();
   if (empty($error_message)) {
     return civicrm_api3_create_success();
-  } else {
+  }
+  else {
     return civicrm_api3_create_error($error);
   }
 }
-
-
-
 
 /**
  * API CALL TO UPDATE TXGROUPs ("Batching")
@@ -123,26 +119,28 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
  */
 function civicrm_api3_sepa_alternative_batching_update($params) {
   // get creditor list
-  $creditor_query = civicrm_api('SepaCreditor', 'get', array('version' => 3, 'option.limit' => 99999));
+  $creditor_query = civicrm_api3('SepaCreditor', 'get', ['version' => 3, 'option.limit' => 99999]);
 
   if (!empty($creditor_query['is_error'])) {
-    return civicrm_api3_create_error("Cannot get creditor list: ".$creditor_query['error_message']);
-  } else {
-    $creditors = array();
+    return civicrm_api3_create_error('Cannot get creditor list: ' . $creditor_query['error_message']);
+  }
+  else {
+    $creditors = [];
     foreach ($creditor_query['values'] as $creditor) {
-        $creditors[] = (int) $creditor['id'];
+      $creditors[] = (int) $creditor['id'];
     }
   }
 
   // Optional now parameter, will be default if not present:
-  $now = array_key_exists('now', $params) ? $params['now'] : null;
+  $now = array_key_exists('now', $params) ? $params['now'] : NULL;
 
-  if ($params['type']=='OOFF') {
+  if ($params['type'] == 'OOFF') {
     foreach ($creditors as $creditor_id) {
       CRM_Sepa_Logic_Batching::updateOOFF($creditor_id, $now);
     }
 
-  } elseif ($params['type']=='RCUR' || $params['type']=='FRST') {
+  }
+  elseif ($params['type'] == 'RCUR' || $params['type'] == 'FRST') {
     // first: make sure, that there are no outdated mandates:
     CRM_Sepa_Logic_Batching::closeEnded();
 
@@ -151,7 +149,8 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
       CRM_Sepa_Logic_Batching::updateRCUR($creditor_id, $params['type'], $now);
     }
 
-  } else {
+  }
+  else {
     return civicrm_api3_create_error(sprintf("Unknown batching mode '%s'.", $params['type']));
   }
 

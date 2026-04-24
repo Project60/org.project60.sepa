@@ -15,17 +15,17 @@
 +--------------------------------------------------------*/
 use CRM_Sepa_ExtensionUtil as E;
 
-return array (
-  0 => 
-  array (
+return [
+  0 =>
+  [
     'name' => 'CRM_Sepa_Form_Search_SepaContactSearch',
     'entity' => 'CustomSearch',
-    'params' => 
-    array (
-        'version'     => 3,
-        'label'       => E::ts('SEPA Contact Search'),
-        'description' => E::ts('Find contacts based on CiviSEPA Mandates'),
-        'class_name'  => 'CRM_Sepa_Form_Search_SepaContactSearch',
-    ),
-  ),
-);
+    'params' =>
+    [
+      'version'     => 3,
+      'label'       => E::ts('SEPA Contact Search'),
+      'description' => E::ts('Find contacts based on CiviSEPA Mandates'),
+      'class_name'  => 'CRM_Sepa_Form_Search_SepaContactSearch',
+    ],
+  ],
+];

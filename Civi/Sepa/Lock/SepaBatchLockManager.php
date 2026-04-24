@@ -34,7 +34,6 @@ final class SepaBatchLockManager {
 
   private LockManager $lockManager;
 
-
   public static function getInstance(): self {
     return \Civi::service(self::class);
   }

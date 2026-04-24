@@ -57,13 +57,13 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    * @throws Exception if mandatory fields aren't set
    */
   public static function createMandateLink($mandate_id, $entity_id, $entity_table, $class, $is_active = TRUE, $start_date = 'now', $end_date = NULL) {
-    $params = array(
-       'mandate_id'   => $mandate_id,
-       'entity_id'    => $entity_id,
-       'entity_table' => $entity_table,
-       'class'        => $class,
-       '$is_active'   => $is_active ? 1 : 0,
-    );
+    $params = [
+      'mandate_id'   => $mandate_id,
+      'entity_id'    => $entity_id,
+      'entity_table' => $entity_table,
+      'class'        => $class,
+      '$is_active'   => $is_active ? 1 : 0,
+    ];
 
     // set dates
     if ($start_date) {
@@ -96,11 +96,11 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    */
   public static function getActiveLinks($mandate_id = NULL, $class = NULL, $entity_id = NULL, $entity_table = NULL, $date = 'now') {
     // build where clause
-    $WHERE_CLAUSES = array();
+    $WHERE_CLAUSES = [];
 
     // process date
     $now = date('YmdHis', strtotime($date));
-    $WHERE_CLAUSES[] = "is_active >= 1";
+    $WHERE_CLAUSES[] = 'is_active >= 1';
     $WHERE_CLAUSES[] = "start_date IS NULL OR start_date <= '{$now}'";
     $WHERE_CLAUSES[] = "end_date   IS NULL OR end_date   >  '{$now}'";
 
@@ -120,10 +120,11 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     // process class restrictions
     if ($class) {
       // make sure they are upper case
-      $classes = array();
+      $classes = [];
       if (is_string($class)) {
         $candidates = explode(',', $class);
-      } elseif (is_array($class)) {
+      }
+      elseif (is_array($class)) {
         $candidates = $class;
       }
       foreach ($candidates as $candidate) {
@@ -144,7 +145,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     $WHERE_CLAUSE = '(' . implode(') AND (', $WHERE_CLAUSES) . ')';
     $query_sql = "SELECT * FROM civicrm_sdd_entity_mandate WHERE {$WHERE_CLAUSE}";
     $query = CRM_Core_DAO::executeQuery($query_sql);
-    $results = array();
+    $results = [];
     while ($query->fetch()) {
       $results[] = $query->toArray();
     }
@@ -174,33 +175,32 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
   /**
    * Create/edit a SepaMandateLink entry
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
    * @return object CRM_Sepa_BAO_SepaMandateLink object on success, null otherwise
    * @access public
    * @static
    * @throws Exception if mandatory parameters not set
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     // class should always be upper case
     if (!empty($params['class'])) {
       $params['class'] = strtoupper($params['class']);
     }
 
-    //
     $hook = empty($params['id']) ? 'create' : 'edit';
     if ($hook == 'create') {
       // check mandatory fields
       if (empty($params['mandate_id'])) {
-        throw new Exception("Field mandate_id is mandatory.");
+        throw new Exception('Field mandate_id is mandatory.');
       }
       if (empty($params['entity_id'])) {
-        throw new Exception("Field entity_id is mandatory.");
+        throw new Exception('Field entity_id is mandatory.');
       }
       if (empty($params['entity_table'])) {
-        throw new Exception("Field entity_table is mandatory.");
+        throw new Exception('Field entity_table is mandatory.');
       }
       if (empty($params['class'])) {
-        throw new Exception("Field class is mandatory.");
+        throw new Exception('Field class is mandatory.');
       }
 
       // set create date
@@ -216,4 +216,5 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     CRM_Utils_Hook::post($hook, 'SepaMandateLink', $dao->id, $dao);
     return $dao;
   }
+
 }

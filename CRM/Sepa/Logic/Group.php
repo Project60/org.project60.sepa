@@ -27,11 +27,11 @@ class CRM_Sepa_Logic_Group {
    *
    * @return error message, unless successful
    */
-  static function close($txgroup_id) {
+  public static function close($txgroup_id) {
     // step 0: check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
-      return "Batching in progress. Please try again later.";
+      return 'Batching in progress. Please try again later.';
     }
 
     // step 1: gather data
@@ -39,8 +39,9 @@ class CRM_Sepa_Logic_Group {
     if ($skip_closed) {
       $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
-    } else {
-      $status_inprogress = (int)  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+    }
+    else {
+      $status_inprogress = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
     }
     $status_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
@@ -56,7 +57,7 @@ class CRM_Sepa_Logic_Group {
     }
 
     // step 2: update the mandates
-    if ($txgroup['type']=='OOFF') {
+    if ($txgroup['type'] == 'OOFF') {
       // OOFFs get new status 'SENT'
       $sql = "
       UPDATE civicrm_sdd_mandate AS mandate
@@ -67,7 +68,8 @@ class CRM_Sepa_Logic_Group {
                                   WHERE txgroup_id=$txgroup_id);";
       CRM_Core_DAO::executeQuery($sql);
 
-    } else if ($txgroup['type']=='FRST') {
+    }
+    elseif ($txgroup['type'] == 'FRST') {
       // update first_contribution and status
       $sql = "UPDATE civicrm_sdd_mandate
               LEFT JOIN civicrm_contribution_recur       ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
@@ -96,14 +98,17 @@ class CRM_Sepa_Logic_Group {
         CRM_Core_DAO::executeQuery($sql);
       }
 
-    } else if ($txgroup['type']=='RCUR') {
+    }
+    elseif ($txgroup['type'] == 'RCUR') {
       // AFAIK there's nothing to do for RCURs...
 
-    } else if ($txgroup['type']=='RTRY') {
+    }
+    elseif ($txgroup['type'] == 'RTRY') {
       // AFAIK there's nothing to do for RTRYs...
 
-    } else {
-      return "Group type '".$txgroup['type']."' not yet supported.";
+    }
+    else {
+      return "Group type '" . $txgroup['type'] . "' not yet supported.";
     }
 
     // step 3.1: update all the contributions to status 'in progress', and set the receive_date as collection
@@ -119,23 +124,21 @@ class CRM_Sepa_Logic_Group {
     CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
 
     // step 4: create the sepa file
-    $xmlfile = civicrm_api('SepaAlternativeBatching', 'createxml', array('txgroup_id'=>$txgroup_id, 'version'=>3));
+    $xmlfile = civicrm_api3('SepaAlternativeBatching', 'createxml', ['txgroup_id' => $txgroup_id, 'version' => 3]);
     if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
-      return "Cannot create sepa xml file for group ".$txgroup_id;
+      return 'Cannot create sepa xml file for group ' . $txgroup_id;
     }
 
     // step 5: close the txgroup object
-    $result = civicrm_api('SepaTransactionGroup', 'create', array(
-          'id'                      => $txgroup_id,
-          'status_id'               => $group_status_id_closed,
-          'version'                 => 3));
+    $result = civicrm_api3('SepaTransactionGroup', 'create', [
+      'id'                      => $txgroup_id,
+      'status_id'               => $group_status_id_closed,
+      'version'                 => 3,
+    ]);
     if (isset($result['is_error']) && $result['is_error']) {
-      sprintf(ts("Cannot close transaction group! Error was: '%s'", array('domain' => 'org.project60.sepa')), $result['error_message']);
+      sprintf(ts("Cannot close transaction group! Error was: '%s'", ['domain' => 'org.project60.sepa']), $result['error_message']);
     }
   }
-
-
-
 
   /**
    * This method will mark the given transaction group as 'received':
@@ -145,11 +148,11 @@ class CRM_Sepa_Logic_Group {
    *
    * @return string error message, unless successful
    */
-  static function received($txgroup_id) {
+  public static function received($txgroup_id) {
     // step 0: check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
-      return "Batching in progress. Please try again later.";
+      return 'Batching in progress. Please try again later.';
     }
 
     // step 1: gather data
@@ -158,13 +161,15 @@ class CRM_Sepa_Logic_Group {
     $group_status_id_received = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
     $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $status_closed     = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-    $status_inprogress = (int)  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+    $status_inprogress = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
 
-    if (empty($group_status_id_received))
+    if (empty($group_status_id_received)) {
       return civicrm_api3_create_error("Status 'Received' does not exist!");
+    }
 
-    if (empty($status_pending) || empty($status_closed) || empty($status_inprogress))
+    if (empty($status_pending) || empty($status_closed) || empty($status_inprogress)) {
       return civicrm_api3_create_error("Status 'Pending', 'Completed' or 'In Progress' does not exist!");
+    }
 
     // step 0: load the group object
     try {
@@ -179,7 +184,7 @@ class CRM_Sepa_Logic_Group {
 
     // check status
     if ($txgroup['status_id'] != $group_status_id_closed) {
-      return "Transaction group ".$txgroup_id." is not 'closed'.";
+      return 'Transaction group ' . $txgroup_id . " is not 'closed'.";
     }
 
     //  this should only be done in CiviCRM < 4.7.0, otherwise it causes the linked recurring contribution to
@@ -213,14 +218,15 @@ class CRM_Sepa_Logic_Group {
     while ($contribution->fetch()) {
       // update status for $contribution->contribution_id
       //   and set receive_date to collection_date (see https://github.com/Project60/sepa_dd/issues/190)
-      $result = civicrm_api('Contribution', 'create', array(
-          'version'                  => 3,
-          'id'                       => $contribution->contribution_id,
-          'contribution_status_id'   => $status_closed,
-          'receive_date'             => date('YmdHis', strtotime($txgroup['collection_date']))));
+      $result = civicrm_api3('Contribution', 'create', [
+        'version'                  => 3,
+        'id'                       => $contribution->contribution_id,
+        'contribution_status_id'   => $status_closed,
+        'receive_date'             => date('YmdHis', strtotime($txgroup['collection_date'])),
+      ]);
       if (!empty($result['is_error'])) {
         $error_count += 1;
-        Civi::log()->debug("org.project60.sepa: ".$result['error_message']);
+        Civi::log()->debug('org.project60.sepa: ' . $result['error_message']);
       }
     }
 
@@ -229,9 +235,9 @@ class CRM_Sepa_Logic_Group {
     CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
 
     // step 3.2: update group status
-    $result = civicrm_api('SepaTransactionGroup', 'create', array('id'=>$txgroup_id, 'status_id'=>$group_status_id_received, 'version'=>3));
+    $result = civicrm_api3('SepaTransactionGroup', 'create', ['id' => $txgroup_id, 'status_id' => $group_status_id_received, 'version' => 3]);
     if (!empty($result['is_error'])) {
-      return "Cannot update transaction group status for ID ".$txgroup_id;
+      return 'Cannot update transaction group status for ID ' . $txgroup_id;
     }
 
     // check if there was problems
@@ -240,7 +246,6 @@ class CRM_Sepa_Logic_Group {
     }
   }
 
-
   /**
    * Do some generic group cleanup:
    * 1) remove stale entries from groups (i.e. contribution doesn't exist any more)
@@ -248,12 +253,14 @@ class CRM_Sepa_Logic_Group {
    */
   public static function cleanup($mode) {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
-    if (empty($group_status_id_open)) return;
+    if (empty($group_status_id_open)) {
+      return;
+    }
 
     // CLEANUP: remove nonexisting contributions from groups
-    CRM_Core_DAO::executeQuery("
+    CRM_Core_DAO::executeQuery('
       DELETE FROM civicrm_sdd_contribution_txgroup
-      WHERE contribution_id NOT IN (SELECT id FROM civicrm_contribution);");
+      WHERE contribution_id NOT IN (SELECT id FROM civicrm_contribution);');
 
     // CLEANUP: delete empty groups
     $empty_group_query = CRM_Core_DAO::executeQuery("
@@ -266,7 +273,8 @@ class CRM_Sepa_Logic_Group {
       // delete group
       $group_id = $empty_group_query->group_id;
       //CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id={$group_id};");
-      $result = civicrm_api3('SepaTransactionGroup', 'delete', array('id' => $group_id));
+      $result = civicrm_api3('SepaTransactionGroup', 'delete', ['id' => $group_id]);
     }
   }
+
 }

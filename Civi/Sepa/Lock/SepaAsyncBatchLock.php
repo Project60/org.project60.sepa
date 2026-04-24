@@ -109,7 +109,7 @@ final class SepaAsyncBatchLock {
   }
 
   /**
-   * @phpstan-param array<string, array{id: string, acquireTime: int}> $locks
+   * @phpstan-param array<string, array{id: string, acquireTime: int}> $id
    */
   private function setAsyncLock(?string $id): void {
     $this->acquiredId = $id;

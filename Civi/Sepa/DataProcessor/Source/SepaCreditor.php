@@ -39,4 +39,5 @@ class SepaCreditor extends AbstractCivicrmEntitySource {
   protected function getTable(): string {
     return 'civicrm_sdd_creditor';
   }
+
 }

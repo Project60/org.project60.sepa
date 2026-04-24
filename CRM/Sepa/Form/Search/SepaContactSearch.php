@@ -20,7 +20,8 @@ use CRM_Sepa_ExtensionUtil as E;
  * A custom contact search
  */
 class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
-  function __construct(&$formValues) {
+
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
   }
 
@@ -30,7 +31,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * @param CRM_Core_Form $form modifiable
    * @return void
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     CRM_Utils_System::setTitle(E::ts('CiviSEPA Contact Search'));
 
     $form->add('text',
@@ -49,17 +50,17 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('reference', 'iban'));
+    $form->assign('elements', ['reference', 'iban']);
   }
 
   /**
    * Get a list of summary data points
    *
    * @return mixed; NULL or array with keys:
-   *  - summary: string
-   *  - total: numeric
+   *   - summary: string
+   *   - total: numeric
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
@@ -68,9 +69,9 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    *
    * @return array, keys are printable column headers and values are SQL column names
    */
-  function &columns() {
+  public function &columns() {
     // return by reference
-    $columns = array(
+    $columns = [
       E::ts('Reference')      => 'reference',
       E::ts('Account Holder') => 'account_holder',
       E::ts('IBAN')           => 'iban',
@@ -79,7 +80,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
       E::ts('Status')         => 'status',
       E::ts('Contact ID')     => 'contact_id',
       E::ts('Name')           => 'sort_name',
-    );
+    ];
     return $columns;
   }
 
@@ -93,7 +94,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * @param bool $justIDs
    * @return string, sql
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     // delegate to $this->sql(), $this->select(), $this->from(), $this->where(), etc.
     $query = $this->sql($this->select(), $offset, $rowcount, $sort, $includeContactIDs, NULL);
     return $query;
@@ -104,8 +105,8 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    *
    * @return string, sql fragment with SELECT arguments
    */
-  function select() {
-    return "
+  public function select() {
+    return '
       contact_a.id           AS contact_id,
       contact_a.sort_name    AS sort_name,
       mandate.reference      AS reference,
@@ -114,7 +115,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
       mandate.bic            AS bic,
       mandate.type           AS type,
       mandate.status         AS status
-    ";
+    ';
   }
 
   /**
@@ -122,11 +123,11 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    *
    * @return string, sql fragment with FROM and JOIN clauses
    */
-  function from() {
-    return "
+  public function from() {
+    return '
       FROM civicrm_contact contact_a
       LEFT JOIN civicrm_sdd_mandate mandate ON (mandate.contact_id = contact_a.id)
-    ";
+    ';
   }
 
   /**
@@ -135,16 +136,16 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * @param bool $includeContactIDs
    * @return string, sql fragment with conditional expressions
    */
-  function where($includeContactIDs = FALSE) {
-    $params = array();
-    $wheres = array();
+  public function where($includeContactIDs = FALSE) {
+    $params = [];
+    $wheres = [];
     $count  = 1;
 
     // add reference
     $reference = $this->_formValues['reference'] ?? NULL;
     if ($reference) {
       $wheres[] = "mandate.reference LIKE %{$count}";
-      $params[$count] = array($reference, 'String');
+      $params[$count] = [$reference, 'String'];
       $count++;
     }
 
@@ -152,13 +153,14 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
     $iban = $this->_formValues['iban'] ?? NULL;
     if ($iban) {
       $wheres[] = "mandate.iban LIKE %{$count}";
-      $params[$count] = array($iban, 'String');
+      $params[$count] = [$iban, 'String'];
       $count++;
     }
 
     if (empty($wheres)) {
       return 'TRUE';
-    } else {
+    }
+    else {
       $where = '(' . implode(') AND (', $wheres) . ')';
       return $this->whereClause($where, $params);
     }
@@ -169,7 +171,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    *
    * @return string, template path (findable through Smarty template path)
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
@@ -179,7 +181,8 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * @param array $row modifiable SQL result row
    * @return void
    */
-  function alterRow(&$row) {
-//    $row['sort_name'] .= ' ( altered )';
+  public function alterRow(&$row) {
+    //    $row['sort_name'] .= ' ( altered )';
   }
+
 }

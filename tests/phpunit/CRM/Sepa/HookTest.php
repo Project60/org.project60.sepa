@@ -20,61 +20,58 @@ use CRM_Sepa_ExtensionUtil as E;
  * Tests for hooks.
  * @group headless
  */
-class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
-{
+class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
   const INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX = 'HookTest-';
 
   /**
    * If true the create_mandate hook will be executed.
    * TODO: Would it be cleaner to have one test file for every hook?
    */
-  protected $executeCreateMandateHook = false;
+  protected $executeCreateMandateHook = FALSE;
   /**
-   * @var int $mandateReferenceCounter A counter for the mandate references to prevent collisions.
+   * @var int
    */
   protected $mandateReferenceCounter = 0;
   /**
-   * @var string|null $lastMandateReference Contains the last given mandate reference. Null if there is none.
+   * @var string|null
    */
-  protected $lastMandateReference = null;
+  protected $lastMandateReference = NULL;
 
   /**
    * If true the modify_txgroup_reference hook will be executed.
    * TODO: Would it be cleaner to have one test file for every hook?
    */
-  protected $executeModifyTxGroupHook = false;
+  protected $executeModifyTxGroupHook = FALSE;
   /**
-   * @var int $transactionGroupReferenceCounter A counter for the transaction group references to prevent collisions.
+   * @var int
    */
   protected $transactionGroupReferenceCounter = 0;
   /**
-   * @var string|null $lastTransactionGroupReference Contains the last given transaction group reference. Null if there is none.
+   * @var string|null
    */
-  protected $lastTransactionGroupReference = null;
+  protected $lastTransactionGroupReference = NULL;
 
   /**
    * If true the installment_created hook will be executed.
    * TODO: Would it be cleaner to have one test file for every hook?
    */
-  protected $executeInstallmentCreatedHook = false;
+  protected $executeInstallmentCreatedHook = FALSE;
 
-  public function setUp(): void
-  {
+  public function setUp(): void {
     parent::setUp();
 
     // Initialise all last references with null so we can easily check if there has been any reference generation happened:
-    $this->lastMandateReference = null;
-    $this->lastTransactionGroupReference = null;
+    $this->lastMandateReference = NULL;
+    $this->lastTransactionGroupReference = NULL;
   }
 
-  public function tearDown(): void
-  {
+  public function tearDown(): void {
     parent::tearDown();
 
     // Prevent all hooks from being called after the test has happened:
-    $this->executeCreateMandateHook = false;
-    $this->executeModifyTxGroupHook = false;
-    $this->executeInstallmentCreatedHook = false;
+    $this->executeCreateMandateHook = FALSE;
+    $this->executeModifyTxGroupHook = FALSE;
+    $this->executeInstallmentCreatedHook = FALSE;
   }
 
   /**
@@ -83,11 +80,9 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * @param array $mandate_parameters The parameters that will be used to create the mandate.
    * @return bool|string Based on op. pre-hooks return a boolean or an error message which aborts the operation.
    */
-  public function hook_civicrm_create_mandate(array &$mandate_parameters)
-  {
+  public function hook_civicrm_create_mandate(array &$mandate_parameters) {
     // Only execute this hook if we are ordered to:
-    if (!$this->executeCreateMandateHook)
-    {
+    if (!$this->executeCreateMandateHook) {
       return;
     }
 
@@ -105,9 +100,8 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * TODO: Check if this is everything needed to fulfil the requirements stated in the test description.
    * @see Case_ID H01
    */
-  public function testOOFFCustomMandateReference(): void
-  {
-    $this->executeCreateMandateHook = true;
+  public function testOOFFCustomMandateReference(): void {
+    $this->executeCreateMandateHook = TRUE;
 
     $mandate = $this->createMandate(
       [
@@ -128,9 +122,8 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * TODO: Check if this is everything needed to fulfil the requirements stated in the test description.
    * @see Case_ID H02
    */
-  public function testRCURCustomMandateReference(): void
-  {
-    $this->executeCreateMandateHook = true;
+  public function testRCURCustomMandateReference(): void {
+    $this->executeCreateMandateHook = TRUE;
 
     $mandate = $this->createMandate(
       [
@@ -154,11 +147,9 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * @param string $mode The SEPA mode (OOFF, RCUR, FRST, RTRY).
    * @param string $creditor_id The SDD creditor ID.
    */
-  function hook_civicrm_modify_txgroup_reference(string &$reference, string $creditor_id, string $mode, string $collection_date): void
-  {
+  public function hook_civicrm_modify_txgroup_reference(string &$reference, string $creditor_id, string $mode, string $collection_date): void {
     // Only execute this hook if we are ordered to:
-    if (!$this->executeModifyTxGroupHook)
-    {
+    if (!$this->executeModifyTxGroupHook) {
       return;
     }
 
@@ -177,9 +168,8 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * Test create OOFF mandate with coustom transaction group reference.
    * @see Case_ID H03
    */
-  public function testOOFFCustomGroupReference(): void
-  {
-    $this->executeModifyTxGroupHook = true;
+  public function testOOFFCustomGroupReference(): void {
+    $this->executeModifyTxGroupHook = TRUE;
 
     $this->createMandate(
       [
@@ -206,9 +196,8 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * Test create RCUR mandate with coustom transaction group reference.
    * @see Case_ID H04
    */
-  public function testRCURCustomGroupReference(): void
-  {
-    $this->executeModifyTxGroupHook = true;
+  public function testRCURCustomGroupReference(): void {
+    $this->executeModifyTxGroupHook = TRUE;
 
     $this->createMandate(
       [
@@ -242,11 +231,9 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * @param string $contribution_recur_id The recurring contribution connected to the mandate.
    * @param string $contribution_id The newly created contribution.
    */
-  function hook_civicrm_installment_created(string $mandate_id, string $contribution_recur_id, string $contribution_id): void
-  {
+  public function hook_civicrm_installment_created(string $mandate_id, string $contribution_recur_id, string $contribution_id): void {
     // Only execute this hook if we are ordered to:
-    if (!$this->executeInstallmentCreatedHook)
-    {
+    if (!$this->executeInstallmentCreatedHook) {
       return;
     }
 
@@ -271,9 +258,8 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
    * Test the installment created hook.
    * @see Case_ID H08
    */
-  public function testInstallmentCreated(): void
-  {
-    $this->executeInstallmentCreatedHook = true;
+  public function testInstallmentCreated(): void {
+    $this->executeInstallmentCreatedHook = TRUE;
 
     $mandate = $this->createMandate(
       [
@@ -294,4 +280,5 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase
       E::ts('The installment_created hook has not been called (correctly).')
     );
   }
+
 }

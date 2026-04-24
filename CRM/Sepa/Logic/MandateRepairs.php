@@ -21,17 +21,21 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_Logic_MandateRepairs {
 
-  /** @var string log file path, will be filled on demand */
-  protected $log_file = null;
+  /**
+   * @var string log file path, will be filled on demand */
+  protected $log_file = NULL;
 
-  /** @var bool should session status information be generated for the user to see? */
-  protected $generate_ui_notifications = false;
+  /**
+   * @var bool should session status information be generated for the user to see? */
+  protected $generate_ui_notifications = FALSE;
 
-  /** @var array collected user notifications to be shown in the end */
+  /**
+   * @var array collected user notifications to be shown in the end */
   protected $ui_notifications = [];
 
-  /** @var string SQL expression to select the mandates to be examined */
-  protected $mandate_selector = null;
+  /**
+   * @var string SQL expression to select the mandates to be examined */
+  protected $mandate_selector = NULL;
 
   /**
    * Create a new instance of this runner.
@@ -39,8 +43,7 @@ class CRM_Sepa_Logic_MandateRepairs {
    * @param string $mandate_selector
    *   SQL expression to select the mandates
    */
-  public function __construct($mandate_selector)
-  {
+  public function __construct($mandate_selector) {
     $this->mandate_selector = $mandate_selector;
   }
 
@@ -48,8 +51,7 @@ class CRM_Sepa_Logic_MandateRepairs {
    * Add a UI notification line to be shown to the user in the end
    * @param string $message
    */
-  public function addUINotification($message)
-  {
+  public function addUINotification($message) {
     if ($this->generate_ui_notifications) {
       $this->ui_notifications[] = $message;
     }
@@ -61,8 +63,7 @@ class CRM_Sepa_Logic_MandateRepairs {
    * @param string|array $messages
    *
    */
-  public function log($messages)
-  {
+  public function log($messages) {
     // make sure the log file name is there
     if (!$this->log_file) {
       $log_folder = Civi::paths()->getPath('[civicrm.files]/ConfigAndLog');
@@ -88,8 +89,7 @@ class CRM_Sepa_Logic_MandateRepairs {
   /**
    * Run all safe repairs
    */
-  public function runAllRepairs()
-  {
+  public function runAllRepairs() {
     $this->detectOrphanedInProgressContributions();
     $this->repairOpenGroupContributionStatus();
     $this->repairFrstPaymentInstruments();
@@ -100,7 +100,6 @@ class CRM_Sepa_Logic_MandateRepairs {
 
     $this->showSessionStatusNotification();
   }
-
 
   /**
    * This process will identify all Pending CiviSEPA contributions
@@ -113,19 +112,19 @@ class CRM_Sepa_Logic_MandateRepairs {
    *
    * @return void
    */
-  protected function detectOrphanedPendingContributions()
-  {
-    static $already_run = false; // run this one only once per process, since it doesn't refer to any mandates
+  protected function detectOrphanedPendingContributions() {
+    // run this one only once per process, since it doesn't refer to any mandates
+    static $already_run = FALSE;
     if (!$already_run) {
       $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
       $orphaned_pending_contribution_ids = $this->getOrphanedContributions($contribution_status_pending);
       if ($orphaned_pending_contribution_ids) {
-        $this->log("Orphaned pending contributions detected: " . implode(',', $orphaned_pending_contribution_ids));
+        $this->log('Orphaned pending contributions detected: ' . implode(',', $orphaned_pending_contribution_ids));
         $this->addUINotification(E::ts("%1 orphaned open (pending) SEPA contributions were found in the system, i.e. they are not part of a SEPA transaction group, and will not be collected any more. You should delete them by searching for contributions in status 'Pending' with payment instruments RCUR and FRST.",
           [1 => count($orphaned_pending_contribution_ids)]));
       }
     }
-    $already_run = true;
+    $already_run = TRUE;
   }
 
   /**
@@ -138,11 +137,11 @@ class CRM_Sepa_Logic_MandateRepairs {
    *
    * @return void
    */
-  protected function detectOrphanedInProgressContributions()
-  {
-    static $already_run = false; // run this one only once per process, since it doesn't refer to any mandates
+  protected function detectOrphanedInProgressContributions() {
+    // run this one only once per process, since it doesn't refer to any mandates
+    static $already_run = FALSE;
     if (!$already_run) {
-      $contribution_status_in_progress =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+      $contribution_status_in_progress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
       $orphaned_in_progress_contribution_ids = $this->getOrphanedContributions($contribution_status_in_progress);
       if ($orphaned_in_progress_contribution_ids) {
         $this->log("WARNING: Orphaned contributions in status 'In Progress' detected: " . implode(',', $orphaned_in_progress_contribution_ids));
@@ -150,9 +149,8 @@ class CRM_Sepa_Logic_MandateRepairs {
           [1 => count($orphaned_in_progress_contribution_ids)]));
       }
     }
-    $already_run = true;
+    $already_run = TRUE;
   }
-
 
   /**
    * Contribution is open transaction groups should be in status 'Pending'. However,
@@ -163,16 +161,15 @@ class CRM_Sepa_Logic_MandateRepairs {
    *
    * @return void
    */
-  protected function repairOpenGroupContributionStatus()
-  {
+  protected function repairOpenGroupContributionStatus() {
     // get the status IDs
     $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    $contribution_status_in_progress =  CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+    $contribution_status_in_progress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     $batch_status_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
     // run the search for contributions in the wrong status
     CRM_Core_DAO::disableFullGroupByMode();
-    $case = CRM_Core_DAO::executeQuery("
+    $case = CRM_Core_DAO::executeQuery('
         SELECT
                open_contribution.id                     AS contribution_id,
                open_contribution.contribution_status_id AS contribution_status_id
@@ -182,10 +179,10 @@ class CRM_Sepa_Logic_MandateRepairs {
         LEFT JOIN civicrm_contribution open_contribution
                ON open_contribution.id = txgroup_contribution.contribution_id
         WHERE txgroup.status_id = %1
-          AND open_contribution.contribution_status_id = %2",
+          AND open_contribution.contribution_status_id = %2',
         [
-            1 => [$batch_status_open, 'Integer'],
-            2 => [$contribution_status_in_progress, 'Integer'],
+          1 => [$batch_status_open, 'Integer'],
+          2 => [$contribution_status_in_progress, 'Integer'],
         ]
     );
     CRM_Core_DAO::reenableFullGroupByMode();
@@ -196,11 +193,11 @@ class CRM_Sepa_Logic_MandateRepairs {
       $status_adjustment_counter++;
       /* sadly, can't do this via API
       civicrm_api3('Contribution', 'create', [
-          'id' => $case->contribution_id,
-          'contribution_status_id' => $contribution_status_pending
+      'id' => $case->contribution_id,
+      'contribution_status_id' => $contribution_status_pending
       ]);*/
-      CRM_Core_DAO::executeQuery("
-         UPDATE civicrm_contribution SET contribution_status_id = %1 WHERE id = %2",
+      CRM_Core_DAO::executeQuery('
+         UPDATE civicrm_contribution SET contribution_status_id = %1 WHERE id = %2',
          [
            1 => [$contribution_status_pending, 'Integer'],
            2 => [$case->contribution_id, 'Integer'],
@@ -211,7 +208,6 @@ class CRM_Sepa_Logic_MandateRepairs {
       $this->addUINotification(E::ts("Warning: had to adjusted the status of %1 contribution(s) to 'Pending', as they are part of an open transaction group.", [1 => $status_adjustment_counter]));
     }
   }
-
 
   /**
    * This goes back to an issue with faulty mandates, probably because of some bad payment processors.
@@ -224,15 +220,15 @@ class CRM_Sepa_Logic_MandateRepairs {
    *
    * @return void
    */
-  protected function repairFrstPaymentInstruments()
-  {
+  protected function repairFrstPaymentInstruments() {
     $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
     $pi_adjustment_counter = 0;
     foreach ($creditors as $creditor) {
       $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor['id']);
       if (count($mapping) > 1) {
         $this->log("repairFrstPaymentInstruments doesn't work with multiple mappings (creditor [{$creditor['id']}]");
-      } else {
+      }
+      else {
         foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
           // fix the recurring contributions
           CRM_Core_DAO::disableFullGroupByMode();
@@ -257,7 +253,7 @@ class CRM_Sepa_Logic_MandateRepairs {
             $pi_adjustment_counter++;
             civicrm_api3('ContributionRecur', 'create', [
               'id' => $case->rcur_id,
-              'payment_instrument_id' => $rcur_pi_id
+              'payment_instrument_id' => $rcur_pi_id,
             ]);
             $this->log("Adjusted SEPA recurring contribution [{$case->rcur_id}] payment instrument from [{$case->rcur_pi}] to [{$rcur_pi_id}]");
           }
@@ -266,7 +262,7 @@ class CRM_Sepa_Logic_MandateRepairs {
     }
 
     if ($pi_adjustment_counter) {
-      $this->addUINotification(E::ts("Adjusted the payment instruments of %1 recurring mandate(s).", [1 => $pi_adjustment_counter]));
+      $this->addUINotification(E::ts('Adjusted the payment instruments of %1 recurring mandate(s).', [1 => $pi_adjustment_counter]));
     }
   }
 
@@ -281,15 +277,15 @@ class CRM_Sepa_Logic_MandateRepairs {
    *
    * @return void
    */
-  protected function repairInstallmentPaymentInstruments()
-  {
+  protected function repairInstallmentPaymentInstruments() {
     $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
     $pi_adjustment_counter = 0;
     foreach ($creditors as $creditor) {
       $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor['id']);
       if (count($mapping) > 1) {
         $this->log("repairInstallmentPaymentInstruments doesn't work with multiple mappings (creditor [{$creditor['id']}]");
-      } else {
+      }
+      else {
         foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
           // fix the recurring contributions
           CRM_Core_DAO::disableFullGroupByMode();
@@ -325,16 +321,18 @@ class CRM_Sepa_Logic_MandateRepairs {
               civicrm_api3('Contribution', 'create', [
                 'id' => $case->contribution_id,
                 'payment_instrument_id' => $new_pi,
-                'financial_type_id' => $case->financial_type_id, // just to avoid warnings in unit tests
+              // just to avoid warnings in unit tests
+                'financial_type_id' => $case->financial_type_id,
               ]);
               $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}]");
-            } catch (CRM_Core_Exception $ex) {
+            }
+            catch (CRM_Core_Exception $ex) {
               // this is probably an issue with interference with other processes, but we HAVE to fix this:
-              CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2",
+              CRM_Core_DAO::executeQuery('UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2',
                 [
                   1 => [$new_pi, 'Integer'],
                   2 => [$case->contribution_id, 'Integer'],
-              ]);
+                ]);
               $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}] via SQL.");
             }
           }
@@ -343,34 +341,32 @@ class CRM_Sepa_Logic_MandateRepairs {
     }
 
     if ($pi_adjustment_counter) {
-      $this->addUINotification(E::ts("Adjusted the payment instruments of %1 recurring mandate(s).", [1 => $pi_adjustment_counter]));
+      $this->addUINotification(E::ts('Adjusted the payment instruments of %1 recurring mandate(s).', [1 => $pi_adjustment_counter]));
     }
   }
-
 
   /**
    * Generate a user session status note with all the collected user notifications
    *
    * @return void
    */
-  public function showSessionStatusNotification()
-  {
+  public function showSessionStatusNotification() {
     if ($this->ui_notifications) {
       // render message
-      $message = E::ts("The following irregularities have been detected and fixed in your database:");
-      $message.= "<ul>";
+      $message = E::ts('The following irregularities have been detected and fixed in your database:');
+      $message .= '<ul>';
       foreach ($this->ui_notifications as $notification) {
-        $message.= "<li>" . $notification . "</li>";
+        $message .= '<li>' . $notification . '</li>';
       }
-      $message.= "</ul>";
+      $message .= '</ul>';
 
       // add footer
-      $message.= "<div>";
-      $message.= E::ts("You can find a detailed log of the changes here: <code>%1</code>", [1 => $this->log_file]);
-      $message.= "</div>";
+      $message .= '<div>';
+      $message .= E::ts('You can find a detailed log of the changes here: <code>%1</code>', [1 => $this->log_file]);
+      $message .= '</div>';
 
       // set status
-      CRM_Core_Session::setStatus($message, E::ts("CiviSEPA Health Check"), 'warn', ['expires' => 0]);
+      CRM_Core_Session::setStatus($message, E::ts('CiviSEPA Health Check'), 'warn', ['expires' => 0]);
     }
   }
 
@@ -384,8 +380,7 @@ class CRM_Sepa_Logic_MandateRepairs {
    * @return array
    *   list of contribution IDs
    */
-  protected function getOrphanedContributions($contribution_status_id)
-  {
+  protected function getOrphanedContributions($contribution_status_id) {
     // get recurring payment instruments
     $rcur_pis = [];
     $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
@@ -399,7 +394,7 @@ class CRM_Sepa_Logic_MandateRepairs {
 
     // run the query
     CRM_Core_DAO::disableFullGroupByMode();
-    $case = CRM_Core_DAO::executeQuery("
+    $case = CRM_Core_DAO::executeQuery('
         SELECT contribution.id AS contribution_id
         FROM civicrm_contribution contribution
         LEFT JOIN civicrm_sdd_contribution_txgroup txgroup_contribution
@@ -407,7 +402,7 @@ class CRM_Sepa_Logic_MandateRepairs {
         WHERE txgroup_contribution.id IS NULL
           AND contribution.contribution_status_id = %1
           AND contribution.payment_instrument_id IN (%2)
-          ",
+          ',
       [
         1 => [$contribution_status_id, 'Integer'],
         2 => [implode(',', $rcur_pis), 'CommaSeparatedIntegers'],
@@ -431,8 +426,7 @@ class CRM_Sepa_Logic_MandateRepairs {
    *
    * @return void
    */
-  public static function runWithMandateIDs($mandate_ids, $ui_notifications = false)
-  {
+  public static function runWithMandateIDs($mandate_ids, $ui_notifications = FALSE) {
     if (!empty($mandate_ids)) {
       // generate the selector
       $mandate_id_string = implode(',', array_map('intval', $mandate_ids));
@@ -443,17 +437,15 @@ class CRM_Sepa_Logic_MandateRepairs {
   }
 
   /**
-   * Run all mandate repairs for the given IDs
-   *
-   * @param array $mandate_ids
-   *    list of the mandate IDs to be used
+   * @param string $mandate_selector
+   *    selector for the Repair-Logic
    *
    * @return void
    */
-  public static function runWithMandateSelector($mandate_selector, $ui_notifications = false)
-  {
+  public static function runWithMandateSelector($mandate_selector, $ui_notifications = FALSE) {
     $mandate_repairs = new CRM_Sepa_Logic_MandateRepairs($mandate_selector);
     $mandate_repairs->generate_ui_notifications = $ui_notifications;
     $mandate_repairs->runAllRepairs();
   }
+
 }
