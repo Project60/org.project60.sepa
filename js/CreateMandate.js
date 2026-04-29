@@ -28,7 +28,7 @@
      * PRs welcome :)
      **/
     function sdd_setDate(fieldname, date) {
-        let dp_element = cj("#sdd-create-mandate").find("[name^=" + fieldname + "].hasDatepicker");
+        let dp_element = cj("#sdd-create-mandate").find("[name=" + fieldname + "]").siblings(".hasDatepicker");
         dp_element.datepicker('setDate', date);
 
         // flash the field a little bit to indicate change
