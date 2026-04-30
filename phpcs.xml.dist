@@ -8,6 +8,7 @@
     <file>CRM</file>
     <file>tests</file>
     <file>sepa.php</file>
+    <file>org.project60.sepacustom/sepacustom.php</file>
 
     <exclude-pattern>/CRM/Sepa/DAO/.*\.php$</exclude-pattern>
 

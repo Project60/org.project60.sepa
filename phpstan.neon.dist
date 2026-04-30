@@ -8,6 +8,7 @@ parameters:
 		- CRM
 		- tests
 		- sepa.php
+		- org.project60.sepacustom/sepacustom.php
 	excludePaths:
 		analyse:
 			- CRM/Sepa/DAO/*
