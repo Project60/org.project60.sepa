@@ -561,7 +561,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$values['cid']}&selectedChild=sepa"));
     }
     // this is not a popup -> redirect
-    if (!($_REQUEST['snippet'] ?? null)) {
+    if (!($_REQUEST['snippet'] ?? NULL)) {
       CRM_Utils_System::redirect(CRM_Core_Session::singleton()->readUserContext());
     }
 

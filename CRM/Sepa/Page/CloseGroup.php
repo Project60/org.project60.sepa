@@ -50,7 +50,6 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
         // check whether this is a group created by a test creditor
         $creditor = civicrm_api3('SepaCreditor', 'getsingle', [
-          'version' => 3,
           'id' => $group['sdd_creditor_id'],
         ]);
         if (isset($creditor['is_error']) && $creditor['is_error']) {
@@ -90,7 +89,6 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
             if (!empty($group['sdd_file_id'])) {
               $result = civicrm_api3('SepaSddFile', 'delete', [
                 'id' => $group['sdd_file_id'],
-                'version' => 3,
               ]);
               if (isset($result['is_error']) && $result['is_error']) {
                 CRM_Core_Session::setStatus(
@@ -130,7 +128,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
     $xmlfile = civicrm_api3(
       'SepaAlternativeBatching',
       'createxml',
-      ['txgroup_id' => $group_id, 'override' => TRUE, 'version' => 3]
+      ['txgroup_id' => $group_id, 'override' => TRUE]
     );
     if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
       CRM_Core_Session::setStatus(
@@ -183,7 +181,6 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
     }
 
     $result = civicrm_api3('SepaAlternativeBatching', 'close', [
-      'version' => 3,
       'txgroup_id' => $groupId,
     ]);
     if ($result['is_error']) {

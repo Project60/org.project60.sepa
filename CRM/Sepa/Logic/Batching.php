@@ -217,7 +217,6 @@ class CRM_Sepa_Logic_Batching {
             $installment_pi = CRM_Sepa_Logic_PaymentInstruments::getInstallmentPaymentInstrument(
               $creditor_id, $mandate['rc_payment_instrument_id'], ($mode == 'FRST'));
             $contribution_data = [
-              'version'                             => 3,
               'total_amount'                        => $mandate['rc_amount'],
               'currency'                            => $mandate['rc_currency'],
               'receive_date'                        => $collection_date,
@@ -442,7 +441,6 @@ class CRM_Sepa_Logic_Batching {
         'creation_date'           => $mandate_to_end['creation_date'],
         'validation_date'         => $mandate_to_end['validation_date'],
         'status'                  => 'COMPLETE',
-        'version'                 => 3,
       ]);
       if (isset($change_mandate['is_error']) && $change_mandate['is_error']) {
         return sprintf("Couldn't set mandate '%s' to 'complete. Error was: '%s'", $mandates_to_end['mandate_id'], $change_mandate['error_message']);
@@ -453,7 +451,6 @@ class CRM_Sepa_Logic_Batching {
         'contribution_status_id'  => $contribution_status_closed,
         'modified_date'           => date('YmdHis'),
         'currency'                => $mandate_to_end['currency'],
-        'version'                 => 3,
       ]);
       if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
         return sprintf("Couldn't set recurring contribution '%s' to 'complete. Error was: '%s'", $mandates_to_end['recur_id'], $change_rcur['error_message']);
@@ -461,11 +458,9 @@ class CRM_Sepa_Logic_Batching {
     }
   }
 
-  /****************************************************************************
-   * *                                                                        **
-   * *                            HELPERS                                     **
-   * *                                                                        **
-   ****************************************************************************/
+  /**
+   * HELPERS *
+   */
   public static function getOrCreateTransactionGroup(
     int $creditor_id,
     string $mode,
@@ -483,7 +478,6 @@ class CRM_Sepa_Logic_Batching {
       $reference = self::getTransactionGroupReference($creditor_id, $mode, $collection_date, $financial_type_id);
 
       $group = civicrm_api3('SepaTransactionGroup', 'create', [
-        'version'                 => 3,
         'reference'               => $reference,
         'type'                    => $mode,
         'collection_date'         => $collection_date,

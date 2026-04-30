@@ -84,14 +84,13 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
 
     // NOW mess up the recurring contribution in a way that likely caused #629:
     //  give the recurring contribution the FRST payment instrument
-    $recurring_contribution = $this->civicrm_api3('ContributionRecur', 'getsingle', [
+    $recurring_contribution = civicrm_api3('ContributionRecur', 'getsingle', [
       'id' => $monthly_mandate['entity_id'],
-      'version' => 3,
     ]);
     $pi_mapping_reversed = array_flip(CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($monthly_mandate['creditor_id']));
     $wrong_payment_instrument_id = $pi_mapping_reversed[$recurring_contribution['payment_instrument_id']];
 
-    $this->civicrm_api3('ContributionRecur', 'create', [
+    civicrm_api3('ContributionRecur', 'create', [
       'id' => $monthly_mandate['entity_id'],
       'payment_instrument_id' => $wrong_payment_instrument_id,
       'contribution_status_id' => self::CONTRIBUTION_STATUS_PENDING,

@@ -142,7 +142,7 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
   return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = ['total_amount' => $total]);
 }
 
-function _civicrm_api3_sepa_transaction_group_close_spec (&$params) {
+function _civicrm_api3_sepa_transaction_group_close_spec(&$params) {
   $params['id']['api.required'] = 1;
 }
 
@@ -156,11 +156,11 @@ function civicrm_api3_sepa_transaction_group_close($params) {
   return civicrm_api3_sepa_transaction_group_create(['id' => $params['id'], 'status_id' => 2]);
 }
 
-function _civicrm_api3_sepa_transaction_group_createnext_spec (&$params) {
+function _civicrm_api3_sepa_transaction_group_createnext_spec(&$params) {
   $params['id']['api.required'] = 1;
 }
 
-function civicrm_api3_sepa_transaction_group_createnext ($params) {
+function civicrm_api3_sepa_transaction_group_createnext($params) {
   $errors = $counter = 0;
   $values = [];
   $group = (int) $params['id'];
@@ -254,7 +254,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   }
 
   if (isset($txgroup['sdd_file_id'])) {
-    $sdd_file = civicrm_api3('SepaSddFile', 'getsingle', ['id' => $txgroup['sdd_file_id'], 'version' => 3]);
+    $sdd_file = civicrm_api3('SepaSddFile', 'getsingle', ['id' => $txgroup['sdd_file_id']]);
     if (isset($sdd_file['is_error']) && $sdd_file['is_error']) {
       return civicrm_api3_create_error('Cannot read sdd file ' . $txgroup['sdd_file_id']);
     }
@@ -328,7 +328,6 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
     'item_count'            => count($transactions),
     'payment_instrument_id' => (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $txgroup['type']),
     'exported_date'         => $sdd_file['created_date'],
-    'version'               => 3,
   ];
   $batch_create = civicrm_api3('Batch', 'create', $batch);
   if (isset($batch_create['is_error']) && $batch_create['is_error']) {

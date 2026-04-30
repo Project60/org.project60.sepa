@@ -46,8 +46,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   const MANDATE_TYPE_OOFF = 'OOFF';
   const MANDATE_TYPE_RCUR = 'RCUR';
   // fixme: this is *NOT* a mandate _type_ but only a mandate status
-  const MANDATE_TYPE_FRST = 'FRST';
   // (while RCUR and OOFF are mandate types)
+  const MANDATE_TYPE_FRST = 'FRST';
 
   const MANDATE_STATUS_SENT = 'SENT';
   const MANDATE_STATUS_INVALID = 'INVALID';
@@ -88,9 +88,6 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   protected $testCreditorId;
 
-  /**
-   * #region PHPUnit Framework implementation
-   */
   public function setUpHeadless(): Civi\Test\CiviEnvBuilder {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
@@ -139,7 +136,7 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
         'creditor_type' => 'SEPA',
         'uses_bic' => FALSE,
         'currency'  => 'EUR',
-    // It must NOT be a test creditor!
+        // It must NOT be a test creditor!
         'category' => NULL,
         'pi_ooff' => $classic_payment_instrument_ids['OOFF'],
         'pi_rcur' => "{$classic_payment_instrument_ids['FRST']}-{$classic_payment_instrument_ids['RCUR']}",

@@ -53,10 +53,10 @@ class CRM_Utils_SepaCustomisationHooks {
    * Be aware the the reference has to be unique. You will have to use suffixes
    *  if your preferred reference is already in use.
    *
-   * @param $reference        string  currently proposed reference (max. 35 characters!)
-   * @param $collection_date  string  scheduled collection date
-   * @param $mode             string  SEPA mode (OOFF, RCUR, FRST, RTRY)
-   * @param $creditor_id      string  SDD creditor ID
+   * @param string $reference currently proposed reference (max. 35 characters!)
+   * @param string $collection_date scheduled collection date
+   * @param string $mode SEPA mode (OOFF, RCUR, FRST, RTRY)
+   * @param int $creditor_id SDD creditor ID
    *
    * @access public
    */
@@ -71,9 +71,9 @@ class CRM_Utils_SepaCustomisationHooks {
    * You can implement this hook to generate a custom message to your
    *  debtor, even an individualised one (like "Thank you, Hans!")
    *
-   * @param string $txmessage    the message that will go with the transaction. Modify or extend
+   * @param string $txmessage the message that will go with the transaction
    * @param array $contribution
-   * @param array $creditor
+   * @param array $creditor the creditor involved
    *
    * @access public
    */
@@ -87,9 +87,9 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * You can implement this hook to generate a custom EndToEndId
    *
-   * @param string $end2endID    the PAIN EndToEndId being used for this transaction
+   * @param string $end2endID the PAIN EndToEndId being used for this transaction
    * @param array $contribution
-   * @param array $creditor
+   * @param array $creditor the creditor involved
    *
    * @access public
    */
@@ -102,8 +102,8 @@ class CRM_Utils_SepaCustomisationHooks {
    * This hook is called when a new mandate is created. It gives you the
    *  opportunity to change things like the cycle date
    *
-   * @param string $rcontribId  the Id of the recurring contribtution, that is connected to the mandate
-   * @param array $rcontrib
+   * @param int $rcontribId the Id of the recurring contribtution, that is connected to the mandate
+   * @param array $rcontrib the recurring contribtution, that is connected to the mandate
    *
    * @access public
    */
@@ -120,7 +120,7 @@ class CRM_Utils_SepaCustomisationHooks {
    *  So the next collection is in January.
    *
    * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
-   * @param array $data
+   * @param array $data data such as mandate_id, mandate_entity_id for contribution recur id.
    *
    * @access public
    */
@@ -135,8 +135,8 @@ class CRM_Utils_SepaCustomisationHooks {
    *  this hook lets you alter the calculated collection date string (format: "YYYY-MM-DD").
    *  You should _only_ defer the date by a few days!
    *
-   * @param string $collection_date  the calculated collection date (format: "YYYY-MM-DD").
-   * @param array $creditor_id
+   * @param string $collection_date the calculated collection date (format: "YYYY-MM-DD").
+   * @param int $creditor_id the creditor involved
    *
    * @access public
    */
@@ -154,9 +154,9 @@ class CRM_Utils_SepaCustomisationHooks {
    * be aware the newly created contribution is still 'Pending', it might NOT be
    * issued to the bank.
    *
-   * @param array $mandate_id
-   * @param array $contribution_recur_id
-   * @param array $contribution_id
+   * @param int $mandate_id
+   * @param int $contribution_recur_id
+   * @param int $contribution_id
    *
    * @access public
    */

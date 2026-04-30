@@ -247,9 +247,9 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     return [
       '1' => E::ts('annually'),
       '2' => E::ts('semi-annually'),
-    //        "3" => E::ts("3-monthly"),
+      // "3" => E::ts("3-monthly"),
       '4' => E::ts('quarterly'),
-    //        "6" => E::ts("bi-monthly"),
+      // "6" => E::ts("bi-monthly"),
       '12' => E::ts('monthly'),
     ];
   }

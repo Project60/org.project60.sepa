@@ -29,11 +29,11 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
    */
   protected $executeCreateMandateHook = FALSE;
   /**
-   * @var int
+   * @var int A counter for the mandate references to prevent collisions.
    */
   protected $mandateReferenceCounter = 0;
   /**
-   * @var string|null
+   * @var string|null Contains the last given mandate reference. Null if there is none.
    */
   protected $lastMandateReference = NULL;
 

@@ -108,7 +108,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $_REQUEST['creditor_id']]);
 
     $contribution_data = [
-      'version'                   => 3,
       'contact_id'                => $_REQUEST['contact_id'],
       'campaign_id'               => $_REQUEST['campaign_id'],
       'financial_type_id'         => $_REQUEST['financial_type_id'],
@@ -151,7 +150,6 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // next, create mandate
     $mandate_data = [
-      'version'                   => 3,
       'debug'                     => 1,
       'contact_id'                => $_REQUEST['contact_id'],
       'source'                    => $_REQUEST['source'],
@@ -208,7 +206,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign('start_date', date('Y-m-d'));
 
     // first, try to load contact
-    $contact = civicrm_api3('Contact', 'getsingle', ['version' => 3, 'id' => $contact_id]);
+    $contact = civicrm_api3('Contact', 'getsingle', ['id' => $contact_id]);
     if (isset($contact['is_error']) && $contact['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't find contact #%s", ['domain' => 'org.project60.sepa']), $cid), ts('Error', ['domain' => 'org.project60.sepa']), 'error');
       $this->assign('display_name', 'ERROR');
@@ -219,7 +217,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign('display_name', $contact['display_name']);
 
     // look up campaigns
-    $campaign_query = civicrm_api3('Campaign', 'get', ['version' => 3, 'is_active' => 1, 'option.limit' => 9999, 'option.sort' => 'title']);
+    $campaign_query = civicrm_api3('Campaign', 'get', ['is_active' => 1, 'option.limit' => 9999, 'option.sort' => 'title']);
     $campaigns = [];
     $campaigns[''] = ts('No Campaign');
     if (isset($campaign_query['is_error']) && $campaign_query['is_error']) {
@@ -253,13 +251,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $iban_reference_type_id = civicrm_api3('OptionValue', 'getvalue', $params);
     }
     if ($iban_reference_type_id) {
-      $accounts = civicrm_api3('BankingAccount', 'get', ['version' => 3, 'contact_id' => $contact_id]);
+      $accounts = civicrm_api3('BankingAccount', 'get', ['contact_id' => $contact_id]);
       if (isset($accounts['is_error']) && $accounts['is_error']) {
         // this probably means, that CiviBanking is not installed...
       }
       else {
         foreach ($accounts['values'] as $account_id => $account) {
-          $account_ref = civicrm_api3('BankingAccountReference', 'getsingle', ['version' => 3, 'ba_id' => $account_id, 'reference_type_id' => $iban_reference_type_id]);
+          $account_ref = civicrm_api3('BankingAccountReference', 'getsingle', ['ba_id' => $account_id, 'reference_type_id' => $iban_reference_type_id]);
           if (isset($account_ref['is_error']) && $account_ref['is_error']) {
             // this would also be an error, if no reference is set...
           }
@@ -292,7 +290,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $this->assign('known_accounts', $known_accounts);
 
     // look up creditors
-    $creditor_query = civicrm_api3('SepaCreditor', 'get', ['version' => 3]);
+    $creditor_query = civicrm_api3('SepaCreditor', 'get');
     $creditors = [];
     if (isset($creditor_query['is_error']) && $creditor_query['is_error']) {
       CRM_Core_Session::setStatus(sprintf(ts("Couldn't find any creditors.", ['domain' => 'org.project60.sepa']), $cid), ts('Error', ['domain' => 'org.project60.sepa']), 'error');
@@ -357,10 +355,10 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     // load the attached contribution
     if ($mandate['entity_table'] == 'civicrm_contribution') {
-      $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $mandate['entity_id'], 'version' => 3]);
+      $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $mandate['entity_id']]);
     }
     elseif ($mandate['entity_table'] == 'civicrm_contribution_recur') {
-      $contribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id'], 'version' => 3]);
+      $contribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id']]);
     }
     else {
       CRM_Core_Session::setStatus(sprintf(ts('Mandate #%s seems to be broken!', ['domain' => 'org.project60.sepa']), $mandate_id), ts('Error', ['domain' => 'org.project60.sepa']), 'error');

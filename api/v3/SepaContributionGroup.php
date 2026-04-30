@@ -81,7 +81,7 @@ function civicrm_api3_sepa_contribution_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-function _civicrm_api3_sepa_contribution_group_getdetail_spec (&$params) {
+function _civicrm_api3_sepa_contribution_group_getdetail_spec(&$params) {
   $params['id']['api.required'] = 1;
 }
 

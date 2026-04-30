@@ -535,8 +535,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * Helper for replacing deprecated core method
    * @return void
    */
-  private function rebuildMenuAndCaches()
-  {
+  private function rebuildMenuAndCaches() {
     Civi::rebuild([
       'ext' => TRUE,
       'files' => TRUE,

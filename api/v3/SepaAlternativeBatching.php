@@ -39,7 +39,7 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   }
 }
 
-function _civicrm_api3_sepa_alternative_batching_close_spec (&$params) {
+function _civicrm_api3_sepa_alternative_batching_close_spec(&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -57,7 +57,7 @@ function civicrm_api3_sepa_alternative_batching_createxml($params) {
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
   if (is_numeric($result)) {
     // this was succesfull -> load the sepa file
-    return civicrm_api3('SepaSddFile', 'getsingle', ['id' => $result, 'version' => 3]);
+    return civicrm_api3('SepaSddFile', 'getsingle', ['id' => $result]);
   }
   else {
     // there was an error:
@@ -91,7 +91,7 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
   }
 }
 
-function _civicrm_api3_sepa_alternative_batching_received_spec (&$params) {
+function _civicrm_api3_sepa_alternative_batching_received_spec(&$params) {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -119,7 +119,7 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
  */
 function civicrm_api3_sepa_alternative_batching_update($params) {
   // get creditor list
-  $creditor_query = civicrm_api3('SepaCreditor', 'get', ['version' => 3, 'option.limit' => 99999]);
+  $creditor_query = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 99999]);
 
   if (!empty($creditor_query['is_error'])) {
     return civicrm_api3_create_error('Cannot get creditor list: ' . $creditor_query['error_message']);

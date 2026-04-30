@@ -39,7 +39,7 @@ class CRM_Sepa_Page_SepaFile extends CRM_Core_Page {
       CRM_Utils_System::civiExit();
     }
     else {
-      throw new \CRM_Core_Exception("missing parameter. you need id");
+      throw new \CRM_Core_Exception('missing parameter. you need id');
     }
   }
 

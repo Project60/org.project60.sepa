@@ -16,7 +16,6 @@
 use CRM_Sepa_ExtensionUtil as E;
 
 return [
-  0 =>
   [
     'name' => 'CRM_Sepa_Form_Search_SepaContactSearch',
     'entity' => 'CustomSearch',

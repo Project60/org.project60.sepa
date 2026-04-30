@@ -196,7 +196,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
 
     // get creditor list
     $creditors_default_list = [];
-    $creditor_query = civicrm_api3('SepaCreditor', 'get', ['version' => 3, 'option.limit' => 99999]);
+    $creditor_query = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 99999]);
     if (!empty($creditor_query['is_error'])) {
       return civicrm_api3_create_error('Cannot get creditor list: ' . $creditor_query['error_message']);
     }

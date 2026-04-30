@@ -321,7 +321,7 @@ class CRM_Sepa_Logic_MandateRepairs {
               civicrm_api3('Contribution', 'create', [
                 'id' => $case->contribution_id,
                 'payment_instrument_id' => $new_pi,
-              // just to avoid warnings in unit tests
+                // just to avoid warnings in unit tests
                 'financial_type_id' => $case->financial_type_id,
               ]);
               $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}]");

@@ -28,14 +28,12 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
   /**
    * Lookup and get a message template
    *
-   * @param $id
-   * @return array
-   * @throws CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function getMessage ($id): array {
-    $msg = civicrm_api3('MessageTemplate', 'getSingle', ['version' => 3, 'id' => $id]);
+  public function getMessage($id): array {
+    $msg = civicrm_api3('MessageTemplate', 'getSingle', ['id' => $id]);
     if (array_key_exists('is_error', $msg)) {
-      throw new \CRM_Core_Exception('The selected message template does not exist: '.$id);
+      throw new \CRM_Core_Exception('The selected message template does not exist: ' . $id);
     };
 
     return $msg;
@@ -47,7 +45,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     }
 
     // use the API to load a extensive contact information bulk
-    $contact = civicrm_api3('Contact', 'getsingle', ['id' => $contact_id, 'version' => 3]);
+    $contact = civicrm_api3('Contact', 'getsingle', ['id' => $contact_id]);
 
     // ... add some missing fields
     $bao = new CRM_Contact_BAO_Contact();
@@ -125,7 +123,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         break;
 
       default:
-        throw new \CRM_Core_Exception("We don't know how to handle mandates for ".$mandate->entity_table);
+        throw new \CRM_Core_Exception("We don't know how to handle mandates for " . $mandate->entity_table);
     }
 
     // add creditor information
@@ -257,7 +255,6 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     foreach ($default_templates as $template_name => $template_title) {
       // find the template's entry in the option group
       $template_entry = civicrm_api3('OptionValue', 'getsingle', [
-        'version'           => 3,
         'option_group_name' => 'msg_tpl_workflow_contribution',
         'name'              => $template_name,
       ]);
@@ -268,7 +265,6 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
       // find the template itself
       $template = civicrm_api3('MessageTemplate', 'get', [
-        'version'           => 3,
         'workflow_id'       => $template_entry['id'],
       ]);
 
@@ -289,7 +285,6 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
           continue;
         }
         $result = civicrm_api3('MessageTemplate', 'create', [
-          'version'     => 3,
           'workflow_id' => $template_entry['id'],
           'msg_title'   => $template_title,
           'msg_subject' => ts('SEPA Direct Debit Payment Information', ['domain' => 'org.project60.sepa']),

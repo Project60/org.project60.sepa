@@ -19,7 +19,6 @@
  */
 class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
-  //array('Contact');
   protected $_customGroupExtends = NULL;
   protected $_customGroupGroupBy = FALSE;
 
