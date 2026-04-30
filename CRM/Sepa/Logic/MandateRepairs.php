@@ -65,7 +65,7 @@ class CRM_Sepa_Logic_MandateRepairs {
   {
     // make sure the log file name is there
     if (!$this->log_file) {
-      $log_folder = Civi::paths()->getPath('[civicrm.files]/ConfigAndLog');
+      $log_folder = Civi::paths()->getPath('[civicrm.log]/');
       $this->log_file = $log_folder . DIRECTORY_SEPARATOR . 'CiviSEPA_repairs.log';
     }
 
