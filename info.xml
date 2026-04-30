@@ -5,8 +5,8 @@
   <description>This extension provides SEPA Direct Debit processing.</description>
   <license>aGPL3</license>
   <maintainer>
-    <author>B. Endres</author>
-    <email>endres@systopia.de</email>
+    <author>SYSTOPIA</author>
+    <email>info@systopia.de</email>
   </maintainer>
   <releaseDate/>
   <version>1.14.0-dev</version>

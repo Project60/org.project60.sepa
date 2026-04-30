@@ -53,8 +53,6 @@ class CRM_Sepa_Logic_Queue_Close {
       CRM_Core_Session::setStatus(E::ts('Cannot close group, another update is in progress!'), E::ts('Error'), 'error');
       $redirect_url = CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed');
       CRM_Utils_System::redirect($redirect_url);
-      // shouldn't be necessary
-      return;
     }
 
     // create a queue

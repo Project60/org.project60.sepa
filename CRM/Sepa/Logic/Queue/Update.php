@@ -43,9 +43,8 @@ class CRM_Sepa_Logic_Queue_Update {
       CRM_Core_Session::setStatus(E::ts('Cannot run update, another update is in progress!'), E::ts('Error'), 'error');
       $redirectUrl = CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active');
       CRM_Utils_System::redirect($redirectUrl);
-      // shouldn't be necessary
-      return;
     }
+
     // create a queue
     $queue = CRM_Queue_Service::singleton()->create([
       'type'  => 'Sql',

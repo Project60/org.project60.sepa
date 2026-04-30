@@ -26,7 +26,7 @@ require_once __DIR__ . '/../../sepa.civix.php';
 // Add test classes to class loader.
 addExtensionDirToClassLoader(__DIR__);
 
-// Add classes for non-headless unit tests
+// Add classes for tests without booted CiviCRM environment, i.e. simple PHPUnit tests.
 addExtensionToClassLoader('org.project60.sepa');
 
 if (!function_exists('ts')) {
@@ -42,7 +42,23 @@ function _sepa_test_civicrm_container(ContainerBuilder $container): void {
 }
 
 function addExtensionToClassLoader(string $extension): void {
-  addExtensionDirToClassLoader(__DIR__ . '/../../../' . $extension);
+  $candidates = [
+    // Support symlinks. Current working dir should be the extensions' directory
+    // relative to the "ext" directory.
+    dirname(getcwd()) . '/' . $extension,
+    __DIR__ . '/../../../' . $extension,
+  ];
+
+  foreach ($candidates as $candidate) {
+    $real = realpath($candidate);
+    if ($real !== FALSE && is_dir($real)) {
+      addExtensionDirToClassLoader($real);
+
+      return;
+    }
+  }
+
+  throw new RuntimeException("Extension path not found for: $extension");
 }
 
 function addExtensionDirToClassLoader(string $extensionDir): void {

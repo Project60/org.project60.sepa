@@ -13,7 +13,7 @@
   </php>
 
   <testsuites>
-    <testsuite name="CiviSEPA Test Suite">
+    <testsuite name="org.project60.sepa Test Suite">
       <directory>./tests/phpunit</directory>
     </testsuite>
   </testsuites>
