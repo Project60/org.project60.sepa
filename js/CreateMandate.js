@@ -28,6 +28,10 @@
      * PRs welcome :)
      **/
     function sdd_setDate(fieldname, date) {
+        let date_element = cj("#sdd-create-mandate").find("[name=" + fieldname + "]");
+        let dateString = CRM.utils.formatDate(date,'yy-mm-dd');
+        // why 'yy-mm-dd' instead of  CRM.config.dateInputFormat because crm.datapicker.js line 128 has also 'yy-mm-dd'
+        date_element.val(dateString);
         let dp_element = cj("#sdd-create-mandate").find("[name=" + fieldname + "]").siblings(".hasDatepicker");
         dp_element.datepicker('setDate', date);
 
@@ -294,7 +298,6 @@
         // reset the picker without triggering change event
         sdd_getF('bank_account_preset').select2('val', '');
     }
-
     // attach earliest link handlers
     cj("#sdd-create-mandate").find("a.sdd-earliest").click(function() {
         if (cj(this).attr('id') == 'sdd_rcur_earliest') {
@@ -303,6 +306,7 @@
             sdd_setDate('ooff_date', $(this).data('date'));
         }
     });
+
 
     // attach the update methods to the various change events
     cj("#sdd-create-mandate").find("[name=interval],[name=amount],[name=cycle_day],[name^=ooff_date],[name^=rcur_start_date]").change(sdd_recalculate_fields);
