@@ -14,9 +14,6 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-require_once 'CRM/Admin/Form/Setting.php';
-require_once 'CRM/Core/BAO/CustomField.php';
-
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
@@ -27,26 +24,33 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     parent::__construct();
 
     $this->config_fields = [
-                     ['cycledays', ts('Cycle Day(s)', ['domain' => 'org.project60.sepa']), ['size' => 6]],
-                     ['batching.OOFF.horizon', ts('One-off horizon', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['batching.OOFF.notice', ts('One-off notice days', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['batching.RCUR.horizon', ts('Recurring horizon', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['batching.RCUR.grace', ts('Recurring grace', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['batching.RCUR.notice', ts('Recurring notice days (follow-up)', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['batching.FRST.notice', ts('Recurring notice days (initial)', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['batching.UPDATE.lock.timeout', ts('Update lock timeout', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['custom_txmsg', ts('Transaction Message', ['domain' => 'org.project60.sepa']), ['size' => 60, 'placeholder' => CRM_Sepa_Logic_Settings::getGenericSetting('custom_txmsg')]],
+      ['cycledays', E::ts('Cycle Day(s)'), ['size' => 6]],
+      ['batching.OOFF.horizon', E::ts('One-off horizon'), ['size' => 2]],
+      ['batching.OOFF.notice', E::ts('One-off notice days'), ['size' => 2]],
+      ['batching.RCUR.horizon', E::ts('Recurring horizon'), ['size' => 2]],
+      ['batching.RCUR.grace', E::ts('Recurring grace'), ['size' => 2]],
+      ['batching.RCUR.notice', E::ts('Recurring notice days (follow-up)'), ['size' => 2]],
+      ['batching.FRST.notice', E::ts('Recurring notice days (initial)'), ['size' => 2]],
+      ['batching.UPDATE.lock.timeout', E::ts('Update lock timeout'), ['size' => 2]],
+      [
+        'custom_txmsg',
+        E::ts('Transaction Message'),
+        [
+          'size' => 60,
+          'placeholder' => CRM_Sepa_Logic_Settings::getGenericSetting('custom_txmsg'),
+        ],
+      ],
     ];
 
     $this->custom_fields = [
-                     ['custom_cycledays', ts('Cycle Day(s)', ['domain' => 'org.project60.sepa']), ['size' => 6]],
-                     ['custom_OOFF_horizon', ts('One-off horizon', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['custom_OOFF_notice', ts('One-off notice days', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['custom_RCUR_horizon', ts('Recurring horizon', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['custom_RCUR_grace', ts('Recurring grace', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['custom_RCUR_notice', ts('Recurring notice days (follow-up)', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['custom_FRST_notice', ts('Recurring notice days (initial)', ['domain' => 'org.project60.sepa']), ['size' => 2]],
-                     ['custom_update_lock_timeout', ts('Update lock timeout', ['domain' => 'org.project60.sepa']), ['size' => 2]],
+      ['custom_cycledays', E::ts('Cycle Day(s)'), ['size' => 6]],
+      ['custom_OOFF_horizon', E::ts('One-off horizon'), ['size' => 2]],
+      ['custom_OOFF_notice', E::ts('One-off notice days'), ['size' => 2]],
+      ['custom_RCUR_horizon', E::ts('Recurring horizon'), ['size' => 2]],
+      ['custom_RCUR_grace', E::ts('Recurring grace'), ['size' => 2]],
+      ['custom_RCUR_notice', E::ts('Recurring notice days (follow-up)'), ['size' => 2]],
+      ['custom_FRST_notice', E::ts('Recurring notice days (initial)'), ['size' => 2]],
+      ['custom_update_lock_timeout', E::ts('Update lock timeout'), ['size' => 2]],
     ];
   }
 
@@ -62,13 +66,16 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     $fields = [];
     // get all default values (they are set once when the extension is being enabled)
     foreach ($this->config_fields as $key => $value) {
-      $fields[$this->domainToString($value[0])] = CRM_Sepa_Logic_Settings::getGenericSetting($this->domainToString($value[0]));
+      $fields[$this->domainToString($value[0])] = CRM_Sepa_Logic_Settings::getGenericSetting(
+        $this->domainToString($value[0])
+      );
     }
     return $fields;
   }
 
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Sepa Direct Debit - Settings', ['domain' => 'org.project60.sepa']));
+    CRM_Utils_System::setTitle(E::ts('Sepa Direct Debit - Settings'));
 
     $customFields = CRM_Core_BAO_CustomField::getFields();
     $cf = [];
@@ -83,10 +90,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
       if (!in_array($elementName, ['cycledays', 'custom_txmsg'])) {
         // integer only rules, except for cycledays (list)
         $this->addRule($this->domainToString($value[0]),
-             sprintf(ts('Please enter the %s as number (integers only).', ['domain' => 'org.project60.sepa']), $value[1]),
+             sprintf(E::ts('Please enter the %s as number (integers only).'), $value[1]),
             'positiveInteger');
         $this->addRule($this->domainToString($value[0]),
-             sprintf(ts('Please enter the %s as number (integers only).', ['domain' => 'org.project60.sepa']), $value[1]),
+             sprintf(E::ts('Please enter the %s as number (integers only).'), $value[1]),
             'required');
       }
     }
@@ -122,14 +129,14 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     asort($filtered);
 
     // do not use array_merge() because it discards the original indizes
-    $country_ids = ['' => ts('- select -', ['domain' => 'org.project60.sepa'])] + $filtered;
+    $country_ids = ['' => E::ts('- select -')] + $filtered;
     $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
     if (!isset($currencies['EUR'])) {
       $currencies['EUR'] = 'EUR';
     }
     $creditor_types = [
-      'SEPA' => ts('SEPA', ['domain' => 'org.project60.sepa']),
-      'PSP'  => ts('PSP', ['domain' => 'org.project60.sepa']),
+      'SEPA' => E::ts('SEPA'),
+      'PSP'  => E::ts('PSP'),
     ];
 
     // look up some values
@@ -153,16 +160,69 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     $this->addElement('text', 'addcreditor_cuc', E::ts('CUC (only from CBIBdySDDReq)'));
     $this->addElement('select', 'addcreditor_currency', E::ts('Currency'), $currencies);
     $this->addElement('select', 'addcreditor_type', E::ts('Type'), $creditor_types);
-    $this->addElement('select', 'addcreditor_pain_version', E::ts('PAIN Version'), ['' => E::ts('- select -')] + CRM_Core_OptionGroup::values('sepa_file_format'));
-    $this->addElement('select', 'addcreditor_pi_ooff', E::ts('One-Off Payment Instruments'), CRM_Utils_SepaOptionGroupTools::getPaymentInstrumentOptions(FALSE), ['class' => 'crm-select2', 'multiple' => 'multiple']);
-    $this->addElement('select', 'addcreditor_pi_rcur', E::ts('Recurring Payment Instruments'), CRM_Utils_SepaOptionGroupTools::getPaymentInstrumentOptions(TRUE), ['class' => 'crm-select2', 'multiple' => 'multiple']);
+    $this->addElement(
+      'select',
+      'addcreditor_pain_version',
+      E::ts('PAIN Version'),
+      ['' => E::ts('- select -')] + CRM_Core_OptionGroup::values('sepa_file_format')
+    );
+    $this->addElement(
+      'select',
+      'addcreditor_pi_ooff',
+      E::ts('One-Off Payment Instruments'),
+      CRM_Utils_SepaOptionGroupTools::getPaymentInstrumentOptions(FALSE),
+      [
+        'class' => 'crm-select2',
+        'multiple' => 'multiple',
+      ]
+    );
+    $this->addElement(
+      'select',
+      'addcreditor_pi_rcur',
+      E::ts('Recurring Payment Instruments'),
+      CRM_Utils_SepaOptionGroupTools::getPaymentInstrumentOptions(TRUE),
+      [
+        'class' => 'crm-select2',
+        'multiple' => 'multiple',
+      ]
+    );
     $this->addElement('checkbox', 'addcreditor_uses_bic', E::ts('Use BICs'), '', (['checked' => 'checked']));
     $this->addElement('checkbox', 'is_test_creditor', E::ts('Is a Test Creditor'), '', ['value' => '0']);
-    $this->addElement('checkbox', 'exclude_weekends', E::ts('Exclude Weekends'), '', ($excld_we ? ['checked' => 'checked'] : []));
-    $this->addElement('checkbox', 'sdd_async_batching', E::ts('Large Groups'), '', ($async_batch ? ['checked' => 'checked'] : []));
-    $this->addElement('checkbox', 'sdd_financial_type_grouping', E::ts('Groups by Financial Types'), '', ($financial_type_grouping ? ['checked' => 'checked'] : []));
-    $this->addElement('checkbox', 'sdd_skip_closed', E::ts('Only Completed Contributions'), '', ($skip_closed ? ['checked' => 'checked'] : []));
-    $this->addElement('checkbox', 'sdd_no_draft_xml', E::ts('No XML drafts'), '', ($no_draftxml ? ['checked' => 'checked'] : []));
+    $this->addElement(
+      'checkbox',
+      'exclude_weekends',
+      E::ts('Exclude Weekends'),
+      '',
+      ($excld_we ? ['checked' => 'checked'] : [])
+    );
+    $this->addElement(
+      'checkbox',
+      'sdd_async_batching',
+      E::ts('Large Groups'),
+      '',
+      ($async_batch ? ['checked' => 'checked'] : [])
+    );
+    $this->addElement(
+      'checkbox',
+      'sdd_financial_type_grouping',
+      E::ts('Groups by Financial Types'),
+      '',
+      ($financial_type_grouping ? ['checked' => 'checked'] : [])
+    );
+    $this->addElement(
+      'checkbox',
+      'sdd_skip_closed',
+      E::ts('Only Completed Contributions'),
+      '',
+      ($skip_closed ? ['checked' => 'checked'] : [])
+    );
+    $this->addElement(
+      'checkbox',
+      'sdd_no_draft_xml',
+      E::ts('No XML drafts'),
+      '',
+      ($no_draftxml ? ['checked' => 'checked'] : [])
+    );
     $this->addElement('text', 'pp_buffer_days', E::ts('Buffer Days'), ['size' => 2, 'value' => $bffrdays]);
     $this->addElement('hidden', 'edit_creditor_id', '', ['id' => 'edit_creditor_id']);
     $this->addElement('hidden', 'add_creditor_id', '', ['id' => 'add_creditor_id']);
@@ -176,13 +236,15 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
       else {
         $properties = [];
       }
-      $properties['placeholder'] = CRM_Sepa_Logic_Settings::getGenericSetting($this->domainToString($this->config_fields[$index][0]));
+      $properties['placeholder'] = CRM_Sepa_Logic_Settings::getGenericSetting(
+        $this->domainToString($this->config_fields[$index][0])
+      );
       $this->addElement('text', $this->domainToString($value[0]), $value[1], $properties);
       $elementName = $this->domainToString($value[0]);
       if (!in_array($elementName, ['custom_cycledays', 'custom_txmsg'])) {
         // integer only rules, except for cycledays (list)
         $this->addRule($elementName,
-           sprintf(ts('Please enter the %s as number (integers only).', ['domain' => 'org.project60.sepa']), $value[1]),
+           sprintf(E::ts('Please enter the %s as number (integers only).'), $value[1]),
           'positiveInteger');
       }
       $index++;
@@ -190,9 +252,13 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
 
     // register and add extra validation rules
     $this->registerRule('sepa_cycle_day_list', 'callback', 'sepa_cycle_day_list', 'CRM_Sepa_Logic_Settings');
-    $this->addRule('cycledays', ts('Please give a comma separated list of valid days.', ['domain' => 'org.project60.sepa']), 'sepa_cycle_day_list');
-    $this->addRule('custom_cycledays', ts('Please give a comma separated list of valid days.', ['domain' => 'org.project60.sepa']), 'sepa_cycle_day_list');
-    $this->addRule('pp_buffer_days', ts('Please enter the number of days', ['domain' => 'org.project60.sepa']), 'positiveInteger');
+    $this->addRule('cycledays', E::ts('Please give a comma separated list of valid days.'), 'sepa_cycle_day_list');
+    $this->addRule(
+      'custom_cycledays',
+      E::ts('Please give a comma separated list of valid days.'),
+      'sepa_cycle_day_list'
+    );
+    $this->addRule('pp_buffer_days', E::ts('Please enter the number of days'), 'positiveInteger');
 
     // get creditor list
     $creditors_default_list = [];
@@ -213,16 +279,24 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
       }
     }
     $this->assign('creditors', $creditors);
-    $default_creditors = $this->addElement('select', 'batching_default_creditor', ts('Default Creditor', ['domain' => 'org.project60.sepa']), ['' => ts('- select -', ['domain' => 'org.project60.sepa'])] + $creditors_default_list);
+    $default_creditors = $this->addElement(
+      'select',
+      'batching_default_creditor',
+      E::ts('Default Creditor'),
+      ['' => E::ts('- select -')] + $creditors_default_list
+    );
     $default_creditors->setSelected(CRM_Sepa_Logic_Settings::getSetting('batching.default.creditor'));
 
     // add general config options
     $amm_options = CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification') ? ['checked' => 'checked'] : [];
-    $this->addElement('checkbox', 'allow_mandate_modification', ts('Mandate Modifications', ['domain' => 'org.project60.sepa']), NULL, $amm_options);
+    $this->addElement('checkbox', 'allow_mandate_modification', E::ts('Mandate Modifications'), NULL, $amm_options);
 
     // add JS logic
     CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/SepaSettings.js');
-    CRM_Core_Resources::singleton()->addVars('p60sdd', CRM_Sepa_Logic_PaymentInstruments::getDefaultSEPAPaymentInstruments());
+    CRM_Core_Resources::singleton()->addVars(
+      'p60sdd',
+      CRM_Sepa_Logic_PaymentInstruments::getDefaultSEPAPaymentInstruments()
+    );
 
     $this->addButtons([
     [
@@ -245,7 +319,10 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     // save field values
     foreach ($this->config_fields as $key => $value) {
       if (array_key_exists($this->domainToString($value[0]), $values)) {
-        CRM_Sepa_Logic_Settings::setSetting($values[$this->domainToString($value[0])], $this->domainToString($value[0]));
+        CRM_Sepa_Logic_Settings::setSetting(
+          $values[$this->domainToString($value[0])],
+          $this->domainToString($value[0])
+        );
       }
     }
 
@@ -257,12 +334,18 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     $allow_mandate_modification = empty($values['allow_mandate_modification']) ? '0' : '1';
     CRM_Sepa_Logic_Settings::setSetting($allow_mandate_modification, 'allow_mandate_modification');
 
-    CRM_Sepa_Logic_Settings::setSetting((isset($values['exclude_weekends']) ? '1' : '0'), 'exclude_weekends');
-    CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_async_batching']) ? '1' : '0'), 'sdd_async_batching');
-    CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_financial_type_grouping']) ? '1' : '0'), 'sdd_financial_type_grouping');
-    CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_skip_closed']) ? '1' : '0'), 'sdd_skip_closed');
-    CRM_Sepa_Logic_Settings::setSetting((isset($values['sdd_no_draft_xml']) ? '1' : '0'), 'sdd_no_draft_xml');
-    CRM_Sepa_Logic_Settings::setSetting((isset($values['pp_buffer_days']) ? (int) $values['pp_buffer_days'] : '0'), 'pp_buffer_days');
+    CRM_Sepa_Logic_Settings::setSetting(isset($values['exclude_weekends']) ? '1' : '0', 'exclude_weekends');
+    CRM_Sepa_Logic_Settings::setSetting(isset($values['sdd_async_batching']) ? '1' : '0', 'sdd_async_batching');
+    CRM_Sepa_Logic_Settings::setSetting(
+      isset($values['sdd_financial_type_grouping']) ? '1' : '0',
+      'sdd_financial_type_grouping'
+    );
+    CRM_Sepa_Logic_Settings::setSetting(isset($values['sdd_skip_closed']) ? '1' : '0', 'sdd_skip_closed');
+    CRM_Sepa_Logic_Settings::setSetting(isset($values['sdd_no_draft_xml']) ? '1' : '0', 'sdd_no_draft_xml');
+    CRM_Sepa_Logic_Settings::setSetting(
+      isset($values['pp_buffer_days']) ? (int) $values['pp_buffer_days'] : '0',
+      'pp_buffer_days'
+    );
 
     $session = CRM_Core_Session::singleton();
     $session->setStatus(E::ts('Settings successfully updated.'), E::ts('Saved'), 'info');

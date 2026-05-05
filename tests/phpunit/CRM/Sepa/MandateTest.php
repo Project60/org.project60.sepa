@@ -34,7 +34,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
 
   /**
    * Test the creation of an OOFF mandate.
-   * @see Case_ID M01
+   * See Case_ID M01.
    */
   public function testOOFFCreate() {
     $mandate = $this->createMandate(
@@ -44,17 +44,17 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     );
     $contribution = $this->getLatestContributionForMandate($mandate);
 
-    $this->assertSame(self::MANDATE_TYPE_OOFF, $mandate['status'], E::ts('OOFF Mandate after creation is incorrect.'));
+    $this->assertSame(self::MANDATE_TYPE_OOFF, $mandate['status'], 'OOFF Mandate after creation is incorrect.');
     $this->assertSame(
       self::CONTRIBUTION_STATUS_PENDING,
       $contribution['contribution_status_id'],
-      E::ts('OOFF contribution after creation is incorrect.')
+      'OOFF contribution after creation is incorrect.'
     );
   }
 
   /**
    * Test the creation of a RCUR mandate.
-   * @see Case_ID M02
+   * See Case_ID M02.
    */
   public function testRCURCreate() {
     $mandate = $this->createMandate(
@@ -65,17 +65,17 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
 
     $recurringContribution = $this->getRecurringContributionForMandate($mandate);
 
-    $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], E::ts('RCUR Mandate after creation is incorrect.'));
+    $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], 'RCUR Mandate after creation is incorrect.');
     $this->assertSame(
       self::RECURRING_CONTRIBUTION_STATUS_PENDING,
       $recurringContribution['contribution_status_id'],
-      E::ts('RCUR contribution after creation is incorrect.')
+      'RCUR contribution after creation is incorrect.'
     );
   }
 
   /**
    * Test the batching for an OOFF mandate.
-   * @see Case_ID M01
+   * See Case_ID M01.
    */
   public function testOOFFBatch() {
     $mandate = $this->createMandate(
@@ -93,23 +93,23 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     $this->assertSame(
       self::MANDATE_TYPE_OOFF,
       $batchedMandate['status'],
-      E::ts('OOFF Mandate status after batching is incorrect.')
+      'OOFF Mandate status after batching is incorrect.'
     );
     $this->assertSame(
       self::CONTRIBUTION_STATUS_PENDING,
       $batchedContribution['contribution_status_id'],
-      E::ts('OOFF contribution status after batching is incorrect.')
+      'OOFF contribution status after batching is incorrect.'
     );
     $this->assertSame(
       self::BATCH_STATUS_OPEN,
       $transactionGroup['status_id'],
-      E::ts('OOFF transaction group status after batching is incorrect.')
+      'OOFF transaction group status after batching is incorrect.'
     );
   }
 
   /**
    * Test the batching for a RCUR mandate.
-   * @see Case_ID M02
+   * See Case_ID M02.
    */
   public function testRCURBatch() {
     $mandate = $this->createMandate(
@@ -129,23 +129,23 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     $this->assertSame(
       self::MANDATE_TYPE_FRST,
       $batchedMandate['status'],
-      E::ts('RCUR Mandate status after batching is incorrect.')
+      'RCUR Mandate status after batching is incorrect.'
     );
     $this->assertSame(
       self::CONTRIBUTION_STATUS_PENDING,
       $batchedContribution['contribution_status_id'],
-      E::ts('RCUR contribution status after batching is incorrect.')
+      'RCUR contribution status after batching is incorrect.'
     );
     $this->assertSame(
       self::BATCH_STATUS_OPEN,
       $transactionGroup['status_id'],
-      E::ts('RCUR transaction group status after batching is incorrect.')
+      'RCUR transaction group status after batching is incorrect.'
     );
   }
 
   /**
    * Test the closing of an OOFF mandate.
-   * @see Case_ID M01
+   * See Case_ID M01.
    */
   public function testOOFFClose() {
     $mandate = $this->createMandate(
@@ -167,23 +167,23 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     $this->assertSame(
       self::MANDATE_STATUS_SENT,
       $closedMandate['status'],
-      E::ts('OOFF Mandate status after closing is incorrect.')
+      'OOFF Mandate status after closing is incorrect.'
     );
     $this->assertSame(
       self::CONTRIBUTION_STATUS_IN_PROGRESS,
       $closedContribution['contribution_status_id'],
-      E::ts('OOFF contribution status after closing is incorrect.')
+      'OOFF contribution status after closing is incorrect.'
     );
     $this->assertSame(
       self::BATCH_STATUS_CLOSED,
       $closedTransactionGroup['status_id'],
-      E::ts('OOFF transaction group status after closing is incorrect.')
+      'OOFF transaction group status after closing is incorrect.'
     );
   }
 
   /**
    * Test the closing of a RCUR mandate group.
-   * @see Case_ID M02
+   * See Case_ID M02.
    */
   public function testRCURClose() {
     $mandate = $this->createMandate(
@@ -207,24 +207,24 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     $this->assertSame(
       self::MANDATE_TYPE_RCUR,
       $closedMandate['status'],
-      E::ts('RCUR Mandate status after closing is incorrect.')
+      'RCUR Mandate status after closing is incorrect.'
     );
     $this->assertSame(
       self::RECURRING_CONTRIBUTION_STATUS_PENDING,
       $closedRecurringContribution['contribution_status_id'],
-      E::ts('RCUR contribution status after closing is incorrect.')
+      'RCUR contribution status after closing is incorrect.'
     );
     $this->assertSame(
       self::BATCH_STATUS_CLOSED,
       $closedTransactionGroup['status_id'],
-      E::ts('RCUR transaction group status after closing is incorrect.')
+      'RCUR transaction group status after closing is incorrect.'
     );
   }
 
   /**
    * Test if status and first_contribution_id are correctly set in FRST -> RCUR transition
    *
-   * @see Case_ID M02
+   * See Case_ID M02.
    */
   public function testRCURFirstContributionID() {
     $mandate = $this->createMandate(
@@ -234,7 +234,7 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     );
 
     // the status should be FRST, and first_contribution_id empty
-    $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], E::ts('Mandate status of new mandate is incorrect.'));
+    $this->assertSame(self::MANDATE_TYPE_FRST, $mandate['status'], 'Mandate status of new mandate is incorrect.');
     $this->assertEmpty(
       $mandate['first_contribution_id'] ?? NULL,
       'first_contribution_id should not be set yet.'
@@ -243,7 +243,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     // batch & check
     $this->executeBatching(self::MANDATE_TYPE_FRST);
     $batchedMandate = $this->getMandate($mandate['id']);
-    $this->assertSame(self::MANDATE_TYPE_FRST, $batchedMandate['status'], E::ts('Mandate status of new mandate is incorrect.'));
+    $this->assertSame(
+      self::MANDATE_TYPE_FRST,
+      $batchedMandate['status'],
+      'Mandate status of new mandate is incorrect.'
+    );
     $this->assertArrayNotHasKey('first_contribution_id', $batchedMandate);
     $this->assertEmpty(
       $batchedMandate['first_contribution_id'] ?? NULL,
@@ -254,14 +258,14 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
     $this->closeTransactionGroup($transactionGroup['id']);
     $rcurMandate = $this->getMandate($mandate['id']);
-    $this->assertSame(self::MANDATE_TYPE_RCUR, $rcurMandate['status'], E::ts('Mandate status of new mandate is incorrect.'));
+    $this->assertSame(self::MANDATE_TYPE_RCUR, $rcurMandate['status'], 'Mandate status of new mandate is incorrect.');
     $this->assertArrayHasKey('first_contribution_id', $rcurMandate);
     $this->assertNotEmpty($rcurMandate['first_contribution_id'], 'first_contribution_id should be set now.');
   }
 
   /**
    * Test the creation of a mandate with non-empty account holder.
-   * @see Case_ID M01
+   * See Case_ID M01.
    */
   public function testOOFFCreateAccountHolder() {
     $mandate = $this->createMandate(
@@ -271,7 +275,11 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
       ]
     );
 
-    $this->assertSame('Test Account Holder', $mandate['account_holder'], E::ts('Mandate account holder after creation is incorrect.'));
+    $this->assertSame(
+      'Test Account Holder',
+      $mandate['account_holder'],
+      'Mandate account holder after creation is incorrect.'
+    );
   }
 
 }

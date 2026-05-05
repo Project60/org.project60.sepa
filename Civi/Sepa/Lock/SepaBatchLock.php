@@ -49,6 +49,7 @@ final class SepaBatchLock {
     }
   }
 
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function acquire(?int $timeout = NULL, ?string $asyncLockId = NULL): bool {
     if (!$this->civiLock->acquire($timeout ?? $this->defaultTimeout)) {
       if (NULL !== $asyncLockId) {

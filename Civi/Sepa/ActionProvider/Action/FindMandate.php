@@ -87,13 +87,19 @@ class FindMandate extends CreateRecurringMandate {
       new Specification('frequency', 'Integer', E::ts('Frequency'), FALSE, NULL, NULL, NULL, FALSE),
       new Specification('cycle_day', 'Integer', E::ts('Collection Day'), FALSE, NULL, NULL, NULL, FALSE),
       new Specification('creditor_id', 'Integer', E::ts('Creditor ID'), FALSE, NULL, NULL, NULL, FALSE),
-      new Specification('financial_type_id', 'Integer', E::ts('Financial Type (default)'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification(
+        'financial_type_id', 'Integer', E::ts('Financial Type (default)'), FALSE, NULL, NULL, NULL, FALSE
+      ),
       new Specification('campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, NULL, FALSE),
       new Specification('start_date', 'Date', E::ts('Start Date'), FALSE, NULL, NULL, NULL, FALSE),
       new Specification('date', 'Date', E::ts('Signature Date'), FALSE, NULL, NULL, NULL, FALSE),
       new Specification('validation_date', 'Date', E::ts('Validation Date'), FALSE, NULL, NULL, NULL, FALSE),
-      new Specification('contribution_id', 'Integer', E::ts('Contribution ID (One-off)'), FALSE, NULL, NULL, NULL, FALSE),
-      new Specification('contribution_recur_id', 'Integer', E::ts('Recurring Contribution ID'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification(
+        'contribution_id', 'Integer', E::ts('Contribution ID (One-off)'), FALSE, NULL, NULL, NULL, FALSE
+      ),
+      new Specification(
+        'contribution_recur_id', 'Integer', E::ts('Recurring Contribution ID'), FALSE, NULL, NULL, NULL, FALSE
+      ),
     ]);
   }
 
@@ -106,6 +112,7 @@ class FindMandate extends CreateRecurringMandate {
    *      The parameters this action can send back
    * @return void
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
     // compile search query
     $mandatesQuery = SepaMandate::get(TRUE);
@@ -176,7 +183,10 @@ class FindMandate extends CreateRecurringMandate {
             $frequency = 52.0 / $recurring_contribution['frequency_interval'];
           }
           $output->setParameter('frequency', $frequency);
-          $output->setParameter('annual_amount', number_format($frequency * $recurring_contribution['amount'], 2, '.', ''));
+          $output->setParameter(
+            'annual_amount',
+            number_format($frequency * $recurring_contribution['amount'], 2, '.', '')
+          );
           break;
 
         case 'OOFF':

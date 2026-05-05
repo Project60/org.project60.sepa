@@ -87,7 +87,9 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
     $recurring_contribution = civicrm_api3('ContributionRecur', 'getsingle', [
       'id' => $monthly_mandate['entity_id'],
     ]);
-    $pi_mapping_reversed = array_flip(CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($monthly_mandate['creditor_id']));
+    $pi_mapping_reversed = array_flip(
+      CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($monthly_mandate['creditor_id'])
+    );
     $wrong_payment_instrument_id = $pi_mapping_reversed[$recurring_contribution['payment_instrument_id']];
 
     civicrm_api3('ContributionRecur', 'create', [
@@ -99,8 +101,7 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
     // now generate and close three groups
     $group_type = self::MANDATE_TYPE_FRST;
     $contributions = [];
-    //foreach (['-60', '-30', '+0'] as $batch_time_offset) { // todo: removed 60 days b/c something is suddenly wrong there
-    foreach (['-30', '+0'] as $batch_time_offset) {
+    foreach (['-60', '-30', '+0'] as $batch_time_offset) {
       // run batching and close the groups
       $this->executeBatching($group_type, "now {$batch_time_offset} days");
 
@@ -129,7 +130,10 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
     // now, run the last one again, and we will get ANOTHER contribution if the bug is present
     $this->executeBatching($group_type);
     $contribution = $this->getLatestContributionForMandate($monthly_mandate);
-    $this->assertTrue(isset($contributions[$contribution['id']]), "A new contribution was generated, but it shouldn't have.");
+    $this->assertTrue(
+      isset($contributions[$contribution['id']]),
+      "A new contribution was generated, but it shouldn't have."
+    );
   }
 
   /**
@@ -160,12 +164,12 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
     $this->assertSame(
       self::MANDATE_STATUS_SENT,
       $closedMandate['status'],
-      E::ts('OOFF Mandate status after closing is incorrect.')
+      'OOFF Mandate status after closing is incorrect.'
     );
     $this->assertSame(
       self::CONTRIBUTION_STATUS_IN_PROGRESS,
       $closedContribution['contribution_status_id'],
-      E::ts('OOFF contribution status after closing is incorrect, probably related to SEPA-629')
+      'OOFF contribution status after closing is incorrect, probably related to SEPA-629'
     );
   }
 

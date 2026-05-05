@@ -30,8 +30,9 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
    * cache for getFormatFilename function */
   protected $_creditorID2format = [];
 
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function run() {
-    CRM_Utils_System::setTitle(ts('CiviSEPA Dashboard', ['domain' => 'org.project60.sepa']));
+    CRM_Utils_System::setTitle(E::ts('CiviSEPA Dashboard'));
     // get requested group status
     $status = CRM_Utils_Request::retrieve('status', 'String');
     if ('open' !== $status && 'closed' !== $status) {
@@ -182,7 +183,9 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
           }
         }
 
-        $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage($group['id']);
+        $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage(
+          $group['id']
+        );
         $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote($group['id']);
 
         $groups[] = $group;
@@ -230,7 +233,11 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
     }
     else {
-      CRM_Core_Session::setStatus(sprintf(E::ts("Unknown batcher mode '%s'. No batching triggered."), $mode), E::ts('Error'), 'error');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts("Unknown batcher mode '%s'. No batching triggered."), $mode),
+        E::ts('Error'),
+        'error'
+      );
     }
   }
 

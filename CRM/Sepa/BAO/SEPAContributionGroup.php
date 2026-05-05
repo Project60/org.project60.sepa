@@ -21,8 +21,6 @@
  *
  */
 
-
-
 /**
  * Class contains functions for Sepa mandates
  */

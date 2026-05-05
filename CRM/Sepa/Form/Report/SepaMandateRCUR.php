@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
+
 /**
  * Report on OOFF SEPA mandates
  */
@@ -56,82 +58,82 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       'dao' => 'CRM_Contribute_BAO_ContributionRecur',
       'fields' => [
         'financial_type_id' => [
-          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Financial Type'),
           'default' => TRUE,
         ],
         'campaign_id' => [
-          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Campaign'),
         ],
         'cycle_day' => [
-          'title' => ts('Cycle Day', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Cycle Day'),
         ],
         'recurring_contribution_status_id' => [
           'name'  => 'recurring_contribution_status_id',
-          'title' => ts('Recurring Contribution Status', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Recurring Contribution Status'),
         ],
         'start_date' => [
-          'title' => ts('Start Date', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Start Date'),
         ],
         'end_date' => [
-          'title' => ts('End Date', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('End Date'),
         ],
         'cancel_reasons' => [
-          'title' => ts('Cancel Reason(s)', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Cancel Reason(s)'),
         ],
         'currency' => [
-          'title' => ts('Currency', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Currency'),
           'required' => TRUE,
           'no_display' => TRUE,
         ],
         'trxn_id' => [
-          'title' => ts('Transaction ID', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Transaction ID'),
         ],
         'installment_amount' => [
           'dbAlias' => 'amount',
-          'title' => ts('Installment Amount', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Installment Amount'),
         ],
         'cycle_interval' => [
-          'title' => ts('Cycle Interval', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Cycle Interval'),
         ],
       ],
       'filters' => [
         'start_date' => [
-          'title' => ts('Start Date', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Start Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
         ],
         'end_date' => [
-          'title' => ts('End Date', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('End Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
         ],
         'financial_type_id' => [
-          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Financial Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::financialType(),
           'type' => CRM_Utils_Type::T_INT,
         ],
         'cycle_interval' => [
           'dbAlias' => 'cycle_interval',
-          'title' => ts('Cycle Interval', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Cycle Interval'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $cycle_intervals,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'cycle_day' => [
-          'title' => ts('Cycle Days', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Cycle Days'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => $cycle_days,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'campaign_id' => [
-          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Campaign'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Campaign_BAO_Campaign::getCampaigns(),
           'type' => CRM_Utils_Type::T_INT,
         ],
         'recurring_contribution_status_id' => [
-          'title' => ts('Recurring Contribution Status', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Recurring Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
@@ -140,18 +142,18 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           'dbAlias' => 'cancel_reasons',
           'type' => CRM_Utils_Type::T_STRING,
           'operatorType' => CRM_Report_Form::OP_STRING,
-          'title' => ts('Cancel Reason(s)', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Cancel Reason(s)'),
         ],
         'installment_amount' => [
           'dbAlias' => 'amount',
-          'title' => ts('Installment Amount', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Installment Amount'),
           'type'  => CRM_Utils_Type::T_FLOAT,
           'operatorType' => CRM_Report_Form::OP_FLOAT,
         ],
       ],
       'order_bys' => [
-        'financial_type_id' => ['title' => ts('Financial Type', ['domain' => 'org.project60.sepa'])],
-        'recurring_contribution_status_id' => ['title' => ts('Recurring Contribution Status', ['domain' => 'org.project60.sepa'])],
+        'financial_type_id' => ['title' => E::ts('Financial Type')],
+        'recurring_contribution_status_id' => ['title' => E::ts('Recurring Contribution Status')],
       ],
       'grouping' => 'rcontri-fields',
     ];
@@ -161,45 +163,45 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       'dao' => 'CRM_Contribute_DAO_Contribution',
       'fields' => [
         'total_amount_collected' => [
-          'title' => ts('Total Amount Collected', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Total Amount Collected'),
         ],
         'total_count_collected' => [
-          'title' => ts('Total Count of Collected Contributions', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Total Count of Collected Contributions'),
         ],
         'total_count_failed' => [
-          'title' => ts('Total Count of Failed/Cancelled Contribution', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Total Count of Failed/Cancelled Contribution'),
         ],
         'contribution_count' => [
-          'title' => ts('Matching Contribution Count', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Matching Contribution Count'),
         ],
       ],
       'filters' => [
         'contribution_status_id' => [
-          'title' => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
         ],
         'total_amount_collected' => [
           'dbAlias' => 'total_amount_collected',
-          'title'   => ts('Total Amount Collected', ['domain' => 'org.project60.sepa']),
+          'title'   => E::ts('Total Amount Collected'),
           'type'    => CRM_Utils_Type::T_FLOAT,
           'operatorType' => CRM_Report_Form::OP_FLOAT,
         ],
         'total_count_collected' => [
           'dbAlias' => 'total_count_collected',
-          'title'   => ts('Total Count of Collected Contributions', ['domain' => 'org.project60.sepa']),
+          'title'   => E::ts('Total Count of Collected Contributions'),
           'type'    => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_INT,
         ],
         'total_count_failed' => [
           'dbAlias' => 'total_count_failed',
-          'title'   => ts('Total Count of Failed/Cancelled Contribution', ['domain' => 'org.project60.sepa']),
+          'title'   => E::ts('Total Count of Failed/Cancelled Contribution'),
           'type'    => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_INT,
         ],
         'receive_date' => [
-          'title' => ts('Contribution Collection Date', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution Collection Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
         ],
@@ -207,19 +209,19 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       'order_bys' => [
         'contribution_count' => [
           'dbAlias' => 'contribution_count',
-          'title' => ts('Matching Contribution Count', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Matching Contribution Count'),
         ],
         'total_amount_collected' => [
           'dbAlias' => 'total_amount_collected',
-          'title' => ts('Total Amount Collected', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Total Amount Collected'),
         ],
         'total_count_collected' => [
           'dbAlias' => 'total_count_collected',
-          'title' => ts('Total Count of Collected Contributions', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Total Count of Collected Contributions'),
         ],
         'total_count_failed' => [
           'dbAlias' => 'total_count_failed',
-          'title' => ts('Total Count of Failed/Cancelled Contribution', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Total Count of Failed/Cancelled Contribution'),
         ],
       ],
     ];
@@ -228,24 +230,40 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
   /**
    * Override select clauses for some fields
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function _getSelectClause($fieldName, $field, $tableName) {
     // add amount from either OOFF or RCUR
     if ($fieldName == 'total_amount_collected') {
       $this->_columnHeaders['total_amount_collected']['title'] = $field['title'];
       $this->_columnHeaders['total_amount_collected']['type']  = $field['type'] ?? NULL;
-      return "(SELECT/*NO_ROW_COUNT*/ SUM(total_amount) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (1) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_amount_collected";
+      return "(SELECT/*NO_ROW_COUNT*/ SUM(total_amount)
+      FROM civicrm_contribution total_amount_collected_contributions
+      WHERE total_amount_collected_contributions.contribution_status_id IN (1)
+        AND total_amount_collected_contributions.contribution_recur_id =
+          {$this->_aliases['civicrm_contribution_recur']}.id
+      ) AS total_amount_collected";
     }
 
     if ($fieldName == 'total_count_collected') {
       $this->_columnHeaders['total_count_collected']['title'] = $field['title'];
       $this->_columnHeaders['total_count_collected']['type']  = $field['type'] ?? NULL;
-      return "(SELECT/*NO_ROW_COUNT*/ COUNT(id) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (1) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_count_collected";
+      return "(SELECT/*NO_ROW_COUNT*/ COUNT(id)
+        FROM civicrm_contribution total_amount_collected_contributions
+        WHERE total_amount_collected_contributions.contribution_status_id IN (1)
+          AND total_amount_collected_contributions.contribution_recur_id =
+            {$this->_aliases['civicrm_contribution_recur']}.id
+        ) AS total_count_collected";
     }
 
     if ($fieldName == 'total_count_failed') {
       $this->_columnHeaders['total_count_failed']['title'] = $field['title'];
       $this->_columnHeaders['total_count_failed']['type']  = $field['type'] ?? NULL;
-      return "(SELECT/*NO_ROW_COUNT*/ COUNT(id) FROM civicrm_contribution total_amount_collected_contributions WHERE total_amount_collected_contributions.contribution_status_id IN (3,4) AND total_amount_collected_contributions.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id) AS total_count_failed";
+      return "(SELECT/*NO_ROW_COUNT*/ COUNT(id)
+        FROM civicrm_contribution total_amount_collected_contributions
+        WHERE total_amount_collected_contributions.contribution_status_id IN (3,4)
+          AND total_amount_collected_contributions.contribution_recur_id =
+            {$this->_aliases['civicrm_contribution_recur']}.id
+        ) AS total_count_failed";
     }
 
     if ($fieldName == 'contribution_count') {
@@ -257,13 +275,17 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     if ($fieldName == 'cancel_reasons') {
       $this->_columnHeaders['cancel_reasons']['title'] = $field['title'];
       $this->_columnHeaders['cancel_reasons']['type']  = $field['type'] ?? NULL;
-      return "GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||') AS cancel_reasons";
+      return "GROUP_CONCAT(
+          DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason)
+          SEPARATOR '||'
+        ) AS cancel_reasons";
     }
 
     if ($fieldName == 'cycle_interval') {
       $this->_columnHeaders['cycle_interval']['title'] = $field['title'];
       $this->_columnHeaders['cycle_interval']['type']  = $field['type'] ?? NULL;
-      return "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval, CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit)) AS cycle_interval";
+      return "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval,
+        CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit)) AS cycle_interval";
     }
 
     return parent::_getSelectClause($fieldName, $field, $tableName);
@@ -275,16 +297,17 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
   public function from() {
     $this->_from = NULL;
     $this->_from = "
-         FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
-               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                          ON {$this->_aliases['civicrm_contact']}.id =
-                             {$this->_aliases['civicrm_sdd_mandate']}.contact_id
-               LEFT JOIN civicrm_contribution_recur {$this->_aliases['civicrm_contribution_recur']}
-                          ON 'civicrm_contribution_recur' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
-                          AND {$this->_aliases['civicrm_contribution_recur']}.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
-               LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                          ON {$this->_aliases['civicrm_contribution_recur']}.id = {$this->_aliases['civicrm_contribution']}.contribution_recur_id
-         ";
+      FROM civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
+      INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+        ON {$this->_aliases['civicrm_contact']}.id =
+           {$this->_aliases['civicrm_sdd_mandate']}.contact_id
+      LEFT JOIN civicrm_contribution_recur {$this->_aliases['civicrm_contribution_recur']}
+        ON 'civicrm_contribution_recur' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
+        AND {$this->_aliases['civicrm_contribution_recur']}.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
+      LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+        ON {$this->_aliases['civicrm_contribution_recur']}.id =
+           {$this->_aliases['civicrm_contribution']}.contribution_recur_id
+    ";
   }
 
   /**
@@ -297,6 +320,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
   /**
    * internal function to generate where clauses
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
   protected function _getWhereClause($fieldName, $field) {
     if ($fieldName == 'cycle_interval') {
       $cycle_intervals = $this->_params["{$fieldName}_value"] ?? NULL;
@@ -308,7 +332,8 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           $this->_params["{$fieldName}_min"] ?? NULL,
           $this->_params["{$fieldName}_max"] ?? NULL
         );
-      $subquery = "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval, CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit))";
+      $subquery = "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval,
+        CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit))";
       $clause = preg_replace('/cycle_interval/', $subquery, $clause);
       return $clause;
     }
@@ -323,8 +348,10 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
-      $subquery = "(SELECT SUM(total_amount) FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id = 1)";
-      $clause = preg_replace('/total_amount_collected/', $subquery, $clause);
+      $subquery = "(SELECT SUM(total_amount) FROM civicrm_contribution
+        WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id
+          AND contribution_status_id = 1)";
+      $clause = preg_replace('/total_amount_collected/', $subquery, $clause ?? '');
       return $clause;
     }
 
@@ -338,7 +365,9 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
-      $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id = 1)";
+      $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution
+        WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id
+        AND contribution_status_id = 1)";
       $clause = preg_replace('/total_count_collected/', $subquery, $clause);
       return $clause;
     }
@@ -353,7 +382,9 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
-      $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id IN (3,4))";
+      $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution
+        WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id
+          AND contribution_status_id IN (3,4))";
       $clause = preg_replace('/total_count_failed/', $subquery, $clause);
       return $clause;
     }
@@ -368,7 +399,11 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
           $this->_params["{$fieldName}_max"] ?? NULL
         );
       }
-      $subquery = "(SELECT GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||') FROM civicrm_contribution WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id AND contribution_status_id IN (3,4))";
+      $subquery = "(SELECT
+      GROUP_CONCAT(DISTINCT({$this->_aliases['civicrm_contribution']}.cancel_reason) SEPARATOR '||')
+      FROM civicrm_contribution
+      WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id
+        AND contribution_status_id IN (3,4))";
       $clause = preg_replace('/cancel_reasons/', $subquery, $clause);
       return $clause;
     }
@@ -387,6 +422,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
   /**
    * Prep data for display
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function alterDisplay(&$rows) {
     // first, let the generic code work through the data
     parent::alterDisplay($rows);
@@ -413,10 +449,16 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
 
       // alter amount
       if (array_key_exists('civicrm_contribution_recur_installment_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_recur_installment_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_recur_installment_amount'], $row['civicrm_contribution_recur_currency']);
+        $rows[$rowNum]['civicrm_contribution_recur_installment_amount'] = CRM_Utils_Money::format(
+          $row['civicrm_contribution_recur_installment_amount'],
+          $row['civicrm_contribution_recur_currency']
+        );
       }
       if (array_key_exists('total_amount_collected', $row)) {
-        $rows[$rowNum]['total_amount_collected'] = CRM_Utils_Money::format($row['total_amount_collected'], $row['civicrm_contribution_recur_currency']);
+        $rows[$rowNum]['total_amount_collected'] = CRM_Utils_Money::format(
+          $row['total_amount_collected'],
+          $row['civicrm_contribution_recur_currency']
+        );
       }
 
       // alter frequency

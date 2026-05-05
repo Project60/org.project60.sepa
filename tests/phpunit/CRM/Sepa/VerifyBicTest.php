@@ -22,19 +22,19 @@ use CRM_Sepa_ExtensionUtil as E;
  * @group headless
  */
 class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
-  const TEST_BIC_SHORT = 'COLSDE33';
+  private const TEST_BIC_SHORT = 'COLSDE33';
   // 8th digit is a zero, meaning this is a test BIC.
-  const TEST_BIC_TEST_CODE = 'ABCDDE30XXX';
+  private const TEST_BIC_TEST_CODE = 'ABCDDE30XXX';
   // 8th digit is a one, meaning the owner of the BIC is passive SWIFT member.
-  const TEST_BIC_PASSIVE_MEMBER_CODE = 'ABCDDE31XXX';
+  private const TEST_BIC_PASSIVE_MEMBER_CODE = 'ABCDDE31XXX';
   // 8th digit is a two, marking that the receiver pays the transaction cost.
-  const TEST_BIC_TRANSACTION_COST_CODE = 'ABCDDE32XXX';
+  private const TEST_BIC_TRANSACTION_COST_CODE = 'ABCDDE32XXX';
   // 7th digit must not be zero or one.
-  const TEST_BIC_INVALID_LOCATION = 'BELADE0EXXX';
-  const TEST_BIC_WRONG_FOR_IBAN = 'BELADEBEXXX';
+  private const TEST_BIC_INVALID_LOCATION = 'BELADE0EXXX';
+  private const TEST_BIC_WRONG_FOR_IBAN = 'BELADEBEXXX';
   // Correct format but does not exist.
-  const TEST_BIC_NONEXISTENT = 'ABCDDE33XXX';
-  const TEST_BIC_INCORRECT = 'INCORRECT';
+  private const TEST_BIC_NONEXISTENT = 'ABCDDE33XXX';
+  private const TEST_BIC_INCORRECT = 'INCORRECT';
 
   public function setUp(): void {
     parent::setUp();
@@ -43,7 +43,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
 
   /**
    * Test that a valid BIC works.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function testValidBic() {
     $this->createMandate(
@@ -57,7 +57,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
 
   /**
    * Test that a short BIC works.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function testShortBic() {
     $this->createMandate(
@@ -71,7 +71,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
 
   /**
    * Test that a test BIC works.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function testTestBic() {
     $this->createMandate(
@@ -85,7 +85,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
 
   /**
    * Test that the BIC of a passive SWIFT member works.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function testPassiveSwiftMemberBic() {
     $this->createMandate(
@@ -99,7 +99,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
 
   /**
    * Test that a BIC with a marking that the receiver pays the transaction cost works.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function testReceiverPaysTransactionCostBic() {
     $this->createMandate(
@@ -113,7 +113,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
 
   /**
    * Test that a BIC with an invalid location code fails.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function testInvalidLocationBic() {
     $this->assertException(
@@ -127,13 +127,13 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
           ]
         );
       },
-      E::ts('Invalid BIC location detection fails!')
+      'Invalid BIC location detection fails!'
     );
   }
 
   /**
    * Test that a BIC not matching the IBAN but being correct and real fails.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function disabled_testWrongBicForIbanFails() {
     self::markTestSkipped(
@@ -149,13 +149,13 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
           'bic' => self::TEST_BIC_WRONG_FOR_IBAN,
         ]);
       },
-      E::ts('Wrong BIC for IBAN detection fails!')
+      'Wrong BIC for IBAN detection fails!'
     );
   }
 
   /**
    * Test that a BIC with correct format but not in use fails.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function disabled_testNonexistentBic() {
     self::markTestSkipped(
@@ -171,13 +171,13 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
           'bic' => self::TEST_BIC_NONEXISTENT,
         ]);
       },
-      E::ts('Nonexistent BIC detection fails!')
+      'Nonexistent BIC detection fails!'
     );
   }
 
   /**
    * Test that an incorrect BIC fails.
-   * @see Case_ID V01
+   * See Case_ID V01.
    */
   public function testIncorrectBicFails() {
     $this->assertException(
@@ -191,13 +191,13 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
           ]
         );
       },
-      E::ts('Incorrect BIC detection fails!')
+      'Incorrect BIC detection fails!'
     );
   }
 
   /**
    * Test that a PSP creator accepts incorrect BICs.
-   * @see Case_ID V02
+   * See Case_ID V02.
    */
   public function testPspCreatorAcceptsIncorrectBic() {
     $this->setCreditorConfiguration('creditor_type', 'PSP');

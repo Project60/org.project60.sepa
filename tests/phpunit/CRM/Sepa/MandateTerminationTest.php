@@ -41,7 +41,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
 
   /**
    * Test the legal termination of an OOFF mandate.
-   * @see Case_ID T01
+   * See Case_ID T01.
    */
   public function testOOFFLegalTerminate() {
     $mandate = $this->createMandate(
@@ -67,7 +67,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
       function() use ($contribution) {
         $this->getTransactionGroupForContribution($contribution);
       },
-      E::ts('There should be no transaction group be associated with the mandate after terminating.')
+      'There should be no transaction group be associated with the mandate after terminating.'
     );
 
     $this->executeBatching(self::MANDATE_TYPE_OOFF);
@@ -83,13 +83,14 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
       function() use ($contributionForRetesting) {
         $this->getTransactionGroupForContribution($contributionForRetesting);
       },
-      E::ts('The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.')
+      // phpcs:ignore Generic.Files.LineLength.TooLong
+      'The mandate is probably incorrectly regrouped again after terminating thus is associated with a transaction group.'
     );
   }
 
   /**
    * Test the illegal termination of an OOFF mandate after it has been closed..
-   * @see Case_ID T02
+   * See Case_ID T02.
    */
   public function testOOFFTerminateAfterClosingFails() {
     $mandate = $this->createMandate(
@@ -113,7 +114,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
       function() use ($mandate) {
         $this->terminateMandate($mandate);
       },
-      E::ts('It must not be allowed to terminate the mandate after the group has been closed.')
+      'It must not be allowed to terminate the mandate after the group has been closed.'
     );
 
     $closedMandate = $this->getMandate($mandate['id']);
@@ -121,18 +122,18 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
     $this->assertNotSame(
       self::MANDATE_STATUS_INVALID,
       $closedMandate['status'],
-      E::ts('The mandate has been illegally terminated after closing.')
+      'The mandate has been illegally terminated after closing.'
     );
     $this->assertSame(
       self::MANDATE_STATUS_SENT,
       $closedMandate['status'],
-      E::ts('The mandate status has been illegally touched after closing.')
+      'The mandate status has been illegally touched after closing.'
     );
   }
 
   /**
    * Test the termination of an RCUR mandate.
-   * @see Case_ID T03
+   * See Case_ID T03.
    */
   public function testRCURTerminate() {
     $mandate = $this->createMandate(
@@ -159,7 +160,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
       function() use ($contribution) {
         $this->getTransactionGroupForContribution($contribution);
       },
-      E::ts('There should be no transaction group be associated with the mandate after terminating.')
+      'There should be no transaction group be associated with the mandate after terminating.'
     );
 
     $this->executeBatching(self::MANDATE_TYPE_FRST);
@@ -170,12 +171,12 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
     $this->assertSame(self::MANDATE_STATUS_COMPLETE, $mandateForRetesting['status']);
 
     $contributionForRetesting = $this->getLatestContributionForMandate($mandateForRetesting, TRUE);
-    $this->assertNULL($contributionForRetesting, E::ts('A new contribution has been created for a terminated mandate.'));
+    $this->assertNULL($contributionForRetesting, 'A new contribution has been created for a terminated mandate.');
   }
 
   /**
    * Test the termination of an RCUR mandate after it's collection date.
-   * @see Case_ID T04
+   * See Case_ID T04.
    */
   public function testRCURTerminateAfterCollectionDate() {
     $mandate = $this->createMandate(
@@ -202,12 +203,16 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
     $endDate = date('Y-m-d', strtotime($endDateString));
 
     // At this point, the end date must be set but the mandate NOT be terminated yet!
-    $this->assertNotSame(self::MANDATE_STATUS_INVALID, $mandate['status'], E::ts('The mandate has been incorrectly terminated.'));
-    $this->assertNotNull($transactionGroup, E::ts('The mandate is not in the transaction group anymore but should be.'));
+    $this->assertNotSame(
+      self::MANDATE_STATUS_INVALID,
+      $mandate['status'],
+      'The mandate has been incorrectly terminated.'
+    );
+    $this->assertNotNull($transactionGroup, 'The mandate is not in the transaction group anymore but should be.');
 
     // verify end date
     $recurring_contribution = $this->getRecurringContributionForMandate($mandate);
-    $this->assertSameDate($endDate, $recurring_contribution['end_date'], E::ts('The end date is not correct.'));
+    $this->assertSameDate($endDate, $recurring_contribution['end_date'], 'The end date is not correct.');
 
     $this->executeBatching(self::MANDATE_TYPE_FRST, '+1 month');
     $this->executeBatching(self::MANDATE_TYPE_RCUR, '+1 month');
@@ -220,7 +225,7 @@ class CRM_Sepa_MandateTerminationTest extends CRM_Sepa_TestBase {
     $this->assertSame(
       $transactionGroup['id'],
       $transactionGroupAfterSecondBatching['id'],
-      E::ts('The mandate has been incorrectly regrouped.')
+      'The mandate has been incorrectly regrouped.'
     );
   }
 

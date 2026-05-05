@@ -78,23 +78,37 @@ abstract class AbstractMandateJoin extends SimpleJoin {
    * @param array $joinConfiguration
    *   The current join configuration
    */
-  public function buildConfigurationForm(CRM_Core_Form $form, SourceInterface $joinFromSource, $joinableToSources, $joinConfiguration = []) {
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+  public function buildConfigurationForm(
+    CRM_Core_Form $form,
+    SourceInterface $joinFromSource,
+    $joinableToSources,
+    $joinConfiguration = []
+  ) {
     $leftFieldCallback = NULL;
     $lookForRightSddEntityIdField = TRUE;
-    if ($joinFromSource->getDataFlow() instanceof SqlTableDataFlow && $joinFromSource->getDataFlow()->getTable() == 'civicrm_sdd_mandate') {
+    if (
+      $joinFromSource->getDataFlow() instanceof SqlTableDataFlow
+      && $joinFromSource->getDataFlow()->getTable() == 'civicrm_sdd_mandate'
+    ) {
       $leftFieldCallback = [$this, 'filterEntityIdField'];
       $lookForRightSddEntityIdField = FALSE;
     }
     $leftFields = [];
     try {
-      $leftFields = CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource($joinFromSource, '', '', $leftFieldCallback);
+      $leftFields = CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource(
+        $joinFromSource,
+        '',
+        '',
+        $leftFieldCallback
+      );
     }
     catch (Exception $e) {
       // @ignoreException
     }
 
     try {
-      $form->add('select', 'left_field', ts('Select field'), $leftFields, TRUE, [
+      $form->add('select', 'left_field', E::ts('Select field'), $leftFields, TRUE, [
         'style' => 'min-width:250px',
         'class' => 'crm-select2 huge',
         'placeholder' => E::ts('- select -'),
@@ -107,15 +121,29 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     $rightFields = [];
     foreach ($joinableToSources as $joinToSource) {
       try {
-        if ($lookForRightSddEntityIdField && $joinToSource->getDataFlow() instanceof SqlTableDataFlow && $joinToSource->getDataFlow()
-          ->getTable() == 'civicrm_sdd_mandate') {
-          $rightFields = array_merge($rightFields, CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource($joinToSource, $joinToSource->getSourceTitle() . ' :: ', $joinToSource->getSourceName() . '::', [
-            $this,
-            'filterEntityIdField',
-          ]));
+        if (
+          $lookForRightSddEntityIdField && $joinToSource->getDataFlow() instanceof SqlTableDataFlow
+          && $joinToSource->getDataFlow()->getTable() == 'civicrm_sdd_mandate'
+        ) {
+          $rightFields = array_merge(
+            $rightFields,
+            CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource(
+              $joinToSource,
+              $joinToSource->getSourceTitle() . ' :: ',
+              $joinToSource->getSourceName() . '::',
+              [$this, 'filterEntityIdField']
+            )
+          );
         }
         elseif (!$lookForRightSddEntityIdField) {
-          $rightFields = array_merge($rightFields, CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource($joinToSource, $joinToSource->getSourceTitle() . ' :: ', $joinToSource->getSourceName() . '::'));
+          $rightFields = array_merge(
+            $rightFields,
+            CRM_Dataprocessor_Utils_DataSourceFields::getAvailableFieldsInDataSource(
+              $joinToSource,
+              $joinToSource->getSourceTitle() . ' :: ',
+              $joinToSource->getSourceName() . '::'
+            )
+          );
         }
       }
       catch (Exception $e) {
@@ -124,7 +152,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     }
 
     try {
-      $form->add('select', 'right_field', ts('Select field'), $rightFields, TRUE, [
+      $form->add('select', 'right_field', E::ts('Select field'), $rightFields, TRUE, [
         'style' => 'min-width:250px',
         'class' => 'crm-select2 huge',
         'placeholder' => E::ts('- select -'),
@@ -135,7 +163,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     }
 
     try {
-      $form->add('select', 'mandate_join_type', ts('Type'), [
+      $form->add('select', 'mandate_join_type', E::ts('Type'), [
         'INNER' => E::ts('Required'),
         'LEFT' => E::ts('Not required'),
       ], TRUE, [
@@ -236,7 +264,10 @@ abstract class AbstractMandateJoin extends SimpleJoin {
     $tablePart = '';
     $joinClause = '';
     $mandateTableAlias = "`$this->left_table`";
-    if ($this->right_source->getDataFlow() instanceof SqlTableDataFlow && $this->right_source->getDataFlow()->getTable() == 'civicrm_sdd_mandate') {
+    if (
+      $this->right_source->getDataFlow() instanceof SqlTableDataFlow
+      && $this->right_source->getDataFlow()->getTable() == 'civicrm_sdd_mandate'
+    ) {
       $mandateTableAlias = "`$this->right_table`";
     }
     if ($sourceDataFlowDescription->getJoinSpecification()) {
@@ -250,7 +281,8 @@ abstract class AbstractMandateJoin extends SimpleJoin {
         $rightColumnName = $this->rightFieldSpec->getSqlColumnName($this->right_table);
       }
 
-      $joinClauses[] = "($leftColumnName = $rightColumnName AND $mandateTableAlias.`entity_table` = '" . $this->getEntityTable() . "')";
+      $joinClauses[] = "($leftColumnName = $rightColumnName
+        AND $mandateTableAlias.`entity_table` = '" . $this->getEntityTable() . "')";
       $joinClause = 'ON (' . implode(' OR ', $joinClauses) . ')';
     }
     if ($sourceDataFlowDescription->getDataFlow() instanceof SqlDataFlow) {

@@ -19,6 +19,7 @@ use CRM_Sepa_ExtensionUtil as E;
 /**
  * A custom contact search
  */
+// phpcs:ignore Generic.Files.LineLength.TooLong
 class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   public function __construct(&$formValues) {
@@ -95,6 +96,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * @return string, sql
    */
   public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
+    // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
     // delegate to $this->sql(), $this->select(), $this->from(), $this->where(), etc.
     $query = $this->sql($this->select(), $offset, $rowcount, $sort, $includeContactIDs, NULL);
     return $query;
@@ -173,16 +175,6 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    */
   public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
-  }
-
-  /**
-   * Modify the content of each row
-   *
-   * @param array $row modifiable SQL result row
-   * @return void
-   */
-  public function alterRow(&$row) {
-    //    $row['sort_name'] .= ' ( altered )';
   }
 
 }

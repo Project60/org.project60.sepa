@@ -51,11 +51,16 @@
     <rule ref="Generic.NamingConventions.AbstractClassNamePrefix"/>
     <rule ref="Generic.NamingConventions.InterfaceNameSuffix"/>
     <rule ref="Generic.NamingConventions.TraitNameSuffix"/>
-    <rule ref="Generic.PHP.RequireStrictTypes"/>
+    <!-- TODO: Add type hints, resolve phpstan type errors, declare strict types, and enable sniff. -->
+    <!--<rule ref="Generic.PHP.RequireStrictTypes"/>-->
     <rule ref="PSR1.Files.SideEffects"/>
     <rule ref="PSR12.Classes.ClassInstantiation"/>
     <rule ref="PSR12.Properties.ConstantVisibility"/>
-    <rule ref="Squiz.PHP.CommentedOutCode"/>
+    <rule ref="Squiz.PHP.CommentedOutCode">
+      <properties>
+        <property name="maxPercentage" value="40"/>
+      </properties>
+    </rule>
     <rule ref="Squiz.PHP.GlobalKeyword"/>
     <rule ref="Squiz.Strings.DoubleQuoteUsage">
         <exclude name="Squiz.Strings.DoubleQuoteUsage.ContainsVar"/>

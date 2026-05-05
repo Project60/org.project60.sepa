@@ -33,12 +33,31 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    */
   public function getConfigurationSpecification() {
     return new SpecificationBag([
-      new Specification('default_creditor_id', 'Integer', E::ts('Creditor (default)'), TRUE, NULL, NULL, $this->getCreditors(), FALSE),
-      new Specification('default_financial_type_id', 'Integer', E::ts('Financial Type (default)'), TRUE, NULL, NULL, $this->getFinancialTypes(), FALSE),
-      new Specification('default_campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
-      new Specification('default_frequency', 'Integer', E::ts('Frequency (default)'), TRUE, 12, NULL, $this->getFrequencies()),
-      new Specification('default_cycle_day', 'Integer', E::ts('Collection Day (default)'), FALSE, 0, NULL, $this->getCollectionDays()),
-      new Specification('buffer_days', 'Integer', E::ts('Buffer Days'), TRUE, 7),
+      new Specification(
+        'default_creditor_id', 'Integer', E::ts('Creditor (default)'), TRUE, NULL, NULL, $this->getCreditors(), FALSE
+      ),
+      new Specification(
+        'default_financial_type_id',
+        'Integer',
+        E::ts('Financial Type (default)'),
+        TRUE,
+        NULL,
+        NULL,
+        $this->getFinancialTypes(),
+        FALSE
+      ),
+      new Specification(
+        'default_campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE
+      ),
+      new Specification(
+        'default_frequency', 'Integer', E::ts('Frequency (default)'), TRUE, 12, NULL, $this->getFrequencies()
+      ),
+      new Specification(
+        'default_cycle_day', 'Integer', E::ts('Collection Day (default)'), FALSE, 0, NULL, $this->getCollectionDays()
+      ),
+      new Specification(
+        'buffer_days', 'Integer', E::ts('Buffer Days'), TRUE, 7
+      ),
     ]);
   }
 
@@ -49,7 +68,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    */
   public function getParameterSpecification() {
     return new SpecificationBag([
-        // required fields
+      // required fields
       new Specification('contact_id', 'Integer', E::ts('Contact ID'), TRUE),
       new Specification('account_holder', 'String', E::ts('Account Holder'), FALSE),
       new Specification('iban', 'String', E::ts('IBAN'), TRUE),
@@ -58,16 +77,43 @@ class CreateRecurringMandate extends CreateOneOffMandate {
       new Specification('source', 'String', E::ts('Source'), FALSE),
       new Specification('amount', 'Money', E::ts('Amount'), FALSE),
 
-        // recurring information
+      // recurring information
       new Specification('frequency', 'Integer', E::ts('Frequency'), FALSE, 12, NULL, $this->getFrequencies()),
       new Specification('cycle_day', 'Integer', E::ts('Collection Day'), FALSE, 1, NULL, $this->getCollectionDays()),
 
-        // basic overrides
-      new Specification('creditor_id', 'Integer', E::ts('Creditor (Leave empty to use default)'), FALSE, NULL, NULL, $this->getCreditors(), FALSE),
-      new Specification('financial_type_id', 'Integer', E::ts('Financial Type (Leave empty to use default)'), FALSE, NULL, NULL, $this->getFinancialTypes(), FALSE),
-      new Specification('campaign_id', 'Integer', E::ts('Campaign (Leave empty to use default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
+      // basic overrides
+      new Specification(
+        'creditor_id',
+        'Integer',
+        E::ts('Creditor (Leave empty to use default)'),
+        FALSE,
+        NULL,
+        NULL,
+        $this->getCreditors(),
+        FALSE
+      ),
+      new Specification(
+        'financial_type_id',
+        'Integer',
+        E::ts('Financial Type (Leave empty to use default)'),
+        FALSE,
+        NULL,
+        NULL,
+        $this->getFinancialTypes(),
+        FALSE
+      ),
+      new Specification(
+        'campaign_id',
+        'Integer',
+        E::ts('Campaign (Leave empty to use default)'),
+        FALSE,
+        NULL,
+        NULL,
+        $this->getCampaigns(),
+        FALSE
+      ),
 
-        // dates
+      // dates
       new Specification('start_date', 'Date', E::ts('Start Date'), FALSE, date('Y-m-d H:i:s')),
       new Specification('date', 'Date', E::ts('Signature Date'), FALSE, date('Y-m-d H:i:s')),
       new Specification('validation_date', 'Date', E::ts('Validation Date'), FALSE, date('Y-m-d H:i:s')),
@@ -86,8 +132,12 @@ class CreateRecurringMandate extends CreateOneOffMandate {
     return new SpecificationBag([
       new Specification('mandate_id', 'Integer', E::ts('Mandate ID'), FALSE, NULL, NULL, NULL, FALSE),
       new Specification('mandate_reference', 'String', E::ts('Mandate Reference'), FALSE, NULL, NULL, NULL, FALSE),
-      new Specification('recurring_contribution_id', 'Integer', E::ts('Recurring Contribution ID'), FALSE, NULL, NULL, NULL, FALSE),
-      new Specification('error', 'String', E::ts('Error Message (if creation failed)'), FALSE, NULL, NULL, NULL, FALSE),
+      new Specification(
+        'recurring_contribution_id', 'Integer', E::ts('Recurring Contribution ID'), FALSE, NULL, NULL, NULL, FALSE
+      ),
+      new Specification(
+        'error', 'String', E::ts('Error Message (if creation failed)'), FALSE, NULL, NULL, NULL, FALSE
+      ),
     ]);
   }
 
@@ -103,7 +153,21 @@ class CreateRecurringMandate extends CreateOneOffMandate {
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
     $mandate_data = ['type' => 'RCUR'];
     // add basic fields
-    foreach (['contact_id', 'account_holder', 'iban', 'bic', 'reference', 'amount', 'start_date', 'date', 'validation_date', 'source', 'creation_date'] as $parameter_name) {
+    foreach (
+      [
+        'contact_id',
+        'account_holder',
+        'iban',
+        'bic',
+        'reference',
+        'amount',
+        'start_date',
+        'date',
+        'validation_date',
+        'source',
+        'creation_date',
+      ] as $parameter_name
+    ) {
       $value = $parameters->getParameter($parameter_name);
       if (!empty($value)) {
         $mandate_data[$parameter_name] = $value;
@@ -209,7 +273,9 @@ class CreateRecurringMandate extends CreateOneOffMandate {
         $creditor_id = $default_creditor->id;
       }
       else {
-        \Civi::log()->notice('CreateRecurringMandate action: No creditor, and no default creditor set! Using cycle day 1');
+        \Civi::log()->notice(
+          'CreateRecurringMandate action: No creditor, and no default creditor set! Using cycle day 1'
+        );
         return 1;
       }
     }

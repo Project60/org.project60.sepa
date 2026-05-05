@@ -71,6 +71,7 @@ function _civicrm_api3_sepa_mandate_create_spec(&$params) {
  *
  * @return array API result array
  */
+// phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 function civicrm_api3_sepa_mandate_createfull($params) {
   // TODO: more sanity checks?
 
@@ -90,7 +91,10 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     $mandate_status = 'RCUR';
   }
   $rcur_pi_status = ($mandate_status == 'OOFF') ? 'OOFF' : 'RCUR';
-  $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $rcur_pi_status);
+  $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor(
+    $params['creditor_id'],
+    $rcur_pi_status
+  );
   if (empty($params['payment_instrument_id'])) {
     // no payment instrument given, see if there is a unique one set
     if (count($eligible_payment_instruments) == 1) {
@@ -100,18 +104,27 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     }
     elseif (count($eligible_payment_instruments) == 0) {
       // no payment instrument -> disabled
-      throw new CRM_Core_Exception("{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
+      throw new CRM_Core_Exception(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        "{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set."
+      );
     }
     else {
       // unclear which one to take
-      throw new CRM_Core_Exception("You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
+      throw new CRM_Core_Exception(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        "You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options."
+      );
     }
 
   }
   else {
     // a payment instrument is set, verify that it's allowed
     if (!array_key_exists($params['payment_instrument_id'], $eligible_payment_instruments)) {
-      throw new CRM_Core_Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}].");
+      throw new CRM_Core_Exception(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        "Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}]."
+      );
     }
   }
 
@@ -120,7 +133,9 @@ function civicrm_api3_sepa_mandate_createfull($params) {
       is_numeric($params['financial_type_id'] ?? NULL)
       && !array_key_exists($params['financial_type_id'], \Civi\Sepa\Util\ContributionUtil::getFinancialTypeList())
     ) {
-    throw new CRM_Core_Exception("No permission for creating SEPA mandates with financial type [{$params['financial_type_id']}].");
+    throw new CRM_Core_Exception(
+      "No permission for creating SEPA mandates with financial type [{$params['financial_type_id']}]."
+    );
   }
 
   // if BIC is used for this creditor, it is required (see #245)
@@ -135,7 +150,6 @@ function civicrm_api3_sepa_mandate_createfull($params) {
 
   // copy array
   $create_contribution = $params;
-  $create_contribution['version'] = 3;
   if (isset($create_contribution['contribution_contact_id'])) {
     // in case someone wants another contact for the contribution than for the mandate...
     $create_contribution['contact_id'] = $create_contribution['contribution_contact_id'];
@@ -145,7 +159,11 @@ function civicrm_api3_sepa_mandate_createfull($params) {
   }
 
   if (empty($create_contribution['contribution_status_id'])) {
-    $create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
   }
 
   if ($params['type'] == 'RCUR') {
@@ -190,7 +208,6 @@ function civicrm_api3_sepa_mandate_createfull($params) {
   // TODO: sanity checks
   // copy array
   $create_mandate = $create_contribution;
-  $create_mandate['version'] = 3;
   $create_mandate['entity_table'] = $contribution_table;
   $create_mandate['entity_id'] = $contribution['id'];
   $mandate = civicrm_api3('SepaMandate', 'create', $create_mandate);
@@ -198,7 +215,9 @@ function civicrm_api3_sepa_mandate_createfull($params) {
     // this didn't work, so we also have to roll back the created contribution
     $delete = civicrm_api3($contribution_entity, 'delete', ['id' => $contribution['id']]);
     if (!empty($delete['is_error'])) {
-      Civi::log()->debug("org.project60.sepa: createfull couldn't roll back created contribution: " . $delete['error_message']);
+      Civi::log()->debug(
+        "org.project60.sepa: createfull couldn't roll back created contribution: " . $delete['error_message']
+      );
     }
   }
   return $mandate;
@@ -352,6 +371,7 @@ function civicrm_api3_sepa_mandate_update_next_scheduled_date($params) {
   if ($params['mode'] == 'empty') {
     $restrictions[] = 'civicrm_contribution_recur.next_sched_contribution_date IS NULL';
   }
+  // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedElseif
   elseif ($params['mode'] == 'all') {
     // no extra restrictions
   }
@@ -379,7 +399,9 @@ function civicrm_api3_sepa_mandate_update_next_scheduled_date($params) {
     civicrm_contribution_recur.id   AS civicrm_contribution_recur_id,
     civicrm_sdd_mandate.creditor_id AS creditor_id
   FROM civicrm_contribution_recur
-  LEFT JOIN civicrm_sdd_mandate ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+  LEFT JOIN civicrm_sdd_mandate
+    ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
+    AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
   WHERE {$restrictions_sql}
   ORDER BY civicrm_sdd_mandate.creditor_id";
 
@@ -434,14 +456,11 @@ function civicrm_api3_sepa_mandate_delete($params) {
 /**
  * Retrieve one or more sepa_mandates
  *
- * @param  array input parameters
- *
- *
  * @example SepaCreditorGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array<string, mixed> $params an associative array of name/value pairs.
  *
- * @return  array api result array
+ * @return array<string, mixed> api result array
  *   {@getfields sepa_mandate_get}
  * @access public
  */

@@ -181,6 +181,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $from = date('Ymd000000', strtotime(date('YmdHis') . ' - 90 days'));
     $presets["{$from}-now"] = E::ts('Last 90 Days');
 
+    // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
     // DEFAULT: add "last month"
     $from = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 month'));
     $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
@@ -197,6 +198,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $to   = date('YmdHis', strtotime(date('Y-m-01') . ' - 1 second'));
     $presets["{$from}-{$to}"] = E::ts('Last 12 Calendar Months (!)');
 
+    // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
     // finally: add custom option
     // TODO: implement: $presets['custom'] = E::ts('Custom Range');
     return $presets;
@@ -247,9 +249,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     return [
       '1' => E::ts('annually'),
       '2' => E::ts('semi-annually'),
-      // "3" => E::ts("3-monthly"),
       '4' => E::ts('quarterly'),
-      // "6" => E::ts("bi-monthly"),
       '12' => E::ts('monthly'),
     ];
   }

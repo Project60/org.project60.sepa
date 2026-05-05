@@ -73,7 +73,7 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase {
 
   /**
    * Test the integrity of an OOFF mandate reference.
-   * @see Case_ID R01
+   * See Case_ID R01.
    */
   public function testOOFFMandateReference() {
     $mandate = $this->createMandate(
@@ -82,12 +82,12 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase {
       ]
     );
 
-    $this->assertValidMandateReference($mandate['reference'], E::ts('The OOFF mandate reference is invalid.'));
+    $this->assertValidMandateReference($mandate['reference'], 'The OOFF mandate reference is invalid.');
   }
 
   /**
    * Test the integrity of a RCUR mandate reference.
-   * @see Case_ID R02
+   * See Case_ID R02.
    */
   public function testRCURMandateReference() {
     $mandate = $this->createMandate(
@@ -96,13 +96,13 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase {
       ]
     );
 
-    $this->assertValidMandateReference($mandate['reference'], E::ts('The RCUR mandate reference is invalid.'));
+    $this->assertValidMandateReference($mandate['reference'], 'The RCUR mandate reference is invalid.');
   }
 
   /**
    * Test to ensure OOFF reference collisions are detected
    *
-   * @see Case_ID R03
+   * See Case_ID R03.
    */
   public function testOOFFMandateReferenceCollision() {
     // enable usage of static reference
@@ -139,7 +139,7 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase {
   /**
    * Test to ensure RCUR reference collisions are detected
    *
-   * @see Case_ID R03
+   * See Case_ID R03.
    */
   public function testRCURMandateReferenceCollision() {
     // enable usage of static reference

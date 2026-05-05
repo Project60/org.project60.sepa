@@ -30,7 +30,14 @@
 function civicrm_api3_sepa_logic_get_retry_stats($params) {
   $stats = CRM_Sepa_Logic_Retry::getStats($params);
   $dao = NULL;
-  return civicrm_api3_create_success($stats['contribution_count'], $params, 'SepaLogic', 'get_retry_stats', $dao, $stats);
+  return civicrm_api3_create_success(
+    $stats['contribution_count'],
+    $params,
+    'SepaLogic',
+    'get_retry_stats',
+    $dao,
+    $stats
+  );
 }
 
 /**
@@ -116,16 +123,16 @@ function _civicrm_api3_sepa_logic_close_spec(&$params) {
  *
  * This method will create the SDD file for the given group
  *
- * @param txgroup_id  the transaction group for which the file should be created
- * @param override    if true, will override an already existing file and create a new one
- *
+ * @param array{txgroup_id: int|numeric-string, override: bool} $params
+ *   txgroup_id: the transaction group for which the file should be created.
+ *   override: if true, will override an already existing file and create a new one.
  */
 function civicrm_api3_sepa_logic_createxml($params) {
   $override = (isset($params['override'])) ? $params['override'] : FALSE;
 
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
   if (is_numeric($result)) {
-    // this was succesfull -> load the sepa file
+    // this was successful -> load the sepa file
     return civicrm_api3('SepaSddFile', 'getsingle', ['id' => $result]);
   }
   else {

@@ -20,9 +20,6 @@
  * @package CiviCRM_SEPA
  * @todo: deprecated, fix
  */
-
-require_once 'CRM/Core/Page.php';
-
 class CRM_Sepa_Page_Mandate extends CRM_Core_Page {
 
   public function run() {

@@ -23,6 +23,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
   /**
    * load mandate information
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function run() {
     CRM_Utils_System::setTitle(E::ts('SEPA Mandates'));
     $contactId = CRM_Utils_Request::retrieve('cid', 'Integer');
@@ -210,13 +211,16 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       $mandate_id_list = implode(',', array_keys($rcurList));
       $fail_sequence = "
         SELECT
-         civicrm_sdd_mandate.id AS mandate_id,
-         GROUP_CONCAT(
-          IF(civicrm_contribution.contribution_status_id IN (1,2,5), '0', '1')
-          SEPARATOR '')        AS fail_sequence
+          civicrm_sdd_mandate.id AS mandate_id,
+          GROUP_CONCAT(
+            IF(civicrm_contribution.contribution_status_id IN (1,2,5), '0', '1')
+            SEPARATOR ''
+          ) AS fail_sequence
         FROM civicrm_sdd_mandate
-        LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
-        LEFT JOIN civicrm_contribution       ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
+        LEFT JOIN civicrm_contribution_recur
+          ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
+        LEFT JOIN civicrm_contribution
+          ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
         WHERE civicrm_sdd_mandate.id IN ({$mandate_id_list})
           AND civicrm_sdd_mandate.type = 'RCUR'
           AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'

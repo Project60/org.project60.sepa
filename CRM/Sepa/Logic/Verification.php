@@ -14,9 +14,11 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-require_once 'packages/php-iban-1.4.0/php-iban.php';
-
 use CRM_Sepa_ExtensionUtil as E;
+
+// phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
+require_once E::path('packages/php-iban-1.4.0/php-iban.php');
+// phpcs:enable
 
 class CRM_Sepa_Logic_Verification {
 
@@ -67,9 +69,9 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Verifies if the given IBAN is formally correct
    *
-   * @param iban  string, IBAN candidate
+   * @param string $iban IBAN candidate
    *
-   * @return NULL if given IBAN is valid, localized error message otherwise
+   * @return null|string NULL if given IBAN is valid, localized error message otherwise
    */
   public static function verifyIBAN($iban, $type = 'SEPA') {
     // first: check if blocklisted (#540)
@@ -187,7 +189,9 @@ class CRM_Sepa_Logic_Verification {
     $anonymised_count = strlen($iban) - 2 * $reveal_count;
 
     // compile anonymised string
-    return substr($iban, 0, $reveal_count) . str_repeat($placeholder, $anonymised_count) . substr($iban, (strlen($iban) - $reveal_count), $reveal_count);
+    return substr($iban, 0, $reveal_count)
+      . str_repeat($placeholder, $anonymised_count)
+      . substr($iban, (strlen($iban) - $reveal_count), $reveal_count);
   }
 
   /**
@@ -238,9 +242,9 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Verifies if the given BIC is formally correct
    *
-   * @param bic  string, BIC candidate
+   * @param string $bic BIC candidate
    *
-   * @return NULL if given BIC is valid, localized error message otherwise
+   * @return null|string NULL if given BIC is valid, localized error message otherwise
    */
   public static function verifyBIC($bic, $type = 'SEPA') {
     switch ($type) {

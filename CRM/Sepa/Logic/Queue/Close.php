@@ -47,7 +47,11 @@ class CRM_Sepa_Logic_Queue_Close {
    *
    * @phpstan-param list<int> $txgroup_ids
    */
-  public static function launchCloseRunner(array $txgroup_ids, int $target_group_status, int $target_contribution_status): void {
+  public static function launchCloseRunner(
+    array $txgroup_ids,
+    int $target_group_status,
+    int $target_contribution_status
+  ): void {
     $asyncLockId = uniqid('', TRUE);
     if (!SepaBatchLockManager::getInstance()->acquire(0, $asyncLockId)) {
       CRM_Core_Session::setStatus(E::ts('Cannot close group, another update is in progress!'), E::ts('Error'), 'error');
@@ -63,7 +67,11 @@ class CRM_Sepa_Logic_Queue_Close {
     ]);
 
     // is this a received runner?
-    $is_received_runner = $target_contribution_status == (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $is_received_runner = $target_contribution_status == (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Completed'
+      );
 
     // fetch the groups
     $txgroups = \Civi\Api4\SepaTransactionGroup::get(TRUE)
@@ -79,21 +87,30 @@ class CRM_Sepa_Logic_Queue_Close {
     foreach ($txgroups as $txgroup) {
       // first: set group status to busy
 
-      $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $group_status_id_busy, $asyncLockId));
+      $queue->createItem(new CRM_Sepa_Logic_Queue_Close(
+        'set_group_status', $txgroup, $group_status_id_busy, $asyncLockId
+      ));
 
       // count the contributions and create an appropriate amount of items
-      $contribution_count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(contribution_id) FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id={$txgroup['id']}");
+      $contribution_count = CRM_Core_DAO::singleValueQuery(
+        "SELECT COUNT(contribution_id) FROM civicrm_sdd_contribution_txgroup
+        WHERE txgroup_id={$txgroup['id']}"
+      );
       // security margin
       $contribution_count += SDD_CLOSE_RUNNER_BATCH_SIZE;
       for ($offset = 0; $offset <= $contribution_count; $offset += SDD_CLOSE_RUNNER_BATCH_SIZE) {
-        $queue->createItem(new CRM_Sepa_Logic_Queue_Close('update_contribution', $txgroup, $target_contribution_status, $asyncLockId, $offset));
+        $queue->createItem(new CRM_Sepa_Logic_Queue_Close(
+          'update_contribution', $txgroup, $target_contribution_status, $asyncLockId, $offset
+        ));
       }
 
       // finally: render XML and mark the group
       if ($is_received_runner) {
         $queue->createItem(new CRM_Sepa_Logic_Queue_Close('create_xml', $txgroup, $target_group_status, $asyncLockId));
       }
-      $queue->createItem(new CRM_Sepa_Logic_Queue_Close('set_group_status', $txgroup, $target_group_status, $asyncLockId));
+      $queue->createItem(new CRM_Sepa_Logic_Queue_Close(
+        'set_group_status', $txgroup, $target_group_status, $asyncLockId
+      ));
 
       $queue->createItem(new CRM_Sepa_Logic_Queue_Close('FINISH', $txgroup, $target_group_status, $asyncLockId));
     }
@@ -116,7 +133,13 @@ class CRM_Sepa_Logic_Queue_Close {
     $runner->runAllViaWeb();
   }
 
-  protected function __construct(string $mode, array $txgroup, int $targetStatusId, string $asyncLockId, ?int $counter = NULL) {
+  protected function __construct(
+    string $mode,
+    array $txgroup,
+    int $targetStatusId,
+    string $asyncLockId,
+    ?int $counter = NULL
+  ) {
     $this->mode = $mode;
     $this->txgroup = $txgroup;
     $this->targetStatusId = $targetStatusId;
@@ -197,7 +220,11 @@ class CRM_Sepa_Logic_Queue_Close {
    * contributions and update their status
    */
   protected function updateContributions() {
-    $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $status_pending = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
     $status_inProgress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
 
     // get eligible contributions (slightly different queries for OOFF/RCUR)
@@ -209,8 +236,11 @@ class CRM_Sepa_Logic_Queue_Close {
           civicrm_contribution.id                     AS contribution_id,
           civicrm_contribution.contribution_status_id AS contribution_status_id
         FROM civicrm_sdd_contribution_txgroup
-        LEFT JOIN civicrm_contribution       ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
-        LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution'
+        LEFT JOIN civicrm_contribution
+          ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
+        LEFT JOIN civicrm_sdd_mandate
+          ON civicrm_sdd_mandate.entity_id = civicrm_contribution.id
+          AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution'
         WHERE civicrm_sdd_contribution_txgroup.txgroup_id = %1
           AND (civicrm_contribution.contribution_status_id = %2 OR civicrm_contribution.contribution_status_id = %3)
           AND (civicrm_contribution.contribution_status_id <> %4)
@@ -231,9 +261,13 @@ class CRM_Sepa_Logic_Queue_Close {
           civicrm_contribution.id                     AS contribution_id,
           civicrm_contribution.contribution_status_id AS contribution_status_id
         FROM civicrm_sdd_contribution_txgroup
-        LEFT JOIN civicrm_contribution       ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
-        LEFT JOIN civicrm_contribution_recur ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
-        LEFT JOIN civicrm_sdd_mandate        ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+        LEFT JOIN civicrm_contribution
+          ON civicrm_contribution.id = civicrm_sdd_contribution_txgroup.contribution_id
+        LEFT JOIN civicrm_contribution_recur
+          ON civicrm_contribution_recur.id = civicrm_contribution.contribution_recur_id
+        LEFT JOIN civicrm_sdd_mandate
+          ON civicrm_sdd_mandate.entity_id = civicrm_contribution_recur.id
+          AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
         WHERE civicrm_sdd_contribution_txgroup.txgroup_id = %1
           AND (civicrm_contribution.contribution_status_id = %2 OR civicrm_contribution.contribution_status_id = %3)
           AND (civicrm_contribution.contribution_status_id <> %4)
@@ -336,14 +370,22 @@ class CRM_Sepa_Logic_Queue_Close {
     }
     if ($this->targetStatusId == $status_inProgress) {
       // this status cannot be set via the API -> use SQL
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN ({$contribution_id_list});");
+      CRM_Core_DAO::executeQuery(
+        "UPDATE civicrm_contribution
+        SET contribution_status_id={$status_inProgress}
+        WHERE id IN ({$contribution_id_list});"
+      );
     }
     else {
       // this should be status 'Completed', but it doesn't really matter
       // first, some sanity checks:
       if (version_compare(CRM_Utils_System::version(), '4.7.0', '>=')) {
         // make sure they're all in status 'In Progress' to avoid SEPA-514
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id={$status_inProgress} WHERE id IN ({$contribution_id_list});");
+        CRM_Core_DAO::executeQuery(
+          "UPDATE civicrm_contribution
+          SET contribution_status_id={$status_inProgress}
+          WHERE id IN ({$contribution_id_list});"
+        );
       }
 
       // then: set them all to the new status

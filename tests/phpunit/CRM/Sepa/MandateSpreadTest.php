@@ -41,7 +41,7 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase {
 
   /**
    * Test a spread of collection dates with timetravel for OOFF mandates.
-   * @see Case_ID M03
+   * See Case_ID M03.
    */
   public function testOOFFSpread() {
     for ($n = 0; $n < 21; $n++) {
@@ -76,7 +76,7 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase {
 
   /**
    * Test a spread of collection dates with timetravel for RCUR mandates.
-   * @see Case_ID M04
+   * See Case_ID M04.
    */
   public function testRCURSpread() {
     for ($n = 0; $n < 21; $n++) {

@@ -79,9 +79,9 @@ class CRM_Sepa_Logic_MandateRepairs {
     $log_stream = fopen($this->log_file, 'aw');
     $prefix = date('[Y-m-d H:i:s] ');
     foreach ($messages as $message) {
-      fputs($log_stream, $prefix);
-      fputs($log_stream, $message);
-      fputs($log_stream, "\n");
+      fwrite($log_stream, $prefix);
+      fwrite($log_stream, $message);
+      fwrite($log_stream, "\n");
     }
     fclose($log_stream);
   }
@@ -95,6 +95,7 @@ class CRM_Sepa_Logic_MandateRepairs {
     $this->repairFrstPaymentInstruments();
     $this->repairInstallmentPaymentInstruments();
 
+    // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
     // detect/repair
     //$this->detectOrphanedPendingContributions();
 
@@ -116,12 +117,19 @@ class CRM_Sepa_Logic_MandateRepairs {
     // run this one only once per process, since it doesn't refer to any mandates
     static $already_run = FALSE;
     if (!$already_run) {
-      $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+      $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'Pending'
+      );
       $orphaned_pending_contribution_ids = $this->getOrphanedContributions($contribution_status_pending);
       if ($orphaned_pending_contribution_ids) {
         $this->log('Orphaned pending contributions detected: ' . implode(',', $orphaned_pending_contribution_ids));
-        $this->addUINotification(E::ts("%1 orphaned open (pending) SEPA contributions were found in the system, i.e. they are not part of a SEPA transaction group, and will not be collected any more. You should delete them by searching for contributions in status 'Pending' with payment instruments RCUR and FRST.",
-          [1 => count($orphaned_pending_contribution_ids)]));
+        $this->addUINotification(E::ts(
+          // phpcs:ignore Generic.Files.LineLength.TooLong
+          "%1 orphaned open (pending) SEPA contributions were found in the system, i.e. they are not part of a SEPA transaction group, and will not be collected any more. You should delete them by searching for contributions in status 'Pending' with payment instruments RCUR and FRST.",
+          [1 => count($orphaned_pending_contribution_ids)]
+        ));
       }
     }
     $already_run = TRUE;
@@ -144,9 +152,15 @@ class CRM_Sepa_Logic_MandateRepairs {
       $contribution_status_in_progress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
       $orphaned_in_progress_contribution_ids = $this->getOrphanedContributions($contribution_status_in_progress);
       if ($orphaned_in_progress_contribution_ids) {
-        $this->log("WARNING: Orphaned contributions in status 'In Progress' detected: " . implode(',', $orphaned_in_progress_contribution_ids));
-        $this->addUINotification(E::ts("WARNING: %1 orphaned active (in Progress) SEPA contributions detected. These may cause irregularities in the generation of the SEPA collection groups, and in particular might cause the same installment to be collected multiple times. You should find them by searching for contributions in status 'in Progress' with the SEPA payment instruments (e.g. RCUR and FRST), and then export (to be safe) and delete them.",
-          [1 => count($orphaned_in_progress_contribution_ids)]));
+        $this->log(
+          "WARNING: Orphaned contributions in status 'In Progress' detected: "
+          . implode(',', $orphaned_in_progress_contribution_ids)
+        );
+        $this->addUINotification(E::ts(
+          // phpcs:ignore Generic.Files.LineLength.TooLong
+          "WARNING: %1 orphaned active (in Progress) SEPA contributions detected. These may cause irregularities in the generation of the SEPA collection groups, and in particular might cause the same installment to be collected multiple times. You should find them by searching for contributions in status 'in Progress' with the SEPA payment instruments (e.g. RCUR and FRST), and then export (to be safe) and delete them.",
+          [1 => count($orphaned_in_progress_contribution_ids)]
+        ));
       }
     }
     $already_run = TRUE;
@@ -163,7 +177,11 @@ class CRM_Sepa_Logic_MandateRepairs {
    */
   protected function repairOpenGroupContributionStatus() {
     // get the status IDs
-    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
     $contribution_status_in_progress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     $batch_status_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
@@ -196,16 +214,22 @@ class CRM_Sepa_Logic_MandateRepairs {
       'id' => $case->contribution_id,
       'contribution_status_id' => $contribution_status_pending
       ]);*/
-      CRM_Core_DAO::executeQuery('
-         UPDATE civicrm_contribution SET contribution_status_id = %1 WHERE id = %2',
+      CRM_Core_DAO::executeQuery(
+         'UPDATE civicrm_contribution SET contribution_status_id = %1 WHERE id = %2',
          [
            1 => [$contribution_status_pending, 'Integer'],
            2 => [$case->contribution_id, 'Integer'],
-         ]);
+         ]
+      );
+      // phpcs:ignore Generic.Files.LineLength.TooLong
       $this->log("Adjusted status of SEPA contribution [{$case->contribution_id}] from [{$case->contribution_status_id}] to status 'Pending'.");
     }
     if ($status_adjustment_counter) {
-      $this->addUINotification(E::ts("Warning: had to adjusted the status of %1 contribution(s) to 'Pending', as they are part of an open transaction group.", [1 => $status_adjustment_counter]));
+      $this->addUINotification(E::ts(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        "Warning: had to adjusted the status of %1 contribution(s) to 'Pending', as they are part of an open transaction group.",
+        [1 => $status_adjustment_counter]
+      ));
     }
   }
 
@@ -255,6 +279,7 @@ class CRM_Sepa_Logic_MandateRepairs {
               'id' => $case->rcur_id,
               'payment_instrument_id' => $rcur_pi_id,
             ]);
+            // phpcs:ignore Generic.Files.LineLength.TooLong
             $this->log("Adjusted SEPA recurring contribution [{$case->rcur_id}] payment instrument from [{$case->rcur_pi}] to [{$rcur_pi_id}]");
           }
         }
@@ -262,7 +287,10 @@ class CRM_Sepa_Logic_MandateRepairs {
     }
 
     if ($pi_adjustment_counter) {
-      $this->addUINotification(E::ts('Adjusted the payment instruments of %1 recurring mandate(s).', [1 => $pi_adjustment_counter]));
+      $this->addUINotification(E::ts(
+        'Adjusted the payment instruments of %1 recurring mandate(s).',
+        [1 => $pi_adjustment_counter]
+      ));
     }
   }
 
@@ -283,7 +311,9 @@ class CRM_Sepa_Logic_MandateRepairs {
     foreach ($creditors as $creditor) {
       $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor['id']);
       if (count($mapping) > 1) {
-        $this->log("repairInstallmentPaymentInstruments doesn't work with multiple mappings (creditor [{$creditor['id']}]");
+        $this->log(
+          "repairInstallmentPaymentInstruments doesn't work with multiple mappings (creditor [{$creditor['id']}]"
+        );
       }
       else {
         foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
@@ -324,15 +354,19 @@ class CRM_Sepa_Logic_MandateRepairs {
                 // just to avoid warnings in unit tests
                 'financial_type_id' => $case->financial_type_id,
               ]);
+              // phpcs:ignore Generic.Files.LineLength.TooLong
               $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}]");
             }
             catch (CRM_Core_Exception $ex) {
               // this is probably an issue with interference with other processes, but we HAVE to fix this:
-              CRM_Core_DAO::executeQuery('UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2',
+              CRM_Core_DAO::executeQuery(
+                'UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2',
                 [
                   1 => [$new_pi, 'Integer'],
                   2 => [$case->contribution_id, 'Integer'],
-                ]);
+                ]
+              );
+              // phpcs:ignore Generic.Files.LineLength.TooLong
               $this->log("Adjusted SEPA contribution [{$case->contribution_id}] payment instrument from [{$case->contribution_pi}] to [{$new_pi}] via SQL.");
             }
           }
@@ -341,7 +375,10 @@ class CRM_Sepa_Logic_MandateRepairs {
     }
 
     if ($pi_adjustment_counter) {
-      $this->addUINotification(E::ts('Adjusted the payment instruments of %1 recurring mandate(s).', [1 => $pi_adjustment_counter]));
+      $this->addUINotification(E::ts(
+        'Adjusted the payment instruments of %1 recurring mandate(s).',
+        [1 => $pi_adjustment_counter]
+      ));
     }
   }
 

@@ -14,8 +14,6 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-
-
 /**
  * Contains logic required for RETRY: attempt to collect failed debits another time
  */
@@ -39,9 +37,17 @@ class CRM_Sepa_Logic_Retry {
     }
 
     // first: get some values
-    $group_status_id_open        = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
-    $payment_instrument_id       = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'RCUR');
-    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+    $payment_instrument_id = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'payment_instrument_id',
+      'RCUR'
+    );
+    $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
 
     // first: fetch contributions and group by creditor
     $contributions_by_creditor = [];
@@ -84,14 +90,20 @@ class CRM_Sepa_Logic_Retry {
         $contribution = civicrm_api3('Contribution', 'create', $contribution_data);
 
         // add contribution to tx_group
-        CRM_Core_DAO::executeQuery('INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES (%1, %2);',
-            [
-              1 => [$group['id'], 'Integer'],
-              2 => [$contribution['id'], 'Integer'],
-            ]);
+        CRM_Core_DAO::executeQuery(
+          'INSERT INTO civicrm_sdd_contribution_txgroup (txgroup_id, contribution_id) VALUES (%1, %2);',
+          [
+            1 => [$group['id'], 'Integer'],
+            2 => [$contribution['id'], 'Integer'],
+          ]
+        );
 
         // finally: call our installment_created Hook
-        CRM_Utils_SepaCustomisationHooks::installment_created($contribution_data['mandate_id'], $contribution_data['contribution_recur_id'], $contribution['id']);
+        CRM_Utils_SepaCustomisationHooks::installment_created(
+          $contribution_data['mandate_id'],
+          $contribution_data['contribution_recur_id'],
+          $contribution['id']
+        );
       }
     }
 
@@ -233,9 +245,10 @@ class CRM_Sepa_Logic_Retry {
 
   /**
    * Generate a SQL selection query for the
-   * @param $select_clause     string  SQL select clause
-   * @param $params            array   query parameters
+   * @param string $select_clause SQL select clause
+   * @param array $params query parameters
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   protected static function getQuery($select_clause, $params) {
     // get some IDs
     $group_status_id_closed   = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');

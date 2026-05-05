@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
+
 /**
  * Report on OOFF SEPA mandates
  */
@@ -47,76 +49,76 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
         ],
         'list_contri_id' => [
           'name' => 'id',
-          'title' => ts('Contribution ID', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution ID'),
         ],
         'financial_type_id' => [
-          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Financial Type'),
           'default' => TRUE,
         ],
         'campaign_id' => [
-          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Campaign'),
         ],
         'contribution_status_id' => [
-          'title' => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution Status'),
         ],
         'cancel_reason' => [
-          'title' => ts('Cancel Reason', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Cancel Reason'),
         ],
         'contribution_page_id' => [
-          'title' => ts('Contribution Page', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution Page'),
         ],
         'source' => [
-          'title' => ts('Source', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Source'),
         ],
         'currency' => [
-          'title' => ts('Currency', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Currency'),
           'required' => TRUE,
           'no_display' => TRUE,
         ],
         'trxn_id' => NULL,
         'receive_date' => [
-          'title'   => ts('Contribution Collection Date', ['domain' => 'org.project60.sepa']),
+          'title'   => E::ts('Contribution Collection Date'),
           'default' => TRUE,
         ],
         'receipt_date' => NULL,
         'total_amount' => [
-          'title' => ts('Amount', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Amount'),
           'type'    => CRM_Utils_Type::T_FLOAT,
         ],
         'fee_amount' => [
-          'title' => ts('Fee Amount', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Fee Amount'),
           'type'    => CRM_Utils_Type::T_FLOAT,
         ],
         'net_amount' => [
-          'title' => ts('Net Amount', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Net Amount'),
           'type'    => CRM_Utils_Type::T_FLOAT,
         ],
       ],
       'filters' => [
         'receive_date' => [
-          'title' => ts('Contribution Collection Date', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution Collection Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
         ],
         'financial_type_id' => [
-          'title' => ts('Financial Type', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Financial Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::financialType(),
           'type' => CRM_Utils_Type::T_INT,
         ],
         'campaign_id' => [
-          'title' => ts('Campaign', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Campaign'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Campaign_BAO_Campaign::getCampaigns(),
           'type' => CRM_Utils_Type::T_INT,
         ],
         'contribution_page_id' => [
-          'title' => ts('Contribution Page', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution Page'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionPage(),
           'type' => CRM_Utils_Type::T_INT,
         ],
         'contribution_status_id' => [
-          'title' => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
+          'title' => E::ts('Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'type' => CRM_Utils_Type::T_INT,
@@ -125,14 +127,14 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
           'name' => 'cancel_reason',
           'type' => CRM_Utils_Type::T_STRING,
           'operatorType' => CRM_Report_Form::OP_STRING,
-          'title' => ts('Cancel Reason'),
+          'title' => E::ts('Cancel Reason'),
         ],
-        'total_amount' => ['title' => ts('Contribution Amount'), ['domain' => 'org.project60.sepa']],
+        'total_amount' => ['title' => E::ts('Contribution Amount')],
       ],
       'order_bys' => [
-        'financial_type_id' => ['title' => ts('Financial Type', ['domain' => 'org.project60.sepa'])],
-        'contribution_status_id' => ['title' => ts('Contribution Status', ['domain' => 'org.project60.sepa'])],
-        'receive_date' => ['title' => ts('Receive Date', ['domain' => 'org.project60.sepa'])],
+        'financial_type_id' => ['title' => E::ts('Financial Type')],
+        'contribution_status_id' => ['title' => E::ts('Contribution Status')],
+        'receive_date' => ['title' => E::ts('Receive Date')],
       ],
       'grouping' => 'contri-fields',
     ];
@@ -144,14 +146,12 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
   public function from() {
     $this->_from = NULL;
     $this->_from = "
-         FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
-               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                          ON {$this->_aliases['civicrm_contact']}.id =
-                             {$this->_aliases['civicrm_sdd_mandate']}.contact_id
-               LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                          ON 'civicrm_contribution' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
-                          AND {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id
-         ";
+      FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
+      INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+        ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_sdd_mandate']}.contact_id
+      LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+        ON 'civicrm_contribution' = {$this->_aliases['civicrm_sdd_mandate']}.entity_table
+        AND {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_sdd_mandate']}.entity_id";
   }
 
   /**
@@ -164,6 +164,7 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
   /**
    * Prep data for display
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function alterDisplay(&$rows) {
     // first, let the generic code work through the data
     parent::alterDisplay($rows);
@@ -187,13 +188,22 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
 
       // alter amount
       if (array_key_exists('civicrm_contribution_total_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_total_amount'], $row['civicrm_contribution_currency']);
+        $rows[$rowNum]['civicrm_contribution_total_amount'] = CRM_Utils_Money::format(
+          $row['civicrm_contribution_total_amount'],
+          $row['civicrm_contribution_currency']
+        );
       }
       if (array_key_exists('civicrm_contribution_net_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_net_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_net_amount'], $row['civicrm_contribution_currency']);
+        $rows[$rowNum]['civicrm_contribution_net_amount'] = CRM_Utils_Money::format(
+          $row['civicrm_contribution_net_amount'],
+          $row['civicrm_contribution_currency']
+        );
       }
       if (array_key_exists('civicrm_contribution_fee_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_fee_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_fee_amount'], $row['civicrm_contribution_currency']);
+        $rows[$rowNum]['civicrm_contribution_fee_amount'] = CRM_Utils_Money::format(
+          $row['civicrm_contribution_fee_amount'],
+          $row['civicrm_contribution_currency']
+        );
       }
 
       // convert campaign_id to campaign title

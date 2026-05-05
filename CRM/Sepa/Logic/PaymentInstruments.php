@@ -188,7 +188,10 @@ class CRM_Sepa_Logic_PaymentInstruments {
       }
 
       // inject JS file
-      CRM_Core_Resources::singleton()->addScriptFile('org.project60.sepa', 'js/form_adjustments/CRM/Contribute/Form/Contribution/manipulate_sdd_payment_instruments.js');
+      CRM_Core_Resources::singleton()->addScriptFile(
+        'org.project60.sepa',
+        'js/form_adjustments/CRM/Contribute/Form/Contribution/manipulate_sdd_payment_instruments.js'
+      );
     }
   }
 
@@ -217,6 +220,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    * @return array
    *   id => [name, label, id]
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function getAllSddPaymentInstruments() {
     if (self::$sdd_payment_instruments === NULL) {
       self::$sdd_payment_instruments = [];
@@ -293,6 +297,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    * @return array
    *   list of payment instrument data
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function getPaymentInstrumentsForCreditor($creditor_id, $type) {
     // get the creditor
     $creditors = self::getAllSddCreditors();
@@ -329,7 +334,9 @@ class CRM_Sepa_Logic_PaymentInstruments {
     }
     else {
       if (!in_array($type, ['OOFF', 'FRST', 'RCUR'])) {
-        Civi::log()->warning("Invalid type '{$type}' passed to CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor()");
+        Civi::log()->warning(
+          "Invalid type '{$type}' passed to CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor()"
+        );
       }
     }
 
@@ -459,7 +466,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *   [name => id]
    *
    * @throws Exception
-   *   if not all of these payment instruments could be identified
+   *   If not all of these payment instruments could be identified.
    */
   public static function getClassicSepaPaymentInstruments() {
     static $classic_payment_instrument_ids = NULL;

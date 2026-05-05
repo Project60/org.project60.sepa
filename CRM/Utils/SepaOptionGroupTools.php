@@ -33,11 +33,12 @@ class CRM_Utils_SepaOptionGroupTools {
    *
    * As a workaround, we check the labels of recurring frequency units and reset them if necessary
    *
-   * @param $reset    boolean  resets altered labels to standard values
-   * @param $warning  boolean  displays a warning if a label has been reset
+   * @param bool $reset resets altered labels to standard values
+   * @param bool $warning displays a warning if a label has been reset
    *
    * @deprecated
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.TooHigh
   public static function checkRecurringFrequencyUnits($reset = FALSE, $warning = TRUE) {
     // compare option group values
     $checkUnits = ['month', 'year'];
@@ -51,7 +52,7 @@ class CRM_Utils_SepaOptionGroupTools {
       $message = sprintf("Option group '%s' does not exist. Error was: %s", $params['name'], $result['error_message']);
       Civi::log()->debug('org.project60.sepa_dd: ' . $message);
       if ($warning) {
-        CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, ts('Warning', ['domain' => 'org.project60.sepa']), 'warn');
+        CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, E::ts('Warning'), 'warn');
       }
       return;
     }
@@ -67,7 +68,7 @@ class CRM_Utils_SepaOptionGroupTools {
       $message = sprintf("Could not retrieve values of group '%d'. Error was: %s", $oid, $result['error_message']);
       Civi::log()->debug('org.project60.sepa_dd: ' . $message);
       if ($warning) {
-        CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, ts('Warning', ['domain' => 'org.project60.sepa']), 'warn');
+        CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, E::ts('Warning'), 'warn');
       }
       return;
     }
@@ -77,7 +78,11 @@ class CRM_Utils_SepaOptionGroupTools {
     foreach ($checkUnits as $c) {
       foreach ($frequencyUnits as $f) {
         if ($c == $f['name'] && ($f['label'] != $c || $f['value'] != $c)) {
-          Civi::log()->debug(sprintf("org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']", $c, $f['label']));
+          Civi::log()->debug(sprintf(
+            "org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']",
+            $c,
+            $f['label']
+          ));
 
           if ($reset) {
             $params = [
@@ -89,10 +94,15 @@ class CRM_Utils_SepaOptionGroupTools {
             ];
             $result = civicrm_api3('OptionValue', 'create', $params);
             if (!empty($result['is_error'])) {
-              $message = sprintf("Could not reset option value [%d] ('%s'). Error was: %s", $f['id'], $c, $result['error_message']);
+              $message = sprintf(
+                "Could not reset option value [%d] ('%s'). Error was: %s",
+                $f['id'],
+                $c,
+                $result['error_message']
+              );
               Civi::log()->debug('org.project60.sepa_dd: ' . $message);
               if ($warning) {
-                CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, ts('Warning', ['domain' => 'org.project60.sepa']), 'warn');
+                CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, E::ts('Warning'), 'warn');
               }
               // FIXME: why not try again? return;
             }
@@ -100,7 +110,11 @@ class CRM_Utils_SepaOptionGroupTools {
               $message = sprintf("Label '%s' of option group 'recur_frequency_units' reset to '%s'", $c, $c);
               Civi::log()->debug('org.project60.sepa_dd: ' . $message);
               if ($warning) {
-                CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, ts('Warning', ['domain' => 'org.project60.sepa']), 'warn');
+                CRM_Core_Session::setStatus(
+                  'CiviSEPA CRM-14114 workaround: ' . $message,
+                  E::ts('Warning'),
+                  'warn'
+                );
               }
             }
           }
@@ -112,27 +126,28 @@ class CRM_Utils_SepaOptionGroupTools {
   /**
    * Offers a textual representation for the donation interval
    *
-   * @param unit      unit of time: 'month' or 'year'
-   * @param interval  payment interval, like 1 or 6
-   * @param ts        set to true, if you want a localised version
+   * @param int $interval payment interval, like 1 or 6
+   * @param 'month'|'year' $unit unit of time: 'month' or 'year'
+   * @param bool $ts set to true, if you want a localised version
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function getFrequencyText($interval, $unit, $ts = FALSE) {
     if ($unit == 'month') {
       if ($interval == 1) {
-        return $ts ? ts('monthly', ['domain' => 'org.project60.sepa']) : 'monthly';
+        return $ts ? E::ts('monthly') : 'monthly';
       }
       elseif ($interval == 3) {
-        return $ts ? ts('quarterly', ['domain' => 'org.project60.sepa']) : 'quarterly';
+        return $ts ? E::ts('quarterly') : 'quarterly';
       }
       elseif ($interval == 6) {
-        return $ts ? ts('semi-annually', ['domain' => 'org.project60.sepa']) : 'semi-annually';
+        return $ts ? E::ts('semi-annually') : 'semi-annually';
       }
       elseif ($interval == 12) {
-        return $ts ? ts('annually', ['domain' => 'org.project60.sepa']) : 'annually';
+        return $ts ? E::ts('annually') : 'annually';
       }
       else {
         if ($ts) {
-          return sprintf(ts('every %1 months', [1 => $interval, 'domain' => 'org.project60.sepa']));
+          return sprintf(E::ts('every %1 months', [1 => $interval]));
         }
         else {
           return sprintf('every %s months', $interval);
@@ -141,11 +156,11 @@ class CRM_Utils_SepaOptionGroupTools {
     }
     elseif ($unit == 'year') {
       if ($interval == 1) {
-        return $ts ? ts('annually') : 'annually';
+        return $ts ? E::ts('annually') : 'annually';
       }
       else {
         if ($ts) {
-          return sprintf(ts('every %1 years', ['domain' => 'org.project60.sepa']), $interval);
+          return sprintf(E::ts('every %1 years'), $interval);
         }
         else {
           return sprintf('every %1 years', $interval);
@@ -153,7 +168,7 @@ class CRM_Utils_SepaOptionGroupTools {
       }
     }
     else {
-      return $ts ? ts('on an irregular basis', ['domain' => 'org.project60.sepa']) : 'on an irregular basis';
+      return $ts ? E::ts('on an irregular basis') : 'on an irregular basis';
     }
   }
 

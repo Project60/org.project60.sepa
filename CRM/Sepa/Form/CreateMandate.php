@@ -19,13 +19,13 @@ use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * SEPA Create Mandate form
- *
- * @see https://wiki.civicrm.org/confluence/display/CRMDOC/QuickForm+Reference
  */
 class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
-  // or 'clone' or 'replace'
-  protected $create_mode = 'create';
+  /**
+   * @var 'create'|'clone'|'replace'
+   */
+  protected string $create_mode = 'create';
   protected $contact_id  = NULL;
   protected $replace_id  = NULL;
   protected $clone_id    = NULL;
@@ -34,6 +34,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   protected $old_mandate = NULL;
   protected $old_contrib = NULL;
 
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function buildQuickForm() {
     // get parameters
     $this->contact_id  = (int) CRM_Utils_Request::retrieve('cid', 'Positive');
@@ -214,7 +215,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     // add amount field
     $this->addMoney(
         'amount',
-        ts('Amount'),
+        E::ts('Amount'),
         TRUE,
         ['class' => 'tiny']
     );
@@ -395,6 +396,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   /**
    * Validate input data
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function validate() {
     parent::validate();
 
@@ -446,7 +448,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         $reference_error = CRM_Sepa_Logic_Verification::verifyReference($this->_submitValues['reference']);
       }
       else {
-        $reference_error = CRM_Sepa_Logic_Verification::verifyReference($this->_submitValues['reference'], $creditor_mode);
+        $reference_error = CRM_Sepa_Logic_Verification::verifyReference(
+          $this->_submitValues['reference'],
+          $creditor_mode
+        );
       }
       if ($reference_error) {
         $this->_errors['reference'] = $reference_error;
@@ -468,32 +473,33 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   /**
    * Create the mandate
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function postProcess() {
     $values = $this->exportValues();
 
     // create a new mandate
     $type = $values['interval'] ? 'RCUR' : 'OOFF';
     $mandate_data = [
-      'type'                      => $type,
-      'creation_date'             => date('YmdHis'),
-      'creditor_id'               => $values['creditor_id'],
-      'contact_id'                => $values['cid'],
-      'campaign_id'               => $values['campaign_id'],
-      'financial_type_id'         => $values['financial_type_id'],
-      'payment_instrument_id'     => $values['payment_instrument_id'],
-      'currency'                  => $values['currency'],
-      'account_holder'            => $values['account_holder'],
-      'iban'                      => $values['iban'],
-      'bic'                       => empty($values['bic']) ? 'NOTPROVIDED' : $values['bic'],
-      'cycle_day'                 => $values['cycle_day'],
-      'amount'                    => $values['amount'],
-      'frequency_interval'        => $type == 'RCUR' ? 12 / $values['interval'] : 0,
-      'frequency_unit'            => 'month',
-      'reference'                 => $values['reference'],
-      'source'                    => $values['source'],
-      'receive_date'              => $type == 'OOFF' ? CRM_Utils_Date::processDate($values['ooff_date']) : '',
-      'start_date'                => $type == 'RCUR' ? CRM_Utils_Date::processDate($values['rcur_start_date']) : '',
-      'end_date'                  => empty($values['rcur_end_date']) ? '' : CRM_Utils_Date::processDate($values['rcur_end_date']),
+      'type' => $type,
+      'creation_date' => date('YmdHis'),
+      'creditor_id' => $values['creditor_id'],
+      'contact_id' => $values['cid'],
+      'campaign_id' => $values['campaign_id'],
+      'financial_type_id' => $values['financial_type_id'],
+      'payment_instrument_id' => $values['payment_instrument_id'],
+      'currency' => $values['currency'],
+      'account_holder' => $values['account_holder'],
+      'iban' => $values['iban'],
+      'bic' => empty($values['bic']) ? 'NOTPROVIDED' : $values['bic'],
+      'cycle_day' => $values['cycle_day'],
+      'amount' => $values['amount'],
+      'frequency_interval' => $type == 'RCUR' ? 12 / $values['interval'] : 0,
+      'frequency_unit' => 'month',
+      'reference' => $values['reference'],
+      'source' => $values['source'],
+      'receive_date' => $type == 'OOFF' ? CRM_Utils_Date::processDate($values['ooff_date']) : '',
+      'start_date' => $type == 'RCUR' ? CRM_Utils_Date::processDate($values['rcur_start_date']) : '',
+      'end_date' => empty($values['rcur_end_date']) ? '' : CRM_Utils_Date::processDate($values['rcur_end_date']),
     ];
 
     try {
@@ -529,13 +535,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
             $values['replace'],
             $mandate['id'],
             CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'));
-
-        /*CRM_Core_Session::setStatus(E::ts("Mandate <a href=\"%2\">%1</a> was scheduled to end on %3", array(
-        1 => $rpl_mandate['reference'],
-        2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$rpl_mandate['id']}"),
-        3 => CRM_Utils_Date::formatDate($values['rpl_end_date'], 'activityDate'))),
-        E::ts("Success"),
-        'info'); */
       }
 
     }
@@ -558,7 +557,10 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
        || (strpos($user_context, 'civicrm/contact/view') !== FALSE)) {
       // I'm not even sure where the first one is coming from... but replace!
       $session->popUserContext();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$values['cid']}&selectedChild=sepa"));
+      $session->pushUserContext(CRM_Utils_System::url(
+        'civicrm/contact/view',
+        "reset=1&cid={$values['cid']}&selectedChild=sepa"
+      ));
     }
     // this is not a popup -> redirect
     if (!($_REQUEST['snippet'] ?? NULL)) {
@@ -647,6 +649,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    *  - successful SEPA mandates
    *  - known CiviBanking accounts
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.TooHigh
   protected function getKnownBankAccounts() {
     $known_accounts = ['' => E::ts('new account')];
 

@@ -14,19 +14,19 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
+
 /**
  * Close a sepa group
  *
  * @package CiviCRM_SEPA
  *
  */
-
-require_once 'CRM/Core/Page.php';
-
 class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
 
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function run() {
-    CRM_Utils_System::setTitle(ts('Delete SEPA Group', ['domain' => 'org.project60.sepa']));
+    CRM_Utils_System::setTitle(E::ts('Delete SEPA Group'));
     if (empty($_REQUEST['group_id'])) {
       $this->assign('status', 'error');
     }

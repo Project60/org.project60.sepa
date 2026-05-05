@@ -15,6 +15,7 @@
 +--------------------------------------------------------*/
 
 use Civi\Sepa\Lock\SepaBatchLockManager;
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * This class holds all the functions of the transaction group life cycle
@@ -25,8 +26,9 @@ class CRM_Sepa_Logic_Group {
    * This function will close a transaction group,
    * and perform the necessary logical changes to the mandates contained
    *
-   * @return error message, unless successful
+   * @return null|string error message, unless successful
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function close($txgroup_id) {
     // step 0: check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
@@ -37,15 +39,17 @@ class CRM_Sepa_Logic_Group {
     // step 1: gather data
     $skip_closed = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_skip_closed');
     if ($skip_closed) {
-      $status_inprogress = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+      $status_inprogress = (int) CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'Completed'
+      );
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
     }
     else {
       $status_inprogress = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
     }
-    $status_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-    $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     try {
       $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
         ->addWhere('id', '=', $txgroup_id)
@@ -71,27 +75,35 @@ class CRM_Sepa_Logic_Group {
     }
     elseif ($txgroup['type'] == 'FRST') {
       // update first_contribution and status
-      $sql = "UPDATE civicrm_sdd_mandate
-              LEFT JOIN civicrm_contribution_recur       ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
-              LEFT JOIN civicrm_contribution             ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
-              LEFT JOIN civicrm_sdd_contribution_txgroup ON civicrm_sdd_contribution_txgroup.contribution_id = civicrm_contribution.id
-              SET
-                status                = 'RCUR',
-                first_contribution_id = civicrm_contribution.id
-              WHERE civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
-                AND civicrm_sdd_mandate.status = 'FRST'
-                AND civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
+      $sql = "
+        UPDATE civicrm_sdd_mandate
+        LEFT JOIN civicrm_contribution_recur
+          ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
+        LEFT JOIN civicrm_contribution
+          ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
+        LEFT JOIN civicrm_sdd_contribution_txgroup
+          ON civicrm_sdd_contribution_txgroup.contribution_id = civicrm_contribution.id
+        SET
+          status = 'RCUR',
+          first_contribution_id = civicrm_contribution.id
+        WHERE civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+          AND civicrm_sdd_mandate.status = 'FRST'
+          AND civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
       CRM_Core_DAO::executeQuery($sql);
 
       // update the recurring contribution payment instruments
-      $creditor_id = CRM_Core_DAO::singleValueQuery("SELECT sdd_creditor_id FROM civicrm_sdd_txgroup WHERE id = {$txgroup_id};");
+      $creditor_id = CRM_Core_DAO::singleValueQuery(
+        "SELECT sdd_creditor_id FROM civicrm_sdd_txgroup WHERE id = {$txgroup_id};"
+      );
       $frst2rcur_pis = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor_id);
       foreach ($frst2rcur_pis as $frst_pi_id => $rcur_pi_id) {
         // do this for every frst/rcur type tuple separately
         $sql = "
             UPDATE civicrm_contribution_recur
-            LEFT JOIN civicrm_contribution             ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
-            LEFT JOIN civicrm_sdd_contribution_txgroup ON civicrm_sdd_contribution_txgroup.contribution_id = civicrm_contribution.id
+            LEFT JOIN civicrm_contribution
+              ON civicrm_contribution.contribution_recur_id = civicrm_contribution_recur.id
+            LEFT JOIN civicrm_sdd_contribution_txgroup
+              ON civicrm_sdd_contribution_txgroup.contribution_id = civicrm_contribution.id
             SET civicrm_contribution_recur.payment_instrument_id = {$rcur_pi_id}
             WHERE civicrm_contribution_recur.payment_instrument_id = {$frst_pi_id}
               AND civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
@@ -99,20 +111,21 @@ class CRM_Sepa_Logic_Group {
       }
 
     }
+    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedElseif
     elseif ($txgroup['type'] == 'RCUR') {
       // AFAIK there's nothing to do for RCURs...
-
     }
+    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedElseif
     elseif ($txgroup['type'] == 'RTRY') {
       // AFAIK there's nothing to do for RTRYs...
-
     }
     else {
       return "Group type '" . $txgroup['type'] . "' not yet supported.";
     }
 
     // step 3.1: update all the contributions to status 'in progress', and set the receive_date as collection
-    //  remark: don't set receive_date to collection_date any more, it confuses the RCUR batcher (see https://github.com/Project60/sepa_dd/issues/190)
+    // remark: don't set receive_date to collection_date any more, it confuses
+    // the RCUR batcher (see https://github.com/Project60/sepa_dd/issues/190)
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_contribution
       LEFT JOIN civicrm_sdd_contribution_txgroup ON contribution_id = civicrm_contribution.id
@@ -135,8 +148,10 @@ class CRM_Sepa_Logic_Group {
       'status_id'               => $group_status_id_closed,
     ]);
     if (isset($result['is_error']) && $result['is_error']) {
-      sprintf(ts("Cannot close transaction group! Error was: '%s'", ['domain' => 'org.project60.sepa']), $result['error_message']);
+      sprintf(E::ts("Cannot close transaction group! Error was: '%s'"), $result['error_message']);
     }
+
+    return NULL;
   }
 
   /**
@@ -147,6 +162,7 @@ class CRM_Sepa_Logic_Group {
    *
    * @return string error message, unless successful
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function received($txgroup_id) {
     // step 0: check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
@@ -158,8 +174,16 @@ class CRM_Sepa_Logic_Group {
     $group_status_id_open     = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $group_status_id_closed   = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
     $group_status_id_received = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
-    $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    $status_closed     = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $status_pending = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
+    $status_closed = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Completed'
+    );
     $status_inprogress = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
 
     if (empty($group_status_id_received)) {
@@ -194,12 +218,19 @@ class CRM_Sepa_Logic_Group {
         FROM civicrm_sdd_contribution_txgroup AS txn_to_contribution
         LEFT JOIN civicrm_contribution AS contribution ON contribution.id = txn_to_contribution.contribution_id
         WHERE txn_to_contribution.txgroup_id IN ($txgroup_id)
-          AND contribution.id NOT IN (SELECT entity_id FROM civicrm_entity_financial_trxn WHERE entity_table='civicrm_contribution');";
+          AND contribution.id NOT IN (
+            SELECT entity_id FROM civicrm_entity_financial_trxn WHERE entity_table='civicrm_contribution'
+          );";
       $rotten_contribution = CRM_Core_DAO::executeQuery($find_rotten_contributions_sql);
       while ($rotten_contribution->fetch()) {
         $contribution_id = $rotten_contribution->contribution_id;
         // set these rotten contributions to 'Pending', no 'pay_later'
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET contribution_status_id=$status_pending, is_pay_later=0 WHERE id=$contribution_id;");
+        CRM_Core_DAO::executeQuery(
+          "UPDATE civicrm_contribution
+          SET contribution_status_id=$status_pending,
+              is_pay_later=0
+          WHERE id=$contribution_id;"
+        );
         // now they will get their transactions back when they get set to 'completed' in the next step...
         Civi::log()->debug("org.project60.sepa: reset bad contribution [$contribution_id] to 'Pending'.");
       }
@@ -233,7 +264,14 @@ class CRM_Sepa_Logic_Group {
     CRM_Sepa_Logic_NextCollectionDate::advanceNextCollectionDate($txgroup_id);
 
     // step 3.2: update group status
-    $result = civicrm_api3('SepaTransactionGroup', 'create', ['id' => $txgroup_id, 'status_id' => $group_status_id_received]);
+    $result = civicrm_api3(
+      'SepaTransactionGroup',
+      'create',
+      [
+        'id' => $txgroup_id,
+        'status_id' => $group_status_id_received,
+      ]
+    );
     if (!empty($result['is_error'])) {
       return 'Cannot update transaction group status for ID ' . $txgroup_id;
     }
@@ -270,8 +308,7 @@ class CRM_Sepa_Logic_Group {
     while ($empty_group_query->fetch()) {
       // delete group
       $group_id = $empty_group_query->group_id;
-      //CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id={$group_id};");
-      $result = civicrm_api3('SepaTransactionGroup', 'delete', ['id' => $group_id]);
+      civicrm_api3('SepaTransactionGroup', 'delete', ['id' => $group_id]);
     }
   }
 

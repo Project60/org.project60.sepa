@@ -22,8 +22,6 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
-
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -69,7 +67,11 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
     if ($async_batch) {
       // execute through runner:
-      $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+      $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'Completed'
+      );
       $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
       CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$groupId], $target_group_status, $target_contribution_status);
     }

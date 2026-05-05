@@ -27,7 +27,7 @@
  */
 class CRM_Utils_SepaCustomisationHooks {
 
-  static $null = NULL;
+  private static $null = NULL;
 
   /**
    * This hook is called before a newly created mandate is written to the DB
@@ -42,7 +42,16 @@ class CRM_Utils_SepaCustomisationHooks {
    */
   public static function create_mandate(&$mandate_parameters) {
     $names = ['mandate_parameters'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $mandate_parameters, self::$null, self::$null, self::$null, self::$null, self::$null, 'civicrm_create_mandate');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $mandate_parameters,
+      self::$null,
+      self::$null,
+      self::$null,
+      self::$null,
+      self::$null,
+      'civicrm_create_mandate'
+    );
   }
 
   /**
@@ -54,15 +63,31 @@ class CRM_Utils_SepaCustomisationHooks {
    *  if your preferred reference is already in use.
    *
    * @param string $reference currently proposed reference (max. 35 characters!)
-   * @param string $collection_date scheduled collection date
-   * @param string $mode SEPA mode (OOFF, RCUR, FRST, RTRY)
    * @param int $creditor_id SDD creditor ID
+   * @param string $mode SEPA mode (OOFF, RCUR, FRST, RTRY)
+   * @param string $collection_date scheduled collection date
+   * @param int $financial_type_id
    *
    * @access public
    */
-  public static function modify_txgroup_reference(&$reference, $creditor_id, $mode, $collection_date, $financial_type_id) {
+  public static function modify_txgroup_reference(
+    &$reference,
+    $creditor_id,
+    $mode,
+    $collection_date,
+    $financial_type_id
+  ) {
     $names = ['reference', 'creditor_id', 'mode', 'collection_date', 'financial_type_id'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $reference, $creditor_id, $mode, $collection_date, $financial_type_id, self::$null, 'civicrm_modify_txgroup_reference');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $reference,
+      $creditor_id,
+      $mode,
+      $collection_date,
+      $financial_type_id,
+      self::$null,
+      'civicrm_modify_txgroup_reference'
+    );
   }
 
   /**
@@ -79,7 +104,16 @@ class CRM_Utils_SepaCustomisationHooks {
    */
   public static function modify_txmessage(&$txmessage, $contribution, $creditor) {
     $names = ['txmessage', 'contribution', 'creditor'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $txmessage, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_txmessage');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $txmessage,
+      $contribution,
+      $creditor,
+      self::$null,
+      self::$null,
+      self::$null,
+      'civicrm_modify_txmessage'
+    );
   }
 
   /**
@@ -95,7 +129,16 @@ class CRM_Utils_SepaCustomisationHooks {
    */
   public static function modify_endtoendid(&$end2endID, $contribution, $creditor) {
     $names = ['end2endID', 'contribution', 'creditor'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $end2endID, $contribution, $creditor, self::$null, self::$null, self::$null, 'civicrm_modify_endtoendid');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $end2endID,
+      $contribution,
+      $creditor,
+      self::$null,
+      self::$null,
+      self::$null,
+      'civicrm_modify_endtoendid'
+    );
   }
 
   /**
@@ -109,15 +152,26 @@ class CRM_Utils_SepaCustomisationHooks {
    */
   public static function mend_rcontrib($rcontribId, &$rcontrib) {
     $names = ['rcontribId', 'rcontrib'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $rcontribId, $rcontrib, self::$null, self::$null, self::$null, self::$null, 'civicrm_mend_rcontrib');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $rcontribId,
+      $rcontrib,
+      self::$null,
+      self::$null,
+      self::$null,
+      self::$null,
+      'civicrm_mend_rcontrib'
+    );
   }
 
   /**
    * This hook is called by the alternativeBatching:
-   *  you can set a custom collection date for a rcurring contribution.
-   *  For example you can use this hook when you mandate is connected to a yearly membership from January to December.
-   *  And when a new member signs up in October. You want to collect that money in october and the membership will end on 31st of December.
-   *  So the next collection is in January.
+   * you can set a custom collection date for a rcurring contribution.
+   * For example you can use this hook when you mandate is connected to a yearly
+   * membership from January to December.
+   * And when a new member signs up in October. You want to collect that money
+   * in October and the membership will end on 31st of December.
+   * So the next collection is in January.
    *
    * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
    * @param array $data data such as mandate_id, mandate_entity_id for contribution recur id.
@@ -126,7 +180,16 @@ class CRM_Utils_SepaCustomisationHooks {
    */
   public static function alter_next_collection_date(&$next_collection_date, $data) {
     $names = ['next_collection_date', 'data'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $next_collection_date, $data, self::$null, self::$null, self::$null, self::$null, 'civicrm_alter_next_collection_date');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $next_collection_date,
+      $data,
+      self::$null,
+      self::$null,
+      self::$null,
+      self::$null,
+      'civicrm_alter_next_collection_date'
+    );
   }
 
   /**
@@ -142,7 +205,16 @@ class CRM_Utils_SepaCustomisationHooks {
    */
   public static function defer_collection_date(&$collection_date, $creditor_id) {
     $names = ['collection_date', 'creditor_id'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $collection_date, $creditor_id, self::$null, self::$null, self::$null, self::$null, 'civicrm_defer_collection_date');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $collection_date,
+      $creditor_id,
+      self::$null,
+      self::$null,
+      self::$null,
+      self::$null,
+      'civicrm_defer_collection_date'
+    );
   }
 
   /**
@@ -162,7 +234,16 @@ class CRM_Utils_SepaCustomisationHooks {
    */
   public static function installment_created($mandate_id, $contribution_recur_id, $contribution_id) {
     $names = ['mandate_id', 'contribution_recur_id', 'contribution_id'];
-    return CRM_Utils_Hook::singleton()->invoke($names, $mandate_id, $contribution_recur_id, $contribution_id, self::$null, self::$null, self::$null, 'civicrm_installment_created');
+    return CRM_Utils_Hook::singleton()->invoke(
+      $names,
+      $mandate_id,
+      $contribution_recur_id,
+      $contribution_id,
+      self::$null,
+      self::$null,
+      self::$null,
+      'civicrm_installment_created'
+    );
   }
 
 }

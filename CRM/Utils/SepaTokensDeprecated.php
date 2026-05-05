@@ -31,7 +31,10 @@ class CRM_Utils_SepaTokensDeprecated {
         $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $mandate['entity_id']]);
         $values[$contactId]["$prefix.amount"] = $contribution['total_amount'];
         $values[$contactId]["$prefix.currency"] = $contribution['currency'];
-        $values[$contactId]["$prefix.amount_text"] = CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']);
+        $values[$contactId]["$prefix.amount_text"] = CRM_Utils_Money::format(
+          $contribution['total_amount'],
+          $contribution['currency']
+        );
         $values[$contactId]["$prefix.first_collection"] = $contribution['receive_date'];
 
       }
@@ -39,17 +42,26 @@ class CRM_Utils_SepaTokensDeprecated {
         $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id']]);
         $values[$contactId]["$prefix.amount"] = $rcontribution['amount'];
         $values[$contactId]["$prefix.currency"] = $rcontribution['currency'];
-        $values[$contactId]["$prefix.amount_text"] = CRM_Utils_Money::format($rcontribution['amount'], $rcontribution['currency']);
+        $values[$contactId]["$prefix.amount_text"] = CRM_Utils_Money::format(
+          $rcontribution['amount'],
+          $rcontribution['currency']
+        );
         $values[$contactId]["$prefix.cycle_day"] = $rcontribution['cycle_day'];
         $values[$contactId]["$prefix.frequency_interval"] = $rcontribution['frequency_interval'];
         $values[$contactId]["$prefix.frequency_unit"] = $rcontribution['frequency_unit'];
-        $values[$contactId]["$prefix.frequency"] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($rcontribution['frequency_interval'], $rcontribution['frequency_unit'], TRUE);
+        $values[$contactId]["$prefix.frequency"] = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
+          $rcontribution['frequency_interval'],
+          $rcontribution['frequency_unit'],
+          TRUE
+        );
 
         // first collection date
         if (empty($mandate['first_contribution_id'])) {
           // calculate
           $calculator = new CRM_Sepa_Logic_NextCollectionDate($mandate['creditor_id']);
-          $values[$contactId]["$prefix.first_collection"] = $calculator->calculateNextCollectionDate($mandate['entity_id']);
+          $values[$contactId]["$prefix.first_collection"] = $calculator->calculateNextCollectionDate(
+            $mandate['entity_id']
+          );
 
         }
         else {
@@ -61,7 +73,9 @@ class CRM_Utils_SepaTokensDeprecated {
 
       // format dates
       if (!empty($values[$contactId]["$prefix.first_collection"])) {
-        $values[$contactId]["$prefix.first_collection_text"] = CRM_Utils_Date::customFormat($values[$contactId]["$prefix.first_collection"]);
+        $values[$contactId]["$prefix.first_collection_text"] = CRM_Utils_Date::customFormat(
+          $values[$contactId]["$prefix.first_collection"]
+        );
       }
       if (!empty($values[$contactId]["$prefix.date"])) {
         $values[$contactId]["$prefix.date_text"] = CRM_Utils_Date::customFormat($values[$contactId]["$prefix.date"]);

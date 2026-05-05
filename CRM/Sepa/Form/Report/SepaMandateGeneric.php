@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
+
 /**
  * Generic report on SEPA mandates
  */
@@ -41,51 +43,51 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         'dao' => 'CRM_Sepa_DAO_SEPAMandate',
         'fields' => [
           'reference' => [
-            'title' => ts('Mandate Reference', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Mandate Reference'),
             'default' => TRUE,
             'no_repeat' => TRUE,
           ],
           'id' => [
-            'title' => ts('Mandate ID', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Mandate ID'),
             'required' => TRUE,
             'no_display' => TRUE,
           ],
           'mandate_type' => [
             'name'  => 'type',
-            'title' => ts('Type', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Type'),
           ],
           'status' => [
-            'title' => ts('Mandate Status', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Mandate Status'),
           ],
           'account_holder' => [
-            'title' => ts('Account Holder', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Account Holder'),
           ],
           'iban' => [
-            'title' => ts('IBAN', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('IBAN'),
           ],
           'bic' => [
-            'title' => ts('BIC', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('BIC'),
           ],
           'source' => [
-            'title' => ts('Source', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Source'),
           ],
           'date' => [
-            'title' => ts('Signature Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Signature Date'),
           ],
           'creation_date' => [
-            'title' => ts('Creation Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Creation Date'),
           ],
           'validation_date' => [
-            'title' => ts('Validation Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Validation Date'),
           ],
           'amount' => [
             'dbAlias' => 'amount',
-            'title'   => ts('Amount', ['domain' => 'org.project60.sepa']),
+            'title'   => E::ts('Amount'),
             'type'    => CRM_Utils_Type::T_FLOAT,
           ],
           'status_id' => [
             'dbAlias' => 'status_id',
-            'title'   => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
+            'title'   => E::ts('Contribution Status'),
             'type'    => CRM_Utils_Type::T_INT,
           ],
         ],
@@ -94,22 +96,22 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'name' => 'reference',
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_STRING,
-            'title' => ts('Mandate Reference', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Mandate Reference'),
           ],
           'mandate_type' => [
             'name' => 'type',
-            'title' => ts('Type', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Type'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => [
-              ''         => ts('Any', ['domain' => 'org.project60.sepa']),
-              'OOFF'     => ts('One-off', ['domain' => 'org.project60.sepa']),
-              'RCUR'     => ts('Recurring', ['domain' => 'org.project60.sepa']),
+              ''         => E::ts('Any'),
+              'OOFF'     => E::ts('One-off'),
+              'RCUR'     => E::ts('Recurring'),
             ],
           ],
           'status' => [
             'name' => 'status',
-            'title' => ts('Mandate Status', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Mandate Status'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Sepa_Logic_Status::getStatusSelectorOptions(TRUE),
@@ -118,50 +120,50 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'name' => 'account_holder',
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_STRING,
-            'title' => ts('account_holder', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('account_holder'),
           ],
           'iban' => [
             'name' => 'iban',
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_STRING,
-            'title' => ts('IBAN', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('IBAN'),
           ],
           'bic' => [
             'name' => 'bic',
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_STRING,
-            'title' => ts('BIC', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('BIC'),
           ],
           'source' => [
             'name' => 'source',
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_STRING,
-            'title' => ts('Source', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Source'),
           ],
           'date' => [
-            'title' => ts('Signature Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Signature Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
           ],
           'creation_date' => [
-            'title' => ts('Creation Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Creation Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
           ],
           'validation_date' => [
-            'title' => ts('Validation Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Validation Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
           ],
           'amount' => [
             'dbAlias' => 'amount',
-            'title' => ts('Amount', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Amount'),
             'type'  => CRM_Utils_Type::T_FLOAT,
             'operatorType' => CRM_Report_Form::OP_FLOAT,
           ],
           'status_id' => [
             'dbAlias' => 'status_id',
-            'title' => ts('Contribution Status', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Contribution Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('contribution_status'),
@@ -169,27 +171,27 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         ],
         'order_bys' => [
           'reference' => [
-            'title' => ts('Mandate Reference', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Mandate Reference'),
           ],
           'mandate_type' => [
             'name'  => 'type',
-            'title' => ts('Type', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Type'),
           ],
           'bic' => [
             'name'  => 'bic',
-            'title' => ts('BIC', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('BIC'),
           ],
           'status' => [
-            'title' => ts('Mandate Status', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Mandate Status'),
           ],
           'date' => [
-            'title' => ts('Signature Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Signature Date'),
           ],
           'creation_date' => [
-            'title' => ts('Creation Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Creation Date'),
           ],
           'validation_date' => [
-            'title' => ts('Validation Date', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Validation Date'),
           ],
         ],
         'grouping' => 'mandate-fields',
@@ -199,8 +201,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         'dao' => 'CRM_Contact_DAO_Contact',
         'fields' => [
           'sort_name' => [
-            'title' => ts('Contact Name', ['domain' => 'org.project60.sepa']),
-            // 'required' => TRUE,
+            'title' => E::ts('Contact Name'),
             'default' => TRUE,
           ],
           'id' => [
@@ -210,20 +211,20 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         ],
         'filters' => [
           'sort_name' => [
-            'title' => ts('Contact Name', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Contact Name'),
             'operator' => 'like',
           ],
           'id' => [
-            'title' => ts('Contact ID', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Contact ID'),
             'type' => CRM_Utils_Type::T_INT,
           ],
         ],
         'order_bys' => [
           'sort_name' => [
-            'title' => ts('Contact Name', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Contact Name'),
           ],
           'id' => [
-            'title' => ts('Contact ID', ['domain' => 'org.project60.sepa']),
+            'title' => E::ts('Contact ID'),
           ],
         ],
         'grouping' => 'contact-fields',
@@ -259,14 +260,21 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     if ($fieldName == 'amount') {
       $this->_columnHeaders['amount']['title'] = $field['title'];
       $this->_columnHeaders['amount']['type']  = $field['type'] ?? NULL;
-      return 'IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.total_amount, civicrm_contribution_recur.amount) AS amount';
+      return 'IF(
+        civicrm_contribution.id IS NOT NULL,
+        civicrm_contribution.total_amount,
+        civicrm_contribution_recur.amount) AS amount';
     }
 
     // add status from either OOFF or RCUR
     if ($fieldName == 'status_id') {
       $this->_columnHeaders['status_id']['title'] = $field['title'];
       $this->_columnHeaders['status_id']['type']  = $field['type'] ?? NULL;
-      return 'IF(civicrm_contribution.id IS NOT NULL, civicrm_contribution.contribution_status_id, civicrm_contribution_recur.contribution_status_id) AS status_id';
+      return 'IF(
+          civicrm_contribution.id IS NOT NULL,
+          civicrm_contribution.contribution_status_id,
+          civicrm_contribution_recur.contribution_status_id
+        ) AS status_id';
     }
 
     // Fallback: generic selector
@@ -298,6 +306,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
   /**
    * internal function to generate where clauses
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
   protected function _getWhereClause($fieldName, $field) {
     $clause = NULL;
     if ($fieldName == 'status_id') {
@@ -421,6 +430,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function alterDisplay(&$rows) {
     $contribution_status = CRM_Core_OptionGroup::values('contribution_status');
 
@@ -449,7 +459,10 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
       // alter mandate status
       if (array_key_exists('civicrm_sdd_mandate_status', $row)) {
-        $rows[$rowNum]['civicrm_sdd_mandate_status'] = CRM_Sepa_Logic_Status::translateMandateStatus($row['civicrm_sdd_mandate_status'], TRUE);
+        $rows[$rowNum]['civicrm_sdd_mandate_status'] = CRM_Sepa_Logic_Status::translateMandateStatus(
+          $row['civicrm_sdd_mandate_status'],
+          TRUE
+        );
       }
 
       // alter contribution status
@@ -464,9 +477,13 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
       // add mandate link
       if (array_key_exists('civicrm_sdd_mandate_reference', $row) && array_key_exists('civicrm_sdd_mandate_id', $row)) {
-        $url = CRM_Utils_System::url('civicrm/sepa/xmandate', 'mid=' . $row['civicrm_sdd_mandate_id'], $this->_absoluteUrl);
+        $url = CRM_Utils_System::url(
+          'civicrm/sepa/xmandate',
+          'mid=' . $row['civicrm_sdd_mandate_id'],
+          $this->_absoluteUrl
+        );
         $rows[$rowNum]['civicrm_sdd_mandate_reference_link'] = $url;
-        $rows[$rowNum]['civicrm_sdd_mandate_reference_hover'] = ts('View Mandate Options.', ['domain' => 'org.project60.sepa']);
+        $rows[$rowNum]['civicrm_sdd_mandate_reference_hover'] = E::ts('View Mandate Options.');
       }
 
       // add contact link
@@ -474,9 +491,13 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_sort_name'] &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $row['civicrm_contact_id'], $this->_absoluteUrl);
+        $url = CRM_Utils_System::url(
+          'civicrm/contact/view',
+          'reset=1&cid=' . $row['civicrm_contact_id'],
+          $this->_absoluteUrl
+        );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Summary for this Contact.', ['domain' => 'org.project60.sepa']);
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = E::ts('View Contact Summary for this Contact.');
         $entryFound = TRUE;
       }
 

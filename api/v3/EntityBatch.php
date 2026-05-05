@@ -62,14 +62,11 @@ function civicrm_api3_entity_batch_delete($params) {
 /**
  * Retrieve one or more batch_entities
  *
- * @param  array input parameters
- *
- *
  * @example SepaCreditorGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array<string, mixed> $params an associative array of name/value pairs.
  *
- * @return  array api result array
+ * @return array<string, mixed> api result array
  *   {@getfields entity_batch_get}
  * @access public
  */

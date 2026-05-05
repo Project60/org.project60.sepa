@@ -42,12 +42,12 @@ class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase {
     // test setting
     CRM_Sepa_Logic_Settings::setGenericSetting($new_value, 'batching.FRST.notice');
     $current_value = CRM_Sepa_Logic_Settings::getGenericSetting('batching.FRST.notice');
-    $this->assertEquals($new_value, $current_value, E::ts("set/getGenericSetting doesn't work"));
+    $this->assertEquals($new_value, $current_value, "set/getGenericSetting doesn't work");
 
     // restore setting
     CRM_Sepa_Logic_Settings::setGenericSetting($old_value, 'batching.FRST.notice');
     $current_value = CRM_Sepa_Logic_Settings::getGenericSetting('batching.FRST.notice');
-    $this->assertEquals($old_value, $current_value, E::ts("set/getGenericSetting doesn't work"));
+    $this->assertEquals($old_value, $current_value, "set/getGenericSetting doesn't work");
   }
 
   /**
@@ -60,12 +60,12 @@ class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase {
     // test setting
     CRM_Sepa_Logic_Settings::setSetting($new_value, 'batching.FRST.notice');
     $current_value = CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice');
-    $this->assertEquals($new_value, $current_value, E::ts("set/getSetting doesn't work"));
+    $this->assertEquals($new_value, $current_value, "set/getSetting doesn't work");
 
     // restore setting
     CRM_Sepa_Logic_Settings::setSetting($old_value, 'batching.FRST.notice');
     $current_value = CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice');
-    $this->assertEquals($old_value, $current_value, E::ts("set/getSetting doesn't work"));
+    $this->assertEquals($old_value, $current_value, "set/getSetting doesn't work");
   }
 
   /**
@@ -80,9 +80,21 @@ class CRM_Sepa_SettingsTest extends CRM_Sepa_TestBase {
     // test setting
     CRM_Sepa_Logic_Settings::setSetting($new_general_value, 'batching.FRST.notice');
     CRM_Sepa_Logic_Settings::setSetting($new_creditor_value, 'batching.FRST.notice', $creditor_id);
-    $this->assertEquals($new_general_value, CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice'), E::ts("set/getSetting doesn't work"));
-    $this->assertEquals($new_general_value, CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', 0), E::ts("set/getSetting doesn't work"));
-    $this->assertEquals($new_creditor_value, CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $creditor_id), E::ts("set/getSetting doesn't work"));
+    $this->assertEquals(
+        $new_general_value,
+        CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice'),
+        "set/getSetting doesn't work"
+    );
+    $this->assertEquals(
+        $new_general_value,
+        CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', 0),
+        "set/getSetting doesn't work"
+    );
+    $this->assertEquals(
+        $new_creditor_value,
+        CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $creditor_id),
+        "set/getSetting doesn't work"
+    );
 
     // restore setting
     CRM_Sepa_Logic_Settings::setSetting($old_value, 'batching.FRST.notice');

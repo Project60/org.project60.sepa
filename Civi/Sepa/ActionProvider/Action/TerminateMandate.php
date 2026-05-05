@@ -91,7 +91,11 @@ class TerminateMandate extends AbstractAction {
             $cancelReason = $this->configuration->getParameter('config_cancel_reason');
           }
           $terminateDate = new \DateTime();
-          \CRM_Sepa_BAO_SEPAMandate::terminateMandate((int) $mandateId, $terminateDate->format('YmdHis'), $cancelReason);
+          \CRM_Sepa_BAO_SEPAMandate::terminateMandate(
+            (int) $mandateId,
+            $terminateDate->format('YmdHis'),
+            $cancelReason
+          );
           // the BAO function terminateMandate does everything aport from set the status to COMPLETE for a RCUR mandate
           $update = 'UPDATE civicrm_sdd_mandate SET status = %1 WHERE id = %2 AND type = %3';
           $updateParams = [

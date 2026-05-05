@@ -21,7 +21,7 @@ use CRM_Sepa_ExtensionUtil as E;
  * @group headless
  */
 class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
-  const INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX = 'HookTest-';
+  private const INSTALLMENT_CREATED_CONTRIBUTION_SOURCE_PREFIX = 'HookTest-';
 
   /**
    * If true the create_mandate hook will be executed.
@@ -60,7 +60,8 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
   public function setUp(): void {
     parent::setUp();
 
-    // Initialise all last references with null so we can easily check if there has been any reference generation happened:
+    // Initialise all last references with null so we can easily check if there
+    // has been any reference generation happened:
     $this->lastMandateReference = NULL;
     $this->lastTransactionGroupReference = NULL;
   }
@@ -98,7 +99,7 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
   /**
    * Test create OOFF mandate with custom reference. \
    * TODO: Check if this is everything needed to fulfil the requirements stated in the test description.
-   * @see Case_ID H01
+   * See Case_ID H01.
    */
   public function testOOFFCustomMandateReference(): void {
     $this->executeCreateMandateHook = TRUE;
@@ -109,18 +110,18 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
       ]
     );
 
-    $this->assertNotNull($this->lastMandateReference, E::ts('The create_mandate hook has not been called.'));
+    $this->assertNotNull($this->lastMandateReference, 'The create_mandate hook has not been called.');
     $this->assertSame(
       $this->lastMandateReference,
       $mandate['reference'],
-      E::ts('The mandate reference is not the generated one.')
+      'The mandate reference is not the generated one.'
     );
   }
 
   /**
    * Test create RCUR mandate with custom reference. \
    * TODO: Check if this is everything needed to fulfil the requirements stated in the test description.
-   * @see Case_ID H02
+   * See Case_ID H02.
    */
   public function testRCURCustomMandateReference(): void {
     $this->executeCreateMandateHook = TRUE;
@@ -131,32 +132,39 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
       ]
     );
 
-    $this->assertNotNull($this->lastMandateReference, E::ts('The create_mandate hook has not been called.'));
+    $this->assertNotNull($this->lastMandateReference, 'The create_mandate hook has not been called.');
     $this->assertSame(
       $this->lastMandateReference,
       $mandate['reference'],
-      E::ts('The mandate reference is not the generated one.')
+      'The mandate reference is not the generated one.'
     );
   }
 
   /**
    * This hook is called when a new transaction group is generated. \
    * We implement it to test if it works by setting a custom reference.
+   *
    * @param string $reference The currently proposed reference (max. 35 characters).
-   * @param string $collection_date The scheduled collection date.
-   * @param string $mode The SEPA mode (OOFF, RCUR, FRST, RTRY).
    * @param string $creditor_id The SDD creditor ID.
+   * @param string $mode The SEPA mode (OOFF, RCUR, FRST, RTRY).
+   * @param string $collection_date The scheduled collection date.
    * @param string $financial_type_id The financial type ID.
    */
-  function hook_civicrm_modify_txgroup_reference(string &$reference, string $creditor_id, string $mode, string $collection_date, string $financial_type_id): void
-  {
+  public function hook_civicrm_modify_txgroup_reference(
+      string &$reference,
+      string $creditor_id,
+      string $mode,
+      string $collection_date,
+      string $financial_type_id
+  ): void {
     // Only execute this hook if we are ordered to:
     if (!$this->executeModifyTxGroupHook) {
       return;
     }
 
-    // NOTE: The reference has a length limitation (currently 35 characters). With the set prefix there are nine characters
-    //       left for a billion possible references. This must be noted if the prefix size is increased.
+    // NOTE: The reference has a length limitation (currently 35 characters).
+    // With the set prefix there are nine characters left for a billion possible
+    // references. This must be noted if the prefix size is increased.
     $newReference = 'HookTest-TxGroupReference-' . $this->transactionGroupReferenceCounter;
 
     $this->transactionGroupReferenceCounter++;
@@ -168,7 +176,7 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
 
   /**
    * Test create OOFF mandate with coustom transaction group reference.
-   * @see Case_ID H03
+   * See Case_ID H03.
    */
   public function testOOFFCustomGroupReference(): void {
     $this->executeModifyTxGroupHook = TRUE;
@@ -185,18 +193,18 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
 
     $this->assertNotNull(
       $this->lastTransactionGroupReference,
-      E::ts('The modify_txgroup_reference hook has not been called.')
+      'The modify_txgroup_reference hook has not been called.'
     );
     $this->assertSame(
       $this->lastTransactionGroupReference,
       $transactionGroup['reference'],
-      E::ts('The transaction group reference is not the generated one.')
+      'The transaction group reference is not the generated one.'
     );
   }
 
   /**
    * Test create RCUR mandate with coustom transaction group reference.
-   * @see Case_ID H04
+   * See Case_ID H04.
    */
   public function testRCURCustomGroupReference(): void {
     $this->executeModifyTxGroupHook = TRUE;
@@ -214,26 +222,34 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
 
     $this->assertNotNull(
       $this->lastTransactionGroupReference,
-      E::ts('The modify_txgroup_reference hook has not been called.')
+      'The modify_txgroup_reference hook has not been called.'
     );
     $this->assertSame(
       $this->lastTransactionGroupReference,
       $transactionGroup['reference'],
-      E::ts('The transaction group reference is not the generated one.')
+      'The transaction group reference is not the generated one.'
     );
   }
 
   /**
-   * This hook is called by the batching algorithm: \
-   * Whenever a new installment has been created for a given RCUR mandate this hook is called so you can modify \
-   * the resulting contribution, e.g. connect it to a membership, or copy custom fields. \
-   * We implement this hook to test if it is called correctly. For this we set the contribution's source to the mandate's reference. \
-   * FIXME: In the sepacustom example extension the three parameters are marked as array, which is wrong and should be fixed.
+   * This hook is called by the batching algorithm:
+   * Whenever a new installment has been created for a given RCUR mandate this
+   * hook is called so you can modify the resulting contribution, e.g. connect
+   * it to a membership, or copy custom fields. We implement this hook to test
+   * if it is called correctly. For this we set the contribution's source to the
+   * mandate's reference.
+   * FIXME: In the sepacustom example extension the three parameters are marked
+   * as array, which is wrong and should be fixed.
+   *
    * @param string $mandate_id The CiviSEPA mandate entity ID.
    * @param string $contribution_recur_id The recurring contribution connected to the mandate.
    * @param string $contribution_id The newly created contribution.
    */
-  public function hook_civicrm_installment_created(string $mandate_id, string $contribution_recur_id, string $contribution_id): void {
+  public function hook_civicrm_installment_created(
+    string $mandate_id,
+    string $contribution_recur_id,
+    string $contribution_id
+  ): void {
     // Only execute this hook if we are ordered to:
     if (!$this->executeInstallmentCreatedHook) {
       return;
@@ -258,7 +274,7 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
 
   /**
    * Test the installment created hook.
-   * @see Case_ID H08
+   * See Case_ID H08.
    */
   public function testInstallmentCreated(): void {
     $this->executeInstallmentCreatedHook = TRUE;
@@ -279,7 +295,7 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
     $this->assertSame(
       $excepted,
       $contribution['contribution_source'],
-      E::ts('The installment_created hook has not been called (correctly).')
+      'The installment_created hook has not been called (correctly).'
     );
   }
 

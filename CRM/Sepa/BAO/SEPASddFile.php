@@ -69,11 +69,6 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
       $total += $txgroup->total;
       $nbtransactions += $txgroup->nbtransactions;
     }
-    // if (count(array_unique($fileFormats)) > 1) {
-    //   throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
-    // } else {
-    //   $fileFormatName = reset($fileFormats);
-    // }
     $template->assign('file', $this->toArray());
     // SEPA-432: two-digit decimals
     $template->assign('total', number_format($total, 2, '.', ''));

@@ -13,16 +13,13 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * SEPA_DD prenotification generator
  *
  * @package CiviCRM_SEPA
  */
-
-require_once 'CRM/Core/Page.php';
-require_once 'api/class.api.php';
-
 class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
   /**
@@ -63,6 +60,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
    * generate the HTML text, and assign all the required variables (tokens)
    * this is a precondition for PDF generation as well as emails
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function generateHTML($mandate, $template_id) {
     // init API wrapper object
     if (!isset($this->api)) {
@@ -97,8 +95,16 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
         // some more extra information:
         $recur_extra = [];
-        $recur_extra['frequency_text'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($recur->frequency_interval, $recur->frequency_unit, FALSE);
-        $recur_extra['frequency_text_l10n'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($recur->frequency_interval, $recur->frequency_unit, TRUE);
+        $recur_extra['frequency_text'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
+          $recur->frequency_interval,
+          $recur->frequency_unit,
+          FALSE
+        );
+        $recur_extra['frequency_text_l10n'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
+          $recur->frequency_interval,
+          $recur->frequency_unit,
+          TRUE
+        );
         $recur_extra['yearly_amount'] = $recur->amount;
         if ($recur->frequency_unit == 'month') {
           $recur_extra['yearly_amount'] = $recur_extra['yearly_amount'] * (12 / $recur->frequency_interval);
@@ -187,7 +193,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $params['toName']  = $params['toEmail'];
 
       if (empty($params['toEmail'])) {
-        CRM_Core_Session::setStatus(sprintf(ts("Error sending %s: Contact doesn't have an email.", ['domain' => 'org.project60.sepa']), $fileName));
+        CRM_Core_Session::setStatus(sprintf(E::ts("Error sending %s: Contact doesn't have an email."), $fileName));
         return FALSE;
       }
       $params['subject'] = 'SEPA ' . $fileName;
@@ -201,7 +207,6 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       $params['text'] = 'this is the mandate, please return signed';
       $params['html'] = $this->getTemplate()->fetch('string:' . $mail['msg_html']);
       CRM_Utils_Mail::send($params);
-      //      CRM_Core_Session::setStatus(ts("Mail sent", array('domain' => 'org.project60.sepa')));
     }
     else {
       CRM_Utils_PDF_Utils::html2pdf($this->html, $fileName, FALSE, NULL);
@@ -248,8 +253,8 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
    */
   public static function installMessageTemplate() {
     $default_templates = [
-      'sepa_mandate'     => ts('SEPA default email template.', ['domain' => 'org.project60.sepa']),
-      'sepa_mandate_pdf' => ts('SEPA default PDF template.', ['domain' => 'org.project60.sepa']),
+      'sepa_mandate'     => E::ts('SEPA default email template.'),
+      'sepa_mandate_pdf' => E::ts('SEPA default PDF template.'),
     ];
 
     foreach ($default_templates as $template_name => $template_title) {
@@ -259,7 +264,11 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         'name'              => $template_name,
       ]);
       if (!empty($template_entry['is_error'])) {
-        Civi::log()->debug("org.project60.sepa: OptionGroup 'msg_tpl_workflow_contribution' not properly populated. Reinstal extension. Error was: " . $template_entry['error_message']);
+        Civi::log()->debug(
+          // phpcs:ignore Generic.Files.LineLength.TooLong
+          "org.project60.sepa: OptionGroup 'msg_tpl_workflow_contribution' not properly populated. Reinstal extension. Error was: "
+            . $template_entry['error_message']
+        );
         continue;
       }
 
@@ -269,13 +278,17 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
       ]);
 
       if (!empty($template['is_error'])) {
-        Civi::log()->debug("org.project60.sepa: Error while checking template '$template_name': " . $template['error_message']);
+        Civi::log()->debug(
+          "org.project60.sepa: Error while checking template '$template_name': " . $template['error_message']
+        );
       }
       elseif ($template['count'] > 1) {
         Civi::log()->debug("org.project60.sepa: There's multiple templates installed for '$template_name'.");
       }
       elseif ($template['count'] == 1) {
-        Civi::log()->debug("org.project60.sepa: Template '$template_name' seems to be correctly installed. Not updated.");
+        Civi::log()->debug(
+          "org.project60.sepa: Template '$template_name' seems to be correctly installed. Not updated."
+        );
       }
       else {
         // template not yet installed, do it!
@@ -287,14 +300,17 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         $result = civicrm_api3('MessageTemplate', 'create', [
           'workflow_id' => $template_entry['id'],
           'msg_title'   => $template_title,
-          'msg_subject' => ts('SEPA Direct Debit Payment Information', ['domain' => 'org.project60.sepa']),
+          'msg_subject' => E::ts('SEPA Direct Debit Payment Information'),
           'is_reserved' => 0,
           'msg_html'    => file_get_contents($filepath),
           'msg_text'    => 'N/A',
         ]);
 
         if (!empty($result['is_error'])) {
-          Civi::log()->debug("org.project60.sepa: There was an error trying to create template '$template_name': " . $result['error_message']);
+          Civi::log()->debug(
+            "org.project60.sepa: There was an error trying to create template '$template_name': "
+              . $result['error_message']
+          );
         }
       }
     }

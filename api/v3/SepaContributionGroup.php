@@ -65,19 +65,15 @@ function civicrm_api3_sepa_contribution_group_delete($params) {
 /**
  * Retrieve one or more sepa_contribution_groups
  *
- * @param  array input parameters
- *
- *
  * @example SepaContributionGroupGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param  array<string, mixed> $params an associative array of name/value pairs.
  *
- * @return  array api result array
+ * @return  array<string, mixed> api result array
  *   {@getfields sepa_contribution_group_get}
  * @access public
  */
 function civicrm_api3_sepa_contribution_group_get($params) {
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -125,5 +121,12 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
     $result[] = $dao->toArray();
     $total += $dao->total_amount;
   }
-  return civicrm_api3_create_success($result, $params, NULL, NULL, $dao, $extraReturnValues = ['total_amount' => $total]);
+  return civicrm_api3_create_success(
+    $result,
+    $params,
+    NULL,
+    NULL,
+    $dao,
+    $extraReturnValues = ['total_amount' => $total]
+  );
 }

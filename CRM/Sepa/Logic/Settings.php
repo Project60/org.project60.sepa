@@ -14,6 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * This class holds all the functions SEPA settings and configuration
@@ -81,9 +82,10 @@ class CRM_Sepa_Logic_Settings {
    * an override mechanism, so creditors can individually have
    * different values than the default
    *
-   * @param string
+   * @param string $param_name
+   * @param int $creditor_id
    */
-  public static function setSetting($value, $param_name, $creditor_id = NULL) {
+  public static function setSetting(mixed $value, $param_name, $creditor_id = NULL): void {
     $param_name = str_replace('.', '_', $param_name);
     if (empty($creditor_id)) {
       // set the general setting
@@ -135,7 +137,7 @@ class CRM_Sepa_Logic_Settings {
 
     // fallback is "Thanks."
     if (empty($transaction_message)) {
-      $transaction_message = ts('Thank you', ['domain' => 'org.project60.sepa']);
+      $transaction_message = E::ts('Thank you');
     }
 
     // make sure that it doesn't contain any special characters
@@ -171,8 +173,9 @@ class CRM_Sepa_Logic_Settings {
   /**
    * Gets the mandate of the given contribution
    *
-   * @param contribution_id  ID of the contribution
-   * @return a map <mandate ID> => <mandate type> of all mandates (should be 0 or 1!), e.g. array(7 => 'OOFF')
+   * @param int $contribution_id  ID of the contribution
+   * @return array<int, string>
+   *   a map <mandate ID> => <mandate type> of all mandates (should be 0 or 1!), e.g. array(7 => 'OOFF')
    */
   public static function getMandateFor($contribution_id) {
     $mandates = [];
@@ -181,13 +184,17 @@ class CRM_Sepa_Logic_Settings {
       return $mandates;
     }
     $sql_query = "
-    SELECT
-      ooff.id AS ooff_id, ooff.type AS ooff_type, ooff.status AS ooff_status,
-      rcur.id AS rcur_id, rcur.type AS rcur_type, rcur.status AS rcur_status
-    FROM civicrm_contribution
-    LEFT JOIN civicrm_sdd_mandate ooff ON ooff.entity_id = civicrm_contribution.id AND ooff.entity_table = 'civicrm_contribution'
-    LEFT JOIN civicrm_sdd_mandate rcur ON rcur.entity_id = civicrm_contribution.contribution_recur_id AND rcur.entity_table = 'civicrm_contribution_recur'
-    WHERE civicrm_contribution.id = $contribution_id;";
+      SELECT
+        ooff.id AS ooff_id, ooff.type AS ooff_type, ooff.status AS ooff_status,
+        rcur.id AS rcur_id, rcur.type AS rcur_type, rcur.status AS rcur_status
+      FROM civicrm_contribution
+      LEFT JOIN civicrm_sdd_mandate ooff
+        ON ooff.entity_id = civicrm_contribution.id
+        AND ooff.entity_table = 'civicrm_contribution'
+      LEFT JOIN civicrm_sdd_mandate rcur
+        ON rcur.entity_id = civicrm_contribution.contribution_recur_id
+        AND rcur.entity_table = 'civicrm_contribution_recur'
+      WHERE civicrm_contribution.id = $contribution_id;";
     $mandate_ids = CRM_Core_DAO::executeQuery($sql_query);
 
     while ($mandate_ids->fetch()) {
@@ -285,13 +292,17 @@ class CRM_Sepa_Logic_Settings {
         'option_group_id' => 'contribution_status',
         'name' => 'In Progress',
         'value' => 5,
-        'label' => ts('In Progress'),
+        'label' => E::ts('In Progress'),
         'is_active' => TRUE,
         'component_id' => 'CiviContribute',
       ]);
 
       // the look up the status
-      $in_progress_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+      $in_progress_status = (int) CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'In Progress'
+      );
       if (empty($in_progress_status)) {
         throw new Exception("Contribution status 'In Progress' is missing, but required.");
       }

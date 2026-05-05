@@ -34,9 +34,22 @@ class CreateOneOffMandate extends AbstractAction {
    */
   public function getConfigurationSpecification() {
     return new SpecificationBag([
-      new Specification('default_creditor_id', 'Integer', E::ts('Creditor (default)'), TRUE, NULL, NULL, $this->getCreditors(), FALSE),
-      new Specification('default_financial_type_id', 'Integer', E::ts('Financial Type (default)'), TRUE, NULL, NULL, $this->getFinancialTypes(), FALSE),
-      new Specification('default_campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
+      new Specification(
+        'default_creditor_id', 'Integer', E::ts('Creditor (default)'), TRUE, NULL, NULL, $this->getCreditors(), FALSE
+      ),
+      new Specification(
+        'default_financial_type_id',
+        'Integer',
+        E::ts('Financial Type (default)'),
+        TRUE,
+        NULL,
+        NULL,
+        $this->getFinancialTypes(),
+        FALSE
+      ),
+      new Specification(
+        'default_campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE
+      ),
       new Specification('default_amount', 'Money', E::ts('Amount (default)'), TRUE),
     ]);
   }
@@ -48,7 +61,7 @@ class CreateOneOffMandate extends AbstractAction {
    */
   public function getParameterSpecification() {
     return new SpecificationBag([
-        // required fields
+      // required fields
       new Specification('contact_id', 'Integer', E::ts('Contact ID'), TRUE),
       new Specification('account_holder', 'String', E::ts('Account Holder'), FALSE),
       new Specification('iban', 'String', E::ts('IBAN'), TRUE),
@@ -56,12 +69,25 @@ class CreateOneOffMandate extends AbstractAction {
       new Specification('reference', 'String', E::ts('Mandate Reference'), FALSE),
       new Specification('amount', 'Money', E::ts('Amount'), FALSE),
 
-        // basic overrides
-      new Specification('creditor_id', 'Integer', E::ts('Creditor (default)'), FALSE, NULL, NULL, $this->getCreditors(), FALSE),
-      new Specification('financial_type_id', 'Integer', E::ts('Financial Type (default)'), FALSE, NULL, NULL, $this->getFinancialTypes(), FALSE),
-      new Specification('campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE),
+      // basic overrides
+      new Specification(
+        'creditor_id', 'Integer', E::ts('Creditor (default)'), FALSE, NULL, NULL, $this->getCreditors(), FALSE
+      ),
+      new Specification(
+        'financial_type_id',
+        'Integer',
+        E::ts('Financial Type (default)'),
+        FALSE,
+        NULL,
+        NULL,
+        $this->getFinancialTypes(),
+        FALSE
+      ),
+      new Specification(
+        'campaign_id', 'Integer', E::ts('Campaign (default)'), FALSE, NULL, NULL, $this->getCampaigns(), FALSE
+      ),
 
-        // dates
+      // dates
       new Specification('receive_date', 'Date', E::ts('Collection Date'), FALSE, date('Y-m-d H:i:s')),
       new Specification('date', 'Date', E::ts('Signature Date'), FALSE, date('Y-m-d H:i:s')),
       new Specification('validation_date', 'Date', E::ts('Validation Date'), FALSE, date('Y-m-d H:i:s')),
@@ -97,7 +123,21 @@ class CreateOneOffMandate extends AbstractAction {
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
     $mandate_data = ['type' => 'OOFF'];
     // add basic fields
-    foreach (['contact_id', 'account_holder', 'iban', 'bic', 'reference', 'amount', 'receive_date', 'date', 'validation_date', 'source', 'creation_date'] as $parameter_name) {
+    foreach (
+      [
+        'contact_id',
+        'account_holder',
+        'iban',
+        'bic',
+        'reference',
+        'amount',
+        'receive_date',
+        'date',
+        'validation_date',
+        'source',
+        'creation_date',
+      ] as $parameter_name
+    ) {
       $value = $parameters->getParameter($parameter_name);
       if (!empty($value)) {
         $mandate_data[$parameter_name] = $value;

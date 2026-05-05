@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
+
 // This file declares a managed database record of type "ReportTemplate".
 // The record will be automatically inserted, updated, or deleted from the
 // database as appropriate. For more details, see "hook_civicrm_managed" at:
@@ -25,8 +27,8 @@ return [
     'params' =>
     [
       'version' => 3,
-      'label' => ts('SEPA Mandates (One-Off)', ['domain' => 'org.project60.sepa']),
-      'description' => ts('SEPA One-Off Mandate Report (org.project60.sepa)', ['domain' => 'org.project60.sepa']),
+      'label' => E::ts('SEPA Mandates (One-Off)'),
+      'description' => E::ts('SEPA One-Off Mandate Report (org.project60.sepa)'),
       'class_name' => 'CRM_Sepa_Form_Report_SepaMandateOOFF',
       'report_url' => 'org.project60.sepa/sepamandateooff',
       'component' => 'CiviContribute',

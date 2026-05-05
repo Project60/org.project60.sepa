@@ -26,7 +26,7 @@ class ContainerSpecs implements CompilerPassInterface {
   /**
    * Register SEPA Actions
    */
-  public function process(ContainerBuilder $container) {
+  public function process(ContainerBuilder $container): void {
     if ($container->hasDefinition('action_provider')) {
       $typeFactoryDefinition = $container->getDefinition('action_provider');
       $typeFactoryDefinition->addMethodCall('addAction', [
@@ -64,30 +64,70 @@ class ContainerSpecs implements CompilerPassInterface {
     }
     if ($container->hasDefinition('data_processor_factory')) {
       $dataProcessorFactoryDefinition = $container->getDefinition('data_processor_factory');
-      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_mandate', 'Civi\Sepa\DataProcessor\Source\SepaMandate', E::ts('SEPA Mandate'),
-      ]);
-      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_creditor', 'Civi\Sepa\DataProcessor\Source\SepaCreditor', E::ts('SEPA Creditor'),
-      ]);
-      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_transaction_group', 'Civi\Sepa\DataProcessor\Source\SepaTransactionGroup', E::ts('SEPA Transaction Group'),
-      ]);
-      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_sdd_file', 'Civi\Sepa\DataProcessor\Source\SepaSddFile', E::ts('SEPA SDD File'),
-      ]);
-      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_contribution_group', 'Civi\Sepa\DataProcessor\Source\SepaContributionGroup', E::ts('SEPA Contribution Group'),
-      ]);
-      $dataProcessorFactoryDefinition->addMethodCall('addDataSource', [
-        'sepa_mandate_link', 'Civi\Sepa\DataProcessor\Source\SepaMandateLink', E::ts('SEPA Mandate Link'),
-      ]);
-      $dataProcessorFactoryDefinition->addMethodCall('addjoinType', [
-        'sepa_mandate_contribution_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionJoin', E::ts('Join Sepa Mandate on Contribution'),
-      ]);
-      $dataProcessorFactoryDefinition->addMethodCall('addjoinType', [
-        'sepa_mandate_contribution_recur_join', 'Civi\Sepa\DataProcessor\Join\MandateContributionRecurJoin', E::ts('Join Sepa Mandate on Contribution Recur'),
-      ]);
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addDataSource',
+        [
+          'sepa_mandate',
+          'Civi\Sepa\DataProcessor\Source\SepaMandate',
+          E::ts('SEPA Mandate'),
+        ]
+      );
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addDataSource',
+        [
+          'sepa_creditor',
+          'Civi\Sepa\DataProcessor\Source\SepaCreditor',
+          E::ts('SEPA Creditor'),
+        ]
+      );
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addDataSource',
+        [
+          'sepa_transaction_group',
+          'Civi\Sepa\DataProcessor\Source\SepaTransactionGroup',
+          E::ts('SEPA Transaction Group'),
+        ]
+      );
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addDataSource',
+        [
+          'sepa_sdd_file',
+          'Civi\Sepa\DataProcessor\Source\SepaSddFile',
+          E::ts('SEPA SDD File'),
+        ]
+      );
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addDataSource',
+        [
+          'sepa_contribution_group',
+          'Civi\Sepa\DataProcessor\Source\SepaContributionGroup',
+          E::ts('SEPA Contribution Group'),
+        ]
+      );
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addDataSource',
+        [
+          'sepa_mandate_link',
+          'Civi\Sepa\DataProcessor\Source\SepaMandateLink',
+          E::ts('SEPA Mandate Link'),
+        ]
+      );
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addjoinType',
+        [
+          'sepa_mandate_contribution_join',
+          'Civi\Sepa\DataProcessor\Join\MandateContributionJoin',
+          E::ts('Join Sepa Mandate on Contribution'),
+        ]
+      );
+      $dataProcessorFactoryDefinition->addMethodCall(
+        'addjoinType',
+        [
+          'sepa_mandate_contribution_recur_join',
+          'Civi\Sepa\DataProcessor\Join\MandateContributionRecurJoin',
+          E::ts('Join Sepa Mandate on Contribution Recur'),
+        ]
+      );
     }
   }
 

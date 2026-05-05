@@ -14,14 +14,19 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
+// phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 require_once 'sepacustom.civix.php';
+// phpcs:enable
 
 /**
  * This hook is called by the alternativeBatching:
  *  you can set a custom collection date for a rcurring contribution.
  *  For example you can use this hook when you mandate is connected to a yearly membership from January to December.
- *  And when a new member signs up in October. You want to collect that money in october and the membership will end on 31st of December.
- *  So the next collection is in January.
+ *  And when a new member signs up in October. You want to collect that money in
+ *  October and the membership will end on 31st of December. So the next
+ *  collection is in January.
  *
  * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
  * @param array $data
@@ -229,64 +234,56 @@ function sepacustom_civicrm_installment_created($mandate_id, $contribution_recur
 }
 
 /**
- * Implementation of hook_civicrm_config
+ * Implements hook_civicrm_config().
  */
 function sepacustom_civicrm_config(&$config): void {
   _sepacustom_civix_civicrm_config($config);
 }
 
 /**
- * Implementation of hook_civicrm_xmlMenu
- *
- * @param $files array(string)
+ * Implements hook_civicrm_xmlMenu().
  */
 function sepacustom_civicrm_xmlMenu(&$files): void {
   _sepacustom_civix_civicrm_xmlMenu($files);
 }
 
 /**
- * Implementation of hook_civicrm_install
+ * Implements hook_civicrm_install().
  */
 function sepacustom_civicrm_install() {
   return _sepacustom_civix_civicrm_install();
 }
 
 /**
- * Implementation of hook_civicrm_uninstall
+ * Implements hook_civicrm_uninstall().
  */
 function sepacustom_civicrm_uninstall() {
   return _sepacustom_civix_civicrm_uninstall();
 }
 
 /**
- * Implementation of hook_civicrm_enable
+ * Implements hook_civicrm_enable().
  */
 function sepacustom_civicrm_enable() {
   return _sepacustom_civix_civicrm_enable();
 }
 
 /**
- * Implementation of hook_civicrm_disable
+ * Implements hook_civicrm_disable().
  */
 function sepacustom_civicrm_disable() {
   return _sepacustom_civix_civicrm_disable();
 }
 
 /**
- * Implementation of hook_civicrm_upgrade
- *
- * @param $op string, the type of operation being performed; 'check' or 'enqueue'
- * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
- *
- * @return mixed  based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
- *   for 'enqueue', returns void
+ * Implements hook_civicrm_upgrade().
  */
-function sepacustom_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+function sepacustom_civicrm_upgrade(string $op, CRM_Queue_Queue $queue = NULL): mixed {
   return _sepacustom_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
- * Implementation of hook_civicrm_managed
+ * Implements hook_civicrm_managed().
  *
  * Generate a list of entities to create/deactivate/delete when this module
  * is installed, disabled, uninstalled.
@@ -296,7 +293,7 @@ function sepacustom_civicrm_managed(&$entities) {
 }
 
 /**
- * Implementation of hook_civicrm_caseTypes
+ * Implements hook_civicrm_caseTypes().
  *
  * Generate a list of case-types
  *

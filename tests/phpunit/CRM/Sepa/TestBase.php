@@ -20,6 +20,7 @@ use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 use CRM_Sepa_ExtensionUtil as E;
+use PHPUnit\Framework\TestCase;
 
 /**
  * FIXME - Add test description.
@@ -35,56 +36,55 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
+class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
   use Api3TestTrait {
     callAPISuccess as protected traitCallAPISuccess;
   }
 
-  const TEST_IBAN = 'DE02370501980001802057';
-  const TEST_BIC = 'COLSDE33XXX';
+  protected const TEST_IBAN = 'DE02370501980001802057';
+  protected const TEST_BIC = 'COLSDE33XXX';
 
-  const MANDATE_TYPE_OOFF = 'OOFF';
-  const MANDATE_TYPE_RCUR = 'RCUR';
+  protected const MANDATE_TYPE_OOFF = 'OOFF';
+  protected const MANDATE_TYPE_RCUR = 'RCUR';
   // fixme: this is *NOT* a mandate _type_ but only a mandate status
   // (while RCUR and OOFF are mandate types)
-  const MANDATE_TYPE_FRST = 'FRST';
+  protected const MANDATE_TYPE_FRST = 'FRST';
 
-  const MANDATE_STATUS_SENT = 'SENT';
-  const MANDATE_STATUS_INVALID = 'INVALID';
-  const MANDATE_STATUS_COMPLETE = 'COMPLETE';
-
-  // TODO: Move the following constants to a better place (or get them dynamically from Civi):
-  const CONTRIBUTION_STATUS_COMPLETED = '1';
-  const CONTRIBUTION_STATUS_PENDING = '2';
-  const CONTRIBUTION_STATUS_CANCELLED = '3';
-  const CONTRIBUTION_STATUS_FAILED = '4';
-  const CONTRIBUTION_STATUS_IN_PROGRESS = '5';
-  //const CONTRIBUTION_STATUS_OVERDUE = '6';
-  const CONTRIBUTION_STATUS_REFUNDED = '7';
-  const CONTRIBUTION_STATUS_PARTIALLY_PAID = '8';
-  const CONTRIBUTION_STATUS_PENDING_REFUND = '9';
-  const CONTRIBUTION_STATUS_CHARGEBACK = '10';
-  const CONTRIBUTION_STATUS_TEMPLATE = '11';
+  protected const MANDATE_STATUS_SENT = 'SENT';
+  protected const MANDATE_STATUS_INVALID = 'INVALID';
+  protected const MANDATE_STATUS_COMPLETE = 'COMPLETE';
 
   // TODO: Move the following constants to a better place (or get them dynamically from Civi):
-  const RECURRING_CONTRIBUTION_STATUS_COMPLETED = '1';
-  const RECURRING_CONTRIBUTION_STATUS_PENDING = '2';
-  const RECURRING_CONTRIBUTION_STATUS_CANCELLED = '3';
-  const RECURRING_CONTRIBUTION_STATUS_FAILED = '4';
-  const RECURRING_CONTRIBUTION_STATUS_IN_PROGRESS = '5';
-  const RECURRING_CONTRIBUTION_STATUS_OVERDUE = '6';
-  const RECURRING_CONTRIBUTION_STATUS_PROCESSING = '7';
-  const RECURRING_CONTRIBUTION_STATUS_FAILING = '8';
+  protected const CONTRIBUTION_STATUS_COMPLETED = '1';
+  protected const CONTRIBUTION_STATUS_PENDING = '2';
+  protected const CONTRIBUTION_STATUS_CANCELLED = '3';
+  protected const CONTRIBUTION_STATUS_FAILED = '4';
+  protected const CONTRIBUTION_STATUS_IN_PROGRESS = '5';
+  protected const CONTRIBUTION_STATUS_REFUNDED = '7';
+  protected const CONTRIBUTION_STATUS_PARTIALLY_PAID = '8';
+  protected const CONTRIBUTION_STATUS_PENDING_REFUND = '9';
+  protected const CONTRIBUTION_STATUS_CHARGEBACK = '10';
+  protected const CONTRIBUTION_STATUS_TEMPLATE = '11';
 
   // TODO: Move the following constants to a better place (or get them dynamically from Civi):
-  const BATCH_STATUS_OPEN = '1';
-  const BATCH_STATUS_CLOSED = '2';
-  const BATCH_STATUS_DATA_ENTRY = '3';
-  const BATCH_STATUS_REOPENED = '4';
-  const BATCH_STATUS_EXPORTED = '5';
-  const BATCH_STATUS_RECEIVED = '6';
-  const PAYMENT_INSTRUMENT_FRST = '6';
-  const PAYMENT_INSTRUMENT_RCUR = '7';
+  protected const RECURRING_CONTRIBUTION_STATUS_COMPLETED = '1';
+  protected const RECURRING_CONTRIBUTION_STATUS_PENDING = '2';
+  protected const RECURRING_CONTRIBUTION_STATUS_CANCELLED = '3';
+  protected const RECURRING_CONTRIBUTION_STATUS_FAILED = '4';
+  protected const RECURRING_CONTRIBUTION_STATUS_IN_PROGRESS = '5';
+  protected const RECURRING_CONTRIBUTION_STATUS_OVERDUE = '6';
+  protected const RECURRING_CONTRIBUTION_STATUS_PROCESSING = '7';
+  protected const RECURRING_CONTRIBUTION_STATUS_FAILING = '8';
+
+  // TODO: Move the following constants to a better place (or get them dynamically from Civi):
+  protected const BATCH_STATUS_OPEN = '1';
+  protected const BATCH_STATUS_CLOSED = '2';
+  protected const BATCH_STATUS_DATA_ENTRY = '3';
+  protected const BATCH_STATUS_REOPENED = '4';
+  protected const BATCH_STATUS_EXPORTED = '5';
+  protected const BATCH_STATUS_RECEIVED = '6';
+  protected const PAYMENT_INSTRUMENT_FRST = '6';
+  protected const PAYMENT_INSTRUMENT_RCUR = '7';
 
   protected $testCreditorId;
 
@@ -177,7 +177,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
     $creditor_template = $this->callAPISuccess('SepaCreditor', 'getsingle', ['id' => $this->testCreditorId]);
     unset($creditor_template['id']);
     unset($creditor_template['creditor_id']);
-    $creditor_template['name'] = 'creditor-' . CRM_Core_DAO::singleValueQuery('SELECT MAX(id) + 2 FROM civicrm_sdd_creditor');
+    $creditor_template['name'] = 'creditor-'
+      . CRM_Core_DAO::singleValueQuery('SELECT MAX(id) + 2 FROM civicrm_sdd_creditor');
 
     // add custom data
     foreach ($params as $key => $value) {
@@ -231,7 +232,11 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Assert that two date strings or date and time strings have the same date.
    */
-  protected function assertSameDate(string $expectedDateOrDateTime, string $actualDateOrDateTime, string $message = ''): void {
+  protected function assertSameDate(
+    string $expectedDateOrDateTime,
+    string $actualDateOrDateTime,
+    string $message = ''
+  ): void {
     // 4 (the year) + 2 (the month) + 2 (the day) NOTE: This will break in the year 10000.
     $lengthOfDate = 8;
 
@@ -338,22 +343,31 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param string $collectionDate A string parsable by strtotime to set the (first) collection date.
    * @return array The mandate.
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   protected function createMandate(array $parameters, string $collectionDate = 'now'): array {
     // default parameters
-    $parameters['contact_id']        = array_key_exists('contact_id', $parameters) ? $parameters['contact_id'] : $this->createContact();
-    $parameters['iban']              = array_key_exists('iban', $parameters) ? $parameters['iban'] : self::TEST_IBAN;
-    $parameters['amount']            = array_key_exists('amount', $parameters) ? $parameters['amount'] : 8;
-    $parameters['financial_type_id'] = array_key_exists('financial_type_id', $parameters) ? $parameters['financial_type_id'] : 1;
-    $parameters['creditor_id']       = array_key_exists('creditor_id', $parameters) ? $parameters['creditor_id'] : CRM_Sepa_Logic_Settings::defaultCreditor()->id;
-    $parameters['account_holder']    = array_key_exists('account_holder', $parameters) ? $parameters['account_holder'] : '';
+    $parameters['contact_id'] = array_key_exists('contact_id', $parameters)
+      ? $parameters['contact_id'] : $this->createContact();
+    $parameters['iban'] = array_key_exists('iban', $parameters) ? $parameters['iban'] : self::TEST_IBAN;
+    $parameters['amount'] = array_key_exists('amount', $parameters) ? $parameters['amount'] : 8;
+    $parameters['financial_type_id'] = array_key_exists('financial_type_id', $parameters)
+      ? $parameters['financial_type_id'] : 1;
+    $parameters['creditor_id'] = array_key_exists('creditor_id', $parameters)
+        ? $parameters['creditor_id'] : CRM_Sepa_Logic_Settings::defaultCreditor()->id;
+    $parameters['account_holder'] = array_key_exists('account_holder', $parameters)
+      ? $parameters['account_holder'] : '';
 
     if ($parameters['type'] == self::MANDATE_TYPE_OOFF) {
-      $parameters['receive_date'] = array_key_exists('receive_date', $parameters) ? $parameters['receive_date'] : $collectionDate;
+      $parameters['receive_date'] = array_key_exists('receive_date', $parameters)
+        ? $parameters['receive_date'] : $collectionDate;
     }
     else {
-      $parameters['start_date']         = array_key_exists('start_date', $parameters) ? $parameters['start_date'] : $collectionDate;
-      $parameters['frequency_unit']     = array_key_exists('frequency_unit', $parameters) ? $parameters['frequency_unit'] : 'month';
-      $parameters['frequency_interval'] = array_key_exists('frequency_interval', $parameters) ? $parameters['frequency_interval'] : 1;
+      $parameters['start_date'] = array_key_exists('start_date', $parameters)
+        ? $parameters['start_date'] : $collectionDate;
+      $parameters['frequency_unit'] = array_key_exists('frequency_unit', $parameters)
+        ? $parameters['frequency_unit'] : 'month';
+      $parameters['frequency_interval'] = array_key_exists('frequency_interval', $parameters)
+        ? $parameters['frequency_interval'] : 1;
 
       // set the cycle day to the next possible collection date
       $frst_notice_days = (int) CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $parameters['creditor_id']);
@@ -382,7 +396,9 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
   /**
    * Terminate a mandate.
    * @param array $mandate The mandate to terminate.
-   * @param string $endDate A string parsable by strtotime. If it differs from 'today' only the end date is set and the mandate not terminated.
+   * @param string $endDate
+   *   A string parsable by strtotime. If it differs from 'today' only the end
+   *   date is set and the mandate not terminated.
    */
   protected function terminateMandate(array $mandate, string $endDate = 'today'): void {
     $this->callAPISuccess(
@@ -397,8 +413,11 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   /**
    * Execute batching for mandates, resulting in the creation of a group.
-   * @param string $type The type of the mandates to batch, possible values can be found in the class constants as "MANDATE_TYPE_X".
-   * @param string $nowOverwrite A string parsable by strtotime to overwrite the current time used for batching.
+   * @param string $type
+   *   The type of the mandates to batch, possible values can be found in the
+   *   class constants as "MANDATE_TYPE_X".
+   * @param string $nowOverwrite
+   *   A string parsable by strtotime to overwrite the current time used for batching.
    */
   protected function executeBatching(string $type, string $nowOverwrite = 'now'): void {
     $this->callAPISuccess(
@@ -478,7 +497,8 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
       );
     }
     elseif (in_array($mandateType, [self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST])) {
-      // If it is an RCUR/FRST mandate, we need to get the contribution from the recurring contribution given in the mandate's entity_id.
+      // If it is an RCUR/FRST mandate, we need to get the contribution from the
+      // recurring contribution given in the mandate's entity_id.
       // There could be multiple contributions attached, so we return the latest one.
 
       $contributions = $this->callAPISuccess(
@@ -506,13 +526,20 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
     }
 
     if (!$can_be_null) {
-      $this->assertNotNull($contribution, E::ts('This mandate has no contribution, even though there should be one.'));
+      $this->assertNotNull($contribution, 'This mandate has no contribution, even though there should be one.');
     }
 
     if ($contribution) {
       // assert some required attributes are there
-      $this->assertArrayHasKey('contribution_status_id', $contribution, "Mandate contribution does not have a 'contribution_status_id'.");
-      $this->assertNotEmpty($contribution['contribution_status_id'], "Mandate contribution does not have a 'contribution_status_id'.");
+      $this->assertArrayHasKey(
+        'contribution_status_id',
+        $contribution,
+        "Mandate contribution does not have a 'contribution_status_id'."
+      );
+      $this->assertNotEmpty(
+        $contribution['contribution_status_id'],
+        "Mandate contribution does not have a 'contribution_status_id'."
+      );
     }
 
     return $contribution;
@@ -540,7 +567,9 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   /**
    * Get the only active transaction group.
-   * @param string $type The mandate type of the group to search for, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @param string $type
+   *   The mandate type of the group to search for, possible values can be found
+   *   in the class constants as "MANDATE_TYPE_X".
    * @return array The transaction group.
    */
   protected function getActiveTransactionGroup(string $type): array {
@@ -557,7 +586,9 @@ class CRM_Sepa_TestBase extends \PHPUnit\Framework\TestCase implements HeadlessI
 
   /**
    * Get all active transaction groups.
-   * @param string $type The mandate type of the groups to search for, possible values can be found in the class constants as "MANDATE_TYPE_X".
+   * @param string $type
+   *   The mandate type of the groups to search for, possible values can be
+   *   found in the class constants as "MANDATE_TYPE_X".
    * @return array[] The list of transaction groups.
    */
   protected function getActiveTransactionGroups(string $type): array {

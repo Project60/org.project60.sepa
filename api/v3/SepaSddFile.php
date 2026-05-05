@@ -67,14 +67,11 @@ function civicrm_api3_sepa_sdd_file_delete($params) {
 /**
  * Retrieve one or more sepa_sdd_files
  *
- * @param  array input parameters
- *
- *
  * @example SepaSddFileGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array<string, mixed> $params an associative array of name/value pairs.
  *
- * @return  array api result array
+ * @return array<string, mixed> api result array
  *   {@getfields sepa_sdd_file_get}
  * @access public
  */

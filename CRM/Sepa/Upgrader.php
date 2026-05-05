@@ -86,7 +86,9 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $currency_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'currency';");
     if (!$currency_column) {
       // doesn't exist yet
-      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `currency` varchar(3) COMMENT 'currency used by this creditor';");
+      $this->executeSql(
+        "ALTER TABLE civicrm_sdd_creditor ADD COLUMN `currency` varchar(3) COMMENT 'currency used by this creditor';"
+      );
     }
     $this->executeSql("UPDATE civicrm_sdd_creditor SET currency = 'EUR' WHERE currency IS NULL;");
     return TRUE;
@@ -115,7 +117,10 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $currency_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'creditor_type';");
     if (!$currency_column) {
       // doesn't exist yet
-      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `creditor_type` varchar(8) COMMENT 'type of the creditor, values are SEPA (default) and PSP';");
+      $this->executeSql(
+        "ALTER TABLE civicrm_sdd_creditor
+        ADD COLUMN `creditor_type` varchar(8) COMMENT 'type of the creditor, values are SEPA (default) and PSP';"
+      );
     }
 
     $this->executeSql("UPDATE civicrm_sdd_creditor SET creditor_type = 'SEPA' WHERE creditor_type IS NULL;");
@@ -143,7 +148,11 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1412() {
     $this->ctx->log->info('Applying update 1412');
     // set all SEPA recurring contributions in status 'In Progress' to 'Pending'
-    $status_pending    = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $status_pending = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
     $status_inprogress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     CRM_Core_DAO::executeQuery("
         UPDATE civicrm_contribution_recur rcur
@@ -165,6 +174,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
           AND mandate.id IS NOT NULL
           AND c2txg.id IS NULL;");
     if ($lost_contributions) {
+      // phpcs:ignore Generic.Files.LineLength.TooLong
       CRM_Core_Session::setStatus("There seems to be {$lost_contributions} SEPA contributions in status 'In Progress', that are not in any transaction group. This is likely due to the bug SEPA-514, and you might want to check, if these shouldn't be deleted.");
     }
 
@@ -207,7 +217,10 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $uses_bic_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'uses_bic';");
     if (!$uses_bic_column) {
       // doesn't exist yet, add the column and set to '1'
-      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `uses_bic` tinyint COMMENT 'If true, BICs are not used for this creditor';");
+      $this->executeSql(
+        "ALTER TABLE civicrm_sdd_creditor
+        ADD COLUMN `uses_bic` tinyint COMMENT 'If true, BICs are not used for this creditor';"
+      );
       $this->executeSql('UPDATE civicrm_sdd_creditor SET `uses_bic`=1 WHERE uses_bic IS NULL');
     }
     return TRUE;
@@ -234,7 +247,10 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $uses_bic_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'label';");
     if (!$uses_bic_column) {
       // doesn't exist yet, add the column and set to '1'
-      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `label` varchar(128) COMMENT 'internally used label for the creditor';");
+      $this->executeSql(
+        "ALTER TABLE civicrm_sdd_creditor
+        ADD COLUMN `label` varchar(128) COMMENT 'internally used label for the creditor';"
+      );
       $this->executeSql('UPDATE civicrm_sdd_creditor SET label=name WHERE label IS NULL');
     }
     return TRUE;
@@ -249,9 +265,18 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1504() {
     $dsn = DB::parseDSN(CIVICRM_DSN);
     $this->ctx->log->info('Adding civicrm_sdd_contribution_txgroup.FK_civicrm_sdd_contribution_id constraint');
-    $constraint_exists = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = '{$dsn['database']}' AND TABLE_NAME = 'civicrm_sdd_contribution_txgroup' AND CONSTRAINT_NAME='FK_civicrm_sdd_contribution_id';");
+    $constraint_exists = (int) CRM_Core_DAO::singleValueQuery(
+      "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+        WHERE TABLE_SCHEMA = '{$dsn['database']}'
+          AND TABLE_NAME = 'civicrm_sdd_contribution_txgroup'
+          AND CONSTRAINT_NAME='FK_civicrm_sdd_contribution_id';"
+    );
     if (!$constraint_exists) {
-      $this->executeSql('ALTER TABLE `civicrm_sdd_contribution_txgroup` ADD CONSTRAINT FK_civicrm_sdd_contribution_id FOREIGN KEY (`contribution_id`) REFERENCES `civicrm_contribution`(`id`) ON DELETE CASCADE;');
+      $this->executeSql(
+        'ALTER TABLE `civicrm_sdd_contribution_txgroup`
+          ADD CONSTRAINT FK_civicrm_sdd_contribution_id FOREIGN KEY (`contribution_id`)
+            REFERENCES `civicrm_contribution`(`id`) ON DELETE CASCADE;'
+      );
     }
     return TRUE;
   }
@@ -298,13 +323,20 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     if (!empty($sdd_processor_type_ids)) {
       // find out, if they're being used
       $sdd_processor_type_id_list = implode(',', $sdd_processor_type_ids);
-      $use_count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
+      $use_count = CRM_Core_DAO::singleValueQuery(
+        "SELECT COUNT(id) FROM civicrm_payment_processor
+        WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});"
+      );
 
       if ($use_count) {
         // if the payment processors are being used, divert them to the dummy processor
         //  and issue a warning to install the SDD PP extension
+        // phpcs:ignore Generic.Files.LineLength.TooLong
         $message = E::ts('Your CiviSEPA payment processors have been disabled, the code was moved into a new extension. If you want to continue using your CiviSEPA payment processors, please install the latest version of the <a href="https://github.com/Project60/org.project60.sepapp/releases">CiviSEPA Payment Processor</a> Extension.');
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET class_name='Payment_Dummy' WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});");
+        CRM_Core_DAO::executeQuery(
+          "UPDATE civicrm_payment_processor SET class_name='Payment_Dummy'
+          WHERE payment_processor_type_id IN ({$sdd_processor_type_id_list});"
+        );
         CRM_Core_Session::setStatus($message, E::ts('%1 Payment Processor(s) Disabled!', [1 => $use_count]), 'warn');
         Civi::log()->warning($message);
 
@@ -347,11 +379,19 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $this->ctx->log->info('Added payment instrument fields');
     $pi_ooff = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_ooff';");
     if (!$pi_ooff) {
-      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_ooff` varchar(64) COMMENT 'payment instruments, comma separated, to be used for one-off collections';");
+      $this->executeSql(
+        "ALTER TABLE civicrm_sdd_creditor
+          ADD COLUMN `pi_ooff` varchar(64)
+            COMMENT 'payment instruments, comma separated, to be used for one-off collections';"
+      );
     }
     $pi_rcur = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_rcur';");
     if (!$pi_rcur) {
-      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `pi_rcur` varchar(64) COMMENT 'payment instruments, comma separated, to be used for recurring collections';");
+      $this->executeSql(
+        "ALTER TABLE civicrm_sdd_creditor
+          ADD COLUMN `pi_rcur` varchar(64)
+            COMMENT 'payment instruments, comma separated, to be used for recurring collections';"
+      );
     }
 
     $logging = new CRM_Logging_Schema();
@@ -368,6 +408,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     catch (Exception $ex) {
       // @ignoreException
       // We have a problem if the old payment instruments have been disabled
+      // phpcs:ignore Generic.Files.LineLength.TooLong
       $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
       CRM_Core_Session::setStatus($message, E::ts('Missing payment instruments!'), 'warn');
       Civi::log()->warning($message);
@@ -389,6 +430,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     try {
       $sdd_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
 
+      // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
       /* RETRACTED: this should already be the case AND it messes with precisely the setups that we want to support now
       // recurring contributions of mandates in status 'RCUR' should always have the RCUR payment instrument set
       //  (that should have already been the case)
@@ -423,6 +465,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     catch (Exception $ex) {
       // @ignoreException
       // We have a problem if the old payment instruments have been disabled
+      // phpcs:ignore Generic.Files.LineLength.TooLong
       $message = E::ts("Couldn't find the classic CiviSEPA payment instruments [OOFF,RCUR,FRST]. Please review the payment instruments assigned to your creditors.");
       CRM_Core_Session::setStatus($message, E::ts('Missing payment instruments!'), 'warn');
       Civi::log()->warning($message);
@@ -453,11 +496,14 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    */
   public function upgrade_1701() {
     $this->ctx->log->info('Adding mandate.account_holder field');
-    $has_account_holder_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_mandate` LIKE 'account_holder';");
+    $has_account_holder_column = CRM_Core_DAO::singleValueQuery(
+      "SHOW COLUMNS FROM `civicrm_sdd_mandate` LIKE 'account_holder';"
+    );
     if (!$has_account_holder_column) {
       // doesn't exist yet, add the column and set to '1'
       $this->executeSql(
-          "ALTER TABLE civicrm_sdd_mandate ADD COLUMN `account_holder` varchar(255) NULL DEFAULT NULL COMMENT 'Name of the account holder';"
+          "ALTER TABLE civicrm_sdd_mandate
+          ADD COLUMN `account_holder` varchar(255) NULL DEFAULT NULL COMMENT 'Name of the account holder';"
       );
     }
     return TRUE;
@@ -479,7 +525,10 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $this->ctx->log->info('Adding CUC-code ("Codice Univoco CBI" for CBIBdySDDReq.00.01.00 standard');
     $cuc = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'cuc';");
     if (!$cuc) {
-      $this->executeSql("ALTER TABLE civicrm_sdd_creditor ADD COLUMN `cuc` varchar(8) COMMENT 'CUC-code of the creditor (Codice Univoco CBI)';");
+      $this->executeSql(
+        "ALTER TABLE civicrm_sdd_creditor
+          ADD COLUMN `cuc` varchar(8) COMMENT 'CUC-code of the creditor (Codice Univoco CBI)';"
+      );
     }
     return TRUE;
   }
@@ -506,12 +555,13 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     );
     if (!$column) {
       $this->executeSql(
+        // phpcs:disable Generic.Files.LineLength.TooLong
         <<<SQL
         ALTER TABLE civicrm_sdd_txgroup
-          ADD COLUMN `financial_type_id`
-            int unsigned
+          ADD COLUMN `financial_type_id` int unsigned
           COMMENT 'Financial type of contained contributions if CiviSEPA is generating groups matching financial types.';
         SQL
+        // phpcs:enable
       );
     }
     return TRUE;

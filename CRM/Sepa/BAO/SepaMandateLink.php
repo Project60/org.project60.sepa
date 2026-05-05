@@ -56,7 +56,15 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    * @return object CRM_Sepa_BAO_SepaMandateLink resulting object
    * @throws Exception if mandatory fields aren't set
    */
-  public static function createMandateLink($mandate_id, $entity_id, $entity_table, $class, $is_active = TRUE, $start_date = 'now', $end_date = NULL) {
+  public static function createMandateLink(
+    $mandate_id,
+    $entity_id,
+    $entity_table,
+    $class,
+    $is_active = TRUE,
+    $start_date = 'now',
+    $end_date = NULL
+  ) {
     $params = [
       'mandate_id'   => $mandate_id,
       'entity_id'    => $entity_id,
@@ -94,7 +102,13 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    * @return array of link data
    * @throws Exception if mandate_id is invalid
    */
-  public static function getActiveLinks($mandate_id = NULL, $class = NULL, $entity_id = NULL, $entity_table = NULL, $date = 'now') {
+  public static function getActiveLinks(
+    $mandate_id = NULL,
+    $class = NULL,
+    $entity_id = NULL,
+    $entity_table = NULL,
+    $date = 'now'
+  ) {
     // build where clause
     $WHERE_CLAUSES = [];
 

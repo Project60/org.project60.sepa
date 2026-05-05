@@ -65,7 +65,9 @@ class CRM_Sepa_Logic_Queue_Update {
         $count = self::getMandateCount($creditor['id'], $sdd_mode) + self::BATCH_SIZE;
         for ($offset = 0; $offset < $count; $offset += self::BATCH_SIZE) {
           // add an item for each batch
-          $queue->createItem(new CRM_Sepa_Logic_Queue_Update('UPDATE', $sdd_mode, $asyncLockId, $creditor['id'], $offset, self::BATCH_SIZE));
+          $queue->createItem(new CRM_Sepa_Logic_Queue_Update(
+            'UPDATE', $sdd_mode, $asyncLockId, $creditor['id'], $offset, self::BATCH_SIZE
+          ));
         }
         $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLEANUP', $sdd_mode, $asyncLockId));
       }
@@ -75,17 +77,23 @@ class CRM_Sepa_Logic_Queue_Update {
 
     // create a runner and launch it
     $runner = new CRM_Queue_Runner([
-      'title'     => ts('Updating %1 SEPA Groups', [1 => $mode, 'domain' => 'org.project60.sepa']),
+      'title'     => E::ts('Updating %1 SEPA Groups', [1 => $mode]),
       'queue'     => $queue,
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      // 'onEnd'     => array('CRM_Admin_Page_ExtensionsUpgrade', 'onEnd'),
       'onEndUrl'  => CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active', FALSE, NULL, FALSE),
     ]);
     // does not return
     $runner->runAllViaWeb();
   }
 
-  protected function __construct(string $cmd, string $mode, string $asyncLockId, $creditorId = NULL, ?int $offset = NULL, ?int $limit = NULL) {
+  protected function __construct(
+    string $cmd,
+    string $mode,
+    string $asyncLockId,
+    $creditorId = NULL,
+    ?int $offset = NULL,
+    ?int $limit = NULL
+  ) {
     $this->cmd = $cmd;
     $this->mode = $mode;
     $this->asyncLockId = $asyncLockId;
@@ -96,25 +104,26 @@ class CRM_Sepa_Logic_Queue_Update {
     // set title
     switch ($this->cmd) {
       case 'PREPARE':
-        $this->title = ts('Preparing to clean up ended mandates', ['domain' => 'org.project60.sepa']);
+        $this->title = E::ts('Preparing to clean up ended mandates');
         break;
 
       case 'CLOSE':
-        $this->title = ts('Cleaning up ended mandates', ['domain' => 'org.project60.sepa']);
+        $this->title = E::ts('Cleaning up ended mandates');
         break;
 
       case 'UPDATE':
-        $this->title = ts('Process %1 mandates (%2-%3)',
-          [1 => $this->mode, 2 => $this->offset, 3 => $this->offset + $this->limit, 'domain' => 'org.project60.sepa']);
+        $this->title = E::ts(
+          'Process %1 mandates (%2-%3)',
+          [1 => $this->mode, 2 => $this->offset, 3 => $this->offset + $this->limit]
+        );
         break;
 
       case 'CLEANUP':
-        $this->title = ts('Cleaning up %1 groups',
-          [1 => $this->mode, 'domain' => 'org.project60.sepa']);
+        $this->title = E::ts('Cleaning up %1 groups', [1 => $this->mode]);
         break;
 
       case 'FINISH':
-        $this->title = ts('Lock released', ['domain' => 'org.project60.sepa']);
+        $this->title = E::ts('Lock released');
         break;
 
       default:
