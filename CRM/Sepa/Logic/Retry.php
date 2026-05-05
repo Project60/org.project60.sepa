@@ -61,7 +61,7 @@ class CRM_Sepa_Logic_Retry {
         $counter += 1;
         $reference = "TXG-{$creditor_id}-RTRY-{$collection_date}--" . $counter;
       }
-      CRM_Utils_SepaCustomisationHooks::modify_txgroup_reference($reference, $creditor_id, 'RTRY', $collection_date);
+      CRM_Utils_SepaCustomisationHooks::modify_txgroup_reference($reference, $creditor_id, 'RTRY', $collection_date, $financial_type_id = NULL);
 
       // create new group
       $group = civicrm_api3('SepaTransactionGroup', 'create', array(
