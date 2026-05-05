@@ -47,12 +47,12 @@ function _civicrm_api3_sepa_alternative_batching_close_spec(&$params) {
  *
  * This method will create the SDD file for the given group
  *
- * @param array{txgroup_id: int|numeric-string, override: bool} $params
+ * @param array{txgroup_id: int|numeric-string, override: bool|scalar} $params
  *   txgroup_id: the transaction group for which the file should be created.
  *   override: if true, will override an already existing file and create a new one.
  */
 function civicrm_api3_sepa_alternative_batching_createxml($params) {
-  $override = (isset($params['override'])) ? $params['override'] : FALSE;
+  $override = (bool) ($params['override'] ?? FALSE);
 
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
   if (is_numeric($result)) {
@@ -61,7 +61,7 @@ function civicrm_api3_sepa_alternative_batching_createxml($params) {
   }
   else {
     // there was an error:
-    civicrm_api3_create_error($result);
+    return civicrm_api3_create_error($result);
   }
 }
 

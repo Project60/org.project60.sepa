@@ -220,7 +220,7 @@ function civicrm_api3_sepa_transaction_group_createnext($params) {
     return civicrm_api3_create_success([$values], $params, 'address', $contrib);
   }
   else {
-    civicrm_api3_create_error('Could not create ' . $errors . ' new contributions', $output);
+    return civicrm_api3_create_error('Could not create ' . $errors . ' new contributions', $output);
   }
 }
 
