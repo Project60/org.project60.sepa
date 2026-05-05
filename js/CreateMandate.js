@@ -28,7 +28,11 @@
      * PRs welcome :)
      **/
     function sdd_setDate(fieldname, date) {
-        let dp_element = cj("#sdd-create-mandate").find("[name^=" + fieldname + "].hasDatepicker");
+        let date_element = cj("#sdd-create-mandate").find("[name=" + fieldname + "]");
+        let dateString = CRM.utils.formatDate(date,'yy-mm-dd');
+        // why 'yy-mm-dd' instead of  CRM.config.dateInputFormat because crm.datapicker.js line 128 has also 'yy-mm-dd'
+        date_element.val(dateString);
+        let dp_element = cj("#sdd-create-mandate").find("[name=" + fieldname + "]").siblings(".hasDatepicker");
         dp_element.datepicker('setDate', date);
 
         // flash the field a little bit to indicate change
