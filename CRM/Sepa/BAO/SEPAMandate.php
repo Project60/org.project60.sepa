@@ -1048,11 +1048,11 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     }
 
     return SepaMandate::get(FALSE)
-        ->addWhere('contact_id', '=', $cid)
-        ->addOrderBy('id', 'DESC')
-        ->setLimit(1)
-        ->execute()
-        ->first() ?? FALSE;
+      ->addWhere('contact_id', '=', $cid)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first() ?? FALSE;
   }
 
   public static function isContributionMandate($mandate) {
