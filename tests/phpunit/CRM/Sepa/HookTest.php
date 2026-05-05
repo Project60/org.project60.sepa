@@ -148,14 +148,14 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
    * @param string $creditor_id The SDD creditor ID.
    * @param string $mode The SEPA mode (OOFF, RCUR, FRST, RTRY).
    * @param string $collection_date The scheduled collection date.
-   * @param string $financial_type_id The financial type ID.
+   * @param int|null $financial_type_id The financial type ID.
    */
   public function hook_civicrm_modify_txgroup_reference(
       string &$reference,
       string $creditor_id,
       string $mode,
       string $collection_date,
-      string $financial_type_id
+      ?int $financial_type_id
   ): void {
     // Only execute this hook if we are ordered to:
     if (!$this->executeModifyTxGroupHook) {

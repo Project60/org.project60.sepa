@@ -66,7 +66,7 @@ class CRM_Utils_SepaCustomisationHooks {
    * @param int $creditor_id SDD creditor ID
    * @param string $mode SEPA mode (OOFF, RCUR, FRST, RTRY)
    * @param string $collection_date scheduled collection date
-   * @param int $financial_type_id
+   * @param int|null $financial_type_id
    *
    * @access public
    */
