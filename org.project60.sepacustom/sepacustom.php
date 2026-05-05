@@ -14,19 +14,24 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
+// phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 require_once 'sepacustom.civix.php';
+// phpcs:enable
 
 /**
  * This hook is called by the alternativeBatching:
  *  you can set a custom collection date for a rcurring contribution.
  *  For example you can use this hook when you mandate is connected to a yearly membership from January to December.
- *  And when a new member signs up in October. You want to collect that money in october and the membership will end on 31st of December.
- *  So the next collection is in January.
+ *  And when a new member signs up in October. You want to collect that money in
+ *  October and the membership will end on 31st of December. So the next
+ *  collection is in January.
  *
  * @param string $next_collection_date  the calculated collection date (format: "YYYY-MM-DD").
- * @param array  $data array with data (such as mandate_id, mandate_entity_id for contribution recur id).
+ * @param array $data
  */
-function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $data) {
+function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $data): void {
   // Check if this rcontribution is part of a membership.
   if (!isset($data['mandate_entity_id']) || !isset($data['mandate_creditor_id'])) {
     return;
@@ -35,18 +40,18 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
   $creditor_id = $data['mandate_creditor_id'];
 
   // Fetch the possible cycle days.
-  $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting("cycledays", range(1, 28), $creditor_id);
+  $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor_id);
   if (!is_array($cycle_days) || !count($cycle_days)) {
     return;
   }
   asort($cycle_days);
   $notice_days = \CRM_Sepa_Logic_Settings::getSetting('batching_RCUR_notice', $creditor_id);
   $now = new \DateTime();
-  $now->modify('+'.$notice_days.' days');
+  $now->modify('+' . $notice_days . ' days');
 
   // Check whether this is the first contribution or not.
-  $sqlContributionCount = "SELECT count(*) FROM civicrm_contribution WHERE contribution_recur_id = %1";
-  $sqlContributionCountParams[1] = array($contribution_recur_id, 'Integer');
+  $sqlContributionCount = 'SELECT count(*) FROM civicrm_contribution WHERE contribution_recur_id = %1';
+  $sqlContributionCountParams[1] = [$contribution_recur_id, 'Integer'];
   $contributionCount = CRM_Core_DAO::singleValueQuery($sqlContributionCount, $sqlContributionCountParams);
   if ($contributionCount > 0) {
     // Only alter the collection date when this is not the first contribution.
@@ -58,11 +63,12 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
         $membershipEndDate = $now;
       }
       // Move the first collection date
-      while(!in_array($membershipEndDate->format('j'), $cycle_days)) {
+      while (!in_array($membershipEndDate->format('j'), $cycle_days)) {
         $membershipEndDate->modify('+1 day');
       }
       $next_collection_date = $membershipEndDate->format('Y-m-d');
-    } catch (CRM_Core_Exception $e) {
+    }
+    catch (CRM_Core_Exception $e) {
       // No membership found.
       // Do not alter the date.
     }
@@ -80,39 +86,49 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
  *       \_\_____________________ inteval, 00=OOFF, 04=quarterly, 02=monthly, etc.
  *   \__\________________________ identifier string
  */
-function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
+function sepacustom_civicrm_create_mandate(&$mandate_parameters): void {
 
-  if (isset($mandate_parameters['reference']) && !empty($mandate_parameters['reference']))
-    return;   // user defined mandate
+  if (isset($mandate_parameters['reference']) && !empty($mandate_parameters['reference'])) {
+    // user defined mandate
+    return;
+  }
 
   // load contribution
-  if ($mandate_parameters['entity_table']=='civicrm_contribution') {
-    $contribution = civicrm_api('Contribution', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
-    $interval = '00';   // one-time
-  } else if ($mandate_parameters['entity_table']=='civicrm_contribution_recur') {
-    $contribution = civicrm_api('ContributionRecur', 'getsingle', array('version' => 3, 'id' => $mandate_parameters['entity_id']));
-    if ($contribution['frequency_unit']=='month') {
-      $interval = sprintf('%02d', 12/$contribution['frequency_interval']);
-    } else if ($contribution['frequency_unit']=='year') {
+  if ($mandate_parameters['entity_table'] == 'civicrm_contribution') {
+    $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $mandate_parameters['entity_id']]);
+    // one-time
+    $interval = '00';
+  }
+  elseif ($mandate_parameters['entity_table'] == 'civicrm_contribution_recur') {
+    $contribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate_parameters['entity_id']]);
+    if ($contribution['frequency_unit'] == 'month') {
+      $interval = sprintf('%02d', 12 / $contribution['frequency_interval']);
+    }
+    elseif ($contribution['frequency_unit'] == 'year') {
       $interval = '01';
-    } else {
+    }
+    else {
       // error:
       $interval = '99';
     }
-  } else {
-    die("unsupported mandate");
+  }
+  else {
+    die('unsupported mandate');
   }
 
   $reference  = 'P60-';
   $reference .= $interval;
   $reference .= sprintf('C%08d', $contribution['contact_id']);
-  $reference .= 'D';          // separator
+  // separator
+  $reference .= 'D';
   $reference .= date('Ymd');
-  $reference .= 'N';          // separator
-  $reference .= '%d';         // for numbers
+  // separator
+  $reference .= 'N';
+  // for numbers
+  $reference .= '%d';
 
   // try to find one that's not used yet...
-  for ($n=0; $n < 10; $n++) {
+  for ($n = 0; $n < 10; $n++) {
     $reference_candidate = sprintf($reference, $n);
     // check if it exists
     try {
@@ -132,7 +148,6 @@ function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
   die('No mandates IDs left for this id/date/type.');
 }
 
-
 /**
  * This hook lets defer the collection date according to your banks preferences.
  * Most banks will only accept collection days that comply with their 'bank days'
@@ -140,7 +155,7 @@ function sepacustom_civicrm_create_mandate(&$mandate_parameters) {
  * In this implementation, we only prevent the collection day to be on weekend,
  * but -depending on your bank- you might want to include national holidays as well.
  */
-function sepacustom_civicrm_defer_collection_date(&$collection_date, $creditor_id) {
+function sepacustom_civicrm_defer_collection_date(&$collection_date, $creditor_id): void {
   // Don't collect on the week end
   $day_of_week = date('N', strtotime($collection_date));
   if ($day_of_week > 5) {
@@ -150,17 +165,15 @@ function sepacustom_civicrm_defer_collection_date(&$collection_date, $creditor_i
   }
 }
 
-
 /**
  * This hook lets you customize the collection message.
  *
  * You can simply put a string here, but most likely you would want to base
  * the message on the type of payment and/or the creditor.
  */
-function sepacustom_civicrm_modify_txmessage(&$txmessage, $info, $creditor) {
-    $txmessage = "This is a customized message.";
+function sepacustom_civicrm_modify_txmessage(&$txmessage, $info, $creditor): void {
+  $txmessage = 'This is a customized message.';
 }
-
 
 /**
  * This hook lets you customize the EndToEndId used when submitting
@@ -173,7 +186,7 @@ function sepacustom_civicrm_modify_txmessage(&$txmessage, $info, $creditor) {
  * each transactions, otherwise it'll be rejected by the bank.
  * It will also have to create the SAME ID every time it's called for the same transaction.
  */
-function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $creditor) {
+function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $creditor): void {
   $end2endID = "PREFIX{$end2endID}SUFFIX";
 }
 
@@ -186,101 +199,91 @@ function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $credi
  * be aware the newly created contribution is still 'Pending', it might NOT be
  * issued to the bank.
  *
- * @param array  $mandate_id             the CiviSEPA mandate entity ID
- * @param array  $contribution_recur_id  the recurring contribution connected to the mandate
- * @param array  $contribution_id        the newly created contribution
+ * @param array $mandate_id
+ * @param array $contribution_recur_id
+ * @param array $contribution_id
  *
  * @access public
  */
-function sepacustom_civicrm_installment_created($mandate_id, $contribution_recur_id, $contribution_id) {
+function sepacustom_civicrm_installment_created($mandate_id, $contribution_recur_id, $contribution_id): void {
   // example: assign to membership if contact has (exactly) one...
   try {
     $contribution = civicrm_api3('Contribution', 'getsingle', [
-        'id'     => $contribution_id,
-        'return' => 'financial_type_id,contact_id']);
+      'id'     => $contribution_id,
+      'return' => 'financial_type_id,contact_id',
+    ]);
     if ($contribution['financial_type_id'] == 2) {
       // this is a membership fee (in a default system...)
       $membership_id = civicrm_api3('Membership', 'getvalue', [
-          'contact_id' => $contribution['contact_id'],
-          'status_id'  => ['IN' => [1, 2, 3]], // current member (in a default system)
-          'return'     => 'id']);
+        'contact_id' => $contribution['contact_id'],
+        // current member (in a default system)
+        'status_id'  => ['IN' => [1, 2, 3]],
+        'return'     => 'id',
+      ]);
 
       // if we get here, both exist and we can connect them
       civicrm_api3('MembershipPayment', 'create', [
-          'membership_id'   => $membership_id,
-          'contribution_id' => $contribution_id]);
+        'membership_id'   => $membership_id,
+        'contribution_id' => $contribution_id,
+      ]);
     }
-  } catch (Exception $ex) {
+  }
+  catch (Exception $ex) {
     // not a big deal, most likely there was not a single membership found in the getvalue call
   }
 }
 
-
-
-
-
-
-
-
 /**
- * Implementation of hook_civicrm_config
+ * Implements hook_civicrm_config().
  */
-function sepacustom_civicrm_config(&$config) {
+function sepacustom_civicrm_config(&$config): void {
   _sepacustom_civix_civicrm_config($config);
 }
 
 /**
- * Implementation of hook_civicrm_xmlMenu
- *
- * @param $files array(string)
+ * Implements hook_civicrm_xmlMenu().
  */
-function sepacustom_civicrm_xmlMenu(&$files) {
+function sepacustom_civicrm_xmlMenu(&$files): void {
   _sepacustom_civix_civicrm_xmlMenu($files);
 }
 
 /**
- * Implementation of hook_civicrm_install
+ * Implements hook_civicrm_install().
  */
 function sepacustom_civicrm_install() {
   return _sepacustom_civix_civicrm_install();
 }
 
 /**
- * Implementation of hook_civicrm_uninstall
+ * Implements hook_civicrm_uninstall().
  */
 function sepacustom_civicrm_uninstall() {
   return _sepacustom_civix_civicrm_uninstall();
 }
 
 /**
- * Implementation of hook_civicrm_enable
+ * Implements hook_civicrm_enable().
  */
 function sepacustom_civicrm_enable() {
   return _sepacustom_civix_civicrm_enable();
 }
 
 /**
- * Implementation of hook_civicrm_disable
+ * Implements hook_civicrm_disable().
  */
 function sepacustom_civicrm_disable() {
   return _sepacustom_civix_civicrm_disable();
 }
 
 /**
- * Implementation of hook_civicrm_upgrade
- *
- * @param $op string, the type of operation being performed; 'check' or 'enqueue'
- * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
- *
- * @return mixed  based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
- *                for 'enqueue', returns void
+ * Implements hook_civicrm_upgrade().
  */
-function sepacustom_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+function sepacustom_civicrm_upgrade(string $op, CRM_Queue_Queue $queue = NULL): mixed {
   return _sepacustom_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
- * Implementation of hook_civicrm_managed
+ * Implements hook_civicrm_managed().
  *
  * Generate a list of entities to create/deactivate/delete when this module
  * is installed, disabled, uninstalled.
@@ -290,12 +293,12 @@ function sepacustom_civicrm_managed(&$entities) {
 }
 
 /**
- * Implementation of hook_civicrm_caseTypes
+ * Implements hook_civicrm_caseTypes().
  *
  * Generate a list of case-types
  *
  * Note: This hook only runs in CiviCRM 4.4+.
  */
-function sepacustom_civicrm_caseTypes(&$caseTypes) {
+function sepacustom_civicrm_caseTypes(&$caseTypes): void {
   _sepacustom_civix_civicrm_caseTypes($caseTypes);
 }

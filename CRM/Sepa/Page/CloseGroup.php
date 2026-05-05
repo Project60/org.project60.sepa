@@ -26,7 +26,8 @@ use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
-  function run() {
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.TooHigh
+  public function run() {
     CRM_Utils_System::setTitle(E::ts('Close SEPA Group'));
     $group_id = CRM_Utils_Request::retrieve('group_id', 'Integer');
     $status = CRM_Utils_Request::retrieve('status', 'String');
@@ -49,8 +50,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
         $this->assign('txgroup', $group);
 
         // check whether this is a group created by a test creditor
-        $creditor = civicrm_api('SepaCreditor', 'getsingle', [
-          'version' => 3,
+        $creditor = civicrm_api3('SepaCreditor', 'getsingle', [
           'id' => $group['sdd_creditor_id'],
         ]);
         if (isset($creditor['is_error']) && $creditor['is_error']) {
@@ -88,9 +88,8 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
             // delete old txfile
             if (!empty($group['sdd_file_id'])) {
-              $result = civicrm_api('SepaSddFile', 'delete', [
+              $result = civicrm_api3('SepaSddFile', 'delete', [
                 'id' => $group['sdd_file_id'],
-                'version' => 3,
               ]);
               if (isset($result['is_error']) && $result['is_error']) {
                 CRM_Core_Session::setStatus(
@@ -127,10 +126,10 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
    * generate an XML download link and assign to the template
    */
   protected function createDownloadLink($group_id) {
-    $xmlfile = civicrm_api(
+    $xmlfile = civicrm_api3(
       'SepaAlternativeBatching',
       'createxml',
-      ['txgroup_id' => $group_id, 'override' => TRUE, 'version' => 3]
+      ['txgroup_id' => $group_id, 'override' => TRUE]
     );
     if (isset($xmlfile['is_error']) && $xmlfile['is_error']) {
       CRM_Core_Session::setStatus(
@@ -182,8 +181,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
       CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$groupId], $target_group_status, $target_contribution_status);
     }
 
-    $result = civicrm_api('SepaAlternativeBatching', 'close', [
-      'version' => 3,
+    $result = civicrm_api3('SepaAlternativeBatching', 'close', [
       'txgroup_id' => $groupId,
     ]);
     if ($result['is_error']) {

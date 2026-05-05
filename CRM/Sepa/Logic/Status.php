@@ -14,6 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * This class provide functions to translate the SEPA mandate status
@@ -28,32 +29,33 @@ class CRM_Sepa_Logic_Status {
    * @param $manadate_status  the status as in the DB
    * @param $localise         return the ts'ed version of the value
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function translateMandateStatus($mandate_status, $localise = FALSE) {
     switch ($mandate_status) {
 
       case 'INIT':
-        return ($localise?ts("Not activated", array('domain' => 'org.project60.sepa')):"Not activated");
+        return ($localise ? E::ts('Not activated') : 'Not activated');
 
       case 'FRST':
       case 'OOFF':
-        return ($localise?ts("Ready", array('domain' => 'org.project60.sepa')):"Ready");
+        return ($localise ? E::ts('Ready') : 'Ready');
 
       case 'RCUR':
       case 'SENT':
-        return ($localise?ts("In Use", array('domain' => 'org.project60.sepa')):"In Use");
+        return ($localise ? E::ts('In Use') : 'In Use');
 
       case 'COMPLETE':
-        return ($localise?ts("Completed", array('domain' => 'org.project60.sepa')):"Completed");
+        return ($localise ? E::ts('Completed') : 'Completed');
 
       case 'ONHOLD':
-        return ($localise?ts("Suspended", array('domain' => 'org.project60.sepa')):"Suspended");
+        return ($localise ? E::ts('Suspended') : 'Suspended');
 
       case 'PARTIAL':
-        return ($localise?ts("Incomplete Donation", array('domain' => 'org.project60.sepa')):"Incomplete Donation");
+        return ($localise ? E::ts('Incomplete Donation') : 'Incomplete Donation');
 
       case 'INVALID':
       default:
-        return ($localise?ts("Error", array('domain' => 'org.project60.sepa')):"Error");
+        return ($localise ? E::ts('Error') : 'Error');
     }
   }
 
@@ -65,66 +67,70 @@ class CRM_Sepa_Logic_Status {
    * @param $mandate_type the mandate type ('RCUR' or 'OOFF').
    *
    * @return string|array  if the mandate type is given, it will only return on status as a string
-   *                        if it's empty, it will always return multiple statuses
+   *   if it's empty, it will always return multiple statuses
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function translateToMandateStatus($status, $mandate_type = NULL) {
     switch ($status) {
 
-      case "Not activated":
-        return ($mandate_type?'INIT':array('INIT'));
+      case 'Not activated':
+        return ($mandate_type ? 'INIT' : ['INIT']);
 
-      case "Ready":
+      case 'Ready':
         if ($mandate_type == 'OOFF') {
           return 'OOFF';
-        } elseif ($mandate_type == 'RCUR') {
+        }
+        elseif ($mandate_type == 'RCUR') {
           return 'FRST';
-        } else {
-          return array('FRST', 'OOFF');
+        }
+        else {
+          return ['FRST', 'OOFF'];
         }
 
-      case "In Use":
+      case 'In Use':
         if ($mandate_type == 'OOFF') {
           return 'SENT';
-        } elseif ($mandate_type == 'RCUR') {
+        }
+        elseif ($mandate_type == 'RCUR') {
           return 'RCUR';
-        } else {
-          return array('SENT', 'RCUR');
+        }
+        else {
+          return ['SENT', 'RCUR'];
         }
 
-      case "Completed":
-        return ($mandate_type?'COMPLETE':array('COMPLETE'));
+      case 'Completed':
+        return ($mandate_type ? 'COMPLETE' : ['COMPLETE']);
 
-      case "Suspended":
-        return ($mandate_type?'ONHOLD':array('ONHOLD'));
+      case 'Suspended':
+        return ($mandate_type ? 'ONHOLD' : ['ONHOLD']);
 
-      case "Incomplete Donation":
-        return ($mandate_type?'PARTIAL':array('PARTIAL'));
+      case 'Incomplete Donation':
+        return ($mandate_type ? 'PARTIAL' : ['PARTIAL']);
 
-      case "Error":
+      case 'Error':
       default:
-        return ($mandate_type?'INVALID':array('INVALID'));
+        return ($mandate_type ? 'INVALID' : ['INVALID']);
     }
   }
-
 
   /**
    * get a mapping of the not localised human readable status
    * to the localised one, as can be used by dropdowns
    */
   public static function getStatusSelectorOptions($excludePartials = FALSE) {
-    $list = array(
-      "Not activated"       => ts("Not activated", array('domain' => 'org.project60.sepa')),
-      "Ready"               => ts("Ready", array('domain' => 'org.project60.sepa')),
-      "In Use"              => ts("In Use", array('domain' => 'org.project60.sepa')),
-      "Completed"           => ts("Completed", array('domain' => 'org.project60.sepa')),
-      "Suspended"           => ts("Suspended", array('domain' => 'org.project60.sepa')),
-      // "Incomplete Donation" => ts("Incomplete Donation", array('domain' => 'org.project60.sepa')),
-      "Error"               => ts("Error", array('domain' => 'org.project60.sepa')),
-    );
+    $list = [
+      'Not activated'       => E::ts('Not activated'),
+      'Ready'               => E::ts('Ready'),
+      'In Use'              => E::ts('In Use'),
+      'Completed'           => E::ts('Completed'),
+      'Suspended'           => E::ts('Suspended'),
+      'Error'               => E::ts('Error'),
+    ];
 
     if (!$excludePartials) {
-      $list["Incomplete Donation"] = ts("Incomplete Donation", array('domain' => 'org.project60.sepa'));
+      $list['Incomplete Donation'] = E::ts('Incomplete Donation');
     }
     return $list;
   }
+
 }

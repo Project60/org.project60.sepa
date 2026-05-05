@@ -32,13 +32,12 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
-{
+class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase {
+
   /**
    * Test the payment instruments of a traditional OOFF mandate
    */
-  public function testTraditionalMandateOOFF()
-  {
+  public function testTraditionalMandateOOFF() {
     $sdd_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
     $mandate         = $this->createMandate(
       [
@@ -59,8 +58,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
   /**
    * Test the payment instruments of a traditional OOFF mandate
    */
-  public function testTraditionalMandateRCUR()
-  {
+  public function testTraditionalMandateRCUR() {
     $sdd_instruments = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
     $mandate         = $this->createMandate(
       [
@@ -82,7 +80,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
     // close & check
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
     $this->closeTransactionGroup($transactionGroup['id']);
-    $this->executeBatching(self::MANDATE_TYPE_RCUR, "now + 1 month");
+    $this->executeBatching(self::MANDATE_TYPE_RCUR, 'now + 1 month');
     $mandate      = $this->getMandate($mandate['id']);
     $contribution = $this->getLatestContributionForMandate($mandate);
     $this->assertNotEmpty($sdd_instruments['RCUR'], "Couldn't find RCUR payment instrument");
@@ -96,8 +94,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
   /**
    * Test the OOFF for multi-payment-instruments creditor
    */
-  public function testMultiPIMandateOOFF()
-  {
+  public function testMultiPIMandateOOFF() {
     $custom_creditor_id = $this->getCustomCreditor(['pi_ooff' => '1,2,3']);
 
     // test 1: you shouldn't be able to create a mandate without PI
@@ -109,13 +106,14 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
+        TRUE,
         "Trying to create a multi-PI creditor's mandate without a payment instrument should thrown an exception"
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
     }
-
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
+    }
 
     // test 2: you not able to create a mandate with the wrong PI
     try {
@@ -127,20 +125,21 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
+        TRUE,
         "Trying to create a multi-PI creditor's mandate a wrong payment instrument should thrown an exception"
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
     }
-
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
+    }
 
     // test 3: you should be able to create a mandate with PI
     $mandate = $this->createMandate(
       [
         'type'                  => self::MANDATE_TYPE_OOFF,
         'creditor_id'           => $custom_creditor_id,
-        'payment_instrument_id' => 1
+        'payment_instrument_id' => 1,
       ]
     );
     $this->assertNotEmpty(
@@ -158,8 +157,7 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
   /**
    * Test the RCUR for multi-payment-instruments creditor
    */
-  public function testMultiPIMandateRCUR()
-  {
+  public function testMultiPIMandateRCUR() {
     $custom_creditor_id = $this->getCustomCreditor(['pi_rcur' => '1,2,3']);
 
     // test 1: you shouldn't be able to create a mandate without PI
@@ -171,13 +169,14 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
+        TRUE,
         "Trying to create a multi-PI creditor's mandate without a payment instrument should thrown an exception"
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
     }
-
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
+    }
 
     // test 2: you not able to create a mandate with the wrong PI
     try {
@@ -189,20 +188,21 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
+        TRUE,
         "Trying to create a multi-PI creditor's mandate a wrong payment instrument should thrown an exception"
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
     }
-
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
+    }
 
     // test 3: you should be able to create a mandate with PI
     $mandate = $this->createMandate(
       [
         'type'                  => self::MANDATE_TYPE_RCUR,
         'creditor_id'           => $custom_creditor_id,
-        'payment_instrument_id' => 1
+        'payment_instrument_id' => 1,
       ]
     );
     $this->assertNotEmpty(
@@ -214,26 +214,25 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
     $this->executeBatching(self::MANDATE_TYPE_FRST);
     $mandate      = $this->getMandate($mandate['id']);
     $contribution = $this->getLatestContributionForMandate($mandate);
-    $this->assertEquals(1, $contribution['payment_instrument_id'], "Requested payment instrument [1] not set.");
+    $this->assertEquals(1, $contribution['payment_instrument_id'], 'Requested payment instrument [1] not set.');
 
     // close & check
     $transactionGroup = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
     $this->closeTransactionGroup($transactionGroup['id']);
-    $this->executeBatching(self::MANDATE_TYPE_RCUR, "now + 1 month");
+    $this->executeBatching(self::MANDATE_TYPE_RCUR, 'now + 1 month');
     $mandate      = $this->getMandate($mandate['id']);
     $contribution = $this->getLatestContributionForMandate($mandate);
     $this->assertEquals(
       1,
       $contribution['payment_instrument_id'],
-      "Requested payment instrument [1] not set in second installment."
+      'Requested payment instrument [1] not set in second installment.'
     );
   }
 
   /**
    * Test if disabling OOFF works (for new mandates)
    */
-  public function testDisabledOOFF()
-  {
+  public function testDisabledOOFF() {
     $custom_creditor_id = $this->getCustomCreditor(['pi_ooff' => '']);
 
     // test 1: you shouldn't be able to create a mandate without PI
@@ -245,11 +244,13 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
-        "Trying to create a OOFF mandate when those payment instruments are disabled should have thrown an exeption"
+        TRUE,
+        'Trying to create a OOFF mandate when those payment instruments are disabled should have thrown an exeption'
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
+    }
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
     }
 
     // test 1: you shouldn't be able to create a mandate with PI
@@ -262,19 +263,20 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
-        "Trying to create a OOFF mandate when those payment instruments are disabled should have thrown an exeption"
+        TRUE,
+        'Trying to create a OOFF mandate when those payment instruments are disabled should have thrown an exeption'
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
+    }
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
     }
   }
 
   /**
    * Test if disabling RCUR works (for new mandates)
    */
-  public function testDisabledRCUR()
-  {
+  public function testDisabledRCUR() {
     $custom_creditor_id = $this->getCustomCreditor(['pi_rcur' => '']);
 
     // test 1: you shouldn't be able to create a mandate without PI
@@ -286,11 +288,13 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
-        "Trying to create a RCUR mandate when those payment instruments are disabled should have thrown an exeption"
+        TRUE,
+        'Trying to create a RCUR mandate when those payment instruments are disabled should have thrown an exeption'
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
+    }
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
     }
 
     // test 1: you shouldn't be able to create a mandate with PI
@@ -303,19 +307,20 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
-        "Trying to create a RCUR mandate when those payment instruments are disabled should have thrown an exeption"
+        TRUE,
+        'Trying to create a RCUR mandate when those payment instruments are disabled should have thrown an exeption'
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
+    }
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
     }
   }
 
   /**
    * Test if the change of PIs works for regular mandates
    */
-  public function testFrstRcurChange()
-  {
+  public function testFrstRcurChange() {
     $custom_creditor_id = $this->getCustomCreditor([]);
 
     $PIs     = CRM_Sepa_Logic_PaymentInstruments::getClassicSepaPaymentInstruments();
@@ -331,11 +336,13 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
         ]
       );
       $this->assertFalse(
-        true,
-        "Trying to create a RCUR mandate when those payment instruments are disabled should have thrown an exeption"
+        TRUE,
+        'Trying to create a RCUR mandate when those payment instruments are disabled should have thrown an exeption'
       );
-    } catch (Exception $ex) {
-      $this->assertTrue(true, "This worked as expected");
+    }
+    catch (Exception $ex) {
+      // @ignoreException
+      $this->assertTrue(TRUE, 'This worked as expected');
     }
 
     // TEST 1:
@@ -348,13 +355,13 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
     $this->assertEquals(
       $PI_FRST,
       $contribution['payment_instrument_id'],
-      "Payment instrument for first contribution is not FRST."
+      'Payment instrument for first contribution is not FRST.'
     );
     $rcontribution = $this->getRecurringContributionForMandate($mandate);
     $this->assertEquals(
       $PI_RCUR,
       $rcontribution['payment_instrument_id'],
-      "Payment instrument for recurring contribution is not RCUR."
+      'Payment instrument for recurring contribution is not RCUR.'
     );
 
     // close group
@@ -364,23 +371,24 @@ class CRM_Sepa_PaymentInstrumentTest extends CRM_Sepa_TestBase
     $this->assertEquals(
       $PI_RCUR,
       $rcontribution['payment_instrument_id'],
-      "Payment instrument for recurring contribution is not RCUR."
+      'Payment instrument for recurring contribution is not RCUR.'
     );
 
     // create the next batch and check again
-    $this->executeBatching(self::MANDATE_TYPE_RCUR, "now + 1 month");
+    $this->executeBatching(self::MANDATE_TYPE_RCUR, 'now + 1 month');
     $contribution = $this->getLatestContributionForMandate($mandate);
     $this->assertEquals(
       $PI_RCUR,
       $contribution['payment_instrument_id'],
-      "Payment instrument for follow up contribution is not RCUR."
+      'Payment instrument for follow up contribution is not RCUR.'
     );
     $rcontribution = $this->getRecurringContributionForMandate($mandate);
     $this->assertEquals(
       $PI_RCUR,
       $rcontribution['payment_instrument_id'],
-      "Payment instrument for recurring contribution is not RCUR."
+      'Payment instrument for recurring contribution is not RCUR.'
     );
 
   }
+
 }

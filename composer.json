@@ -1,0 +1,68 @@
+{
+    "name": "systopia/org.project60.sepa",
+    "description": "This extension provides SEPA Direct Debit processing.",
+    "type": "civicrm-ext",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "SYSTOPIA",
+            "email": "info@systopia.de",
+            "homepage": "https://www.systopia.de"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "prepend-autoloader": false,
+        "sort-packages": true,
+        "platform": {
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "civicrm/civicrm-core": ">=5.76",
+        "civicrm/civicrm-packages": ">=5.76"
+    },
+    "autoload": {
+        "classmap": ["ComposerHelper.php"]
+    },
+    "scripts": {
+        "pre-update-cmd": [
+            "Sepa\\ComposerHelper::preUpdate"
+        ],
+        "composer-phpcs": [
+            "@composer --working-dir=tools/phpcs"
+        ],
+        "composer-phpstan": [
+            "@composer --working-dir=tools/phpstan"
+        ],
+        "composer-phpunit": [
+            "@composer --working-dir=tools/phpunit"
+        ],
+        "composer-tools": [
+            "@composer-phpcs",
+            "@composer-phpstan",
+            "@composer-phpunit"
+        ],
+        "phpcs": [
+            "@php tools/phpcs/vendor/bin/phpcs"
+        ],
+        "phpcbf": [
+            "@php tools/phpcs/vendor/bin/phpcbf"
+        ],
+        "phpstan": [
+            "@php tools/phpstan/vendor/bin/phpstan -v"
+        ],
+        "phpunit": [
+            "@php tools/phpunit/vendor/bin/simple-phpunit --coverage-text"
+        ],
+        "test": [
+            "@phpcs",
+            "@phpstan",
+            "@phpunit"
+        ]
+    },
+    "conflict": {
+        "pear/mail_mime": "<1.10.2"
+    }
+}

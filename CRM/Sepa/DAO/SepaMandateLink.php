@@ -18,8 +18,8 @@
  * CAUTION: NOT Generated from xml/schema/CRM/Sepa/SepaMandateLink.xml
  * This is handcrafted - and yes, that should be changed.
  */
-require_once 'CRM/Core/DAO.php';
-require_once 'CRM/Utils/Type.php';
+
+use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
 {
@@ -187,7 +187,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
           'mandate_id' => [
               'name' => 'mandate_id',
               'type' => CRM_Utils_Type::T_INT,
-              'title' => ts('SepaMandate ID'),
+              'title' => E::ts('SepaMandate ID'),
               'description' => 'FK to SepaMandate ID',
               'table_name' => 'civicrm_sdd_entity_mandate',
               'entity' => 'SepaMandateLink',
@@ -197,7 +197,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
           'entity_table' => [
               'name' => 'entity_table',
               'type' => CRM_Utils_Type::T_STRING,
-              'title' => ts('Entity Table'),
+              'title' => E::ts('Entity Table'),
               'description' => 'Physical table name for entity being linked, eg civicrm_membership',
               'maxlength' => 64,
               'size' => CRM_Utils_Type::BIG,
@@ -209,7 +209,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
           'entity_id' => [
               'name' => 'entity_id',
               'type' => CRM_Utils_Type::T_INT,
-              'title' => ts('Entity ID'),
+              'title' => E::ts('Entity ID'),
               'description' => 'FK to entity table specified in entity_table column',
               'required' => TRUE,
               'table_name' => 'civicrm_sdd_entity_mandate',
@@ -220,7 +220,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
           'class' => [
               'name' => 'class',
               'type' => CRM_Utils_Type::T_STRING,
-              'title' => ts('Entity Table'),
+              'title' => E::ts('Entity Table'),
               'description' => 'Link class, freely defined by client',
               'maxlength' => 16,
               'size' => CRM_Utils_Type::TWELVE,
@@ -241,7 +241,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
           'creation_date' => [
               'name' => 'creation_date',
               'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-              'title' => ts('Creation Date'),
+              'title' => E::ts('Creation Date'),
               'description' => 'Link creation date',
               'table_name' => 'civicrm_sdd_entity_mandate',
               'entity' => 'SepaMandateLink',
@@ -251,7 +251,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
           'start_date' => [
               'name' => 'start_date',
               'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-              'title' => ts('Start Date'),
+              'title' => E::ts('Start Date'),
               'description' => 'Start date of the link (optional)',
               'table_name' => 'civicrm_sdd_entity_mandate',
               'entity' => 'SepaMandateLink',
@@ -261,7 +261,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
           'end_date' => [
               'name' => 'end_date',
               'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-              'title' => ts('End Date'),
+              'title' => E::ts('End Date'),
               'description' => 'End date of the link (optional)',
               'table_name' => 'civicrm_sdd_entity_mandate',
               'entity' => 'SepaMandateLink',

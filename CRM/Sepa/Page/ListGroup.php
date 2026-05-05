@@ -26,7 +26,7 @@ use Civi\Api4\Contribution;
  */
 class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
 
-  function run() {
+  public function run() {
     CRM_Utils_System::setTitle(E::ts('SEPA Group Contributions'));
     try {
       $groupId = CRM_Utils_Request::retrieve('group_id', 'Integer', NULL, TRUE);

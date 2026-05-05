@@ -22,20 +22,18 @@
  *
  */
 
-require_once 'CRM/Core/Page.php';
-
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
 
-  function run() {
+  public function run() {
     CRM_Utils_System::setTitle(E::ts('Mark SEPA group received'));
 
     // get the group ID
     $group_id = (int) $_REQUEST['group_id'] ?? 0;
     if (!$group_id) {
-      throw new CRM_Core_Exception(E::ts("No group_id given!"));
+      throw new CRM_Core_Exception(E::ts('No group_id given!'));
     }
 
     // get the group
@@ -46,10 +44,10 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     $this->assign('txgroup', $group);
 
     // check whether this is a group created by a test creditor
-    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id'=> $group['sdd_creditor_id']]);
-    $is_test_creditor = isset($creditor['category']) && ($creditor['category'] == "TEST");
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $group['sdd_creditor_id']]);
+    $is_test_creditor = isset($creditor['category']) && ($creditor['category'] == 'TEST');
     if ($is_test_creditor) {
-      throw new Exception(E::ts("Cannot mark TEST groups as received."));
+      throw new Exception(E::ts('Cannot mark TEST groups as received.'));
     }
 
     // run the 'mark received' process
@@ -69,14 +67,21 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     $async_batch = CRM_Sepa_Logic_Settings::getGenericSetting('sdd_async_batching');
     if ($async_batch) {
       // execute through runner:
-      $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+      $target_contribution_status = (int) CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'Completed'
+      );
       $target_group_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
       CRM_Sepa_Logic_Queue_Close::launchCloseRunner([$groupId], $target_group_status, $target_contribution_status);
-    } else {
+    }
+    else {
       // execute via API
       try {
         civicrm_api3('SepaAlternativeBatching', 'received', ['txgroup_id' => $groupId]);
-      } catch (Exception $exception) {
+      }
+      catch (Exception $exception) {
+        // @ignoreException
         $error_message = $exception->getMessage();
         CRM_Core_Session::setStatus(E::ts("Couldn't close SDD group #%1.<br/>Error was: %2",
           [1 => $groupId, 2 => $error_message]));

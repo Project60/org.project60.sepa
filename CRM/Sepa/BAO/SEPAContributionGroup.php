@@ -21,22 +21,19 @@
  *
  */
 
-
-
 /**
  * Class contains functions for Sepa mandates
  */
 class CRM_Sepa_BAO_SEPAContributionGroup extends CRM_Sepa_DAO_SEPAContributionGroup {
 
-
   /**
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
    *
    * @return object       CRM_Core_BAO_SEPAContributionGroup object on success, null otherwise
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaContributionGroup', $params['id'] ?? NULL, $params);
 
@@ -49,4 +46,3 @@ class CRM_Sepa_BAO_SEPAContributionGroup extends CRM_Sepa_DAO_SEPAContributionGr
   }
 
 }
-

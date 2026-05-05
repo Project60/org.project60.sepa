@@ -16,9 +16,11 @@
 
 use CRM_Sepa_ExtensionUtil as E;
 
-/*
-* This class holds methods to manipulate option groups
-*/
+/**
+ *
+ * This class holds methods to manipulate option groups
+ *
+ */
 class CRM_Utils_SepaOptionGroupTools {
 
   /**
@@ -31,74 +33,88 @@ class CRM_Utils_SepaOptionGroupTools {
    *
    * As a workaround, we check the labels of recurring frequency units and reset them if necessary
    *
-   * @param $reset    boolean  resets altered labels to standard values
-   * @param $warning  boolean  displays a warning if a label has been reset
+   * @param bool $reset resets altered labels to standard values
+   * @param bool $warning displays a warning if a label has been reset
    *
    * @deprecated
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.TooHigh
   public static function checkRecurringFrequencyUnits($reset = FALSE, $warning = TRUE) {
     // compare option group values
-    $checkUnits = array('month', 'year');
+    $checkUnits = ['month', 'year'];
 
     // get group id
-    $params = array(
+    $params = [
       'name' => 'recur_frequency_units',
-    );
+    ];
     $result = civicrm_api3('OptionGroup', 'getsingle', $params);
-    if(!empty($result['is_error'])) {
+    if (!empty($result['is_error'])) {
       $message = sprintf("Option group '%s' does not exist. Error was: %s", $params['name'], $result['error_message']);
-      Civi::log()->debug("org.project60.sepa_dd: ".$message);
-      if($warning) {
-        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
+      Civi::log()->debug('org.project60.sepa_dd: ' . $message);
+      if ($warning) {
+        CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, E::ts('Warning'), 'warn');
       }
       return;
     }
     $oid = $result['id'];
 
-
     // get all values
-    $params = array(
+    $params = [
       'option.limit'    => 99999,
       'option_group_id' => $oid,
-    );
+    ];
     $result = civicrm_api3('OptionValue', 'get', $params);
-    if(!empty($result['is_error'])) {
+    if (!empty($result['is_error'])) {
       $message = sprintf("Could not retrieve values of group '%d'. Error was: %s", $oid, $result['error_message']);
-      Civi::log()->debug("org.project60.sepa_dd: ".$message);
-      if($warning) {
-        CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
+      Civi::log()->debug('org.project60.sepa_dd: ' . $message);
+      if ($warning) {
+        CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, E::ts('Warning'), 'warn');
       }
       return;
     }
     $frequencyUnits = $result['values'];
 
     // check all the values for
-    foreach($checkUnits as $c) {
-      foreach($frequencyUnits as $f) {
-        if($c == $f['name'] && ($f['label'] != $c || $f['value'] != $c)) {
-          Civi::log()->debug(sprintf("org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']", $c, $f['label']));
+    foreach ($checkUnits as $c) {
+      foreach ($frequencyUnits as $f) {
+        if ($c == $f['name'] && ($f['label'] != $c || $f['value'] != $c)) {
+          Civi::log()->debug(sprintf(
+            "org.project60.sepa_dd: label '%s' of option group 'recur_frequency_units' has been changed ['%s']",
+            $c,
+            $f['label']
+          ));
 
           if ($reset) {
-            $params = array(
+            $params = [
               'option_group_id' => $oid,
               'name'            => $c,
               'label'           => $c,
               'value'           => $c,
-              'id'              => $f['id']
-            );
+              'id'              => $f['id'],
+            ];
             $result = civicrm_api3('OptionValue', 'create', $params);
-            if(!empty($result['is_error'])) {
-              $message = sprintf("Could not reset option value [%d] ('%s'). Error was: %s", $f['id'], $c, $result['error_message']);
-              Civi::log()->debug("org.project60.sepa_dd: ".$message);
-              if($warning) {
-                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
+            if (!empty($result['is_error'])) {
+              $message = sprintf(
+                "Could not reset option value [%d] ('%s'). Error was: %s",
+                $f['id'],
+                $c,
+                $result['error_message']
+              );
+              Civi::log()->debug('org.project60.sepa_dd: ' . $message);
+              if ($warning) {
+                CRM_Core_Session::setStatus('CiviSEPA CRM-14114 workaround: ' . $message, E::ts('Warning'), 'warn');
               }
               // FIXME: why not try again? return;
-            } else {
+            }
+            else {
               $message = sprintf("Label '%s' of option group 'recur_frequency_units' reset to '%s'", $c, $c);
-              Civi::log()->debug("org.project60.sepa_dd: ".$message);
-              if($warning) {
-                CRM_Core_Session::setStatus("CiviSEPA CRM-14114 workaround: ".$message, ts('Warning', array('domain' => 'org.project60.sepa')), 'warn');
+              Civi::log()->debug('org.project60.sepa_dd: ' . $message);
+              if ($warning) {
+                CRM_Core_Session::setStatus(
+                  'CiviSEPA CRM-14114 workaround: ' . $message,
+                  E::ts('Warning'),
+                  'warn'
+                );
               }
             }
           }
@@ -110,87 +126,99 @@ class CRM_Utils_SepaOptionGroupTools {
   /**
    * Offers a textual representation for the donation interval
    *
-   * @param unit      unit of time: 'month' or 'year'
-   * @param interval  payment interval, like 1 or 6
-   * @param ts        set to true, if you want a localised version
+   * @param int $interval payment interval, like 1 or 6
+   * @param 'month'|'year' $unit unit of time: 'month' or 'year'
+   * @param bool $ts set to true, if you want a localised version
    */
-  public static function getFrequencyText($interval, $unit, $ts=false) {
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+  public static function getFrequencyText($interval, $unit, $ts = FALSE) {
     if ($unit == 'month') {
       if ($interval == 1) {
-        return $ts?ts('monthly', array('domain' => 'org.project60.sepa')):'monthly';
-      } elseif ($interval == 3) {
-        return $ts?ts('quarterly', array('domain' => 'org.project60.sepa')):'quarterly';
-      } elseif ($interval == 6) {
-          return $ts?ts('semi-annually', array('domain' => 'org.project60.sepa')):'semi-annually';
-      } elseif ($interval == 12) {
-        return $ts?ts('annually', array('domain' => 'org.project60.sepa')):'annually';
-      } else {
+        return $ts ? E::ts('monthly') : 'monthly';
+      }
+      elseif ($interval == 3) {
+        return $ts ? E::ts('quarterly') : 'quarterly';
+      }
+      elseif ($interval == 6) {
+        return $ts ? E::ts('semi-annually') : 'semi-annually';
+      }
+      elseif ($interval == 12) {
+        return $ts ? E::ts('annually') : 'annually';
+      }
+      else {
         if ($ts) {
-          return sprintf(ts("every %1 months", array(1 => $interval, 'domain' => 'org.project60.sepa')));
-        } else {
-          return sprintf("every %s months", $interval);
+          return sprintf(E::ts('every %1 months', [1 => $interval]));
+        }
+        else {
+          return sprintf('every %s months', $interval);
         }
       }
-    } elseif ($unit == 'year') {
+    }
+    elseif ($unit == 'year') {
       if ($interval == 1) {
-        return $ts?ts('annually'):'annually';
-      } else {
+        return $ts ? E::ts('annually') : 'annually';
+      }
+      else {
         if ($ts) {
-          return sprintf(ts("every %1 years", array('domain' => 'org.project60.sepa')), $interval);
-        } else {
-          return sprintf("every %1 years", $interval);
+          return sprintf(E::ts('every %1 years'), $interval);
+        }
+        else {
+          return sprintf('every %1 years', $interval);
         }
       }
-    } else {
-      return $ts?ts('on an irregular basis', array('domain' => 'org.project60.sepa')):'on an irregular basis';
+    }
+    else {
+      return $ts ? E::ts('on an irregular basis') : 'on an irregular basis';
     }
   }
 
-    /**
-     * Get the option list of payment instruments eligible with the creditor settings
-     *
-     * @param boolean $recurring
-     *      is this for recurring? if not, it's for one-off
-     *
-     * @return array
-     *      list of eligible options
-     */
-  public static function getPaymentInstrumentOptions($recurring = false) {
-      // gather some basic data
-      $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
-      static $all_pis = NULL;
-      static $all_pis_by_name = NULL;
-      if ($all_pis === NULL) {
-          // load all payment instruments
-          $all_pis = [];
-          $all_pis_by_name = [];
-          $instrument_query = civicrm_api3('OptionValue', 'get', [
-              'option_group_id' => 'payment_instrument',
-              'return'          => 'value,name,label',
-              'option.limit'    => 0,
-              'sequential'      => 0
-          ]);
-          foreach ($instrument_query['values'] as $pi) {
-              $all_pis[$pi['value']] = $pi['label'];
-              $all_pis_by_name[$pi['name']] = $pi['value'];
-          }
+  /**
+   * Get the option list of payment instruments eligible with the creditor settings
+   *
+   * @param boolean $recurring
+   *      is this for recurring? if not, it's for one-off
+   *
+   * @return array
+   *   list of eligible options
+   */
+  public static function getPaymentInstrumentOptions($recurring = FALSE) {
+    // gather some basic data
+    $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
+    static $all_pis = NULL;
+    static $all_pis_by_name = NULL;
+    if ($all_pis === NULL) {
+      // load all payment instruments
+      $all_pis = [];
+      $all_pis_by_name = [];
+      $instrument_query = civicrm_api3('OptionValue', 'get', [
+        'option_group_id' => 'payment_instrument',
+        'return'          => 'value,name,label',
+        'option.limit'    => 0,
+        'sequential'      => 0,
+      ]);
+      foreach ($instrument_query['values'] as $pi) {
+        $all_pis[$pi['value']] = $pi['label'];
+        $all_pis_by_name[$pi['name']] = $pi['value'];
       }
-      // start compiling the list
-      $eligible_pis = $all_pis;
-      if ($recurring) {
-          // add the SEPA default combo
-          $eligible_pis["{$all_pis_by_name['FRST']}-{$all_pis_by_name['RCUR']}"] = E::ts("SEPA Standard (FRST/RCUR)");
+    }
+    // start compiling the list
+    $eligible_pis = $all_pis;
+    if ($recurring) {
+      // add the SEPA default combo
+      $eligible_pis["{$all_pis_by_name['FRST']}-{$all_pis_by_name['RCUR']}"] = E::ts('SEPA Standard (FRST/RCUR)');
 
-          // ...but remove OOFF/FRST individually
-          unset($eligible_pis[$all_pis_by_name['OOFF']]);
-          unset($eligible_pis[$all_pis_by_name['FRST']]);
+      // ...but remove OOFF/FRST individually
+      unset($eligible_pis[$all_pis_by_name['OOFF']]);
+      unset($eligible_pis[$all_pis_by_name['FRST']]);
 
-      } else {
-          // remove FRST/RCUR
-          unset($eligible_pis[$all_pis_by_name['FRST']]);
-          unset($eligible_pis[$all_pis_by_name['RCUR']]);
-      }
+    }
+    else {
+      // remove FRST/RCUR
+      unset($eligible_pis[$all_pis_by_name['FRST']]);
+      unset($eligible_pis[$all_pis_by_name['RCUR']]);
+    }
 
-      return $eligible_pis;
+    return $eligible_pis;
   }
+
 }

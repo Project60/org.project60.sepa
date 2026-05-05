@@ -30,19 +30,16 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
-{
+class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase {
   /* activates the hook to generate static references */
   protected $static_mandate_reference = NULL;
 
-  public function setUp(): void
-  {
+  public function setUp(): void {
     parent::setUp();
     $this->static_mandate_reference = NULL;
   }
 
-  public function tearDown(): void
-  {
+  public function tearDown(): void {
     $this->static_mandate_reference = NULL;
     parent::tearDown();
   }
@@ -51,12 +48,12 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
    * Assert that a given mandate reference is valid. \
    * TODO: Should this be moved to CRM_Sepa_TestBase?
    */
-  protected function assertValidMandateReference(string $actual, string $message = '')
-  {
+  protected function assertValidMandateReference(string $actual, string $message = '') {
     $isValid = is_string($actual) &&
         (strlen($actual) > 0) &&
         (strlen($actual) <= 35) &&
-        !preg_match("/[^0-9A-Za-z\+\?\/\-\:\(\)\.\,\' ]/", $actual); // There must be no invalid character found.
+    // There must be no invalid character found.
+        !preg_match("/[^0-9A-Za-z\+\?\/\-\:\(\)\.\,\' ]/", $actual);
 
     $this->assertTrue($isValid, $message);
     return $isValid;
@@ -74,46 +71,42 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
     }
   }
 
-
   /**
    * Test the integrity of an OOFF mandate reference.
-   * @see Case_ID R01
+   * See Case_ID R01.
    */
-  public function testOOFFMandateReference()
-  {
+  public function testOOFFMandateReference() {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
       ]
     );
 
-    $this->assertValidMandateReference($mandate['reference'], E::ts('The OOFF mandate reference is invalid.'));
+    $this->assertValidMandateReference($mandate['reference'], 'The OOFF mandate reference is invalid.');
   }
 
   /**
    * Test the integrity of a RCUR mandate reference.
-   * @see Case_ID R02
+   * See Case_ID R02.
    */
-  public function testRCURMandateReference()
-  {
+  public function testRCURMandateReference() {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_RCUR,
       ]
     );
 
-    $this->assertValidMandateReference($mandate['reference'], E::ts('The RCUR mandate reference is invalid.'));
+    $this->assertValidMandateReference($mandate['reference'], 'The RCUR mandate reference is invalid.');
   }
 
   /**
    * Test to ensure OOFF reference collisions are detected
    *
-   * @see Case_ID R03
+   * See Case_ID R03.
    */
-  public function testOOFFMandateReferenceCollision()
-  {
+  public function testOOFFMandateReferenceCollision() {
     // enable usage of static reference
-    $this->static_mandate_reference = "OOFF-STATIC-TEST-0001";
+    $this->static_mandate_reference = 'OOFF-STATIC-TEST-0001';
 
     // Use the same contact for every mandate to check reference generation per contact:
     $contactId = $this->createContact();
@@ -128,14 +121,16 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
 
     // NOW: try creating a second mandate with the _same_ reference
     try {
-      $this->createMandate(['type' => self::MANDATE_TYPE_OOFF, 'contact_id' => $contactId,]);
+      $this->createMandate(['type' => self::MANDATE_TYPE_OOFF, 'contact_id' => $contactId]);
       // this should, of course, fail:
       $this->fail("This should've failed, since we're using the same reference for multiple mandates");
 
-    } catch (Throwable $ex) {
+    }
+    catch (Throwable $ex) {
+      // @ignoreException
       // ok, it failed - let's check if it's the right failure
       $this->assertStringStartsWith(
-        "Failure in api call for SepaMandate createfull:  DB Error: already exists",
+        'Failure in api call for SepaMandate createfull:  DB Error: already exists',
         $ex->getMessage(),
         "This should've thrown an 'DB Error: already exists'");
     }
@@ -144,12 +139,11 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
   /**
    * Test to ensure RCUR reference collisions are detected
    *
-   * @see Case_ID R03
+   * See Case_ID R03.
    */
-  public function testRCURMandateReferenceCollision()
-  {
+  public function testRCURMandateReferenceCollision() {
     // enable usage of static reference
-    $this->static_mandate_reference = "RCUR-STATIC-TEST-0001";
+    $this->static_mandate_reference = 'RCUR-STATIC-TEST-0001';
 
     // Use the same contact for every mandate to check reference generation per contact:
     $contactId = $this->createContact();
@@ -164,16 +158,19 @@ class CRM_Sepa_ReferenceGenerationTest extends CRM_Sepa_TestBase
 
     // NOW: try creating a second mandate with the _same_ reference
     try {
-      $this->createMandate(['type' => self::MANDATE_TYPE_RCUR, 'contact_id' => $contactId,]);
+      $this->createMandate(['type' => self::MANDATE_TYPE_RCUR, 'contact_id' => $contactId]);
       // this should, of course, fail:
       $this->fail("This should've failed, since we're using the same reference for multiple mandates");
 
-    } catch (Throwable $ex) {
+    }
+    catch (Throwable $ex) {
+      // @ignoreException
       // ok, it failed - let's check if it's the right failure
       $this->assertStringStartsWith(
-        "Failure in api call for SepaMandate createfull:  DB Error: already exists",
+        'Failure in api call for SepaMandate createfull:  DB Error: already exists',
         $ex->getMessage(),
         "This should've thrown an 'DB Error: already exists'");
     }
   }
+
 }
