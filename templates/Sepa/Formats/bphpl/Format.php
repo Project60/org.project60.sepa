@@ -14,6 +14,9 @@
  * | written permission from the original author(s).        |
  * +--------------------------------------------------------
  */
+
+declare(strict_types = 1);
+
 class CRM_Sepa_Logic_Format_bphpl extends CRM_Sepa_Logic_Format {
 
   /**

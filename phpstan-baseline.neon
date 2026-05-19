@@ -1047,12 +1047,6 @@ parameters:
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
-			message: '#^Only numeric types are allowed in \+, bool given on the right side\.$#'
-			identifier: plus.rightNonNumeric
-			count: 1
-			path: CRM/Sepa/Logic/Batching.php
-
-		-
 			message: '#^Parameter \#1 \$datetime of function strtotime expects string, mixed given\.$#'
 			identifier: argument.type
 			count: 1
@@ -2658,15 +2652,9 @@ parameters:
 			path: CRM/Sepa/Page/SepaMandatePdf.php
 
 		-
-			message: '#^Cannot cast civicrm_api3 to float\.$#'
-			identifier: cast.double
-			count: 1
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
 			message: '#^Cannot cast civicrm_api3 to int\.$#'
 			identifier: cast.int
-			count: 7
+			count: 2
 			path: CRM/Sepa/Page/SepaMandatePdf.php
 
 		-
@@ -2691,30 +2679,6 @@ parameters:
 			message: '#^Dynamic call to static method CRM_Core_Page\:\:getTemplate\(\)\.$#'
 			identifier: staticMethod.dynamicCall
 			count: 2
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
-			message: '#^Equal\: Condition between ''month'' and civicrm_api3 are falsy, please do not mix types\.$#'
-			identifier: voku.Equal
-			count: 1
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
-			message: '#^Equal\: Condition between ''year'' and civicrm_api3 are falsy, please do not mix types\.$#'
-			identifier: voku.Equal
-			count: 1
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
-			message: '#^Equal\: Do not compare objects directly, civicrm_api3 and ''month'' found\.$#'
-			identifier: voku.Equal
-			count: 1
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
-			message: '#^Equal\: Do not compare objects directly, civicrm_api3 and ''year'' found\.$#'
-			identifier: voku.Equal
-			count: 1
 			path: CRM/Sepa/Page/SepaMandatePdf.php
 
 		-
@@ -2756,6 +2720,12 @@ parameters:
 		-
 			message: '#^Only booleans are allowed in an elseif condition, mixed given\.$#'
 			identifier: elseif.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^PHPDoc tag @var with type stdClass is not subtype of type civicrm_api3\.$#'
+			identifier: varTag.type
 			count: 1
 			path: CRM/Sepa/Page/SepaMandatePdf.php
 

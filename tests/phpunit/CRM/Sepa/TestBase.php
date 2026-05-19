@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit - PHPUnit tests         |
 | Copyright (C) 2019 SYSTOPIA                            |
@@ -251,9 +253,9 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
 
   /**
    * Create a contact and return it's ID.
-   * @return string The Id of the created contact.
+   * @return int The Id of the created contact.
    */
-  protected function createContact(): string {
+  protected function createContact(): int {
     $contact = $this->callAPISuccess(
       'Contact',
       'create',

@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -87,6 +89,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     switch ($mandate->entity_table) {
       case 'civicrm_contribution_recur':
         $api->ContributionRecur->getsingle(['id' => $mandate->entity_id]);
+        /** @var \stdClass $recur */
         $recur = $api->result;
         $this->assign('recur', (array) $recur);
         $this->assign('contactId', $recur->contact_id);

@@ -13,6 +13,9 @@
 | copyright header is strictly prohibited without        |
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
+
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 return [

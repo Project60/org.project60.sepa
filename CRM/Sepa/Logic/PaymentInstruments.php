@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * takes care of the SDD payment instruments
  */
@@ -394,9 +396,8 @@ class CRM_Sepa_Logic_PaymentInstruments {
     $creditors = self::getAllSddCreditors();
     $creditor = $creditors[$creditor_id] ?? NULL;
     if (!$creditor) {
-      $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
       // creditor not found
-      return $recurring_contribution_pi;
+      return $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
     }
 
     // we found our creditor
@@ -406,15 +407,13 @@ class CRM_Sepa_Logic_PaymentInstruments {
           // this is a frst-rcur combo
           $frst_rcur = explode('-', $pi_spec, 2);
           if ($frst_rcur[1] == $recurring_contribution_pi) {
-            $cache[$creditor_id][$recurring_contribution_pi] = $frst_rcur[0];
-            return (int) $frst_rcur[0];
+            return $cache[$creditor_id][$recurring_contribution_pi] = (int) $frst_rcur[0];
           }
         }
         else {
           // if this matches an individual PI, we're also happy
           if ($pi_spec == $recurring_contribution_pi) {
-            $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
-            return $recurring_contribution_pi;
+            return $cache[$creditor_id][$recurring_contribution_pi] = $recurring_contribution_pi;
           }
         }
       }

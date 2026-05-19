@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * SepaMandateLink.create API specification (optional)
  * This is used for documentation and validation.

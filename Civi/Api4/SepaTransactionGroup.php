@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace Civi\Api4;
 
 use Civi\Sepa\Api4\Action\SepaTransactionGroup\GetAction;

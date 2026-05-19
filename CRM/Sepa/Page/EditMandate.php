@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * back office mandate manipulation form
  *
@@ -167,7 +169,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       }
       else {
         $mandate['creditor_name'] = $creditor['label'];
-        $cycle_days = CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor['id']);
+        $cycle_days = CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), (int) $creditor['id']);
       }
     }
 

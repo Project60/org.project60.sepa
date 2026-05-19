@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * Mark a sepa group as 'received' via a runner
  * @see https://github.com/Project60/org.project60.sepa/issues/655

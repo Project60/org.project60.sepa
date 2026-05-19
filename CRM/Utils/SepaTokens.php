@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 use Civi\Token\TokenRow;
 use CRM_Sepa_ExtensionUtil as E;
 

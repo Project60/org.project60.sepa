@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -753,7 +755,7 @@ class CRM_Sepa_Logic_Batching {
   public static function getNextExecutionDate(array $rcontribution, int $now, bool $FRST = FALSE): ?string {
     // ignore time of day
     $now = strtotime(date('Y-m-d', $now));
-    $cycle_day = $rcontribution['cycle_day'];
+    $cycle_day = (int) $rcontribution['cycle_day'];
     $interval = $rcontribution['frequency_interval'];
     $unit = $rcontribution['frequency_unit'];
 
@@ -763,8 +765,7 @@ class CRM_Sepa_Logic_Batching {
       0,
       0,
       0,
-      // FIXME: We have int + bool here.
-      (int) date('n', $start_date) + (date('j', $start_date) > $cycle_day),
+      (int) date('n', $start_date) + (((int) date('j', $start_date) > $cycle_day) ? 1 : 0),
       $cycle_day,
       (int) date('Y', $start_date)
     );
@@ -773,7 +774,7 @@ class CRM_Sepa_Logic_Batching {
       $next_date = strtotime(date('Y-m-d', strtotime($rcontribution['mandate_first_executed'])));
 
       // go back to last cycle day (in case the collection was delayed)
-      while (date('j', $next_date) != $cycle_day) {
+      while (((int) date('j', $next_date)) != $cycle_day) {
         $next_date = strtotime('-1 day', $next_date);
       }
 

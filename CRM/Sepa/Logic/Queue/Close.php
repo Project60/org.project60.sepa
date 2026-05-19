@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 define('SDD_CLOSE_RUNNER_BATCH_SIZE', 100);
 
 use Civi\Sepa\Lock\SepaBatchLockManager;
