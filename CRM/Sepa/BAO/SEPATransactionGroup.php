@@ -113,7 +113,6 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       WHERE g.txgroup_id = %1
         AND c.contribution_status_id != 3
         AND mandate.is_enabled = true
-//and not cancelled
       GROUP BY c.id";
 
     CRM_Core_DAO::disableFullGroupByMode();
