@@ -19,7 +19,7 @@ class CRM_Sepa_Logic_Format_bphpl extends CRM_Sepa_Logic_Format {
   /**
    * gives the option of setting extra variables to the template
    */
-  public function assignExtraVariables($template) {
+  public function assignExtraVariables(\CRM_Core_Smarty $template): void {
     $template->assign('settings', [
       'nip' => '7251872505',
       'zleceniodawca_nazwa' => 'Instytut Spraw Obywatelskich',
@@ -28,11 +28,11 @@ class CRM_Sepa_Logic_Format_bphpl extends CRM_Sepa_Logic_Format {
     ]);
   }
 
-  public function getDDFilePrefix() {
+  public function getDDFilePrefix(): string {
     return 'BPH-';
   }
 
-  public function getFilename($variable_string) {
+  public function getFilename(string $variable_string): string {
     return $variable_string . '.pld';
   }
 

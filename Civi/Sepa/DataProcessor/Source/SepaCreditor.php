@@ -24,8 +24,6 @@ class SepaCreditor extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the entity name
-   *
-   * @return String
    */
   protected function getEntity(): string {
     return 'SepaCreditor';
@@ -33,8 +31,6 @@ class SepaCreditor extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the table name of this entity
-   *
-   * @return String
    */
   protected function getTable(): string {
     return 'civicrm_sdd_creditor';

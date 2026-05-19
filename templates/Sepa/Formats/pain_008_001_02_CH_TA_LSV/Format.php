@@ -49,7 +49,7 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
    *   LSV+-Identifikation, ESR-Teilnehmernummer, ESR-Referenznummerpräfix
    */
   private static function explodeCreditorIdentifier(string $identifier): array {
-    [$lsvId, $esrTeilnehmernummer, $esrPrefix] = explode('/', $identifier) + [NULL, NULL, NULL];
+    [$lsvId, $esrTeilnehmernummer, $esrPrefix] = explode('/', $identifier) + ['', '', NULL];
     if (NULL === $esrPrefix) {
       throw new \InvalidArgumentException(
         'Creditor identifier has to be in this form: LSV+-Identifikation/ESR-Teilnehmernummer/ESR-Referenznummernpräfix'
@@ -84,7 +84,8 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
     return self::extractIidFromIban($iban);
   }
 
-  public function assignExtraVariables($template): void {
+  public function assignExtraVariables(\CRM_Core_Smarty $template): void {
+    /** @var array{iban?: string, bic: string, identifier: string} $creditor */
     $creditor = $template->getTemplateVars('creditor');
     if (!isset($creditor['iban'])) {
       throw new \InvalidArgumentException('Creditor IBAN is missing');
@@ -99,11 +100,12 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
     $template->assign('creditor', $creditor);
   }
 
-  public function extendTransaction(&$txn, $creditorId): void {
+  public function extendTransaction(array &$txn, int $creditorId): void {
     if (!isset($txn['iban'])) {
       throw new \InvalidArgumentException('Transaction IBAN is missing');
     }
 
+    // @phpstan-ignore argument.type, argument.type
     $txn['iid'] = self::getIid($txn['iban'], $txn['bic']);
     $txn['esr'] = $this->generateEsr($txn, $creditorId);
   }
@@ -117,6 +119,8 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
   }
 
   /**
+   * @param array<string, mixed> $txn
+   *
    * @return string
    *   A string of length 27 containing:
    *   <ESR prefix><filling zeros><Contribution ID><check digit>
@@ -126,6 +130,7 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
     [$lsvId, $esrTeilnehmernummer, $esrPrefix] = self::explodeCreditorIdentifier($creditorIdentifier);
 
     $prefixLen = strlen($esrPrefix);
+    // @phpstan-ignore cast.string
     $contributionId = (string) $txn['contribution_id'];
 
     $zeroCount = 26 - $prefixLen - strlen($contributionId);

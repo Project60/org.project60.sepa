@@ -30,7 +30,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
   /**
    * @param array $params
    *
-   * @return object       CRM_Core_BAO_SEPATransactionGroup object on success, null otherwise
+   * @return \CRM_Sepa_DAO_SEPATransactionGroup
    * @access public
    * @static
    */
@@ -42,18 +42,19 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $dao->copyValues($params);
     $dao->save();
 
-    CRM_Utils_Hook::post($hook, 'SepaTransactionGroup', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'SepaTransactionGroup', (int) $dao->id, $dao);
+    /** @var \CRM_Sepa_DAO_SEPATransactionGroup $dao */
     return $dao;
   }
 
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public function generateXML($id = NULL) {
+  public function generateXML(?int $id = NULL): string {
     $template = CRM_Core_Smarty::singleton();
     if ($id) {
       $this->id = $id;
     }
     if (empty($this->id)) {
-      CRM_Core_Error::fatal('missing id of the transaction group');
+      throw new CRM_Core_Exception('missing id of the transaction group');
     }
     $r = [];
     $this->total = 0;
@@ -65,10 +66,15 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $group['type'] = 'RCUR';
     }
 
-    $creditor_id = $group['sdd_creditor_id'];
-    $creditor    = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $creditor_id]);
+    $creditor_id = (int) $group['sdd_creditor_id'];
+    /** @var array<string, mixed> $creditor */
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $creditor_id]);
     if (!empty($creditor['country_id'])) {
-      $creditor['ctry'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $creditor['country_id'], 'iso_code');
+      $creditor['ctry'] = CRM_Core_DAO::getFieldValue(
+        'CRM_Core_DAO_Country',
+        (int) $creditor['country_id'],
+        'iso_code'
+      );
     }
     $format = CRM_Sepa_Logic_Format::getFormatForCreditor($creditor_id);
     $template->assign('group', $group);
@@ -116,6 +122,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       GROUP BY c.id";
 
     CRM_Core_DAO::disableFullGroupByMode();
+    /** @var \CRM_Core_DAO $contrib */
     $contrib = CRM_Core_DAO::executeQuery($query, $queryParams);
     CRM_Core_DAO::reenableFullGroupByMode();
 
@@ -147,7 +154,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $t['city']           = CRM_Sepa_Logic_Verification::convert2SepaCharacterSet($t['city']);
 
       // create an individual transaction message
-      $t['message'] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor, $this->id);
+      $t['message'] = CRM_Sepa_Logic_Settings::getTransactionMessage($t, $creditor, (int) $this->id);
 
       // create an individual EndToEndId
       // that's the old default
@@ -180,10 +187,10 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     $template->assign('contributions', $r);
 
     // load file format class
-    $fileFormatName = CRM_Core_PseudoConstant::getName(
+    $fileFormatName = (string) CRM_Core_PseudoConstant::getName(
       'CRM_Sepa_BAO_SEPACreditor',
       'sepa_file_format_id',
-      $creditor['sepa_file_format_id']
+      (int) $creditor['sepa_file_format_id']
     );
     $fileFormat = CRM_Sepa_Logic_Format::loadFormatClass($fileFormatName);
     $fileFormat->assignExtraVariables($template);
@@ -203,7 +210,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    *
    * @return int|string id of the created or existing sepa file entity, or an error message string
    */
-  public static function createFile($txgroup_id, $override = FALSE) {
+  public static function createFile(int $txgroup_id, bool $override = FALSE): int|string {
     try {
       $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
         ->addWhere('id', '=', $txgroup_id)
@@ -217,9 +224,12 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
     // get file format
     $format = CRM_Sepa_Logic_Format::getFormatForCreditor($txgroup['sdd_creditor_id']);
 
-    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['sequential' => 1, 'id' => $txgroup['sdd_creditor_id']]);
     // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, Generic.Files.LineLength.TooLong
-    // TODO: grouping: $fileFormatGrouping = CRM_Sepa_CustomData::getOptionValue('sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping');
+    // TODO: grouping:
+    // $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['sequential' => 1, 'id' => $txgroup['sdd_creditor_id']]);
+    // $fileFormatGrouping = CRM_Sepa_CustomData::getOptionValue(
+    //   'sepa_file_format', $creditor['sepa_file_format_id'], 'value', 'String', 'grouping'
+    // );
 
     if ($override || (!isset($txgroup['sdd_file_id']) || !$txgroup['sdd_file_id'])) {
       // find an available txgroup reference
@@ -227,7 +237,9 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $available_name = $name = $format->getFileReference($txgroup);
       $counter = 1;
       $test_sql = "SELECT id FROM civicrm_sdd_file WHERE reference='%s';";
-      while (CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name))->fetch()) {
+      /** @var \CRM_Core_DAO $test_query */
+      $test_query = CRM_Core_DAO::executeQuery(sprintf($test_sql, $available_name));
+      while ($test_query->fetch()) {
         // i.e. available_name is already taken, modify it
         $available_name = $name . '--' . $counter;
         $counter += 1;
@@ -242,8 +254,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       $sepa_file = civicrm_api3('SepaSddFile', 'create', [
         'reference'               => $available_name,
         // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
-        // TODO: grouping: 'filename' => $fileFormatGrouping
-        // ? $available_name.'.'.$fileFormatGrouping : $available_name.'.xml',
+        // TODO: grouping:
+        // 'filename' => $fileFormatGrouping ? $available_name.'.'.$fileFormatGrouping : $available_name.'.xml',
         'filename'                => $format->getFilename($available_name),
         'latest_submission_date'  => $txgroup['latest_submission_date'],
         'created_date'            => date('YmdHis'),
@@ -267,7 +279,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       }
     }
 
-    return $txgroup['sdd_file_id'];
+    return (int) $txgroup['sdd_file_id'];
   }
 
   /**
@@ -280,7 +292,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    * @return array<string, mixed>|string
    *   an update array with the txgroup or a string with an error message
    */
-  public static function adjustCollectionDate($txgroup_id, $latest_submission_date) {
+  public static function adjustCollectionDate(int $txgroup_id, string $latest_submission_date): array|string {
     $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
       ->addWhere('id', '=', $txgroup_id)
       ->execute()
@@ -341,7 +353,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
    *   string with an error message. An error message of 'ok' means deletion
    *   successful.
    */
-  public static function deleteGroup($txgroup_id, $delete_contributions_mode = 'no') {
+  public static function deleteGroup(int $txgroup_id, string $delete_contributions_mode = 'no'): array|string {
     // load the group
     try {
       $txgroup = \Civi\Api4\SepaTransactionGroup::get(TRUE)
@@ -393,8 +405,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
   /**
    * Helper method to delete a txgroup along with all the contents that match the selector
    */
-  public static function _deleteGroupContents($txgroup_id, $type, $selector) {
-    $txgroup_id = (int) $txgroup_id;
+  public static function _deleteGroupContents(int $txgroup_id, string $type, string $selector): array {
     $deleted_contributions = [];
 
     if ($type == 'OOFF') {
@@ -414,6 +425,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
           civicrm_sdd_contribution_txgroup.txgroup_id = $txgroup_id
         AND
           $selector;";
+      /** @var \CRM_Core_DAO $results */
       $results = CRM_Core_DAO::executeQuery($query);
       while ($results->fetch()) {
         $contribution_id = (int) $results->contribution_id;
@@ -442,6 +454,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       civicrm_sdd_contribution_txgroup.txgroup_id = $txgroup_id
     AND
       $selector;";
+    /** @var \CRM_Core_DAO $results */
     $results = CRM_Core_DAO::executeQuery($query);
     while ($results->fetch()) {
       if (isset($deleted_contributions[$results->contribution_id])) {
@@ -471,57 +484,38 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
   /**
    * Get the custom transaction message for the given group.
-   *
-   * @param int|string $groupId
-   *
-   * @return string|null
    */
-  public static function getCustomGroupTransactionMessage($groupId) {
+  public static function getCustomGroupTransactionMessage(int $groupId): ?string {
     return self::getNoteWithSubject($groupId, 'transaction_message');
   }
 
   /**
    * Set the custom transaction message for the given group.
-   *
-   * @param int|string $groupId
-   * @param string $note
    */
-  public static function setCustomGroupTransactionMessage($groupId, $note) {
+  public static function setCustomGroupTransactionMessage(int $groupId, string $note): void {
     self::setNoteWithSubject($groupId, 'transaction_message', $note);
   }
 
   /**
    * Get the transaction note for the given group.
-   *
-   * @param int|string $groupId
-   *
-   * @return string|null
    */
-  public static function getNote($groupId) {
+  public static function getNote(int $groupId): ?string {
     return self::getNoteWithSubject($groupId, 'transaction_note');
   }
 
   /**
    * Set the transaction note for the given group.
-   *
-   * @param int|string $groupId
-   * @param string $note
    */
-  public static function setNote($groupId, $note) {
+  public static function setNote(int $groupId, string $note): void {
     self::setNoteWithSubject($groupId, 'transaction_note', $note);
   }
 
   /**
    * Get the CiviCRM note with the given subject for the given group.
-   *
-   * @param int|string $groupId
-   * @param string $subject
-   *
-   * @return string|null
    */
-  private static function getNoteWithSubject($groupId, $subject) {
+  private static function getNoteWithSubject(int $groupId, string $subject): ?string {
     // NOTE: We cannot use the API here as it seems to only allow a fixed set of values for entity_table.
-
+    /** @var \CRM_Core_DAO $queryResult */
     $queryResult = CRM_Core_DAO::executeQuery(
       "SELECT
         note
@@ -532,7 +526,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         AND entity_id = %1
         AND `subject` = %2",
       [
-        1 => [(int) $groupId, 'Integer'],
+        1 => [$groupId, 'Integer'],
         2 => [$subject, 'String'],
       ]
     );
@@ -547,12 +541,8 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
 
   /**
    * Set a note with the given subject for the given group.
-   *
-   * @param int|string $groupId
-   * @param string $subject
-   * @param string $note
    */
-  private static function setNoteWithSubject($groupId, $subject, $note) {
+  private static function setNoteWithSubject(int $groupId, string $subject, string $note): void {
     // NOTE: We cannot use the API here as it seems to only allow a fixed set of values for entity_table.
 
     CRM_Core_DAO::executeQuery(
@@ -563,7 +553,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
         AND entity_id = %1
         AND `subject` = %2",
       [
-        1 => [(int) $groupId, 'Integer'],
+        1 => [$groupId, 'Integer'],
         2 => [$subject, 'String'],
       ]
     );
@@ -575,7 +565,7 @@ class CRM_Sepa_BAO_SEPATransactionGroup extends CRM_Sepa_DAO_SEPATransactionGrou
       VALUES
         ('civicrm_sdd_txgroup', %1, %2, %3)",
       [
-        1 => [(int) $groupId, 'Integer'],
+        1 => [$groupId, 'Integer'],
         2 => [$subject, 'String'],
         3 => [$note, 'String'],
       ]

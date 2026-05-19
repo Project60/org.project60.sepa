@@ -28,11 +28,13 @@
  *
  * @example SepaContributionGroupCreate.php Standard Create Example
  *
- * @return array API result array
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed> API result array
  *   {@getfields sepa_contribution_group_create}
  * @access public
  */
-function civicrm_api3_sepa_contribution_group_create($params) {
+function civicrm_api3_sepa_contribution_group_create(array $params): array {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -40,9 +42,9 @@ function civicrm_api3_sepa_contribution_group_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array<string, array<string, mixed>> $params array or parameters determined by getfields
  */
-function _civicrm_api3_sepa_contribution_group_create_spec(&$params) {
+function _civicrm_api3_sepa_contribution_group_create_spec(array &$params): void {
   $params['contribution_id']['api.required'] = 1;
   $params['txgroup_id']['api.required'] = 1;
 }
@@ -50,15 +52,15 @@ function _civicrm_api3_sepa_contribution_group_create_spec(&$params) {
 /**
  * Deletes an existing SepaContributionGroup
  *
- * @param  array $params
+ * @param  array<string, mixed> $params
  *
  * @example SepaContributionGroupDelete.php Standard Delete Example
  *
- * @return boolean | error  true if successfull, error otherwise
+ * @return array<string, mixed>
  *   {@getfields sepa_contribution_group_delete}
  * @access public
  */
-function civicrm_api3_sepa_contribution_group_delete($params) {
+function civicrm_api3_sepa_contribution_group_delete(array $params): array {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -73,15 +75,24 @@ function civicrm_api3_sepa_contribution_group_delete($params) {
  *   {@getfields sepa_contribution_group_get}
  * @access public
  */
-function civicrm_api3_sepa_contribution_group_get($params) {
+function civicrm_api3_sepa_contribution_group_get(array $params): array {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-function _civicrm_api3_sepa_contribution_group_getdetail_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_contribution_group_getdetail_spec(array &$params): void {
   $params['id']['api.required'] = 1;
 }
 
-function civicrm_api3_sepa_contribution_group_getdetail($params) {
+/**
+ * @param array{id: int|numeric-string} $params
+ *
+ * @throws \CRM_Core_Exception
+ * @throws \Civi\Core\Exception\DBQueryException
+ */
+function civicrm_api3_sepa_contribution_group_getdetail(array $params): array {
   $group = (int) $params['id'];
   if (!$group) {
     throw new CRM_Core_Exception('Incorrect or missing value for group id');
@@ -114,6 +125,7 @@ function civicrm_api3_sepa_contribution_group_getdetail($params) {
       /* AND mandate.is_enabled=1 */
       AND mandate.status IN ('FRST','OOFF','RCUR')
   ";
+  /** @var \CRM_Core_DAO $dao */
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result = [];
   $total = 0;

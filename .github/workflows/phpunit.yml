@@ -97,16 +97,14 @@ jobs:
           fi
 
           # Install dev dependencies from extension's composer.json.
-          jq -r '.["require-dev"] | to_entries[] | "\"\(.key):\(.value)\""' "$EXT_DIR/composer.json" | xargs -r composer require --dev --no-update
+          jq -r '.["require-dev"] | to_entries[] | "\"\(.key):\(.value)\""' "$EXT_DIR/composer.json" 2>/dev/null | xargs -r composer require --dev --no-update
 
           # --with-all-dependencies is required because downgrades from packages
           # installed before might be necessary.
-          # \PEAR_ErrorStack::singleton() is static since pear/pear-core v1.10.16
           # civicrm/composer-compile-plugin v0.22 is the minimum version
           # compatible with symfony/console >=8.0 used in composer since 2.9.0.
           composer require --with-all-dependencies --no-progress --${{ matrix.prefer }} \
-            --optimize-autoloader $EXT_COMPOSER_NAME 'pear/pear-core-minimal:>=1.10.16' \
-            'civicrm/composer-compile-plugin:>=0.22'
+            --optimize-autoloader $EXT_COMPOSER_NAME 'civicrm/composer-compile-plugin:>=0.22'
 
       - name: Set up CiviCRM
         env:

@@ -21,7 +21,8 @@
     "require": {
         "php": "^8.1",
         "civicrm/civicrm-core": ">=6.1",
-        "civicrm/civicrm-packages": ">=6.1"
+        "civicrm/civicrm-packages": ">=6.1",
+        "webmozart/assert": "^1 || ^2"
     },
     "autoload": {
         "classmap": ["ComposerHelper.php"]
@@ -63,6 +64,10 @@
         ]
     },
     "conflict": {
-        "pear/mail_mime": "<1.10.2"
-    }
+        "pear/mail_mime": "<1.10.2",
+        "pear/pear-core-minimal": "<1.10.16"
+    },
+    "_comment": [
+      "PEAR_ErrorStack::singleton() overridden in CRM_Core_Error is static since pear/pear-core v1.10.16"
+    ]
 }

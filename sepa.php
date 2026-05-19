@@ -260,7 +260,7 @@ function sepa_civicrm_links(
     $links_copy = $links;
     foreach ($links_copy as $index => $link) {
       if ($link['bit'] == CRM_Core_Action::DELETE) {
-        $protected = CRM_Sepa_Logic_ContributionProtector::isProtected($objectId, 'civicrm_contribution');
+        $protected = CRM_Sepa_Logic_ContributionProtector::isProtected((int) $objectId, 'civicrm_contribution');
         if ($protected) {
           // this is a protected contribution -> remove "DELETE" link
           unset($links[$index]);
@@ -295,6 +295,7 @@ function sepa_civicrm_pre(string $op, string $objectName, ?int $id, array $param
    * this is only a last resort, most UI actions leading to this should've been disabled
    */
   if ($op == 'delete' && ($objectName == 'Contribution' || $objectName == 'ContributionRecur')) {
+    assert(NULL !== $id);
     if ($objectName == 'Contribution') {
       $error = CRM_Sepa_Logic_ContributionProtector::isProtected($id, 'civicrm_contribution');
     }
@@ -318,10 +319,10 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
   if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
     if ($op == 'create' || $op == 'edit') {
       if ($objectName == 'SepaMandate') {
-        CRM_Sepa_Logic_NextCollectionDate::processMandatePostEdit($op, $objectName, $objectId, $objectRef);
+        CRM_Sepa_Logic_NextCollectionDate::processMandatePostEdit($op, $objectName, (int) $objectId, $objectRef);
       }
       else {
-        CRM_Sepa_Logic_NextCollectionDate::processRecurPostEdit($op, $objectName, $objectId, $objectRef);
+        CRM_Sepa_Logic_NextCollectionDate::processRecurPostEdit($op, $objectName, (int) $objectId, $objectRef);
       }
     }
   }
@@ -443,7 +444,7 @@ function sepa_civicrm_permission(&$permissions): void {
 /**
  * Set permission to the API calls
  */
-function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions): void {
+function sepa_civicrm_alterAPIPermissions($entity, $action, &$params, array &$permissions): void {
   // TODO: add more
   $permissions['sepa_alternative_batching']['received'] = ['batch sepa groups'];
   $permissions['sepa_logic']['received'] = ['batch sepa groups'];
@@ -464,8 +465,8 @@ function sepa_civicrm_validateForm($formName, &$fields, &$files, &$form, &$error
     }
 
     // find the contribution id
-    $contribution_id = $form->getVar('_id');
-    if (empty($contribution_id)) {
+    $contribution_id = (int) $form->getVar('_id');
+    if (0 === $contribution_id) {
       return;
     }
 
@@ -492,7 +493,7 @@ function sepa_civicrm_tokens(&$tokens): void {
   // spaces break newletters, see https://github.com/Project60/org.project60.sepa/issues/419
   $prefix = str_replace(' ', '_', $prefix);
 
-  $tokenList = CRM_Utils_SepaTokensDeprecated::getTokenList();
+  $tokenList = CRM_Utils_SepaTokens::getTokenList();
   foreach ($tokenList as $token => $tokenDescription) {
     $tokens[$prefix]["$prefix.$token"] = $tokenDescription;
   }
@@ -504,7 +505,7 @@ function sepa_get_cids_as_array($cids): array {
   }
 
   // also works on scalars (int)
-  $contained_ids = explode(',', $cids);
+  $contained_ids = explode(',', (string) $cids);
   // make $cids into an array
   $cids = [];
   foreach ($contained_ids as $cid_string) {
@@ -521,7 +522,7 @@ function sepa_get_cids_as_array($cids): array {
  * Fill "Last Mandate" tokens
  * (Deprecated hook)
  */
-function sepa_civicrm_tokenValues(&$values, $cids, $job = NULL, $tokens = [], $context = NULL): void {
+function sepa_civicrm_tokenValues(array &$values, $cids, $job = NULL, array $tokens = [], $context = NULL): void {
   $cids = sepa_get_cids_as_array($cids);
 
   $prefix = E::ts('Most Recent SEPA Mandate');
@@ -534,7 +535,8 @@ function sepa_civicrm_tokenValues(&$values, $cids, $job = NULL, $tokens = [], $c
   }
 
   foreach ($cids as $cid) {
-    CRM_Utils_SepaTokensDeprecated::fillLastMandateTokenValues($cid, $prefix, $values);
+    // @phpstan-ignore staticMethod.deprecatedClass
+    CRM_Utils_SepaTokensDeprecated::fillLastMandateTokenValues((int) $cid, $prefix, $values);
   }
 }
 
@@ -549,12 +551,11 @@ function sepa_register_tokens(\Civi\Token\Event\TokenRegisterEvent $e): void {
 
 function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e): void {
   $prefix = 'Most_Recent_SEPA_Mandate';
-
   foreach ($e->getRows() as $tokenRow) {
     // @phpstan-ignore-next-line False positive caused by CiviCRM core PHPDoc bug in TokenValueEvent::getRows().
     if (!empty($tokenRow->context['contactId'])) {
       $tokenRow->format('text/html');
-      CRM_Utils_SepaTokens::fillLastMandateTokenValues($tokenRow->context['contactId'], $prefix, $tokenRow);
+      CRM_Utils_SepaTokens::fillLastMandateTokenValues((int) $tokenRow->context['contactId'], $prefix, $tokenRow);
     }
   }
 }
@@ -564,7 +565,7 @@ function sepa_evaluate_tokens(\Civi\Token\Event\TokenValueEvent $e): void {
  *
  * Implements hook_civicrm_tabset().
  */
-function sepa_civicrm_tabset($tabsetName, &$tabs, $context): void {
+function sepa_civicrm_tabset(string $tabsetName, array &$tabs, array $context): void {
   if ($tabsetName == 'civicrm/contact/view'
     && (empty($context['contact_id'])
       || CRM_Core_Permission::check(
@@ -575,24 +576,17 @@ function sepa_civicrm_tabset($tabsetName, &$tabs, $context): void {
       'id' => 'sepa',
       'url' => CRM_Utils_System::url('civicrm/sepa/tab', "reset=1&snippet=1&force=1&cid={$context['contact_id']}"),
       'title' => E::ts('SEPA Mandates'),
-      'count' => CRM_Sepa_Page_MandateTab::getMandateCount($context['contact_id']),
+      'count' => CRM_Sepa_Page_MandateTab::getMandateCount((int) $context['contact_id']),
       'icon' => 'crm-i fa-bank',
       'weight' => 20,
     ];
   }
 }
 
-function sepa_civicrm_xmlMenu(&$files): void {
-  foreach (glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
+function sepa_civicrm_xmlMenu(array &$files): void {
+  $menuXmlFiles = glob(__DIR__ . '/xml/Menu/*.xml');
+  assert(is_array($menuXmlFiles));
+  foreach ($menuXmlFiles as $file) {
     $files[] = $file;
   }
 }
-
-// /**
-//  * Implements hook_civicrm_entityTypes().
-//  *
-//  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
-//  */
-// function sepa_civicrm_entityTypes(&$entityTypes) {
-//   _sepa_civix_civicrm_entityTypes($entityTypes);
-// }

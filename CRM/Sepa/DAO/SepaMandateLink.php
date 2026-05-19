@@ -121,21 +121,21 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
    * creation date
    * by default now()
    *
-   * @var datetime
+   * @var string
    */
   public $creation_date;
 
   /**
    * link start date (optional)
    *
-   * @var datetime
+   * @var string|null
    */
   public $start_date;
 
   /**
    * link end date (optional)
    *
-   * @var datetime
+   * @var string|null
    */
   public $end_date;
 
@@ -151,7 +151,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
    *
    * @static
    * @access public
-   * @return array of CRM_Core_EntityReference
+   * @return list<CRM_Core_Reference_Basic>
    */
   static function getReferenceColumns()
   {
@@ -332,7 +332,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
       self::$_import = array();
       $fields = self::fields();
       foreach($fields as $name => $field) {
-        if (CRM_Utils_Array::value('import', $field)) {
+        if ($field['import'] ?? NULL) {
           if ($prefix) {
             self::$_import['sdd_entity_mandate'] = & $fields[$name];
           } else {
@@ -356,7 +356,7 @@ class CRM_Sepa_DAO_SepaMandateLink extends CRM_Core_DAO
       self::$_export = array();
       $fields = self::fields();
       foreach($fields as $name => $field) {
-        if (CRM_Utils_Array::value('export', $field)) {
+        if ($field['export'] ?? NULL) {
           if ($prefix) {
             self::$_export['sdd_entity_mandate'] = & $fields[$name];
           } else {

@@ -21,6 +21,14 @@ use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Queue Item for updating a sepa group
+ *
+ * @phpstan-type txgroupT array{
+ *   id: int,
+ *   type: string|null,
+ *   reference: string|null,
+ *   collection_date: string|null,
+ *   ...
+ * }
  */
 class CRM_Sepa_Logic_Queue_Close {
 
@@ -33,7 +41,7 @@ class CRM_Sepa_Logic_Queue_Close {
   private string $mode;
 
   /**
-   * @phpstan-var array<string, mixed>
+   * @phpstan-var txgroupT
    */
   private array $txgroup;
 
@@ -74,6 +82,7 @@ class CRM_Sepa_Logic_Queue_Close {
       );
 
     // fetch the groups
+    /** @phpstan-var \ArrayObject<int, txgroupT> $txgroups */
     $txgroups = \Civi\Api4\SepaTransactionGroup::get(TRUE)
       ->addWhere('id', 'IN', $txgroup_ids)
       ->execute();
@@ -92,7 +101,7 @@ class CRM_Sepa_Logic_Queue_Close {
       ));
 
       // count the contributions and create an appropriate amount of items
-      $contribution_count = CRM_Core_DAO::singleValueQuery(
+      $contribution_count = (int) CRM_Core_DAO::singleValueQuery(
         "SELECT COUNT(contribution_id) FROM civicrm_sdd_contribution_txgroup
         WHERE txgroup_id={$txgroup['id']}"
       );
@@ -133,6 +142,9 @@ class CRM_Sepa_Logic_Queue_Close {
     $runner->runAllViaWeb();
   }
 
+  /**
+   * @phpstan-param txgroupT $txgroup
+   */
   protected function __construct(
     string $mode,
     array $txgroup,
@@ -172,7 +184,7 @@ class CRM_Sepa_Logic_Queue_Close {
     }
   }
 
-  public function run($context): bool {
+  public function run(): bool {
     if (!SepaBatchLockManager::getInstance()->acquire(10, $this->asyncLockId)) {
       throw new \RuntimeException('Unable to acquire lock');
     }
@@ -219,7 +231,7 @@ class CRM_Sepa_Logic_Queue_Close {
    * will select the next batch of up to SDD_CLOSE_RUNNER_BATCH_SIZE
    * contributions and update their status
    */
-  protected function updateContributions() {
+  protected function updateContributions(): void {
     $status_pending = (int) CRM_Core_PseudoConstant::getKey(
       'CRM_Contribute_BAO_Contribution',
       'contribution_status_id',
@@ -229,6 +241,7 @@ class CRM_Sepa_Logic_Queue_Close {
 
     // get eligible contributions (slightly different queries for OOFF/RCUR)
     if ($this->txgroup['type'] == 'OOFF') {
+      /** @var \CRM_Core_DAO $query */
       $query = CRM_Core_DAO::executeQuery("
         SELECT
           civicrm_sdd_mandate.id                      AS mandate_id,
@@ -254,6 +267,7 @@ class CRM_Sepa_Logic_Queue_Close {
 
     }
     elseif ($this->txgroup['type'] == 'RCUR' || $this->txgroup['type'] == 'FRST' || $this->txgroup['type'] == 'RTRY') {
+      /** @var \CRM_Core_DAO $query */
       $query = CRM_Core_DAO::executeQuery("
         SELECT
           civicrm_sdd_mandate.id                      AS mandate_id,
@@ -321,7 +335,7 @@ class CRM_Sepa_Logic_Queue_Close {
   /**
    * Update the status of all the given contributions'
    */
-  protected function updateMandateStatus($contributions, $new_status, $for_old_status) {
+  protected function updateMandateStatus(array $contributions, string $new_status, string $for_old_status): void {
     foreach ($contributions as $contribution) {
       if ($contribution['mandate_status'] == $for_old_status) {
         // the mandate has the required status
@@ -342,7 +356,7 @@ class CRM_Sepa_Logic_Queue_Close {
    * Update the status of all the given contributions'
    * @deprecated currently unused in favour of updateMandateStatus
    */
-  protected function updateMandateStatusSQL($contributions, $new_status, $for_old_status) {
+  protected function updateMandateStatusSQL(array $contributions, string $new_status, string $for_old_status): void {
     // generate a mandate_id list
     $mandate_ids = [];
     foreach ($contributions as $contribution) {
@@ -361,7 +375,7 @@ class CRM_Sepa_Logic_Queue_Close {
   /**
    * Update the status of all given contributions to $this->target_status_id
    */
-  protected function updateContributionStatus($contributions) {
+  protected function updateContributionStatus(array $contributions): void {
     $contribution_id_list = implode(',', array_keys($contributions));
     $status_inProgress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
     if (empty($contribution_id_list)) {
@@ -391,9 +405,9 @@ class CRM_Sepa_Logic_Queue_Close {
       // then: set them all to the new status
       foreach ($contributions as $contribution) {
         civicrm_api3('Contribution', 'create', [
-          'id'                       => $contribution['id'],
+          'id' => $contribution['id'],
           'contribution_status_id'   => $this->targetStatusId,
-          'receive_date'             => date('YmdHis', strtotime($this->txgroup['collection_date'])),
+          'receive_date' => date('YmdHis', strtotime($this->txgroup['collection_date'] ?? '1970-01-01')),
         ]);
       }
     }

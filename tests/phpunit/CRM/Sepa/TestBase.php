@@ -169,10 +169,10 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
    * @param array $params
    *   a list of parameters that are to be different from the default creditor
    *
-   * @return integer
+   * @return int
    *   new creditor ID
    */
-  protected function getCustomCreditor($params) {
+  protected function getCustomCreditor(array $params): int {
     // load the default creditor
     $creditor_template = $this->callAPISuccess('SepaCreditor', 'getsingle', ['id' => $this->testCreditorId]);
     unset($creditor_template['id']);
@@ -193,14 +193,9 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
    *
    * This breaks some tests when xdebug is present, and we don't need it.
    *
-   * @param $entity
-   * @param $action
-   * @param $params
-   * @param null $checkAgainst
-   *
    * @return array|int
    */
-  protected function callAPISuccess(string $entity, string $action, array $params, $checkAgainst = NULL) {
+  protected function callAPISuccess(string $entity, string $action, array $params, mixed $checkAgainst = NULL) {
     $result = $this->traitCallAPISuccess($entity, $action, $params, $checkAgainst);
     if (is_array($result)) {
       unset($result['xdebug']);
@@ -282,7 +277,8 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
    * @param string $key The settings key.
    * @param mixed $value The settings value.
    */
-  protected function setCreditorConfiguration(string $key, $value): void {
+  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidTypeHint
+  protected function setCreditorConfiguration(string $key, mixed $value): void {
     // Fetch the active/default creditor:
     $creditorId = $this->callAPISuccessGetValue(
       'SepaCreditor',
@@ -307,7 +303,8 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
    * @param string $key The settings key.
    * @param mixed $value The settings value.
    */
-  protected function setSepaConfiguration(string $key, $value): void {
+  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidTypeHint
+  protected function setSepaConfiguration(string $key, mixed $value): void {
     CRM_Sepa_Logic_Settings::setSetting($value, $key);
   }
 
@@ -476,15 +473,13 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
    *
    * @return array|null contribution data
    */
-  protected function getLatestContributionForMandate(array $mandate, $can_be_null = FALSE) {
+  protected function getLatestContributionForMandate(array $mandate, bool $can_be_null = FALSE) {
     $mandateType = $mandate['type'];
 
     // Check if the mandate type is supported:
     if (!in_array($mandateType, [self::MANDATE_TYPE_OOFF, self::MANDATE_TYPE_RCUR, self::MANDATE_TYPE_FRST])) {
       throw new Exception('For this mandate type can no contribution be determined.');
     }
-
-    $contribution = NULL;
 
     if ($mandateType == self::MANDATE_TYPE_OOFF) {
       // If it is an OOFF mandate, we simply have the contribution ID given in the mandate's entity_id.

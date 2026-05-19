@@ -19,36 +19,38 @@ class CRM_Sepa_Logic_Format {
 
   /**
    * @var array Settings per format */
-  public static $settings = [];
+  public static array $settings = [];
 
-  protected $fileFormatName = NULL;
+  protected string $fileFormatName;
 
   /**
    * get the file format for the given creditor ID
    */
-  public static function getFormatForCreditor($creditor_id) {
-    if (empty($creditor_id)) {
-      return new CRM_Sepa_Logic_Format();
-    }
-
+  public static function getFormatForCreditor(int $creditor_id): static {
     try {
+      /** @var array{sepa_file_format_id: int|numeric-string} $creditor */
       $creditor = civicrm_api3('SepaCreditor', 'getsingle', [
         'id'     => $creditor_id,
         'return' => 'sepa_file_format_id',
       ]);
     }
     catch (Exception $e) {
-      throw new Exception(E::ts('Creditor [%1] is missing!', [1 => $creditor_id]));
+      throw new RuntimeException(E::ts('Creditor [%1] is missing!', [1 => $creditor_id]), $e->getCode(), $e);
     }
 
     try {
+      /** @var array{id: int|numeric-string, value: string, name: string, label: string} $file_format */
       $file_format = civicrm_api3('OptionValue', 'getsingle', [
         'option_group_id' => 'sepa_file_format',
-        'value'           => $creditor['sepa_file_format_id'],
+        'value' => $creditor['sepa_file_format_id'],
       ]);
     }
     catch (Exception $e) {
-      throw new Exception(E::ts('File format [%1] is missing!', [1 => $creditor['sepa_file_format_id']]));
+      throw new RuntimeException(
+        E::ts('File format [%1] is missing!', [1 => $creditor['sepa_file_format_id']]),
+        $e->getCode(),
+        $e
+      );
     }
 
     return self::loadFormatClass($file_format['name']);
@@ -57,11 +59,9 @@ class CRM_Sepa_Logic_Format {
   /**
    * Load class based on format name.
    *
-   * @param $fileFormat
-   *
    * @throws Exception
    */
-  public static function loadFormatClass($fileFormatName): static {
+  public static function loadFormatClass(string $fileFormatName): static {
     $s              = DIRECTORY_SEPARATOR;
     $fileFormatName = self::sanitizeFileFormat($fileFormatName);
 
@@ -72,6 +72,8 @@ class CRM_Sepa_Logic_Format {
     else {
       throw new Exception("Class format file '{$file}' not found.");
     }
+
+    /** @var class-string<\CRM_Sepa_Logic_Format> $format_class */
     $format_class = 'CRM_Sepa_Logic_Format_' . $fileFormatName;
     return new $format_class($fileFormatName);
   }
@@ -79,6 +81,8 @@ class CRM_Sepa_Logic_Format {
   /**
    * Lets the format add extra information to each individual
    *  transaction (contribution + extra data)
+   *
+   * @param array<string, mixed> $txn
    */
   public function extendTransaction(array &$txn, int $creditor_id) {
     // nothing to do here, but overwritten by some formats
@@ -87,19 +91,21 @@ class CRM_Sepa_Logic_Format {
   /**
    * Constructor
    */
-  protected function __construct($fileFormatName) {
+  protected function __construct(string $fileFormatName) {
     $this->fileFormatName = $fileFormatName;
   }
 
   /**
    * get file format string
    */
-  public function getFileFormatName() {
-    require $this->fileFormatName;
+  public function getFileFormatName(): string {
+    return $this->fileFormatName;
   }
 
   /**
    * get the header TPL file
+   *
+   * @return string
    */
   public function getHeaderTpl() {
     return "Sepa/Formats/{$this->fileFormatName}/transaction-header.tpl";
@@ -107,6 +113,8 @@ class CRM_Sepa_Logic_Format {
 
   /**
    * get the header TPL file
+   *
+   * @return string
    */
   public function getDetailsTpl() {
     return "Sepa/Formats/{$this->fileFormatName}/transaction-details.tpl";
@@ -114,6 +122,8 @@ class CRM_Sepa_Logic_Format {
 
   /**
    * get the header TPL file
+   *
+   * @return string
    */
   public function getFooterTpl() {
     return "Sepa/Formats/{$this->fileFormatName}/transaction-footer.tpl";
@@ -121,35 +131,26 @@ class CRM_Sepa_Logic_Format {
 
   /**
    * Sanitize file format name which is used in directory name.
-   *
-   * @param $fileFormat
-   *
-   * @return mixed
    */
-  public static function sanitizeFileFormat($fileFormat) {
-    $fileFormat = preg_replace(['/[^a-zA-Z0-9]+/'], '_', $fileFormat);
-    return $fileFormat;
+  public static function sanitizeFileFormat(string $fileFormat): string {
+    return preg_replace(['/[^a-zA-Z0-9]+/'], '_', $fileFormat) ?? '';
   }
 
   /**
    * Improve content of file.
    *
-   * @param string $content
-   *
-   * @return mixed
+   * @return string
    */
-  public function improveContent($content) {
+  public function improveContent(string $content) {
     return $content;
   }
 
   /**
    * Apply string encoding
    *
-   * @param string $content
-   *
-   * @return mixed
+   * @return string
    */
-  public function characterEncode($content) {
+  public function characterEncode(string $content) {
     return $content;
   }
 
@@ -157,8 +158,12 @@ class CRM_Sepa_Logic_Format {
    * Get the propsed file reference. The final
    * reference might have an '--1' like extension
    * if there is conflicts.
+   *
+   * @param array{reference: string} $txgroup
+   *
+   * @return string
    */
-  public function getFileReference($txgroup) {
+  public function getFileReference(array $txgroup) {
     return $this->getDDFilePrefix() . $txgroup['reference'];
   }
 
@@ -174,16 +179,16 @@ class CRM_Sepa_Logic_Format {
   /**
    * Method returns filename with extension for transactional file.
    *
-   * @param $variable_string
-   *
    * @return string
    */
-  public function getFilename($file_reference) {
+  public function getFilename(string $file_reference) {
     return $file_reference . '.xml';
   }
 
   /**
    * gives the option of setting extra variables to the template
+   *
+   * @return void
    */
   public function assignExtraVariables(\CRM_Core_Smarty $template) {
     $template->assign('fileFormat', $this->fileFormatName);

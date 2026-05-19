@@ -18,8 +18,9 @@ class SepaMandate extends Generic\DAOEntity {
   }
 
   /**
+   * @return array<string, list<string|list<string>>>
+   *
    * @see \Civi\Api4\Generic\AbstractEntity::permissions()
-   * @return array[]
    */
   public static function permissions(): array {
     return [

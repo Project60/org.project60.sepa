@@ -5,7 +5,10 @@ use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Utils_SepaTokens {
 
-  public static function getTokenList() {
+  /**
+   * @return array<string, string>
+   */
+  public static function getTokenList(): array {
     return [
       'reference'               => E::ts('Reference'),
       'source'                  => E::ts('Source'),
@@ -29,7 +32,7 @@ class CRM_Utils_SepaTokens {
     ];
   }
 
-  public static function fillLastMandateTokenValues($contactId, $prefix, TokenRow $tokenRow) {
+  public static function fillLastMandateTokenValues(int $contactId, string $prefix, TokenRow $tokenRow): void {
     $mandate = CRM_Sepa_BAO_SEPAMandate::getLastMandateOfContact($contactId);
     if ($mandate) {
       self::fillLastMandateCommonTokenValues($mandate, $prefix, $tokenRow);
@@ -43,7 +46,7 @@ class CRM_Utils_SepaTokens {
     }
   }
 
-  private static function fillLastMandateCommonTokenValues($mandate, $prefix, TokenRow $tokenRow) {
+  private static function fillLastMandateCommonTokenValues(array $mandate, string $prefix, TokenRow $tokenRow): void {
     // copy the mandate values
     $tokenRow->tokens($prefix, 'reference', $mandate['reference'] ?? '');
     $tokenRow->tokens($prefix, 'source', $mandate['source'] ?? '');
@@ -63,7 +66,11 @@ class CRM_Utils_SepaTokens {
     }
   }
 
-  private static function fillLastMandateContributionTokenValues($mandate, $prefix, TokenRow $tokenRow) {
+  private static function fillLastMandateContributionTokenValues(
+    array $mandate,
+    string $prefix,
+    TokenRow $tokenRow
+  ): void {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $mandate['entity_id']]);
     $tokenRow->tokens($prefix, 'amount', $contribution['total_amount']);
     $tokenRow->tokens($prefix, 'currency', $contribution['currency']);
@@ -79,7 +86,11 @@ class CRM_Utils_SepaTokens {
     }
   }
 
-  private static function fillLastMandateContributionRecurTokenValues($mandate, $prefix, TokenRow $tokenRow) {
+  private static function fillLastMandateContributionRecurTokenValues(
+    array $mandate,
+    string $prefix,
+    TokenRow $tokenRow
+  ): void {
     $rcontribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id']]);
     $tokenRow->tokens($prefix, 'amount', $rcontribution['amount']);
     $tokenRow->tokens($prefix, 'currency', $rcontribution['currency']);
@@ -95,7 +106,7 @@ class CRM_Utils_SepaTokens {
       $prefix,
       'frequency',
       CRM_Utils_SepaOptionGroupTools::getFrequencyText(
-        $rcontribution['frequency_interval'],
+        (int) $rcontribution['frequency_interval'],
         $rcontribution['frequency_unit'],
         TRUE
       )
@@ -104,8 +115,8 @@ class CRM_Utils_SepaTokens {
     // first collection date
     if (empty($mandate['first_contribution_id'])) {
       // calculate
-      $calculator = new CRM_Sepa_Logic_NextCollectionDate($mandate['creditor_id']);
-      $firstCollectionDate = $calculator->calculateNextCollectionDate($mandate['entity_id']);
+      $calculator = new CRM_Sepa_Logic_NextCollectionDate((int) $mandate['creditor_id']);
+      $firstCollectionDate = $calculator->calculateNextCollectionDate((int) $mandate['entity_id']);
     }
     else {
       // use date of first contribution

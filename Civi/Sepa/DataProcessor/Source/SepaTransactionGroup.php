@@ -25,8 +25,6 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the entity name
-   *
-   * @return String
    */
   protected function getEntity(): string {
     return 'SepaTransactionGroup';
@@ -34,8 +32,6 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the table name of this entity
-   *
-   * @return String
    */
   protected function getTable(): string {
     return 'civicrm_sdd_txgroup';

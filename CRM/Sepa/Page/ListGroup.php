@@ -53,7 +53,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         E::ts(
           'Cannot read SEPA transaction group [%1]. Error was: %2',
           [
-            1 => $groupId,
+            1 => $groupId ?? NULL,
             2 => $exception->getMessage(),
           ]
         ),
@@ -96,7 +96,10 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         'contribution_id' => $contribution['id'],
         'contribution_status' => $contribution['contribution_status_id:label'],
         'contribution_amount' => $contribution['total_amount'],
-        'contribution_amount_str' => CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']),
+        'contribution_amount_str' => CRM_Utils_Money::format(
+          (float) $contribution['total_amount'],
+          (string) $contribution['currency']
+        ),
         'financial_type_id' => $contribution['financial_type_id'],
         'financial_type' => $contribution['financial_type_id:label'],
         'campaign' => $contribution['campaign_id.title'],
@@ -110,7 +113,10 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
     $this->assign('group_id', $groupId);
     $this->assign('total_count', $txGroup['total_count']);
     $this->assign('total_amount', $txGroup['total_amount']);
-    $this->assign('total_amount_str', CRM_Utils_Money::format($txGroup['total_amount'], $result->first()['currency']));
+    $this->assign('total_amount_str', CRM_Utils_Money::format(
+      $txGroup['total_amount'],
+      $result->first()['currency'] ?? NULL
+    ));
     $this->assign('contributions', $contributions);
     $this->assign('different_campaigns', $txGroup['different_campaigns']);
     $this->assign('different_types', $txGroup['different_types']);

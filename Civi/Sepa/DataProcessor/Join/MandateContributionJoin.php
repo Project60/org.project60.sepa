@@ -23,10 +23,8 @@ class MandateContributionJoin extends AbstractMandateJoin {
   /**
    * When this join has configuration specify the template file name
    * for the configuration form.
-   *
-   * @return false|string
    */
-  public function getConfigurationTemplateFileName():? string {
+  public function getConfigurationTemplateFileName(): string {
     return 'CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl';
   }
 

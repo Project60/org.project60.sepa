@@ -22,12 +22,19 @@ use CRM_Sepa_ExtensionUtil as E;
  */
 class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
+  private civicrm_api3|null $api = NULL;
+
+  private array|null $html = NULL;
+
+  private \stdClass|null $mandate = NULL;
+
   /**
    * Lookup and get a message template
    *
    * @throws \CRM_Core_Exception
    */
-  public function getMessage($id): array {
+  public function getMessage(int $id): array {
+    /** @var array<string, mixed> $msg */
     $msg = civicrm_api3('MessageTemplate', 'getSingle', ['id' => $id]);
     if (array_key_exists('is_error', $msg)) {
       throw new \CRM_Core_Exception('The selected message template does not exist: ' . $id);
@@ -36,7 +43,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     return $msg;
   }
 
-  public function addContactTokens($contact_id, $variable_name) {
+  public function addContactTokens(int $contact_id, string $variable_name): void {
     if (empty($contact_id)) {
       return;
     }
@@ -46,7 +53,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
     // ... add some missing fields
     $bao = new CRM_Contact_BAO_Contact();
-    $bao->get('id', $contact_id);
+    $bao->get('id', (string) $contact_id);
     $contact['postal_greeting_display'] = $bao->postal_greeting_display;
     $contact['email_greeting_display']  = $bao->email_greeting_display;
     $contact['addressee_display']       = $bao->addressee_display;
@@ -61,17 +68,15 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
    * this is a precondition for PDF generation as well as emails
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public function generateHTML($mandate, $template_id) {
+  public function generateHTML(array|\stdClass $mandate, int $template_id): void {
     // init API wrapper object
-    if (!isset($this->api)) {
-      $this->api = new civicrm_api3();
-    }
-    $api = $this->api;
+    $api = $this->api ??= new civicrm_api3();
 
     // LOAD INFORMATION and set tokens (smarty variables)
 
     // fix mandate. @X+: Why?
     if (is_array($mandate)) {
+      /** @var \stdClass $mandate */
       $mandate = json_decode(json_encode($mandate), FALSE);
     }
     $this->mandate = $mandate;
@@ -85,9 +90,9 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         $recur = $api->result;
         $this->assign('recur', (array) $recur);
         $this->assign('contactId', $recur->contact_id);
-        $this->addContactTokens($recur->contact_id, 'contact');
+        $this->addContactTokens((int) $recur->contact_id, 'contact');
 
-        // first_conttribution
+        // first_contribution
         if (!empty($mandate->first_contribution_id)) {
           $api->Contribution->getsingle(['id' => $mandate->first_contribution_id]);
           $this->assign('first_contribution', (array) $api->result);
@@ -96,27 +101,27 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         // some more extra information:
         $recur_extra = [];
         $recur_extra['frequency_text'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
-          $recur->frequency_interval,
+          (int) $recur->frequency_interval,
           $recur->frequency_unit,
           FALSE
         );
         $recur_extra['frequency_text_l10n'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
-          $recur->frequency_interval,
+          (int) $recur->frequency_interval,
           $recur->frequency_unit,
           TRUE
         );
-        $recur_extra['yearly_amount'] = $recur->amount;
+        $recur_extra['yearly_amount'] = (float) $recur->amount;
         if ($recur->frequency_unit == 'month') {
-          $recur_extra['yearly_amount'] = $recur_extra['yearly_amount'] * (12 / $recur->frequency_interval);
+          $recur_extra['yearly_amount'] = $recur_extra['yearly_amount'] * (12 / (int) $recur->frequency_interval);
         }
         elseif ($recur->frequency_unit == 'year') {
-          $recur_extra['yearly_amount'] = $recur_extra['yearly_amount'] / $recur->frequency_interval;
+          $recur_extra['yearly_amount'] = $recur_extra['yearly_amount'] / (int) $recur->frequency_interval;
         }
         else {
           // we don't support other units
           unset($recur_extra['yearly_amount']);
         }
-        $this->assign('recur_extra', (array) $recur_extra);
+        $this->assign('recur_extra', $recur_extra);
 
         break;
 
@@ -125,7 +130,7 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
         $contribution = $api->result;
         $this->assign('contribution', (array) $contribution);
         $this->assign('contactId', $contribution->contact_id);
-        $this->addContactTokens($contribution->contact_id, 'contact');
+        $this->addContactTokens((int) $contribution->contact_id, 'contact');
         break;
 
       default:
@@ -146,49 +151,50 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     }
     if (!empty($payment_processor_id)) {
       $api->PaymentProcessor->getsingle(['id' => $payment_processor_id]);
-      if (isset($api->$result)) {
-        $this->assign('payment_processor', $api->$result);
+      if (isset($api->result)) {
+        $this->assign('payment_processor', $api->result);
         // LEGACY: set 'creditor' to the following (@X+: why?)
-        $this->assign('creditor', $api->$result->user_name);
+        $this->assign('creditor', $api->result->user_name);
       }
     }
 
     // set some more basic information
-    $this->addContactTokens($mandate->contact_id, 'mandate_contact');
-    $this->addContactTokens($creditor->creditor_id, 'creditor_contact');
-    $this->addContactTokens(CRM_Core_Session::singleton()->get('userID'), 'user');
+    $this->addContactTokens((int) $mandate->contact_id, 'mandate_contact');
+    $this->addContactTokens((int) $creditor->creditor_id, 'creditor_contact');
+    $this->addContactTokens(CRM_Core_Session::getLoggedInContactID(), 'user');
 
     // Load the template and run SMARTY
     $msg = $this->getMessage($template_id);
     CRM_Utils_System::setTitle($msg['msg_title'] . ' ' . $mandate->reference);
-    $this->html = $this->getTemplate()->fetch('string:' . $msg['msg_html']);
+    $this->html = (array) $this->getTemplate()->fetch('string:' . $msg['msg_html']);
   }
 
   /**
    * Generate pre-notification PDF to download or return
    *
-   * @param boolean $send
+   * @param bool $send
    *   should the PDF be sent to via email or offered as download?
    *
-   * @param integer $template_id
+   * @param int $template_id
    *   ID of the pre-notification template
    *
-   * @return false|void
+   * @return false|null
    *   false iff the process failed (probably because there's no email address with the contact)
    *
    * @throws CRM_Core_Exception
    */
-  public function generatePDF($send, $template_id) {
+  public function generatePDF(bool $send, int $template_id): bool|null {
     require_once 'CRM/Utils/PDF/Utils.php';
     $fileName = $this->mandate->reference . '.pdf';
     if ($send) {
       $config = CRM_Core_Config::singleton();
       $pdfFullFilename = $config->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
-      file_put_contents($pdfFullFilename, CRM_Utils_PDF_Utils::html2pdf($this->html, $fileName, TRUE, NULL));
-      list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+      file_put_contents($pdfFullFilename, CRM_Utils_PDF_Utils::html2pdf($this->html, $fileName, TRUE));
+      [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
       $params              = [];
       $params['groupName'] = 'SEPA Email Sender';
       $params['from']      = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
+      // FIXME: $this->contact is never assigned, i.e. this method never worked.
       $params['toEmail'] = $this->contact->email;
       $params['toName']  = $params['toEmail'];
 
@@ -211,6 +217,8 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     else {
       CRM_Utils_PDF_Utils::html2pdf($this->html, $fileName, FALSE, NULL);
     }
+
+    return NULL;
   }
 
   public function run() {
@@ -248,10 +256,8 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
 
   /**
    * Install SEPA's default message template, if not yet installed
-   *
-   * @author endres@systopia.de
    */
-  public static function installMessageTemplate() {
+  public static function installMessageTemplate(): void {
     $default_templates = [
       'sepa_mandate'     => E::ts('SEPA default email template.'),
       'sepa_mandate_pdf' => E::ts('SEPA default PDF template.'),

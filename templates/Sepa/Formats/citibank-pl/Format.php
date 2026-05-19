@@ -20,22 +20,22 @@ class CRM_Sepa_Logic_Format_citibankpl extends CRM_Sepa_Logic_Format {
    * Apply string encoding
    *
    * @param string $content
-   *
-   * @return mixed
    */
-  public function characterEncode($content) {
+  public function characterEncode(string $content): string {
+    /** @var string */
     return iconv('UTF-8', 'WINDOWS-1250', $content);
   }
 
-  public function improveContent($content) {
+  public function improveContent(string $content): string {
+    /** @var string */
     return preg_replace('~(*BSR_ANYCRLF)\R~', "\r\n", $content);
   }
 
-  public function getDDFilePrefix() {
+  public function getDDFilePrefix(): string {
     return 'CITIBANK-';
   }
 
-  public function getFilename($variable_string) {
+  public function getFilename(string $variable_string): string {
     return $variable_string . '.txt';
   }
 

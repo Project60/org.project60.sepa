@@ -14,17 +14,13 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-use CRM_Sepa_ExtensionUtil as E;
-
 /**
  * SepaMandateLink.create API specification (optional)
  * This is used for documentation and validation.
  *
- * @param array $spec description of fields supported by this API call
- * @return void
- * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
+ * @param array<string, array<string, mixed>> $spec description of fields supported by this API call
  */
-function _civicrm_api3_sepa_mandate_link_create_spec(&$spec) {
+function _civicrm_api3_sepa_mandate_link_create_spec(array &$spec): void {
   $spec['id'] = [
     'name'         => 'id',
     'api.required' => 1,
@@ -86,44 +82,42 @@ function _civicrm_api3_sepa_mandate_link_create_spec(&$spec) {
 /**
  * SepaMandateLink.create API
  *
- * @param array $params
- * @return array API result descriptor
+ * @param array<string, mixed> $params
+ * @return array<string, mixed> API result descriptor
  * @throws CRM_Core_Exception
  */
-function civicrm_api3_sepa_mandate_link_create($params) {
+function civicrm_api3_sepa_mandate_link_create(array $params): array {
   return _civicrm_api3_basic_create('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
 
 /**
  * SepaMandateLink.delete API
  *
- * @param array $params
- * @return array API result descriptor
+ * @param array<string, mixed> $params
+ * @return array<string, mixed> API result descriptor
  * @throws CRM_Core_Exception
  */
-function civicrm_api3_sepa_mandate_link_delete($params) {
+function civicrm_api3_sepa_mandate_link_delete(array $params): array {
   return _civicrm_api3_basic_delete('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
 
 /**
  * SepaMandateLink.get API
  *
- * @param array $params
- * @return array API result descriptor
+ * @param array<string, mixed> $params
+ * @return array<string, mixed> API result descriptor
  * @throws CRM_Core_Exception
  */
-function civicrm_api3_sepa_mandate_link_get($params) {
+function civicrm_api3_sepa_mandate_link_get(array $params): array {
   return _civicrm_api3_basic_get('CRM_Sepa_BAO_SepaMandateLink', $params);
 }
 
 /**
  * SepaMandateLink.getactive API specification
  *
- * @param array $spec description of fields supported by this API call
- * @return void
- * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
+ * @param array<string, array<string, mixed>> $spec description of fields supported by this API call
  */
-function _civicrm_api3_sepa_mandate_link_getactive_spec(&$spec) {
+function _civicrm_api3_sepa_mandate_link_getactive_spec(array &$spec): void {
   $spec['mandate_id'] = [
     'name'         => 'mandate_id',
     'api.required' => 0,
@@ -164,21 +158,29 @@ function _civicrm_api3_sepa_mandate_link_getactive_spec(&$spec) {
 /**
  * SepaMandateLink.getactive API
  *
- * @param array $params
- * @return array API result descriptor
+ * @phpstan-param array{
+ *   mandate_id?: int|numeric-string,
+ *   class?: string,
+ *   entity_id?: int|numeric-string,
+ *   entity_table?: string,
+ *   date?: string,
+ * } $params
+ *
+ * @return array<string, mixed> API result descriptor
  * @throws CRM_Core_Exception
  */
-function civicrm_api3_sepa_mandate_link_getactive($params) {
+function civicrm_api3_sepa_mandate_link_getactive(array $params): array {
   try {
     $result = CRM_Sepa_BAO_SepaMandateLink::getActiveLinks(
-        $params['mandate_id'] ?? NULL,
+        isset($params['mandate_id']) ? (int) $params['mandate_id'] : NULL,
         $params['class'] ?? NULL,
-        $params['entity_id'] ?? NULL,
+        isset($params['entity_id']) ? (int) $params['entity_id'] : NULL,
         $params['entity_table'] ?? NULL,
-        $params['date'] ?? 'now');
+        $params['date'] ?? 'now'
+    );
     return civicrm_api3_create_success($result);
   }
   catch (Exception $ex) {
-    throw new CRM_Core_Exception($ex->getMessage());
+    throw new CRM_Core_Exception($ex->getMessage(), $ex->getCode(), [], $ex);
   }
 }

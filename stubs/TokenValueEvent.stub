@@ -1,0 +1,12 @@
+<?php
+// Required before CiviCRM 6.16, see https://github.com/civicrm/civicrm-core/pull/35441
+namespace Civi\Token\Event;
+
+class TokenValueEvent {
+
+  /**
+   * @return \Traversable<\Civi\Token\TokenRow>
+   */
+  public function getRows() {}
+
+}

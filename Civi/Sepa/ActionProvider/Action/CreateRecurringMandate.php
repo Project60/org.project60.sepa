@@ -150,6 +150,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    *      The parameters this action can send back
    * @return void
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
     $mandate_data = ['type' => 'RCUR'];
     // add basic fields
@@ -196,8 +197,9 @@ class CreateRecurringMandate extends CreateOneOffMandate {
 
     // verify/adjust start date
     $buffer_days = (int) $this->configuration->getParameter('buffer_days');
+    /** @var int $earliest_start_date */
     $earliest_start_date = strtotime("+ {$buffer_days} days");
-    $current_start_date = strtotime($mandate_data['start_date']);
+    $current_start_date = strtotime($mandate_data['start_date'] ?? '1970-01-01');
     if ($current_start_date < $earliest_start_date) {
       $mandate_data['start_date'] = date('YmdHis', $earliest_start_date);
     }
@@ -236,7 +238,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
   /**
    * Get list of frequencies
    */
-  protected function getFrequencies() {
+  protected function getFrequencies(): array {
     return [
       1  => E::ts('annually'),
       2  => E::ts('semi-annually'),
@@ -249,7 +251,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
   /**
    * Get list of collection days
    */
-  protected function getCollectionDays() {
+  protected function getCollectionDays(): array {
     $list = range(0, 28);
     $options = array_combine($list, $list);
     $options[0] = E::ts('as soon as possible');
@@ -264,13 +266,13 @@ class CreateRecurringMandate extends CreateOneOffMandate {
    *      all data known about the mandate
    *
    */
-  protected function calculateSoonestCycleDay($mandate_data) {
+  protected function calculateSoonestCycleDay(array $mandate_data): int {
     // get creditor ID
     $creditor_id = (int) $mandate_data['creditor_id'];
     if (!$creditor_id) {
       $default_creditor = \CRM_Sepa_Logic_Settings::defaultCreditor();
       if ($default_creditor) {
-        $creditor_id = $default_creditor->id;
+        $creditor_id = (int) $default_creditor->id;
       }
       else {
         \Civi::log()->notice(
@@ -290,7 +292,7 @@ class CreateRecurringMandate extends CreateOneOffMandate {
     for ($i = 0; $i < 31; $i++) {
       if (in_array(date('j', $date), $cycle_days)) {
         // we found our cycle_day!
-        return date('j', $date);
+        return (int) date('j', $date);
       }
       else {
         // no? try the next one...

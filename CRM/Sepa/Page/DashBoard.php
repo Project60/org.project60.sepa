@@ -28,7 +28,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
   /**
    * cache for getFormatFilename function */
-  protected $_creditorID2format = [];
+  protected array $_creditorID2format = [];
 
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function run() {
@@ -58,7 +58,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     );
 
     if (isset($_REQUEST['update'])) {
-      $this->callBatcher($_REQUEST['update']);
+      $this->callBatcher((string) $_REQUEST['update']);
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
     }
 
@@ -106,6 +106,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     // now read the details
     try {
       // API4 SepaTransactionGroup.get checks Financial ACLs for corresponding contributions.
+      /** @var \ArrayObject<int, array<string, mixed>> $sepaTransactionGroups */
       $sepaTransactionGroups = \Civi\Api4\SepaTransactionGroup::get(TRUE)
         ->selectRowCount()
         ->addSelect(
@@ -131,6 +132,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         ->addJoin(
           'SepaSddFile AS sepa_sdd_file',
           'LEFT',
+          NULL,
           ['sdd_file_id', '=', 'sepa_sdd_file.id']
         )
         ->addWhere('status_id', 'IN', $status_list[$status])
@@ -186,7 +188,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage(
           $group['id']
         );
-        $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote($group['id']);
+        $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote((int) $group['id']);
 
         $groups[] = $group;
       }
@@ -208,10 +210,22 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
   /**
    * call the batching API
+   *
+   * @param 'OOFF'|'RCUR' $mode
    */
   public function callBatcher(string $mode): void {
     if (!SepaBatchLockManager::getInstance()->acquire(0)) {
       CRM_Core_Session::setStatus(E::ts('Cannot run update, another update is in progress!'), '', 'error');
+
+      return;
+    }
+
+    if ($mode !== 'OOFF' && $mode !== 'RCUR') {
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts("Unknown batcher mode '%s'. No batching triggered."), $mode),
+        E::ts('Error'),
+        'error'
+      );
 
       return;
     }
@@ -222,40 +236,31 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       CRM_Sepa_Logic_Queue_Update::launchUpdateRunner($mode);
     }
 
-    if ($mode == 'OOFF') {
-      $result = civicrm_api3('SepaAlternativeBatching', 'update', ['type' => $mode]);
-
+    if ($mode === 'OOFF') {
+      civicrm_api3('SepaAlternativeBatching', 'update', ['type' => $mode]);
     }
-    elseif ($mode == 'RCUR') {
+    elseif ($mode === 'RCUR') {
       // perform for FRST _and_ RCUR
-      $result = civicrm_api3('SepaAlternativeBatching', 'update', ['type' => 'FRST']);
-      $result = civicrm_api3('SepaAlternativeBatching', 'update', ['type' => 'RCUR']);
-
-    }
-    else {
-      CRM_Core_Session::setStatus(
-        sprintf(E::ts("Unknown batcher mode '%s'. No batching triggered."), $mode),
-        E::ts('Error'),
-        'error'
-      );
+      civicrm_api3('SepaAlternativeBatching', 'update', ['type' => 'FRST']);
+      civicrm_api3('SepaAlternativeBatching', 'update', ['type' => 'RCUR']);
     }
   }
 
   /**
    * Generate the right link wrt the correct file format
    *
-   * @param $group_data array the group data
+   * @param array $group_data the group data
    * @return string new (full) suggested file name
    * @throws Exception
    */
-  protected function getFormatFilename($group_data) {
+  protected function getFormatFilename(array $group_data): string {
     if (empty($group_data['file'])) {
       return '';
     }
 
     // get the format
     if (!empty($group_data['creditor_id'] && !isset($this->_creditorID2format[$group_data['creditor_id']]))) {
-      $format = CRM_Sepa_Logic_Format::getFormatForCreditor($group_data['creditor_id']);
+      $format = CRM_Sepa_Logic_Format::getFormatForCreditor((int) $group_data['creditor_id']);
       $this->_creditorID2format[$group_data['creditor_id']] = $format;
     }
     $format = $this->_creditorID2format[$group_data['creditor_id']];

@@ -29,7 +29,7 @@ class CRM_Sepa_BAO_SEPAContributionGroup extends CRM_Sepa_DAO_SEPAContributionGr
   /**
    * @param array $params
    *
-   * @return object       CRM_Core_BAO_SEPAContributionGroup object on success, null otherwise
+   * @return \CRM_Sepa_DAO_SEPAContributionGroup
    * @access public
    * @static
    */
@@ -41,7 +41,8 @@ class CRM_Sepa_BAO_SEPAContributionGroup extends CRM_Sepa_DAO_SEPAContributionGr
     $dao->copyValues($params);
     $dao->save();
 
-    CRM_Utils_Hook::post($hook, 'SepaContributionGroup', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'SepaContributionGroup', (int) $dao->id, $dao);
+    /** @var \CRM_Sepa_DAO_SEPAContributionGroup $dao */
     return $dao;
   }
 

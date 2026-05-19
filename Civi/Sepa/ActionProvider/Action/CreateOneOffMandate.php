@@ -188,7 +188,7 @@ class CreateOneOffMandate extends AbstractAction {
   /**
    * Get a list of all creditors
    */
-  protected function getCreditors() {
+  protected function getCreditors(): array {
     $creditor_list = [];
     $creditor_query = \civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
     foreach ($creditor_query['values'] as $creditor) {
@@ -200,7 +200,7 @@ class CreateOneOffMandate extends AbstractAction {
   /**
    * Get a list of all financial types
    */
-  protected function getFinancialTypes() {
+  protected function getFinancialTypes(): array {
     $list = [];
     $query = \civicrm_api3('FinancialType', 'get', [
       'option.limit' => 0,
@@ -216,7 +216,7 @@ class CreateOneOffMandate extends AbstractAction {
   /**
    * Get a list of all campaigns
    */
-  protected function getCampaigns() {
+  protected function getCampaigns(): array {
     $list = [];
     $query = \civicrm_api3('Campaign', 'get', [
       'option.limit' => 0,

@@ -24,13 +24,17 @@
 /**
  * This function will close a transaction group,
  * and perform the necessary logical changes to the mandates contained
+ *
+ * @param array{txgroup_id: int|numeric-string} $params
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_alternative_batching_close($params) {
+function civicrm_api3_sepa_alternative_batching_close(array $params): array {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error('Required field txgroup_id was not properly set.');
   }
 
-  $error_message = CRM_Sepa_Logic_Group::close($params['txgroup_id']);
+  $error_message = CRM_Sepa_Logic_Group::close((int) $params['txgroup_id']);
   if (empty($error_message)) {
     return civicrm_api3_create_success();
   }
@@ -39,7 +43,10 @@ function civicrm_api3_sepa_alternative_batching_close($params) {
   }
 }
 
-function _civicrm_api3_sepa_alternative_batching_close_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_alternative_batching_close_spec(array &$params): void {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -50,13 +57,16 @@ function _civicrm_api3_sepa_alternative_batching_close_spec(&$params) {
  * @param array{txgroup_id: int|numeric-string, override: bool|scalar} $params
  *   txgroup_id: the transaction group for which the file should be created.
  *   override: if true, will override an already existing file and create a new one.
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_alternative_batching_createxml($params) {
+function civicrm_api3_sepa_alternative_batching_createxml(array $params): array {
   $override = (bool) ($params['override'] ?? FALSE);
 
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
   if (is_numeric($result)) {
     // this was successful -> load the sepa file
+    /** @var array<string, mixed> */
     return civicrm_api3('SepaSddFile', 'getsingle', ['id' => $result]);
   }
   else {
@@ -65,7 +75,10 @@ function civicrm_api3_sepa_alternative_batching_createxml($params) {
   }
 }
 
-function civicrm_api3_sepa_alternative_batching_createxml_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function civicrm_api3_sepa_alternative_batching_createxml_spec(array &$params): void {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -75,9 +88,11 @@ function civicrm_api3_sepa_alternative_batching_createxml_spec(&$params) {
  *    - change status from 'In Progress' to 'Completed' for all contributions
  *    - (store/update the bank account information)
  *
- * @package CiviCRM_SEPA
+ * @param array{txgroup_id: int|numeric-string} $params
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_alternative_batching_received($params) {
+function civicrm_api3_sepa_alternative_batching_received(array $params): array {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error('Required field txgroup_id was not properly set.');
   }
@@ -91,19 +106,23 @@ function civicrm_api3_sepa_alternative_batching_received($params) {
   }
 }
 
-function _civicrm_api3_sepa_alternative_batching_received_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_alternative_batching_received_spec(array &$params): void {
   $params['txgroup_id']['api.required'] = 1;
 }
 
 /**
  * API CALL TO CLOSE MANDATES THAT ENDED
  *
- * @package CiviCRM_SEPA
+ * @param array<string, mixed> $params
  *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_alternative_batching_closeended($params) {
+function civicrm_api3_sepa_alternative_batching_closeended(array $params): array {
   $error = CRM_Sepa_Logic_Batching::closeEnded();
-  if (empty($error_message)) {
+  if (NULL === $error) {
     return civicrm_api3_create_success();
   }
   else {
@@ -114,10 +133,11 @@ function civicrm_api3_sepa_alternative_batching_closeended($params) {
 /**
  * API CALL TO UPDATE TXGROUPs ("Batching")
  *
- * @package CiviCRM_SEPA
+ * @param array{type: string, now?: string} $params
  *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_alternative_batching_update($params) {
+function civicrm_api3_sepa_alternative_batching_update(array $params): array {
   // get creditor list
   $creditor_query = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 99999]);
 
@@ -132,7 +152,7 @@ function civicrm_api3_sepa_alternative_batching_update($params) {
   }
 
   // Optional now parameter, will be default if not present:
-  $now = array_key_exists('now', $params) ? $params['now'] : NULL;
+  $now = array_key_exists('now', $params) ? $params['now'] : 'now';
 
   if ($params['type'] == 'OOFF') {
     foreach ($creditors as $creditor_id) {

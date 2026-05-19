@@ -29,11 +29,13 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @example SepaTransactionGroupCreate.php Standard Create Example
  *
- * @return array API result array
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed> API result array
  *   {@getfields sepa_transaction_group_create}
  * @access public
  */
-function civicrm_api3_sepa_transaction_group_create($params) {
+function civicrm_api3_sepa_transaction_group_create(array $params): array {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -41,9 +43,9 @@ function civicrm_api3_sepa_transaction_group_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array<string, array<string, mixed>> $params array or parameters determined by getfields
  */
-function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
+function _civicrm_api3_sepa_transaction_group_create_spec(array &$params): void {
   $params['reference']['api.required'] = 1;
   $params['type']['api.required'] = 1;
   //Close
@@ -55,15 +57,14 @@ function _civicrm_api3_sepa_transaction_group_create_spec(&$params) {
 /**
  * Deletes an existing SepaTransactionGroup
  *
- * @param  array $params
+ * @param  array<string, mixed> $params
  *
  * @example SepaTransactionGroupDelete.php Standard Delete Example
  *
- * @return boolean | error  true if successfull, error otherwise
- *   {@getfields sepa_transaction_group_delete}
+ * @return array<string, mixed>
  * @access public
  */
-function civicrm_api3_sepa_transaction_group_delete($params) {
+function civicrm_api3_sepa_transaction_group_delete(array $params): array {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -78,14 +79,18 @@ function civicrm_api3_sepa_transaction_group_delete($params) {
  *   {@getfields sepa_transaction_group_get}
  * @access public
  */
-function civicrm_api3_sepa_transaction_group_get($params) {
+function civicrm_api3_sepa_transaction_group_get(array $params): array {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed>
+ *
  * @deprecated This action will not be ported to APIv4. Use the "Get" action with custom joins and filters instead.
  */
-function civicrm_api3_sepa_transaction_group_getdetail($params) {
+function civicrm_api3_sepa_transaction_group_getdetail(array $params): array {
   $where = '1';
   $orderby = 'ORDER BY txgroup.latest_submission_date ASC';
   if (array_key_exists('id', $params)) {
@@ -131,6 +136,7 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
              civicrm_sdd_file.created_date, contrib.currency, civicrm_sdd_file.reference
     $orderby;";
 
+  /** @var \CRM_Core_DAO $dao */
   $dao = CRM_Core_DAO::executeQuery($sql);
   $result = [];
   $total = 0;
@@ -148,11 +154,19 @@ function civicrm_api3_sepa_transaction_group_getdetail($params) {
   );
 }
 
-function _civicrm_api3_sepa_transaction_group_close_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_transaction_group_close_spec(array &$params): void {
   $params['id']['api.required'] = 1;
 }
 
-function civicrm_api3_sepa_transaction_group_close($params) {
+/**
+ * @param array{id: int|numeric-string} $params
+ *
+ * @return array<string, mixed>
+ */
+function civicrm_api3_sepa_transaction_group_close(array $params): array {
   $result = [];
   // a single query much better for perf, but no hook called. To be revised later?
   $sql = 'update civicrm_contribution as contrib, civicrm_sdd_contribution_txgroup
@@ -162,28 +176,45 @@ function civicrm_api3_sepa_transaction_group_close($params) {
   return civicrm_api3_sepa_transaction_group_create(['id' => $params['id'], 'status_id' => 2]);
 }
 
-function _civicrm_api3_sepa_transaction_group_createnext_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_transaction_group_createnext_spec(array &$params): void {
   $params['id']['api.required'] = 1;
 }
 
-function civicrm_api3_sepa_transaction_group_createnext($params) {
+/**
+ * @param array{id: int|numeric-string} $params
+ *
+ * @return array<string, mixed>
+ */
+function civicrm_api3_sepa_transaction_group_createnext(array $params): array {
   $errors = $counter = 0;
   $values = [];
   $group = (int) $params['id'];
   if (!$group) {
     throw new CRM_Core_Exception('Incorrect or missing value for group id');
   }
+
+  $output = [];
   $contribs = civicrm_api3('sepa_contribution_group', 'getdetail', $params);
 
   foreach ($contribs['values'] as $old) {
     if (!$old['recur_id']) {
       throw new CRM_Core_Exception('Trying to create next payment for non-recurrent contribution?');
     }
+
+    if (NULL === $old['receive_date'] || NULL === $old['frequency_unit']) {
+      continue;
+    }
+
+    /** @var int $date */
     $date = strtotime(substr($old['receive_date'], 0, 10));
+    /** @var int $next_collectionDate */
     $next_collectionDate = strtotime('+' . $old['frequency_interval'] . ' ' . $old['frequency_unit'], $date);
     $next_collectionDate = date('YmdHis', $next_collectionDate);
     $new = $old;
-    $new['hash'] = md5(uniqid(rand(), TRUE));
+    $new['hash'] = md5(uniqid((string) rand(), TRUE));
     $new['source'] = 'SEPA recurring contribution';
     unset($new['id']);
     unset($new['contribution_id']);
@@ -198,7 +229,6 @@ function civicrm_api3_sepa_transaction_group_createnext($params) {
     if ($result['is_error']) {
       $output[] = $result['error_message'];
       ++$errors;
-      continue;
     }
     else {
       ++$counter;
@@ -206,6 +236,8 @@ function civicrm_api3_sepa_transaction_group_createnext($params) {
       $contrib = new CRM_Contribute_BAO_Contribution();
       //it sucks to have to fetch again, just to get the BAO
       $contrib->get('id', $result['id']);
+      // FIXME: batchContributionByCreditor() method does not exist.
+      // This API action doesn't seem to be used. Drop it?
       $group = CRM_Sepa_Logic_Batching::batchContributionByCreditor(
         $contrib,
         $old['creditor_id'],
@@ -214,10 +246,11 @@ function civicrm_api3_sepa_transaction_group_createnext($params) {
       $values = $group->toArray();
     }
   }
-  if (!$errors) {
+
+  if (!$errors && isset($contrib)) {
     $values['nb_contrib'] = $counter;
     $values['total'] = $total;
-    return civicrm_api3_create_success([$values], $params, 'address', $contrib);
+    return civicrm_api3_create_success([$values], $params, 'SepaTransactionGroup', 'createNext', $contrib);
   }
   else {
     return civicrm_api3_create_error('Could not create ' . $errors . ' new contributions', $output);
@@ -228,9 +261,11 @@ function civicrm_api3_sepa_transaction_group_createnext($params) {
  * This API call creates a corresponding accounting batch for a SEPA group
  *
  * @param array{txgroup_id: int|numeric-string} $params
+ *
+ * @return array<string, mixed>
  */
 // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
+function civicrm_api3_sepa_transaction_group_toaccgroup(array $params): array {
   // first, load the txgroup
   $txgroup_id = $params['txgroup_id'];
   try {
@@ -271,6 +306,7 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   WHERE txgroup_contrib.txgroup_id = $txgroup_id
   GROUP BY contribution.id, entity_trxn.financial_trxn_id, contribution.total_amount;";
 
+  /** @var \CRM_Core_DAO $contributions_query */
   $contributions_query = CRM_Core_DAO::executeQuery($contributions_query_sql);
 
   $transactions = [];
@@ -289,7 +325,9 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   // find a name
   $name = $wanted_name = 'SEPA ' . $txgroup['reference'];
   $counter = 0;
-  while (CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_batch WHERE title='$name';")->fetch()) {
+  /** @var \CRM_Core_DAO $query */
+  $query = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_batch WHERE title='$name';");
+  while ($query->fetch()) {
     $counter++;
     $name = $wanted_name . '_' . $counter;
   }
@@ -303,8 +341,8 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
       'label' => E::ts('SEPA DD Transaction Batch'),
       'is_active' => 1,
     ];
-    $action = CRM_Core_Action::ADD;
-    $type_id = CRM_Core_OptionValue::addOptionValue($value_spec, 'batch_type', $action, NULL)->value;
+    // @phpstan-ignore argument.type
+    $type_id = CRM_Core_OptionValue::addOptionValue($value_spec, 'batch_type', CRM_Core_Action::ADD, NULL)->value;
   }
 
   // then, finally, create the accounting group
@@ -359,6 +397,9 @@ function civicrm_api3_sepa_transaction_group_toaccgroup($params) {
   return civicrm_api3_create_success($batch_create, $params);
 }
 
-function _civicrm_api3_sepa_transaction_group_toaccgroup_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_transaction_group_toaccgroup_spec(array &$params): void {
   $params['txgroup_id']['api.required'] = 1;
 }

@@ -103,8 +103,9 @@ class TerminateMandate extends AbstractAction {
             2 => [(int) $mandateId, 'Integer'],
             3 => ['RCUR', 'String'],
           ];
+
+          \CRM_Core_DAO::executeQuery($update, $updateParams);
         }
-        \CRM_Core_DAO::executeQuery($update, $updateParams);
       }
       catch (\CRM_Core_Exception $ex) {
         // @ignoreException

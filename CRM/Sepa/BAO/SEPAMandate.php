@@ -27,6 +27,7 @@ use Civi\Core\Event\PreEvent;
 use Civi\Core\HookInterface;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
+use Webmozart\Assert\Assert;
 
 /**
  * Class contains functions for Sepa mandates
@@ -36,12 +37,24 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * @throws \CRM_Core_Exception
    */
-  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
   public static function self_hook_civicrm_pre(PreEvent $event): void {
     if (!in_array($event->action, ['create', 'edit'], TRUE)) {
       return;
     }
 
+    /**
+     * @var array{
+     *   id?: int|numeric-string,
+     *   creditor_id?: int|numeric-string,
+     *   date?: string,
+     *   reference?: string,
+     *   type?: string,
+     *   iban?: string,
+     *   bic?: string,
+     *   ...
+     * } $params
+     */
     $params = &$event->params;
 
     // load the creditor
@@ -49,10 +62,15 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       if ('create' === $event->action) {
         // new mandate, use the default creditor
         $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
-        $params['creditor_id'] = $default_creditor->id;
+        if (NULL === $default_creditor) {
+          throw new \RuntimeException('Default creditor is missing');
+        }
+
+        $params['creditor_id'] = (int) $default_creditor->id;
       }
       else {
         // existing mandate, get creditor
+        Assert::keyExists($params, 'id');
         $params['creditor_id'] = SepaMandate::get(FALSE)
           ->addSelect('creditor_id')
           ->addWhere('id', '=', $params['id'])
@@ -60,6 +78,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
           ->single()['creditor_id'];
       }
     }
+    /** @var array{mandate_prefix: string|null, creditor_type: string|null} $creditor */
     $creditor = SepaCreditor::get(FALSE)
       ->setSelect(['mandate_prefix', 'creditor_type'])
       ->addWhere('id', '=', $params['creditor_id'])
@@ -89,23 +108,26 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // validate IBAN / BIC / reference
     if (!empty($params['iban'])) {
-      $params['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($params['iban'], $creditor['creditor_type']);
-      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type']);
+      $params['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($params['iban'], $creditor['creditor_type'] ?? 'SEPA');
+      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type'] ?? 'SEPA');
       if ($iban_error) {
         throw new CRM_Core_Exception($iban_error . ': ' . $params['iban']);
       }
     }
 
     if (!empty($params['bic'])) {
-      $params['bic'] = CRM_Sepa_Logic_Verification::formatBIC($params['bic'], $creditor['creditor_type']);
-      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type']);
+      $params['bic'] = CRM_Sepa_Logic_Verification::formatBIC($params['bic'], $creditor['creditor_type'] ?? 'SEPA');
+      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type'] ?? 'SEPA');
       if ($bic_error) {
         throw new CRM_Core_Exception($bic_error . ':' . $params['bic']);
       }
     }
 
     if (isset($params['reference']) && strlen($params['reference']) > 0) {
-      $reference_error = CRM_Sepa_Logic_Verification::verifyReference($params['reference'], $creditor['creditor_type']);
+      $reference_error = CRM_Sepa_Logic_Verification::verifyReference(
+        $params['reference'],
+        $creditor['creditor_type'] ?? 'SEPA'
+      );
       if ($reference_error) {
         throw new CRM_Core_Exception($reference_error . ':' . $params['reference']);
       }
@@ -125,7 +147,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     }
   }
 
-  public static function is_active($mandateStatus) {
+  public static function is_active(string $mandateStatus): bool {
     switch ($mandateStatus) {
       case 'INIT':
       case 'ONHOLD':
@@ -141,18 +163,18 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * getContract() returns the contribution or recurring contribution this mandate uses as a contract
    */
-  private function getContract() {
+  private function getContract(): CRM_Contribute_BAO_ContributionRecur|CRM_Contribute_BAO_Contribution|null {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
     switch ($etp) {
       case 'civicrm_contribution_recur':
         $recur = new CRM_Contribute_BAO_ContributionRecur();
-        $recur->get('id', $eid);
+        $recur->get('id', (string) $eid);
         return $recur;
 
       case 'civicrm_contribution':
         $contr = new CRM_Contribute_BAO_Contribution();
-        $contr->get('id', $eid);
+        $contr->get('id', (string) $eid);
         return $contr;
 
       default:
@@ -167,18 +189,18 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * or
    *   MANDATE -> CONTRIBUTION
    */
-  public function findContribution() {
+  public function findContribution(): ?CRM_Contribute_BAO_Contribution {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
     switch ($etp) {
       case 'civicrm_contribution_recur':
         $contr = new CRM_Contribute_BAO_Contribution();
-        $contr->get('contribution_recur_id', $eid);
+        $contr->get('contribution_recur_id', (string) $eid);
         return $contr;
 
       case 'civicrm_contribution':
         $contr = new CRM_Contribute_BAO_Contribution();
-        $contr->get('id', $eid);
+        $contr->get('id', (string) $eid);
         return $contr;
 
       default:
@@ -193,12 +215,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * @deprecated
    * @return array
    */
-  public function getUnbatchedContributionIds() {
+  public function getUnbatchedContributionIds(): array {
     // 1.determine the contract (ie. find out how to get contributions)
     $contrib = $this->getContract();
 
     // 2. if it is a recurring one, get the contribs that match the pattern
-    if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
+    if ($contrib instanceof CRM_Contribute_BAO_ContributionRecur) {
       $query = "
         SELECT c.id AS id, b.id  AS batch_id
         FROM civicrm_contribution c
@@ -207,6 +229,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
         WHERE c.contribution_recur_id = " . $contrib->id . '
         AND b.type_id IN ( ' . 222 . ' )
         HAVING batch_id IS NULL';
+      /** @var \CRM_Core_DAO $dao */
       $dao = CRM_Core_DAO::executeQuery($query);
       $contributions = [];
       while ($dao->fetch()) {
@@ -215,7 +238,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       return $contributions;
     }
 
-    if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
+    if ($contrib instanceof CRM_Contribute_BAO_Contribution) {
       return [$contrib->id];
     }
 
@@ -231,15 +254,15 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * @return array|null
    *   basic mandate data like id, type, creditor_id, etc.
    */
-  public static function getMandateFor($contribution_id) {
+  public static function getMandateFor(int $contribution_id): ?array {
     // cache results
     static $contribution_map = [];
-    $contribution_id = (int) $contribution_id;
     if (array_key_exists($contribution_id, $contribution_map)) {
       return $contribution_map[$contribution_id];
     }
 
     // run the lookup
+    /** @var \CRM_Core_DAO $mandate_query */
     $mandate_query = CRM_Core_DAO::executeQuery("
     SELECT
       COALESCE(ooff_mandate.id, rcur_mandate.id)                   AS mandate_id,
@@ -280,10 +303,15 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * gracefully terminates OOFF mandates
    *
-   * @return boolean success
+   * @return bool success
    * @author endres -at- systopia.de
    */
-  public static function terminateOOFFMandate($mandate_id, $new_end_date_str, $cancel_reason = NULL, $mandate = NULL) {
+  public static function terminateOOFFMandate(
+    int $mandate_id,
+    string $new_end_date_str,
+    ?string $cancel_reason = NULL,
+    ?array $mandate = NULL
+  ): bool {
     // use a lock, in case somebody is batching just now
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
@@ -383,16 +411,22 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * gracefully terminates RCUR mandates
    *
-   * @param $mandate_id        int    mandate ID
-   * @param $new_end_date_str  string requested end_date
-   * @param $error_to_ui       bool   if TRUE will write errors to Session::status and return FALSE
-   *                                     else will throw errors
-   * @param $cancel_reason     string cancel reason to set
-   * @return boolean success
-   * @author endres -at- systopia.de
+   * @param int $mandate_id mandate ID
+   * @param string $new_end_date_str requested end_date
+   * @param string|null $cancel_reason cancel reason to set
+   * @param bool $error_to_ui
+   *   if TRUE will write errors to Session::status and return FALSE else will
+   *   throw errors
+   *
+   * @return bool success
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
-  public static function terminateMandate($mandate_id, $new_end_date_str, $cancel_reason = NULL, $error_to_ui = TRUE) {
+  public static function terminateMandate(
+    int $mandate_id,
+    string $new_end_date_str,
+    ?string $cancel_reason = NULL,
+    bool $error_to_ui = TRUE
+  ) {
     $contribution_id_pending = CRM_Core_PseudoConstant::getKey(
       'CRM_Contribute_BAO_Contribution',
       'contribution_status_id',
@@ -418,12 +452,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
         ->execute()
         ->single();
     }
-    catch (\CRM_Core_Exception $exception) {
+    catch (\CRM_Core_Exception $e) {
       $error_message = E::ts(
         "Cannot read mandate [%1]. Error was: '%2'",
         [
           1 => $mandate_id,
-          2 => $exception->getMessage(),
+          2 => $e->getMessage(),
         ]
       );
       if ($error_to_ui) {
@@ -431,7 +465,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
         return FALSE;
       }
       else {
-        throw new CRM_Core_Exception($error_message);
+        throw new CRM_Core_Exception($error_message, $e->getErrorCode(), $e->getErrorData(), $e);
       }
     }
 
@@ -543,6 +577,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     WHERE receive_date > '$newEndDate'
       AND contribution_recur_id = $contribution_id
       AND contribution_status_id = $contribution_id_pending;";
+    /** @var \CRM_Core_DAO $obsolete_ids_query */
     $obsolete_ids_query = CRM_Core_DAO::executeQuery($obsolete_query);
     while ($obsolete_ids_query->fetch()) {
       array_push($obsolete_ids, $obsolete_ids_query->id);
@@ -619,12 +654,15 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * Changes will take effect out to all future contributions,
    *  including already created ones in status 'Pending'
    *
+   * @param int $mandate_id
+   * @param array<string, mixed> $changes
+   *
+   * @return list<string>
+   *
    * @throws Exception
-   * @return mixed success
-   * @author endres -at- systopia.de
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function modifyMandate($mandate_id, $changes) {
+  public static function modifyMandate(int $mandate_id, array $changes): array {
     // use a lock, in case somebody is batching just now
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
@@ -639,6 +677,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     if ($mandate['type'] != 'RCUR') {
       throw new Exception(E::ts('You can only modify RCUR mandates.'));
     }
+    /** @var array<string, mixed> $contribution_rcur */
     $contribution_rcur = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id']]);
 
     // collect the changes
@@ -684,8 +723,8 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       // record the change
       $contribution_changes['amount'] = $changes['amount'];
       $change_variables = [
-        1 => CRM_Utils_Money::format($contribution_rcur['amount'], $contribution_rcur['currency']),
-        2 => CRM_Utils_Money::format($changes['amount'], $contribution_rcur['currency']),
+        1 => CRM_Utils_Money::format((float) $contribution_rcur['amount'], $contribution_rcur['currency']),
+        2 => CRM_Utils_Money::format((float) $changes['amount'], $contribution_rcur['currency']),
       ];
       if ($changes['amount'] > $contribution_rcur['amount']) {
         $changes_subjects[] = E::ts('Amount increased');
@@ -702,7 +741,9 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       !empty($changes['financial_type_id'])
       && $changes['financial_type_id'] != $contribution_rcur['financial_type_id']
     ) {
-      $financial_types = CRM_Contribute_PseudoConstant::financialType();
+      /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+      $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+      $financial_types = array_column($financialTypeOptions, 'label', 'id');
       if (empty($financial_types[$changes['financial_type_id']])) {
         throw new Exception(E::ts('Invalid financial type ID [%1] supplied.', [1 => $changes['financial_type_id']]));
       }
@@ -802,7 +843,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * Generate a new activity
    */
-  public static function generateModificationActivity($mandate, $subject, $detail_lines) {
+  public static function generateModificationActivity(array $mandate, string $subject, array $detail_lines): void {
     // get / create activity type
     $activity_type_id = CRM_Sepa_CustomData::getOptionValue('activity_type', 'sdd_update', 'name');
     if (!$activity_type_id) {
@@ -846,8 +887,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * @deprecated in favour of modifyMandate
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function adjustAmount($mandate_id, $adjusted_amount) {
-    $adjusted_amount = (float) $adjusted_amount;
+  public static function adjustAmount(int $mandate_id, float $adjusted_amount): bool {
     $contribution_id_pending = CRM_Core_PseudoConstant::getKey(
       'CRM_Contribute_BAO_Contribution',
       'contribution_status_id',
@@ -948,6 +988,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     WHERE receive_date >= DATE(NOW())
       AND contribution_recur_id = $contribution_id
       AND contribution_status_id = $contribution_id_pending;";
+    /** @var \CRM_Core_DAO $contributions2adjust_query */
     $contributions2adjust_query = CRM_Core_DAO::executeQuery($find_need2adjust);
     while ($contributions2adjust_query->fetch()) {
       $contributions2adjust[] = $contributions2adjust_query->id;
@@ -990,15 +1031,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * Give a (cache) ID of the sepa mandate belonging to this contribution (if any)
    *
-   * @param integer $contribution_id
+   * @param int $contribution_id
    *   contribution to look up
    *
-   * @return integer
+   * @return int
    *   mandate ID or 0
    */
-  public static function getContributionMandateID($contribution_id) {
+  public static function getContributionMandateID(int $contribution_id): int {
     static $mandate_by_contribution_id = [];
-    $contribution_id = (int) $contribution_id;
     if (!isset($mandate_by_contribution_id[$contribution_id])) {
       // run a SQL query
       $mandate_id = CRM_Core_DAO::singleValueQuery("
@@ -1021,15 +1061,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * Give a (cache) ID of the sepa mandate belonging to this recurring contribution (if any)
    *
-   * @param integer $recurring_contribution_id
+   * @param int $recurring_contribution_id
    *   recurring contribution to look up
    *
-   * @return integer
+   * @return int
    *   mandate ID or 0
    */
-  public static function getRecurringContributionMandateID($recurring_contribution_id) {
+  public static function getRecurringContributionMandateID(int $recurring_contribution_id): int {
     static $mandate_by_rcontribution_id = [];
-    $recurring_contribution_id = (int) $recurring_contribution_id;
     if (!isset($mandate_by_rcontribution_id[$recurring_contribution_id])) {
       // run a SQL query
       $mandate_id = CRM_Core_DAO::singleValueQuery("
@@ -1042,11 +1081,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     return $mandate_by_rcontribution_id[$recurring_contribution_id];
   }
 
-  public static function getLastMandateOfContact($cid) {
-    if (empty($cid)) {
-      return FALSE;
-    }
-
+  public static function getLastMandateOfContact(int $cid): array|bool {
     return SepaMandate::get(FALSE)
       ->addWhere('contact_id', '=', $cid)
       ->addOrderBy('id', 'DESC')
@@ -1055,22 +1090,12 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       ->first() ?? FALSE;
   }
 
-  public static function isContributionMandate($mandate) {
-    if ($mandate['entity_table'] == 'civicrm_contribution') {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+  public static function isContributionMandate(array $mandate): bool {
+    return $mandate['entity_table'] === 'civicrm_contribution';
   }
 
-  public static function isContributionRecurMandate($mandate) {
-    if ($mandate['entity_table'] == 'civicrm_contribution_recur') {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+  public static function isContributionRecurMandate(array $mandate): bool {
+    return $mandate['entity_table'] === 'civicrm_contribution_recur';
   }
 
 }

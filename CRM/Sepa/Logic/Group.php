@@ -29,7 +29,7 @@ class CRM_Sepa_Logic_Group {
    * @return null|string error message, unless successful
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function close($txgroup_id) {
+  public static function close(int $txgroup_id): ?string {
     // step 0: check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
@@ -47,7 +47,7 @@ class CRM_Sepa_Logic_Group {
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received');
     }
     else {
-      $status_inprogress = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+      $status_inprogress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
       $group_status_id_closed = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed');
     }
     try {
@@ -92,7 +92,7 @@ class CRM_Sepa_Logic_Group {
       CRM_Core_DAO::executeQuery($sql);
 
       // update the recurring contribution payment instruments
-      $creditor_id = CRM_Core_DAO::singleValueQuery(
+      $creditor_id = (int) CRM_Core_DAO::singleValueQuery(
         "SELECT sdd_creditor_id FROM civicrm_sdd_txgroup WHERE id = {$txgroup_id};"
       );
       $frst2rcur_pis = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor_id);
@@ -160,10 +160,10 @@ class CRM_Sepa_Logic_Group {
    *   - change status from 'In Progress' to 'Completed' for all contributions
    *   - (store/update the bank account information)
    *
-   * @return string error message, unless successful
+   * @return string|null error message, unless successful
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function received($txgroup_id) {
+  public static function received(int $txgroup_id): ?string {
     // step 0: check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
@@ -184,14 +184,14 @@ class CRM_Sepa_Logic_Group {
       'contribution_status_id',
       'Completed'
     );
-    $status_inprogress = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+    $status_inprogress = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
 
     if (empty($group_status_id_received)) {
-      return civicrm_api3_create_error("Status 'Received' does not exist!");
+      return "Status 'Received' does not exist!";
     }
 
     if (empty($status_pending) || empty($status_closed) || empty($status_inprogress)) {
-      return civicrm_api3_create_error("Status 'Pending', 'Completed' or 'In Progress' does not exist!");
+      return "Status 'Pending', 'Completed' or 'In Progress' does not exist!";
     }
 
     // step 0: load the group object
@@ -221,6 +221,7 @@ class CRM_Sepa_Logic_Group {
           AND contribution.id NOT IN (
             SELECT entity_id FROM civicrm_entity_financial_trxn WHERE entity_table='civicrm_contribution'
           );";
+      /** @var \CRM_Core_DAO $rotten_contribution */
       $rotten_contribution = CRM_Core_DAO::executeQuery($find_rotten_contributions_sql);
       while ($rotten_contribution->fetch()) {
         $contribution_id = $rotten_contribution->contribution_id;
@@ -243,6 +244,7 @@ class CRM_Sepa_Logic_Group {
       LEFT JOIN civicrm_contribution AS contribution ON contribution.id = txn_to_contribution.contribution_id
       WHERE contribution_status_id IN ($status_pending,$status_inprogress)
       AND txn_to_contribution.txgroup_id IN ($txgroup_id);";
+    /** @var \CRM_Core_DAO $contribution */
     $contribution = CRM_Core_DAO::executeQuery($find_txgroup_contributions_sql);
     $error_count = 0;
     while ($contribution->fetch()) {
@@ -280,6 +282,8 @@ class CRM_Sepa_Logic_Group {
     if ($error_count) {
       return "$error_count contributions could not be updated to status 'completed'.";
     }
+
+    return NULL;
   }
 
   /**
@@ -287,7 +291,7 @@ class CRM_Sepa_Logic_Group {
    * 1) remove stale entries from groups (i.e. contribution doesn't exist any more)
    * 2) delete empty groups
    */
-  public static function cleanup($mode) {
+  public static function cleanup(string $mode): void {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     if (empty($group_status_id_open)) {
       return;
@@ -299,6 +303,7 @@ class CRM_Sepa_Logic_Group {
       WHERE contribution_id NOT IN (SELECT id FROM civicrm_contribution);');
 
     // CLEANUP: delete empty groups
+    /** @var \CRM_Core_DAO $empty_group_query */
     $empty_group_query = CRM_Core_DAO::executeQuery("
       SELECT id AS group_id
       FROM civicrm_sdd_txgroup

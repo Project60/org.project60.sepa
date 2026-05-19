@@ -10,6 +10,9 @@ namespace Civi\Api4;
  */
 class SepaSddFile extends Generic\DAOEntity {
 
+  /**
+   * @return array<string, list<string|list<string>>>
+   */
   public static function permissions(): array {
     return [
       'get' => ['view sepa groups'],

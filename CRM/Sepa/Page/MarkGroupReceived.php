@@ -31,7 +31,7 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     CRM_Utils_System::setTitle(E::ts('Mark SEPA group received'));
 
     // get the group ID
-    $group_id = (int) $_REQUEST['group_id'] ?? 0;
+    $group_id = (int) ($_REQUEST['group_id'] ?? 0);
     if (!$group_id) {
       throw new CRM_Core_Exception(E::ts('No group_id given!'));
     }

@@ -233,7 +233,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
    * @return bool
    */
   public function worksWithDataFlow(AbstractDataFlow $dataFlow): bool {
-    if (!$dataFlow instanceof SqlDataFlow) {
+    if (!$dataFlow instanceof SqlTableDataFlow) {
       return FALSE;
     }
     $this->initialize();

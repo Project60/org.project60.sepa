@@ -25,9 +25,11 @@
 /**
  * Get stats to support the retry collection form
  *
- * @param $params
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_logic_get_retry_stats($params) {
+function civicrm_api3_sepa_logic_get_retry_stats(array $params): array {
   $stats = CRM_Sepa_Logic_Retry::getStats($params);
   $dao = NULL;
   return civicrm_api3_create_success(
@@ -43,9 +45,9 @@ function civicrm_api3_sepa_logic_get_retry_stats($params) {
 /**
  * Get stats to support the retry collection form
  *
- * @param $params
+ * @param array<string, array<string, mixed>> $params
  */
-function _civicrm_api3_sepa_logic_get_retry_stats_spec($params) {
+function _civicrm_api3_sepa_logic_get_retry_stats_spec(array &$params): void {
   // CONTACT BASE
   $params['date_from'] = [
     'name'         => 'date_from',
@@ -100,13 +102,17 @@ function _civicrm_api3_sepa_logic_get_retry_stats_spec($params) {
 /**
  * This function will close a transaction group,
  * and perform the necessary logical changes to the mandates contained
+ *
+ * @param array{txgroup_id: int|numeric-string} $params
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_logic_close($params) {
+function civicrm_api3_sepa_logic_close(array $params): array {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error('Required field txgroup_id was not properly set.');
   }
 
-  $error_message = CRM_Sepa_Logic_Group::close($params['txgroup_id']);
+  $error_message = CRM_Sepa_Logic_Group::close((int) $params['txgroup_id']);
   if (empty($error_message)) {
     return civicrm_api3_create_success();
   }
@@ -115,7 +121,10 @@ function civicrm_api3_sepa_logic_close($params) {
   }
 }
 
-function _civicrm_api3_sepa_logic_close_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_logic_close_spec(array &$params): void {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -126,13 +135,16 @@ function _civicrm_api3_sepa_logic_close_spec(&$params) {
  * @param array{txgroup_id: int|numeric-string, override: bool|scalar} $params
  *   txgroup_id: the transaction group for which the file should be created.
  *   override: if true, will override an already existing file and create a new one.
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_logic_createxml($params) {
+function civicrm_api3_sepa_logic_createxml(array $params): array {
   $override = (bool) ($params['override'] ?? FALSE);
 
   $result = CRM_Sepa_BAO_SEPATransactionGroup::createFile((int) $params['txgroup_id'], $override);
   if (is_numeric($result)) {
     // this was successful -> load the sepa file
+    /** @var array<string, mixed> */
     return civicrm_api3('SepaSddFile', 'getsingle', ['id' => $result]);
   }
   else {
@@ -141,7 +153,10 @@ function civicrm_api3_sepa_logic_createxml($params) {
   }
 }
 
-function civicrm_api3_sepa_logic_createxml_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function civicrm_api3_sepa_logic_createxml_spec(array &$params): void {
   $params['txgroup_id']['api.required'] = 1;
 }
 
@@ -151,9 +166,11 @@ function civicrm_api3_sepa_logic_createxml_spec(&$params) {
  *    - change status from 'In Progress' to 'Completed' for all contributions
  *    - (store/update the bank account information)
  *
- * @package CiviCRM_SEPA
+ * @param array{txgroup_id: int|numeric-string} $params
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_logic_received($params) {
+function civicrm_api3_sepa_logic_received(array $params): array {
   if (!is_numeric($params['txgroup_id'])) {
     return civicrm_api3_create_error('Required field txgroup_id was not properly set.');
   }
@@ -167,19 +184,23 @@ function civicrm_api3_sepa_logic_received($params) {
   }
 }
 
-function _civicrm_api3_sepa_logic_received_spec(&$params) {
+/**
+ * @param array<string, array<string, mixed>> $params
+ */
+function _civicrm_api3_sepa_logic_received_spec(array &$params): void {
   $params['txgroup_id']['api.required'] = 1;
 }
 
 /**
  * API CALL TO CLOSE MANDATES THAT ENDED
  *
- * @package CiviCRM_SEPA
+ * @param array{} $params
  *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_logic_closeended($params) {
+function civicrm_api3_sepa_logic_closeended(array $params): array {
   $error = CRM_Sepa_Logic_Batching::closeEnded();
-  if (empty($error_message)) {
+  if (empty($error)) {
     return civicrm_api3_create_success();
   }
   else {
@@ -190,10 +211,11 @@ function civicrm_api3_sepa_logic_closeended($params) {
 /**
  * API CALL TO UPDATE TXGROUPs ("Batching")
  *
- * @package CiviCRM_SEPA
+ * @param array{type: string} $params
  *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_logic_update($params) {
+function civicrm_api3_sepa_logic_update(array $params): array {
   // get creditor list
   $creditor_query = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 99999]);
 
