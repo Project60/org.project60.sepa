@@ -34,11 +34,10 @@ class CRM_Sepa_Logic_Format_pain_008_001_02_CH_TA_LSV extends CRM_Sepa_Logic_For
    */
   private array $creditorIdentifiers = [];
 
-  private static function calcEsrCheckDigit(string $referenceNumber): int
-  {
+  private static function calcEsrCheckDigit(string $referenceNumber): int {
     static $checkList = [0, 9, 4, 6, 8, 2, 7, 1, 3, 5];
     $transferNumber = 0;
-    foreach(str_split($referenceNumber) as $number) {
+    foreach (str_split($referenceNumber) as $number) {
       $transferNumber = $checkList[($transferNumber + (int) $number) % 10];
     }
 
