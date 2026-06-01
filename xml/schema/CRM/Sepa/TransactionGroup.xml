@@ -62,7 +62,10 @@
     <name>status_id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>fk sepa group Status options in civicrm_option_values</comment>
+    <comment>fk to batch status options in civicrm_option_values</comment>
+    <pseudoconstant>
+      <optionGroupName>batch_status</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>sdd_creditor_id</name>

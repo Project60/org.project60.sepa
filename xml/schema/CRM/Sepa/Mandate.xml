@@ -57,7 +57,7 @@
        <type>varchar</type>
        <title>Entity Table</title>
        <length>64</length>
-       <comment>Physical tablename for the contract entity being joined, eg contributionRecur or Membership</comment>
+       <comment>Physical tablename for the contract entity being joined (civicrm_contribution or civicrm_contribution_recur)</comment>
        <add>3.2</add>
   </field>
   <field>

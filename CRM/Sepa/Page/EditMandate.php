@@ -26,6 +26,7 @@ declare(strict_types = 1);
  *
  */
 
+use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
@@ -41,35 +42,54 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $mandate_id = (int) $_REQUEST['mid'];
     }
 
+    // Note: CRM_Utils_Request::retrieve() cannot be used because of its special handling for "action".
     if (isset($_REQUEST['action'])) {
-      if ($_REQUEST['action'] == 'delete') {
+      $action = $_REQUEST['action'];
+      if ($action === 'delete') {
         $this->deleteMandate($mandate_id);
         $this->assign('deleted_mandate', $mandate_id);
         parent::run();
         return;
-
       }
-      elseif ($_REQUEST['action'] == 'end') {
+
+      if ($action === 'end') {
         $this->endMandate($mandate_id);
-
       }
-      elseif ($_REQUEST['action'] == 'validate') {
+      elseif ($action === 'validate') {
         $this->validateMandate($mandate_id);
-
       }
-      elseif ($_REQUEST['action'] == 'cancel') {
+      elseif ($action === 'cancel') {
         $this->cancelMandate($mandate_id);
-
       }
-      elseif ($_REQUEST['action'] == 'adjustamount') {
+      elseif ($action === 'adjustamount') {
         $this->adjustAmount($mandate_id);
       }
-      elseif ($_REQUEST['action'] == 'changecyleday') {
+      elseif ($action === 'changecyleday') {
         $this->changecyleday($mandate_id);
+      }
+      elseif ($action === 'suspend') {
+        SepaMandate::suspend()
+          ->addWhere('id', '=', $mandate_id)
+          ->execute();
+        CRM_Core_Session::setStatus(
+          E::ts('The mandate has been suspended. You should re-create open transaction groups.'),
+          E::ts('Advice'),
+          'info'
+        );
+      }
+      elseif ($action === 'resume') {
+        SepaMandate::resume()
+          ->addWhere('id', '=', $mandate_id)
+          ->execute();
+        CRM_Core_Session::setStatus(
+          E::ts('The mandate has been resumed. You should re-create transaction groups.'),
+          E::ts('Advice'),
+          'info'
+        );
       }
       else {
         CRM_Core_Session::setStatus(
-          sprintf(E::ts("Unkown action '%s'. Ignored."), (string) $_REQUEST['action']),
+          sprintf(E::ts("Unknown action '%s'. Ignored."), $action),
           E::ts('Error'),
           'error'
         );
@@ -79,7 +99,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     // first, load the mandate
     try {
       // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
-      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+      $mandate = SepaMandate::get(TRUE)
         ->addWhere('id', '=', $mandate_id)
         ->execute()
         ->single();

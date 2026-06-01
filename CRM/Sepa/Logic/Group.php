@@ -300,6 +300,7 @@ class CRM_Sepa_Logic_Group {
     }
 
     // CLEANUP: remove nonexisting contributions from groups
+    // @todo This should be done by foreign key cascade deletion.
     CRM_Core_DAO::executeQuery('
       DELETE FROM civicrm_sdd_contribution_txgroup
       WHERE contribution_id NOT IN (SELECT id FROM civicrm_contribution);');
