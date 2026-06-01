@@ -3558,6 +3558,12 @@ parameters:
 			path: api/v3/SepaLogic.php
 
 		-
+			message: '#^Binary operation "\." between ''Unknown mandate…'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
 			message: '#^Cannot access offset ''currency'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -3572,6 +3578,12 @@ parameters:
 		-
 			message: '#^Cannot access offset ''uses_bic'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
 			count: 1
 			path: api/v3/SepaMandate.php
 
@@ -3635,8 +3647,32 @@ parameters:
 			path: api/v3/SepaMandate.php
 
 		-
+			message: '#^Parameter \#1 \$key of function array_key_exists expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: api/v3/SepaMandate.php
+
+		-
 			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
 			identifier: argument.type
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Part \$params\[''creditor_id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 5
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Part \$params\[''financial_type_id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Part \$params\[''payment_instrument_id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
 			count: 1
 			path: api/v3/SepaMandate.php
 
