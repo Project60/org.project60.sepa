@@ -320,7 +320,6 @@ class CRM_Sepa_Logic_PaymentInstruments {
     $payment_instrument_ids = [];
     if (isset($creditor['pi_ooff']) && $type == 'OOFF') {
       $payment_instrument_ids = explode(',', $creditor['pi_ooff']);
-
     }
     elseif (isset($creditor['pi_rcur']) && ($type == 'FRST' || $type == 'RCUR')) {
       foreach (explode(',', $creditor['pi_rcur']) as $pi_spec) {
