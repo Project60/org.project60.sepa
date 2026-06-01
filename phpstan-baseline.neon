@@ -2598,18 +2598,6 @@ parameters:
 			path: CRM/Sepa/Page/SepaFile.php
 
 		-
-			message: '#^Access to an undefined property CRM_Sepa_Page_SepaMandatePdf\:\:\$contact\.$#'
-			identifier: property.notFound
-			count: 1
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
-			message: '#^Binary operation "\." between mixed and string results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
 			message: '#^Call to an undefined method civicrm_api3\:\:get\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -2672,18 +2660,12 @@ parameters:
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
-			count: 10
+			count: 9
 			path: CRM/Sepa/Page/SepaMandatePdf.php
 
 		-
 			message: '#^Dynamic call to static method CRM_Core_Page\:\:getTemplate\(\)\.$#'
 			identifier: staticMethod.dynamicCall
-			count: 2
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
-			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
-			identifier: notEqual.notAllowed
 			count: 1
 			path: CRM/Sepa/Page/SepaMandatePdf.php
 
@@ -2739,12 +2721,6 @@ parameters:
 			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
 			identifier: argument.type
 			count: 1
-			path: CRM/Sepa/Page/SepaMandatePdf.php
-
-		-
-			message: '#^Parameter \#1 \$text of static method CRM_Utils_PDF_Utils\:\:html2pdf\(\) expects array, array\|null given\.$#'
-			identifier: argument.type
-			count: 2
 			path: CRM/Sepa/Page/SepaMandatePdf.php
 
 		-

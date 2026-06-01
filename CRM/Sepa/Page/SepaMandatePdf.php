@@ -173,55 +173,12 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
   }
 
   /**
-   * Generate pre-notification PDF to download or return
-   *
-   * @param bool $send
-   *   should the PDF be sent to via email or offered as download?
-   *
-   * @param int $template_id
-   *   ID of the pre-notification template
-   *
-   * @return false|null
-   *   false iff the process failed (probably because there's no email address with the contact)
-   *
-   * @throws CRM_Core_Exception
+   * Generate pre-notification PDF to download.
    */
-  public function generatePDF(bool $send, int $template_id): bool|null {
-    require_once 'CRM/Utils/PDF/Utils.php';
+  private function generatePDF(): void {
+    assert(NULL !== $this->html);
     $fileName = $this->mandate->reference . '.pdf';
-    if ($send) {
-      $config = CRM_Core_Config::singleton();
-      $pdfFullFilename = $config->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
-      file_put_contents($pdfFullFilename, CRM_Utils_PDF_Utils::html2pdf($this->html, $fileName, TRUE));
-      [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
-      $params              = [];
-      $params['groupName'] = 'SEPA Email Sender';
-      $params['from']      = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
-      // FIXME: $this->contact is never assigned, i.e. this method never worked.
-      $params['toEmail'] = $this->contact->email;
-      $params['toName']  = $params['toEmail'];
-
-      if (empty($params['toEmail'])) {
-        CRM_Core_Session::setStatus(sprintf(E::ts("Error sending %s: Contact doesn't have an email."), $fileName));
-        return FALSE;
-      }
-      $params['subject'] = 'SEPA ' . $fileName;
-      $params['attachments'][] = [
-        'fullPath' => $pdfFullFilename,
-        'mime_type' => 'application/pdf',
-        'cleanName' => $fileName,
-      ];
-      ;
-      $mail = $this->getMessage($template_id);
-      $params['text'] = 'this is the mandate, please return signed';
-      $params['html'] = $this->getTemplate()->fetch('string:' . $mail['msg_html']);
-      CRM_Utils_Mail::send($params);
-    }
-    else {
-      CRM_Utils_PDF_Utils::html2pdf($this->html, $fileName, FALSE, NULL);
-    }
-
-    return NULL;
+    CRM_Utils_PDF_Utils::html2pdf($this->html, $fileName);
   }
 
   public function run() {
@@ -244,17 +201,15 @@ class CRM_Sepa_Page_SepaMandatePdf extends CRM_Core_Page {
     if ($api->is_error()) {
       throw new \CRM_Core_Exception($api->errorMsg());
     }
+
     $this->generateHTML($api->values[0], $template);
     if (!$action) {
       $this->assign('html', $this->html);
       parent::run();
       return;
     }
-    if ($action != 'email') {
-      $this->generatePDF(FALSE, $template);
-      CRM_Utils_System::civiExit();
-    }
-    $this->generatePDF(TRUE, $template);
+
+    $this->generatePDF();
   }
 
   /**
