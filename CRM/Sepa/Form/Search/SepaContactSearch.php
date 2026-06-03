@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -30,21 +32,22 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * Prepare a set of search fields
    *
    * @param CRM_Core_Form $form modifiable
-   * @return void
    */
-  public function buildForm(&$form) {
+  public function buildForm(&$form): void {
     CRM_Utils_System::setTitle(E::ts('CiviSEPA Contact Search'));
 
     $form->add('text',
       'reference',
       E::ts('Mandate Reference'),
+      [],
       TRUE
     );
 
     $form->add('text',
-        'iban',
-        E::ts('IBAN'),
-        TRUE
+      'iban',
+      E::ts('IBAN'),
+      [],
+      TRUE
     );
 
     /**
@@ -57,9 +60,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   /**
    * Get a list of summary data points
    *
-   * @return mixed; NULL or array with keys:
-   *   - summary: string
-   *   - total: numeric
+   * @return null
    */
   public function summary() {
     return NULL;
@@ -68,7 +69,8 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   /**
    * Get a list of displayable columns
    *
-   * @return array, keys are printable column headers and values are SQL column names
+   * @return array<string, string>
+   *   keys are printable column headers and values are SQL column names
    */
   public function &columns() {
     // return by reference
@@ -90,10 +92,11 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    *
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
-   * @return string, sql
+   *
+   * @return string sql
    */
   public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
@@ -105,7 +108,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   /**
    * Construct a SQL SELECT clause
    *
-   * @return string, sql fragment with SELECT arguments
+   * @return string sql fragment with SELECT arguments
    */
   public function select() {
     return '
@@ -123,7 +126,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   /**
    * Construct a SQL FROM clause
    *
-   * @return string, sql fragment with FROM and JOIN clauses
+   * @return string sql fragment with FROM and JOIN clauses
    */
   public function from() {
     return '
@@ -136,7 +139,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * Construct a SQL WHERE clause
    *
    * @param bool $includeContactIDs
-   * @return string, sql fragment with conditional expressions
+   * @return string sql fragment with conditional expressions
    */
   public function where($includeContactIDs = FALSE) {
     $params = [];
@@ -171,7 +174,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   /**
    * Determine the Smarty template for the search screen
    *
-   * @return string, template path (findable through Smarty template path)
+   * @return string template path (findable through Smarty template path)
    */
   public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';

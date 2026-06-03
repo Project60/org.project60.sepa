@@ -25,7 +25,7 @@ use Civi\Api4\SepaContributionGroup;
 
 class GetAction extends DAOGetAction {
 
-  public function _run(Result $result) {
+  public function _run(Result $result): void {
     if ($this->getCheckPermissions()) {
       // Count permissioned contributions (in the join) and the total number of contributions in the transaction group,
       // and extract those with matching counts, i.e. groups of which the user has permission to view all contributions.
@@ -35,7 +35,7 @@ class GetAction extends DAOGetAction {
           'COUNT(contribution.id) AS allowed_contributions',
           'COUNT(*) AS total_contributions'
         )
-        ->addJoin('Contribution AS contribution', 'LEFT', ['contribution.id', '=', 'contribution_id'])
+        ->addJoin('Contribution AS contribution', 'LEFT', NULL, ['contribution.id', '=', 'contribution_id'])
         ->addGroupBy('txgroup_id')
         ->addHaving('allowed_contributions', '=', 'total_contributions', TRUE)
         ->execute()
@@ -43,7 +43,7 @@ class GetAction extends DAOGetAction {
       $this
         ->addWhere('id', 'IN', $fullyPermissionedTxgroups);
     }
-    return parent::_run($result);
+    parent::_run($result);
   }
 
 }

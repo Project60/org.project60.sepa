@@ -36,8 +36,8 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
   if (!isset($data['mandate_entity_id']) || !isset($data['mandate_creditor_id'])) {
     return;
   }
-  $contribution_recur_id = $data['mandate_entity_id'];
-  $creditor_id = $data['mandate_creditor_id'];
+  $contribution_recur_id = (int) $data['mandate_entity_id'];
+  $creditor_id = (int) $data['mandate_creditor_id'];
 
   // Fetch the possible cycle days.
   $cycle_days = \CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor_id);
@@ -69,6 +69,7 @@ function sepacustom_civicrm_alter_next_collection_date(&$next_collection_date, $
       $next_collection_date = $membershipEndDate->format('Y-m-d');
     }
     catch (CRM_Core_Exception $e) {
+      // @ignoreException
       // No membership found.
       // Do not alter the date.
     }
@@ -157,7 +158,7 @@ function sepacustom_civicrm_create_mandate(&$mandate_parameters): void {
  */
 function sepacustom_civicrm_defer_collection_date(&$collection_date, $creditor_id): void {
   // Don't collect on the week end
-  $day_of_week = date('N', strtotime($collection_date));
+  $day_of_week = (int) date('N', strtotime($collection_date));
   if ($day_of_week > 5) {
     // this is a weekend -> skip to Monday
     $defer_days = 8 - $day_of_week;
@@ -198,14 +199,12 @@ function sepacustom_civicrm_modify_endtoendid(&$end2endID, $contribution, $credi
  *
  * be aware the newly created contribution is still 'Pending', it might NOT be
  * issued to the bank.
- *
- * @param array $mandate_id
- * @param array $contribution_recur_id
- * @param array $contribution_id
- *
- * @access public
  */
-function sepacustom_civicrm_installment_created($mandate_id, $contribution_recur_id, $contribution_id): void {
+function sepacustom_civicrm_installment_created(
+  int $mandate_id,
+  int $contribution_recur_id,
+  int $contribution_id
+): void {
   // example: assign to membership if contact has (exactly) one...
   try {
     $contribution = civicrm_api3('Contribution', 'getsingle', [
@@ -228,7 +227,8 @@ function sepacustom_civicrm_installment_created($mandate_id, $contribution_recur
       ]);
     }
   }
-  catch (Exception $ex) {
+  catch (Exception $e) {
+    // @ignoreException
     // not a big deal, most likely there was not a single membership found in the getvalue call
   }
 }
@@ -278,7 +278,7 @@ function sepacustom_civicrm_disable() {
 /**
  * Implements hook_civicrm_upgrade().
  */
-function sepacustom_civicrm_upgrade(string $op, CRM_Queue_Queue $queue = NULL): mixed {
+function sepacustom_civicrm_upgrade(string $op, ?CRM_Queue_Queue $queue = NULL): mixed {
   return _sepacustom_civix_civicrm_upgrade($op, $queue);
 }
 

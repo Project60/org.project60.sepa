@@ -14,6 +14,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
 
 /**
  * This class holds all SEPA logic wrt to the next collection date
@@ -24,21 +25,27 @@ class CRM_Sepa_Logic_NextCollectionDate {
 
   /**
    * fields for Mandate/RecurringContribution edit/create event processing */
-  protected static $currently_edited_mandate_id = NULL;
-  protected static $currently_edited_mandate_params = NULL;
-  protected static $currently_edited_recurring_contribution_id = NULL;
-  protected static $currently_edited_recurring_contribution_params = NULL;
+  protected static ?int $currently_edited_mandate_id = NULL;
+  protected static ?array $currently_edited_mandate_params = NULL;
+  protected static ?int $currently_edited_recurring_contribution_id = NULL;
+  protected static ?array $currently_edited_recurring_contribution_params = NULL;
 
-  protected $now;
-  protected $creditor_id;
+  protected int $now;
+  protected int $creditor_id;
 
-  public function __construct($creditor_id = NULL, $mode = 'RCUR') {
+  /**
+   * @param int|null $creditor_id
+   */
+  public function __construct(?int $creditor_id = NULL, string $mode = 'RCUR') {
     if (empty($creditor_id)) {
+      // @phpstan-ignore cast.int
       $creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
     }
+    // @phpstan-ignore cast.int
     $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting("batching.{$mode}.grace", $creditor_id);
-    $rcur_notice  = (int) CRM_Sepa_Logic_Settings::getSetting("batching.{$mode}.notice", $creditor_id);
-    $this->now    = strtotime("+$rcur_notice days -$grace_period days");
+    // @phpstan-ignore cast.int
+    $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.{$mode}.notice", $creditor_id);
+    $this->now = strtotime("+$rcur_notice days -$grace_period days");
     $this->creditor_id = $creditor_id;
   }
 
@@ -46,7 +53,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
    * check if this NextCollectionDate instance uses the
    * given creditor ID
    */
-  public function usesCreditor($creditor_id) {
+  public function usesCreditor(int $creditor_id): bool {
     return $creditor_id == $this->creditor_id;
   }
 
@@ -54,13 +61,10 @@ class CRM_Sepa_Logic_NextCollectionDate {
    * update the next scheduled collection date for the SepaMandate
    * identified by either $contribution_recur_id or $mandate_id
    */
-  public function updateNextCollectionDate($contribution_recur_id, $mandate_id) {
-    $contribution_recur_id = (int) $contribution_recur_id;
-    $mandate_id = (int) $mandate_id;
-
+  public function updateNextCollectionDate(?int $contribution_recur_id, ?int $mandate_id): void {
     if (!$contribution_recur_id) {
       if ($mandate_id) {
-        $contribution_recur_id = CRM_Core_DAO::singleValueQuery(
+        $contribution_recur_id = (int) CRM_Core_DAO::singleValueQuery(
           "SELECT entity_id FROM civicrm_sdd_mandate
           WHERE id = {$mandate_id} AND entity_table='civicrm_contribution_recur'"
         );
@@ -93,12 +97,12 @@ class CRM_Sepa_Logic_NextCollectionDate {
   /**
    * Calculate the next collection date for the given mandate
    */
-  public function calculateNextCollectionDate($contribution_recur_id) {
-    $contribution_recur_id = (int) $contribution_recur_id;
+  public function calculateNextCollectionDate(int $contribution_recur_id): ?string {
     if (!$contribution_recur_id) {
       return NULL;
     }
 
+    /** @var \CRM_Core_DAO $query */
     $query = CRM_Core_DAO::executeQuery("
       SELECT
         civicrm_contribution_recur.cycle_day          AS cycle_day,
@@ -129,6 +133,8 @@ class CRM_Sepa_Logic_NextCollectionDate {
       ];
       return CRM_Sepa_Logic_Batching::getNextExecutionDate($mandate, $this->now, ($mode == 'FRST'));
     }
+
+    return NULL;
   }
 
   /**
@@ -136,10 +142,11 @@ class CRM_Sepa_Logic_NextCollectionDate {
    *
    * the recurring contributions in question can be identified either
    * by $txgroup_id (i.e. the whole group) or as list of individual recurring contributions
+   *
+   * @param list<int>|null $contribution_id_list
    */
-  public static function advanceNextCollectionDate($txgroup_id, $contribution_id_list = NULL) {
+  public static function advanceNextCollectionDate(?int $txgroup_id, ?array $contribution_id_list = NULL): void {
     // PREPARE: generate the right identification snippets
-    $txgroup_id = (int) $txgroup_id;
     if (!empty($txgroup_id)) {
       $joins = '
         LEFT JOIN civicrm_contribution
@@ -168,6 +175,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
       FROM civicrm_contribution_recur
       {$joins}
       WHERE {$where} LIMIT 1";
+    /** @var \CRM_Core_DAO $info_query */
     $info_query = CRM_Core_DAO::executeQuery($info_query_sql);
     if (
       !$info_query->fetch() || empty($info_query->receive_date)
@@ -219,7 +227,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
   /**
    * preparation for self::processMandatePostEdit
    */
-  public static function processMandatePreEdit($op, $objectName, $id, $params) {
+  public static function processMandatePreEdit(string $op, string $objectName, ?int $id, array $params): void {
     self::$currently_edited_mandate_id = $id;
     self::$currently_edited_mandate_params = $params;
   }
@@ -227,7 +235,12 @@ class CRM_Sepa_Logic_NextCollectionDate {
   /**
    * process SepaMandate edit/create events
    */
-  public static function processMandatePostEdit($op, $objectName, $objectId, $objectRef) {
+  public static function processMandatePostEdit(
+    string $op,
+    string $objectName,
+    int $objectId,
+    object $objectRef
+  ): void {
     if (empty(self::$currently_edited_mandate_params)) {
       return;
     }
@@ -250,10 +263,10 @@ class CRM_Sepa_Logic_NextCollectionDate {
     if ($update_required && self::$currently_edited_mandate_id) {
       // get creditor_id
       if (!empty(self::$currently_edited_mandate_params['creditor_id'])) {
-        $creditor_id = self::$currently_edited_mandate_params['creditor_id'];
+        $creditor_id = (int) self::$currently_edited_mandate_params['creditor_id'];
       }
       else {
-        $creditor_id = CRM_Core_DAO::singleValueQuery(
+        $creditor_id = (int) CRM_Core_DAO::singleValueQuery(
           'SELECT creditor_id FROM civicrm_sdd_mandate WHERE id = '
           . self::$currently_edited_mandate_id
         );
@@ -270,7 +283,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
   /**
    * preparation for self::processRecurPostEdit
    */
-  public static function processRecurPreEdit($op, $objectName, $id, $params) {
+  public static function processRecurPreEdit(string $op, string $objectName, ?int $id, array $params): void {
     self::$currently_edited_recurring_contribution_id = $id;
     self::$currently_edited_recurring_contribution_params = $params;
   }
@@ -278,7 +291,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
   /**
    * process RecurringContribution edit/create events
    */
-  public static function processRecurPostEdit($op, $objectName, $objectId, $objectRef) {
+  public static function processRecurPostEdit(string $op, string $objectName, int $objectId, object $objectRef): void {
     if (empty(self::$currently_edited_recurring_contribution_params)) {
       return;
     }
@@ -310,7 +323,7 @@ class CRM_Sepa_Logic_NextCollectionDate {
     }
 
     if ($update_required && self::$currently_edited_recurring_contribution_id) {
-      $creditor_id = CRM_Core_DAO::singleValueQuery(
+      $creditor_id = (int) CRM_Core_DAO::singleValueQuery(
         "SELECT creditor_id FROM civicrm_sdd_mandate
         WHERE entity_table='civicrm_contribution_recur'
           AND entity_id = " . self::$currently_edited_recurring_contribution_id

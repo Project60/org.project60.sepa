@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -26,11 +28,12 @@ class CRM_Sepa_Page_SepaFile extends CRM_Core_Page {
     // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
     CRM_Utils_System::setTitle(E::ts('Generate XML File'));
 
+    // @phpstan-ignore cast.int
     $id = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($id > 0) {
       //fetch the file, then the group
       $file = new CRM_Sepa_BAO_SEPASddFile();
-      $xml = $file->generateXML($id);
+      $xml = $file->generatexml($id);
       header('Content-Type: text/xml; charset=utf-8');
       echo $xml;
       CRM_Utils_System::civiExit();

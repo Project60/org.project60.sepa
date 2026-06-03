@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * defines customization hooks
  *
@@ -34,16 +36,19 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * You can implement this hook e.g. to modify the mandate reference ($parameters['reference'])
    *
-   * @param array $mandate_parameters the parameters that will be used to create the mandate.
+   * @param array<string, mixed> $mandate_parameters
+   *   the parameters that will be used to create the mandate.
    *
-   * @return mixed             based on op. pre-hooks return a boolean or
-   *   an error message which aborts the operation
+   * @return mixed
+   *   based on op. pre-hooks return a boolean or an error message which aborts
+   *   the operation
    * @access public
    */
-  public static function create_mandate(&$mandate_parameters) {
+  public static function create_mandate(array &$mandate_parameters): mixed {
     $names = ['mandate_parameters'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,
+      // @phpstan-ignore parameterByRef.type
       $mandate_parameters,
       self::$null,
       self::$null,
@@ -71,15 +76,16 @@ class CRM_Utils_SepaCustomisationHooks {
    * @access public
    */
   public static function modify_txgroup_reference(
-    &$reference,
-    $creditor_id,
-    $mode,
-    $collection_date,
-    $financial_type_id
-  ) {
+    string &$reference,
+    int $creditor_id,
+    string $mode,
+    string $collection_date,
+    ?int $financial_type_id
+  ): mixed {
     $names = ['reference', 'creditor_id', 'mode', 'collection_date', 'financial_type_id'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,
+      // @phpstan-ignore parameterByRef.type
       $reference,
       $creditor_id,
       $mode,
@@ -102,10 +108,11 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @access public
    */
-  public static function modify_txmessage(&$txmessage, $contribution, $creditor) {
+  public static function modify_txmessage(string &$txmessage, array $contribution, array $creditor): mixed {
     $names = ['txmessage', 'contribution', 'creditor'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,
+      // @phpstan-ignore parameterByRef.type
       $txmessage,
       $contribution,
       $creditor,
@@ -127,10 +134,11 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @access public
    */
-  public static function modify_endtoendid(&$end2endID, $contribution, $creditor) {
+  public static function modify_endtoendid(string &$end2endID, array $contribution, array $creditor): mixed {
     $names = ['end2endID', 'contribution', 'creditor'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,
+      // @phpstan-ignore parameterByRef.type
       $end2endID,
       $contribution,
       $creditor,
@@ -150,11 +158,12 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @access public
    */
-  public static function mend_rcontrib($rcontribId, &$rcontrib) {
+  public static function mend_rcontrib(int $rcontribId, array &$rcontrib): mixed {
     $names = ['rcontribId', 'rcontrib'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,
       $rcontribId,
+      // @phpstan-ignore parameterByRef.type
       $rcontrib,
       self::$null,
       self::$null,
@@ -178,10 +187,11 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @access public
    */
-  public static function alter_next_collection_date(&$next_collection_date, $data) {
+  public static function alter_next_collection_date(string &$next_collection_date, array $data): mixed {
     $names = ['next_collection_date', 'data'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,
+      // @phpstan-ignore parameterByRef.type
       $next_collection_date,
       $data,
       self::$null,
@@ -203,10 +213,11 @@ class CRM_Utils_SepaCustomisationHooks {
    *
    * @access public
    */
-  public static function defer_collection_date(&$collection_date, $creditor_id) {
+  public static function defer_collection_date(string &$collection_date, int $creditor_id): mixed {
     $names = ['collection_date', 'creditor_id'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,
+      // @phpstan-ignore parameterByRef.type
       $collection_date,
       $creditor_id,
       self::$null,
@@ -226,13 +237,9 @@ class CRM_Utils_SepaCustomisationHooks {
    * be aware the newly created contribution is still 'Pending', it might NOT be
    * issued to the bank.
    *
-   * @param int $mandate_id
-   * @param int $contribution_recur_id
-   * @param int $contribution_id
-   *
    * @access public
    */
-  public static function installment_created($mandate_id, $contribution_recur_id, $contribution_id) {
+  public static function installment_created(int $mandate_id, int $contribution_recur_id, int $contribution_id): mixed {
     $names = ['mandate_id', 'contribution_recur_id', 'contribution_id'];
     return CRM_Utils_Hook::singleton()->invoke(
       $names,

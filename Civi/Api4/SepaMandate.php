@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace Civi\Api4;
 
 use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
@@ -18,8 +21,9 @@ class SepaMandate extends Generic\DAOEntity {
   }
 
   /**
+   * @return array<string, list<string|list<string>>>
+   *
    * @see \Civi\Api4\Generic\AbstractEntity::permissions()
-   * @return array[]
    */
   public static function permissions(): array {
     return [

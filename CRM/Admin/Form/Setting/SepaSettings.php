@@ -14,11 +14,13 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
-  private $config_fields;
-  private $custom_fields;
+  private array $config_fields;
+  private array $custom_fields;
 
   public function __construct() {
     parent::__construct();
@@ -54,11 +56,11 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     ];
   }
 
-  public function domainToString($raw) {
+  public function domainToString(string $raw): string {
     return str_replace('.', '_', $raw);
   }
 
-  public function stringToDomain($raw) {
+  public function stringToDomain(string $raw): string {
     return str_replace('_', '.', $raw);
   }
 
@@ -73,18 +75,12 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
     return $fields;
   }
 
-  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(E::ts('Sepa Direct Debit - Settings'));
 
-    $customFields = CRM_Core_BAO_CustomField::getFields();
-    $cf = [];
-    foreach ($customFields as $k => $v) {
-      $cf[$k] = $v['label'];
-    }
-
     // add all form elements and validation rules
-    foreach ($this->config_fields as $key => $value) {
+    foreach ($this->config_fields as $value) {
       $elementName = $this->domainToString($value[0]);
       $elem = $this->addElement('text', $elementName, $value[1], (isset($value[2]) ? $value[2] : []));
       if (!in_array($elementName, ['cycledays', 'custom_txmsg'])) {
@@ -98,38 +94,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
       }
     }
 
-    // country drop down field
-    $i18n = CRM_Core_I18n::singleton();
-    $climit = [];
-    $cnames = [];
-    $ciso = [];
-    $filtered = [];
-
-    // country-limit fix by @scardinius (see https://github.com/Project60/org.project60.sepa/pull/388)
-    if (version_compare(CRM_Utils_System::version(), '4.7', '>=')) {
-      $climit = CRM_Core_BAO_Country::countryLimit();
-    }
-    else {
-      $config = CRM_Core_Config::singleton();
-      $climit = $config->countryLimit();
-    }
-
-    CRM_Core_PseudoConstant::populate($cnames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
-    CRM_Core_PseudoConstant::populate($ciso, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
-
-    foreach ($ciso as $key => $value) {
-      foreach ($climit as $active_country) {
-        if ($active_country == $value) {
-          $filtered[$key] = $cnames[$key];
-        }
-      }
-    }
-
-    $i18n->localizeArray($filtered, ['context' => 'country']);
-    asort($filtered);
-
-    // do not use array_merge() because it discards the original indizes
-    $country_ids = ['' => E::ts('- select -')] + $filtered;
+    /** @var list<array{id: int, name: string, label: string, abbr: string}> $countryIdOptions */
+    $countryIdOptions = \Civi::entity('Address')->getOptions('country_id');
+    $country_ids = ['' => E::ts('- select -')] + array_column($countryIdOptions, 'label', 'id');
     $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
     if (!isset($currencies['EUR'])) {
       $currencies['EUR'] = 'EUR';
@@ -279,6 +246,7 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
       }
     }
     $this->assign('creditors', $creditors);
+    /** @var \HTML_QuickForm_select $default_creditors */
     $default_creditors = $this->addElement(
       'select',
       'batching_default_creditor',
@@ -349,7 +317,9 @@ class CRM_Admin_Form_Setting_SepaSettings extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $session->setStatus(E::ts('Settings successfully updated.'), E::ts('Saved'), 'info');
-    CRM_Core_DAO::triggerRebuild();
+    /** @var \Civi\Core\SqlTriggers $sqlTriggers */
+    $sqlTriggers = Civi::service('sql_triggers');
+    $sqlTriggers->rebuild();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/setting/sepa'));
   }
 

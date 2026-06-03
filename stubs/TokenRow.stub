@@ -1,0 +1,5 @@
+<?php
+// Required by TokenValueEvent.stub
+namespace Civi\Token;
+
+class TokenRow {}

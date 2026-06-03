@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace Civi\Api4;
 
 use Civi\Sepa\Api4\Action\SepaTransactionGroup\GetAction;
@@ -12,11 +15,17 @@ use Civi\Sepa\Api4\Action\SepaTransactionGroup\GetAction;
  */
 class SepaTransactionGroup extends Generic\DAOEntity {
 
+  /**
+   * @return \Civi\Sepa\Api4\Action\SepaTransactionGroup\GetAction
+   */
   public static function get($checkPermissions = TRUE) {
     return (new GetAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @return array<string, list<string|list<string>>>
+   */
   public static function permissions(): array {
     return [
       'get' => ['view sepa groups'],

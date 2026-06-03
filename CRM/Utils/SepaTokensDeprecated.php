@@ -1,14 +1,16 @@
 <?php
 
-use CRM_Sepa_ExtensionUtil as E;
+declare(strict_types = 1);
 
+/**
+ * @deprecated
+ */
 class CRM_Utils_SepaTokensDeprecated {
 
-  public static function getTokenList() {
-    return CRM_Utils_SepaTokens::getTokenList();
-  }
-
-  public static function fillLastMandateTokenValues($contactId, $prefix, &$values) {
+  /**
+   * @param int $contactId
+   */
+  public static function fillLastMandateTokenValues(int $contactId, string $prefix, array &$values): void {
     $mandate = CRM_Sepa_BAO_SEPAMandate::getLastMandateOfContact($contactId);
     if (!$mandate) {
       return;
@@ -50,7 +52,7 @@ class CRM_Utils_SepaTokensDeprecated {
         $values[$contactId]["$prefix.frequency_interval"] = $rcontribution['frequency_interval'];
         $values[$contactId]["$prefix.frequency_unit"] = $rcontribution['frequency_unit'];
         $values[$contactId]["$prefix.frequency"] = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
-          $rcontribution['frequency_interval'],
+          (int) $rcontribution['frequency_interval'],
           $rcontribution['frequency_unit'],
           TRUE
         );

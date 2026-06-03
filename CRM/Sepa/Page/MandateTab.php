@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 use Civi\Api4\SepaMandate;
 use Civi\Api4\Contribution;
@@ -63,12 +65,14 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       ->addJoin(
         'Contribution AS contribution',
         'INNER',
+        NULL,
         ['entity_table', '=', '"civicrm_contribution"'],
         ['entity_id', '=', 'contribution.id']
       )
       ->addJoin(
         'Campaign AS campaign',
         'LEFT',
+        NULL,
         ['campaign.id', '=', 'contribution.campaign_id']
       )
       ->addWhere('contact_id', '=', $contactId)
@@ -78,7 +82,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       $ooffList[] = [
         'receive_date' => $ooffMandate['contribution.receive_date'],
         'status_raw' => $ooffMandate['status'],
-        'status' => CRM_Sepa_Logic_Status::translateMandateStatus($ooffMandate['status'], TRUE),
+        'status' => CRM_Sepa_Logic_Status::translateMandateStatus((string) $ooffMandate['status'], TRUE),
         'reference' => $ooffMandate['reference'],
         'financial_type' => $ooffMandate['contribution.financial_type_id:name'],
         'campaign' => $ooffMandate['campaign.title'],
@@ -122,12 +126,14 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       ->addJoin(
         'ContributionRecur AS contribution_recur',
         'INNER',
+        NULL,
         ['entity_id', '=', 'contribution_recur.id'],
         ['entity_table', '=', '"civicrm_contribution_recur"']
       )
       ->addJoin(
         'Note AS cancel_reason',
         'LEFT',
+        NULL,
         ['cancel_reason.entity_id', '=', 'contribution_recur.id'],
         ['cancel_reason.entity_table', '=', '"civicrm_contribution_recur"'],
         ['cancel_reason.subject', '=', '"cancel_reason"']
@@ -135,6 +141,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
       ->addJoin(
         'Campaign AS campaign',
         'LEFT',
+        NULL,
         ['campaign.id', '=', 'contribution_recur.campaign_id']
       )
       ->addWhere('contact_id', '=', $contactId)
@@ -162,7 +169,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         'reference' => $rcurMandate['reference'],
         'financial_type' => $rcurMandate['contribution_recur.financial_type_id:name'],
         'campaign' => $rcurMandate['campaign.title'],
-        'status' => CRM_Sepa_Logic_Status::translateMandateStatus($rcurMandate['status'], TRUE),
+        'status' => CRM_Sepa_Logic_Status::translateMandateStatus((string) $rcurMandate['status'], TRUE),
         'frequency' => CRM_Utils_SepaOptionGroupTools::getFrequencyText(
           $rcurMandate['contribution_recur.frequency_interval'],
           $rcurMandate['contribution_recur.frequency_unit'],
@@ -170,7 +177,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         ),
         'next_collection_date' => $rcurMandate['contribution_recur.next_sched_contribution_date'],
         'last_collection_date' => $lastInstallment['receive_date'] ?? NULL,
-        'cancel_reason' => $rcur_mandates['cancel_reason'],
+        'cancel_reason' => $rcurMandate['cancel_reason'],
         'last_cancel_reason' => $lastInstallment['cancel_reason'] ?? NULL,
         'end_date' => $rcurMandate['contribution_recur.end_date'],
         'currency' => $rcurMandate['contribution_recur.currency'],
@@ -229,6 +236,7 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
         ORDER BY civicrm_contribution.receive_date;";
 
       CRM_Core_DAO::disableFullGroupByMode();
+      /** @var \CRM_Core_DAO $fail_query */
       $fail_query = CRM_Core_DAO::executeQuery($fail_sequence);
       CRM_Core_DAO::reenableFullGroupByMode();
 
@@ -249,8 +257,8 @@ class CRM_Sepa_Page_MandateTab extends CRM_Core_Page {
    * get the number of mandates
    * for the given contact
    */
-  public static function getMandateCount($contact_id) {
-    return CRM_Core_DAO::singleValueQuery("
+  public static function getMandateCount(int $contact_id): int {
+    return (int) CRM_Core_DAO::singleValueQuery("
         SELECT COUNT(id) FROM civicrm_sdd_mandate
         WHERE contact_id = %1
           AND status IN ('FRST', 'RCUR', 'OOFF', 'INIT');",

@@ -195,4 +195,3 @@ function mark_received(group_id) {
 }
 </script>
 {/literal}
-

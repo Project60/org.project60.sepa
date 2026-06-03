@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit - PHPUnit tests         |
 | Copyright (C) 2019 SYSTOPIA                            |
@@ -31,9 +33,9 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
   private const TEST_BIC_TRANSACTION_COST_CODE = 'ABCDDE32XXX';
   // 7th digit must not be zero or one.
   private const TEST_BIC_INVALID_LOCATION = 'BELADE0EXXX';
+  // @phpstan-ignore classConstant.unused
   private const TEST_BIC_WRONG_FOR_IBAN = 'BELADEBEXXX';
   // Correct format but does not exist.
-  private const TEST_BIC_NONEXISTENT = 'ABCDDE33XXX';
   private const TEST_BIC_INCORRECT = 'INCORRECT';
 
   public function setUp(): void {
@@ -140,6 +142,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
       'FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.'
     );
 
+    // @phpstan-ignore deadCode.unreachable
     $this->assertException(
       \PHPUnit\Framework\ExpectationFailedException::class,
       function () {
@@ -162,6 +165,7 @@ class CRM_Sepa_VerifyBicTest extends CRM_Sepa_TestBase {
       'FIXME: Test fails because the Sepa extension does only verify that BICs have a correct format.'
     );
 
+    // @phpstan-ignore deadCode.unreachable
     $this->assertException(
       \PHPUnit\Framework\ExpectationFailedException::class,
       function () {

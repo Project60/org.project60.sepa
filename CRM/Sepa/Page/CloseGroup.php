@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * Close a sepa group
  *
@@ -72,6 +74,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
 
           if ('' === $status) {
             // first adjust group's collection date if requested
+            /** @var string|null $adjust */
             $adjust = CRM_Utils_Request::retrieve('adjust', 'String');
             if (!empty($adjust)) {
               $result = CRM_Sepa_BAO_SEPATransactionGroup::adjustCollectionDate($group_id, $adjust);
@@ -109,10 +112,10 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
           }
         }
       }
-      catch (\CRM_Core_Exception $exception) {
+      catch (\CRM_Core_Exception $e) {
         CRM_Core_Session::setStatus(
           E::ts('Cannot load group #%1', [1 => $group_id]) . '<br />'
-          . E::ts('Error was: %1', [1 => $group['error_message']]),
+          . E::ts('Error was: %1', [1 => $e->getMessage()]),
           E::ts('Error'),
           'error'
         );
@@ -125,7 +128,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
   /**
    * generate an XML download link and assign to the template
    */
-  protected function createDownloadLink($group_id) {
+  protected function createDownloadLink(int $group_id): void {
     $xmlfile = civicrm_api3(
       'SepaAlternativeBatching',
       'createxml',
@@ -170,7 +173,7 @@ class CRM_Sepa_Page_CloseGroup extends CRM_Core_Page {
         );
       }
       else {
-        $target_contribution_status = (int) CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
+        $target_contribution_status = CRM_Sepa_Logic_Settings::contributionInProgressStatusId();
         $target_group_status = (int) CRM_Core_PseudoConstant::getKey(
           'CRM_Batch_BAO_Batch',
           'status_id',

@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * File for the CiviCRM sepa_creditor business logic
  *
@@ -28,7 +30,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
   /**
    * @param array $params
    *
-   * @return object       CRM_Core_BAO_SEPACreditor object on success, null otherwise
+   * @return \CRM_Sepa_DAO_SEPACreditor
    * @access public
    * @static
    */
@@ -50,7 +52,8 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
     // reset creditor cache
     CRM_Sepa_Logic_PaymentInstruments::clearCaches();
 
-    CRM_Utils_Hook::post($hook, 'SepaCreditor', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'SepaCreditor', (int) $dao->id, $dao);
+    /** @var \CRM_Sepa_DAO_SEPACreditor $dao */
     return $dao;
   }
 
@@ -63,7 +66,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
    * @deprecated this is not used by this extension, will be removed in CiviSEPA >= 1.6
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function initialiseMandateData($creditor_id, &$mandate_data) {
+  public static function initialiseMandateData(int $creditor_id, array &$mandate_data): void {
     if (empty($creditor_id) || empty($mandate_data['id']) || empty($mandate_data['type'])) {
       return;
     }
@@ -109,7 +112,7 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
   /**
    * If there is currently no creditors available, create one
    */
-  public static function addDefaultCreditorIfMissing() {
+  public static function addDefaultCreditorIfMissing(): void {
     $creditor_count = civicrm_api3('SepaCreditor', 'getcount');
     if (empty($creditor_count)) {
       // get the classic payment instruments
@@ -135,8 +138,8 @@ class CRM_Sepa_BAO_SEPACreditor extends CRM_Sepa_DAO_SEPACreditor {
           'cuc' => '',
         ]);
       }
-      catch (Exception $ex) {
-        throw new Exception("Couldn't create default creditor: " . $ex->getMessage());
+      catch (Exception $e) {
+        throw new RuntimeException("Couldn't create default creditor: " . $e->getMessage(), $e->getCode(), $e);
       }
     }
   }

@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -88,7 +90,7 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
       elseif ($_REQUEST['confirmed'] == 'yes') {
         // delete the group
         $this->assign('status', 'done');
-        $delete_contributions_mode = $_REQUEST['delete_contents'];
+        $delete_contributions_mode = (string) $_REQUEST['delete_contents'];
         $deleted_ok = [];
         $deleted_error = [];
         $result = CRM_Sepa_BAO_SEPATransactionGroup::deleteGroup($group_id, $delete_contributions_mode);
@@ -126,9 +128,10 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
   /**
    * gather some statistics about the contributions linked to this txgroup
    *
-   * @return array(contribution_status_id->array(contribution_ids))
+   * @return array<int, list<int>>
+   *   Mapping of contribution_status_id to list of contribution_id
    */
-  public function contributionStats($group_id) {
+  public function contributionStats(int $group_id): array {
     $stats = [];
     $sql = "
   	SELECT
@@ -139,12 +142,13 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
   	WHERE
   		civicrm_sdd_contribution_txgroup.txgroup_id = $group_id;
   	";
+    /** @var \CRM_Core_DAO $contribution_info */
     $contribution_info = CRM_Core_DAO::executeQuery($sql);
     while ($contribution_info->fetch()) {
       if (!isset($stats[$contribution_info->status_id])) {
         $stats[$contribution_info->status_id] = [];
       }
-      array_push($stats[$contribution_info->status_id], $contribution_info->contribution_id);
+      array_push($stats[$contribution_info->status_id], (int) $contribution_info->contribution_id);
     }
     return $stats;
   }

@@ -14,13 +14,13 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-use CRM_Sepa_ExtensionUtil as E;
+declare(strict_types = 1);
 
 class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
 
 
-  public static $LINK_CLASS_REPLACES    = 'REPLACES';
-  public static $LINK_CLASS_MEMBERSHIP  = 'MEMBERSHIP';
+  public static string $LINK_CLASS_REPLACES    = 'REPLACES';
+  public static string $LINK_CLASS_MEMBERSHIP  = 'MEMBERSHIP';
 
   /**
    * Create a new mandate link
@@ -29,10 +29,13 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    * @param int $new_mandate_id        ID of the SepaMandate replacing the old one
    * @param string $replacement_date   timestamp of the replacement, default is: now
    *
-   * @return object CRM_Sepa_BAO_SepaMandateLink resulting object
    * @throws Exception if mandatory fields aren't set
    */
-  public static function addReplaceMandateLink($old_mandate_id, $new_mandate_id, $replacement_date = 'now') {
+  public static function addReplaceMandateLink(
+    int $old_mandate_id,
+    int $new_mandate_id,
+    string $replacement_date = 'now'
+  ): self {
     return self::createMandateLink(
         $new_mandate_id,
         $old_mandate_id,
@@ -51,20 +54,19 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    * @param string $class              link class, max 16 characters
    * @param bool $is_active            is the link active? default is YES
    * @param string $start_date         start date of the link, default NOW
-   * @param string $end_date           end date of the link, default is NONE
+   * @param string|null $end_date           end date of the link, default is NONE
    *
-   * @return object CRM_Sepa_BAO_SepaMandateLink resulting object
    * @throws Exception if mandatory fields aren't set
    */
   public static function createMandateLink(
-    $mandate_id,
-    $entity_id,
-    $entity_table,
-    $class,
-    $is_active = TRUE,
-    $start_date = 'now',
-    $end_date = NULL
-  ) {
+    int $mandate_id,
+    int $entity_id,
+    string $entity_table,
+    string $class,
+    bool $is_active = TRUE,
+    string $start_date = 'now',
+    ?string $end_date = NULL
+  ): self {
     $params = [
       'mandate_id'   => $mandate_id,
       'entity_id'    => $entity_id,
@@ -91,24 +93,25 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    *        start_date NULL or in the past
    *
    *
-   * @param int $mandate_id            the mandate to link
-   * @param string|array $class        link class, max 16 characters
-   * @param int $entity_id             ID of the linked entity
-   * @param int $entity_table          table name of the linked entity
+   * @param int|null $mandate_id            the mandate to link
+   * @param string|list<string>|null $class        link class, max 16 characters
+   * @param int|null $entity_id             ID of the linked entity
+   * @param string|null $entity_table          table name of the linked entity
    * @param string $date               what timestamp does the "active" refer to? Default is: now
    *
    * @todo: add limit
    *
-   * @return array of link data
+   * @return list<array<string, mixed>> list of link data
+   *
    * @throws Exception if mandate_id is invalid
    */
   public static function getActiveLinks(
-    $mandate_id = NULL,
-    $class = NULL,
-    $entity_id = NULL,
-    $entity_table = NULL,
-    $date = 'now'
-  ) {
+    ?int $mandate_id = NULL,
+    string|array|null $class = NULL,
+    ?int $entity_id = NULL,
+    ?string $entity_table = NULL,
+    string $date = 'now'
+  ): array {
     // build where clause
     $WHERE_CLAUSES = [];
 
@@ -120,25 +123,24 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
 
     // process mandate_id
     if (!empty($mandate_id)) {
-      $mandate_id = (int) $mandate_id;
       $WHERE_CLAUSES[] = "mandate_id = {$mandate_id}";
     }
 
     // process entity restrictions
-    if (!empty($entity_id) && preg_match('#^[a-z_]+$#', $entity_table)) {
+    if (!empty($entity_id) && NULL !== $entity_table && preg_match('#^[a-z_]+$#', $entity_table)) {
       $entity_id = (int) $entity_id;
       $WHERE_CLAUSES[] = "entity_id = {$entity_id}";
       $WHERE_CLAUSES[] = "entity_table = '{$entity_table}'";
     }
 
     // process class restrictions
-    if ($class) {
+    if (NULL !== $class) {
       // make sure they are upper case
       $classes = [];
       if (is_string($class)) {
         $candidates = explode(',', $class);
       }
-      elseif (is_array($class)) {
+      else {
         $candidates = $class;
       }
       foreach ($candidates as $candidate) {
@@ -158,6 +160,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     // build and run query
     $WHERE_CLAUSE = '(' . implode(') AND (', $WHERE_CLAUSES) . ')';
     $query_sql = "SELECT * FROM civicrm_sdd_entity_mandate WHERE {$WHERE_CLAUSE}";
+    /** @var \CRM_Core_DAO $query */
     $query = CRM_Core_DAO::executeQuery($query_sql);
     $results = [];
     while ($query->fetch()) {
@@ -172,11 +175,9 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    * @param int $link_id               ID of the link
    * @param string $date               at what timestamp should the link be ended - default is "now"
    *
-   * @return object CRM_Sepa_BAO_SepaMandateLink resulting object
    * @throws Exception if mandatory fields aren't set
    */
-  public static function endMandateLink($link_id, $date = 'now') {
-    $link_id = (int) $link_id;
+  public static function endMandateLink(int $link_id, string $date = 'now'): void {
     if ($link_id) {
       $link = new CRM_Sepa_BAO_SepaMandateLink();
       $link->id = $link_id;
@@ -189,13 +190,13 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
   /**
    * Create/edit a SepaMandateLink entry
    *
-   * @param array $params
-   * @return object CRM_Sepa_BAO_SepaMandateLink object on success, null otherwise
+   * @param array<string, mixed> $params
+   *
    * @access public
    * @static
    * @throws Exception if mandatory parameters not set
    */
-  public static function add(&$params) {
+  public static function add(array &$params): self {
     // class should always be upper case
     if (!empty($params['class'])) {
       $params['class'] = strtoupper($params['class']);
@@ -228,6 +229,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     $dao->save();
 
     CRM_Utils_Hook::post($hook, 'SepaMandateLink', $dao->id, $dao);
+    /** @var \CRM_Sepa_BAO_SepaMandateLink $dao */
     return $dao;
   }
 

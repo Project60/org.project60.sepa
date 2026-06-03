@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -24,7 +26,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
   /**
    * Installation
    */
-  public function install() {
+  public function install(): void {
     $this->executeSqlFile('sql/sepa.sql');
   }
 
@@ -36,7 +38,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * created during the installation (e.g., a setting or a managed entity), do
    * so here to avoid order of operation problems.
    */
-  public function postInstall() {
+  public function postInstall(): void {
     // add default message templates
     CRM_Sepa_Page_SepaMandatePdf::installMessageTemplate();
 
@@ -47,14 +49,14 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
   /**
    * Example: Run a simple query when a module is disabled.
    */
-  public function disable() {
+  public function disable(): void {
     // TODO: anything?
   }
 
   /**
    * Example: Run a simple query when a module is enabled.
    */
-  public function enable() {
+  public function enable(): void {
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/batch_status_option_group.json'));
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
@@ -68,7 +70,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1261() {
+  public function upgrade_1261(): bool {
     $this->ctx->log->info('Adding new file formats');
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(__DIR__ . '/../../resources/formats_option_group.json');
@@ -80,7 +82,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1400() {
+  public function upgrade_1400(): bool {
     // add currency
     $this->ctx->log->info('Added currency field');
     $currency_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'currency';");
@@ -99,7 +101,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1403() {
+  public function upgrade_1403(): bool {
     // add currency
     $this->ctx->log->info('Added SepaMandateLink entity');
     $this->executeSqlFile('sql/update_1403.sql');
@@ -111,7 +113,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1410() {
+  public function upgrade_1410(): bool {
     // add currency
     $this->ctx->log->info('Adding creditor_type field');
     $currency_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'creditor_type';");
@@ -132,7 +134,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1411() {
+  public function upgrade_1411(): bool {
     $this->ctx->log->info('Adding new file formats');
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
@@ -145,7 +147,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1412() {
+  public function upgrade_1412(): bool {
     $this->ctx->log->info('Applying update 1412');
     // set all SEPA recurring contributions in status 'In Progress' to 'Pending'
     $status_pending = (int) CRM_Core_PseudoConstant::getKey(
@@ -188,7 +190,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1414() {
+  public function upgrade_1414(): bool {
     $this->ctx->log->info('Applying update 1414');
     CRM_Core_DAO::executeQuery('UPDATE civicrm_sdd_creditor SET payment_processor_id = NULL;');
     return TRUE;
@@ -200,7 +202,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1415() {
+  public function upgrade_1415(): bool {
     $this->ctx->log->info('Applying update 1415: Fix logging schema');
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
@@ -211,7 +213,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1501() {
+  public function upgrade_1501(): bool {
     // add currency
     $this->ctx->log->info('Adding uses_bic field');
     $uses_bic_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'uses_bic';");
@@ -230,7 +232,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1502() {
+  public function upgrade_1502(): bool {
     $this->ctx->log->info('Adding IBAN Blocklist');
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/iban_blacklist_option_group.json'));
@@ -241,7 +243,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1503() {
+  public function upgrade_1503(): bool {
     // add currency
     $this->ctx->log->info('Adding creditor.label field');
     $uses_bic_column = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'label';");
@@ -262,7 +264,8 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1504() {
+  public function upgrade_1504(): bool {
+    // @phpstan-ignore constant.notFound
     $dsn = DB::parseDSN(CIVICRM_DSN);
     $this->ctx->log->info('Adding civicrm_sdd_contribution_txgroup.FK_civicrm_sdd_contribution_id constraint');
     $constraint_exists = (int) CRM_Core_DAO::singleValueQuery(
@@ -287,8 +290,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1506() {
-    $dsn = DB::parseDSN(CIVICRM_DSN);
+  public function upgrade_1506(): bool {
     $this->ctx->log->info("Adding new 'pain.008.001.02 without BIC.");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
@@ -305,7 +307,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1507() {
+  public function upgrade_1507(): bool {
     $this->ctx->log->info('Dealing with migrated payment processor code...');
 
     // get the IDs of the SDD processor types
@@ -360,7 +362,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1508() {
+  public function upgrade_1508(): bool {
     $this->ctx->log->info('Make sure the new action-provider actions are available.');
     // run twice, classloader/psr-4 prefixes/angular is a tricky combination
     $this->rebuildMenuAndCaches();
@@ -374,7 +376,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1601() {
+  public function upgrade_1601(): bool {
     // add currency
     $this->ctx->log->info('Added payment instrument fields');
     $pi_ooff = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_sdd_creditor` LIKE 'pi_ooff';");
@@ -424,7 +426,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1602() {
+  public function upgrade_1602(): bool {
     // add currency
     $this->ctx->log->info('Adjusting RCUR mandates payment instruments.');
     try {
@@ -480,7 +482,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1604() {
+  public function upgrade_1604(): bool {
     // add currency
     $this->ctx->log->info('Adding new PAIN file format.');
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
@@ -494,7 +496,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1701() {
+  public function upgrade_1701(): bool {
     $this->ctx->log->info('Adding mandate.account_holder field');
     $has_account_holder_column = CRM_Core_DAO::singleValueQuery(
       "SHOW COLUMNS FROM `civicrm_sdd_mandate` LIKE 'account_holder';"
@@ -515,8 +517,7 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1801() {
-    $dsn = DB::parseDSN(CIVICRM_DSN);
+  public function upgrade_1801(): bool {
     $this->ctx->log->info("Adding new 'SDD - CBIBdySDDReq.00.01.00");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
@@ -539,14 +540,14 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-  public function upgrade_1804() {
+  public function upgrade_1804(): bool {
     $this->ctx->log->info("Adding new 'SDD - EBICS 3.6 pain formats");
     $customData = new CRM_Sepa_CustomData('org.project60.sepa');
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
     return TRUE;
   }
 
-  public function upgrade_11301() {
+  public function upgrade_11301(): bool {
     $this->ctx->log->info('Adding financial_type_id column to civicrm_sdd_txgroup table.');
     $column = CRM_Core_DAO::singleValueQuery(
       <<<SQL
@@ -583,9 +584,9 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Helper for replacing deprecated core method
-   * @return void
    */
-  private function rebuildMenuAndCaches() {
+  private function rebuildMenuAndCaches(): void {
+    // @phpstan-ignore argument.type
     Civi::rebuild([
       'ext' => TRUE,
       'files' => TRUE,

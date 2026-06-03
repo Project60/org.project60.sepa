@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright (C) 2023  Jaap Jansma (jaap.jansma@civicoop.org)
  *
@@ -15,7 +18,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 namespace Civi\Sepa\DataProcessor\Join;
 
 use Civi\DataProcessor\DataFlow\AbstractDataFlow;
@@ -233,7 +235,7 @@ abstract class AbstractMandateJoin extends SimpleJoin {
    * @return bool
    */
   public function worksWithDataFlow(AbstractDataFlow $dataFlow): bool {
-    if (!$dataFlow instanceof SqlDataFlow) {
+    if (!$dataFlow instanceof SqlTableDataFlow) {
       return FALSE;
     }
     $this->initialize();

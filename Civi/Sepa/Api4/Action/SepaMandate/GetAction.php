@@ -24,7 +24,7 @@ use Civi\Api4\Generic\Result;
 
 class GetAction extends DAOGetAction {
 
-  public function _run(Result $result) {
+  public function _run(Result $result): void {
     // Add unique joins for permission checks of Financial ACLs.
     if ($this->getCheckPermissions()) {
       $contributionAlias = uniqid('contribution_');
@@ -33,12 +33,14 @@ class GetAction extends DAOGetAction {
         ->addJoin(
           'Contribution AS ' . $contributionAlias,
           'LEFT',
+          NULL,
           ['entity_table', '=', '"civicrm_contribution"'],
           ['entity_id', '=', $contributionAlias . '.id']
         )
         ->addJoin(
           'ContributionRecur AS ' . $contributionRecurAlias,
           'LEFT',
+          NULL,
           ['entity_table', '=', '"civicrm_contribution_recur"'],
           ['entity_id', '=', $contributionRecurAlias . '.id']
         )
@@ -48,7 +50,7 @@ class GetAction extends DAOGetAction {
           ['AND', [['type', '=', 'RCUR'], [$contributionRecurAlias . '.id', 'IS NOT NULL']]]
         );
     }
-    return parent::_run($result);
+    parent::_run($result);
   }
 
 }

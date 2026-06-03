@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -29,10 +31,10 @@ class CRM_Sepa_Logic_ContributionProtector implements API_Wrapper {
     if ($apiRequest['action'] == 'delete') {
       $error = FALSE;
       if ($apiRequest['entity'] == 'Contribution') {
-        $error = self::isProtected($apiRequest['params']['id'], 'civicrm_contribution');
+        $error = self::isProtected((int) $apiRequest['params']['id'], 'civicrm_contribution');
       }
       elseif ($apiRequest['entity'] == 'ContributionRecur') {
-        $error = self::isProtected($apiRequest['params']['id'], 'civicrm_contribution_recur');
+        $error = self::isProtected((int) $apiRequest['params']['id'], 'civicrm_contribution_recur');
       }
 
       if ($error) {
@@ -53,12 +55,11 @@ class CRM_Sepa_Logic_ContributionProtector implements API_Wrapper {
 
   /**
    * Check if the given entity is protected by CiviSEPA,
-   *  which usually means that it's connected to a SepaMandate
+   * which usually means that it's connected to a SepaMandate
    *
-   * @return string Error message if it is protected, FALSE otherwise
+   * @return string|false Error message if it is protected, FALSE otherwise
    */
-  public static function isProtected($entity_id, $entity_table) {
-    $entity_id = (int) $entity_id;
+  public static function isProtected(int $entity_id, string $entity_table): string|false {
     if ($entity_id) {
       if ($entity_table == 'civicrm_contribution' || $entity_table == 'civicrm_contribution_recur') {
         $protected = CRM_Core_DAO::singleValueQuery(

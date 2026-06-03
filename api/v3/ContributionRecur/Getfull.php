@@ -13,18 +13,29 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * Extend ContributionRecur API
  *
  * @package CiviCRM_SEPA
  *
  */
-function civicrm_api3_contribution_recur_getfull($params) {
+
+/**
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed>
+ *
+ * @throws \CRM_Core_Exception
+ */
+function civicrm_api3_contribution_recur_getfull(array $params): array {
   $sql = 'select recur.id,recur.contact_id, date(start_date) as start_date, create_date, amount,
       count(recur.id) as nb_contribution, SUM(contrib.total_amount) as total
     from civicrm_contribution_recur as recur, civicrm_contribution contrib
     where contribution_recur_id = recur.id AND recur.contribution_status_id = 1
     group by recur.id order by nb_contribution, start_date';
+  /** @var \CRM_Core_DAO $dao */
   $dao = CRM_Core_DAO::executeQuery($sql);
   $values = [];
   while ($dao->fetch()) {

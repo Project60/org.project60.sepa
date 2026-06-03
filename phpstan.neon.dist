@@ -6,6 +6,7 @@ parameters:
 		- api
 		- Civi
 		- CRM
+		- templates/Sepa/Formats
 		- tests
 		- sepa.php
 		- org.project60.sepacustom/sepacustom.php
@@ -13,14 +14,20 @@ parameters:
 		analyse:
 			- CRM/Sepa/DAO/*
 			- tests/phpunit/bootstrap.php
+			- tests/*
+	stubFiles:
+		- stubs/TokenRow.stub
+		- stubs/TokenValueEvent.stub
 	scanFiles:
 		- sepa.civix.php
+		- org.project60.sepacustom/sepacustom.civix.php
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/src/Framework/TestCase.php
 	scanDirectories:
+		- packages
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/src/Framework
 		- mixin
-		- ../dataprocessor/
 		- ../action-provider
+		- ../dataprocessor
 	bootstrapFiles:
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/vendor/autoload.php
 		- phpstanBootstrap.php
@@ -29,7 +36,10 @@ parameters:
 		- Civi\Core\Event\GenericHookEvent
 		- CRM_Core_Config
 		- CRM_Core_DAO
+		- civicrm_api3
 	earlyTerminatingMethodCalls:
+		CRM_Core_Error:
+			- statusBounce
 		CRM_Utils_System:
 			- civiExit
 			- redirect
@@ -50,10 +60,4 @@ parameters:
 		# Note paths are prefixed with "*/" to work with inspections in PHPStorm because of:
 		# https://youtrack.jetbrains.com/issue/WI-63891/PHPStan-ignoreErrors-configuration-isnt-working-with-inspections
 
-		# False positive caused by incorrect/ambiguous Core PHPDoc in TokenValueEvent::getRows().
-		# Upstream fix proposed in Core PR https://github.com/civicrm/civicrm-core/pull/35441.
-		# Remove this ignore once the Core fix is released in the minimum supported CiviCRM version.
-		-
-			message: '#Access to property \$context on an unknown class Civi\\Token\\Event\\TokenRow#'
-			path: sepa.php
 	tmpDir: .phpstan

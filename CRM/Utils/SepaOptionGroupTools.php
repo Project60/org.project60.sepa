@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -39,7 +41,7 @@ class CRM_Utils_SepaOptionGroupTools {
    * @deprecated
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.TooHigh
-  public static function checkRecurringFrequencyUnits($reset = FALSE, $warning = TRUE) {
+  public static function checkRecurringFrequencyUnits(bool $reset = FALSE, bool $warning = TRUE): void {
     // compare option group values
     $checkUnits = ['month', 'year'];
 
@@ -127,11 +129,11 @@ class CRM_Utils_SepaOptionGroupTools {
    * Offers a textual representation for the donation interval
    *
    * @param int $interval payment interval, like 1 or 6
-   * @param 'month'|'year' $unit unit of time: 'month' or 'year'
+   * @param 'month'|'year'|string $unit unit of time: 'month' or 'year'
    * @param bool $ts set to true, if you want a localised version
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function getFrequencyText($interval, $unit, $ts = FALSE) {
+  public static function getFrequencyText(int $interval, string $unit, bool $ts = FALSE): string {
     if ($unit == 'month') {
       if ($interval == 1) {
         return $ts ? E::ts('monthly') : 'monthly';
@@ -147,7 +149,7 @@ class CRM_Utils_SepaOptionGroupTools {
       }
       else {
         if ($ts) {
-          return sprintf(E::ts('every %1 months', [1 => $interval]));
+          return E::ts('every %1 months', [1 => $interval]);
         }
         else {
           return sprintf('every %s months', $interval);
@@ -160,10 +162,10 @@ class CRM_Utils_SepaOptionGroupTools {
       }
       else {
         if ($ts) {
-          return sprintf(E::ts('every %1 years'), $interval);
+          return E::ts('every %1 years', [1 => $interval]);
         }
         else {
-          return sprintf('every %1 years', $interval);
+          return sprintf('every %d years', $interval);
         }
       }
     }
@@ -178,10 +180,10 @@ class CRM_Utils_SepaOptionGroupTools {
    * @param boolean $recurring
    *      is this for recurring? if not, it's for one-off
    *
-   * @return array
+   * @return array<int|string, string>
    *   list of eligible options
    */
-  public static function getPaymentInstrumentOptions($recurring = FALSE) {
+  public static function getPaymentInstrumentOptions(bool $recurring = FALSE): array {
     // gather some basic data
     $sepa_pis = CRM_Sepa_Logic_PaymentInstruments::getSddPaymentInstruments();
     static $all_pis = NULL;

@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * Mark a sepa group as 'received' via a runner
  * @see https://github.com/Project60/org.project60.sepa/issues/655
@@ -31,7 +33,7 @@ class CRM_Sepa_Page_MarkGroupReceived extends CRM_Core_Page {
     CRM_Utils_System::setTitle(E::ts('Mark SEPA group received'));
 
     // get the group ID
-    $group_id = (int) $_REQUEST['group_id'] ?? 0;
+    $group_id = (int) ($_REQUEST['group_id'] ?? 0);
     if (!$group_id) {
       throw new CRM_Core_Exception(E::ts('No group_id given!'));
     }

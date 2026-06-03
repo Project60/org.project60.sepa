@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -137,7 +139,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
     $values = $this->exportValues();
 
     // format some values
-    $values['collection_date'] = CRM_Utils_Date::processDate($values['collection_date'], NULL, NULL, 'YmdHis');
+    $values['collection_date'] = CRM_Utils_Date::processDate($values['collection_date'], NULL, FALSE, 'YmdHis');
 
     // process from-to dates
     if ($values['date_range'] != 'custom') {
@@ -149,8 +151,6 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
 
     // go to dashboard
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
-
-    parent::postProcess();
   }
 
   /**

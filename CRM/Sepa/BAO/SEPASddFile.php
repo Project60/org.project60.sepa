@@ -13,6 +13,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
 
 /**
  * File for the CiviCRM sepa_sdd_file business logic
@@ -30,7 +31,7 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
   /**
    * @param array $params
    *
-   * @return object       CRM_Core_BAO_SEPASddFile object on success, null otherwise
+   * @return \CRM_Sepa_DAO_SEPASddFile
    * @access public
    * @static
    */
@@ -42,19 +43,20 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     $dao->copyValues($params);
     $dao->save();
 
-    CRM_Utils_Hook::post($hook, 'SepaSddFile', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'SepaSddFile', (int) $dao->id, $dao);
+    /** @var \CRM_Sepa_DAO_SEPASddFile $dao */
     return $dao;
   }
 
   /**
-   * generate XML file
-   * Currenlty only one group per file is supported by this code
-   *  but potentially multiple groups could be in one file
+   * Generate XML file.
+   * Currently only one group per file is supported by this code,
+   * but potentially multiple groups could be in one file
    */
-  public function generatexml($id) {
+  public function generatexml(int $id): string {
     $xml = '';
     $template = CRM_Core_Smarty::singleton();
-    $this->get((int) $id);
+    $this->get((string) $id);
     $template->assign('file', $this->toArray());
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->sdd_file_id = $this->id;

@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use Civi\Sepa\Util\ContributionUtil;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -26,13 +28,13 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    * @var 'create'|'clone'|'replace'
    */
   protected string $create_mode = 'create';
-  protected $contact_id  = NULL;
-  protected $replace_id  = NULL;
-  protected $clone_id    = NULL;
-  protected $rpl_date    = NULL;
-  protected $rpl_reason  = NULL;
-  protected $old_mandate = NULL;
-  protected $old_contrib = NULL;
+  protected int|null $contact_id  = NULL;
+  protected int|null $replace_id  = NULL;
+  protected int|null $clone_id    = NULL;
+  protected string|null $rpl_date    = NULL;
+  protected string|null $rpl_reason  = NULL;
+  protected array|null $old_mandate = NULL;
+  protected array|null $old_contrib = NULL;
 
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function buildQuickForm() {
@@ -100,7 +102,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           1 => $this->contact_id,
           2 => $contact_name,
         ]));
-        $this->assign('replace_mandate_reference', $this->old_mandate['reference']);
+        $this->assign('replace_mandate_reference', $this->old_mandate['reference'] ?? '');
         break;
 
       default:
@@ -117,7 +119,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $this->assign('create_mode', $this->create_mode);
 
     // add contact_id field
-    $this->add('hidden', 'cid', $this->contact_id);
+    $this->add('hidden', 'cid', (string) $this->contact_id);
 
     // add creditor field
     $js_vars['creditor_data'] = $this->getCreditors();
@@ -232,33 +234,35 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     // add 'replaces' fields
     // store ID of mandate to be replaced
-    $this->add('hidden', 'replace', $this->replace_id);
+    $this->add('hidden', 'replace', (string) $this->replace_id);
 
     // add the replace date
     $this->add('datepicker',
-        'rpl_end_date',
-        E::ts('Replacement Date'),
-        ['formatType' => 'activityDate'],
-        $this->replace_id,
-        ['time' => FALSE]
+      'rpl_end_date',
+      E::ts('Replacement Date'),
+      ['formatType' => 'activityDate'],
+      (bool) $this->replace_id,
+      ['time' => FALSE]
     );
 
     // add the replacement/cancel reason
     $this->add(
-        'text',
-        'rpl_cancel_reason',
-        E::ts('Replacement Reason'),
-        ['placeholder' => E::ts('required'), 'class' => 'huge'],
-        $this->replace_id);
+      'text',
+      'rpl_cancel_reason',
+      E::ts('Replacement Reason'),
+      ['placeholder' => E::ts('required'), 'class' => 'huge'],
+      (bool) $this->replace_id
+    );
 
     // add OOFF fields
     // add collection date
-    $this->add('datepicker',
-        'ooff_date',
-        E::ts('Collection Date'),
-        ['formatType' => 'activityDate'],
-        FALSE,
-        ['time' => FALSE]
+    $this->add(
+      'datepicker',
+      'ooff_date',
+      E::ts('Collection Date'),
+      ['formatType' => 'activityDate'],
+      FALSE,
+      ['time' => FALSE]
     );
 
     // add RCUR fields
@@ -338,7 +342,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    if ($this->old_mandate) {
+    if ($this->old_mandate && NULL !== $this->old_contrib) {
       // set all parameters to the mandate-to-be-replaced
       $defaults['creditor_id']       = $this->old_mandate['creditor_id'];
       $defaults['financial_type_id'] = $this->old_contrib['financial_type_id'];
@@ -384,6 +388,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     }
     else {
       // set default creditor
+      // @phpstan-ignore cast.int
       $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
       if ($default_creditor_id) {
         $defaults['creditor_id'] = $default_creditor_id;
@@ -527,14 +532,16 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           ->single();
 
         CRM_Sepa_BAO_SEPAMandate::terminateMandate(
-            $values['replace'],
-            CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'),
-            $values['rpl_cancel_reason']);
+          (int) $values['replace'],
+          CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'),
+          $values['rpl_cancel_reason']
+        );
 
         CRM_Sepa_BAO_SepaMandateLink::addReplaceMandateLink(
-            $values['replace'],
-            $mandate['id'],
-            CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'));
+          (int) $values['replace'],
+          (int) $mandate['id'],
+          CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d')
+        );
       }
 
     }
@@ -579,6 +586,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    *  - the currency
    */
   protected function getCreditors() {
+    // @phpstan-ignore cast.int
     $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
     $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
 
@@ -592,18 +600,31 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       }
 
       // add cycle days
-      $creditor['cycle_days'] = CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor['id']);
+      $creditor['cycle_days'] = CRM_Sepa_Logic_Settings::getListSetting(
+        'cycledays',
+        range(1, 28),
+        (int) $creditor['id']
+      );
+      // @phpstan-ignore cast.int
       $creditor['buffer_days'] = (int) CRM_Sepa_Logic_Settings::getSetting('pp_buffer_days');
-      $creditor['ooff_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.notice', $creditor['id']);
-      $creditor['frst_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $creditor['id']);
+      // @phpstan-ignore cast.int
+      $creditor['ooff_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting(
+        'batching.OOFF.notice',
+        (int) $creditor['id']
+      );
+      // @phpstan-ignore cast.int
+      $creditor['frst_notice'] = (int) CRM_Sepa_Logic_Settings::getSetting(
+        'batching.FRST.notice',
+        (int) $creditor['id']
+      );
 
       // add FRST/OOFF payment instruments
       $creditor['pi_ooff_options'] = $creditor['pi_rcur_options'] = [];
-      $rcur_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor['id'], 'RCUR');
+      $rcur_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor((int) $creditor['id'], 'RCUR');
       foreach ($rcur_pis as $pi) {
         $creditor['pi_rcur_options'][$pi['id']] = $pi['label'];
       }
-      $ooff_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($creditor['id'], 'OOFF');
+      $ooff_pis = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor((int) $creditor['id'], 'OOFF');
       foreach ($ooff_pis as $pi) {
         $creditor['pi_ooff_options'][$pi['id']] = $pi['label'];
       }
@@ -617,7 +638,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    * @param $creditors
    * @return array of eligible creditors
    */
-  protected function getCreditorList($creditors) {
+  protected function getCreditorList(array $creditors): array {
     $creditor_list = [];
     foreach ($creditors as $creditor) {
       $creditor_list[$creditor['id']] = "[{$creditor['id']}] {$creditor['label']}";

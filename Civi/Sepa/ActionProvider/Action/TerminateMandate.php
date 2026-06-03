@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit                         |
 | Copyright (C) 2019 SYSTOPIA                            |
@@ -13,7 +16,6 @@
 | copyright header is strictly prohibited without        |
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
-
 namespace Civi\Sepa\ActionProvider\Action;
 
 use Civi\ActionProvider\Action\AbstractAction;
@@ -103,8 +105,9 @@ class TerminateMandate extends AbstractAction {
             2 => [(int) $mandateId, 'Integer'],
             3 => ['RCUR', 'String'],
           ];
+
+          \CRM_Core_DAO::executeQuery($update, $updateParams);
         }
-        \CRM_Core_DAO::executeQuery($update, $updateParams);
       }
       catch (\CRM_Core_Exception $ex) {
         // @ignoreException

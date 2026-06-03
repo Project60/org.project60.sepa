@@ -20,6 +20,9 @@ declare(strict_types = 1);
 // phpcs:disable Drupal.Commenting.DocComment.ContentAfterOpen
 /** @var \PHPStan\DependencyInjection\Container $container */
 /** @phpstan-var array<string> $bootstrapFiles */
+
+use Composer\Autoload\ClassLoader;
+
 $bootstrapFiles = $container->getParameter('bootstrapFiles');
 foreach ($bootstrapFiles as $bootstrapFile) {
   if (str_ends_with($bootstrapFile, 'vendor/autoload.php')) {
@@ -37,15 +40,15 @@ foreach ($bootstrapFiles as $bootstrapFile) {
       continue;
     }
     if (file_exists($civiCrmCoreDir)) {
-      set_include_path(get_include_path()
+      set_include_path(
+        get_include_path()
         . PATH_SEPARATOR . $civiCrmCoreDir
         . PATH_SEPARATOR . $civiCrmPackagesDir
       );
-      // $bootstrapFile might not be included, yet. It is required for the
-      // following require_once, though.
-      require_once $bootstrapFile;
-      // Prevent error "Class 'CRM_Core_Exception' not found in file".
-      require_once $civiCrmCoreDir . '/CRM/Core/Exception.php';
+
+      $loader = new ClassLoader();
+      $loader->add('CRM_', [$civiCrmCoreDir]);
+      $loader->add('HTML_', [$civiCrmPackagesDir]);
 
       // The class \Smarty extended by \CRM_Core_SmartyCompatibility uses the
       // __call() method to delegate method calls to \Smarty\Smarty, but hasn't
@@ -56,6 +59,20 @@ foreach ($bootstrapFiles as $bootstrapFile) {
         require_once $smartyAutoloadFile;
         class_alias(\Smarty\Smarty::class, 'Smarty');
       }
+
+      $coreExtDirs = glob("$civiCrmCoreDir/ext/*");
+      if (FALSE !== $coreExtDirs) {
+        foreach ($coreExtDirs as $extensionDir) {
+          if (is_dir("$extensionDir/CRM")) {
+            $loader->add('CRM_', [$extensionDir]);
+          }
+          if (is_dir("$extensionDir/Civi")) {
+            $loader->addPsr4('Civi\\', [$extensionDir . '/Civi']);
+          }
+        }
+      }
+
+      $loader->register();
 
       break;
     }

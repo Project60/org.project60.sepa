@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -38,6 +40,18 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
     // remove contribution amount (will be added as separate column)
     unset($this->_columns['civicrm_sdd_mandate']['fields']['amount']);
     unset($this->_columns['civicrm_sdd_mandate']['filters']['amount']);
+
+    /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+    $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+    $financialTypes = array_column($financialTypeOptions, 'label', 'id');
+
+    /** @var list<array{id: int, label: string, name: string}> $contributionPageOptions */
+    $contributionPageOptions = Civi::entity('Contribution')->getOptions('contribution_page_id');
+    $contributionPages = array_column($contributionPageOptions, 'label', 'id');
+
+    /** @var list<array{id: int, label: string, name: string}> $contributionStatusOptions */
+    $contributionStatusOptions = Civi::entity('Contribution')->getOptions('contribution_status_id');
+    $contributionStatuses = array_column($contributionStatusOptions, 'label', 'id');
 
     $this->_columns['civicrm_contribution'] = [
       'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -102,7 +116,7 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
         'financial_type_id' => [
           'title' => E::ts('Financial Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => CRM_Contribute_PseudoConstant::financialType(),
+          'options' => $financialTypes,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'campaign_id' => [
@@ -114,13 +128,13 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
         'contribution_page_id' => [
           'title' => E::ts('Contribution Page'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => CRM_Contribute_PseudoConstant::contributionPage(),
+          'options' => $contributionPages,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'contribution_status_id' => [
           'title' => E::ts('Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+          'options' => $contributionStatuses,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'cancel_reason' => [
@@ -144,7 +158,6 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
    * override FROM clause
    */
   public function from() {
-    $this->_from = NULL;
     $this->_from = "
       FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
       INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -170,17 +183,26 @@ class CRM_Sepa_Form_Report_SepaMandateOOFF extends CRM_Sepa_Form_Report_SepaMand
     parent::alterDisplay($rows);
 
     // now, prep contribution specific data
-    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-    $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
+    /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+    $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+    $financialTypes = array_column($financialTypeOptions, 'label', 'id');
+
+    /** @var list<array{id: int, label: string, name: string}> $contributionPageOptions */
+    $contributionPageOptions = Civi::entity('Contribution')->getOptions('contribution_page_id');
+    $contributionPages = array_column($contributionPageOptions, 'label', 'id');
+
+    /** @var list<array{id: int, label: string, name: string}> $contributionStatusOptions */
+    $contributionStatusOptions = Civi::entity('Contribution')->getOptions('contribution_status_id');
+    $contributionStatuses = array_column($contributionStatusOptions, 'label', 'id');
+
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
 
     foreach ($rows as $rowNum => $row) {
       if ($value = $row['civicrm_contribution_financial_type_id'] ?? NULL) {
-        $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
+        $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $financialTypes[$value];
       }
       if ($value = $row['civicrm_contribution_contribution_status_id'] ?? NULL) {
-        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
+        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatuses[$value];
       }
       if ($value = $row['civicrm_contribution_contribution_page_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];

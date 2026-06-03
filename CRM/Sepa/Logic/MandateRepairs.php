@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -22,20 +24,20 @@ use CRM_Sepa_ExtensionUtil as E;
 class CRM_Sepa_Logic_MandateRepairs {
 
   /**
-   * @var string log file path, will be filled on demand */
-  protected $log_file = NULL;
+   * @var string|null log file path, will be filled on demand */
+  protected ?string $log_file = NULL;
 
   /**
    * @var bool should session status information be generated for the user to see? */
-  protected $generate_ui_notifications = FALSE;
+  protected bool $generate_ui_notifications = FALSE;
 
   /**
    * @var array collected user notifications to be shown in the end */
-  protected $ui_notifications = [];
+  protected array $ui_notifications = [];
 
   /**
    * @var string SQL expression to select the mandates to be examined */
-  protected $mandate_selector = NULL;
+  protected string $mandate_selector;
 
   /**
    * Create a new instance of this runner.
@@ -43,7 +45,7 @@ class CRM_Sepa_Logic_MandateRepairs {
    * @param string $mandate_selector
    *   SQL expression to select the mandates
    */
-  public function __construct($mandate_selector) {
+  public function __construct(string $mandate_selector) {
     $this->mandate_selector = $mandate_selector;
   }
 
@@ -51,7 +53,7 @@ class CRM_Sepa_Logic_MandateRepairs {
    * Add a UI notification line to be shown to the user in the end
    * @param string $message
    */
-  public function addUINotification($message) {
+  public function addUINotification(string $message): void {
     if ($this->generate_ui_notifications) {
       $this->ui_notifications[] = $message;
     }
@@ -60,10 +62,10 @@ class CRM_Sepa_Logic_MandateRepairs {
   /**
    * Log a single message to the log file
    *
-   * @param string|array $messages
+   * @param string|list<string> $messages
    *
    */
-  public function log($messages) {
+  public function log(string|array $messages): void {
     // make sure the log file name is there
     if (!$this->log_file) {
       $log_folder = Civi::paths()->getPath('[civicrm.log]/');
@@ -77,6 +79,10 @@ class CRM_Sepa_Logic_MandateRepairs {
 
     // using fopen here allows us to avoid issues with parallel logging.
     $log_stream = fopen($this->log_file, 'aw');
+    if (FALSE === $log_stream) {
+      throw new \RuntimeException("Failed to open $this->log_file");
+    }
+
     $prefix = date('[Y-m-d H:i:s] ');
     foreach ($messages as $message) {
       fwrite($log_stream, $prefix);
@@ -89,7 +95,7 @@ class CRM_Sepa_Logic_MandateRepairs {
   /**
    * Run all safe repairs
    */
-  public function runAllRepairs() {
+  public function runAllRepairs(): void {
     $this->detectOrphanedInProgressContributions();
     $this->repairOpenGroupContributionStatus();
     $this->repairFrstPaymentInstruments();
@@ -110,10 +116,8 @@ class CRM_Sepa_Logic_MandateRepairs {
    * @see https://github.com/Project60/org.project60.sepa/issues/629
    *
    * @todo currently don't do that - they don't cause any harm (afaik), and they might simply get re-assigned to a group
-   *
-   * @return void
    */
-  protected function detectOrphanedPendingContributions() {
+  protected function detectOrphanedPendingContributions(): void {
     // run this one only once per process, since it doesn't refer to any mandates
     static $already_run = FALSE;
     if (!$already_run) {
@@ -142,10 +146,8 @@ class CRM_Sepa_Logic_MandateRepairs {
    * They may cause serious ramifications with the collection system
    *
    * @see https://github.com/Project60/org.project60.sepa/issues/629
-   *
-   * @return void
    */
-  protected function detectOrphanedInProgressContributions() {
+  protected function detectOrphanedInProgressContributions(): void {
     // run this one only once per process, since it doesn't refer to any mandates
     static $already_run = FALSE;
     if (!$already_run) {
@@ -172,10 +174,8 @@ class CRM_Sepa_Logic_MandateRepairs {
    *  the generated contributions are as well. This repair task tries to fix that
    *
    * @see https://github.com/Project60/org.project60.sepa/issues/629
-   *
-   * @return void
    */
-  protected function repairOpenGroupContributionStatus() {
+  protected function repairOpenGroupContributionStatus(): void {
     // get the status IDs
     $contribution_status_pending = (int) CRM_Core_PseudoConstant::getKey(
       'CRM_Contribute_BAO_Contribution',
@@ -187,6 +187,7 @@ class CRM_Sepa_Logic_MandateRepairs {
 
     // run the search for contributions in the wrong status
     CRM_Core_DAO::disableFullGroupByMode();
+    /** @var \CRM_Core_DAO $case */
     $case = CRM_Core_DAO::executeQuery('
         SELECT
                open_contribution.id                     AS contribution_id,
@@ -244,11 +245,11 @@ class CRM_Sepa_Logic_MandateRepairs {
    *
    * @return void
    */
-  protected function repairFrstPaymentInstruments() {
+  protected function repairFrstPaymentInstruments(): void {
     $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
     $pi_adjustment_counter = 0;
     foreach ($creditors as $creditor) {
-      $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor['id']);
+      $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping((int) $creditor['id']);
       if (count($mapping) > 1) {
         $this->log("repairFrstPaymentInstruments doesn't work with multiple mappings (creditor [{$creditor['id']}]");
       }
@@ -256,6 +257,7 @@ class CRM_Sepa_Logic_MandateRepairs {
         foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
           // fix the recurring contributions
           CRM_Core_DAO::disableFullGroupByMode();
+          /** @var \CRM_Core_DAO $case */
           $case = CRM_Core_DAO::executeQuery(
             "
             SELECT rcur.id AS rcur_id,
@@ -302,14 +304,12 @@ class CRM_Sepa_Logic_MandateRepairs {
    *   - the follow-up contributions should have PI RCUR
    *
    * @see https://github.com/Project60/org.project60.sepa/issues/629
-   *
-   * @return void
    */
-  protected function repairInstallmentPaymentInstruments() {
+  protected function repairInstallmentPaymentInstruments(): void {
     $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
     $pi_adjustment_counter = 0;
     foreach ($creditors as $creditor) {
-      $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor['id']);
+      $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping((int) $creditor['id']);
       if (count($mapping) > 1) {
         $this->log(
           "repairInstallmentPaymentInstruments doesn't work with multiple mappings (creditor [{$creditor['id']}]"
@@ -319,6 +319,7 @@ class CRM_Sepa_Logic_MandateRepairs {
         foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
           // fix the recurring contributions
           CRM_Core_DAO::disableFullGroupByMode();
+          /** @var \CRM_Core_DAO $case */
           $case = CRM_Core_DAO::executeQuery(
             "
             SELECT contribution.id                    AS contribution_id,
@@ -384,10 +385,8 @@ class CRM_Sepa_Logic_MandateRepairs {
 
   /**
    * Generate a user session status note with all the collected user notifications
-   *
-   * @return void
    */
-  public function showSessionStatusNotification() {
+  public function showSessionStatusNotification(): void {
     if ($this->ui_notifications) {
       // render message
       $message = E::ts('The following irregularities have been detected and fixed in your database:');
@@ -411,18 +410,18 @@ class CRM_Sepa_Logic_MandateRepairs {
    * Identify all 'orphaned' contributions by contribution status,
    *  i.e. SEPA contributions that are not part of a sepa transaction group
    *
-   * @param integer $contribution_status_id
+   * @param int $contribution_status_id
    *   contribution status ID
    *
-   * @return array
+   * @return list<int>
    *   list of contribution IDs
    */
-  protected function getOrphanedContributions($contribution_status_id) {
+  protected function getOrphanedContributions(int $contribution_status_id): array {
     // get recurring payment instruments
     $rcur_pis = [];
     $creditors = CRM_Sepa_Logic_PaymentInstruments::getAllSddCreditors();
     foreach ($creditors as $creditor) {
-      $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($creditor['id']);
+      $mapping = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping((int) $creditor['id']);
       foreach ($mapping as $frst_pi_id => $rcur_pi_id) {
         $rcur_pis[] = $frst_pi_id;
         $rcur_pis[] = $rcur_pi_id;
@@ -431,6 +430,7 @@ class CRM_Sepa_Logic_MandateRepairs {
 
     // run the query
     CRM_Core_DAO::disableFullGroupByMode();
+    /** @var \CRM_Core_DAO $case */
     $case = CRM_Core_DAO::executeQuery('
         SELECT contribution.id AS contribution_id
         FROM civicrm_contribution contribution
@@ -458,12 +458,10 @@ class CRM_Sepa_Logic_MandateRepairs {
   /**
    * Run all mandate repairs for the given IDs
    *
-   * @param array $mandate_ids
+   * @param list<int> $mandate_ids
    *    list of the mandate IDs to be used
-   *
-   * @return void
    */
-  public static function runWithMandateIDs($mandate_ids, $ui_notifications = FALSE) {
+  public static function runWithMandateIDs(array $mandate_ids, bool $ui_notifications = FALSE): void {
     if (!empty($mandate_ids)) {
       // generate the selector
       $mandate_id_string = implode(',', array_map('intval', $mandate_ids));
@@ -476,10 +474,8 @@ class CRM_Sepa_Logic_MandateRepairs {
   /**
    * @param string $mandate_selector
    *    selector for the Repair-Logic
-   *
-   * @return void
    */
-  public static function runWithMandateSelector($mandate_selector, $ui_notifications = FALSE) {
+  public static function runWithMandateSelector(string $mandate_selector, bool $ui_notifications = FALSE): void {
     $mandate_repairs = new CRM_Sepa_Logic_MandateRepairs($mandate_selector);
     $mandate_repairs->generate_ui_notifications = $ui_notifications;
     $mandate_repairs->runAllRepairs();

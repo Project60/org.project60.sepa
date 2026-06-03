@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 
 /**
  * File for the CiviCRM APIv3 sepa_sdd_file functions
@@ -28,11 +30,13 @@
  *
  * @example SepaSddFileCreate.php Standard Create Example
  *
- * @return array API result array
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed> API result array
  *   {@getfields sepa_sdd_file_create}
  * @access public
  */
-function civicrm_api3_sepa_sdd_file_create($params) {
+function civicrm_api3_sepa_sdd_file_create(array $params): array {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -40,9 +44,9 @@ function civicrm_api3_sepa_sdd_file_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array<string, array<string, mixed>> $params array or parameters determined by getfields
  */
-function _civicrm_api3_sepa_sdd_file_create_spec(&$params) {
+function _civicrm_api3_sepa_sdd_file_create_spec(array &$params): void {
   $params['reference']['api.required'] = 1;
   $params['filename']['api.required'] = 1;
   $params['created_date']['api.default'] = 'now';
@@ -52,15 +56,15 @@ function _civicrm_api3_sepa_sdd_file_create_spec(&$params) {
 /**
  * Deletes an existing SepaSddFile
  *
- * @param  array $params
+ * @param array<string, mixed> $params
  *
  * @example SepaSddFileDelete.php Standard Delete Example
  *
- * @return boolean | error  true if successfull, error otherwise
+ * @return array<string, mixed>
  *   {@getfields sepa_sdd_file_delete}
  * @access public
  */
-function civicrm_api3_sepa_sdd_file_delete($params) {
+function civicrm_api3_sepa_sdd_file_delete(array $params): array {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -75,17 +79,6 @@ function civicrm_api3_sepa_sdd_file_delete($params) {
  *   {@getfields sepa_sdd_file_get}
  * @access public
  */
-function civicrm_api3_sepa_sdd_file_get($params) {
-
+function civicrm_api3_sepa_sdd_file_get(array $params): array {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
-
-function _civicrm_api3_sepa_sdd_file_generatexml_spec(&$params) {
-  $params['id']['api.required'] = 1;
-}
-
-function civicrm_api3_sepa_sdd_file_generatexml($params) {
-  //fetch the file, then the group
-  $file = new CRM_Sepa_BAO_SEPASddFile();
-  $file->generateXML($params['id']);
 }

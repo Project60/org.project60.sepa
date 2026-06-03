@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -34,17 +36,26 @@ class CRM_Sepa_Logic_Batching {
    * @param int|null $limit
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
-  public static function updateRCUR($creditor_id, $mode, $now = 'now', $offset = NULL, $limit = NULL) {
+  public static function updateRCUR(
+    int $creditor_id,
+    string $mode,
+    string $now = 'now',
+    ?int $offset = NULL,
+    ?int $limit = NULL
+  ): ?string {
     // check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
       return 'Batching in progress. Please try again later.';
     }
 
+    // @phpstan-ignore cast.int
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.RCUR.horizon', $creditor_id);
+    // @phpstan-ignore cast.int
     $grace_period = (int) CRM_Sepa_Logic_Settings::getSetting('batching.RCUR.grace', $creditor_id);
     $latest_date = date('Y-m-d', strtotime("$now +$horizon days"));
 
+    // @phpstan-ignore cast.int
     $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting("batching.$mode.notice", $creditor_id);
     // (virtually) move ahead notice_days, but also go back grace days
     $now = strtotime("$now +$rcur_notice days -$grace_period days");
@@ -57,7 +68,7 @@ class CRM_Sepa_Logic_Batching {
     $payment_instrument_id_list = implode(',', array_keys($payment_instruments));
     if (empty($payment_instrument_id_list)) {
       // disabled
-      return;
+      return NULL;
     }
 
     if ($offset !== NULL && $limit !== NULL) {
@@ -77,6 +88,7 @@ class CRM_Sepa_Logic_Batching {
     // RCUR-STEP 1: find all active/pending RCUR mandates within the horizon that are NOT in a closed batch and that
     // have a corresponding contribution of a financial type the user has access to (implicit condition added by
     // Financial ACLs extension if enabled)
+    /** @var list<array<string, mixed>> $relevant_mandates */
     $relevant_mandates = \Civi\Api4\SepaMandate::get(TRUE)
       ->addSelect(
         'id',
@@ -103,19 +115,21 @@ class CRM_Sepa_Logic_Batching {
       ->addJoin(
         'ContributionRecur AS contribution_recur',
         'INNER',
+        NULL,
         ['entity_table', '=', '"civicrm_contribution_recur"'],
         ['entity_id', '=', 'contribution_recur.id']
       )
       ->addJoin(
         'Contribution AS first_contribution',
         'LEFT',
+        NULL,
         ['first_contribution_id', '=', 'first_contribution.id']
       )
       ->addWhere('type', '=', 'RCUR')
       ->addWhere('status', '=', $mode)
       ->addWhere('creditor_id', '=', $creditor_id)
-      ->setLimit($limit)
-      ->setOffset($offset)
+      ->setLimit($limit ?? 0)
+      ->setOffset($offset ?? 0)
       ->execute()
       ->getArrayCopy();
 
@@ -199,6 +213,7 @@ class CRM_Sepa_Logic_Batching {
           AND DATE(contribution.receive_date) = DATE('{$collection_date}')
           AND (txg.type IS NULL OR txg.type IN ('RCUR', 'FRST'))
           AND contribution.payment_instrument_id IN ({$payment_instrument_id_list});";
+        /** @var \CRM_Core_DAO $results */
         $results = CRM_Core_DAO::executeQuery($sql_query);
         while ($results->fetch()) {
           $existing_contributions_by_recur_id[$results->contribution_recur_id] = $results->contribution_id;
@@ -240,7 +255,7 @@ class CRM_Sepa_Logic_Batching {
               CRM_Utils_SepaCustomisationHooks::installment_created(
                 $mandate['mandate_id'],
                 $recur_id,
-                $contribution['id']
+                (int) $contribution['id']
               );
 
               // 'mandate_entity_id' will now be overwritten with the contribution instance ID
@@ -282,11 +297,12 @@ class CRM_Sepa_Logic_Batching {
       WHERE txgroup.type = '$mode'
         AND txgroup.sdd_creditor_id = $creditor_id
         AND txgroup.status_id = $group_status_id_open;";
+    /** @var \CRM_Core_DAO $results */
     $results = CRM_Core_DAO::executeQuery($sql_query);
     $existing_groups = [];
     while ($results->fetch()) {
       $collection_date = date('Y-m-d', strtotime($results->collection_date));
-      $existing_groups[$collection_date][$results->financial_type_id ?? 0] = $results->txgroup_id;
+      $existing_groups[$collection_date][$results->financial_type_id ?? 0] = (int) $results->txgroup_id;
     }
 
     // step 6: sync calculated group structure with existing (open) groups
@@ -294,12 +310,13 @@ class CRM_Sepa_Logic_Batching {
       $mandates_by_nextdate,
       $existing_groups,
       $mode,
-      'RCUR',
       $rcur_notice,
       $creditor_id,
       NULL !== $offset,
       0 === $offset
     );
+
+    return NULL;
   }
 
   /**
@@ -313,14 +330,21 @@ class CRM_Sepa_Logic_Batching {
    * @param int|null $limit used for segmented updates
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function updateOOFF($creditor_id, $now = 'now', $offset = NULL, $limit = NULL) {
+  public static function updateOOFF(
+    int $creditor_id,
+    string $now = 'now',
+    ?int $offset = NULL,
+    ?int $limit = NULL
+  ): ?string {
     // check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
       return 'Batching in progress. Please try again later.';
     }
 
+    // @phpstan-ignore cast.int
     $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
+    // @phpstan-ignore cast.int
     $ooff_notice = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.notice', $creditor_id);
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $date_limit = date('Y-m-d', strtotime("$now +$horizon days"));
@@ -328,11 +352,13 @@ class CRM_Sepa_Logic_Batching {
     // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch and that have a
     // corresponding contribution of a financial type the user has access to (implicit condition added by Financial ACLs
     // extension if enabled).
+    /** @var list<array<string, mixed>> $relevant_mandates */
     $relevant_mandates = \Civi\Api4\SepaMandate::get(TRUE)
       ->addSelect('id', 'contact_id', 'entity_id', 'contribution.receive_date', 'contribution.financial_type_id')
       ->addJoin(
         'Contribution AS contribution',
         'INNER',
+        NULL,
         ['entity_table', '=', "'civicrm_contribution'"],
         ['entity_id', '=', 'contribution.id']
       )
@@ -356,18 +382,16 @@ class CRM_Sepa_Logic_Batching {
       $mandate['mandate_contact_id'] = $mandate['contact_id'];
       $mandate['mandate_entity_id'] = $mandate['entity_id'];
       $mandate['start_date'] = $mandate['contribution.receive_date'];
-      $mandate['financial_type_id'] = $mandate['contribution.financial_type_id'];
+      /** @var int $financialTypeId */
+      $financialTypeId = $mandate['financial_type_id'] = $mandate['contribution.financial_type_id'];
 
       $collection_date = date('Y-m-d', strtotime($mandate['start_date']));
       if ($collection_date <= $earliest_collection_date) {
         $collection_date = $earliest_collection_date;
       }
 
-      if (!isset($calculated_groups[$collection_date][$mandate['financial_type_id']])) {
-        $calculated_groups[$collection_date][$mandate['financial_type_id']] = [];
-      }
-
-      array_push($calculated_groups[$collection_date][$mandate['financial_type_id']], $mandate);
+      $calculated_groups[$collection_date][$financialTypeId] ??= [];
+      $calculated_groups[$collection_date][$financialTypeId][] = $mandate;
 
       if ($collection_date > $latest_collection_date) {
         $latest_collection_date = $collection_date;
@@ -375,7 +399,7 @@ class CRM_Sepa_Logic_Batching {
     }
     if (!$latest_collection_date) {
       // nothing to do...
-      return [];
+      return NULL;
     }
 
     // step 3: find all existing OPEN groups in the horizon
@@ -388,11 +412,12 @@ class CRM_Sepa_Logic_Batching {
       WHERE txgroup.sdd_creditor_id = $creditor_id
         AND txgroup.type = 'OOFF'
         AND txgroup.status_id = $group_status_id_open;";
+    /** @var \CRM_Core_DAO $results */
     $results = CRM_Core_DAO::executeQuery($sql_query);
     $existing_groups = [];
     while ($results->fetch()) {
       $collection_date = date('Y-m-d', strtotime($results->collection_date));
-      $existing_groups[$collection_date][$results->financial_type_id ?? 0] = $results->txgroup_id;
+      $existing_groups[$collection_date][$results->financial_type_id ?? 0] = (int) $results->txgroup_id;
     }
 
     // step 4: sync calculated group structure with existing (open) groups
@@ -400,18 +425,22 @@ class CRM_Sepa_Logic_Batching {
       $calculated_groups,
       $existing_groups,
       'OOFF',
-      'OOFF',
       $ooff_notice,
       $creditor_id,
       $offset !== NULL,
       $offset === 0
     );
+
+    return NULL;
   }
 
   /**
    * Maintenance: Close all mandates that have expired
+   *
+   * @return string|null
+   *   Error message on error, NULL otherwise.
    */
-  public static function closeEnded() {
+  public static function closeEnded(): ?string {
     // check lock
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
@@ -441,6 +470,7 @@ class CRM_Sepa_Logic_Batching {
       WHERE mandate.type = 'RCUR'
         AND mandate.status IN ('RCUR','FRST')
         AND end_date <= DATE(NOW());";
+    /** @var \CRM_Core_DAO $results */
     $results = CRM_Core_DAO::executeQuery($sql_query);
     $mandates_to_end = [];
     while ($results->fetch()) {
@@ -466,7 +496,7 @@ class CRM_Sepa_Logic_Batching {
       if (isset($change_mandate['is_error']) && $change_mandate['is_error']) {
         return sprintf(
           "Couldn't set mandate '%s' to 'complete. Error was: '%s'",
-          $mandates_to_end['mandate_id'],
+          $mandate_to_end['mandate_id'],
           $change_mandate['error_message']
         );
       }
@@ -480,11 +510,13 @@ class CRM_Sepa_Logic_Batching {
       if (isset($change_rcur['is_error']) && $change_rcur['is_error']) {
         return sprintf(
           "Couldn't set recurring contribution '%s' to 'complete. Error was: '%s'",
-          $mandates_to_end['recur_id'],
+          $mandate_to_end['recur_id'],
           $change_rcur['error_message']
         );
       }
     }
+
+    return NULL;
   }
 
   /**
@@ -518,22 +550,15 @@ class CRM_Sepa_Logic_Batching {
         'sdd_creditor_id'         => $creditor_id,
       ]);
       if (!empty($group['is_error'])) {
-        // TODO: Error handling
-        Civi::log()->debug('org.project60.sepa: batching:syncGroups/createGroup ' . $group['error_message']);
+        throw new \CRM_Core_Exception(sprintf('Could not create transaction group: %s', $group['error_message']));
       }
     }
     else {
-      try {
-        $group = \Civi\Api4\SepaTransactionGroup::get(TRUE)
-          ->addWhere('id', '=', $existing_groups[$collection_date][$financial_type_id ?? 0])
-          ->addWhere('status_id', '=', $group_status_id_open)
-          ->execute()
-          ->single();
-      }
-      catch (\CRM_Core_Exception $exception) {
-        // TODO: Error handling
-        Civi::log()->debug('org.project60.sepa: batching:syncGroups/getGroup ' . $exception->getMessage());
-      }
+      $group = \Civi\Api4\SepaTransactionGroup::get(TRUE)
+        ->addWhere('id', '=', $existing_groups[$collection_date][$financial_type_id ?? 0])
+        ->addWhere('status_id', '=', $group_status_id_open)
+        ->execute()
+        ->single();
       unset($existing_groups[$collection_date][$financial_type_id ?? 0]);
     }
 
@@ -542,26 +567,27 @@ class CRM_Sepa_Logic_Batching {
 
   /**
    * subroutine to create the group/contribution structure as calculated
-   * @param $calculated_groups  array [collection_date] -> array(contributions) as calculated
-   * @param $existing_groups    array [collection_date] -> array(contributions) as currently present
-   * @param $mode               SEPA mode (OOFF, RCUR, FRST)
-   * @param $type               SEPA type (RCUR, FRST)
-   * @param $notice             notice days
-   * @param $creditor_id        SDD creditor ID
-   * @param $partial_groups     Is this a partial update?
-   * @param $partial_first      Is this the first call in a partial update?
+   *
+   * @param array<string, array<int, list<array<string, mixed>>>> $calculated_groups
+   *   [collection_date] => [financial_type_id] => list(mandates) as calculated
+   * @param array<string, array<int, int>> $existing_groups
+   *   [collection_date]=> [financial_type_id] => txgroup_id as currently present
+   * @param 'OOFF'|'RCUR'|'FRST' $mode SEPA mode (OOFF, RCUR, FRST)
+   * @param int $notice notice days
+   * @param int $creditor_id SDD creditor ID
+   * @param bool $partial_groups Is this a partial update?
+   * @param bool $partial_first Is this the first call in a partial update?
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   protected static function syncGroups(
-    $calculated_groups,
-    $existing_groups,
-    $mode,
-    $type,
-    $notice,
-    $creditor_id,
-    $partial_groups = FALSE,
-    $partial_first = FALSE
-  ) {
+    array $calculated_groups,
+    array $existing_groups,
+    string $mode,
+    int $notice,
+    int $creditor_id,
+    bool $partial_groups = FALSE,
+    bool $partial_first = FALSE
+  ): void {
     $group_status_id_open = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
 
     foreach ($calculated_groups as $collection_date => $financial_type_groups) {
@@ -575,11 +601,11 @@ class CRM_Sepa_Logic_Batching {
 
       foreach ($financial_type_groups as $financial_type_id => $mandates) {
         $group_id = self::getOrCreateTransactionGroup(
-          (int) $creditor_id,
+          $creditor_id,
           $mode,
           $collection_date,
           0 === $financial_type_id ? NULL : $financial_type_id,
-          (int) $notice,
+          $notice,
           $existing_groups
         );
 
@@ -605,6 +631,7 @@ class CRM_Sepa_Logic_Batching {
         // now, filter out the entity_ids that are are already in a non-open group
         //   (DO NOT CHANGE CLOSED GROUPS!)
         $entity_ids_list = implode(',', $entity_ids);
+        /** @var \CRM_Core_DAO $already_sent_contributions */
         $already_sent_contributions = CRM_Core_DAO::executeQuery(
           <<<SQL
               SELECT contribution_id
@@ -647,6 +674,7 @@ class CRM_Sepa_Logic_Batching {
         );
 
         // now check which ones are already in our group...
+        /** @var \CRM_Core_DAO $existing */
         $existing = CRM_Core_DAO::executeQuery(
           <<<SQL
               SELECT *
@@ -683,7 +711,7 @@ class CRM_Sepa_Logic_Batching {
   /**
    * Check if a transaction group reference is already in use
    */
-  public static function referenceExists($reference) {
+  public static function referenceExists(string $reference): bool {
     return \Civi\Api4\SepaTransactionGroup::get(TRUE)
       ->selectRowCount()
       ->addWhere('reference', '=', $reference)
@@ -724,10 +752,10 @@ class CRM_Sepa_Logic_Batching {
   /**
    * Calculate the next execution date for a recurring contribution
    */
-  public static function getNextExecutionDate($rcontribution, $now, $FRST = FALSE) {
+  public static function getNextExecutionDate(array $rcontribution, int $now, bool $FRST = FALSE): ?string {
     // ignore time of day
     $now = strtotime(date('Y-m-d', $now));
-    $cycle_day = $rcontribution['cycle_day'];
+    $cycle_day = (int) $rcontribution['cycle_day'];
     $interval = $rcontribution['frequency_interval'];
     $unit = $rcontribution['frequency_unit'];
 
@@ -737,16 +765,16 @@ class CRM_Sepa_Logic_Batching {
       0,
       0,
       0,
-      date('n', $start_date) + (date('j', $start_date) > $cycle_day),
+      (int) date('n', $start_date) + (((int) date('j', $start_date) > $cycle_day) ? 1 : 0),
       $cycle_day,
-      date('Y', $start_date)
+      (int) date('Y', $start_date)
     );
     if (!$FRST && !empty($rcontribution['mandate_first_executed'])) {
       // if there is a first contribution, that dictates the cycle (12am)
       $next_date = strtotime(date('Y-m-d', strtotime($rcontribution['mandate_first_executed'])));
 
       // go back to last cycle day (in case the collection was delayed)
-      while (date('j', $next_date) != $cycle_day) {
+      while (((int) date('j', $next_date)) != $cycle_day) {
         $next_date = strtotime('-1 day', $next_date);
       }
 
@@ -777,7 +805,7 @@ class CRM_Sepa_Logic_Batching {
       return NULL;
     }
     // ..or the cancel_date
-    if (!empty($rcontribution['cancel_date']) && strtotime($rcontribution['cancel_date']) < strtotime($next_date)) {
+    if (!empty($rcontribution['cancel_date']) && strtotime($rcontribution['cancel_date']) < $next_date) {
       return NULL;
     }
 
@@ -789,7 +817,7 @@ class CRM_Sepa_Logic_Batching {
    * For monthly payments, this would be the cycle day,
    * while for annual payments this would be the cycle day and the month.
    */
-  public static function getCycleDay($rcontribution, $creditor_id) {
+  public static function getCycleDay(array $rcontribution, int $creditor_id): string {
     $cycle_day = $rcontribution['cycle_day'];
     $interval  = $rcontribution['frequency_interval'];
     $unit      = $rcontribution['frequency_unit'];
@@ -814,6 +842,7 @@ class CRM_Sepa_Logic_Batching {
         }
         else {
           // hasn't been collected yet
+          // @phpstan-ignore cast.int
           $rcur_notice = (int) CRM_Sepa_Logic_Settings::getSetting('batching.FRST.notice', $creditor_id);
           $now = strtotime("now +$rcur_notice days");
           $date = CRM_Sepa_Logic_Batching::getNextExecutionDate($rcontribution, $now, TRUE);
@@ -836,8 +865,8 @@ class CRM_Sepa_Logic_Batching {
    * Get a string representation of the recurring contribution cycle,
    * e.g. 'weekly' or 'annually'
    */
-  public static function getCycle($rcontribution) {
-    $interval  = $rcontribution['frequency_interval'];
+  public static function getCycle(array $rcontribution): string {
+    $interval  = (int) $rcontribution['frequency_interval'];
     $unit      = $rcontribution['frequency_unit'];
     return CRM_Utils_SepaOptionGroupTools::getFrequencyText($interval, $unit, TRUE);
   }
@@ -845,12 +874,12 @@ class CRM_Sepa_Logic_Batching {
   /**
    * Apply any (date-based) defers on the collection date
    */
-  public static function deferCollectionDate(&$collection_date, $creditor_id) {
+  public static function deferCollectionDate(string &$collection_date, int $creditor_id): void {
     // first check if the weekends are to be excluded
     $exclude_weekends = CRM_Sepa_Logic_Settings::getGenericSetting('exclude_weekends');
     if ($exclude_weekends) {
       // skip (western) week ends, if the option is activated.
-      $day_of_week = date('N', strtotime($collection_date));
+      $day_of_week = (int) date('N', strtotime($collection_date));
       if ($day_of_week > 5) {
         // this is a weekend -> skip to Monday
         $defer_days = 8 - $day_of_week;

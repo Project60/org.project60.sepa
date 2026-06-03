@@ -14,15 +14,14 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * Generic report on SEPA mandates
  */
 class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
-
-  protected $_customGroupExtends = NULL;
-  protected $_customGroupGroupBy = FALSE;
 
   /**
    * generic constructor
@@ -36,6 +35,8 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
   /**
    * internal function to init the configuration array (_columns)
+   *
+   * @return void
    */
   protected function _initColumns() {
     $this->_columns = [
@@ -254,6 +255,12 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
   /**
    * get individual select clauses
+   *
+   * @param string $fieldName
+   * @param array<string, mixed> $field
+   * @param string $tableName
+   *
+   * @return string|null
    */
   public function _getSelectClause($fieldName, $field, $tableName) {
     // add amount from either OOFF or RCUR
@@ -288,7 +295,6 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
   }
 
   public function from() {
-    $this->_from = NULL;
     $this->_from = "
          FROM  civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
                INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -305,15 +311,21 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
   /**
    * internal function to generate where clauses
+   *
+   * @param string $fieldName
+   * @param array<string, mixed> $field
+   *
+   * @return string|null
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
   protected function _getWhereClause($fieldName, $field) {
     $clause = NULL;
     if ($fieldName == 'status_id') {
       if (!empty($this->_params["{$fieldName}_value"])) {
+        /** @var string $base_clause */
         $base_clause = $this->whereClause($field,
             $this->_params["{$fieldName}_op"] ?? NULL,
-            $this->_params["{$fieldName}_value"] ?? NULL,
+            $this->_params["{$fieldName}_value"],
             $this->_params["{$fieldName}_min"] ?? NULL,
             $this->_params["{$fieldName}_max"] ?? NULL
           );
@@ -340,9 +352,10 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
     elseif ($fieldName == 'amount') {
       if (!empty($this->_params["{$fieldName}_value"])) {
+        /** @var string $base_clause */
         $base_clause = $this->whereClause($field,
             $this->_params["{$fieldName}_op"] ?? NULL,
-            $this->_params["{$fieldName}_value"] ?? NULL,
+            $this->_params["{$fieldName}_value"],
             $this->_params["{$fieldName}_min"] ?? NULL,
             $this->_params["{$fieldName}_max"] ?? NULL
           );
@@ -379,6 +392,10 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
 
   /**
    * internal function to generate where clauses
+   *
+   * @param list<string> $clauses
+   *
+   * @return void
    */
   protected function _extendWhereClause(&$clauses) {
     // Nothin to do here

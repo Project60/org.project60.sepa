@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -26,13 +28,14 @@ class CRM_Sepa_Logic_Status {
   /**
    * translate the DB status tags to a human readable one.
    *
-   * @param $manadate_status  the status as in the DB
-   * @param $localise         return the ts'ed version of the value
+   * @param string $mandate_status the status as in the DB
+   * @param bool $localise
+   *
+   * @return string the ts'ed version of the value
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function translateMandateStatus($mandate_status, $localise = FALSE) {
+  public static function translateMandateStatus(string $mandate_status, bool $localise = FALSE): string {
     switch ($mandate_status) {
-
       case 'INIT':
         return ($localise ? E::ts('Not activated') : 'Not activated');
 
@@ -63,16 +66,16 @@ class CRM_Sepa_Logic_Status {
    * Translates human readable status to the ones used in the DB
    * CAUTION: This only works for UNLOCALISED strings
    *
-   * @param $status       the status as in the DB
-   * @param $mandate_type the mandate type ('RCUR' or 'OOFF').
+   * @param string $status       the status as in the DB
+   * @param 'RCUR'|'OOFF'|NULL $mandate_type the mandate type ('RCUR' or 'OOFF').
    *
-   * @return string|array  if the mandate type is given, it will only return on status as a string
+   * @return ($mandate_type is empty ? list<string> : string)
+   *   if the mandate type is given, it will only return on status as a string
    *   if it's empty, it will always return multiple statuses
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public static function translateToMandateStatus($status, $mandate_type = NULL) {
+  public static function translateToMandateStatus(string $status, ?string $mandate_type = NULL): array|string {
     switch ($status) {
-
       case 'Not activated':
         return ($mandate_type ? 'INIT' : ['INIT']);
 
@@ -116,8 +119,10 @@ class CRM_Sepa_Logic_Status {
   /**
    * get a mapping of the not localised human readable status
    * to the localised one, as can be used by dropdowns
+   *
+   * @return array<string, string>
    */
-  public static function getStatusSelectorOptions($excludePartials = FALSE) {
+  public static function getStatusSelectorOptions(bool $excludePartials = FALSE): array {
     $list = [
       'Not activated'       => E::ts('Not activated'),
       'Ready'               => E::ts('Ready'),

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright (C) 2023  Jaap Jansma (jaap.jansma@civicoop.org)
  *
@@ -15,7 +18,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 namespace Civi\Sepa\DataProcessor\Join;
 
 class MandateContributionJoin extends AbstractMandateJoin {
@@ -23,10 +25,8 @@ class MandateContributionJoin extends AbstractMandateJoin {
   /**
    * When this join has configuration specify the template file name
    * for the configuration form.
-   *
-   * @return false|string
    */
-  public function getConfigurationTemplateFileName():? string {
+  public function getConfigurationTemplateFileName(): string {
     return 'CRM/Sepa/Form/DataProcessor/Join/MandateContributionJoin.tpl';
   }
 

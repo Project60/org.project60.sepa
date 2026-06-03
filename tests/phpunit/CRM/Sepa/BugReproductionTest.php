@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit - PHPUnit tests         |
 | Copyright (C) 2022 SYSTOPIA                            |
@@ -88,7 +90,7 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
       'id' => $monthly_mandate['entity_id'],
     ]);
     $pi_mapping_reversed = array_flip(
-      CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping($monthly_mandate['creditor_id'])
+      CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping((int) $monthly_mandate['creditor_id'])
     );
     $wrong_payment_instrument_id = $pi_mapping_reversed[$recurring_contribution['payment_instrument_id']];
 

@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * back office mandate manipulation form
  *
@@ -67,7 +69,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       }
       else {
         CRM_Core_Session::setStatus(
-          sprintf(E::ts("Unkown action '%s'. Ignored."), $_REQUEST['action']),
+          sprintf(E::ts("Unkown action '%s'. Ignored."), (string) $_REQUEST['action']),
           E::ts('Error'),
           'error'
         );
@@ -108,7 +110,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $contact1 = civicrm_api3('Contact', 'getsingle', ['id' => $mandate['contact_id']]);
     if (isset($contact1['is_error']) && $contact1['is_error']) {
       CRM_Core_Session::setStatus(
-        sprintf(E::ts("Cannot read contact [%s]. Error was: '%s'"), $contact1, $contact1['error_message']),
+        sprintf(E::ts("Cannot read contact [%s]. Error was: '%s'"), $mandate['contact_id'], $contact1['error_message']),
         E::ts('Error'),
         'error'
       );
@@ -118,6 +120,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     $mandate_cancel_reasons = [];
     if ($mandate['type'] == 'RCUR') {
       $contribution_recur_id = (int) $mandate['entity_id'];
+      /** @var \CRM_Core_DAO $cancel_reason_query */
       $cancel_reason_query = CRM_Core_DAO::executeQuery(
         "SELECT note FROM civicrm_note
             WHERE entity_id = {$contribution_recur_id}
@@ -138,7 +141,11 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $contact2 = civicrm_api3('Contact', 'getsingle', ['id' => $contribution['contact_id']]);
       if (isset($contact2['is_error']) && $contact2['is_error']) {
         CRM_Core_Session::setStatus(
-          sprintf(E::ts("Cannot read contact [%s]. Error was: '%s'"), $contact2, $contact2['error_message']),
+          sprintf(
+            E::ts("Cannot read contact [%s]. Error was: '%s'"),
+            $contribution['contact_id'],
+            $contact2['error_message']
+          ),
           E::ts('Error'),
           'error'
         );
@@ -162,7 +169,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       }
       else {
         $mandate['creditor_name'] = $creditor['label'];
-        $cycle_days = CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), $creditor['id']);
+        $cycle_days = CRM_Sepa_Logic_Settings::getListSetting('cycledays', range(1, 28), (int) $creditor['id']);
       }
     }
 
@@ -177,7 +184,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       $campaign = civicrm_api3('Campaign', 'getsingle', ['id' => $campaign_id]);
       if (isset($campaign['is_error'])) {
         CRM_Core_Session::setStatus(
-          sprintf(E::ts("Cannot read contact [%s]. Error was: '%s'"), $campaign, $campaign['error_message']),
+          sprintf(E::ts("Cannot read campaign [%s]. Error was: '%s'"), $campaign_id, $campaign['error_message']),
           E::ts('Error'),
           'error'
         );
@@ -193,7 +200,9 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     // prepare the data
     $mandate['status_text'] = CRM_Sepa_Logic_Status::translateMandateStatus($mandate['status'], TRUE);
 
-    $financial_types = CRM_Contribute_PseudoConstant::financialType();
+    /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+    $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+    $financial_types = array_column($financialTypeOptions, 'label', 'id');
 
     $contact1['link'] = CRM_Utils_System::url('civicrm/contact/view', '&reset=1&cid=' . $contact1['id']);
     $contact2['link'] = CRM_Utils_System::url('civicrm/contact/view', '&reset=1&cid=' . $contact2['id']);
@@ -206,7 +215,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
       );
       $contribution['currency']  = $contribution['currency'];
       $contribution['cycle']     = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
-        $contribution['frequency_interval'],
+        (int) $contribution['frequency_interval'],
         $contribution['frequency_unit'],
         TRUE
       );
@@ -249,6 +258,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
               WHERE  `is_active` = 1
               AND (  (`workflow_id` = '{$template_entry['id']}')
                   OR (`msg_title` LIKE 'SEPA%' AND `workflow_id` IS NULL) );";
+      /** @var \CRM_Core_DAO $result */
       $result = CRM_Core_DAO::executeQuery($query);
       while ($result->fetch()) {
         $tpl_ids[] = [$result->id, $result->msg_title];
@@ -273,13 +283,10 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
    *  - set status to FRST/INIT (depending on type)
    *  - set validation date
    *
-   * @param integer $mandate_id
-   *   mandate ID
-   *
    * @throws Exception
    *   If anything is wrong.
    */
-  public function validateMandate($mandate_id) {
+  public function validateMandate(int $mandate_id): void {
     // first, load the mandate
     $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id]);
 
@@ -316,7 +323,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
   }
 
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public function deleteMandate($mandate_id) {
+  public function deleteMandate(int $mandate_id): void {
     // first, load the mandate
     $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id]);
     if (isset($mandate['is_error']) && $mandate['is_error']) {
@@ -412,11 +419,11 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     ), E::ts('Mandate deleted'), 'info');
   }
 
-  public function endMandate($mandate_id) {
-    $end_date = $_REQUEST['end_date'];
+  public function endMandate(int $mandate_id): void {
+    $end_date = (string) $_REQUEST['end_date'];
     if ($end_date) {
       if (isset($_REQUEST['end_reason'])) {
-        CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date, $_REQUEST['end_reason']);
+        CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date, (string) $_REQUEST['end_reason']);
       }
       else {
         CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, $end_date);
@@ -427,8 +434,8 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
   }
 
-  public function cancelMandate($mandate_id) {
-    $cancel_reason = $_REQUEST['cancel_reason'];
+  public function cancelMandate(int $mandate_id): void {
+    $cancel_reason = (string) $_REQUEST['cancel_reason'];
     if ($cancel_reason) {
       CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, date('Y-m-d'), $cancel_reason);
     }
@@ -437,12 +444,12 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
   }
 
-  public function adjustAmount($mandate_id) {
+  public function adjustAmount(int $mandate_id): void {
     // check if we are allowed to...
     if (CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
       $adjusted_amount = (float) $_REQUEST['adjust_amount'];
       if ($adjusted_amount > 0) {
-        if (CRM_Sepa_BAO_SEPAMandate::modifyMandate($mandate_id, $adjusted_amount)) {
+        if (CRM_Sepa_BAO_SEPAMandate::modifyMandate($mandate_id, ['amount' => $adjusted_amount])) {
           CRM_Core_Session::setStatus(
             E::ts('The amount of this mandate was modified. You should send out a new prenotification to the debtor.'),
             E::ts('Advice'),
@@ -464,7 +471,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
   }
 
-  public function changecyleday($mandate_id) {
+  public function changecyleday(int $mandate_id): void {
     if (CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
       $new_cycle_day = $_REQUEST['new_cycle_day'];
       $statuses = CRM_Sepa_BAO_SEPAMandate::modifyMandate($mandate_id, ['cycle_day' => $new_cycle_day]);

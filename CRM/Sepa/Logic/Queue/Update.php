@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -26,8 +28,12 @@ class CRM_Sepa_Logic_Queue_Update {
 
   public string $title;
   private string $cmd;
+
+  /**
+   * @var 'FRST'|'RCUR'|'OOFF'
+   */
   private string $mode;
-  private $creditorId;
+  private int $creditorId;
   private ?int $offset;
   private ?int $limit;
 
@@ -36,6 +42,8 @@ class CRM_Sepa_Logic_Queue_Update {
   /**
    * Use CRM_Queue_Runner to do the SDD group update
    * This doesn't return, but redirects to the runner
+   *
+   * @param 'OOFF'|'RCUR' $mode
    */
   public static function launchUpdateRunner(string $mode): void {
     $asyncLockId = uniqid('', TRUE);
@@ -62,7 +70,7 @@ class CRM_Sepa_Logic_Queue_Update {
       $sdd_modes = ($mode == 'RCUR') ? ['FRST', 'RCUR'] : ['OOFF'];
       foreach ($sdd_modes as $sdd_mode) {
         // safety margin
-        $count = self::getMandateCount($creditor['id'], $sdd_mode) + self::BATCH_SIZE;
+        $count = self::getMandateCount((int) $creditor['id'], $sdd_mode) + self::BATCH_SIZE;
         for ($offset = 0; $offset < $count; $offset += self::BATCH_SIZE) {
           // add an item for each batch
           $queue->createItem(new CRM_Sepa_Logic_Queue_Update(
@@ -86,6 +94,9 @@ class CRM_Sepa_Logic_Queue_Update {
     $runner->runAllViaWeb();
   }
 
+  /**
+   * @param 'FRST'|'RCUR'|'OOFF' $mode
+   */
   protected function __construct(
     string $cmd,
     string $mode,
@@ -114,7 +125,7 @@ class CRM_Sepa_Logic_Queue_Update {
       case 'UPDATE':
         $this->title = E::ts(
           'Process %1 mandates (%2-%3)',
-          [1 => $this->mode, 2 => $this->offset, 3 => $this->offset + $this->limit]
+          [1 => $this->mode, 2 => $this->offset, 3 => ($this->offset ?? 0) + ($this->limit ?? 0)]
         );
         break;
 
@@ -131,7 +142,7 @@ class CRM_Sepa_Logic_Queue_Update {
     }
   }
 
-  public function run($context): bool {
+  public function run(): bool {
     if (!SepaBatchLockManager::getInstance()->acquire(10, $this->asyncLockId)) {
       throw new \RuntimeException('Unable to acquire lock');
     }
@@ -173,11 +184,12 @@ class CRM_Sepa_Logic_Queue_Update {
   /**
    * determine the count of mandates to be investigated
    */
-  protected static function getMandateCount($creditor_id, $sdd_mode) {
+  protected static function getMandateCount(int $creditor_id, string $sdd_mode): int {
     if ($sdd_mode == 'OOFF') {
+      // @phpstan-ignore cast.int
       $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
       $date_limit = date('Y-m-d', strtotime("+$horizon days"));
-      return CRM_Core_DAO::singleValueQuery("
+      return (int) CRM_Core_DAO::singleValueQuery("
         SELECT COUNT(mandate.id)
         FROM civicrm_sdd_mandate AS mandate
         INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id
@@ -187,7 +199,7 @@ class CRM_Sepa_Logic_Queue_Update {
           AND mandate.creditor_id = $creditor_id;");
     }
     else {
-      return CRM_Core_DAO::singleValueQuery("
+      return (int) CRM_Core_DAO::singleValueQuery("
         SELECT
           COUNT(mandate.id)
         FROM civicrm_sdd_mandate AS mandate

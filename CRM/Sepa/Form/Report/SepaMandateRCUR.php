@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -47,12 +49,20 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
 
     // cycle intervals
     $cycle_intervals = [
-      "'1 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('1', 'month', TRUE),
-      "'3 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('3', 'month', TRUE),
-      "'4 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('4', 'month', TRUE),
-      "'6 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText('6', 'month', TRUE),
-      "'12 month'" => CRM_Utils_SepaOptionGroupTools::getFrequencyText('12', 'month', TRUE),
+      "'1 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(1, 'month', TRUE),
+      "'3 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(3, 'month', TRUE),
+      "'4 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(4, 'month', TRUE),
+      "'6 month'"  => CRM_Utils_SepaOptionGroupTools::getFrequencyText(6, 'month', TRUE),
+      "'12 month'" => CRM_Utils_SepaOptionGroupTools::getFrequencyText(12, 'month', TRUE),
     ];
+
+    /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+    $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+    $financialTypes = array_column($financialTypeOptions, 'label', 'id');
+
+    /** @var list<array{id: int, label: string, name: string}> $contributionStatusOptions */
+    $contributionStatusOptions = Civi::entity('Contribution')->getOptions('contribution_status_id');
+    $contributionStatuses = array_column($contributionStatusOptions, 'label', 'id');
 
     $this->_columns['civicrm_contribution_recur'] = [
       'dao' => 'CRM_Contribute_BAO_ContributionRecur',
@@ -110,7 +120,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         'financial_type_id' => [
           'title' => E::ts('Financial Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => CRM_Contribute_PseudoConstant::financialType(),
+          'options' => $financialTypes,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'cycle_interval' => [
@@ -135,7 +145,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         'recurring_contribution_status_id' => [
           'title' => E::ts('Recurring Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+          'options' => $contributionStatuses,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'cancel_reasons' => [
@@ -179,7 +189,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         'contribution_status_id' => [
           'title' => E::ts('Contribution Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+          'options' => $contributionStatuses,
           'type' => CRM_Utils_Type::T_INT,
         ],
         'total_amount_collected' => [
@@ -295,7 +305,6 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
    * override FROM clause
    */
   public function from() {
-    $this->_from = NULL;
     $this->_from = "
       FROM civicrm_sdd_mandate {$this->_aliases['civicrm_sdd_mandate']} {$this->_aclFrom}
       INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
@@ -328,10 +337,14 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
         // the database could have both: '1 year' and '12 month'...
         $cycle_intervals[] = "'1 year'";
       }
-      $clause = $this->whereClause($field, $this->_params["{$fieldName}_op"] ?? NULL, $cycle_intervals,
-          $this->_params["{$fieldName}_min"] ?? NULL,
-          $this->_params["{$fieldName}_max"] ?? NULL
-        );
+      /** @var string $clause */
+      $clause = $this->whereClause(
+        $field,
+        $this->_params["{$fieldName}_op"] ?? NULL,
+        $cycle_intervals,
+        $this->_params["{$fieldName}_min"] ?? NULL,
+        $this->_params["{$fieldName}_max"] ?? NULL
+      );
       $subquery = "CONCAT({$this->_aliases['civicrm_contribution_recur']}.frequency_interval,
         CONCAT(' ', {$this->_aliases['civicrm_contribution_recur']}.frequency_unit))";
       $clause = preg_replace('/cycle_interval/', $subquery, $clause);
@@ -368,7 +381,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution
         WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id
         AND contribution_status_id = 1)";
-      $clause = preg_replace('/total_count_collected/', $subquery, $clause);
+      $clause = preg_replace('/total_count_collected/', $subquery, $clause ?? '');
       return $clause;
     }
 
@@ -385,7 +398,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       $subquery = "(SELECT COUNT(DISTINCT(id)) FROM civicrm_contribution
         WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id
           AND contribution_status_id IN (3,4))";
-      $clause = preg_replace('/total_count_failed/', $subquery, $clause);
+      $clause = preg_replace('/total_count_failed/', $subquery, $clause ?? '');
       return $clause;
     }
 
@@ -404,7 +417,7 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       FROM civicrm_contribution
       WHERE contribution_recur_id={$this->_aliases['civicrm_contribution_recur']}.id
         AND contribution_status_id IN (3,4))";
-      $clause = preg_replace('/cancel_reasons/', $subquery, $clause);
+      $clause = preg_replace('/cancel_reasons/', $subquery, $clause ?? '');
       return $clause;
     }
 
@@ -428,23 +441,32 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
     parent::alterDisplay($rows);
 
     // now, prep contribution specific data
-    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-    $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
+    /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+    $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+    $financialTypes = array_column($financialTypeOptions, 'label', 'id');
+
+    /** @var list<array{id: int, label: string, name: string}> $contributionPageOptions */
+    $contributionPageOptions = Civi::entity('Contribution')->getOptions('contribution_page_id');
+    $contributionPages = array_column($contributionPageOptions, 'label', 'id');
+
+    /** @var list<array{id: int, label: string, name: string}> $contributionStatusOptions */
+    $contributionStatusOptions = Civi::entity('Contribution')->getOptions('contribution_status_id');
+    $contributionStatuses = array_column($contributionStatusOptions, 'label', 'id');
+
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
 
     foreach ($rows as $rowNum => $row) {
       if ($value = $row['civicrm_contribution_recur_financial_type_id'] ?? NULL) {
-        $rows[$rowNum]['civicrm_contribution_recur_financial_type_id'] = $contributionTypes[$value];
+        $rows[$rowNum]['civicrm_contribution_recur_financial_type_id'] = $financialTypes[$value];
       }
       if ($value = $row['civicrm_contribution_recur_contribution_status_id'] ?? NULL) {
-        $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = $contributionStatus[$value];
+        $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = $contributionStatuses[$value];
       }
       if ($value = $row['civicrm_contribution_recur_contribution_page_id'] ?? NULL) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_page_id'] = $contributionPages[$value];
       }
       if ($value = $row['civicrm_contribution_contribution_status_id'] ?? NULL) {
-        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
+        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatuses[$value];
       }
 
       // alter amount
@@ -464,7 +486,11 @@ class CRM_Sepa_Form_Report_SepaMandateRCUR extends CRM_Sepa_Form_Report_SepaMand
       // alter frequency
       if (array_key_exists('cycle_interval', $row)) {
         list($interval, $unit) = explode(' ', $row['cycle_interval']);
-        $rows[$rowNum]['cycle_interval'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText($interval, $unit, TRUE);
+        $rows[$rowNum]['cycle_interval'] = CRM_Utils_SepaOptionGroupTools::getFrequencyText(
+          (int) $interval,
+          $unit,
+          TRUE
+        );
       }
 
       // expand concat cancel_reasons

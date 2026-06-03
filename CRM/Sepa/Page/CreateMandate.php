@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * back office mandate creation form
  *
@@ -36,13 +38,13 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   public function run() {
     CRM_Utils_System::setTitle(E::ts('Create SEPA Mandate'));
     if (isset($_REQUEST['mandate_type'])) {
-      $contact_id = $_REQUEST['contact_id'];
+      $contact_id = (int) $_REQUEST['contact_id'];
       $this->assign(
         'back_url',
         CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact_id}&selectedChild=contribute")
       );
 
-      $errors = $this->validateParameters($_REQUEST['mandate_type']);
+      $errors = $this->validateParameters();
       if (count($errors) > 0) {
         // i.e. validation failed
         $this->assign('validation_errors', $errors);
@@ -62,17 +64,17 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     }
     elseif (isset($_REQUEST['cid'])) {
       // create a new form
-      $this->prepareCreateForm($_REQUEST['cid']);
+      $this->prepareCreateForm((int) $_REQUEST['cid']);
 
     }
     elseif (isset($_REQUEST['clone'])) {
       // this is a cloned form
-      $this->prepareClonedData($_REQUEST['clone']);
+      $this->prepareClonedData((int) $_REQUEST['clone']);
 
     }
     elseif (isset($_REQUEST['replace'])) {
       // this is a replace form
-      $this->prepareClonedData($_REQUEST['replace']);
+      $this->prepareClonedData((int) $_REQUEST['replace']);
       $this->assign('replace', $_REQUEST['replace']);
       if (isset($_REQUEST['replace_date'])) {
         $this->assign('replace_date', $_REQUEST['replace_date']);
@@ -102,8 +104,10 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
   /**
    * Creates a SEPA mandate for the given type
+   *
+   * @param 'OOFF'|'RCUR' $type
    */
-  public function createMandate($type) {
+  public function createMandate(string $type): void {
     // first create a contribution
     $payment_instrument_id  = CRM_Core_PseudoConstant::getKey(
       'CRM_Contribute_BAO_Contribution',
@@ -128,18 +132,18 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       'currency'                  => $creditor['currency'],
     ];
 
-    if ($type == 'OOFF') {
+    if ($type === 'OOFF') {
       $initial_status = 'OOFF';
       $entity_table = 'civicrm_contribution';
-      $contribution_data['total_amount'] = number_format($_REQUEST['total_amount'], 2, '.', '');
+      $contribution_data['total_amount'] = number_format((float) $_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['receive_date'] = $_REQUEST['date'];
       $contribution_data['source'] = $_REQUEST['source'];
       $contribution = civicrm_api3('Contribution', 'create', $contribution_data);
     }
-    elseif ($type == 'RCUR') {
+    elseif ($type === 'RCUR') {
       $initial_status = 'FRST';
       $entity_table = 'civicrm_contribution_recur';
-      $contribution_data['amount']              = number_format($_REQUEST['total_amount'], 2, '.', '');
+      $contribution_data['amount']              = number_format((float) $_REQUEST['total_amount'], 2, '.', '');
       $contribution_data['start_date']          = $_REQUEST['start_date'];
       $contribution_data['end_date']            = $_REQUEST['end_date'];
       $contribution_data['create_date']         = date('YmdHis');
@@ -150,13 +154,17 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $contribution_data['is_email_receipt']    = 0;
       $contribution = civicrm_api3('ContributionRecur', 'create', $contribution_data);
     }
+    else {
+      throw new \InvalidArgumentException("Invalid type: $type");
+    }
 
     if (isset($contribution['is_error']) && $contribution['is_error']) {
       $this->processError(
-        sprintf(E::ts("Couldn't create contribution for contact #%s"), $_REQUEST['contact_id']),
+        sprintf(E::ts("Couldn't create contribution for contact #%s"), (string) $_REQUEST['contact_id']),
         E::ts("Couldn't create contribution"),
         $contribution['error_message'],
-        $_REQUEST['contact_id']);
+        (int) $_REQUEST['contact_id']
+      );
       return;
     }
 
@@ -184,24 +192,25 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $mandate = civicrm_api3('SepaMandate', 'create', $mandate_data);
     if (isset($mandate['is_error']) && $mandate['is_error']) {
       $this->processError(
-        sprintf(E::ts("Couldn't create %s mandate for contact #%s"), $type, $_REQUEST['contact_id']),
+        sprintf(E::ts("Couldn't create %s mandate for contact #%s"), $type, (string) $_REQUEST['contact_id']),
         E::ts("Couldn't create mandate"),
         $mandate['error_message'],
-        $_REQUEST['contact_id']);
+        (int) $_REQUEST['contact_id']
+      );
       return;
     }
 
     // if we want to replace an old mandate:
     if (isset($_REQUEST['replace'])) {
       CRM_Sepa_BAO_SEPAMandate::terminateMandate(
-        $_REQUEST['replace'],
-        $_REQUEST['replace_date'],
-        $_REQUEST['replace_reason']
+        (int) $_REQUEST['replace'],
+        (string) $_REQUEST['replace_date'],
+        (string) $_REQUEST['replace_reason']
       );
       CRM_Sepa_BAO_SepaMandateLink::addReplaceMandateLink(
-        $_REQUEST['replace'],
-        $mandate['id'],
-        $_REQUEST['replace_date']
+        (int) $_REQUEST['replace'],
+        (int) $mandate['id'],
+        (string) $_REQUEST['replace_date']
       );
     }
 
@@ -233,17 +242,19 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   /**
    * Will prepare the form and look up all necessary data
    */
-  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public function prepareCreateForm($contact_id) {
-    // load financial types
-    $this->assign('financial_types', CRM_Contribute_PseudoConstant::financialType());
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.TooHigh
+  public function prepareCreateForm(int $contact_id): void {
+    /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+    $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+    $financialTypes = array_column($financialTypeOptions, 'label', 'id');
+    $this->assign('financial_types', $financialTypes);
     $this->assign('date', date('Y-m-d'));
     $this->assign('start_date', date('Y-m-d'));
 
     // first, try to load contact
     $contact = civicrm_api3('Contact', 'getsingle', ['id' => $contact_id]);
     if (isset($contact['is_error']) && $contact['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(E::ts("Couldn't find contact #%s"), $cid), E::ts('Error'), 'error');
+      CRM_Core_Session::setStatus(sprintf(E::ts("Couldn't find contact #%s"), $contact_id), E::ts('Error'), 'error');
       $this->assign('display_name', 'ERROR');
       return;
     }
@@ -264,7 +275,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $campaigns = [];
     $campaigns[''] = E::ts('No Campaign');
     if (isset($campaign_query['is_error']) && $campaign_query['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(E::ts("Couldn't load campaign list."), $cid), E::ts('Error'), 'error');
+      CRM_Core_Session::setStatus(E::ts("Couldn't load campaign list."), E::ts('Error'), 'error');
     }
     else {
       foreach ($campaign_query['values'] as $campaign_id => $campaign) {
@@ -277,6 +288,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $known_accounts = [];
     $query_sql = 'SELECT DISTINCT iban, bic FROM civicrm_sdd_mandate WHERE contact_id=%1';
     $query_params = ['1' => [$contact_id, 'Integer']];
+    /** @var \CRM_Core_DAO $old_mandates */
     $old_mandates = CRM_Core_DAO::executeQuery($query_sql, $query_params);
     while ($old_mandates->fetch()) {
       $value = $old_mandates->iban . '/' . $old_mandates->bic;
@@ -292,34 +304,35 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         'value' => 'IBAN',
       ];
       $iban_reference_type_id = civicrm_api3('OptionValue', 'getvalue', $params);
-    }
-    if ($iban_reference_type_id) {
-      $accounts = civicrm_api3('BankingAccount', 'get', ['contact_id' => $contact_id]);
-      // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
-      if (isset($accounts['is_error']) && $accounts['is_error']) {
-        // this probably means, that CiviBanking is not installed...
-      }
-      else {
-        foreach ($accounts['values'] as $account_id => $account) {
-          $account_ref = civicrm_api3(
-            'BankingAccountReference',
-            'getsingle',
-            [
-              'ba_id' => $account_id,
-              'reference_type_id' => $iban_reference_type_id,
-            ]
-          );
-          // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
-          if (isset($account_ref['is_error']) && $account_ref['is_error']) {
-            // this would also be an error, if no reference is set...
-          }
-          else {
-            $account_data = json_decode($account['data_parsed']);
-            if (isset($account_data->BIC)) {
-              // we have IBAN and BIC -> add:
-              $value = $account_ref['reference'] . '/' . $account_data->BIC;
-              array_push($known_accounts,
-                ['name' => $account_ref['reference'], 'value' => $value]);
+
+      if ($iban_reference_type_id) {
+        $accounts = civicrm_api3('BankingAccount', 'get', ['contact_id' => $contact_id]);
+        // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
+        if (isset($accounts['is_error']) && $accounts['is_error']) {
+          // this probably means, that CiviBanking is not installed...
+        }
+        else {
+          foreach ($accounts['values'] as $account_id => $account) {
+            $account_ref = civicrm_api3(
+              'BankingAccountReference',
+              'getsingle',
+              [
+                'ba_id' => $account_id,
+                'reference_type_id' => $iban_reference_type_id,
+              ]
+            );
+            // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
+            if (isset($account_ref['is_error']) && $account_ref['is_error']) {
+              // this would also be an error, if no reference is set...
+            }
+            else {
+              $account_data = json_decode($account['data_parsed']);
+              if ($account_data instanceof \stdClass && isset($account_data->BIC)) {
+                // we have IBAN and BIC -> add:
+                $value = $account_ref['reference'] . '/' . $account_data->BIC;
+                array_push($known_accounts,
+                  ['name' => $account_ref['reference'], 'value' => $value]);
+              }
             }
           }
         }
@@ -345,7 +358,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     $creditor_query = civicrm_api3('SepaCreditor', 'get');
     $creditors = [];
     if (isset($creditor_query['is_error']) && $creditor_query['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(E::ts("Couldn't find any creditors."), $cid), E::ts('Error'), 'error');
+      CRM_Core_Session::setStatus(E::ts("Couldn't find any creditors."), E::ts('Error'), 'error');
     }
     else {
       foreach ($creditor_query['values'] as $creditor_id => $creditor) {
@@ -407,10 +420,10 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
    * Will prepare the form by cloning the data from the given mandate
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public function prepareClonedData($mandate_id) {
+  public function prepareClonedData(int $mandate_id): void {
     try {
       $mandate = \Civi\Api4\SepaMandate::get(TRUE)
-        ->addWhere('id', '=', $mandate)
+        ->addWhere('id', '=', $mandate_id)
         ->execute()
         ->single();
     }
@@ -444,7 +457,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
 
     if (isset($contribution['is_error']) && $contribution['is_error']) {
       CRM_Core_Session::setStatus(
-        sprintf(E::ts("Couldn't load associated (r)contribution #%s"), $contribution),
+        sprintf(E::ts("Couldn't load associated (r)contribution #%s"), $mandate['entity_id']),
         E::ts('Error'),
         'error'
       );
@@ -495,10 +508,12 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   /**
    * Will checks all the POSTed data with respect to creating a mandate
    *
-   * @return array('<field_id>' => '<error message>') with the fields that have not passed
+   * @return array<string, string>
+   *   Mapping of field_name to error message with the fields that have not
+   *   passed.
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
-  public function validateParameters() {
+  public function validateParameters(): array {
     $errors = [];
 
     // load creditor
@@ -516,14 +531,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $errors['total_amount'] = sprintf(E::ts("'%s' is a required field."), E::ts('Amount'));
     }
     else {
-      $_REQUEST['total_amount'] = str_replace(',', '.', $_REQUEST['total_amount']);
-      if (strlen($_REQUEST['total_amount']) == 0) {
+      $_REQUEST['total_amount'] = str_replace(',', '.', (string) $_REQUEST['total_amount']);
+      if (strlen((string) $_REQUEST['total_amount']) == 0) {
         $errors['total_amount'] = sprintf(E::ts("'%s' is a required field."), E::ts('Amount'));
       }
-      elseif (!is_numeric($_REQUEST['total_amount'])) {
+      elseif (!is_numeric((string) $_REQUEST['total_amount'])) {
         $errors['total_amount'] = E::ts('Cannot parse amount');
       }
-      elseif ($_REQUEST['total_amount'] <= 0) {
+      elseif ((float) $_REQUEST['total_amount'] <= 0) {
         $errors['total_amount'] = E::ts('Amount has to be positive');
       }
     }
@@ -533,7 +548,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $errors['bic'] = sprintf(E::ts("'%s' is a required field."), 'BIC');
     }
     else {
-      $_REQUEST['bic'] = CRM_Sepa_Logic_Verification::formatBIC($_REQUEST['bic'], $creditor['creditor_type']);
+      $_REQUEST['bic'] = CRM_Sepa_Logic_Verification::formatBIC((string) $_REQUEST['bic'], $creditor['creditor_type']);
       if (strlen($_REQUEST['bic']) == 0) {
         $errors['bic'] = sprintf(E::ts("'%s' is a required field."), 'BIC');
       }
@@ -550,7 +565,10 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       $errors['iban'] = sprintf(E::ts("'%s' is a required field."), 'IBAN');
     }
     else {
-      $_REQUEST['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($_REQUEST['iban'], $creditor['creditor_type']);
+      $_REQUEST['iban'] = CRM_Sepa_Logic_Verification::formatIBAN(
+        (string) $_REQUEST['iban'],
+        $creditor['creditor_type']
+      );
       if (strlen($_REQUEST['iban']) == 0) {
         $errors['iban'] = sprintf(E::ts("'%s' is a required field."), 'IBAN');
       }
@@ -563,6 +581,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     }
 
     // check reference
+    /** @var string|null $reference */
     $reference = CRM_Utils_Request::retrieve('reference', 'String');
     if (!empty($reference)) {
       // check if it is formally correct
@@ -594,7 +613,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
       if (!$this->_check_date('start_date')) {
         $errors['start_date'] = E::ts('Incorrect date format');
       }
-      if (isset($_REQUEST['end_date']) && strlen($_REQUEST['end_date'])) {
+      if (isset($_REQUEST['end_date']) && strlen((string) $_REQUEST['end_date'])) {
         if (!$this->_check_date('end_date')) {
           $errors['end_date'] = E::ts('Incorrect date format');
         }
@@ -613,7 +632,7 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
         $errors['replace_date'] = E::ts('Incorrect date format');
       }
 
-      if (!isset($_REQUEST['replace_reason']) || strlen($_REQUEST['replace_reason']) == 0) {
+      if (!isset($_REQUEST['replace_reason']) || strlen((string) $_REQUEST['replace_reason']) == 0) {
         $errors['replace_reason'] = sprintf(E::ts("'%s' is a required field."), E::ts('replace reason'));
       }
     }
@@ -621,12 +640,12 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
     return $errors;
   }
 
-  public function _check_date($date_field) {
+  public function _check_date(string $date_field): bool {
     if (!isset($_REQUEST[$date_field])) {
       return FALSE;
     }
     else {
-      $parsed_date = date_parse_from_format('Y-m-d', $_REQUEST[$date_field]);
+      $parsed_date = date_parse_from_format('Y-m-d', (string) $_REQUEST[$date_field]);
       if ($parsed_date['errors']) {
         return FALSE;
       }
@@ -639,14 +658,14 @@ class CRM_Sepa_Page_CreateMandate extends CRM_Core_Page {
   /**
    * test if this page is called as a popup
    */
-  protected function isPopup() {
-    return $_REQUEST['snippet'] ?? NULL;
+  protected function isPopup(): bool {
+    return (bool) ($_REQUEST['snippet'] ?? NULL);
   }
 
   /**
    * report error data
    */
-  protected function processError($status, $title, $message, $contact_id) {
+  protected function processError(string $status, string $title, string $message, int $contact_id): void {
     CRM_Core_Session::setStatus($status . '<br/>' . $message, E::ts('Error'), 'error');
     $this->assign('error_title', $title);
     $this->assign('error_message', $message);
