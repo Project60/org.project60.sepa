@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit - PHPUnit tests         |
 | Copyright (C) 2019 SYSTOPIA                            |
@@ -30,10 +32,9 @@ use CRM_Sepa_ExtensionUtil as E;
  *
  * @group headless
  */
-class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
-{
-  public function setUp(): void
-  {
+class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase {
+
+  public function setUp(): void {
     parent::setUp();
 
     $this->setCreditorConfiguration('batching.OOFF.horizon', 31);
@@ -42,12 +43,10 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
 
   /**
    * Test a spread of collection dates with timetravel for OOFF mandates.
-   * @see Case_ID M03
+   * See Case_ID M03.
    */
-  public function testOOFFSpread()
-  {
-    for ($n = 0; $n < 21; $n++)
-    {
+  public function testOOFFSpread() {
+    for ($n = 0; $n < 21; $n++) {
       // For the following collection date generation:
       // Starting at the next monday guarantees the determinism of this test.
       // Every four days spreads seven mandates once for every day of the week over 3.5 weeks.
@@ -79,12 +78,10 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
 
   /**
    * Test a spread of collection dates with timetravel for RCUR mandates.
-   * @see Case_ID M04
+   * See Case_ID M04.
    */
-  public function testRCURSpread()
-  {
-    for ($n = 0; $n < 21; $n++)
-    {
+  public function testRCURSpread() {
+    for ($n = 0; $n < 21; $n++) {
       // For the following collection date generation:
       // Starting at the next monday guarantees the determinism of this test.
       // Every four days spreads seven mandates once for every day of the week over 3.5 weeks.
@@ -140,4 +137,5 @@ class CRM_Sepa_MandateSpreadTest extends CRM_Sepa_TestBase
     //       because more than that is not needed in this scenario and having the time frame
     //       resulting out of the amount of mandates makes the test simpler and deterministic.
   }
+
 }

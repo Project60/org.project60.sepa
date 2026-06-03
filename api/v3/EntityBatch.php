@@ -13,6 +13,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
 
 /**
  * File for the CiviCRM APIv3 batch entity
@@ -21,17 +22,18 @@
  *
  */
 
-
 /**
  * Allowed @params array keys are:
  *
  * @example SepaCreditorCreate.php Standard Create Example
  *
- * @return array API result array
- * {@getfields entity_batch_create}
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed> API result array
+ *   {@getfields entity_batch_create}
  * @access public
  */
-function civicrm_api3_entity_batch_create($params) {
+function civicrm_api3_entity_batch_create(array $params): array {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -39,9 +41,9 @@ function civicrm_api3_entity_batch_create($params) {
  * Adjust Metadata for Create action
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array<string, array<string, mixed>> $params array or parameters determined by getfields
  */
-function _civicrm_api3_entity_batch_create_spec(&$params) {
+function _civicrm_api3_entity_batch_create_spec(array &$params): void {
   $params['entity_id']['api.required'] = 1;
   $params['batch_id']['api.required'] = 1;
 }
@@ -49,33 +51,31 @@ function _civicrm_api3_entity_batch_create_spec(&$params) {
 /**
  * Deletes an existing SepaCreditor
  *
- * @param  array  $params
+ * @param  array<string, mixed> $params
  *
  * @example SepaCreditorDelete.php Standard Delete Example
  *
  * {@getfields entity_batch_delete}
+ *
+ * @return array<string, mixed>
+ *
  * @access public
  */
-function civicrm_api3_entity_batch_delete($params) {
+function civicrm_api3_entity_batch_delete(array $params): array {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
  * Retrieve one or more batch_entities
  *
- * @param  array input parameters
- *
- *
  * @example SepaCreditorGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array<string, mixed> $params an associative array of name/value pairs.
  *
- * @return  array api result array
- * {@getfields entity_batch_get}
+ * @return array<string, mixed> api result array
+ *   {@getfields entity_batch_get}
  * @access public
  */
-function civicrm_api3_entity_batch_get($params) {
-
+function civicrm_api3_entity_batch_get(array $params): array {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

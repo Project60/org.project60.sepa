@@ -14,22 +14,25 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-require_once 'packages/php-iban-1.4.0/php-iban.php';
+declare(strict_types = 1);
 
 use CRM_Sepa_ExtensionUtil as E;
 
+// phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
+require_once E::path('packages/php-iban-1.4.0/php-iban.php');
+// phpcs:enable
 
 class CRM_Sepa_Logic_Verification {
 
   /**
    * Will format the given string
    *
-   * @param $iban  string, IBAN candidate
-   * @param $type  creditor_type, SEPA or PSP
+   * @param string $iban IBAN candidate
+   * @param string $type creditor_type, SEPA or PSP
    *
-   * @return formatted IBAN
+   * @return string formatted IBAN
    */
-  public static function formatIBAN($iban, $type = 'SEPA') {
+  public static function formatIBAN(string $iban, string $type = 'SEPA'): string {
     switch ($type) {
       case 'SEPA':
         $iban = trim($iban);
@@ -47,12 +50,9 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Format the given BIC
    *
-   * @param $bic
-   * @param string $type
-   *
    * @return string formatted BIC
    */
-  public static function formatBIC($bic, $type = 'SEPA') {
+  public static function formatBIC(string $bic, string $type = 'SEPA'): string {
     switch ($type) {
       case 'SEPA':
         $bic = strtoupper($bic);
@@ -65,40 +65,39 @@ class CRM_Sepa_Logic_Verification {
     return $bic;
   }
 
-
   /**
    * Verifies if the given IBAN is formally correct
    *
-   * @param iban  string, IBAN candidate
+   * @param string $iban IBAN candidate
    *
-   * @return NULL if given IBAN is valid, localized error message otherwise
+   * @return null|string NULL if given IBAN is valid, localized error message otherwise
    */
-  public static function verifyIBAN($iban, $type = 'SEPA') {
+  public static function verifyIBAN(string $iban, string $type = 'SEPA'): ?string {
     // first: check if blocklisted (#540)
     if (self::isIbanBlocklisted($iban)) {
-      return E::ts("IBAN is blocklisted");
+      return E::ts('IBAN is blocklisted');
     }
 
     switch ($type) {
       case 'SEPA':
         // We only accept uppecase characters and numerals (machine format)
         // see https://github.com/Project60/org.project60.sepa/issues/246
-        if (!preg_match("/^[A-Z0-9]+$/", $iban)) {
-          return E::ts("IBAN is not correct");
+        if (!preg_match('/^[A-Z0-9]+$/', $iban)) {
+          return E::ts('IBAN is not correct');
         }
-        if (preg_match("/^IBAN/", $iban)) {
-          return E::ts("Please remove leading IBAN");
+        if (str_starts_with($iban, 'IBAN')) {
+          return E::ts('Please remove leading IBAN');
         }
         if (!verify_iban($iban)) {
-          return E::ts("IBAN is not correct");
+          return E::ts('IBAN is not correct');
         }
         break;
 
       default:
       case 'PSP':
         // anything that's a string and not empty is fine
-        if (empty($iban) || !is_string($iban)) {
-          return E::ts("Invalid PSP Code");
+        if ('' === $iban) {
+          return E::ts('Invalid PSP Code');
         }
     }
     // all clear
@@ -108,18 +107,19 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Check if this IBAN is blocklisted
    *
-   * @param $iban string IBAN to check
-   * @return boolean
+   * @param string $iban IBAN to check
+   *
+   * @return bool
    */
-  public static function isIbanBlocklisted($iban) {
+  public static function isIbanBlocklisted(string $iban): bool {
     static $blocklist = NULL;
     if ($blocklist === NULL) {
       // we have to check whether the group exists first, getOptionValuesAssocArrayFromName doesn't do that
       $blocklist = [];
       $query = civicrm_api3('OptionValue', 'get', [
-          'option_group_id' => 'iban_blacklist',
-          'option.limit'    => 0,
-          'return'          => 'value'
+        'option_group_id' => 'iban_blacklist',
+        'option.limit'    => 0,
+        'return'          => 'value',
       ]);
       foreach ($query['values'] as $value) {
         $blocklist[$value['value']] = 1;
@@ -131,16 +131,17 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Verifies if the given mandate reference is formally correct
    *
-   * @param $reference string reference candidate
+   * @param string $reference reference candidate
    *
-   * @return NULL if given reference is valid, localized error message otherwise
+   * @return string|null
+   *   NULL if given reference is valid, localized error message otherwise
    */
-  public static function verifyReference($reference, $type = 'SEPA') {
+  public static function verifyReference(string $reference, string $type = 'SEPA'): ?string {
     switch ($type) {
       case 'SEPA':
         // official guidelines say this:
         if (!preg_match("#^[A-Za-z0-9+?/\-:()., ']+$#", $reference)) {
-          return E::ts("Illegal characters detected");
+          return E::ts('Illegal characters detected');
         }
 
         // we don't want weird numbers starting/ending with special characters
@@ -156,7 +157,7 @@ class CRM_Sepa_Logic_Verification {
       case 'PSP':
         // similar to SEPA, but with extra '_'
         if (!preg_match("#^[A-Za-z0-9+?/\-:()., _']+$#", $reference)) {
-          return E::ts("Illegal characters detected");
+          return E::ts('Illegal characters detected');
         }
 
         // we don't want weird numbers starting/ending with special characters
@@ -174,12 +175,12 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Generates an anonymised version of the given IBAN
    *
-   * @param $iban  string, IBAN candidate
+   * @param string $iban IBAN candidate
    *
    * @return string anonymised IBAN
    */
-  static function anonymiseIBAN($iban, $placeholder='X', $type = 'SEPA') {
-    if (empty($iban)) {
+  public static function anonymiseIBAN(string $iban, string $placeholder = 'X'): string {
+    if ('' === $iban) {
       return $iban;
     }
 
@@ -189,23 +190,26 @@ class CRM_Sepa_Logic_Verification {
     $anonymised_count = strlen($iban) - 2 * $reveal_count;
 
     // compile anonymised string
-    return substr($iban, 0, $reveal_count) . str_repeat($placeholder, $anonymised_count) . substr($iban, (strlen($iban)-$reveal_count), $reveal_count);
+    return substr($iban, 0, $reveal_count)
+      . str_repeat($placeholder, $anonymised_count)
+      . substr($iban, (strlen($iban) - $reveal_count), $reveal_count);
   }
 
   /**
    * Convert the given string to the SEPA character set (see SEPA-520)
    *
-   * @param $string string given value
+   * @param string|null $string given value
+   *
    * @return string converted string
    */
-  public static function convert2SepaCharacterSet($string) {
-    if (!isset($string)) {
-      return $string;
+  public static function convert2SepaCharacterSet(?string $string): string {
+    if (NULL === $string) {
+      return '';
     }
 
     // try to convert the name into transliterated ASCII
-    if (function_exists("iconv")){
-      $string = iconv("UTF-8", "ASCII//TRANSLIT", $string);
+    if (function_exists('iconv')) {
+      $string = (string) iconv('UTF-8', 'ASCII//TRANSLIT', $string);
     }
 
     // replace the remaining characters with '?'
@@ -213,14 +217,14 @@ class CRM_Sepa_Logic_Verification {
     return $string;
   }
 
-
   /**
    * Form rule wrapper for ::verifyIBAN
    */
-  static function rule_valid_IBAN($value) {
-    if (self::verifyIBAN($value)===NULL) {
+  public static function rule_valid_IBAN(string $value): int {
+    if (self::verifyIBAN($value) === NULL) {
       return 1;
-    } else {
+    }
+    else {
       return 0;
     }
   }
@@ -228,10 +232,11 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Form rule wrapper for ::verifyIBAN
    */
-  static function rule_valid_PSP_Code($value) {
-    if (self::verifyIBAN($value, 'PSP')===NULL) {
+  public static function rule_valid_PSP_Code(string $value): int {
+    if (self::verifyIBAN($value, 'PSP') === NULL) {
       return 1;
-    } else {
+    }
+    else {
       return 0;
     }
   }
@@ -239,36 +244,39 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Verifies if the given BIC is formally correct
    *
-   * @param bic  string, BIC candidate
+   * @param string $bic BIC candidate
    *
-   * @return NULL if given BIC is valid, localized error message otherwise
+   * @return null|string NULL if given BIC is valid, localized error message otherwise
    */
-  static function verifyBIC($bic, $type = 'SEPA') {
+  public static function verifyBIC(string $bic, string $type = 'SEPA'): ?string {
     switch ($type) {
       case 'SEPA':
-        if (preg_match("/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/", $bic)) {
+        if (preg_match('/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/', $bic)) {
           return NULL;
-        } else {
-          return E::ts("BIC is not correct");
+        }
+        else {
+          return E::ts('BIC is not correct');
         }
 
       default:
       case 'PSP':
-        if (preg_match("/^[a-zA-Z0-9_\/\-=+]{0,25}$/", $bic)) {
+        if (preg_match('/^[a-zA-Z0-9_\/\-=+]{0,25}$/', $bic)) {
           return NULL;
-        } else {
-          return E::ts("PSP/BIC is not correct");
         }
-      }
+        else {
+          return E::ts('PSP/BIC is not correct');
+        }
+    }
   }
 
   /**
    * Form rule wrapper for ::verifyBIC
    */
-  static function rule_valid_BIC($value) {
-    if (self::verifyBIC($value)===NULL) {
+  public static function rule_valid_BIC(string $value): int {
+    if (self::verifyBIC($value) === NULL) {
       return 1;
-    } else {
+    }
+    else {
       return 0;
     }
   }
@@ -276,11 +284,13 @@ class CRM_Sepa_Logic_Verification {
   /**
    * Form rule wrapper for ::verifyBIC
    */
-  static function rule_valid_PSP_BIC($value) {
-    if (self::verifyBIC($value, 'PSP')===NULL) {
+  public static function rule_valid_PSP_BIC(string $value): int {
+    if (self::verifyBIC($value, 'PSP') === NULL) {
       return 1;
-    } else {
+    }
+    else {
       return 0;
     }
   }
+
 }

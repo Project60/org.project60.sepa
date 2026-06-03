@@ -14,19 +14,21 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
+use CRM_Sepa_ExtensionUtil as E;
+
 /**
  * Close a sepa group
  *
  * @package CiviCRM_SEPA
  *
  */
-
-require_once 'CRM/Core/Page.php';
-
 class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
 
-  function run() {
-    CRM_Utils_System::setTitle(ts('Delete SEPA Group', ['domain' => 'org.project60.sepa']));
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+  public function run() {
+    CRM_Utils_System::setTitle(E::ts('Delete SEPA Group'));
     if (empty($_REQUEST['group_id'])) {
       $this->assign('status', 'error');
     }
@@ -88,7 +90,7 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
       elseif ($_REQUEST['confirmed'] == 'yes') {
         // delete the group
         $this->assign('status', 'done');
-        $delete_contributions_mode = $_REQUEST['delete_contents'];
+        $delete_contributions_mode = (string) $_REQUEST['delete_contents'];
         $deleted_ok = [];
         $deleted_error = [];
         $result = CRM_Sepa_BAO_SEPATransactionGroup::deleteGroup($group_id, $delete_contributions_mode);
@@ -126,11 +128,12 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
   /**
    * gather some statistics about the contributions linked to this txgroup
    *
-   * @return array(contribution_status_id->array(contribution_ids))
+   * @return array<int, list<int>>
+   *   Mapping of contribution_status_id to list of contribution_id
    */
-  function contributionStats($group_id) {
-  	$stats = array();
-  	$sql = "
+  public function contributionStats(int $group_id): array {
+    $stats = [];
+    $sql = "
   	SELECT
   		civicrm_contribution.id 						AS contribution_id,
   		civicrm_contribution.contribution_status_id 	AS status_id
@@ -139,13 +142,15 @@ class CRM_Sepa_Page_DeleteGroup extends CRM_Core_Page {
   	WHERE
   		civicrm_sdd_contribution_txgroup.txgroup_id = $group_id;
   	";
-  	$contribution_info = CRM_Core_DAO::executeQuery($sql);
-  	while ($contribution_info->fetch()) {
-  		if (!isset($stats[$contribution_info->status_id])) {
-  			$stats[$contribution_info->status_id] = array();
-  		}
-  		array_push($stats[$contribution_info->status_id], $contribution_info->contribution_id);
-  	}
-  	return $stats;
+    /** @var \CRM_Core_DAO $contribution_info */
+    $contribution_info = CRM_Core_DAO::executeQuery($sql);
+    while ($contribution_info->fetch()) {
+      if (!isset($stats[$contribution_info->status_id])) {
+        $stats[$contribution_info->status_id] = [];
+      }
+      array_push($stats[$contribution_info->status_id], (int) $contribution_info->contribution_id);
+    }
+    return $stats;
   }
+
 }

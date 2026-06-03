@@ -34,8 +34,8 @@ final class SepaBatchLockManager {
 
   private LockManager $lockManager;
 
-
   public static function getInstance(): self {
+    /** @var self */
     return \Civi::service(self::class);
   }
 
@@ -51,7 +51,9 @@ final class SepaBatchLockManager {
   }
 
   public function getLock(): SepaBatchLock {
+    // @phpstan-ignore voku.Coalesce
     return $this->lock ??= new SepaBatchLock(
+      // @phpstan-ignore voku.Coalesce
       $this->civiLock ??= $this->lockManager->create(self::LOCK_NAME),
       $this->getAsyncLock(),
       $this->getDefaultLockTimeout());
@@ -68,16 +70,19 @@ final class SepaBatchLockManager {
 
   private function getDefaultLockTimeout(): int {
     return $this->defaultLockTimeout ??=
+      // @phpstan-ignore cast.int
       (int) (\CRM_Sepa_Logic_Settings::getSetting('batching.UPDATE.lock.timeout') ?? 0);
   }
 
   private function getAsyncLock(): SepaAsyncBatchLock {
+    // @phpstan-ignore voku.Coalesce
     return $this->asyncLock ??= new SepaAsyncBatchLock(
       \Civi::paths()->getPath('[civicrm.files]/custom') . '/civisepa_' . self::LOCK_NAME . '.lock'
     );
   }
 
   private function getPrivateLock(): SepaBatchLock {
+    // @phpstan-ignore voku.Coalesce
     return $this->lock ??= $this->getLock();
   }
 

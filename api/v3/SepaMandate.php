@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * Add an SepaCreditor for a contact
  *
@@ -20,11 +22,13 @@
  *
  * @example SepaCreditorCreate.php Standard Create Example
  *
- * @return array API result array
- * {@getfields sepa_mandate_create}
+ * @param array<string, mixed> $params
+ *
+ * @return array<string, mixed> API result array
+ *   {@getfields sepa_mandate_create}
  * @access public
  */
-function civicrm_api3_sepa_mandate_create($params) {
+function civicrm_api3_sepa_mandate_create(array $params): array {
   _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
@@ -33,324 +37,383 @@ function civicrm_api3_sepa_mandate_create($params) {
  * Provide Metadata for SepaMandate.create
  *
  * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * @param array<string, array<string, mixed>> $params array or parameters determined by getfields
  */
-function _civicrm_api3_sepa_mandate_create_spec(&$params) {
-  $params['entity_id'] = array(
+function _civicrm_api3_sepa_mandate_create_spec(array &$params): void {
+  $params['entity_id'] = [
     'name'         => 'entity_id',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Entity ID of linked contribution',
-  );
-  $params['entity_table'] = array(
+  ];
+  $params['entity_table'] = [
     'name'         => 'entity_table',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Table name of linked contribution',
-    );
-  $params['type'] = array(
+  ];
+  $params['type'] = [
     'name'         => 'type',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'RCUR for recurring, OOFF for one-off mandate',
-  );
-  $params['status'] = array(
+  ];
+  $params['status'] = [
     'name'         => 'status',
     'api.default'  => 'INIT',
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Mandate status',
-  );
+  ];
 }
-
 
 /**
  * Creates a mandate object along with its "contract",
  * i.e. the payment details as recorded in an
  * associated contribution or recurring contribution
  *
- * @author endres -at- systopia.de
+ * @param array{
+ *   creditor_id: int|numeric-string,
+ *   type: string,
+ *   status?: string,
+ *   payment_instrument_id?: int|numeric-string,
+ *   financial_type_id: int|numeric-string,
+ *   bic?: string,
+ *   contribution_contact_id?: int|numeric-string,
+ *   currency?: string,
+ *   contribution_status_id?: int|numeric-string,
+ *   is_pay_later?: bool|scalar,
+ *   total_amount?: int|float|numeric-string,
+ *   amount: int|float|numeric-string,
+ *   ...
+ * } $params
  *
- * @return array API result array
+ * @return array<string, mixed> API result array
  */
-function civicrm_api3_sepa_mandate_createfull($params) {
-    // TODO: more sanity checks?
+// phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+function civicrm_api3_sepa_mandate_createfull(array $params): array {
+  // TODO: more sanity checks?
 
-    // get creditor
-    try {
-      _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
-      $creditor = civicrm_api3('SepaCreditor', 'getsingle', array('id' => $params['creditor_id']));
-    } catch (Exception $e) {
-      throw new Exception("Couldn't load creditor [{$params['creditor_id']}].");
+  // get creditor
+  try {
+    _civicrm_api3_sepa_mandate_adddefaultcreditor($params);
+    $creditor = civicrm_api3('SepaCreditor', 'getsingle', ['id' => $params['creditor_id']]);
+  }
+  catch (Exception $e) {
+    throw new Exception("Couldn't load creditor [{$params['creditor_id']}].", $e->getCode(), $e);
+  }
+
+  // verify/set payment_instrument_id
+  $mandate_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
+  // if there is a status override, use that
+  if (isset($params['status']) && $params['status'] == 'RCUR') {
+    $mandate_status = 'RCUR';
+  }
+  $rcur_pi_status = ($mandate_status == 'OOFF') ? 'OOFF' : 'RCUR';
+  $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor(
+    (int) $params['creditor_id'],
+    $rcur_pi_status
+  );
+  if (empty($params['payment_instrument_id'])) {
+    // no payment instrument given, see if there is a unique one set
+    if (count($eligible_payment_instruments) == 1) {
+      // there is exactly one instrument defined -> use that
+      $params['payment_instrument_id'] = reset($eligible_payment_instruments)['id'];
+
+    }
+    elseif (count($eligible_payment_instruments) == 0) {
+      // no payment instrument -> disabled
+      throw new CRM_Core_Exception(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        "{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set."
+      );
+    }
+    else {
+      // unclear which one to take
+      throw new CRM_Core_Exception(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        "You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options."
+      );
     }
 
-    // verify/set payment_instrument_id
-    $mandate_status = ($params['type'] == 'OOFF') ? 'OOFF' : 'FRST';
-    if (isset($params['status']) && $params['status'] == 'RCUR') { // if there is a status override, use that
-      $mandate_status = 'RCUR';
+  }
+  else {
+    // a payment instrument is set, verify that it's allowed
+    if (!array_key_exists($params['payment_instrument_id'], $eligible_payment_instruments)) {
+      throw new CRM_Core_Exception(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        "Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}]."
+      );
     }
-    $rcur_pi_status = ($mandate_status == 'OOFF') ? 'OOFF' : 'RCUR';
-    $eligible_payment_instruments = CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor($params['creditor_id'], $rcur_pi_status);
-    if (empty($params['payment_instrument_id'])) {
-      // no payment instrument given, see if there is a unique one set
-      if (count($eligible_payment_instruments) == 1) {
-        // there is exactly one instrument defined -> use that
-        $params['payment_instrument_id'] = reset($eligible_payment_instruments)['id'];
+  }
 
-      } elseif (count($eligible_payment_instruments) == 0) {
-        // no payment instrument -> disabled
-        throw new CRM_Core_Exception("{$mandate_status} mandate for creditor ID [{$params['creditor_id']}] disabled, i.e. no valid payment instrument set.");
-      } else {
-        // unclear which one to take
-        throw new CRM_Core_Exception("You have to define the payment_instrument_id for {$mandate_status} mandates for creditor ID [{$params['creditor_id']}], there are multiple options.");
-      }
+  // Validate financial type.
+  if (!array_key_exists($params['financial_type_id'], \Civi\Sepa\Util\ContributionUtil::getFinancialTypeList())) {
+    throw new CRM_Core_Exception(
+      "No permission for creating SEPA mandates with financial type [{$params['financial_type_id']}]."
+    );
+  }
 
-    } else {
-      // a payment instrument is set, verify that it's allowed
-      if (!array_key_exists($params['payment_instrument_id'], $eligible_payment_instruments)) {
-        throw new CRM_Core_Exception("Payment instrument [{$params['payment_instrument_id']}] invalid for {$mandate_status} mandates with creditor ID [{$params['creditor_id']}].");
-      }
+  // if BIC is used for this creditor, it is required (see #245)
+  if (empty($params['bic'])) {
+    if ($creditor['uses_bic']) {
+      return civicrm_api3_create_error("BIC is required for creditor [{$params['creditor_id']}].");
     }
-
-    // Validate financial type.
-    if (
-      is_numeric($params['financial_type_id'] ?? NULL)
-      && !array_key_exists($params['financial_type_id'], \Civi\Sepa\Util\ContributionUtil::getFinancialTypeList())
-    ) {
-      throw new CRM_Core_Exception("No permission for creating SEPA mandates with financial type [{$params['financial_type_id']}].");
+    else {
+      $params['bic'] = 'NOTPROVIDED';
     }
+  }
 
-    // if BIC is used for this creditor, it is required (see #245)
-    if (empty($params['bic'])) {
-      if ($creditor['uses_bic']) {
-        return civicrm_api3_create_error("BIC is required for creditor [{$params['creditor_id']}].");
-      } else {
-        $params['bic'] = 'NOTPROVIDED';
-      }
+  // copy array
+  $create_contribution = $params;
+  if (isset($create_contribution['contribution_contact_id'])) {
+    // in case someone wants another contact for the contribution than for the mandate...
+    $create_contribution['contact_id'] = $create_contribution['contribution_contact_id'];
+  }
+  if (empty($create_contribution['currency'])) {
+    $create_contribution['currency'] = $creditor['currency'];
+  }
+
+  if (empty($create_contribution['contribution_status_id'])) {
+    $create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
+  }
+
+  if ($params['type'] == 'RCUR') {
+    $contribution_entity = 'ContributionRecur';
+    $contribution_table  = 'civicrm_contribution_recur';
+    $create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
+    if (empty($create_contribution['status'])) {
+      // set default status
+      $create_contribution['status'] = 'FRST';
     }
-
-    $create_contribution = $params; // copy array
-    $create_contribution['version'] = 3;
-    if (isset($create_contribution['contribution_contact_id'])) {
-    	// in case someone wants another contact for the contribution than for the mandate...
-    	$create_contribution['contact_id'] = $create_contribution['contribution_contact_id'];
-    }
-	  if (empty($create_contribution['currency']))
-		  $create_contribution['currency'] = $creditor['currency'];
-
-	  if (empty($create_contribution['contribution_status_id']))
-		  $create_contribution['contribution_status_id'] = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-
-    if ($params['type']=='RCUR') {
-    	$contribution_entity = 'ContributionRecur';
-	    $contribution_table  = 'civicrm_contribution_recur';
-      	$create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
-      	if (empty($create_contribution['status']))
-      		$create_contribution['status'] = 'FRST'; // set default status
-      	if (empty($create_contribution['is_pay_later']))
-      		$create_contribution['is_pay_later'] = 1; // set default pay_later
-
-    } elseif ($params['type']=='OOFF') {
-	 	$contribution_entity = 'Contribution';
-	    $contribution_table  = 'civicrm_contribution';
-      	$create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
-      	if (empty($create_contribution['status']))
-      		$create_contribution['status'] = 'OOFF'; // set default status
-      	if (empty($create_contribution['total_amount']))
-      		$create_contribution['total_amount'] = $create_contribution['amount']; // copy from amount
-
-    } else {
-    	return civicrm_api3_create_error('Unknown mandate type: '.$params['type']);
+    if (empty($create_contribution['is_pay_later'])) {
+      // set default pay_later
+      $create_contribution['is_pay_later'] = 1;
     }
 
-    // create the contribution
-    $contribution = civicrm_api($contribution_entity, "create", $create_contribution);
-    if (!empty($contribution['is_error'])) {
-    	return $contribution;
+  }
+  elseif ($params['type'] == 'OOFF') {
+    $contribution_entity = 'Contribution';
+    $contribution_table  = 'civicrm_contribution';
+    $create_contribution['payment_instrument_id'] = $params['payment_instrument_id'];
+    if (empty($create_contribution['status'])) {
+      // set default status
+      $create_contribution['status'] = 'OOFF';
+    }
+    if (empty($create_contribution['total_amount'])) {
+      // copy from amount
+      $create_contribution['total_amount'] = $create_contribution['amount'];
     }
 
-    // create the mandate object itself
-    // TODO: sanity checks
-    $create_mandate = $create_contribution; // copy array
-    $create_mandate['version'] = 3;
-    $create_mandate['entity_table'] = $contribution_table;
-    $create_mandate['entity_id'] = $contribution['id'];
-    $mandate = civicrm_api("SepaMandate", "create", $create_mandate);
-    if (!empty($mandate['is_error'])) {
-    	// this didn't work, so we also have to roll back the created contribution
-    	$delete = civicrm_api($contribution_entity, "delete", array('id'=>$contribution['id'], 'version'=>3));
-    	if (!empty($delete['is_error'])) {
-    		Civi::log()->debug("org.project60.sepa: createfull couldn't roll back created contribution: ".$delete['error_message']);
-    	}
+  }
+  else {
+    return civicrm_api3_create_error('Unknown mandate type: ' . $params['type']);
+  }
+
+  // create the contribution
+  $contribution = civicrm_api3($contribution_entity, 'create', $create_contribution);
+  if (!empty($contribution['is_error'])) {
+    return $contribution;
+  }
+
+  // create the mandate object itself
+  // TODO: sanity checks
+  // copy array
+  $create_mandate = $create_contribution;
+  $create_mandate['entity_table'] = $contribution_table;
+  $create_mandate['entity_id'] = $contribution['id'];
+  /** @var array<string, mixed> $mandate */
+  $mandate = civicrm_api3('SepaMandate', 'create', $create_mandate);
+  if (!empty($mandate['is_error'])) {
+    // this didn't work, so we also have to roll back the created contribution
+    $delete = civicrm_api3($contribution_entity, 'delete', ['id' => $contribution['id']]);
+    if (!empty($delete['is_error'])) {
+      Civi::log()->debug(
+        "org.project60.sepa: createfull couldn't roll back created contribution: " . $delete['error_message']
+      );
     }
-	return $mandate;
+  }
+  return $mandate;
 }
 
 /**
  * Provide Metadata for SepaMandate.createfull
+ *
+ * @param array<string, array<string, mixed>> $params
  */
-function _civicrm_api3_sepa_mandate_createfull_spec(&$params) {
-  $params['contact_id'] = array(
+function _civicrm_api3_sepa_mandate_createfull_spec(array &$params): void {
+  $params['contact_id'] = [
     'name'         => 'contact_id',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Contact ID for the new mandate',
-  );
-  $params['type'] = array(
+  ];
+  $params['type'] = [
     'name'         => 'type',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'RCUR for recurring, OOFF for one-off',
-  );
-  $params['account_holder'] = array(
+  ];
+  $params['account_holder'] = [
     'name'         => 'account_holder',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Account holder for the mandate',
-  );
-  $params['iban'] = array(
+  ];
+  $params['iban'] = [
     'name'         => 'iban',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'IBAN (account number) for the mandate',
-  );
-  $params['bic'] = array(
+  ];
+  $params['bic'] = [
     'name'         => 'bic',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'BIC (bank number) for the mandate',
-  );
-  $params['amount'] = array(
+  ];
+  $params['amount'] = [
     'name'         => 'amount',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_FLOAT,
     'title'        => 'Nominal (installment) amount',
-  );
-  $params['reference'] = array(
+  ];
+  $params['reference'] = [
     'name'         => 'reference',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Mandate reference. Will be calculated if omitted',
-  );
-  $params['source'] = array(
+  ];
+  $params['source'] = [
     'name'         => 'source',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Source of the mandate',
-  );
-  $params['date'] = array(
+  ];
+  $params['date'] = [
     'name'         => 'date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
+    'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'title'        => 'Signature date',
-  );
-  $params['creation_date'] = array(
+  ];
+  $params['creation_date'] = [
     'name'         => 'creation_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
+    'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'title'        => 'Creation date',
-  );
-  $params['validation_date'] = array(
+  ];
+  $params['validation_date'] = [
     'name'         => 'validation_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
+    'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'title'        => 'Validation date',
-  );
-  $params['is_enabled'] = array(
+  ];
+  $params['is_enabled'] = [
     'name'         => 'is_enabled',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Mandate enabled?',
-  );
-  $params['creditor_id'] = array(
+  ];
+  $params['creditor_id'] = [
     'name'         => 'creditor_id',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Creditor ID. Default creditor used if omitted',
-  );
-  $params['financial_type_id'] = array(
+  ];
+  $params['financial_type_id'] = [
     'name'         => 'financial_type_id',
     'api.required' => 1,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Financial type of the contribution(s)',
-  );
-  $params['payment_instrument_id'] = array(
+  ];
+  $params['payment_instrument_id'] = [
     'name'         => 'payment_instrument_id',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Payment Method',
-  );
-  $params['campaign_id'] = array(
+  ];
+  $params['campaign_id'] = [
     'name'         => 'campaign_id',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Campaign of the contribution(s)',
-  );
-  $params['receive_date'] = array(
+  ];
+  $params['receive_date'] = [
     'name'         => 'receive_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
+    'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'title'        => 'Collection date (only for OOFF)',
-  );
-  $params['start_date'] = array(
+  ];
+  $params['start_date'] = [
     'name'         => 'start_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
+    'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'title'        => 'Start of collection (only for RCUR)',
-  );
-  $params['end_date'] = array(
+  ];
+  $params['end_date'] = [
     'name'         => 'end_date',
     'api.required' => 0,
-    'type'         => CRM_Utils_Type::T_DATE+CRM_Utils_Type::T_TIME,
+    'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'title'        => 'End of collection (only for RCUR)',
-  );
-  $params['frequency_interval'] = array(
+  ];
+  $params['frequency_interval'] = [
     'name'         => 'frequency_interval',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Collection interval (together with frequency_unit, only for RCUR)',
-  );
-  $params['frequency_unit'] = array(
+  ];
+  $params['frequency_unit'] = [
     'name'         => 'frequency_unit',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Collection interval unit (together with frequency_interval, only for RCUR)',
-  );
-  $params['cycle_day'] = array(
+  ];
+  $params['cycle_day'] = [
     'name'         => 'cycle_day',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Day of the month (for collection, only for RCUR)',
-  );
+  ];
 }
-
-
 
 /**
  * Update next scheduled collection day
  *
  * This can be used for migration or recovery after profound changes
+ *
+ * @param array{mode: string, mandate_ids?: string} $params
+ *
+ * @return array<string, mixed>
  */
-function civicrm_api3_sepa_mandate_update_next_scheduled_date($params) {
-  $restrictions = array();
+function civicrm_api3_sepa_mandate_update_next_scheduled_date(array $params): array {
+  $restrictions = [];
   if ($params['mode'] == 'empty') {
     $restrictions[] = 'civicrm_contribution_recur.next_sched_contribution_date IS NULL';
-  } elseif ($params['mode'] == 'all') {
+  }
+  // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedElseif
+  elseif ($params['mode'] == 'all') {
     // no extra restrictions
-  } else {
+  }
+  else {
     return civicrm_api3_create_error("Please select mode 'empty' or 'all'.");
   }
 
   if (!empty($params['mandate_ids'])) {
     // sanitize input string
-    $mandate_id_list = preg_replace("#[^0-9,]#", '', $params['mandate_ids']);
+    $mandate_id_list = preg_replace('#[^0-9,]#', '', $params['mandate_ids']);
     if (!empty($mandate_id_list)) {
       $restrictions[] = "civicrm_sdd_mandate.id IN ($mandate_id_list)";
     }
   }
 
   // add general restrictions
-  $restrictions[] = "civicrm_sdd_mandate.type = 'RCUR'"; // only type RCUR
-  $restrictions[] = "civicrm_sdd_mandate.status IN ('FRST','RCUR')"; // only active ones
+  // only type RCUR
+  $restrictions[] = "civicrm_sdd_mandate.type = 'RCUR'";
+  // only active ones
+  $restrictions[] = "civicrm_sdd_mandate.status IN ('FRST','RCUR')";
   $restrictions_sql = '(' . implode(') AND (', $restrictions) . ')';
 
   $query = "
@@ -358,85 +421,90 @@ function civicrm_api3_sepa_mandate_update_next_scheduled_date($params) {
     civicrm_contribution_recur.id   AS civicrm_contribution_recur_id,
     civicrm_sdd_mandate.creditor_id AS creditor_id
   FROM civicrm_contribution_recur
-  LEFT JOIN civicrm_sdd_mandate ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
+  LEFT JOIN civicrm_sdd_mandate
+    ON civicrm_contribution_recur.id = civicrm_sdd_mandate.entity_id
+    AND civicrm_sdd_mandate.entity_table = 'civicrm_contribution_recur'
   WHERE {$restrictions_sql}
   ORDER BY civicrm_sdd_mandate.creditor_id";
 
+  /** @var \CRM_Core_DAO $recurring_contributions */
   $recurring_contributions = CRM_Core_DAO::executeQuery($query);
   $counter = 0;
   $updater = NULL;
   while ($recurring_contributions->fetch()) {
     $counter++;
 
-    if (!$updater || !$updater->usesCreditor($recurring_contributions->creditor_id)) {
-      $updater = new CRM_Sepa_Logic_NextCollectionDate($recurring_contributions->creditor_id);
+    if (!$updater || !$updater->usesCreditor((int) $recurring_contributions->creditor_id)) {
+      $updater = new CRM_Sepa_Logic_NextCollectionDate((int) $recurring_contributions->creditor_id);
     }
 
-    $updater->updateNextCollectionDate($recurring_contributions->civicrm_contribution_recur_id, NULL);
+    $updater->updateNextCollectionDate((int) $recurring_contributions->civicrm_contribution_recur_id, NULL);
   }
 
   $null = NULL;
-  return civicrm_api3_create_success(array(), $params, $null, $null, $null, array('count' => $counter));
+  return civicrm_api3_create_success([], $params, $null, $null, $null, ['count' => $counter]);
 }
 
 /**
  * Provide Metadata for SepaMandate.create
+ *
+ * @param array<string, array<string, mixed>> $params
  */
-function _civicrm_api3_sepa_mandate_update_next_scheduled_date_spec(&$params) {
-  $params['mode'] = array(
+function _civicrm_api3_sepa_mandate_update_next_scheduled_date_spec(array &$params): void {
+  $params['mode'] = [
     'name'         => 'mode',
     'api.default'  => 'empty',
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Should all be updated ("all") or only empty ones ("empty")',
-    );
-  $params['mandate_ids'] = array(
+  ];
+  $params['mandate_ids'] = [
     'name'         => 'mandate_ids',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Restrict to the given (comma separated) list of mandate IDs',
-    );
+  ];
 }
 
 /**
  * Deletes an existing Mandate
  *
- * @param  array  $params
+ * @param array<string, mixed> $params
  *
- * @return array true if successfull, error otherwise
- * {@getfields sepa_mandate_delete}
+ * @return array<string, mixed>
+ *   {@getfields sepa_mandate_delete}
  * @access public
  */
-function civicrm_api3_sepa_mandate_delete($params) {
+function civicrm_api3_sepa_mandate_delete(array $params): array {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
  * Retrieve one or more sepa_mandates
  *
- * @param  array input parameters
- *
- *
  * @example SepaCreditorGet.php Standard Get Example
  *
- * @param  array $params  an associative array of name/value pairs.
+ * @param array<string, mixed> $params an associative array of name/value pairs.
  *
- * @return  array api result array
- * {@getfields sepa_mandate_get}
+ * @return array<string, mixed> api result array
+ *   {@getfields sepa_mandate_get}
  * @access public
  */
-function civicrm_api3_sepa_mandate_get($params) {
+function civicrm_api3_sepa_mandate_get(array $params): array {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
 
 /**
  * Modify/update mandates
  *
+ * @param array{mandate_id?: int|numeric-string, reference?: string, ...} $params
+ *
+ * @return array<string, mixed>
+ *
  * @see https://github.com/Project60/org.project60.sepa/issues/413
  */
-function civicrm_api3_sepa_mandate_modify($params) {
+function civicrm_api3_sepa_mandate_modify(array $params): array {
   if (!CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
-    return civicrm_api3_create_error("Mandate modification not allowed. Check your settings.");
+    return civicrm_api3_create_error('Mandate modification not allowed. Check your settings.');
   }
 
   // look up mandate ID if only reference is given
@@ -459,68 +527,78 @@ function civicrm_api3_sepa_mandate_modify($params) {
   }
 
   try {
-    $changes = CRM_Sepa_BAO_SEPAMandate::modifyMandate($params['mandate_id'], $params);
+    $changes = CRM_Sepa_BAO_SEPAMandate::modifyMandate((int) $params['mandate_id'], $params);
     return civicrm_api3_create_success($changes);
-  } catch (Exception $e) {
+  }
+  catch (Exception $e) {
+    // @ignoreException
     return civicrm_api3_create_error($e->getMessage());
   }
 }
 
 /**
  * API specs for updating mandates
+ *
+ * @param array<string, array<string, mixed>> $params
  */
-function _civicrm_api3_sepa_mandate_modify_spec(&$params) {
-  $params['mandate_id'] = array(
+function _civicrm_api3_sepa_mandate_modify_spec(array &$params): void {
+  $params['mandate_id'] = [
     'name'         => 'mandate_id',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Mandate ID',
-  );
-  $params['reference'] = array(
+  ];
+  $params['reference'] = [
     'name'         => 'reference',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Mandate Reference',
-  );
-  $params['amount'] = array(
+  ];
+  $params['amount'] = [
     'name'         => 'amount',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'New Amount',
-  );
-  $params['iban'] = array(
+  ];
+  $params['iban'] = [
     'name'         => 'iban',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'New IBAN',
-  );
-  $params['bic'] = array(
+  ];
+  $params['bic'] = [
     'name'         => 'bic',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'New BIC',
-  );
-  $params['financial_type_id'] = array(
+  ];
+  $params['financial_type_id'] = [
     'name'         => 'financial_type_id',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'New Financial Type ID',
-  );
-  $params['campaign_id'] = array(
+  ];
+  $params['campaign_id'] = [
     'name'         => 'campaign_id',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'New Campaign ID',
-  );
+  ];
 }
-
 
 /**
  * Terminate mandates responsibly
  *
+ * @phpstan-param array{
+ *   mandate_id?: int|numeric-string,
+ *   reference?: string,
+ *   end_date?: string,
+ *   cancel_reason?: string,
+ * } $params
+ *
  * @see https://github.com/Project60/org.project60.sepa/issues/483
  */
-function civicrm_api3_sepa_mandate_terminate($params) {
+function civicrm_api3_sepa_mandate_terminate(array $params): array {
   // look up mandate ID if only reference is given
   if (empty($params['mandate_id']) && !empty($params['reference'])) {
     try {
@@ -542,66 +620,73 @@ function civicrm_api3_sepa_mandate_terminate($params) {
 
   try {
     $success = CRM_Sepa_BAO_SEPAMandate::terminateMandate(
-      $params['mandate_id'],
+      (int) $params['mandate_id'],
       date('Y-m-d', strtotime($params['end_date'] ?? 'today')),
       $params['cancel_reason'] ?? NULL,
       FALSE);
     if ($success) {
       return civicrm_api3_create_success();
-    } else {
+    }
+    else {
       return civicrm_api3_create_error("Mandate couldn't be closed (again).");
     }
 
-  } catch (Exception $e) {
-
+  }
+  catch (Exception $e) {
+    // @ignoreException
     return civicrm_api3_create_error($e->getMessage());
   }
 }
 
 /**
  * API specs for updating mandates
+ *
+ * @param array<string, array<string, mixed>> $params
  */
-function _civicrm_api3_sepa_mandate_terminate_spec(&$params) {
-  $params['mandate_id'] = array(
+function _civicrm_api3_sepa_mandate_terminate_spec(array &$params): void {
+  $params['mandate_id'] = [
     'name'         => 'mandate_id',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
     'title'        => 'Mandate ID',
-  );
-  $params['reference'] = array(
+  ];
+  $params['reference'] = [
     'name'         => 'reference',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Mandate Reference',
-  );
-  $params['end_date'] = array(
+  ];
+  $params['end_date'] = [
     'name'         => 'end_date',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'End Date',
     'description'  => 'Default is NOW',
-  );
-  $params['cancel_reason'] = array(
+  ];
+  $params['cancel_reason'] = [
     'name'         => 'cancel_reason',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
     'title'        => 'Cancel Reason',
-  );
+  ];
 }
-
 
 /**
  * HELPER FUNCTION
  *
  * will add the default creditor_id if no id and creditor_id is given, and the
  * default creditor is valid
+ *
+ * @template T of array<string, mixed>
+ *
+ * @phpstan-param T $params
+ * }
  */
-function _civicrm_api3_sepa_mandate_adddefaultcreditor(&$params) {
+function _civicrm_api3_sepa_mandate_adddefaultcreditor(array &$params): void {
   if (empty($params['id']) && empty($params['creditor_id'])) {
     $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
     if ($default_creditor != NULL) {
-      $params['creditor_id'] = $default_creditor->id;
+      $params['creditor_id'] = (int) $default_creditor->id;
     }
   }
 }
-

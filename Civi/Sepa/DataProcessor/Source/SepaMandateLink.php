@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright (C) 2023  Jaap Jansma (jaap.jansma@civicoop.org)
  *
@@ -15,7 +18,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 namespace Civi\Sepa\DataProcessor\Source;
 
 use Civi\DataProcessor\DataSpecification\DataSpecification;
@@ -33,8 +35,6 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the entity name
-   *
-   * @return String
    */
   protected function getEntity(): string {
     return 'SepaMandateLink';
@@ -42,8 +42,6 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the table name of this entity
-   *
-   * @return String
    */
   protected function getTable(): string {
     return 'civicrm_sdd_entity_mandate';
@@ -52,7 +50,7 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
   /**
    * Load the fields from this entity.
    *
-   * @param DataSpecification $dataSpecification
+   * @param \Civi\DataProcessor\DataSpecification\DataSpecification $dataSpecification
    * @param array $fieldsToSkip
    *
    * @throws \Civi\DataProcessor\DataSpecification\FieldExistsException
@@ -64,22 +62,25 @@ class SepaMandateLink extends AbstractCivicrmEntitySource {
 
   protected function getEntityTables(): array {
     if (!$this->entityTables) {
-      $this->entityTables = array();
-      $allTables = CRM_Core_DAO_AllCoreTables::getCoreTables();
-      foreach($allTables as $entity_table => $daoClass) {
+      $this->entityTables = [];
+      $allTables = CRM_Core_DAO_AllCoreTables::tables();
+      foreach ($allTables as $entity_table => $daoClass) {
         try {
           $r = new ReflectionMethod($daoClass, 'getEntityTitle');
           if ($r->getDeclaringClass()->getName() == $daoClass) {
-            $this->entityTables[$entity_table] = call_user_func([$daoClass,'getEntityTitle']);
+            $this->entityTables[$entity_table] = call_user_func([$daoClass, 'getEntityTitle']);
           }
-        } catch (ReflectionException $e) {
+        }
+        catch (ReflectionException $e) {
+          // @ignoreException
         }
         if (!isset($this->entityTables[$entity_table])) {
-          $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getBriefName($daoClass);
+          $this->entityTables[$entity_table] = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoClass);
         }
       }
       asort($this->entityTables);
     }
     return $this->entityTables;
   }
+
 }

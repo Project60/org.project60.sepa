@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /**
  * Copyright (C) 2023  Jaap Jansma (jaap.jansma@civicoop.org)
  *
@@ -15,7 +18,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 namespace Civi\Sepa\DataProcessor\Source;
 
 use Civi\DataProcessor\DataSpecification\DataSpecification;
@@ -25,8 +27,6 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the entity name
-   *
-   * @return String
    */
   protected function getEntity(): string {
     return 'SepaTransactionGroup';
@@ -34,8 +34,6 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
 
   /**
    * Returns the table name of this entity
-   *
-   * @return String
    */
   protected function getTable(): string {
     return 'civicrm_sdd_txgroup';
@@ -44,7 +42,7 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
   /**
    * Load the fields from this entity.
    *
-   * @param DataSpecification $dataSpecification
+   * @param \Civi\DataProcessor\DataSpecification\DataSpecification $dataSpecification
    * @param array $fieldsToSkip
    *
    * @throws \Civi\DataProcessor\DataSpecification\FieldExistsException
@@ -57,4 +55,5 @@ class SepaTransactionGroup extends AbstractCivicrmEntitySource {
       'OOFF' => 'OOFF',
     ];
   }
+
 }

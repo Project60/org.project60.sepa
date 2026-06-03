@@ -19,8 +19,6 @@ declare(strict_types = 1);
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\DAOEntity;
-
 /**
  * SepaContributionGroup entity.
  *
@@ -31,6 +29,9 @@ use Civi\Api4\Generic\DAOEntity;
 class SepaContributionGroup extends Generic\DAOEntity {
   use Generic\Traits\EntityBridge;
 
+  /**
+   * @return array<string, list<string|list<string>>>
+   */
   public static function permissions(): array {
     return [
       'get' => ['view sepa groups'],

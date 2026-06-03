@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 /*-------------------------------------------------------+
 | Project 60 - SEPA direct debit - PHPUnit tests         |
 | Copyright (C) 2019 SYSTOPIA                            |
@@ -25,20 +27,18 @@ use CRM_Sepa_ExtensionUtil as E;
  *        correct dates/days to set for it to work.
  * @group headless
  */
-class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
-{
-  public function setUp(): void
-  {
+class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase {
+
+  public function setUp(): void {
     parent::setUp();
     $this->setSepaConfiguration('exclude_weekends', '0');
   }
 
   /**
    * Test that OOFF mandates do not get deferred Saturdays if the configuration is not set.
-   * @see Case_ID D01
+   * See Case_ID D01.
    */
-  public function testOOFFNotBeingDeferredOnSaturday()
-  {
+  public function testOOFFNotBeingDeferredOnSaturday() {
     $this->setSepaConfiguration('exclude_weekends', '0');
 
     $mandateDate = 'next Saturday + 1 week';
@@ -64,10 +64,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
   /**
    * Test that OOFF mandates do not get deferred Sundays if the configuration is not set.
-   * @see Case_ID D01
+   * See Case_ID D01.
    */
-  public function testOOFFNotBeingDeferredOnSunday()
-  {
+  public function testOOFFNotBeingDeferredOnSunday() {
     $this->setSepaConfiguration('exclude_weekends', '0');
 
     $mandateDate = 'next Sunday + 1 week';
@@ -93,10 +92,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
   /**
    * Test that RCUR mandates do not get deferred Saturdays if the configuration is not set.
-   * @see Case_ID D03
+   * See Case_ID D03.
    */
-  public function testRCURNotBeingDeferredOnSaturday()
-  {
+  public function testRCURNotBeingDeferredOnSaturday() {
     $this->setSepaConfiguration('exclude_weekends', '0');
 
     $mandateDate = 'next Saturday + 1 week';
@@ -123,10 +121,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
   /**
    * Test that RCUR mandates do not get deferred Sundays if the configuration is not set.
-   * @see Case_ID D03
+   * See Case_ID D03.
    */
-  public function testRCURNotBeingDeferredOnSunday()
-  {
+  public function testRCURNotBeingDeferredOnSunday() {
     $this->setSepaConfiguration('exclude_weekends', '0');
 
     $mandateDate = 'next Sunday + 1 week';
@@ -153,10 +150,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
   /**
    * Test that OOFF mandates do get deferred Saturdays if the configuration is set.
-   * @see Case_ID D02
+   * See Case_ID D02.
    */
-  public function testOOFFBeingDeferredOnSaturday()
-  {
+  public function testOOFFBeingDeferredOnSaturday() {
     $this->setSepaConfiguration('exclude_weekends', '1');
 
     $mandateDate = 'next Saturday + 1 week';
@@ -183,10 +179,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
   /**
    * Test that OOFF mandates do get deferred Sundays if the configuration is set.
-   * @see Case_ID D02
+   * See Case_ID D02.
    */
-  public function testOOFFBeingDeferredOnSunday()
-  {
+  public function testOOFFBeingDeferredOnSunday() {
     $this->setSepaConfiguration('exclude_weekends', '1');
 
     $mandateDate = 'next Sunday + 1 week';
@@ -213,10 +208,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
   /**
    * Test that RCUR mandates do get deferred Saturdays if the configuration is set.
-   * @see Case_ID D04
+   * See Case_ID D04.
    */
-  public function testRCURBeingDeferredOnSaturday()
-  {
+  public function testRCURBeingDeferredOnSaturday() {
     $this->setSepaConfiguration('exclude_weekends', '1');
 
     $mandateDate = 'next Saturday + 1 week';
@@ -244,10 +238,9 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
 
   /**
    * Test that RCUR mandates do get deferred Sundays if the configuration is set.
-   * @see Case_ID D04
+   * See Case_ID D04.
    */
-  public function testRCURBeingDeferredOnSunday()
-  {
+  public function testRCURBeingDeferredOnSunday() {
     $this->setSepaConfiguration('exclude_weekends', '1');
 
     $mandateDate = 'next Sunday + 1 week';
@@ -272,4 +265,5 @@ class CRM_Sepa_DeferredCollectionTest extends CRM_Sepa_TestBase
     $this->assertNotSame('Saturday', $dayOfWeek, 'Collection date is not being deferred.');
     $this->assertNotSame('Sunday', $dayOfWeek, 'Collection date is not being deferred.');
   }
+
 }

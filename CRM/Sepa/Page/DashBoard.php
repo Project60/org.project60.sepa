@@ -14,6 +14,8 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 /**
  * sepa dash board / group manager
  *
@@ -26,11 +28,13 @@ use CRM_Sepa_ExtensionUtil as E;
 
 class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
-  /** cache for getFormatFilename function */
-  protected $_creditorID2format = array();
+  /**
+   * cache for getFormatFilename function */
+  protected array $_creditorID2format = [];
 
-  function run() {
-    CRM_Utils_System::setTitle(ts('CiviSEPA Dashboard', array('domain' => 'org.project60.sepa')));
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+  public function run() {
+    CRM_Utils_System::setTitle(E::ts('CiviSEPA Dashboard'));
     // get requested group status
     $status = CRM_Utils_Request::retrieve('status', 'String');
     if ('open' !== $status && 'closed' !== $status) {
@@ -38,16 +42,16 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     }
 
     // add button URLs
-    $this->assign("status", $status);
-    $this->assign("show_closed_url", CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed'));
-    $this->assign("show_open_url", CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
-    $this->assign("batch_ooff", CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=OOFF'));
-    $this->assign("batch_recur", CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=RCUR'));
-    $this->assign("batch_retry", CRM_Utils_System::url('civicrm/sepa/retry', 'reset=1'));
+    $this->assign('status', $status);
+    $this->assign('show_closed_url', CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=closed'));
+    $this->assign('show_open_url', CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
+    $this->assign('batch_ooff', CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=OOFF'));
+    $this->assign('batch_recur', CRM_Utils_System::url('civicrm/sepa/dashboard', 'update=RCUR'));
+    $this->assign('batch_retry', CRM_Utils_System::url('civicrm/sepa/retry', 'reset=1'));
 
     // check permissions
     $this->assign('can_delete', CRM_Core_Permission::check('delete sepa groups'));
-    $this->assign('can_batch',  CRM_Core_Permission::check('batch sepa groups'));
+    $this->assign('can_batch', CRM_Core_Permission::check('batch sepa groups'));
     $this->assign(
       'financialacls',
       \CRM_Extension_System::singleton()
@@ -56,33 +60,38 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     );
 
     if (isset($_REQUEST['update'])) {
-      $this->callBatcher($_REQUEST['update']);
+      $this->callBatcher((string) $_REQUEST['update']);
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/sepa/dashboard', 'status=active'));
     }
 
     // generate status value list
-    $status_2_title = array();
-    $status_list = array(
-      'open' => array(
-            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open'),
-            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Reopened')),
-      'closed' => array(
-            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'),
-            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Exported'),
-            CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received')));
+    $status_2_title = [];
+    $status_list = [
+      'open' => [
+        CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open'),
+        CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Reopened'),
+      ],
+      'closed' => [
+        CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'),
+        CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Exported'),
+        CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Received'),
+      ],
+    ];
     foreach ($status_list as $title => $values) {
       foreach ($values as $value) {
-        if (empty($value)) {    // delete empty values (i.e. batch_status doesn't exist)
+        // delete empty values (i.e. batch_status doesn't exist)
+        if (empty($value)) {
           unset($status_list[$title][array_search($value, $status_list[$title])]);
-        } else {
+        }
+        else {
           $status_2_title[$value] = $title;
         }
       }
     }
     // generate group value list
-    $status2label = array();
-    $status_values = array();
-    $status_group_selector = array('name'=>'batch_status');
+    $status2label = [];
+    $status_values = [];
+    $status_group_selector = ['name' => 'batch_status'];
     CRM_Core_OptionValue::getValues($status_group_selector, $status_values);
     foreach ($status_values as $status_value) {
       $status2label[$status_value['value']] = $status_value['label'];
@@ -99,6 +108,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
     // now read the details
     try {
       // API4 SepaTransactionGroup.get checks Financial ACLs for corresponding contributions.
+      /** @var \ArrayObject<int, array<string, mixed>> $sepaTransactionGroups */
       $sepaTransactionGroups = \Civi\Api4\SepaTransactionGroup::get(TRUE)
         ->selectRowCount()
         ->addSelect(
@@ -124,6 +134,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         ->addJoin(
           'SepaSddFile AS sepa_sdd_file',
           'LEFT',
+          NULL,
           ['sdd_file_id', '=', 'sepa_sdd_file.id']
         )
         ->addWhere('status_id', 'IN', $status_list[$status])
@@ -154,7 +165,7 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
         $group['file'] = $group['sepa_sdd_file.reference'];
         $group['file'] = $this->getFormatFilename($group);
         $group['status_label'] = $status2label[$group['status_id']];
-        $remaining_days = (strtotime($group['latest_submission_date']) - strtotime("now")) / (60 * 60 * 24);
+        $remaining_days = (strtotime($group['latest_submission_date']) - strtotime('now')) / (60 * 60 * 24);
         if ('closed' === $group['status']) {
           $group['submit'] = 'closed';
         }
@@ -176,8 +187,10 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
           }
         }
 
-        $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage($group['id']);
-        $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote($group['id']);
+        $group['transaction_message'] = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage(
+          $group['id']
+        );
+        $group['transaction_note'] = CRM_Sepa_BAO_SEPATransactionGroup::getNote((int) $group['id']);
 
         $groups[] = $group;
       }
@@ -199,10 +212,22 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
 
   /**
    * call the batching API
+   *
+   * @param 'OOFF'|'RCUR' $mode
    */
-  function callBatcher(string $mode): void {
+  public function callBatcher(string $mode): void {
     if (!SepaBatchLockManager::getInstance()->acquire(0)) {
       CRM_Core_Session::setStatus(E::ts('Cannot run update, another update is in progress!'), '', 'error');
+
+      return;
+    }
+
+    if ($mode !== 'OOFF' && $mode !== 'RCUR') {
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts("Unknown batcher mode '%s'. No batching triggered."), $mode),
+        E::ts('Error'),
+        'error'
+      );
 
       return;
     }
@@ -213,42 +238,41 @@ class CRM_Sepa_Page_DashBoard extends CRM_Core_Page {
       CRM_Sepa_Logic_Queue_Update::launchUpdateRunner($mode);
     }
 
-    if ($mode=="OOFF") {
-      $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => $mode));
-
-    } elseif ($mode=="RCUR") {
+    if ($mode === 'OOFF') {
+      civicrm_api3('SepaAlternativeBatching', 'update', ['type' => $mode]);
+    }
+    elseif ($mode === 'RCUR') {
       // perform for FRST _and_ RCUR
-      $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => 'FRST'));
-      $result = civicrm_api3("SepaAlternativeBatching", "update", array('type' => 'RCUR'));
-
-    } else {
-      CRM_Core_Session::setStatus(sprintf(E::ts("Unknown batcher mode '%s'. No batching triggered."), $mode), E::ts('Error'), 'error');
+      civicrm_api3('SepaAlternativeBatching', 'update', ['type' => 'FRST']);
+      civicrm_api3('SepaAlternativeBatching', 'update', ['type' => 'RCUR']);
     }
   }
 
   /**
    * Generate the right link wrt the correct file format
    *
-   * @param $group_data array the group data
+   * @param array $group_data the group data
    * @return string new (full) suggested file name
    * @throws Exception
    */
-  protected function getFormatFilename($group_data) {
+  protected function getFormatFilename(array $group_data): string {
     if (empty($group_data['file'])) {
       return '';
     }
 
     // get the format
     if (!empty($group_data['creditor_id'] && !isset($this->_creditorID2format[$group_data['creditor_id']]))) {
-      $format = CRM_Sepa_Logic_Format::getFormatForCreditor($group_data['creditor_id']);
+      $format = CRM_Sepa_Logic_Format::getFormatForCreditor((int) $group_data['creditor_id']);
       $this->_creditorID2format[$group_data['creditor_id']] = $format;
     }
     $format = $this->_creditorID2format[$group_data['creditor_id']];
 
     if ($format) {
       return $format->getFilename($group_data['file']);
-    } else {
+    }
+    else {
       return $group_data['file'] . '.xml';
     }
   }
+
 }

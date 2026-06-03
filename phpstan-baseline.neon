@@ -1,0 +1,4253 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 2
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Dynamic call to static method CRM_Core_Session\:\:setStatus\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Method CRM_Admin_Form_Setting_SepaSettings\:\:buildQuickForm\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Method CRM_Admin_Form_Setting_SepaSettings\:\:postProcess\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Method CRM_Admin_Form_Setting_SepaSettings\:\:setDefaultValues\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Only booleans are allowed in a ternary operator condition, mixed given\.$#'
+			identifier: ternary.condNotBoolean
+			count: 6
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^PHPDoc tag @var with type HTML_QuickForm_select is not subtype of type HTML_QuickForm_Element\.$#'
+			identifier: varTag.type
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Property CRM_Admin_Form_Setting_SepaSettings\:\:\$config_fields type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Property CRM_Admin_Form_Setting_SepaSettings\:\:\$custom_fields type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Admin/Form/Setting/SepaSettings.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: CRM/Sepa/BAO/SEPAContributionGroup.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAContributionGroup\:\:add\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAContributionGroup.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 11
+			path: CRM/Sepa/BAO/SEPACreditor.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 4
+			path: CRM/Sepa/BAO/SEPACreditor.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPACreditor\:\:add\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPACreditor.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPACreditor\:\:initialiseMandateData\(\) has parameter \$mandate_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPACreditor.php
+
+		-
+			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot access offset ''amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot access offset ''count'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot access offset ''currency'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot access offset ''error_message'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot access offset ''title'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot access offset ''type'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 2
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 21
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 9
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 14
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 4
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:generateModificationActivity\(\) has parameter \$detail_lines with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:generateModificationActivity\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:getLastMandateOfContact\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:getMandateFor\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:getUnbatchedContributionIds\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:isContributionMandate\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:isContributionRecurMandate\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPAMandate\:\:terminateOOFFMandate\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, string\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\<0, max\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 3
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 6
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Parameter \#2 \$currency of static method CRM_Utils_Money\:\:format\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 3
+			path: CRM/Sepa/BAO/SEPAMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: CRM/Sepa/BAO/SEPASddFile.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPASddFile\:\:add\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPASddFile.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''sdd_creditor_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''type'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 3
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 10
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Equal\: Insane comparison between ''all'' and ''all''\.$#'
+			identifier: voku.Equal
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 9
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPATransactionGroup\:\:_deleteGroupContents\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Method CRM_Sepa_BAO_SEPATransactionGroup\:\:add\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Parameter \#1 \$txgroup of method CRM_Sepa_Logic_Format\:\:getFileReference\(\) expects array\{reference\: string\}, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: CRM/Sepa/BAO/SEPATransactionGroup.php
+
+		-
+			message: '#^Casting to int something that''s already int\<min, \-1\>\|int\<1, max\>\.$#'
+			identifier: cast.useless
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 9
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 4
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Only booleans are allowed in &&, int\|false given on the right side\.$#'
+			identifier: booleanAnd.rightNotBoolean
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\|false given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Parameter \#1 \$string of function strtoupper expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 4
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Parameter \#3 \$id of static method CRM_Utils_Hook\:\:pre\(\) expects int\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Parameter &\$params by\-ref type of method CRM_Sepa_BAO_SepaMandateLink\:\:add\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: CRM/Sepa/BAO/SepaMandateLink.php
+
+		-
+			message: '#^Cannot access offset ''BIC'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''bic'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''iban'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''reference'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''uses_bic'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 8
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 10
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Implicit array creation is not allowed \- variable \$js_vars does not exist\.$#'
+			identifier: variable.implicitArray
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Form_CreateMandate\:\:postProcess", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 11
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:buildQuickForm\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getCampaignList\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getCreditorList\(\) has parameter \$creditors with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getCreditorList\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getCreditors\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getCurrencyList\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getFrequencyList\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getKnownBankAccounts\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:postProcess\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:setDefaultValues\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in &&, array\|null given on the left side\.$#'
+			identifier: booleanAnd.leftNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\|int given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 4
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in \|\|, int given on the left side\.$#'
+			identifier: booleanOr.leftNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in \|\|, int given on the right side\.$#'
+			identifier: booleanOr.rightNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Parameter \#2 \$formatType of static method CRM_Utils_Date\:\:setDateDefaults\(\) expects null, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Part \$account_data\[''name''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Part \$bic \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Part \$mandate\[''bic''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Part \$mandate\[''iban''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Part \$mandate\[''reference''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Property CRM_Sepa_Form_CreateMandate\:\:\$old_contrib \(array\|null\) does not accept array\|int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Property CRM_Sepa_Form_CreateMandate\:\:\$old_contrib type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Property CRM_Sepa_Form_CreateMandate\:\:\$old_mandate type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Property CRM_Sepa_Form_CreateMandate\:\:\$rpl_date \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Property CRM_Sepa_Form_CreateMandate\:\:\$rpl_reason \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: CRM/Sepa/Form/CreateMandate.php
+
+		-
+			message: '#^Binary operation "&" between mixed and 4 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 2
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 9
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 5
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateGeneric\:\:alterDisplay\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateGeneric\:\:alterDisplay\(\) has parameter \$rows with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateGeneric\:\:from\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateGeneric\:\:postProcess\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateGeneric\:\:select\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateGeneric\:\:where\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Offset mixed might not exist on array\|null\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Only booleans are allowed in an elseif condition, int\<0, 4\> given\.$#'
+			identifier: elseif.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Parameter \#1 \$fieldName of method CRM_Report_Form\:\:dateClause\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Parameter \#5 \$type of method CRM_Report_Form\:\:dateClause\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Part \$field\[''dbAlias''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateGeneric.php
+
+		-
+			message: '#^Cannot access offset mixed on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateOOFF.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateOOFF\:\:alterDisplay\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateOOFF.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateOOFF\:\:alterDisplay\(\) has parameter \$rows with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateOOFF.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateOOFF\:\:from\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateOOFF.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+
+		-
+			message: '#^Cannot access offset mixed on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 11
+			path: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateRCUR\:\:alterDisplay\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateRCUR\:\:alterDisplay\(\) has parameter \$rows with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateRCUR\:\:from\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Report_SepaMandateRCUR\:\:groupBy\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/Report/SepaMandateRCUR.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_RetryCollection\:\:buildQuickForm\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_RetryCollection\:\:getContributionStatusList\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_RetryCollection\:\:getCreditorList\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_RetryCollection\:\:getDateRangePresets\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_RetryCollection\:\:getFrequencyList\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_RetryCollection\:\:getGroupList\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_RetryCollection\:\:postProcess\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 9
+			path: CRM/Sepa/Form/RetryCollection.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: CRM/Sepa/Form/Search/SepaContactSearch.php
+
+		-
+			message: '#^Method CRM_Sepa_Form_Search_SepaContactSearch\:\:__construct\(\) has parameter \$formValues with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Form/Search/SepaContactSearch.php
+
+		-
+			message: '#^Parameter \#4 \$attributes of method CRM_Core_Form\:\:add\(\) expects array\|null, true given\.$#'
+			identifier: argument.type
+			count: 2
+			path: CRM/Sepa/Form/Search/SepaContactSearch.php
+
+		-
+			message: '#^Parameter \#4 \$sort of method CRM_Contact_Form_Search_Custom_Base\:\:sql\(\) expects null, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Form/Search/SepaContactSearch.php
+
+		-
+			message: '#^Return type \(string\) of method CRM_Sepa_Form_Search_SepaContactSearch\:\:templateFile\(\) should be compatible with return type \(null\) of method CRM_Contact_Form_Search_Custom_Base\:\:templateFile\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: CRM/Sepa/Form/Search/SepaContactSearch.php
+
+		-
+			message: '#^Binary operation "\." between ''org\.project60\.sepa\:…'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Call to function array_search\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 2
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 9
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 2
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 8
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Batching\:\:getCycle\(\) has parameter \$rcontribution with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Batching\:\:getCycleDay\(\) has parameter \$rcontribution with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Batching\:\:getNextExecutionDate\(\) has parameter \$rcontribution with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Batching\:\:getOrCreateTransactionGroup\(\) has parameter \$existing_groups with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int\<\-11, 11\> given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, string given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#1 \$datetime of function strtotime expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#1 \$mandate_id of static method CRM_Utils_SepaCustomisationHooks\:\:installment_created\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, array\<int, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, list\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#2 \$baseTimestamp of function strtotime expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 5
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#2 \$contribution_recur_id of static method CRM_Utils_SepaCustomisationHooks\:\:installment_created\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#2 \$now of static method CRM_Sepa_Logic_Batching\:\:getNextExecutionDate\(\) expects int, int\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#2 \$recurring_contribution_pi of static method CRM_Sepa_Logic_PaymentInstruments\:\:getInstallmentPaymentInstrument\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 8
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Part \$entity_id \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 7
+			path: CRM/Sepa/Logic/Batching.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 5
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_ContributionProtector\:\:fromApiInput\(\) has parameter \$apiRequest with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_ContributionProtector\:\:fromApiInput\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_ContributionProtector\:\:toApiOutput\(\) has parameter \$apiRequest with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_ContributionProtector\:\:toApiOutput\(\) has parameter \$result with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_ContributionProtector\:\:toApiOutput\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|false given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/ContributionProtector.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 1
+			path: CRM/Sepa/Logic/Format.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Format\:\:extendTransaction\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Logic/Format.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Format\:\:loadFormatClass\(\) should return static\(CRM_Sepa_Logic_Format\) but returns CRM_Sepa_Logic_Format\.$#'
+			identifier: return.type
+			count: 1
+			path: CRM/Sepa/Logic/Format.php
+
+		-
+			message: '#^Only booleans are allowed in &&, string\|false given on the left side\.$#'
+			identifier: booleanAnd.leftNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Format.php
+
+		-
+			message: '#^Property CRM_Sepa_Logic_Format\:\:\$settings type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Format.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 7
+			path: CRM/Sepa/Logic/Group.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Logic/Group.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 4
+			path: CRM/Sepa/Logic/Group.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\<0, max\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Group.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Group.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/''\|''\\\\'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 3
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^If_\: Use a function e\.g\. `count\(\$foo\) \> 0` instead of `\$foo`\.$#'
+			identifier: voku.If
+			count: 2
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 1
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, string\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\<0, max\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 3
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, list\<int\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Part \$creditor\[''id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Property CRM_Sepa_Logic_MandateRepairs\:\:\$ui_notifications type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/MandateRepairs.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 10
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 7
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_NextCollectionDate\:\:processMandatePreEdit\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_NextCollectionDate\:\:processRecurPreEdit\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Only booleans are allowed in &&, int\|null given on the right side\.$#'
+			identifier: booleanAnd.rightNotBoolean
+			count: 2
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 2
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Property CRM_Sepa_Logic_NextCollectionDate\:\:\$currently_edited_mandate_params type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Property CRM_Sepa_Logic_NextCollectionDate\:\:\$currently_edited_recurring_contribution_params type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Property CRM_Sepa_Logic_NextCollectionDate\:\:\$now \(int\) does not accept int\|false\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: CRM/Sepa/Logic/NextCollectionDate.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 2
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Cannot access offset ''name'' on int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Cannot access offset ''value'' on int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 3
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Implicit array creation is not allowed \- variable \$pi_ids does not exist\.$#'
+			identifier: variable.implicitArray
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 8
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_PaymentInstruments\:\:isSDD\(\) has parameter \$contribution with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, array\<string, mixed\>\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 2
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\<string, mixed\>\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int given\.$#'
+			identifier: if.condNotBoolean
+			count: 5
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 6
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Property CRM_Sepa_Logic_PaymentInstruments\:\:\$contribution_id_to_pi type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Property CRM_Sepa_Logic_PaymentInstruments\:\:\$sdd_creditors type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/PaymentInstruments.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: CRM/Sepa/Logic/Queue/Close.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 2
+			path: CRM/Sepa/Logic/Queue/Close.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 14
+			path: CRM/Sepa/Logic/Queue/Close.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Queue_Close\:\:updateContributionStatus\(\) has parameter \$contributions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Queue/Close.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Queue_Close\:\:updateMandateStatus\(\) has parameter \$contributions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Queue/Close.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Queue_Close\:\:updateMandateStatusSQL\(\) has parameter \$contributions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Queue/Close.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Queue/Close.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Logic/Queue/Update.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 2
+			path: CRM/Sepa/Logic/Queue/Update.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Queue_Update\:\:__construct\(\) has parameter \$creditorId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: CRM/Sepa/Logic/Queue/Update.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Queue/Update.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 12
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 2
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 2
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 3
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Retry\:\:createRetryGroup\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Retry\:\:getQuery\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Retry\:\:getRetryContributions\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Retry\:\:getStats\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\|false given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Parameter \#2 \$baseTimestamp of function strtotime expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Logic/Retry.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Cannot access offset int\<min, \-1\>\|int\<1, max\> on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 8
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 1
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 5
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Settings\:\:getTransactionMessage\(\) has parameter \$creditor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Settings\:\:getTransactionMessage\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Variable property access on mixed\.$#'
+			identifier: property.dynamicName
+			count: 2
+			path: CRM/Sepa/Logic/Settings.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 4
+			path: CRM/Sepa/Logic/Status.php
+
+		-
+			message: '#^Only booleans are allowed in a ternary operator condition, string\|null given\.$#'
+			identifier: ternary.condNotBoolean
+			count: 5
+			path: CRM/Sepa/Logic/Status.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Logic/Verification.php
+
+		-
+			message: '#^Method CRM_Sepa_Logic_Verification\:\:convert2SepaCharacterSet\(\) should return string but returns string\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: CRM/Sepa/Logic/Verification.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int\|false given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 3
+			path: CRM/Sepa/Logic/Verification.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\|false given\.$#'
+			identifier: if.condNotBoolean
+			count: 6
+			path: CRM/Sepa/Logic/Verification.php
+
+		-
+			message: '#^Cannot access offset ''filename'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CloseGroup.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CloseGroup.php
+
+		-
+			message: '#^Cannot access offset ''is_error'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CloseGroup.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: CRM/Sepa/Page/CloseGroup.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_CloseGroup\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/CloseGroup.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/CloseGroup.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: CRM/Sepa/Page/CloseGroup.php
+
+		-
+			message: '#^Cannot access offset ''amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''creditor_type'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''currency'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''cycle_day'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''display_name'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''financial_type_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''frequency_interval'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''reference'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''start_date'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 5
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 2
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 8
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 11
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 4
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Identical\: Insane comparison between ''RCUR'' and ''RCUR''\.$#'
+			identifier: voku.Identical
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_CreateMandate\:\:_check_date", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 2
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_CreateMandate\:\:createMandate", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 29
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_CreateMandate\:\:isPopup", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_CreateMandate\:\:prepareCreateForm", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 3
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_CreateMandate\:\:run", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 17
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_CreateMandate\:\:validateParameters", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 26
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 10
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_CreateMandate\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in &&, int\<0, max\> given on the right side\.$#'
+			identifier: booleanAnd.rightNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int\|false given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\<string\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\|int given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^Part \$contribution_data\[''contact_id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Page/CreateMandate.php
+
+		-
+			message: '#^BooleanAnd\: Condition between bool and false are always false\.$#'
+			identifier: voku.BooleanAnd
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^BooleanAndNode\: Condition between bool and false are always false\.$#'
+			identifier: voku.BooleanAndNode
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Call to function array_search\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 3
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Identical\: Insane comparison between ''RCUR'' and ''RCUR''\.$#'
+			identifier: voku.Identical
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_DashBoard\:\:run", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 2
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_DashBoard\:\:getFormatFilename\(\) has parameter \$group_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_DashBoard\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^NotIdentical\: Insane comparison between ''RCUR'' and ''RCUR''\.$#'
+			identifier: voku.NotIdentical
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Only numeric types are allowed in \-, int\|false given on the left side\.$#'
+			identifier: minus.leftNonNumeric
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Parameter \#1 \$datetime of function strtotime expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Parameter \#1 \$mode of method CRM_Sepa_Page_DashBoard\:\:callBatcher\(\) expects ''OOFF''\|''RCUR'', string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Property CRM_Sepa_Page_DashBoard\:\:\$_creditorID2format type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Page/DashBoard.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: CRM/Sepa/Page/DeleteGroup.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: CRM/Sepa/Page/DeleteGroup.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 2
+			path: CRM/Sepa/Page/DeleteGroup.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_DeleteGroup\:\:run", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 7
+			path: CRM/Sepa/Page/DeleteGroup.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 5
+			path: CRM/Sepa/Page/DeleteGroup.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_DeleteGroup\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/DeleteGroup.php
+
+		-
+			message: '#^Parameter \#2 \$delete_contributions_mode of static method CRM_Sepa_BAO_SEPATransactionGroup\:\:deleteGroup\(\) expects ''all''\|''no''\|''open'', string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Page/DeleteGroup.php
+
+		-
+			message: '#^Cannot access offset ''campaign'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''contact_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''financial_type'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''financial_type_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''label'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''link'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''status'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''title'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 4
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 3
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 2
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:adjustAmount", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:cancelMandate", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:changecyleday", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:endMandate", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 3
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:run", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 10
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 15
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_EditMandate\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, list\<string\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: CRM/Sepa/Page/EditMandate.php
+
+		-
+			message: '#^Binary operation "\." between ''&reset\=1&cid\='' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Binary operation "\." between ''&reset\=1&id\='' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''campaign_id\.title'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''contact_id\.contact_type'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''contact_id\.display_name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''contact_id\.id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''contribution_status_id\:label'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''currency'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''financial_type_id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''financial_type_id\:label'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''total_amount'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot cast mixed to float\.$#'
+			identifier: cast.double
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_ListGroup\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_Mandate\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/Mandate.php
+
+		-
+			message: '#^Binary operation "\*" between mixed and 12\.0 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Binary operation "/" between float and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Binary operation "/" between mixed and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''campaign\.title'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''cancel_reason'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution\.cancel_reason'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution\.currency'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution\.financial_type_id\:name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution\.id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution\.receive_date'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution\.total_amount'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.amount'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.currency'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.cycle_day'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.end_date'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.financial_type_id\:name'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.frequency_interval'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.frequency_unit'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.next_sched_contribution_date'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''contribution_recur\.start_date'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''reference'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot access offset ''status'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 6
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 2
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_MandateTab\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\|false given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Parameter \#1 \$interval of static method CRM_Utils_SepaOptionGroupTools\:\:getFrequencyText\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Parameter \#2 \$unit of static method CRM_Utils_SepaOptionGroupTools\:\:getFrequencyText\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Part \$contactId \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 2
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Part \$ooffMandate\[''contribution\.id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Part \$ooffMandate\[''id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Part \$rcurMandate\[''contribution_recur\.id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Part \$rcurMandate\[''id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 1
+			path: CRM/Sepa/Page/MandateTab.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: CRM/Sepa/Page/MarkGroupReceived.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 1
+			path: CRM/Sepa/Page/MarkGroupReceived.php
+
+		-
+			message: '#^In method "CRM_Sepa_Page_MarkGroupReceived\:\:run", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			count: 1
+			path: CRM/Sepa/Page/MarkGroupReceived.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 1
+			path: CRM/Sepa/Page/MarkGroupReceived.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_MarkGroupReceived\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/MarkGroupReceived.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/MarkGroupReceived.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/MarkGroupReceived.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_SepaFile\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/SepaFile.php
+
+		-
+			message: '#^Call to an undefined method civicrm_api3\:\:get\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Call to an undefined method civicrm_api3\:\:getsingle\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot access offset ''count'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot access offset ''postal_greeting_display'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot access offset 0 on civicrm_api3\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot access property \$reference on stdClass\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot cast civicrm_api3 to int\.$#'
+			identifier: cast.int
+			count: 2
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 2
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Coalesce\: Do not compare objects directly, civicrm_api3 and civicrm_api3\|null found\.$#'
+			identifier: voku.Coalesce
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 9
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Dynamic call to static method CRM_Core_Page\:\:getTemplate\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 3
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_SepaMandatePdf\:\:generateHTML\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_SepaMandatePdf\:\:getMessage\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Method CRM_Sepa_Page_SepaMandatePdf\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Only booleans are allowed in an elseif condition, mixed given\.$#'
+			identifier: elseif.condNotBoolean
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^PHPDoc tag @var with type stdClass is not subtype of type civicrm_api3\.$#'
+			identifier: varTag.type
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Parameter \#1 \$contact_id of method CRM_Sepa_Page_SepaMandatePdf\:\:addContactTokens\(\) expects int, int\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Property CRM_Sepa_Page_SepaMandatePdf\:\:\$html type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Sepa/Page/SepaMandatePdf.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Sepa/Upgrader.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: CRM/Sepa/Upgrader.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Sepa/Upgrader.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, string\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 9
+			path: CRM/Sepa/Upgrader.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: CRM/Sepa/Upgrader.php
+
+		-
+			message: '#^Method CRM_Utils_SepaCustomisationHooks\:\:alter_next_collection_date\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaCustomisationHooks.php
+
+		-
+			message: '#^Method CRM_Utils_SepaCustomisationHooks\:\:mend_rcontrib\(\) has parameter \$rcontrib with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaCustomisationHooks.php
+
+		-
+			message: '#^Method CRM_Utils_SepaCustomisationHooks\:\:modify_endtoendid\(\) has parameter \$contribution with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaCustomisationHooks.php
+
+		-
+			message: '#^Method CRM_Utils_SepaCustomisationHooks\:\:modify_endtoendid\(\) has parameter \$creditor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaCustomisationHooks.php
+
+		-
+			message: '#^Method CRM_Utils_SepaCustomisationHooks\:\:modify_txmessage\(\) has parameter \$contribution with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaCustomisationHooks.php
+
+		-
+			message: '#^Method CRM_Utils_SepaCustomisationHooks\:\:modify_txmessage\(\) has parameter \$creditor with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaCustomisationHooks.php
+
+		-
+			message: '#^Property CRM_Utils_SepaCustomisationHooks\:\:\$null has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: CRM/Utils/SepaCustomisationHooks.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaOptionGroupTools.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaOptionGroupTools.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 3
+			path: CRM/Utils/SepaOptionGroupTools.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 2
+			path: CRM/Utils/SepaOptionGroupTools.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 8
+			path: CRM/Utils/SepaOptionGroupTools.php
+
+		-
+			message: '#^Cannot access offset ''amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Cannot access offset ''currency'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Cannot access offset ''cycle_day'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Cannot access offset ''frequency_interval'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Cannot access offset ''frequency_unit'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Cannot access offset ''receive_date'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Cannot access offset ''total_amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 4
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Method CRM_Utils_SepaTokens\:\:fillLastMandateCommonTokenValues\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Method CRM_Utils_SepaTokens\:\:fillLastMandateContributionRecurTokenValues\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Method CRM_Utils_SepaTokens\:\:fillLastMandateContributionTokenValues\(\) has parameter \$mandate with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, array\|bool given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Parameter \#1 \$mandate of static method CRM_Sepa_BAO_SEPAMandate\:\:isContributionMandate\(\) expects array, array\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Parameter \#1 \$mandate of static method CRM_Sepa_BAO_SEPAMandate\:\:isContributionRecurMandate\(\) expects array, array\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Parameter \#1 \$mandate of static method CRM_Utils_SepaTokens\:\:fillLastMandateCommonTokenValues\(\) expects array, array\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Parameter \#1 \$mandate of static method CRM_Utils_SepaTokens\:\:fillLastMandateContributionRecurTokenValues\(\) expects array, array\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Parameter \#1 \$mandate of static method CRM_Utils_SepaTokens\:\:fillLastMandateContributionTokenValues\(\) expects array, array\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: CRM/Utils/SepaTokens.php
+
+		-
+			message: '#^Cannot access offset ''account_holder'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''bic'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''currency'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''cycle_day'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''date'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''entity_table'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''frequency_interval'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''frequency_unit'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''iban'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''receive_date'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''reference'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''source'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''status'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''total_amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''type'' on non\-empty\-array\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 3
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 2
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Method CRM_Utils_SepaTokensDeprecated\:\:fillLastMandateTokenValues\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, array\|bool given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: CRM/Utils/SepaTokensDeprecated.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 4
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateOneOffMandate\:\:getCampaigns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateOneOffMandate\:\:getCreditors\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateOneOffMandate\:\:getFinancialTypes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Offset ''creation_date'' might not exist on array\{type\: ''OOFF'', contact_id\?\: mixed, account_holder\?\: mixed, iban\?\: mixed, bic\?\: mixed, reference\?\: mixed, amount\: mixed, receive_date\?\: mixed, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 5
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateRecurringMandate\:\:calculateSoonestCycleDay\(\) has parameter \$mandate_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateRecurringMandate\:\:getCollectionDays\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateRecurringMandate\:\:getFrequencies\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Offset ''creation_date'' might not exist on array\{type\: ''RCUR'', contact_id\?\: mixed, account_holder\?\: mixed, iban\?\: mixed, bic\?\: mixed, reference\?\: mixed, amount\?\: mixed, start_date\?\: mixed, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, CRM_Sepa_DAO_SEPACreditor\|null given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
+
+		-
+			message: '#^Cannot access offset ''amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Cannot access offset ''campaign_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Cannot access offset ''cycle_day'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Cannot access offset ''financial_type_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Cannot access offset ''frequency_unit'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Cannot access offset ''start_date'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Cannot access offset ''total_amount'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 7
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 3
+			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
+
+		-
+			message: '#^Dead catch \- CRM_Core_Exception is never thrown in the try block\.$#'
+			identifier: catch.neverThrown
+			count: 3
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 6
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Join\\AbstractMandateJoin\:\:buildConfigurationForm\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Join\\AbstractMandateJoin\:\:buildConfigurationForm\(\) has parameter \$joinConfiguration with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Join\\AbstractMandateJoin\:\:processConfiguration\(\) has parameter \$submittedValues with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Join\\AbstractMandateJoin\:\:processConfiguration\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Join\\AbstractMandateJoin\:\:setConfiguration\(\) has parameter \$configuration with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, Civi\\DataProcessor\\DataFlow\\MultipleDataFlows\\JoinInterface given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, Civi\\DataProcessor\\DataSpecification\\FieldSpecification given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\<0, max\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Return type \(Civi\\DataProcessor\\DataFlow\\MultipleDataFlows\\JoinInterface\) of method Civi\\Sepa\\DataProcessor\\Join\\AbstractMandateJoin\:\:setConfiguration\(\) should be covariant with return type \(Civi\\DataProcessor\\Source\\SourceInterface\) of method Civi\\DataProcessor\\DataFlow\\MultipleDataFlows\\JoinInterface\:\:setConfiguration\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^Return type \(Civi\\DataProcessor\\DataFlow\\MultipleDataFlows\\JoinInterface\) of method Civi\\Sepa\\DataProcessor\\Join\\AbstractMandateJoin\:\:setDataProcessor\(\) should be covariant with return type \(Civi\\DataProcessor\\Source\\SourceInterface\) of method Civi\\DataProcessor\\DataFlow\\MultipleDataFlows\\JoinInterface\:\:setDataProcessor\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: Civi/Sepa/DataProcessor/Join/AbstractMandateJoin.php
+
+		-
+			message: '#^BooleanNot\: Use a function e\.g\. `count\(\$foo\) \=\=\= 0` instead of `\!\$foo`\.$#'
+			identifier: voku.BooleanNot
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaMandate\:\:getDefaultConfiguration\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaMandate\:\:getEntityTables\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaMandate\:\:loadFields\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaMandate\:\:loadFields\(\) has parameter \$fieldsToSkip with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, array given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function call_user_func expects callable\(\)\: mixed, array\{class\-string\<object\>, ''getEntityTitle''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Parameter \#2 \$fieldsToSkip \(array\) of method Civi\\Sepa\\DataProcessor\\Source\\SepaMandate\:\:loadFields\(\) should be contravariant with parameter \$fieldsToSkip \(mixed\) of method Civi\\DataProcessor\\Source\\AbstractCivicrmEntitySource\:\:loadFields\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^Property Civi\\Sepa\\DataProcessor\\Source\\SepaMandate\:\:\$entityTables type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandate.php
+
+		-
+			message: '#^BooleanNot\: Use a function e\.g\. `count\(\$foo\) \=\=\= 0` instead of `\!\$foo`\.$#'
+			identifier: voku.BooleanNot
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaMandateLink\:\:getEntityTables\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaMandateLink\:\:loadFields\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaMandateLink\:\:loadFields\(\) has parameter \$fieldsToSkip with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, array given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function call_user_func expects callable\(\)\: mixed, array\{class\-string\<object\>, ''getEntityTitle''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Parameter \#2 \$fieldsToSkip \(array\) of method Civi\\Sepa\\DataProcessor\\Source\\SepaMandateLink\:\:loadFields\(\) should be contravariant with parameter \$fieldsToSkip \(mixed\) of method Civi\\DataProcessor\\Source\\AbstractCivicrmEntitySource\:\:loadFields\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Property Civi\\Sepa\\DataProcessor\\Source\\SepaMandateLink\:\:\$entityTables type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaMandateLink.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaTransactionGroup\:\:loadFields\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaTransactionGroup.php
+
+		-
+			message: '#^Method Civi\\Sepa\\DataProcessor\\Source\\SepaTransactionGroup\:\:loadFields\(\) has parameter \$fieldsToSkip with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaTransactionGroup.php
+
+		-
+			message: '#^Parameter \#2 \$fieldsToSkip \(array\) of method Civi\\Sepa\\DataProcessor\\Source\\SepaTransactionGroup\:\:loadFields\(\) should be contravariant with parameter \$fieldsToSkip \(mixed\) of method Civi\\DataProcessor\\Source\\AbstractCivicrmEntitySource\:\:loadFields\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: Civi/Sepa/DataProcessor/Source/SepaTransactionGroup.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/civisepa_'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: Civi/Sepa/Lock/SepaBatchLockManager.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_create expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/EntityBatch.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_delete expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/EntityBatch.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_get expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/EntityBatch.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaAlternativeBatching.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 3
+			path: api/v3/SepaAlternativeBatching.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 3
+			path: api/v3/SepaAlternativeBatching.php
+
+		-
+			message: '#^Function civicrm_api3_sepa_contribution_group_getdetail\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: api/v3/SepaContributionGroup.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: api/v3/SepaContributionGroup.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_create expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaContributionGroup.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_delete expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaContributionGroup.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_get expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaContributionGroup.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, string\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: api/v3/SepaCreditor.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_create expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaCreditor.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_delete expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaCreditor.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaLogic.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 4
+			path: api/v3/SepaLogic.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 3
+			path: api/v3/SepaLogic.php
+
+		-
+			message: '#^Binary operation "\." between ''Unknown mandate…'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Cannot access offset ''currency'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Cannot access offset ''uses_bic'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 21
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Do not throw the \\Exception base class\.$#'
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Function civicrm_api3_sepa_mandate_terminate\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
+			identifier: notEqual.notAllowed
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 9
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, CRM_Sepa_Logic_NextCollectionDate\|null given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_create expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_delete expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_get expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Parameter \#1 \$key of function array_key_exists expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Part \$params\[''creditor_id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 5
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Part \$params\[''financial_type_id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Part \$params\[''payment_instrument_id''\] \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: api/v3/SepaMandate.php
+
+		-
+			message: '#^Function civicrm_api3_sepa_mandate_link_get\(\) has CRM_Core_Exception in PHPDoc @throws tag but it''s not thrown\.$#'
+			identifier: throws.unusedType
+			count: 1
+			path: api/v3/SepaMandateLink.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_create expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaSddFile.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_delete expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaSddFile.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_get expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaSddFile.php
+
+		-
+			message: '#^Call to an undefined static method CRM_Sepa_Logic_Batching\:\:batchContributionByCreditor\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''contributions_missing_transaction'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''created_date'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''created_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''is_error'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Cannot access offset ''values'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 2
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 2
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int\<0, max\> given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int\<0, max\> given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_create expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_delete expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Parameter \#1 \$bao_name of function _civicrm_api3_basic_get expects CRM_Core_DAO\|string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Part \$status_ids \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Variable \$total might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: api/v3/SepaTransactionGroup.php
+
+		-
+			message: '#^Binary operation "\." between ''\+'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Cannot access offset ''contact_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Cannot access offset ''end_date'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Cannot access offset ''financial_type_id'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Cannot access offset ''frequency_unit'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_alter_next_collection_date\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_caseTypes\(\) has parameter \$caseTypes with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_config\(\) has parameter \$config with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_create_mandate\(\) has parameter \$mandate_parameters with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_defer_collection_date\(\) has parameter \$collection_date with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_defer_collection_date\(\) has parameter \$creditor_id with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_disable\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_enable\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_install\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_managed\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_managed\(\) has parameter \$entities with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_modify_endtoendid\(\) has parameter \$contribution with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_modify_endtoendid\(\) has parameter \$creditor with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_modify_endtoendid\(\) has parameter \$end2endID with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_modify_txmessage\(\) has parameter \$creditor with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_modify_txmessage\(\) has parameter \$info with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_modify_txmessage\(\) has parameter \$txmessage with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_uninstall\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Function sepacustom_civicrm_xmlMenu\(\) has parameter \$files with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Implicit array creation is not allowed \- variable \$sqlContributionCountParams does not exist\.$#'
+			identifier: variable.implicitArray
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 5
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int\<0, max\> given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: org.project60.sepacustom/sepacustom.php
+
+		-
+			message: '#^Call to function in_array\(\) requires parameter \#3 to be set\.$#'
+			identifier: function.strict
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Cannot access offset ''id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Cannot cast mixed to int\.$#'
+			identifier: cast.int
+			count: 2
+			path: sepa.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 6
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_alterAPIPermissions\(\) has parameter \$action with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_alterAPIPermissions\(\) has parameter \$entity with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_alterAPIPermissions\(\) has parameter \$params with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_alterAPIPermissions\(\) has parameter \$permissions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_apiWrappers\(\) has parameter \$apiRequest with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_apiWrappers\(\) has parameter \$wrappers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_entityTypes\(\) has parameter \$entityTypes with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_links\(\) has parameter \$links with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_links\(\) has parameter \$mask with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_links\(\) has parameter \$values with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_merge\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_merge\(\) has parameter \$mainId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_merge\(\) has parameter \$otherId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_merge\(\) has parameter \$tables with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_navigationMenu\(\) has parameter \$menu with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_permission\(\) has parameter \$permissions with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_post\(\) has parameter \$objectId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_post\(\) has parameter \$objectName with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_post\(\) has parameter \$objectRef with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_post\(\) has parameter \$op with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_pre\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_summaryActions\(\) has parameter \$actions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_summaryActions\(\) has parameter \$contactID with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tabset\(\) has parameter \$context with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tabset\(\) has parameter \$tabs with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tokenValues\(\) has parameter \$cids with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tokenValues\(\) has parameter \$context with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tokenValues\(\) has parameter \$job with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tokenValues\(\) has parameter \$tokens with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tokenValues\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_tokens\(\) has parameter \$tokens with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_validateForm\(\) has parameter \$errors with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_validateForm\(\) has parameter \$fields with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_validateForm\(\) has parameter \$files with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_validateForm\(\) has parameter \$form with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_validateForm\(\) has parameter \$formName with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_civicrm_xmlMenu\(\) has parameter \$files with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_get_cids_as_array\(\) has parameter \$cids with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Function sepa_get_cids_as_array\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
+			identifier: equal.notAllowed
+			count: 21
+			path: sepa.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 2
+			path: sepa.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, int given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
+			identifier: if.condNotBoolean
+			count: 1
+			path: sepa.php
+
+		-
+			message: '#^Only booleans are allowed in an if condition, string\|false given\.$#'
+			identifier: if.condNotBoolean
+			count: 2
+			path: sepa.php
+
+		-
+			message: '#^Variable \$contribution_recur_id in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: sepa.php

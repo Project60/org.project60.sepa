@@ -13,6 +13,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
 
 /**
  * SEPA_DD payment processor view component
@@ -20,15 +21,14 @@
  * @package CiviCRM_SEPA
  * @todo: deprecated, fix
  */
-
-require_once 'CRM/Core/Page.php';
-
 class CRM_Sepa_Page_Mandate extends CRM_Core_Page {
-  function run() {
 
-    $r = civicrm_api ("ContributionRecur","getfull", array("version"=>3));
+  public function run() {
+
+    $r = civicrm_api3('ContributionRecur', 'getfull');
     $this->assign('contributions', $r);
 
     parent::run();
   }
+
 }

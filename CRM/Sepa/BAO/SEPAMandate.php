@@ -13,6 +13,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
 
 /**
  * File for the CiviCRM sepa_mandate business logic
@@ -27,6 +28,7 @@ use Civi\Core\Event\PreEvent;
 use Civi\Core\HookInterface;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
+use Webmozart\Assert\Assert;
 
 /**
  * Class contains functions for Sepa mandates
@@ -36,11 +38,24 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * @throws \CRM_Core_Exception
    */
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
   public static function self_hook_civicrm_pre(PreEvent $event): void {
     if (!in_array($event->action, ['create', 'edit'], TRUE)) {
       return;
     }
 
+    /**
+     * @var array{
+     *   id?: int|numeric-string,
+     *   creditor_id?: int|numeric-string,
+     *   date?: string,
+     *   reference?: string,
+     *   type?: string,
+     *   iban?: string,
+     *   bic?: string,
+     *   ...
+     * } $params
+     */
     $params = &$event->params;
 
     // load the creditor
@@ -48,10 +63,15 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       if ('create' === $event->action) {
         // new mandate, use the default creditor
         $default_creditor = CRM_Sepa_Logic_Settings::defaultCreditor();
-        $params['creditor_id'] = $default_creditor->id;
+        if (NULL === $default_creditor) {
+          throw new \RuntimeException('Default creditor is missing');
+        }
+
+        $params['creditor_id'] = (int) $default_creditor->id;
       }
       else {
         // existing mandate, get creditor
+        Assert::keyExists($params, 'id');
         $params['creditor_id'] = SepaMandate::get(FALSE)
           ->addSelect('creditor_id')
           ->addWhere('id', '=', $params['id'])
@@ -59,6 +79,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
           ->single()['creditor_id'];
       }
     }
+    /** @var array{mandate_prefix: string|null, creditor_type: string|null} $creditor */
     $creditor = SepaCreditor::get(FALSE)
       ->setSelect(['mandate_prefix', 'creditor_type'])
       ->addWhere('id', '=', $params['creditor_id'])
@@ -88,23 +109,26 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // validate IBAN / BIC / reference
     if (!empty($params['iban'])) {
-      $params['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($params['iban'], $creditor['creditor_type']);
-      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type']);
+      $params['iban'] = CRM_Sepa_Logic_Verification::formatIBAN($params['iban'], $creditor['creditor_type'] ?? 'SEPA');
+      $iban_error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'], $creditor['creditor_type'] ?? 'SEPA');
       if ($iban_error) {
         throw new CRM_Core_Exception($iban_error . ': ' . $params['iban']);
       }
     }
 
     if (!empty($params['bic'])) {
-      $params['bic'] = CRM_Sepa_Logic_Verification::formatBIC($params['bic'], $creditor['creditor_type']);
-      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type']);
+      $params['bic'] = CRM_Sepa_Logic_Verification::formatBIC($params['bic'], $creditor['creditor_type'] ?? 'SEPA');
+      $bic_error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'], $creditor['creditor_type'] ?? 'SEPA');
       if ($bic_error) {
         throw new CRM_Core_Exception($bic_error . ':' . $params['bic']);
       }
     }
 
     if (isset($params['reference']) && strlen($params['reference']) > 0) {
-      $reference_error = CRM_Sepa_Logic_Verification::verifyReference($params['reference'], $creditor['creditor_type']);
+      $reference_error = CRM_Sepa_Logic_Verification::verifyReference(
+        $params['reference'],
+        $creditor['creditor_type'] ?? 'SEPA'
+      );
       if ($reference_error) {
         throw new CRM_Core_Exception($reference_error . ':' . $params['reference']);
       }
@@ -124,40 +148,40 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     }
   }
 
-  static function is_active($mandateStatus) {
+  public static function is_active(string $mandateStatus): bool {
     switch ($mandateStatus) {
-      case 'INIT' :
-      case 'ONHOLD' :
-      case 'CANCELLED' :
-      case 'INVALID' :
-        return false;
-        break;
-      default :
-        return true;
+      case 'INIT':
+      case 'ONHOLD':
+      case 'CANCELLED':
+      case 'INVALID':
+        return FALSE;
+
+      default:
+        return TRUE;
     }
   }
 
   /**
    * getContract() returns the contribution or recurring contribution this mandate uses as a contract
    */
-  private function getContract() {
+  private function getContract(): CRM_Contribute_BAO_ContributionRecur|CRM_Contribute_BAO_Contribution|null {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
     switch ($etp) {
-      case 'civicrm_contribution_recur' :
+      case 'civicrm_contribution_recur':
         $recur = new CRM_Contribute_BAO_ContributionRecur();
-        $recur->get('id', $eid);
+        $recur->get('id', (string) $eid);
         return $recur;
-        break;
-      case 'civicrm_contribution' :
+
+      case 'civicrm_contribution':
         $contr = new CRM_Contribute_BAO_Contribution();
-        $contr->get('id', $eid);
+        $contr->get('id', (string) $eid);
         return $contr;
-        break;
+
       default:
         echo 'Huh ? ' . $etp;
     }
-    return null;
+    return NULL;
   }
 
   /**
@@ -166,26 +190,25 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * or
    *   MANDATE -> CONTRIBUTION
    */
-  public function findContribution() {
+  public function findContribution(): ?CRM_Contribute_BAO_Contribution {
     $etp = $this->entity_table;
     $eid = $this->entity_id;
     switch ($etp) {
-      case 'civicrm_contribution_recur' :
+      case 'civicrm_contribution_recur':
         $contr = new CRM_Contribute_BAO_Contribution();
-        $contr->get('contribution_recur_id', $eid);
+        $contr->get('contribution_recur_id', (string) $eid);
         return $contr;
-        break;
-      case 'civicrm_contribution' :
+
+      case 'civicrm_contribution':
         $contr = new CRM_Contribute_BAO_Contribution();
-        $contr->get('id', $eid);
+        $contr->get('id', (string) $eid);
         return $contr;
-        break;
+
       default:
         echo 'Huh ? ' . $etp;
     }
-    return null;
+    return NULL;
   }
-
 
   /**
    * Looks like an unused function, candidate for deprecation because of nasty code
@@ -193,20 +216,21 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * @deprecated
    * @return array
    */
-  public function getUnbatchedContributionIds() {
+  public function getUnbatchedContributionIds(): array {
     // 1.determine the contract (ie. find out how to get contributions)
     $contrib = $this->getContract();
 
     // 2. if it is a recurring one, get the contribs that match the pattern
-    if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
-      $query = "SELECT        c.id AS id, b.id  AS batch_id
-                FROM          civicrm_contribution c
-                LEFT JOIN     civicrm_entity_batch eb ON ( c.id = eb.entity_id AND eb.entity_table = 'civicrm_contribution' )
-                LEFT JOIN     civicrm_batch b ON ( b.id = eb.batch_id )
-                WHERE         c.contribution_recur_id = " . $contrib->id . "
-                AND           b.type_id IN ( " . 222 . " )
-                HAVING        batch_id IS NULL
-                ";
+    if ($contrib instanceof CRM_Contribute_BAO_ContributionRecur) {
+      $query = "
+        SELECT c.id AS id, b.id  AS batch_id
+        FROM civicrm_contribution c
+        LEFT JOIN civicrm_entity_batch eb ON c.id = eb.entity_id AND eb.entity_table = 'civicrm_contribution'
+        LEFT JOIN civicrm_batch b ON b.id = eb.batch_id
+        WHERE c.contribution_recur_id = " . $contrib->id . '
+        AND b.type_id IN ( ' . 222 . ' )
+        HAVING batch_id IS NULL';
+      /** @var \CRM_Core_DAO $dao */
       $dao = CRM_Core_DAO::executeQuery($query);
       $contributions = [];
       while ($dao->fetch()) {
@@ -215,31 +239,31 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       return $contributions;
     }
 
-    if (is_a($contrib, 'CRM_Contribute_BAO_ContributionRecur')) {
-      return array($contrib->id);
+    if ($contrib instanceof CRM_Contribute_BAO_Contribution) {
+      return [$contrib->id];
     }
 
-    return array();
+    return [];
   }
 
   /**
    * Gets the mandate for any  given contribution
    *
-   * @param integer contribution_id
+   * @param int $contribution_id
    *   ID of the contribution
    *
    * @return array|null
    *   basic mandate data like id, type, creditor_id, etc.
    */
-  public static function getMandateFor($contribution_id) {
+  public static function getMandateFor(int $contribution_id): ?array {
     // cache results
     static $contribution_map = [];
-    $contribution_id = (int) $contribution_id;
     if (array_key_exists($contribution_id, $contribution_map)) {
       return $contribution_map[$contribution_id];
     }
 
     // run the lookup
+    /** @var \CRM_Core_DAO $mandate_query */
     $mandate_query = CRM_Core_DAO::executeQuery("
     SELECT
       COALESCE(ooff_mandate.id, rcur_mandate.id)                   AS mandate_id,
@@ -268,47 +292,60 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
         'reference'   => $mandate_query->reference,
         'contact_id'  => $mandate_query->contact_id,
         'iban'        => $mandate_query->iban,
-        'bic'         => $mandate_query->bic
+        'bic'         => $mandate_query->bic,
       ];
-    } else {
-      $contribution_map[$contribution_id] = null;
+    }
+    else {
+      $contribution_map[$contribution_id] = NULL;
     }
     return $contribution_map[$contribution_id];
   }
 
-
   /**
    * gracefully terminates OOFF mandates
    *
-   * @return boolean success
+   * @return bool success
    * @author endres -at- systopia.de
    */
-  static function terminateOOFFMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL, $mandate=NULL) {
+  public static function terminateOOFFMandate(
+    int $mandate_id,
+    string $new_end_date_str,
+    ?string $cancel_reason = NULL,
+    ?array $mandate = NULL
+  ): bool {
     // use a lock, in case somebody is batching just now
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot close mandate [%s], batching in progress!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts('Cannot close mandate [%s], batching in progress!'), $mandate_id),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
     // if not passed by param, load the mandate
-    if ($mandate==NULL || $mandate_id != $mandate['id']) {
-      $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
+    if ($mandate == NULL || $mandate_id != $mandate['id']) {
+      $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id]);
       if (isset($mandate['is_error'])) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error'), 'error');
+        CRM_Core_Session::setStatus(
+          sprintf(E::ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']),
+          E::ts('Error'),
+          'error'
+        );
         return FALSE;
       }
     }
 
     // check if it's really a OOFF mandate
-    if ( $mandate['type']!="OOFF" ) {
-      Civi::log()->debug("org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!");
+    if ($mandate['type'] != 'OOFF') {
+      Civi::log()->debug('org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!');
       return FALSE;
     }
 
     // check if it's not been SENT yet
-    if ( $mandate['status']!='OOFF' && $mandate['status']!='INIT') {
-      Civi::log()->debug("org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!");
+    if ($mandate['status'] != 'OOFF' && $mandate['status'] != 'INIT') {
+      Civi::log()->debug('org.project60.sepa: the terminateOOFFMandate method can only modify OOFF mandates!');
       return FALSE;
     }
 
@@ -322,36 +359,52 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       WHERE contribution_id = $contribution_id
       AND status_id <> $group_status_id_open;");
     if ($is_in_closed_group) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot close mandate [%s], it's alread batched in a non-open group!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts("Cannot close mandate [%s], it's alread batched in a non-open group!"), $mandate_id),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
     // NOW: cancel this mandate
     // first: cancel the mandate entity
-    $result = civicrm_api('SepaMandate', 'create', array(
-      'version'   => 3,
+    $result = civicrm_api3('SepaMandate', 'create', [
       'id'        => $mandate_id,
       'status'    => 'INVALID',
-    ));
+    ]);
     if (!empty($result['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot properly end mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $result['error_message']), ts('Error'), 'warn');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts("Cannot properly end mandate [%s]. Error was: '%s'"), $mandate_id, $result['error_message']),
+        E::ts('Error'),
+        'warn'
+      );
     }
 
     // then: cancel the associated contribution
-    $contribution_id_cancelled = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled');
-    $result = civicrm_api('Contribution', 'create', array(
-      'version'                   => 3,
+    $contribution_id_cancelled = (int) CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Cancelled'
+    );
+    $result = civicrm_api3('Contribution', 'create', [
       'id'                        => $contribution_id,
       'contribution_status_id'    => $contribution_id_cancelled,
       'cancel_reason'             => $cancel_reason,
-      'cancel_date'               => date('YmdHis', strtotime($new_end_date_str))
-    ));
+      'cancel_date'               => date('YmdHis', strtotime($new_end_date_str)),
+    ]);
     if (!empty($result['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot properly end mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $result['error_message']), ts('Error'), 'warn');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts("Cannot properly end mandate [%s]. Error was: '%s'"), $mandate_id, $result['error_message']),
+        E::ts('Error'),
+        'warn'
+      );
     }
 
     // finally: remove contribution from any open SEPA groups
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id = $contribution_id;");
+    CRM_Core_DAO::executeQuery(
+      "DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id = $contribution_id;"
+    );
 
     return TRUE;
   }
@@ -359,106 +412,141 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * gracefully terminates RCUR mandates
    *
-   * @param $mandate_id        int    mandate ID
-   * @param $new_end_date_str  string requested end_date
-   * @param $error_to_ui       bool   if TRUE will write errors to Session::status and return FALSE
-   *                                     else will throw errors
-   * @param $cancel_reason     string cancel reason to set
-   * @return boolean success
-   * @author endres -at- systopia.de
+   * @param int $mandate_id mandate ID
+   * @param string $new_end_date_str requested end_date
+   * @param string|null $cancel_reason cancel reason to set
+   * @param bool $error_to_ui
+   *   if TRUE will write errors to Session::status and return FALSE else will
+   *   throw errors
+   *
+   * @return bool success
    */
-  static function terminateMandate($mandate_id, $new_end_date_str, $cancel_reason=NULL, $error_to_ui = TRUE) {
-    $contribution_id_pending = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+  public static function terminateMandate(
+    int $mandate_id,
+    string $new_end_date_str,
+    ?string $cancel_reason = NULL,
+    bool $error_to_ui = TRUE
+  ) {
+    $contribution_id_pending = CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
     // use a lock, in case somebody is batching just now
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
-      $error_message = sprintf(ts("Cannot terminate mandate [%s], batching in progress!", array('domain' => 'org.project60.sepa')), $mandate_id);
+      $error_message = sprintf(E::ts('Cannot terminate mandate [%s], batching in progress!'), $mandate_id);
       if ($error_to_ui) {
-        CRM_Core_Session::setStatus($error_message, ts('Error'), 'error');
+        CRM_Core_Session::setStatus($error_message, E::ts('Error'), 'error');
         return FALSE;
-      } else {
+      }
+      else {
         throw new Exception($error_message);
       }
     }
 
-     // first, load the mandate
+    // first, load the mandate
     try {
       $mandate = SepaMandate::get(TRUE)
         ->addWhere('id', '=', $mandate_id)
         ->execute()
         ->single();
     }
-    catch (\CRM_Core_Exception $exception) {
-      $error_message = E::ts("Cannot read mandate [%1]. Error was: '%2'", [1 => $mandate_id, 2 => $exception->getMessage()]);
+    catch (\CRM_Core_Exception $e) {
+      $error_message = E::ts(
+        "Cannot read mandate [%1]. Error was: '%2'",
+        [
+          1 => $mandate_id,
+          2 => $e->getMessage(),
+        ]
+      );
       if ($error_to_ui) {
-        CRM_Core_Session::setStatus($error_message, ts('Error'), 'error');
+        CRM_Core_Session::setStatus($error_message, E::ts('Error'), 'error');
         return FALSE;
       }
       else {
-        throw new CRM_Core_Exception($error_message);
+        throw new CRM_Core_Exception($error_message, $e->getErrorCode(), $e->getErrorData(), $e);
       }
     }
 
     // check the mandate type
-    if ( $mandate['type']=="OOFF" ) {
+    if ($mandate['type'] == 'OOFF') {
       return CRM_Sepa_BAO_SEPAMandate::terminateOOFFMandate($mandate_id, $new_end_date_str, $cancel_reason, $mandate);
 
-    } elseif ( $mandate['type']!="RCUR" ) {
-      $error_message = ts("You can only modify the end date of recurring contribution mandates.", array('domain' => 'org.project60.sepa'));
+    }
+    elseif ($mandate['type'] != 'RCUR') {
+      $error_message = E::ts('You can only modify the end date of recurring contribution mandates.');
       if ($error_to_ui) {
-        CRM_Core_Session::setStatus($error_message, ts('Error'), 'error');
+        CRM_Core_Session::setStatus($error_message, E::ts('Error'), 'error');
         return FALSE;
-      } else {
+      }
+      else {
         throw new Exception($error_message);
       }
     }
 
     // load the contribution
     $contribution_id = $mandate['entity_id'];
-    $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
+    $contribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $contribution_id]);
     if (isset($contribution['is_error']) && $contribution['is_error']) {
-      $error_message = sprintf(ts("Cannot read contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $contribution['error_message']);
+      $error_message = sprintf(
+        E::ts("Cannot read contribution [%s]. Error was: '%s'"),
+        $contribution_id,
+        $contribution['error_message']
+      );
       if ($error_to_ui) {
-        CRM_Core_Session::setStatus($error_message, ts('Error'), 'error');
+        CRM_Core_Session::setStatus($error_message, E::ts('Error'), 'error');
         return FALSE;
-      } else {
+      }
+      else {
         throw new Exception($error_message);
       }
     }
 
     // check the date
-    $today = strtotime("today");
+    $today = strtotime('today');
     $new_end_date = strtotime($new_end_date_str);
 
     if ($new_end_date < $today) {
-      $error_message = sprintf(ts("You cannot set an end date in the past.", array('domain' => 'org.project60.sepa')), $contribution_id, $contribution['error_message']);
+      $error_message = sprintf(
+        E::ts('You cannot set an end date in the past.'),
+        $contribution_id,
+        $contribution['error_message']
+      );
       if ($error_to_ui) {
-        CRM_Core_Session::setStatus($error_message, ts('Error'), 'error');
+        CRM_Core_Session::setStatus($error_message, E::ts('Error'), 'error');
         return FALSE;
-      } else {
+      }
+      else {
         throw new Exception($error_message);
       }
     }
 
     // actually set the date
-    $query = array(
-      'version'   => 3,
+    $query = [
       'id'        => $contribution_id,
       'currency'  => $contribution['currency'],
-      'end_date'  => date('YmdHis', $new_end_date));
+      'end_date'  => date('YmdHis', $new_end_date),
+    ];
     if ($cancel_reason) {
       // FIXME: cancel_reason does not exist in contribution_recur!!
       //$query['cancel_reason'] = $cancel_reason;
       $query['cancel_date'] = $query['end_date'];
     }
 
-    $result = civicrm_api("ContributionRecur", "create", $query);
+    $result = civicrm_api3('ContributionRecur', 'create', $query);
     if (isset($result['is_error']) && $result['is_error']) {
-      $error_message = sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $result['error_message']);
+      $error_message = sprintf(
+        E::ts("Cannot modify recurring contribution [%s]. Error was: '%s'"),
+        $contribution_id,
+        $result['error_message']
+      );
       if ($error_to_ui) {
-        CRM_Core_Session::setStatus($error_message, ts('Error'), 'error');
+        CRM_Core_Session::setStatus($error_message, E::ts('Error'), 'error');
         return FALSE;
-      } else {
+      }
+      else {
         throw new Exception($error_message);
       }
     }
@@ -472,17 +560,17 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       $create_note_query = "
       INSERT INTO civicrm_note (entity_table, entity_id, modified_date, subject, note, privacy)
              VALUES('civicrm_contribution_recur', %1, %2, 'cancel_reason', %3, 0)";
-      $create_note_parameters = array(
-        1 => array($contribution_id, 'Integer'),
-        2 => array(date('YmdHis'), 'String'),
-        3 => array($cancel_reason, 'String'),
-      );
+      $create_note_parameters = [
+        1 => [$contribution_id, 'Integer'],
+        2 => [date('YmdHis'), 'String'],
+        3 => [$cancel_reason, 'String'],
+      ];
       CRM_Core_DAO::executeQuery($create_note_query, $create_note_parameters);
     }
 
     // find already created contributions that are now obsolete...
-    $obsolete_ids = array();
-    $deleted_ids = array();
+    $obsolete_ids = [];
+    $deleted_ids = [];
     $newEndDate = date('Y-m-d', $new_end_date);
     $obsolete_query = "
     SELECT id
@@ -490,6 +578,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     WHERE receive_date > '$newEndDate'
       AND contribution_recur_id = $contribution_id
       AND contribution_status_id = $contribution_id_pending;";
+    /** @var \CRM_Core_DAO $obsolete_ids_query */
     $obsolete_ids_query = CRM_Core_DAO::executeQuery($obsolete_query);
     while ($obsolete_ids_query->fetch()) {
       array_push($obsolete_ids, $obsolete_ids_query->id);
@@ -497,42 +586,64 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // ...and delete them:
     foreach ($obsolete_ids as $obsolete_id) {
-      $delete_result = civicrm_api("Contribution", "delete", array('id'=>$obsolete_id, 'version'=>3));
+      $delete_result = civicrm_api3('Contribution', 'delete', ['id' => $obsolete_id]);
       if (isset($delete_result['is_error']) && $delete_result['is_error']) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot delete scheduled contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $obsolete_id, $delete_result['error_message']), ts('Error'), 'warn');
-      } else {
+        CRM_Core_Session::setStatus(
+          sprintf(
+            E::ts("Cannot delete scheduled contribution [%s]. Error was: '%s'"),
+            $obsolete_id,
+            $delete_result['error_message']
+          ),
+          E::ts('Error'),
+          'warn'
+        );
+      }
+      else {
         array_push($deleted_ids, $obsolete_id);
       }
     }
     if (count($deleted_ids)) {
       // also, remove them from the groups
       $deleted_ids_string = implode(',', $deleted_ids);
-      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id IN ($deleted_ids_string);");
+      CRM_Core_DAO::executeQuery(
+        "DELETE FROM civicrm_sdd_contribution_txgroup WHERE contribution_id IN ($deleted_ids_string);"
+      );
     }
 
     // finally, let the API close the mandate if end_date is now
     if ($new_end_date <= $today) {
-      $close_result = civicrm_api("SepaAlternativeBatching", "closeended", array('version'=>3));
+      $close_result = civicrm_api3('SepaAlternativeBatching', 'closeended');
       if (isset($close_result['is_error']) && $close_result['is_error']) {
         if ($error_to_ui) {
-          CRM_Core_Session::setStatus(sprintf(ts("Closing Mandate failed. Error was: '%s'", array('domain' => 'org.project60.sepa')), $close_result['error_message']), ts('Error'), 'warn');
+          CRM_Core_Session::setStatus(
+            sprintf(E::ts("Closing Mandate failed. Error was: '%s'"), $close_result['error_message']),
+            E::ts('Error'),
+            'warn'
+          );
         }
       }
     }
 
     if ($error_to_ui) {
-      CRM_Core_Session::setStatus(ts("New end date set.", array('domain' => 'org.project60.sepa')), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'info');
-      CRM_Core_Session::setStatus(ts("Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed.", array('domain' => 'org.project60.sepa')), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'warn');
+      CRM_Core_Session::setStatus(E::ts('New end date set.'), E::ts('Mandate updated.'), 'info');
+      CRM_Core_Session::setStatus(
+        // phpcs:ignore Generic.Files.LineLength.TooLong
+        E::ts('Please note, that any <i>closed</i> batches that include this mandate cannot be changed any more - all pending contributions will still be executed.'),
+        E::ts('Mandate updated.'),
+        'warn'
+      );
 
       if (count($deleted_ids)) {
-        CRM_Core_Session::setStatus(sprintf(ts("Successfully deleted %d now obsolete contributions.", array('domain' => 'org.project60.sepa')), count($deleted_ids)), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'info');
+        CRM_Core_Session::setStatus(
+          sprintf(E::ts('Successfully deleted %d now obsolete contributions.'), count($deleted_ids)),
+          E::ts('Mandate updated.'),
+          'info'
+        );
       }
     }
 
     return TRUE;
   }
-
-
 
   /**
    * Allows you to modifiy certain mandate parameters of an active mandate:
@@ -544,16 +655,19 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * Changes will take effect out to all future contributions,
    *  including already created ones in status 'Pending'
    *
+   * @param int $mandate_id
+   * @param array<string, mixed> $changes
+   *
+   * @return list<string>
+   *
    * @throws Exception
-   * @return mixed success
-   * @author endres -at- systopia.de
    */
-  static function modifyMandate($mandate_id, $changes) {
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+  public static function modifyMandate(int $mandate_id, array $changes): array {
     // use a lock, in case somebody is batching just now
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
-      throw new Exception(ts("Cannot adjust mandate [%1], batching in progress!",
-        array(1 => $mandate_id, 'domain' => 'org.project60.sepa')));
+      throw new Exception(E::ts('Cannot adjust mandate [%1], batching in progress!', [1 => $mandate_id]));
     }
 
     // load the mandate
@@ -562,94 +676,117 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       ->execute()
       ->single();
     if ($mandate['type'] != 'RCUR') {
-      throw new Exception(ts("You can only modify RCUR mandates.", array('domain' => 'org.project60.sepa')));
+      throw new Exception(E::ts('You can only modify RCUR mandates.'));
     }
-    $contribution_rcur = civicrm_api3('ContributionRecur', 'getsingle', array('id' => $mandate['entity_id']));
+    /** @var array<string, mixed> $contribution_rcur */
+    $contribution_rcur = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $mandate['entity_id']]);
 
     // collect the changes
-    $changes_subjects = array();
-    $changes_details = array();
+    $changes_subjects = [];
+    $changes_details = [];
 
     // BANK DETAIL CHANGES (applies to the MANDATE ENTITY)
-    $bank_data_changes = array();
+    $bank_data_changes = [];
     if (!empty($changes['account_holder']) && $changes['account_holder'] != $mandate['account_holder']) {
       $bank_data_changes['account_holder'] = $changes['account_holder'];
-      $changes_details[] = ts("Account Holder changed from '%1' to '%2'",
-        array(1 => $mandate['account_holder'], 2 => $changes['account_holder'], 'domain' => 'org.project60.sepa'));
+      $changes_details[] = E::ts(
+        "Account Holder changed from '%1' to '%2'",
+        [1 => $mandate['account_holder'], 2 => $changes['account_holder']]
+      );
     }
     if (!empty($changes['iban']) && $changes['iban'] != $mandate['iban']) {
       $bank_data_changes['iban'] = $changes['iban'];
-      $changes_details[] = ts("IBAN changed from '%1' to '%2'",
-        array(1 => $mandate['iban'], 2 => $changes['iban'], 'domain' => 'org.project60.sepa'));
+      $changes_details[] = E::ts(
+        "IBAN changed from '%1' to '%2'",
+        [1 => $mandate['iban'], 2 => $changes['iban']]
+      );
     }
     if (!empty($changes['bic']) && $changes['bic'] != $mandate['bic']) {
       $bank_data_changes['bic'] = $changes['bic'];
-      $changes_details[] = ts("BIC changed from '%1' to '%2'",
-        array(1 => $mandate['bic'], 2 => $changes['bic'], 'domain' => 'org.project60.sepa'));
+      $changes_details[] = E::ts(
+        "BIC changed from '%1' to '%2'",
+        [1 => $mandate['bic'], 2 => $changes['bic']]
+      );
     }
     if (!empty($bank_data_changes)) {
       $bank_data_changes['id'] = $mandate['id'];
-      $changes_subjects[] = ts("Bank details changed", array('domain' => 'org.project60.sepa'));
+      $changes_subjects[] = E::ts('Bank details changed');
       civicrm_api3('SepaMandate', 'create', $bank_data_changes);
     }
 
     // AMOUNT CHANGE (applied to the CONTRIBUTION)
-    $contribution_changes = array();
+    $contribution_changes = [];
     if (!empty($changes['amount']) && $changes['amount'] != $contribution_rcur['amount']) {
       if ($changes['amount'] <= 0) {
-        throw new Exception(ts("The amount has to be positive.", array('domain' => 'org.project60.sepa')));
+        throw new Exception(E::ts('The amount has to be positive.'));
       }
 
       // record the change
       $contribution_changes['amount'] = $changes['amount'];
-      $change_variables = array('domain' => 'org.project60.sepa',
-        1 => CRM_Utils_Money::format($contribution_rcur['amount'], $contribution_rcur['currency']),
-        2 => CRM_Utils_Money::format($changes['amount'], $contribution_rcur['currency']));
+      $change_variables = [
+        1 => CRM_Utils_Money::format((float) $contribution_rcur['amount'], $contribution_rcur['currency']),
+        2 => CRM_Utils_Money::format((float) $changes['amount'], $contribution_rcur['currency']),
+      ];
       if ($changes['amount'] > $contribution_rcur['amount']) {
-        $changes_subjects[] = ts("Amount increased");
-        $changes_details[] = ts("Amount increased from %1 to %2", $change_variables);
-      } else {
-        $changes_subjects[] = ts("Amount decreased", $change_variables);
-        $changes_details[] = ts("Amount decreased from %1 to %2", $change_variables);
+        $changes_subjects[] = E::ts('Amount increased');
+        $changes_details[] = E::ts('Amount increased from %1 to %2', $change_variables);
+      }
+      else {
+        $changes_subjects[] = E::ts('Amount decreased', $change_variables);
+        $changes_details[] = E::ts('Amount decreased from %1 to %2', $change_variables);
       }
     }
 
     // FINANCIAL TYPE CHANGE
-    if (!empty($changes['financial_type_id']) && $changes['financial_type_id'] != $contribution_rcur['financial_type_id']) {
-      $financial_types = CRM_Contribute_PseudoConstant::financialType();
+    if (
+      !empty($changes['financial_type_id'])
+      && $changes['financial_type_id'] != $contribution_rcur['financial_type_id']
+    ) {
+      /** @var list<array{id: int, label: string, name: string}> $financialTypeOptions */
+      $financialTypeOptions = Civi::entity('Contribution')->getOptions('financial_type_id');
+      $financial_types = array_column($financialTypeOptions, 'label', 'id');
       if (empty($financial_types[$changes['financial_type_id']])) {
-        throw new Exception(ts("Invalid financial type ID [%1] supplied.", array(1 => $changes['financial_type_id'], 'domain' => 'org.project60.sepa')));
+        throw new Exception(E::ts('Invalid financial type ID [%1] supplied.', [1 => $changes['financial_type_id']]));
       }
       $contribution_changes['financial_type_id'] = $changes['financial_type_id'];
-      $changes_subjects[] = ts("Financial type changed", array('domain' => 'org.project60.sepa'));
-      $changes_details[] = ts("Financial type changed from '%1' to '%2'.",
-        array(1 => $financial_types[$contribution_rcur['financial_type_id']],
-              2 => $financial_types[$changes['financial_type_id']],
-              'domain' => 'org.project60.sepa'));
+      $changes_subjects[] = E::ts('Financial type changed');
+      $changes_details[] = E::ts(
+          "Financial type changed from '%1' to '%2'.",
+        [
+          1 => $financial_types[$contribution_rcur['financial_type_id']],
+          2 => $financial_types[$changes['financial_type_id']],
+        ]
+      );
     }
 
     // CAMPAIGN CHANGE
     if (!empty($changes['campaign_id']) && $changes['campaign_id'] != $contribution_rcur['campaign_id']) {
       $contribution_changes['campaign_id'] = $changes['campaign_id'];
-      $old_campaign = civicrm_api3('Campaign', 'getsingle', array('id' => $contribution_rcur['campaign_id']));
-      $new_campaign = civicrm_api3('Campaign', 'getsingle', array('id' => $changes['campaign_id']));
-      $changes_subjects[] = ts("Campaign changed", array('domain' => 'org.project60.sepa'));
-      $changes_details[] = ts("Campaign changed from '%1' [%2] to '%3' [%4].",
-        array(1 => $old_campaign['title'],
-              2 => $contribution_rcur['campaign_id'],
-              3 => $new_campaign['title'],
-              4 => $changes['campaign_id'],
-              'domain' => 'org.project60.sepa'));
+      $old_campaign = civicrm_api3('Campaign', 'getsingle', ['id' => $contribution_rcur['campaign_id']]);
+      $new_campaign = civicrm_api3('Campaign', 'getsingle', ['id' => $changes['campaign_id']]);
+      $changes_subjects[] = E::ts('Campaign changed');
+      $changes_details[] = E::ts(
+        "Campaign changed from '%1' [%2] to '%3' [%4].",
+        [
+          1 => $old_campaign['title'],
+          2 => $contribution_rcur['campaign_id'],
+          3 => $new_campaign['title'],
+          4 => $changes['campaign_id'],
+        ]
+      );
     }
 
     // CYCLE DAY CHANGE
     if (!empty($changes['cycle_day']) && $changes['cycle_day'] != $contribution_rcur['cycle_day']) {
       $contribution_changes['cycle_day'] = $changes['cycle_day'];
-      $changes_subjects[] = ts("Cycle day changed", array('domain' => 'org.project60.sepa'));
-      $changes_details[] = ts("Cycle day changed from '%1' to '%2'.",
-        array(1 => $contribution_rcur['cycle_day'],
+      $changes_subjects[] = E::ts('Cycle day changed');
+      $changes_details[] = E::ts(
+        "Cycle day changed from '%1' to '%2'.",
+        [
+          1 => $contribution_rcur['cycle_day'],
           2 => $changes['cycle_day'],
-          'domain' => 'org.project60.sepa'));
+        ]
+      );
     }
 
     if (!empty($contribution_changes)) {
@@ -659,17 +796,23 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
       civicrm_api3('ContributionRecur', 'create', $contribution_changes);
 
       // ...AND pending associated contributions
-      $contributions2update = civicrm_api3('Contribution', 'get', array(
-        'receive_date'           => array('>=' => date('YmdHis')),
+      $contributions2update = civicrm_api3('Contribution', 'get', [
+        'receive_date'           => ['>=' => date('YmdHis')],
         'contribution_recur_id'  => $contribution_rcur['id'],
-        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+        'contribution_status_id' => CRM_Core_PseudoConstant::getKey(
+          'CRM_Contribute_BAO_Contribution',
+          'contribution_status_id',
+          'Pending'
+        ),
         'return'                 => 'id',
-        'option.limit'           => 0
-        ));
+        'option.limit'           => 0,
+      ]);
 
       // save details
-      $changes_details[] = ts("%1 pending contributions were adjusted as well.",
-          array(1 => $contributions2update['count'], 'domain' => 'org.project60.sepa'));
+      $changes_details[] = E::ts(
+        '%1 pending contributions were adjusted as well.',
+        [1 => $contributions2update['count']]
+      );
 
       // amount is 'total_amount' for contributions
       if (isset($contribution_changes['amount'])) {
@@ -698,44 +841,44 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     return $changes_details;
   }
 
-
   /**
    * Generate a new activity
    */
-  public static function generateModificationActivity($mandate, $subject, $detail_lines) {
+  public static function generateModificationActivity(array $mandate, string $subject, array $detail_lines): void {
     // get / create activity type
     $activity_type_id = CRM_Sepa_CustomData::getOptionValue('activity_type', 'sdd_update', 'name');
     if (!$activity_type_id) {
       // create activity type
-      civicrm_api3('OptionValue', 'create', array(
-        'label'           => ts('SEPA Mandate Updated', array('domain' => 'org.project60.sepa')),
+      civicrm_api3('OptionValue', 'create', [
+        'label'           => E::ts('SEPA Mandate Updated'),
         'name'            => 'sdd_update',
         'option_group_id' => 'activity_type',
-        ));
+      ]);
       $activity_type_id = CRM_Sepa_CustomData::getOptionValue('activity_type', 'sdd_update', 'name');
     }
 
     // compile activity
     $prefix = "[{$mandate['id']}] ";
-    $mandate_link = CRM_Utils_System::url("civicrm/sepa/xmandate", 'reset=1&mid=' . $mandate['id'], TRUE);
+    $mandate_link = CRM_Utils_System::url('civicrm/sepa/xmandate', 'reset=1&mid=' . $mandate['id'], TRUE);
     $mandate_ref = "<a href='$mandate_link'>{$mandate['reference']}</a>";
-    $details = ts("The following changes have been applied to SDD mandate %1:", array(1 => $mandate_ref, 'domain' => 'org.project60.sepa'));
-    $details .= "<ul><li>";
-    $details .= implode("</li><li>", $detail_lines);
-    $details .= "</li></ul>";
+    $details = E::ts('The following changes have been applied to SDD mandate %1:', [1 => $mandate_ref]);
+    $details .= '<ul><li>';
+    $details .= implode('</li><li>', $detail_lines);
+    $details .= '</li></ul>';
 
     // create activity
-    civicrm_api3('Activity', 'create', array(
+    civicrm_api3('Activity', 'create', [
       'source_record_id'   => $mandate['id'],
       'activity_type_id'   => $activity_type_id,
       'activity_date_time' => date('YmdHis'),
       'details'            => $details,
-      'subject'            => $prefix.$subject,
-      'status_id'          => 2, // completed
+      'subject'            => $prefix . $subject,
+      // completed
+      'status_id'          => 2,
       'source_contact_id'  => CRM_Core_Session::getLoggedInContactID(),
-      'target_id'          => $mandate['contact_id']));
+      'target_id'          => $mandate['contact_id'],
+    ]);
   }
-
 
   /**
    * changes the amount of a SEPA mandate
@@ -744,72 +887,109 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
    * @author endres -at- systopia.de
    * @deprecated in favour of modifyMandate
    */
-  static function adjustAmount($mandate_id, $adjusted_amount) {
-    $adjusted_amount = (float) $adjusted_amount;
-    $contribution_id_pending = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+  public static function adjustAmount(int $mandate_id, float $adjusted_amount): bool {
+    $contribution_id_pending = CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending'
+    );
 
     // use a lock, in case somebody is batching just now
     $lock = SepaBatchLockManager::getInstance()->getLock();
     if (!$lock->acquire()) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot adjust mandate [%s], batching in progress!", array('domain' => 'org.project60.sepa')), $mandate_id), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts('Cannot adjust mandate [%s], batching in progress!'), $mandate_id),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
-     // first, load the mandate
-    $mandate = civicrm_api("SepaMandate", "getsingle", array('id'=>$mandate_id, 'version'=>3));
+    // first, load the mandate
+    $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id]);
     if (isset($mandate['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read mandate [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $mandate_id, $mandate['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
     // check the mandate type
-    if ( $mandate['type']!="RCUR" ) {
-      CRM_Core_Session::setStatus(ts("You can only adjust the amount of recurring contribution mandates.", array('domain' => 'org.project60.sepa')), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+    if ($mandate['type'] != 'RCUR') {
+      CRM_Core_Session::setStatus(
+        E::ts('You can only adjust the amount of recurring contribution mandates.'),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
     // load the contribution
     $contribution_id = $mandate['entity_id'];
-    $contribution = civicrm_api('ContributionRecur', "getsingle", array('id'=>$contribution_id, 'version'=>3));
+    $contribution = civicrm_api3('ContributionRecur', 'getsingle', ['id' => $contribution_id]);
     if (isset($contribution['is_error']) && $contribution['is_error']) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot read contribution [%s]. Error was: '%s'"), $contribution_id, $contribution['error_message']), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(
+        sprintf(
+          E::ts("Cannot read contribution [%s]. Error was: '%s'"),
+          $contribution_id,
+          $contribution['error_message']
+        ),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
     // check the amount
     if ($adjusted_amount <= 0) {
-      CRM_Core_Session::setStatus(ts("The amount cannot be changed to zero or less.", array('domain' => 'org.project60.sepa')), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+      CRM_Core_Session::setStatus(E::ts('The amount cannot be changed to zero or less.'), E::ts('Error'), 'error');
       return FALSE;
     }
 
     // check the amount
     $old_amount = (float) $contribution['amount'];
     if ($old_amount == $adjusted_amount) {
-      CRM_Core_Session::setStatus(ts("The requested amount is the same as the current one.", array('domain' => 'org.project60.sepa')), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+      CRM_Core_Session::setStatus(
+        E::ts('The requested amount is the same as the current one.'),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
     // modify the amount in the recurring contribution
-    $query = array(
-      'version'   => 3,
+    $query = [
       'id'        => $contribution_id,
       'amount'    => $adjusted_amount,
-      'currency'  => $contribution['currency']);
-    $result = civicrm_api("ContributionRecur", "create", $query);
+      'currency'  => $contribution['currency'],
+    ];
+    $result = civicrm_api3('ContributionRecur', 'create', $query);
     if (!empty($result['is_error'])) {
-      CRM_Core_Session::setStatus(sprintf(ts("Cannot modify recurring contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution_id, $result['error_message'], array('domain' => 'org.project60.sepa')), ts('Error', array('domain' => 'org.project60.sepa')), 'error');
+      CRM_Core_Session::setStatus(
+        sprintf(
+          E::ts("Cannot modify recurring contribution [%s]. Error was: '%s'"),
+          $contribution_id,
+          $result['error_message']
+        ),
+        E::ts('Error'),
+        'error'
+      );
       return FALSE;
     }
 
     // find already created contributions. Those also need to be modified
-    $contributions2adjust = array();
-    $adjusted_ids = array();
+    $contributions2adjust = [];
+    $adjusted_ids = [];
     $find_need2adjust = "
     SELECT id
     FROM civicrm_contribution
     WHERE receive_date >= DATE(NOW())
       AND contribution_recur_id = $contribution_id
       AND contribution_status_id = $contribution_id_pending;";
+    /** @var \CRM_Core_DAO $contributions2adjust_query */
     $contributions2adjust_query = CRM_Core_DAO::executeQuery($find_need2adjust);
     while ($contributions2adjust_query->fetch()) {
       $contributions2adjust[] = $contributions2adjust_query->id;
@@ -817,20 +997,33 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // ...and adjust them:
     foreach ($contributions2adjust as $contribution2adjust_id) {
-      $update_result = civicrm_api("Contribution", "create", array(
-        'version'                => 3,
+      $update_result = civicrm_api3('Contribution', 'create', [
         'id'                     => $contribution2adjust_id,
         'total_amount'           => $adjusted_amount,
-        'contribution_status_id' => $contribution_id_pending));
+        'contribution_status_id' => $contribution_id_pending,
+      ]);
       if (!empty($update_result['is_error'])) {
-        CRM_Core_Session::setStatus(sprintf(ts("Cannot update scheduled contribution [%s]. Error was: '%s'", array('domain' => 'org.project60.sepa')), $contribution2adjust_id, $update_result['error_message']), ts('Error', array('domain' => 'org.project60.sepa')), 'warn');
-      } else {
+        CRM_Core_Session::setStatus(
+          sprintf(
+            E::ts("Cannot update scheduled contribution [%s]. Error was: '%s'"),
+            $contribution2adjust_id,
+            $update_result['error_message']
+          ),
+          E::ts('Error'),
+          'warn'
+        );
+      }
+      else {
         array_push($adjusted_ids, $contribution2adjust_id);
       }
     }
 
     if (count($adjusted_ids)) {
-      CRM_Core_Session::setStatus(sprintf(ts("Successfully updated %d generated contributions.", array('domain' => 'org.project60.sepa')), count($adjusted_ids)), ts('Mandate updated.', array('domain' => 'org.project60.sepa')), 'info');
+      CRM_Core_Session::setStatus(
+        sprintf(E::ts('Successfully updated %d generated contributions.'), count($adjusted_ids)),
+        E::ts('Mandate updated.'),
+        'info'
+      );
     }
 
     return TRUE;
@@ -839,15 +1032,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * Give a (cache) ID of the sepa mandate belonging to this contribution (if any)
    *
-   * @param integer $contribution_id
+   * @param int $contribution_id
    *   contribution to look up
    *
-   * @return integer
+   * @return int
    *   mandate ID or 0
    */
-  public static function getContributionMandateID($contribution_id) {
+  public static function getContributionMandateID(int $contribution_id): int {
     static $mandate_by_contribution_id = [];
-    $contribution_id = (int) $contribution_id;
     if (!isset($mandate_by_contribution_id[$contribution_id])) {
       // run a SQL query
       $mandate_id = CRM_Core_DAO::singleValueQuery("
@@ -870,15 +1062,14 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
   /**
    * Give a (cache) ID of the sepa mandate belonging to this recurring contribution (if any)
    *
-   * @param integer $recurring_contribution_id
+   * @param int $recurring_contribution_id
    *   recurring contribution to look up
    *
-   * @return integer
+   * @return int
    *   mandate ID or 0
    */
-  public static function getRecurringContributionMandateID($recurring_contribution_id) {
+  public static function getRecurringContributionMandateID(int $recurring_contribution_id): int {
     static $mandate_by_rcontribution_id = [];
-    $recurring_contribution_id = (int) $recurring_contribution_id;
     if (!isset($mandate_by_rcontribution_id[$recurring_contribution_id])) {
       // run a SQL query
       $mandate_id = CRM_Core_DAO::singleValueQuery("
@@ -891,34 +1082,21 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     return $mandate_by_rcontribution_id[$recurring_contribution_id];
   }
 
-  public static function getLastMandateOfContact($cid) {
-    if (empty($cid)) {
-      return FALSE;
-    }
-
+  public static function getLastMandateOfContact(int $cid): array|bool {
     return SepaMandate::get(FALSE)
-        ->addWhere('contact_id', '=', $cid)
-        ->addOrderBy('id', 'DESC')
-        ->setLimit(1)
-        ->execute()
-        ->first() ?? FALSE;
+      ->addWhere('contact_id', '=', $cid)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first() ?? FALSE;
   }
 
-  public static function isContributionMandate($mandate) {
-    if ($mandate['entity_table'] == 'civicrm_contribution') {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+  public static function isContributionMandate(array $mandate): bool {
+    return $mandate['entity_table'] === 'civicrm_contribution';
   }
 
-  public static function isContributionRecurMandate($mandate) {
-    if ($mandate['entity_table'] == 'civicrm_contribution_recur') {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+  public static function isContributionRecurMandate(array $mandate): bool {
+    return $mandate['entity_table'] === 'civicrm_contribution_recur';
   }
+
 }

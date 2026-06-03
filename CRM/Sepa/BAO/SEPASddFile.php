@@ -13,6 +13,7 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
 
 /**
  * File for the CiviCRM sepa_sdd_file business logic
@@ -27,15 +28,14 @@
  */
 class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
 
-
   /**
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
    *
-   * @return object       CRM_Core_BAO_SEPASddFile object on success, null otherwise
+   * @return \CRM_Sepa_DAO_SEPASddFile
    * @access public
    * @static
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'SepaSddFile', $params['id'] ?? NULL, $params);
 
@@ -43,42 +43,39 @@ class CRM_Sepa_BAO_SEPASddFile extends CRM_Sepa_DAO_SEPASddFile {
     $dao->copyValues($params);
     $dao->save();
 
-    CRM_Utils_Hook::post($hook, 'SepaSddFile', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'SepaSddFile', (int) $dao->id, $dao);
+    /** @var \CRM_Sepa_DAO_SEPASddFile $dao */
     return $dao;
   }
 
   /**
-   * generate XML file
-   * Currenlty only one group per file is supported by this code
-   *  but potentially multiple groups could be in one file
+   * Generate XML file.
+   * Currently only one group per file is supported by this code,
+   * but potentially multiple groups could be in one file
    */
-  function generatexml($id) {
-    $xml = "";
+  public function generatexml(int $id): string {
+    $xml = '';
     $template = CRM_Core_Smarty::singleton();
-    $this->get((int)$id);
-    $template->assign("file", $this->toArray());
+    $this->get((string) $id);
+    $template->assign('file', $this->toArray());
     $txgroup = new CRM_Sepa_BAO_SEPATransactionGroup();
     $txgroup->sdd_file_id = $this->id;
     $txgroup->find();
-    $total =0;
-    $nbtransactions =0;
+    $total = 0;
+    $nbtransactions = 0;
 
     // TODO: properly implement multi-group
-    $fileFormats = array();
+    $fileFormats = [];
     while ($txgroup->fetch()) {
       $xml .= $txgroup->generateXML();
       $total += $txgroup->total;
       $nbtransactions += $txgroup->nbtransactions;
     }
-    // if (count(array_unique($fileFormats)) > 1) {
-    //   throw new Exception('Creditors with mismatching File Formats cannot be mixed in same File');
-    // } else {
-    //   $fileFormatName = reset($fileFormats);
-    // }
-    $template->assign("file", $this->toArray());
-    $template->assign("total", number_format($total, 2, '.', '')); // SEPA-432: two-digit decimals
-    $template->assign("nbtransactions", $nbtransactions);
+    $template->assign('file', $this->toArray());
+    // SEPA-432: two-digit decimals
+    $template->assign('total', number_format($total, 2, '.', ''));
+    $template->assign('nbtransactions', $nbtransactions);
     return $xml;
   }
-}
 
+}

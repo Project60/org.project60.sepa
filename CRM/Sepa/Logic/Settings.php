@@ -14,6 +14,9 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
+use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * This class holds all the functions SEPA settings and configuration
@@ -23,10 +26,9 @@ class CRM_Sepa_Logic_Settings {
   /**
    * Get a generic configuration setting, not related to any of the creditors
    *
-   * @param $setting_name string setting name
    * @return mixed value
    */
-  public static function getGenericSetting($setting_name) {
+  public static function getGenericSetting(string $setting_name): mixed {
     $setting_name = str_replace('.', '_', $setting_name);
     return Civi::settings()->get($setting_name);
   }
@@ -34,10 +36,9 @@ class CRM_Sepa_Logic_Settings {
   /**
    * Get a generic configuration setting, not related to any of the creditors
    *
-   * @param $value        mixed  new value
-   * @param $setting_name string setting name
+   * @phpstan-param mixed $value new value
    */
-  public static function setGenericSetting($value, $setting_name) {
+  public static function setGenericSetting(mixed $value, string $setting_name): void {
     $setting_name = str_replace('.', '_', $setting_name);
     Civi::settings()->set($setting_name, $value);
   }
@@ -48,25 +49,28 @@ class CRM_Sepa_Logic_Settings {
    * an override mechanism, so creditors can individually have
    * different values than the default
    *
-   * @param $param_name  string   the parameter name. note that '.' will be replaced with '_'
-   * @param $creditor_id int|null creditor context
-   * @return mixed|null the current value
+   * @param string $param_name the parameter name. note that '.' will be replaced with '_'
+   * @param int|null $creditor_id creditor context
+   * @return mixed the current value
    */
-  public static function getSetting($param_name, $creditor_id = NULL) {
+  public static function getSetting(string $param_name, $creditor_id = NULL): mixed {
     $param_name = str_replace('.', '_', $param_name);
     $stdvalue = Civi::settings()->get($param_name);
     $override = Civi::settings()->get("{$param_name}_override");
-    $exception = array('cycledays','pp_buffer_days');
+    $exception = ['cycledays', 'pp_buffer_days'];
     if (($override == NULL && $stdvalue == NULL) || ($stdvalue == NULL && !in_array($param_name, $exception))) {
       Civi::log()->debug("org.project60.sepa: get_parameter for unknown key: $param_name");
       return NULL;
-    } else if ($override == NULL) {
+    }
+    elseif ($override == NULL) {
       return $stdvalue;
-    } else {
-      $override = json_decode($override);
+    }
+    else {
+      $override = json_decode((string) $override);
       if (isset($override->{$creditor_id})) {
         return $override->{$creditor_id};
-      } else {
+      }
+      else {
         return $stdvalue;
       }
     }
@@ -78,24 +82,32 @@ class CRM_Sepa_Logic_Settings {
    * an override mechanism, so creditors can individually have
    * different values than the default
    *
-   * @param string
+   * @param int|null $creditor_id
    */
-  static function setSetting($value, $param_name, $creditor_id=NULL) {
+  public static function setSetting(mixed $value, string $param_name, $creditor_id = NULL): void {
     $param_name = str_replace('.', '_', $param_name);
     if (empty($creditor_id)) {
       // set the general setting
       Civi::settings()->set($param_name, $value);
-    } else {
+    }
+    else {
       // set the individual override
       $override_string = CRM_Sepa_Logic_Settings::getGenericSetting("{$param_name}_override");
-      $override = json_decode($override_string, TRUE);
-      if (!$override) {
+      if (is_scalar($override_string)) {
+        $override = json_decode((string) $override_string, TRUE);
+        if (!$override) {
+          $override = [];
+        }
+      }
+      else {
         $override = [];
       }
-      if ($value==NULL || $value=='') {
+
+      if ($value === NULL || $value === '') {
         // remove override
         unset($override[$creditor_id]);
-      } else {
+      }
+      else {
         // add override
         $override[$creditor_id] = $value;
       }
@@ -110,14 +122,15 @@ class CRM_Sepa_Logic_Settings {
    *   mandate / contribution data
    * @param array $creditor
    *   creditor data
-   * @param integer $txgroup_id
+   * @param int $txgroup_id
    *   ID of the transactino group
    *
    * @return string a SEPA compliant transaction message
    */
-  static function getTransactionMessage($mandate, $creditor, $txgroup_id = 0) {
+  public static function getTransactionMessage(array $mandate, array $creditor, int $txgroup_id = 0): string {
     // get tx message from settings
-    $transaction_message = self::getSetting('custom_txmsg', $creditor['id']);
+    /** @var string $transaction_message */
+    $transaction_message = self::getSetting('custom_txmsg', $creditor['id']) ?? '';
 
     // override with custom txgroup message
     $custom_transaction_message = CRM_Sepa_BAO_SEPATransactionGroup::getCustomGroupTransactionMessage($txgroup_id);
@@ -130,7 +143,7 @@ class CRM_Sepa_Logic_Settings {
 
     // fallback is "Thanks."
     if (empty($transaction_message)) {
-      $transaction_message = ts("Thank you", array('domain' => 'org.project60.sepa'));
+      $transaction_message = E::ts('Thank you');
     }
 
     // make sure that it doesn't contain any special characters
@@ -142,20 +155,23 @@ class CRM_Sepa_Logic_Settings {
   /**
    * Get a SEPA setting as a list
    *
-   * @see self::getSetting
+   * @param array<int|string> $default
    *
-   * @return string
+   * @return array<int|string, int|string>
+   *
+   * @see getSetting()
    */
-  static function getListSetting($param_name, $default, $creditor_id=NULL) {
+  public static function getListSetting(string $param_name, array $default, ?int $creditor_id = NULL): array {
     $value = self::getSetting($param_name, $creditor_id);
     if (empty($value)) {
       $list = $default;
-    } else {
-      $list = explode(',', $value);
+    }
+    else {
+      $list = explode(',', (string) $value);
     }
 
     // make it into an associative array (for dropdown elements)
-    $result = array();
+    $result = [];
     foreach ($list as $item) {
       $result[$item] = $item;
     }
@@ -163,23 +179,30 @@ class CRM_Sepa_Logic_Settings {
   }
 
   /**
-    * Gets the mandate of the given contribution
-    *
-    * @param contribution_id  ID of the contribution
-    * @return a map <mandate ID> => <mandate type> of all mandates (should be 0 or 1!), e.g. array(7 => 'OOFF')
-    */
-  public static function getMandateFor($contribution_id) {
-    $mandates = array();
-    $contribution_id = (int) $contribution_id;
-    if (empty($contribution_id)) return $mandates;
+   * Gets the mandate of the given contribution
+   *
+   * @param int $contribution_id  ID of the contribution
+   * @return array<int, string>
+   *   a map <mandate ID> => <mandate type> of all mandates (should be 0 or 1!), e.g. array(7 => 'OOFF')
+   */
+  public static function getMandateFor(int $contribution_id): array {
+    $mandates = [];
+    if (empty($contribution_id)) {
+      return $mandates;
+    }
     $sql_query = "
-    SELECT
-      ooff.id AS ooff_id, ooff.type AS ooff_type, ooff.status AS ooff_status,
-      rcur.id AS rcur_id, rcur.type AS rcur_type, rcur.status AS rcur_status
-    FROM civicrm_contribution
-    LEFT JOIN civicrm_sdd_mandate ooff ON ooff.entity_id = civicrm_contribution.id AND ooff.entity_table = 'civicrm_contribution'
-    LEFT JOIN civicrm_sdd_mandate rcur ON rcur.entity_id = civicrm_contribution.contribution_recur_id AND rcur.entity_table = 'civicrm_contribution_recur'
-    WHERE civicrm_contribution.id = $contribution_id;";
+      SELECT
+        ooff.id AS ooff_id, ooff.type AS ooff_type, ooff.status AS ooff_status,
+        rcur.id AS rcur_id, rcur.type AS rcur_type, rcur.status AS rcur_status
+      FROM civicrm_contribution
+      LEFT JOIN civicrm_sdd_mandate ooff
+        ON ooff.entity_id = civicrm_contribution.id
+        AND ooff.entity_table = 'civicrm_contribution'
+      LEFT JOIN civicrm_sdd_mandate rcur
+        ON rcur.entity_id = civicrm_contribution.contribution_recur_id
+        AND rcur.entity_table = 'civicrm_contribution_recur'
+      WHERE civicrm_contribution.id = $contribution_id;";
+    /** @var \CRM_Core_DAO $mandate_ids */
     $mandate_ids = CRM_Core_DAO::executeQuery($sql_query);
 
     while ($mandate_ids->fetch()) {
@@ -189,7 +212,8 @@ class CRM_Sepa_Logic_Settings {
       if ($mandate_ids->rcur_id) {
         if ($mandate_ids->rcur_status == 'FRST') {
           $mandates[$mandate_ids->rcur_id] = 'FRST';
-        } else {
+        }
+        else {
           $mandates[$mandate_ids->rcur_id] = 'RCUR';
         }
       }
@@ -201,16 +225,20 @@ class CRM_Sepa_Logic_Settings {
    * Reads the default creditor from the settings
    * Will only return a creditor if it exists and if it's active
    *
-   * @return CRM_Sepa_BAO_SEPACreditor object or NULL
+   * @return CRM_Sepa_DAO_SEPACreditor|null object or NULL
    */
-  static function defaultCreditor() {
+  public static function defaultCreditor(): CRM_Sepa_DAO_SEPACreditor|null {
+    // @phpstan-ignore cast.int
     $default_creditor_id = (int) CRM_Sepa_Logic_Settings::getSetting('batching_default_creditor');
-    if (empty($default_creditor_id)) return NULL;
+    if (0 === $default_creditor_id) {
+      return NULL;
+    }
     $default_creditor = new CRM_Sepa_DAO_SEPACreditor();
-    $default_creditor->get('id', $default_creditor_id);
+    $default_creditor->get('id', (string) $default_creditor_id);
     if (empty($default_creditor->mandate_active)) {
       return NULL;
-    } else {
+    }
+    else {
       return $default_creditor;
     }
   }
@@ -219,16 +247,16 @@ class CRM_Sepa_Logic_Settings {
    * Form rule to only allow empty value or a list of
    * valid days (e.g. 1 <= x <= 28)
    */
-  static function sepa_cycle_day_list($value) {
+  public static function sepa_cycle_day_list(?string $value): bool {
     if (!empty($value)) {
       $days = explode(',', $value);
       foreach ($days as $day) {
-        if (!is_numeric($day) || $day < 1 || $day > 28) {
-          return false;
+        if (!is_numeric($day) || (int) $day < 1 || (int) $day > 28) {
+          return FALSE;
         }
       }
     }
-    return true;
+    return TRUE;
   }
 
   /**
@@ -236,11 +264,13 @@ class CRM_Sepa_Logic_Settings {
    *
    * @return bool TRUE if it is
    */
-  public static function isLittleBicExtensionAccessible() {
+  public static function isLittleBicExtensionAccessible(): bool {
     try {
-      $result = civicrm_api3('Bic', 'findbyiban', array('iban' => 'TEST'));
+      $result = civicrm_api3('Bic', 'findbyiban', ['iban' => 'TEST']);
       return empty($result['is_error']);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
+      // @ignoreException
       return FALSE;
     }
   }
@@ -251,8 +281,8 @@ class CRM_Sepa_Logic_Settings {
    */
   public static function isFinancialaclsInstalled(): bool {
     return \CRM_Extension_System::singleton()
-        ->getManager()
-        ->getStatus('financialacls') === \CRM_Extension_Manager::STATUS_INSTALLED;
+      ->getManager()
+      ->getStatus('financialacls') === \CRM_Extension_Manager::STATUS_INSTALLED;
   }
 
   /**
@@ -260,25 +290,26 @@ class CRM_Sepa_Logic_Settings {
    *
    * @see https://github.com/Project60/org.project60.sepa/issues/632
    * @see https://lab.civicrm.org/dev/financial/-/issues/201
-   *
-   * @return integer
    */
-  public static function contributionInProgressStatusId()
-  {
-    static $in_progress_status = null;
-    if ($in_progress_status === null) {
+  public static function contributionInProgressStatusId(): int {
+    static $in_progress_status = NULL;
+    if ($in_progress_status === NULL) {
       // add mitigation for CiviCRM 5.55+
       CRM_Core_BAO_OptionValue::ensureOptionValueExists([
         'option_group_id' => 'contribution_status',
         'name' => 'In Progress',
         'value' => 5,
-        'label' => ts('In Progress'),
+        'label' => E::ts('In Progress'),
         'is_active' => TRUE,
         'component_id' => 'CiviContribute',
       ]);
 
       // the look up the status
-      $in_progress_status = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'In Progress');
+      $in_progress_status = (int) CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'In Progress'
+      );
       if (empty($in_progress_status)) {
         throw new Exception("Contribution status 'In Progress' is missing, but required.");
       }

@@ -14,13 +14,17 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
  * A custom contact search
  */
+// phpcs:ignore Generic.Files.LineLength.TooLong
 class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
-  function __construct(&$formValues) {
+
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
   }
 
@@ -28,49 +32,49 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * Prepare a set of search fields
    *
    * @param CRM_Core_Form $form modifiable
-   * @return void
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form): void {
     CRM_Utils_System::setTitle(E::ts('CiviSEPA Contact Search'));
 
     $form->add('text',
       'reference',
       E::ts('Mandate Reference'),
+      [],
       TRUE
     );
 
     $form->add('text',
-        'iban',
-        E::ts('IBAN'),
-        TRUE
+      'iban',
+      E::ts('IBAN'),
+      [],
+      TRUE
     );
 
     /**
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('reference', 'iban'));
+    $form->assign('elements', ['reference', 'iban']);
   }
 
   /**
    * Get a list of summary data points
    *
-   * @return mixed; NULL or array with keys:
-   *  - summary: string
-   *  - total: numeric
+   * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
   /**
    * Get a list of displayable columns
    *
-   * @return array, keys are printable column headers and values are SQL column names
+   * @return array<string, string>
+   *   keys are printable column headers and values are SQL column names
    */
-  function &columns() {
+  public function &columns() {
     // return by reference
-    $columns = array(
+    $columns = [
       E::ts('Reference')      => 'reference',
       E::ts('Account Holder') => 'account_holder',
       E::ts('IBAN')           => 'iban',
@@ -79,7 +83,7 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
       E::ts('Status')         => 'status',
       E::ts('Contact ID')     => 'contact_id',
       E::ts('Name')           => 'sort_name',
-    );
+    ];
     return $columns;
   }
 
@@ -88,12 +92,14 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    *
    * @param int $offset
    * @param int $rowcount
-   * @param null $sort
+   * @param string|null $sort
    * @param bool $includeContactIDs
    * @param bool $justIDs
-   * @return string, sql
+   *
+   * @return string sql
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
+    // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
     // delegate to $this->sql(), $this->select(), $this->from(), $this->where(), etc.
     $query = $this->sql($this->select(), $offset, $rowcount, $sort, $includeContactIDs, NULL);
     return $query;
@@ -102,10 +108,10 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   /**
    * Construct a SQL SELECT clause
    *
-   * @return string, sql fragment with SELECT arguments
+   * @return string sql fragment with SELECT arguments
    */
-  function select() {
-    return "
+  public function select() {
+    return '
       contact_a.id           AS contact_id,
       contact_a.sort_name    AS sort_name,
       mandate.reference      AS reference,
@@ -114,37 +120,37 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
       mandate.bic            AS bic,
       mandate.type           AS type,
       mandate.status         AS status
-    ";
+    ';
   }
 
   /**
    * Construct a SQL FROM clause
    *
-   * @return string, sql fragment with FROM and JOIN clauses
+   * @return string sql fragment with FROM and JOIN clauses
    */
-  function from() {
-    return "
+  public function from() {
+    return '
       FROM civicrm_contact contact_a
       LEFT JOIN civicrm_sdd_mandate mandate ON (mandate.contact_id = contact_a.id)
-    ";
+    ';
   }
 
   /**
    * Construct a SQL WHERE clause
    *
    * @param bool $includeContactIDs
-   * @return string, sql fragment with conditional expressions
+   * @return string sql fragment with conditional expressions
    */
-  function where($includeContactIDs = FALSE) {
-    $params = array();
-    $wheres = array();
+  public function where($includeContactIDs = FALSE) {
+    $params = [];
+    $wheres = [];
     $count  = 1;
 
     // add reference
     $reference = $this->_formValues['reference'] ?? NULL;
     if ($reference) {
       $wheres[] = "mandate.reference LIKE %{$count}";
-      $params[$count] = array($reference, 'String');
+      $params[$count] = [$reference, 'String'];
       $count++;
     }
 
@@ -152,13 +158,14 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
     $iban = $this->_formValues['iban'] ?? NULL;
     if ($iban) {
       $wheres[] = "mandate.iban LIKE %{$count}";
-      $params[$count] = array($iban, 'String');
+      $params[$count] = [$iban, 'String'];
       $count++;
     }
 
     if (empty($wheres)) {
       return 'TRUE';
-    } else {
+    }
+    else {
       $where = '(' . implode(') AND (', $wheres) . ')';
       return $this->whereClause($where, $params);
     }
@@ -167,19 +174,10 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
   /**
    * Determine the Smarty template for the search screen
    *
-   * @return string, template path (findable through Smarty template path)
+   * @return string template path (findable through Smarty template path)
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
-  /**
-   * Modify the content of each row
-   *
-   * @param array $row modifiable SQL result row
-   * @return void
-   */
-  function alterRow(&$row) {
-//    $row['sort_name'] .= ' ( altered )';
-  }
 }
