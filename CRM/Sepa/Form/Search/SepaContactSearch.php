@@ -32,22 +32,21 @@ class CRM_Sepa_Form_Search_SepaContactSearch extends CRM_Contact_Form_Search_Cus
    * Prepare a set of search fields
    *
    * @param CRM_Core_Form $form modifiable
-   * @return void
    */
-  public function buildForm(&$form) {
+  public function buildForm(&$form): void {
     CRM_Utils_System::setTitle(E::ts('CiviSEPA Contact Search'));
 
     $form->add('text',
       'reference',
       E::ts('Mandate Reference'),
-      // FIXME: $attributes should be an array. Was it meant for $required?
+      [],
       TRUE
     );
 
     $form->add('text',
       'iban',
       E::ts('IBAN'),
-      // FIXME: $attributes should be an array. Was it meant for $required?
+      [],
       TRUE
     );
 
