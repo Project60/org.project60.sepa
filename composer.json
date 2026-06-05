@@ -1,5 +1,5 @@
 {
-    "name": "systopia/org.project60.sepa",
+    "name": "project60/org.project60.sepa",
     "description": "This extension provides SEPA Direct Debit processing.",
     "type": "civicrm-ext",
     "license": "AGPL-3.0-or-later",
