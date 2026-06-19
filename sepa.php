@@ -346,36 +346,7 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
   }
 }
 
-/**
- * totten's addition
- */
 function sepa_civicrm_entityTypes(&$entityTypes): void {
-  // add my DAO's
-  $entityTypes[] = [
-    'name' => 'SepaMandate',
-    'class' => 'CRM_Sepa_DAO_SEPAMandate',
-    'table' => 'civicrm_sdd_mandate',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaCreditor',
-    'class' => 'CRM_Sepa_DAO_SEPACreditor',
-    'table' => 'civicrm_sdd_creditor',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaTransactionGroup',
-    'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
-    'table' => 'civicrm_sdd_txgroup',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaSddFile',
-    'class' => 'CRM_Sepa_DAO_SEPASddFile',
-    'table' => 'civicrm_sdd_file',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaContributionGroup',
-    'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
-    'table' => 'civicrm_sdd_contribution_txgroup',
-  ];
   $entityTypes[] = [
     'name' => 'SepaMandateLink',
     'class' => 'CRM_Sepa_DAO_SepaMandateLink',
