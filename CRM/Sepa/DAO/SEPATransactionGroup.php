@@ -8,16 +8,6 @@
  *
  * This stub provides compatibility. It is not intended to be modified in a
  * substantive way. Property annotations may be added, but are not required.
- * @property int $id
- * @property string $reference
- * @property string $type
- * @property string $collection_date
- * @property string $financial_type_id
- * @property string $latest_submission_date
- * @property string $created_date
- * @property string $status_id
- * @property string $sdd_creditor_id
- * @property string $sdd_file_id
  */
 class CRM_Sepa_DAO_SEPATransactionGroup extends CRM_Sepa_DAO_Base {
 

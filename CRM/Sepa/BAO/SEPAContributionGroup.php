@@ -1,29 +1,13 @@
 <?php
-/*-------------------------------------------------------+
-| Project 60 - SEPA direct debit                         |
-| Copyright (C) 2013-2018 TTTP                           |
-| Author: X+                                             |
-+--------------------------------------------------------+
-| This program is released as free software under the    |
-| Affero GPL license. You can redistribute it and/or     |
-| modify it under the terms of this license which you    |
-| can read by viewing the included agpl.txt or online    |
-| at www.gnu.org/licenses/agpl.html. Removal of this     |
-| copyright header is strictly prohibited without        |
-| written permission from the original author(s).        |
-+--------------------------------------------------------*/
-
-declare(strict_types = 1);
 
 /**
- * File for the CiviCRM sepa_contribution_group business logic
+ * DAOs provide an OOP-style facade for reading and writing database records.
  *
- * @package CiviCRM_SEPA
+ * DAOs are a primary source for metadata in older versions of CiviCRM (<5.74)
+ * and are required for some subsystems (such as APIv3).
  *
- */
-
-/**
- * Class contains functions for Sepa mandates
+ * This stub provides compatibility. It is not intended to be modified in a
+ * substantive way. Property annotations may be added, but are not required.
  */
 class CRM_Sepa_BAO_SEPAContributionGroup extends CRM_Sepa_DAO_SEPAContributionGroup {
 
