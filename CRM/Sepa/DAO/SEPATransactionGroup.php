@@ -8,7 +8,7 @@
  *
  * This stub provides compatibility. It is not intended to be modified in a
  * substantive way. Property annotations may be added, but are not required.
- * @property string $id
+ * @property int $id
  * @property string $reference
  * @property string $type
  * @property string $collection_date
