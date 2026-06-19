@@ -109,6 +109,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
           $contribution['mandate.iban'] = $mandate['iban'];
         }
         catch (\Exception $e) {
+          // @ignoreException
         }
       }
       $contributions[] = [
