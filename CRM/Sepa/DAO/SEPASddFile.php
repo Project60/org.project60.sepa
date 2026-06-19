@@ -8,15 +8,6 @@
  *
  * This stub provides compatibility. It is not intended to be modified in a
  * substantive way. Property annotations may be added, but are not required.
- * @property string $id
- * @property string $reference
- * @property string $filename
- * @property string $latest_submission_date
- * @property string $created_date
- * @property string $created_id
- * @property string $status_id
- * @property string $comments
- * @property string $tag
  */
 class CRM_Sepa_DAO_SEPASddFile extends CRM_Sepa_DAO_Base {
 

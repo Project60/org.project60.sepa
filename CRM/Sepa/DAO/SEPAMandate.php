@@ -8,22 +8,6 @@
  *
  * This stub provides compatibility. It is not intended to be modified in a
  * substantive way. Property annotations may be added, but are not required.
- * @property string $id
- * @property string $reference
- * @property string $source
- * @property string $entity_table
- * @property string $entity_id
- * @property string $date
- * @property string $creditor_id
- * @property string $contact_id
- * @property string $account_holder
- * @property string $iban
- * @property string $bic
- * @property string $type
- * @property string $status
- * @property string $creation_date
- * @property string $first_contribution_id
- * @property string $validation_date
  */
 class CRM_Sepa_DAO_SEPAMandate extends CRM_Sepa_DAO_Base {
 
