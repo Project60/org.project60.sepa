@@ -24,13 +24,6 @@ use CRM_Sepa_ExtensionUtil as E;
 class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
-   * Installation
-   */
-  public function install(): void {
-    $this->executeSqlFile('sql/sepa.sql');
-  }
-
-  /**
    * Example: Work with entities usually not available during the install step.
    *
    * This method can be used for any post-install tasks. For example, if a step
