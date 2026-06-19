@@ -1099,7 +1099,10 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     return $mandate['entity_table'] === 'civicrm_contribution_recur';
   }
 
-  public static function entityTableOptions() {
+  /**
+   * @phpstan-return array<string, string>
+   */
+  public static function entityTableOptions(): array {
     return [
       'civicrm_contribution' => E::ts('Contribution'),
       'civicrm_contribution_recur' => E::ts('Recurring Contribution'),
