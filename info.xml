@@ -14,6 +14,9 @@
   <compatibility>
     <ver>5.76</ver>
   </compatibility>
+  <requires>
+    <ext>legacycustomsearches</ext>
+  </requires>
   <urls>
     <url desc="Main Extension Page">https://github.com/Project60/org.project60.sepa</url>
     <url desc="Documentation">https://docs.civicrm.org/civisepa</url>
