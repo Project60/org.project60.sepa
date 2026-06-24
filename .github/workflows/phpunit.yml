@@ -123,6 +123,9 @@ jobs:
           cv vars:fill --quiet
           sed -i "s#\"TEST_DB_DSN\": \".*\"#\"TEST_DB_DSN\": \"$DATABASE_URL\"#g" "$CV_CONFIG"
 
+          cv ext:download "action-provider@https://lab.civicrm.org/extensions/action-provider/-/archive/1.195/action-provider-1.195.zip"
+          cv ext:download "dataprocessor@https://lab.civicrm.org/extensions/dataprocessor/-/archive/1.151/dataprocessor-1.151.zip"
+
       - name: Run PHPUnit
         run: |
           export PATH="$(realpath ../civicrm-standalone/vendor/bin):$PATH"
