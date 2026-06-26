@@ -69,5 +69,10 @@
     },
     "_comment": [
       "PEAR_ErrorStack::singleton() overridden in CRM_Core_Error is static since pear/pear-core v1.10.16"
-    ]
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.14.x-dev"
+        }
+    }
 }
