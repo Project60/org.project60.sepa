@@ -1246,6 +1246,10 @@ msgstr ""
 msgid "Compiling XML for group '%1'"
 msgstr ""
 
+#: CRM/Sepa/Logic/Queue/Close.php CRM/Sepa/Logic/Queue/Update.php
+msgid "Lock released"
+msgstr ""
+
 #: CRM/Sepa/Logic/Queue/Update.php CRM/Sepa/Page/DashBoard.php
 msgid "Cannot run update, another update is in progress!"
 msgstr ""
@@ -1268,10 +1272,6 @@ msgstr ""
 
 #: CRM/Sepa/Logic/Queue/Update.php
 msgid "Cleaning up %1 groups"
-msgstr ""
-
-#: CRM/Sepa/Logic/Queue/Update.php
-msgid "Lock released"
 msgstr ""
 
 #: CRM/Sepa/Logic/Settings.php
@@ -1495,6 +1495,10 @@ msgid "Cannot read creditor [%s]. Error was: '%s'"
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
+msgid "Cannot read campaign [%s]. Error was: '%s'"
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
 msgid "None"
 msgstr ""
 
@@ -1584,14 +1588,6 @@ msgstr ""
 
 #: CRM/Sepa/Page/SepaFile.php
 msgid "Generate XML File"
-msgstr ""
-
-#: CRM/Sepa/Page/SepaMandatePdf.php
-msgid "The selected message template does not exist (%d)"
-msgstr ""
-
-#: CRM/Sepa/Page/SepaMandatePdf.php
-msgid "Error sending %s: Contact doesn't have an email."
 msgstr ""
 
 #: CRM/Sepa/Page/SepaMandatePdf.php
@@ -1860,6 +1856,10 @@ msgstr ""
 
 #: js/CreateMandate.js
 msgid "Account Reference"
+msgstr ""
+
+#: js/CreateMandate.js
+msgid "org.project60.sepa"
 msgstr ""
 
 #: js/RetryCollection.js
@@ -2226,7 +2226,7 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl templates/CRM/Sepa/Page/MandateTab.tpl templates/Sepa/Contribute/Page/ContributionRecur.tpl
+#: templates/CRM/Admin/Form/Setting/SepaSettings.tpl templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "Edit"
 msgstr ""
 
@@ -3122,14 +3122,6 @@ msgstr ""
 msgid "This contact has no recorded one-off mandates."
 msgstr ""
 
-#: templates/Sepa/Admin/Form/PaymentProcessor.tpl
-msgid "Sepa Creditor"
-msgstr ""
-
-#: templates/Sepa/Admin/Form/SepaMandate.tpl
-msgid "Debit frequency"
-msgstr ""
-
 #: templates/Sepa/Contribute/Form/ContributionView.tpl templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "Sepa Mandate [%1]"
 msgstr ""
@@ -3144,10 +3136,6 @@ msgstr ""
 
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
 msgid "1st contribution"
-msgstr ""
-
-#: templates/Sepa/Contribute/Page/ContributionRecur.tpl
-msgid "Done"
 msgstr ""
 
 #: templates/Sepa/Contribute/Page/ContributionRecur.tpl
