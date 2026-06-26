@@ -24,12 +24,20 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+function _sepa_composer_autoload(): void {
+  if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+  }
+}
+
 /**
  * Implements hook_civicrm_container().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_container/
  */
 function sepa_civicrm_container(ContainerBuilder $container): void {
+  _sepa_composer_autoload();
+
   if (class_exists('\Civi\Sepa\ContainerSpecs')) {
     $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs(), PassConfig::TYPE_OPTIMIZE);
   }
@@ -146,7 +154,7 @@ function sepa_civicrm_pageRun(object $page): void {
         /** @var \CRM_Core_DAO $mandate_note_query */
         $mandate_note_query = CRM_Core_DAO::executeQuery(
           "SELECT note FROM civicrm_note
-            WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur' 
+            WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur'
             ORDER BY modified_date DESC;"
         );
         while ($mandate_note_query->fetch()) {
@@ -172,6 +180,7 @@ function sepa_civicrm_buildForm(string $formName, object $form): void {
  * Implements hook_civicrm_config().
  */
 function sepa_civicrm_config(CRM_Core_Config $config): void {
+  _sepa_composer_autoload();
   _sepa_civix_civicrm_config($config);
 }
 
