@@ -2234,6 +2234,18 @@ parameters:
 			path: CRM/Sepa/Page/ListGroup.php
 
 		-
+			message: '#^Cannot access offset ''mandate\.reference'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
+			message: '#^Cannot access offset ''mandate\.iban'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: CRM/Sepa/Page/ListGroup.php
+
+		-
 			message: '#^Cannot access offset ''contact_id\.contact_type'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -2278,7 +2290,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''id'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
+			count: 3
 			path: CRM/Sepa/Page/ListGroup.php
 
 		-

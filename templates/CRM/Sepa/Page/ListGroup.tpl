@@ -24,6 +24,8 @@
     <th>{ts domain="org.project60.sepa"}Contact{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Financial Type{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Campaign{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}Reference{/ts}</th>
+    <th>{ts domain="org.project60.sepa"}IBAN{/ts}</th>
   </thead>
   <tbody>
     {foreach from=$contributions item=contribution}
@@ -36,6 +38,8 @@
       <td><a href="{$contribution.contact_link}"><div class="icon crm-icon {$contribution.contact_type}-icon"></div>{$contribution.contact_display_name}</a></td>
       <td>{$contribution.financial_type}</td>
       <td>{$contribution.campaign}</td>
+      <td>{$contribution.reference}</td>
+      <td>{$contribution.iban}</td>
     </tr>
     {/foreach}
   </tbody>
