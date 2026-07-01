@@ -44,28 +44,18 @@ class ReinstateAction extends AbstractBatchAction {
       'id',
       'type',
       'status',
-      'entity_table',
-      'entity_id',
+      'first_contribution_id',
     ];
   }
 
   private function doRun(Result $result): void {
-    /** @var array{id: int, type: string, status: string, entity_table: string|null, entity_id: int|null} $mandate */
+    /** @var array{id: int, type: string, status: string, first_contribution_id: ?int} $mandate */
     foreach ($this->getBatchRecords() as $mandate) {
       if ('RCUR' !== $mandate['type'] || 'ONHOLD' !== $mandate['status']) {
         continue;
       }
 
-      if (NULL === $mandate['entity_id'] || 'civicrm_contribution_recur' !== $mandate['entity_table']) {
-        $status = 'FRST';
-      }
-      else {
-        $status = $this->detectMandateStatusForRecurContribution($mandate['entity_id']);
-        ContributionRecur::update(FALSE)
-          ->addValue('contribution_status_id:name', 'Pending')
-          ->addWhere('id', '=', $mandate['entity_id'])
-          ->execute();
-      }
+      $status = NULL === $mandate['first_contribution_id'] ? 'FRST' : 'RCUR';
 
       SepaMandate::update($this->getCheckPermissions())
         ->addValue('status', $status)
@@ -74,30 +64,6 @@ class ReinstateAction extends AbstractBatchAction {
 
       $result[] = ['status' => $status] + $mandate;
     }
-  }
-
-  private function detectMandateStatusForRecurContribution(int $contributionRecurId): string {
-    $contributionIds = Contribution::get(FALSE)
-      ->addSelect('id')
-      ->addWhere('contribution_recur_id', '=', $contributionRecurId)
-      ->execute()
-      ->column('id');
-
-    if ([] === $contributionIds) {
-      return 'FRST';
-    }
-
-    $transactionGroup = SepaTransactionGroup::get(FALSE)
-      ->addSelect('id')
-      ->addJoin('SepaContributionGroup AS sepa_contribution_group', 'INNER', NULL,
-        ['sepa_contribution_group.txgroup_id', '=', 'id'],
-        ['sepa_contribution_group.contribution_id', 'IN', $contributionIds],
-      )
-      ->setLimit(1)
-      ->execute()
-      ->first();
-
-    return NULL === $transactionGroup ? 'FRST' : 'RCUR';
   }
 
 }

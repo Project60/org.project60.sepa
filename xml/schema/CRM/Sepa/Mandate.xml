@@ -199,7 +199,7 @@
 
   <field>
     <name>first_contribution_id</name>
-    <title>First Contribution (to be deprecated)</title>
+    <title>First Contribution</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contribution</comment>
   </field>

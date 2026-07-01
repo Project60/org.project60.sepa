@@ -51,7 +51,6 @@ class SuspendAction extends AbstractBatchAction {
   }
 
   private function doRun(Result $result): void {
-    $now = date('Y-m-d H:i:s');
     /** @var array{id: int, type: string, status: string, entity_table: string|null, entity_id: int|null} $mandate */
     foreach ($this->getBatchRecords() as $mandate) {
       if ('RCUR' !== $mandate['type'] || !in_array($mandate['status'], ['FRST', 'RCUR'], TRUE)) {
@@ -67,40 +66,32 @@ class SuspendAction extends AbstractBatchAction {
 
       if ('civicrm_contribution_recur' === $mandate['entity_table'] && NULL !== $mandate['entity_id']) {
         ContributionRecur::update(FALSE)
-          ->setValues([
-            'contribution_status_id:name' => 'Cancelled',
-            'cancel_date' => $now,
-            'cancel_reason' => E::ts('SEPA mandate was suspended.'),
-          ])
+          ->setValues(['contribution_status_id:name' => 'Pending on hold'])
           ->addWhere('id', '=', $mandate['entity_id'])
-          ->addWhere('contribution_status_id:name', '!=', 'Cancelled')
           ->execute();
 
-        $contributionIdsInOpenTransactionGroups = Contribution::get(FALSE)
+        $pendingContributionIdsInOpenTransactionGroups = Contribution::get(FALSE)
           ->addJoin('SepaContributionGroup AS sepa_contribution_group', 'INNER', NULL,
             ['sepa_contribution_group.contribution_id', '=', 'id'],
           )
           ->addJoin('SepaTransactionGroup AS sepa_transaction_group', 'INNER', NULL,
             ['sepa_transaction_group.id', '=', 'sepa_contribution_group.txgroup_id'],
-            ['sepa_contribution_group.status_id:name', '=', 'Open']
+            ['sepa_transaction_group.status_id:name', '=', '"Open"']
           )
           ->addWhere('contribution_recur_id', '=', $mandate['entity_id'])
+          ->addWhere('contribution_status_id:name', '=', 'Pending')
           ->execute()
           ->column('id');
 
-        if ([] !== $contributionIdsInOpenTransactionGroups) {
+        if ([] !== $pendingContributionIdsInOpenTransactionGroups) {
+          // Remove contributions from transaction groups.
           SepaContributionGroup::delete(FALSE)
-            ->addWhere('contribution_id', 'IN', $contributionIdsInOpenTransactionGroups)
+            ->addWhere('contribution_id', 'IN', $pendingContributionIdsInOpenTransactionGroups)
             ->execute();
 
           Contribution::update(FALSE)
-            ->setValues([
-              'contribution_status_id:name' => 'Cancelled',
-              'cancel_date' => $now,
-              'cancel_reason' => E::ts('SEPA mandate was suspended.'),
-            ])
-            ->addWhere('id', 'IN', $contributionIdsInOpenTransactionGroups)
-            ->addWhere('contribution_status_id:name', '!=', 'Cancelled')
+            ->setValues(['contribution_status_id:name' => 'Pending on hold'])
+            ->addWhere('id', 'IN', $pendingContributionIdsInOpenTransactionGroups)
             ->execute();
         }
       }

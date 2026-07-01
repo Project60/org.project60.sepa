@@ -18,6 +18,7 @@ declare(strict_types = 1);
 require_once 'sepa.civix.php';
 // phpcs:enable
 
+use Civi\Core\ClassScanner;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 use Symfony\Component\Config\Resource\FileResource;
@@ -51,6 +52,14 @@ function sepa_civicrm_container(ContainerBuilder $container): void {
     ->setPublic(TRUE);
 
   $container->autowire(SepaBatchLockManager::class)->setPublic(TRUE);
+}
+
+/**
+ * @param list<string> $classes
+ */
+function sepa_civicrm_scanClasses(array &$classes): void {
+  // @phpstan-ignore parameterByRef.type
+  ClassScanner::scanFolders($classes, __DIR__, 'Civi/Sepa/SpecProvider', '\\');
 }
 
 // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
