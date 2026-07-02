@@ -33,6 +33,7 @@ use Systopia\TestFixtures\Fixtures\Builders\SepaCreditorBuilder;
 
 /**
  * @covers \Civi\Sepa\Api4\Action\SepaMandate\SuspendAction
+ * @covers \Civi\Api4\SepaMandate
  *
  * @group headless
  */
@@ -68,7 +69,7 @@ final class SuspendActionTest extends AbstractSepaHeadlessTestCase {
       ['contribution_recur_id' => $mandate['entity_id']]
     );
 
-    $transactionGroup1 = SepaTransactionGroup::create(FALSE)
+    $transactionGroupOpen1 = SepaTransactionGroup::create(FALSE)
       ->setValues([
         'status_id:name' => 'Open',
         'reference' => 'open1',
@@ -77,7 +78,7 @@ final class SuspendActionTest extends AbstractSepaHeadlessTestCase {
       ->execute()
       ->single();
 
-    $transactionGroup2 = SepaTransactionGroup::create(FALSE)
+    $transactionGroupOpen2 = SepaTransactionGroup::create(FALSE)
       ->setValues([
         'status_id:name' => 'Open',
         'reference' => 'open2',
@@ -98,14 +99,14 @@ final class SuspendActionTest extends AbstractSepaHeadlessTestCase {
     SepaContributionGroup::create(FALSE)
       ->setValues([
         'contribution_id' => $contributionPending1Id,
-        'txgroup_id' => $transactionGroup1['id'],
+        'txgroup_id' => $transactionGroupOpen1['id'],
       ])
       ->execute();
 
     SepaContributionGroup::create(FALSE)
       ->setValues([
         'contribution_id' => $contributionCancelledId,
-        'txgroup_id' => $transactionGroup2['id'],
+        'txgroup_id' => $transactionGroupOpen2['id'],
       ])
       ->execute();
 
@@ -124,7 +125,6 @@ final class SuspendActionTest extends AbstractSepaHeadlessTestCase {
         'status' => 'ONHOLD',
         'id' => $mandate['id'],
         'type' => 'RCUR',
-        'entity_table' => 'civicrm_contribution_recur',
         'entity_id' => $mandate['entity_id'],
       ],
     ], $suspendedMandate->getArrayCopy());
@@ -138,43 +138,40 @@ final class SuspendActionTest extends AbstractSepaHeadlessTestCase {
         ->single()['status']
     );
 
-    static::assertSame(
-      'Pending on hold',
+    // Recurring contribution should be set to on hold.
+    static::assertTrue(
       ContributionRecur::get(FALSE)
-        ->addSelect('contribution_status_id:name')
+        ->addSelect('civi_sepa_contribution_recur.is_on_hold')
         ->addWhere('id', '=', $mandate['entity_id'])
         ->execute()
-        ->single()['contribution_status_id:name']
+        ->single()['civi_sepa_contribution_recur.is_on_hold']
     );
 
-    // Status of pending contribution in open transaction group should be changed.
-    static::assertSame(
-      'Pending on hold',
+    // Pending contribution in open transaction group should be set to on hold.
+    static::assertTrue(
       Contribution::get(FALSE)
-        ->addSelect('contribution_status_id:name')
+        ->addSelect('civi_sepa_contribution.is_on_hold')
         ->addWhere('id', '=', $contributionPending1Id)
         ->execute()
-        ->single()['contribution_status_id:name']
+        ->single()['civi_sepa_contribution.is_on_hold']
     );
 
-    // Status of pending contribution in closed transaction group should be unchanged.
-    static::assertSame(
-      'Pending',
+    // Pending contribution in closed transaction group should be unchanged.
+    static::assertFalse(
       Contribution::get(FALSE)
-        ->addSelect('contribution_status_id:name')
+        ->addSelect('civi_sepa_contribution.is_on_hold')
         ->addWhere('id', '=', $contributionPending2Id)
         ->execute()
-        ->single()['contribution_status_id:name']
+        ->single()['civi_sepa_contribution.is_on_hold']
     );
 
-    // Status of canceled contribution in open transaction group should be unchanged.
-    static::assertSame(
-      'Canceled',
+    // Canceled contribution in open transaction group should be unchanged.
+    static::assertFalse(
       Contribution::get(FALSE)
-        ->addSelect('contribution_status_id:name')
+        ->addSelect('civi_sepa_contribution.is_on_hold')
         ->addWhere('id', '=', $contributionCancelledId)
         ->execute()
-        ->single()['contribution_status_id:name']
+        ->single()['civi_sepa_contribution.is_on_hold']
     );
   }
 

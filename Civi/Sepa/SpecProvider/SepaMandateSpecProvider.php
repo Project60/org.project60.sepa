@@ -20,6 +20,7 @@ declare(strict_types = 1);
 
 namespace Civi\Sepa\SpecProvider;
 
+use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Core\Service\AutoService;
@@ -39,6 +40,32 @@ final class SepaMandateSpecProvider extends AutoService implements SpecProviderI
     $spec->getFieldByName('creditor_id')?->setRequired(FALSE);
     $spec->getFieldByName('date')?->setRequired(FALSE);
     $spec->getFieldByName('reference')?->setRequired(FALSE);
+
+    if ('createFull' === $spec->getAction()) {
+      $spec->addFieldSpec(new FieldSpec('payment_instrument_id', 'SepaMandate', 'Integer'));
+
+      $spec->addFieldSpec(
+        (new FieldSpec('financial_type_id', 'SepaMandate', 'Integer'))
+        ->setRequired(TRUE)
+        ->setFkEntity('FinancialType')
+      );
+
+      $spec->addFieldSpec(
+        (new FieldSpec('contribution_contact_id', 'SepaMandate', 'Integer'))
+        ->setFkEntity('Contact')
+      );
+
+      $spec->addFieldSpec(new FieldSpec('currency', 'SepaMandate', 'String'));
+
+      $spec->addFieldSpec(new FieldSpec('contribution_status_id', 'SepaMandate', 'Integer'));
+
+      $spec->addFieldSpec(new FieldSpec('is_pay_later', 'SepaMandate', 'Boolean'));
+
+      $spec->addFieldSpec(
+        (new FieldSpec('amount', 'SepaMandate', 'Money'))
+        ->setRequired(TRUE)
+      );
+    }
   }
 
   public function applies(string $entity, string $action): bool {

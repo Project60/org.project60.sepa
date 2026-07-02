@@ -46,7 +46,6 @@ final class CreateFullAction extends AbstractCreateAction {
      *    currency?: string,
      *    contribution_status_id?: int|numeric-string,
      *    is_pay_later?: bool|scalar,
-     *    total_amount?: int|float|numeric-string,
      *    amount: int|float|numeric-string,
      *    ...
      *  } $values
@@ -68,7 +67,9 @@ final class CreateFullAction extends AbstractCreateAction {
       ->single();
 
     // verify/set payment_instrument_id
-    $values['status'] ??= $values['type'] === 'OOFF' ? 'OOFF' : 'FRST';
+    $values['status'] ??= $values['type'] === 'OOFF'
+      ? 'OOFF'
+      : (isset($values['first_contribution_id']) ? 'FRST' : 'RCUR');
     $rcurPaymentInstrumentType = $values['status'] === 'FRST' ? 'FRST' : $values['type'];
     $eligiblePaymentInstruments = \CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor(
       (int) $values['creditor_id'],
@@ -125,30 +126,31 @@ final class CreateFullAction extends AbstractCreateAction {
     }
 
     // copy array
-    $contributionData = $values;
-    if (isset($contributionData['contribution_contact_id'])) {
+    // @todo Put only actual contribution values into $contributionValues.
+    $contributionValues = $values;
+    if (isset($contributionValues['contribution_contact_id'])) {
       // in case someone wants another contact for the contribution than for the mandate...
-      $contributionData['contact_id'] = $contributionData['contribution_contact_id'];
+      $contributionValues['contact_id'] = $contributionValues['contribution_contact_id'];
     }
-    if (!isset($contributionData['currency'])) {
-      $contributionData['currency'] = $creditor['currency'];
+    if (!isset($contributionValues['currency'])) {
+      $contributionValues['currency'] = $creditor['currency'];
     }
 
-    if (!isset($contributionData['contribution_status_id'])) {
-      $contributionData['contribution_status_id:name'] ??= 'Pending';
+    if (!isset($contributionValues['contribution_status_id'])) {
+      $contributionValues['contribution_status_id:name'] ??= 'Pending';
     }
 
     if ($values['type'] === 'RCUR') {
       $contributionEntity = 'ContributionRecur';
       $contributionTable  = 'civicrm_contribution_recur';
-      $contributionData['payment_instrument_id'] = $values['payment_instrument_id'];
-      $contributionData['is_pay_later'] ??= TRUE;
+      $contributionValues['payment_instrument_id'] = $values['payment_instrument_id'];
+      $contributionValues['is_pay_later'] ??= TRUE;
     }
     elseif ($values['type'] === 'OOFF') {
       $contributionEntity = 'Contribution';
       $contributionTable  = 'civicrm_contribution';
-      $contributionData['payment_instrument_id'] = $values['payment_instrument_id'];
-      $contributionData['total_amount'] = $contributionData['amount'];
+      $contributionValues['payment_instrument_id'] = $values['payment_instrument_id'];
+      $contributionValues['total_amount'] = $contributionValues['amount'];
     }
     else {
       throw new \CRM_Core_Exception('Unknown mandate type: ' . $values['type']);
@@ -157,18 +159,19 @@ final class CreateFullAction extends AbstractCreateAction {
     // create the contribution
     $contribution = civicrm_api4($contributionEntity, 'create', [
       'checkPermissions' => FALSE,
-      'values' => $contributionData,
+      'values' => $contributionValues,
     ])->single();
 
     // create the mandate object itself
     // TODO: sanity checks
     // copy array
-    $mandateData = $contributionData;
-    $mandateData['entity_table'] = $contributionTable;
-    $mandateData['entity_id'] = $contribution['id'];
+    // @todo Put only actual mandate values into $mandateValues.
+    $mandateValues = $values;
+    $mandateValues['entity_table'] = $contributionTable;
+    $mandateValues['entity_id'] = $contribution['id'];
     /** @var array<string, mixed> $mandate */
-    $mandate = SepaMandate::create(FALSE)
-      ->setValues($mandateData)
+    $mandate = SepaMandate::create($this->getCheckPermissions())
+      ->setValues($mandateValues)
       ->execute()
       ->single();
 

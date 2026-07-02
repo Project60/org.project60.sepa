@@ -45,13 +45,12 @@ class SuspendAction extends AbstractBatchAction {
       'id',
       'type',
       'status',
-      'entity_table',
       'entity_id',
     ];
   }
 
   private function doRun(Result $result): void {
-    /** @var array{id: int, type: string, status: string, entity_table: string|null, entity_id: int|null} $mandate */
+    /** @var array{id: int, type: string, status: string, entity_id: ?int} $mandate */
     foreach ($this->getBatchRecords() as $mandate) {
       if ('RCUR' !== $mandate['type'] || !in_array($mandate['status'], ['FRST', 'RCUR'], TRUE)) {
         continue;
@@ -64,9 +63,9 @@ class SuspendAction extends AbstractBatchAction {
 
       $result[] = ['status' => 'ONHOLD'] + $mandate;
 
-      if ('civicrm_contribution_recur' === $mandate['entity_table'] && NULL !== $mandate['entity_id']) {
+      if (NULL !== $mandate['entity_id']) {
         ContributionRecur::update(FALSE)
-          ->setValues(['contribution_status_id:name' => 'Pending on hold'])
+          ->setValues(['civi_sepa_contribution_recur.is_on_hold' => TRUE])
           ->addWhere('id', '=', $mandate['entity_id'])
           ->execute();
 
@@ -90,7 +89,7 @@ class SuspendAction extends AbstractBatchAction {
             ->execute();
 
           Contribution::update(FALSE)
-            ->setValues(['contribution_status_id:name' => 'Pending on hold'])
+            ->setValues(['civi_sepa_contribution.is_on_hold' => TRUE])
             ->addWhere('id', 'IN', $pendingContributionIdsInOpenTransactionGroups)
             ->execute();
         }

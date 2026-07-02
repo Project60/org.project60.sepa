@@ -19,18 +19,16 @@ declare(strict_types = 1);
 
 namespace Civi\Sepa\Api4\Action\SepaMandate;
 
-use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\Generic\AbstractBatchAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\SepaMandate;
-use Civi\Api4\SepaTransactionGroup;
 
 /**
  * Reinstates SEPA mandates that are in status "ONHOLD". The new status will be
- * "FRST", if there's no related contribution in any transaction group,
- * otherwise it will be "RCUR". The corresponding recurrent contribution will be
- * set to "Pending".
+ * "FRST", if first_contribution_id is NULL, otherwise it will be "RCUR". The
+ * is_on_hold flag of the corresponding recurrent contribution will be set to
+ * FALSE.
  */
 class ReinstateAction extends AbstractBatchAction {
 
@@ -44,12 +42,13 @@ class ReinstateAction extends AbstractBatchAction {
       'id',
       'type',
       'status',
+      'entity_id',
       'first_contribution_id',
     ];
   }
 
   private function doRun(Result $result): void {
-    /** @var array{id: int, type: string, status: string, first_contribution_id: ?int} $mandate */
+    /** @var array{id: int, type: string, status: string, entity_id: ?int, first_contribution_id: ?int} $mandate */
     foreach ($this->getBatchRecords() as $mandate) {
       if ('RCUR' !== $mandate['type'] || 'ONHOLD' !== $mandate['status']) {
         continue;
@@ -61,6 +60,13 @@ class ReinstateAction extends AbstractBatchAction {
         ->addValue('status', $status)
         ->addWhere('id', '=', $mandate['id'])
         ->execute();
+
+      if (NULL !== $mandate['entity_id']) {
+        ContributionRecur::update(FALSE)
+          ->addValue('civi_sepa_contribution_recur.is_on_hold', FALSE)
+          ->addWhere('id', '=', $mandate['entity_id'])
+          ->execute();
+      }
 
       $result[] = ['status' => $status] + $mandate;
     }

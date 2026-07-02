@@ -176,7 +176,7 @@ class CRM_Sepa_Logic_Batching {
 
     $deferredCollectionDates = [];
     $rcontribIdsByCollectionDate = [];
-    $mandatesByNextDateAndFinancialTypeId = [];
+    $mandatesByCollectionDateAndFinancialTypeId = [];
     foreach ($relevantMandates as $mandate) {
       // TODO: Use API attribute names in subsequent code instead of copying to legacy name elements.
       $mandate += [
@@ -205,7 +205,8 @@ class CRM_Sepa_Logic_Batching {
       $nextDate = $deferredCollectionDates[$nextDate];
 
       $rcontribIdsByCollectionDate[$nextDate][] = $mandate['entity_id'];
-      $mandatesByNextDateAndFinancialTypeId[$nextDate][$mandate['contribution_recur.financial_type_id']][] = $mandate;
+      $financialTypeId = $mandate['contribution_recur.financial_type_id'];
+      $mandatesByCollectionDateAndFinancialTypeId[$nextDate][$financialTypeId][] = $mandate;
     }
 
     // RCUR-STEP 3: find already created contributions
@@ -230,8 +231,10 @@ class CRM_Sepa_Logic_Batching {
       }
     }
 
-    // RCUR-STEP 4: create the missing contributions, store all in $mandate['mandate_entity_id']
-    foreach ($mandatesByNextDateAndFinancialTypeId as $collectionDate => &$mandatesByFinancialTypeId) {
+    // RCUR-STEP 4: Create the missing contributions. Store contribution IDs
+    // (existing and created) in $mandate['mandate_entity_id']. Remove mandates
+    // in status "ONHOLD" so contribution won't be added to transaction group.
+    foreach ($mandatesByCollectionDateAndFinancialTypeId as $collectionDate => &$mandatesByFinancialTypeId) {
       foreach ($mandatesByFinancialTypeId as &$mandates) {
         foreach ($mandates as $index => &$mandate) {
           $recurId = $mandate['entity_id'];
@@ -261,6 +264,7 @@ class CRM_Sepa_Logic_Batching {
                   'campaign_id' => $mandate['contribution_recur.campaign_id'] ?? NULL,
                   'is_test' => $mandate['contribution_recur.is_test'],
                   'payment_instrument_id' => $installmentPaymentInstrumentId,
+                  'civi_sepa_contribution.is_on_hold' => 'ONHOLD' === $mandate['status'],
                 ])
                 ->execute()
                 ->single();
@@ -277,11 +281,11 @@ class CRM_Sepa_Logic_Batching {
               );
               // TODO: Error handling?
             }
+          }
 
-            if ('ONHOLD' === $mandate['status']) {
-              // Don't add contribution to transaction group.
-              unset($mandates[$index]);
-            }
+          if ('ONHOLD' === $mandate['status']) {
+            // Don't add contribution to transaction group.
+            unset($mandates[$index]);
           }
         }
       }
@@ -313,7 +317,7 @@ class CRM_Sepa_Logic_Batching {
 
     // step 6: sync calculated group structure with existing (open) groups
     self::syncGroups(
-      $mandatesByNextDateAndFinancialTypeId,
+      $mandatesByCollectionDateAndFinancialTypeId,
       $existingGroups,
       $mode,
       $rcurNotice,
