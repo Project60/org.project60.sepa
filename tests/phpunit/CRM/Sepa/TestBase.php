@@ -457,7 +457,7 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
   /**
    * Get a mandate by it's ID.
    */
-  protected function getMandate(string $mandateId): array {
+  protected function getMandate(int|string $mandateId): array {
     $mandate = $this->callAPISuccessGetSingle(
       'SepaMandate',
       [
