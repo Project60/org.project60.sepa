@@ -14,7 +14,7 @@
     <name>id</name>
     <autoincrement>true</autoincrement>
   </primaryKey>
-  
+
   <field>
     <name>contribution_id</name>
     <type>int unsigned</type>
@@ -28,8 +28,9 @@
     <name>contribution_id</name>
     <table>civicrm_contribution</table>
     <key>id</key>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
-  
+
   <field>
     <name>txgroup_id</name>
     <type>int unsigned</type>
@@ -45,5 +46,5 @@
     <name>txglookup</name>
     <fieldName>txgroup_id</fieldName>
   </index>
-  
+
 </table>

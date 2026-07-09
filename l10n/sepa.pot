@@ -94,7 +94,7 @@ msgstr ""
 msgid "CUC (only from CBIBdySDDReq)"
 msgstr ""
 
-#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Form/Report/SepaMandateRCUR.php CRM/Utils/SepaTokens.php
+#: CRM/Admin/Form/Setting/SepaSettings.php CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Form/Report/SepaMandateRCUR.php CRM/Utils/SepaTokens.php Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
 msgid "Currency"
 msgstr ""
 
@@ -583,7 +583,7 @@ msgid "Entity Table"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-msgid "Physical tablename for the contract entity being joined, eg contributionRecur or Membership"
+msgid "Physical table name for the contribution entity being joined (civicrm_contribution or civicrm_contribution_recur)"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SepaMandateLink.php
@@ -659,7 +659,7 @@ msgid "Created Date"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
-msgid "First Contribution (to be deprecated)"
+msgid "First Contribution (RCUR mandates)"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPAMandate.php
@@ -754,7 +754,7 @@ msgstr ""
 msgid "Target collection date"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPATransactionGroup.php
+#: CRM/Sepa/DAO/SEPATransactionGroup.php Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
 msgid "Financial Type ID"
 msgstr ""
 
@@ -763,7 +763,7 @@ msgid "Financial type of contained contributions if CiviSEPA is generating group
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
-msgid "fk sepa group Status options in civicrm_option_values"
+msgid "fk to batch status options in civicrm_option_values"
 msgstr ""
 
 #: CRM/Sepa/DAO/SEPATransactionGroup.php
@@ -858,7 +858,7 @@ msgstr ""
 msgid "required"
 msgstr ""
 
-#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Page/CreateMandate.php CRM/Utils/SepaTokens.php Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php Civi/Sepa/ActionProvider/Action/FindMandate.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl templates/CRM/Sepa/Page/CreateMandate.tpl templates/CRM/Sepa/Page/EditMandate.tpl templates/CRM/Sepa/Page/ListGroup.tpl templates/CRM/Sepa/Page/MandateTab.tpl
+#: CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateGeneric.php CRM/Sepa/Form/Report/SepaMandateOOFF.php CRM/Sepa/Page/CreateMandate.php CRM/Utils/SepaTokens.php Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php Civi/Sepa/ActionProvider/Action/FindMandate.php Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php templates/CRM/Contribute/Form/ContributionThankYou.sepa.tpl templates/CRM/Event/Form/RegistrationThankYou.sepa.tpl templates/CRM/Sepa/Page/CreateMandate.tpl templates/CRM/Sepa/Page/EditMandate.tpl templates/CRM/Sepa/Page/ListGroup.tpl templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "Amount"
 msgstr ""
 
@@ -1483,7 +1483,23 @@ msgid "This page needs a mandate id ('mid') parameter."
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
-msgid "Unkown action '%s'. Ignored."
+msgid "The mandate has been suspended."
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "Mandate suspended"
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "The mandate has been reinstated."
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "Mandate reinstated"
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "Unknown action '%s'. Ignored."
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
@@ -1766,6 +1782,54 @@ msgstr ""
 msgid "Cancel Reason (if no parameter)"
 msgstr ""
 
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Payment Method ID"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Contact ID for contribution"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Can be used if contribution contact is different from mandate contact."
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Creditor currency will be used if not given."
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Contribution Status ID"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Collection date (only for OOFF)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Start of collection (only for RCUR)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "End of collection (only for RCUR)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Collection interval (together with frequency_unit, only for RCUR)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Collection interval unit (together with frequency_interval, only for RCUR)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Day of the month (for collection, only for RCUR)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Campaign ID"
+msgstr ""
+
 #: Civi/Sepa/ContainerSpecs.php
 msgid "Create SEPA Mandate (One-Off)"
 msgstr ""
@@ -1888,6 +1952,18 @@ msgstr ""
 
 #: js/SepaSettings.js
 msgid "Creditor updated"
+msgstr ""
+
+#: managed/CustomGroup_civi_sepa_contribution.mgd.php
+msgid "CiviSEPA Contribution Fields"
+msgstr ""
+
+#: managed/CustomGroup_civi_sepa_contribution.mgd.php managed/CustomGroup_civi_sepa_contribution_recur.mgd.php
+msgid "Is On Hold"
+msgstr ""
+
+#: managed/CustomGroup_civi_sepa_contribution_recur.mgd.php
+msgid "CiviSEPA ContributionRecur Fields"
 msgstr ""
 
 #: sepa.php
@@ -3012,6 +3088,22 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Change amount to:"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Suspend"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Suspend this mandate."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Reinstate"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Reinstate this mandate."
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl

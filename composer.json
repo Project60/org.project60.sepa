@@ -24,6 +24,9 @@
         "civicrm/civicrm-packages": ">=6.1",
         "webmozart/assert": "^1 || ^2"
     },
+    "require-dev": {
+        "systopia/civicrm-test-fixtures-sepa": "dev-main"
+    },
     "autoload": {
         "classmap": ["ComposerHelper.php"]
     },
