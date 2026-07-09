@@ -304,7 +304,7 @@ class CRM_Sepa_Logic_PaymentInstruments {
    *    one of ['OOFF', 'FRST', 'RCUR']
    *
    * @return array<int, array<string, mixed>>
-   *   list of payment instrument data
+   *   list of payment instrument data indexed by ID.
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function getPaymentInstrumentsForCreditor(int $creditor_id, string $type): array {

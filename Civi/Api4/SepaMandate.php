@@ -4,7 +4,9 @@ declare(strict_types = 1);
 
 namespace Civi\Api4;
 
+use Civi\Sepa\Api4\Action\SepaMandate\CreateFullAction;
 use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
+use Civi\Sepa\Api4\Action\SepaMandate\GetFieldsAction;
 
 /**
  * SepaMandate entity.
@@ -15,8 +17,18 @@ use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
  */
 class SepaMandate extends Generic\DAOEntity {
 
+  public static function createFull(bool $checkPermissions = TRUE): CreateFullAction {
+    return (new CreateFullAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
   public static function get($checkPermissions = TRUE) {
     return (new GetAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function getFields($checkPermissions = TRUE) {
+    return (new GetFieldsAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -28,7 +40,7 @@ class SepaMandate extends Generic\DAOEntity {
   public static function permissions(): array {
     return [
       'get' => ['view sepa mandates'],
-      'update' => ['edit sepa mandates'],
+      'default' => ['edit sepa mandates'],
     ];
   }
 
