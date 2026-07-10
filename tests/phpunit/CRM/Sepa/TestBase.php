@@ -94,7 +94,6 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
     return \Civi\Test::headless()
-      ->install('legacycustomsearches')
       ->installMe(__DIR__)
       ->apply();
   }
