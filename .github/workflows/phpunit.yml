@@ -124,7 +124,7 @@ jobs:
           sed -i "s#\"TEST_DB_DSN\": \".*\"#\"TEST_DB_DSN\": \"$DATABASE_URL\"#g" "$CV_CONFIG"
 
           cv ext:download "action-provider@https://lab.civicrm.org/extensions/action-provider/-/archive/1.195/action-provider-1.195.zip"
-          cv ext:download "dataprocessor@https://lab.civicrm.org/extensions/dataprocessor/-/archive/1.151/dataprocessor-1.151.zip"
+          cv ext:download "dataprocessor@https://lab.civicrm.org/extensions/dataprocessor/-/archive/1.153/dataprocessor-1.153.zip"
 
       - name: Run PHPUnit
         run: |
