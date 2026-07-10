@@ -60,7 +60,7 @@ final class ReinstateActionTest extends AbstractSepaHeadlessTestCase {
       ->single();
 
     ContributionRecur::update(FALSE)
-      ->addValue('civi_sepa_contribution_recur.is_on_hold', TRUE)
+      ->addValue('sepa_contribution_recur.is_on_hold', TRUE)
       ->addWhere('id', '=', $mandate['entity_id'])
       ->execute()
       ->single();
@@ -92,10 +92,10 @@ final class ReinstateActionTest extends AbstractSepaHeadlessTestCase {
 
     static::assertFalse(
       ContributionRecur::get(FALSE)
-        ->addSelect('civi_sepa_contribution_recur.is_on_hold')
+        ->addSelect('sepa_contribution_recur.is_on_hold')
         ->addWhere('id', '=', $mandate['entity_id'])
         ->execute()
-        ->single()['civi_sepa_contribution_recur.is_on_hold']
+        ->single()['sepa_contribution_recur.is_on_hold']
     );
   }
 
@@ -128,7 +128,7 @@ final class ReinstateActionTest extends AbstractSepaHeadlessTestCase {
       ->single();
 
     ContributionRecur::update(FALSE)
-      ->addValue('civi_sepa_contribution_recur.is_on_hold', TRUE)
+      ->addValue('sepa_contribution_recur.is_on_hold', TRUE)
       ->addWhere('id', '=', $mandate['entity_id'])
       ->execute()
       ->single();
@@ -160,10 +160,10 @@ final class ReinstateActionTest extends AbstractSepaHeadlessTestCase {
 
     static::assertFalse(
       ContributionRecur::get(FALSE)
-        ->addSelect('civi_sepa_contribution_recur.is_on_hold')
+        ->addSelect('sepa_contribution_recur.is_on_hold')
         ->addWhere('id', '=', $mandate['entity_id'])
         ->execute()
-        ->single()['civi_sepa_contribution_recur.is_on_hold']
+        ->single()['sepa_contribution_recur.is_on_hold']
     );
   }
 

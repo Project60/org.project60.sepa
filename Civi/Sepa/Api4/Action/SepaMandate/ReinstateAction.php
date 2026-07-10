@@ -63,7 +63,7 @@ class ReinstateAction extends AbstractBatchAction {
 
       if (NULL !== $mandate['entity_id']) {
         ContributionRecur::update(FALSE)
-          ->addValue('civi_sepa_contribution_recur.is_on_hold', FALSE)
+          ->addValue('sepa_contribution_recur.is_on_hold', FALSE)
           ->addWhere('id', '=', $mandate['entity_id'])
           ->execute();
       }

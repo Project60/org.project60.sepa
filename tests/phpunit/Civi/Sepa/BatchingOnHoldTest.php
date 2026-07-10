@@ -55,15 +55,8 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
       ->execute()
       ->single();
 
-    SepaMandate::update(FALSE)
-      ->addValue('status', 'ONHOLD')
+    SepaMandate::suspend(FALSE)
       ->addWhere('id', '=', $mandate['id'])
-      ->execute()
-      ->single();
-
-    ContributionRecur::update(FALSE)
-      ->addValue('civi_sepa_contribution_recur.is_on_hold', TRUE)
-      ->addWhere('id', '=', $mandate['entity_id'])
       ->execute()
       ->single();
 
@@ -71,11 +64,11 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
 
     // One contribution with "is_on_hold" enabled should be created.
     $contribution = Contribution::get(FALSE)
-      ->addSelect('id', 'civi_sepa_contribution.is_on_hold')
+      ->addSelect('id', 'sepa_contribution.is_on_hold')
       ->addWhere('contribution_recur_id', '=', $mandate['entity_id'])
       ->execute()
       ->single();
-    static::assertTrue($contribution['civi_sepa_contribution.is_on_hold']);
+    static::assertTrue($contribution['sepa_contribution.is_on_hold']);
 
     // No transaction group should be created.
     static::assertEmpty(SepaTransactionGroup::get(FALSE)->execute());
@@ -89,14 +82,14 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
     // hold and not being added to an transaction group.
     \CRM_Sepa_Logic_Batching::updateRCUR($creditorId, 'FRST');
     static::assertTrue(Contribution::get(FALSE)
-      ->addSelect('civi_sepa_contribution.is_on_hold')
+      ->addSelect('sepa_contribution.is_on_hold')
       ->addWhere('contribution_recur_id', '=', $mandate['entity_id'])
       ->execute()
-      ->single()['civi_sepa_contribution.is_on_hold']);
+      ->single()['sepa_contribution.is_on_hold']);
     static::assertEmpty(SepaTransactionGroup::get(FALSE)->execute());
 
     Contribution::update(FALSE)
-      ->addValue('civi_sepa_contribution.is_on_hold', FALSE)
+      ->addValue('sepa_contribution.is_on_hold', FALSE)
       ->addWhere('id', '=', $contribution['id'])
       ->execute();
 
@@ -140,7 +133,7 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
       ->single();
 
     ContributionRecur::update(FALSE)
-      ->addValue('civi_sepa_contribution_recur.is_on_hold', TRUE)
+      ->addValue('sepa_contribution_recur.is_on_hold', TRUE)
       ->addWhere('id', '=', $mandate['entity_id'])
       ->execute()
       ->single();
@@ -149,12 +142,12 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
 
     // One contribution with "is_on_hold" enabled should be created.
     $contribution = Contribution::get(FALSE)
-      ->addSelect('id', 'civi_sepa_contribution.is_on_hold')
+      ->addSelect('id', 'sepa_contribution.is_on_hold')
       ->addWhere('contribution_recur_id', '=', $mandate['entity_id'])
       ->addWhere('id', '!=', $firstContributionId)
       ->execute()
       ->single();
-    static::assertTrue($contribution['civi_sepa_contribution.is_on_hold']);
+    static::assertTrue($contribution['sepa_contribution.is_on_hold']);
 
     // No transaction group should be created.
     static::assertEmpty(SepaTransactionGroup::get(FALSE)->execute());
@@ -168,14 +161,14 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
     // hold and not being added to an transaction group.
     \CRM_Sepa_Logic_Batching::updateRCUR($creditorId, 'RCUR');
     static::assertTrue(Contribution::get(FALSE)
-      ->addSelect('civi_sepa_contribution.is_on_hold')
+      ->addSelect('sepa_contribution.is_on_hold')
       ->addWhere('id', '=', $contribution['id'])
       ->execute()
-      ->single()['civi_sepa_contribution.is_on_hold']);
+      ->single()['sepa_contribution.is_on_hold']);
     static::assertEmpty(SepaTransactionGroup::get(FALSE)->execute());
 
     Contribution::update(FALSE)
-      ->addValue('civi_sepa_contribution.is_on_hold', FALSE)
+      ->addValue('sepa_contribution.is_on_hold', FALSE)
       ->addWhere('id', '=', $contribution['id'])
       ->execute();
 
@@ -206,15 +199,8 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
       ->execute()
       ->single();
 
-    SepaMandate::update(FALSE)
-      ->addValue('status', 'ONHOLD')
+    SepaMandate::suspend(FALSE)
       ->addWhere('id', '=', $mandate['id'])
-      ->execute()
-      ->single();
-
-    ContributionRecur::update(FALSE)
-      ->addValue('civi_sepa_contribution_recur.is_on_hold', TRUE)
-      ->addWhere('id', '=', $mandate['entity_id'])
       ->execute()
       ->single();
 
@@ -254,17 +240,17 @@ final class BatchingOnHoldTest extends AbstractSepaHeadlessTestCase {
       ->single();
 
     ContributionRecur::update(FALSE)
-      ->addValue('civi_sepa_contribution_recur.is_on_hold', TRUE)
+      ->addValue('sepa_contribution_recur.is_on_hold', TRUE)
       ->addWhere('id', '=', $mandate['entity_id'])
       ->execute()
       ->single();
 
     \CRM_Sepa_Logic_Batching::updateRCUR($creditorId, 'FRST');
 
-    // RCUR mandate in ONHOLD should not handled.
-    $contribution = Contribution::get(FALSE)->addSelect('id', 'civi_sepa_contribution.is_on_hold')->execute()->single();
+    // RCUR mandate in ONHOLD should not be handled.
+    $contribution = Contribution::get(FALSE)->addSelect('id', 'sepa_contribution.is_on_hold')->execute()->single();
     static::assertSame($firstContributionId, $contribution['id']);
-    static::assertFalse($contribution['civi_sepa_contribution.is_on_hold']);
+    static::assertFalse($contribution['sepa_contribution.is_on_hold']);
     static::assertEmpty(SepaTransactionGroup::get(FALSE)->execute());
   }
 

@@ -1954,16 +1954,12 @@ msgstr ""
 msgid "Creditor updated"
 msgstr ""
 
-#: managed/CustomGroup_civi_sepa_contribution.mgd.php
-msgid "CiviSEPA Contribution Fields"
+#: managed/CustomGroup_sepa_contribution.mgd.php managed/CustomGroup_sepa_contribution_recur.mgd.php sepa.php
+msgid "CiviSEPA"
 msgstr ""
 
-#: managed/CustomGroup_civi_sepa_contribution.mgd.php managed/CustomGroup_civi_sepa_contribution_recur.mgd.php
+#: managed/CustomGroup_sepa_contribution.mgd.php managed/CustomGroup_sepa_contribution_recur.mgd.php
 msgid "Is On Hold"
-msgstr ""
-
-#: managed/CustomGroup_civi_sepa_contribution_recur.mgd.php
-msgid "CiviSEPA ContributionRecur Fields"
 msgstr ""
 
 #: sepa.php
@@ -1980,10 +1976,6 @@ msgstr ""
 
 #: sepa.php
 msgid "CiviSEPA Settings"
-msgstr ""
-
-#: sepa.php
-msgid "CiviSEPA"
 msgstr ""
 
 #: sepa.php

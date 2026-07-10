@@ -143,37 +143,37 @@ final class SuspendActionTest extends AbstractSepaHeadlessTestCase {
     // Recurring contribution should be set to on hold.
     static::assertTrue(
       ContributionRecur::get(FALSE)
-        ->addSelect('civi_sepa_contribution_recur.is_on_hold')
+        ->addSelect('sepa_contribution_recur.is_on_hold')
         ->addWhere('id', '=', $mandate['entity_id'])
         ->execute()
-        ->single()['civi_sepa_contribution_recur.is_on_hold']
+        ->single()['sepa_contribution_recur.is_on_hold']
     );
 
     // Pending contribution in open transaction group should be set to on hold.
     static::assertTrue(
       Contribution::get(FALSE)
-        ->addSelect('civi_sepa_contribution.is_on_hold')
+        ->addSelect('sepa_contribution.is_on_hold')
         ->addWhere('id', '=', $contributionPending1Id)
         ->execute()
-        ->single()['civi_sepa_contribution.is_on_hold']
+        ->single()['sepa_contribution.is_on_hold']
     );
 
     // Pending contribution in closed transaction group should be unchanged.
     static::assertFalse(
       Contribution::get(FALSE)
-        ->addSelect('civi_sepa_contribution.is_on_hold')
+        ->addSelect('sepa_contribution.is_on_hold')
         ->addWhere('id', '=', $contributionPending2Id)
         ->execute()
-        ->single()['civi_sepa_contribution.is_on_hold']
+        ->single()['sepa_contribution.is_on_hold']
     );
 
     // Canceled contribution in open transaction group should be unchanged.
     static::assertFalse(
       Contribution::get(FALSE)
-        ->addSelect('civi_sepa_contribution.is_on_hold')
+        ->addSelect('sepa_contribution.is_on_hold')
         ->addWhere('id', '=', $contributionCancelledId)
         ->execute()
-        ->single()['civi_sepa_contribution.is_on_hold']
+        ->single()['sepa_contribution.is_on_hold']
     );
   }
 

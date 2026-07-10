@@ -65,7 +65,7 @@ class SuspendAction extends AbstractBatchAction {
 
       if (NULL !== $mandate['entity_id']) {
         ContributionRecur::update(FALSE)
-          ->setValues(['civi_sepa_contribution_recur.is_on_hold' => TRUE])
+          ->setValues(['sepa_contribution_recur.is_on_hold' => TRUE])
           ->addWhere('id', '=', $mandate['entity_id'])
           ->execute();
 
@@ -89,7 +89,7 @@ class SuspendAction extends AbstractBatchAction {
             ->execute();
 
           Contribution::update(FALSE)
-            ->addValue('civi_sepa_contribution.is_on_hold', TRUE)
+            ->addValue('sepa_contribution.is_on_hold', TRUE)
             ->addWhere('id', 'IN', $pendingContributionIdsInOpenTransactionGroups)
             ->execute();
         }

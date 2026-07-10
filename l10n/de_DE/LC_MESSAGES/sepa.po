@@ -2276,18 +2276,15 @@ msgstr ""
 msgid "Creditor updated"
 msgstr "Gläubiger aktualisiert"
 
-#: managed/CustomGroup_civi_sepa_contribution.mgd.php
-msgid "CiviSEPA Contribution Fields"
-msgstr "CiviSEPA Contribution Felder"
+#: managed/CustomGroup_sepa_contribution.mgd.php
+#: managed/CustomGroup_sepa_contribution_recur.mgd.php sepa.php
+msgid "CiviSEPA"
+msgstr "CiviSEPA"
 
-#: managed/CustomGroup_civi_sepa_contribution.mgd.php
-#: managed/CustomGroup_civi_sepa_contribution_recur.mgd.php
+#: managed/CustomGroup_sepa_contribution.mgd.php
+#: managed/CustomGroup_sepa_contribution_recur.mgd.php
 msgid "Is On Hold"
 msgstr "Ist ausgesetzt"
-
-#: managed/CustomGroup_civi_sepa_contribution_recur.mgd.php
-msgid "CiviSEPA ContributionRecur Fields"
-msgstr "CiviSEPA ContributionRecur Felder"
 
 #: sepa.php
 msgid "<i>None</i>"
@@ -2304,10 +2301,6 @@ msgstr "SEPA-Mandat erfassen"
 #: sepa.php
 msgid "CiviSEPA Settings"
 msgstr "CiviSEPA Einstellungen"
-
-#: sepa.php
-msgid "CiviSEPA"
-msgstr "CiviSEPA"
 
 #: sepa.php
 msgid "Create SEPA mandates"

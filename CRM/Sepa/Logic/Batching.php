@@ -213,7 +213,7 @@ class CRM_Sepa_Logic_Batching {
     $existingContributionsByRecurId = [];
     foreach ($rcontribIdsByCollectionDate as $collectionDate => $rcontribIds) {
       $existingContributionsByRecurId += Contribution::get(FALSE)
-        ->addSelect('id', 'contribution_recur_id', 'civi_sepa_contribution.is_on_hold')
+        ->addSelect('id', 'contribution_recur_id', 'sepa_contribution.is_on_hold')
         ->addJoin('SepaContributionGroup AS ctxg', 'LEFT', NULL, ['ctxg.contribution_id', '=', 'id'])
         ->addJoin('SepaTransactionGroup AS txg', 'LEFT', NULL, ['txg.id', '=', 'ctxg.txgroup_id'])
         ->addWhere('contribution_recur_id', 'IN', $rcontribIds)
@@ -225,7 +225,7 @@ class CRM_Sepa_Logic_Batching {
         ->execute()
         ->indexBy('contribution_recur_id')
         ->getArrayCopy();
-      /** @var array<int, array{id: int, contribution_recur_id: int, "civi_sepa_contribution.is_on_hold": ?bool}> $existingContributionsByRecurId */
+      /** @var array<int, array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool}> $existingContributionsByRecurId */
     }
 
     // RCUR-STEP 4: Create the missing contributions. Store contribution IDs
@@ -238,7 +238,7 @@ class CRM_Sepa_Logic_Batching {
           if (isset($existingContributionsByRecurId[$recurId])) {
             // if the contribution already exists, store it
             $mandate['mandate_entity_id'] = $existingContributionsByRecurId[$recurId]['id'];
-            if (TRUE === $existingContributionsByRecurId[$recurId]['civi_sepa_contribution.is_on_hold']) {
+            if (TRUE === $existingContributionsByRecurId[$recurId]['sepa_contribution.is_on_hold']) {
               // Don't add on hold contribution to transaction group.
               unset($mandates[$index]);
             }
@@ -265,7 +265,7 @@ class CRM_Sepa_Logic_Batching {
                 'campaign_id' => $mandate['contribution_recur.campaign_id'] ?? NULL,
                 'is_test' => $mandate['contribution_recur.is_test'],
                 'payment_instrument_id' => $installmentPaymentInstrumentId,
-                'civi_sepa_contribution.is_on_hold' => 'ONHOLD' === $mandate['status'],
+                'sepa_contribution.is_on_hold' => 'ONHOLD' === $mandate['status'],
               ])
               ->execute()
               ->single();
