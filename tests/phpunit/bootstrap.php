@@ -28,6 +28,7 @@ addExtensionDirToClassLoader(__DIR__);
 
 // Add classes for tests without booted CiviCRM environment, i.e. simple PHPUnit tests.
 addExtensionToClassLoader('org.project60.sepa');
+addExtensionToClassLoader('action-provider');
 
 if (!function_exists('ts')) {
   // Ensure function ts() is available - it's declared in the same file as CRM_Core_I18n in CiviCRM < 5.74.
