@@ -114,12 +114,15 @@ class CRM_Sepa_Logic_Batching {
      *   "contribution_recur.amount": float,
      *   "contribution_recur.is_test": bool,
      *   "contribution_recur.contact_id": positive-int,
-     *   "contribution_recur.financial_type_id": ?positive-int,
+     *   "contribution_recur.financial_type_id": positive-int,
      *   "contribution_recur.contribution_status_id:name": ?string,
      *   "contribution_recur.currency": ?string,
      *   "contribution_recur.campaign_id"?: ?positive-int,
-     *   "contribution_recur.payment_instrument_id": ?positive-int,
+     *   "contribution_recur.payment_instrument_id": positive-int,
      *  }> $relevantMandates */
+    // Note: contribution_recur.financial_type_id and contribution_recur.payment_instrument_id could be NULL according
+    // to the database schema, though they are set, when the recurring contribution is created and there's no UI to edit
+    // recurring contributions.
     $relevantMandates = SepaMandate::get(TRUE)
       ->addSelect(
         'id',

@@ -44,6 +44,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
     // Note: CRM_Utils_Request::retrieve() cannot be used because of its special handling for "action".
     if (isset($_REQUEST['action'])) {
+      /** @var string $action */
       $action = $_REQUEST['action'];
       if ($action === 'delete') {
         $this->deleteMandate($mandate_id);

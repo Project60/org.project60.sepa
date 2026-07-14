@@ -965,25 +965,25 @@ parameters:
 		-
 			message: '#^Cannot access offset ''id'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 3
+			count: 1
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
-			count: 9
+			count: 6
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
 			message: '#^Loose comparison via "\!\=" is not allowed\.$#'
 			identifier: notEqual.notAllowed
-			count: 2
+			count: 1
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
 			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
 			identifier: equal.notAllowed
-			count: 8
+			count: 6
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
@@ -1041,12 +1041,6 @@ parameters:
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
-			message: '#^Parameter \#1 \$mandate_id of static method CRM_Utils_SepaCustomisationHooks\:\:installment_created\(\) expects int, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: CRM/Sepa/Logic/Batching.php
-
-		-
 			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, array\<int, mixed\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -1055,7 +1049,7 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, list\<mixed\> given\.$#'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
@@ -1065,19 +1059,7 @@ parameters:
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
-			message: '#^Parameter \#2 \$contribution_recur_id of static method CRM_Utils_SepaCustomisationHooks\:\:installment_created\(\) expects int, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: CRM/Sepa/Logic/Batching.php
-
-		-
 			message: '#^Parameter \#2 \$now of static method CRM_Sepa_Logic_Batching\:\:getNextExecutionDate\(\) expects int, int\|false given\.$#'
-			identifier: argument.type
-			count: 2
-			path: CRM/Sepa/Logic/Batching.php
-
-		-
-			message: '#^Parameter \#2 \$recurring_contribution_pi of static method CRM_Sepa_Logic_PaymentInstruments\:\:getInstallmentPaymentInstrument\(\) expects int, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: CRM/Sepa/Logic/Batching.php
@@ -1085,19 +1067,13 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
 			identifier: argument.type
-			count: 8
+			count: 7
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
 			message: '#^Part \$entity_id \(mixed\) of encapsed string cannot be cast to string\.$#'
 			identifier: encapsedStringPart.nonString
 			count: 1
-			path: CRM/Sepa/Logic/Batching.php
-
-		-
-			message: '#^Possibly invalid array key type mixed\.$#'
-			identifier: offsetAccess.invalidOffset
-			count: 7
 			path: CRM/Sepa/Logic/Batching.php
 
 		-
@@ -2134,7 +2110,7 @@ parameters:
 		-
 			message: '#^Cannot cast mixed to string\.$#'
 			identifier: cast.string
-			count: 4
+			count: 3
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-
@@ -2170,7 +2146,7 @@ parameters:
 
 		-
 			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:run", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
-			count: 10
+			count: 4
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-
@@ -2182,7 +2158,7 @@ parameters:
 		-
 			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
 			identifier: equal.notAllowed
-			count: 15
+			count: 9
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-
