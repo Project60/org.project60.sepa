@@ -10,7 +10,6 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID</comment>
-    <add>4.3</add>
     <export>true</export>
     <html>
       <type>Number</type>
@@ -28,7 +27,6 @@
     <required>true</required>
     <unique>true</unique>
     <comment>A unique mandate reference</comment>
-    <add>4.3</add>
     <html>
       <type>Text</type>
     </html>
@@ -37,7 +35,6 @@
     <name>reference</name>
     <fieldName>reference</fieldName>
     <unique>unique</unique>
-    <add>4.3</add>
   </index>
 
 
@@ -46,7 +43,6 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Information about the source of registration of the mandate</comment>
-    <add>4.3</add>
     <html>
       <type>Text</type>
     </html>
@@ -57,8 +53,7 @@
        <type>varchar</type>
        <title>Entity Table</title>
        <length>64</length>
-       <comment>Physical tablename for the contract entity being joined, eg contributionRecur or Membership</comment>
-       <add>3.2</add>
+       <comment>Physical table name for the contribution entity being joined (civicrm_contribution or civicrm_contribution_recur)</comment>
   </field>
   <field>
       <name>entity_id</name>
@@ -66,18 +61,15 @@
       <title>Entity ID</title>
       <required>true</required>
       <comment>FK to contract entity table specified in entity_table column.</comment>
-      <add>4.3</add>
   </field>
   <dynamicForeignKey>
       <idColumn>entity_id</idColumn>
       <typeColumn>entity_table</typeColumn>
-      <add>4.3</add>
   </dynamicForeignKey>
   <index>
        <name>index_entity</name>
        <fieldName>entity_table</fieldName>
        <fieldName>entity_id</fieldName>
-       <add>4.3</add>
   </index>
 
   <field>
@@ -86,7 +78,6 @@
     <type>datetime</type>
     <required>true</required>
     <comment>by default now()</comment>
-    <add>4.3</add>
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
@@ -132,7 +123,6 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Name of the account holder</comment>
-    <add>4.3</add>
     <html>
       <type>Text</type>
     </html>
@@ -144,7 +134,6 @@
     <length>42</length>
     <required>false</required>
     <comment>Iban of the debtor</comment>
-    <add>4.3</add>
     <html>
       <type>Text</type>
     </html>
@@ -152,7 +141,6 @@
   <index>
     <name>iban</name>
     <fieldName>iban</fieldName>
-    <add>4.3</add>
   </index>
 
   <field>
@@ -160,7 +148,6 @@
     <type>varchar</type>
     <length>11</length>
     <comment>BIC of the debtor</comment>
-    <add>4.3</add>
     <html>
       <type>Text</type>
     </html>
@@ -181,7 +168,6 @@
     <length>8</length>
     <required>true</required>
     <default>"INIT"</default>
-    <add>4.3</add>
     <comment>Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, ONHOLD)</comment>
   </field>
 
@@ -190,7 +176,6 @@
     <title>creation date</title>
     <type>datetime</type>
     <export>true</export>
-    <add>4.3</add>
     <html>
       <label>Created Date</label>
       <type>Select Date</type>
@@ -199,7 +184,7 @@
 
   <field>
     <name>first_contribution_id</name>
-    <title>First Contribution (to be deprecated)</title>
+    <title>First Contribution (RCUR mandates)</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contribution</comment>
   </field>
@@ -212,6 +197,5 @@
     <name>validation_date</name>
     <title>validation date</title>
     <type>datetime</type>
-    <add>4.3</add>
   </field>
 </table>

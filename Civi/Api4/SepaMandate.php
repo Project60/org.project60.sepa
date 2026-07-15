@@ -7,6 +7,8 @@ namespace Civi\Api4;
 use Civi\Sepa\Api4\Action\SepaMandate\CreateFullAction;
 use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
 use Civi\Sepa\Api4\Action\SepaMandate\GetFieldsAction;
+use Civi\Sepa\Api4\Action\SepaMandate\SuspendAction;
+use Civi\Sepa\Api4\Action\SepaMandate\ReinstateAction;
 
 /**
  * SepaMandate entity.
@@ -29,6 +31,16 @@ class SepaMandate extends Generic\DAOEntity {
 
   public static function getFields($checkPermissions = TRUE) {
     return (new GetFieldsAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function suspend(bool $checkPermissions = TRUE): SuspendAction {
+    return (new SuspendAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function reinstate(bool $checkPermissions = TRUE): ReinstateAction {
+    return (new ReinstateAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

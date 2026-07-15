@@ -25,7 +25,6 @@ parameters:
 	scanDirectories:
 		- packages
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/src/Framework
-		- mixin
 		- ../action-provider
 		- ../dataprocessor
 	bootstrapFiles:
