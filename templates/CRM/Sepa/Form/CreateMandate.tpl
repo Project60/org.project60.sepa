@@ -21,6 +21,7 @@
   {if $create_mode eq 'replace'}
   <div style="background-color: paleturquoise; padding: 1em; border-radius: 1em;">
     {$form.replace.html}
+    {$form.collect_receivable.html}
 
     <div style="text-align: left; font-size: large;">
       <span><strong>{ts 1=$replace_mandate_reference domain='org.project60.sepa'}You're replacing mandate %1{/ts}</strong></span>

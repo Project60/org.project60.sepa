@@ -105,6 +105,11 @@
                     <br/>
                     {ts domain="org.project60.sepa"}Replace for the following reason:{/ts}&nbsp;
                     <input type="text" name="replace_reason" size="32" class="crm-form-text" />
+                    {if $sepa.status === 'ONHOLD' }
+                      <br><label for="replace_collect_receivable">{ts}Collect receivable{/ts}</label>
+                  <input type="checkbox" name="replace_collect_receivable" id="replace_collect_receivable" value="1" class="crm-form-checkbox"/>
+                  {ts}If checked, an OOFF mandate with the sum of the amounts of pending on hold contributions will be created.{/ts}
+                    {/if}
                 </td>
             </tr>{/if}{/if}
 
@@ -141,7 +146,12 @@
                 <td class="label" style="vertical-align: middle;">
                   <a class="button" onclick="mandate_action_reinstate();">{ts}Reinstate{/ts}</a>
                 </td>
-                <td>{ts}Reinstate this mandate.{/ts}</td>
+                <td>
+                  {ts}Reinstate this mandate.{/ts}<br>
+                  <label for="collect_receivable">{ts}Collect receivable{/ts}</label>
+                  <input type="checkbox" name="collect_receivable" id="collect_receivable" value="1" class="crm-form-checkbox"/>
+                  {ts}If checked, an OOFF mandate with the sum of the amounts of pending on hold contributions will be created.{/ts}
+                </td>
               </tr>
             {/if}
 
@@ -248,6 +258,10 @@ function mandate_action_replace() {
     replace_url = cj("<div/>").html(replace_url).text();
     replace_url += '&replace_date=' + encodeURIComponent(cj("[name='replace_date']").val());
     replace_url += '&replace_reason=' + encodeURIComponent(cj("[name='replace_reason']").val());
+    if (cj("[name='replace_collect_receivable']").val()) {
+      replace_url += '&collect_receivable=1';
+    }
+
     location.href = replace_url;
 }
 

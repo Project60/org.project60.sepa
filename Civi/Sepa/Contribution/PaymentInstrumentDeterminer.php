@@ -41,7 +41,6 @@ final class PaymentInstrumentDeterminer {
     if ([] === $eligiblePaymentInstruments) {
       // no payment instrument -> disabled
       throw new \CRM_Core_Exception(
-        // phpcs:ignore Generic.Files.LineLength.TooLong
         "$mandateType mandate for creditor ID [$creditorId] disabled, i.e. no valid payment instrument set."
       );
     }
@@ -68,6 +67,28 @@ final class PaymentInstrumentDeterminer {
       // phpcs:ignore Generic.Files.LineLength.TooLong
       "Payment instrument [$givenPaymentInstrumentId] invalid for $mandateType mandates with creditor ID [$creditorId]."
     );
+  }
+
+  public function determineCollectReceivablePaymentInstrument(int $creditorId, int $rcurPaymentInstrumentId): int {
+    $eligiblePaymentInstruments = \CRM_Sepa_Logic_PaymentInstruments::getPaymentInstrumentsForCreditor(
+      $creditorId,
+      'OOFF'
+    );
+
+    if ([] === $eligiblePaymentInstruments) {
+      // no payment instrument -> disabled
+      throw new \CRM_Core_Exception(
+        "OOFF mandate for creditor ID [$creditorId] disabled, i.e. no valid payment instrument set."
+      );
+    }
+
+    if (isset($eligiblePaymentInstruments[$rcurPaymentInstrumentId])) {
+      // Use the same payment instrument ID that was used for the RCUR mandate, if possible.
+      return $rcurPaymentInstrumentId;
+    }
+
+    // Use the first configured FRST payment instrument.
+    return key($eligiblePaymentInstruments);
   }
 
 }
