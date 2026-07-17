@@ -582,6 +582,14 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_11304(): bool {
+    $this->ctx->log->info('Delete database index mandate_id ON civicrm_sdd_entity_mandate');
+    // There is a foreign key constraint so there's no need for an additional index.
+    $this->executeSql('DROP INDEX IF EXISTS mandate_id ON civicrm_sdd_entity_mandate');
+
+    return TRUE;
+  }
+
   /**
    * Helper for replacing deprecated core method
    */
