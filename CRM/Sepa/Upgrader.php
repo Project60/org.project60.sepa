@@ -579,6 +579,24 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_11305(): bool {
+    $this->ctx->log->info('Increase length of database column civicrm_sdd_mandate.source');
+    $this->executeSql(<<<SQL
+      ALTER TABLE civicrm_sdd_mandate
+        MODIFY COLUMN `source` varchar(255) COMMENT 'Information about the source of registration of the mandate'
+      SQL
+    );
+
+    $this->ctx->log->info('Increase length of database column civicrm_sdd_entity_mandate.class');
+    $this->executeSql(<<<SQL
+      ALTER TABLE civicrm_sdd_entity_mandate
+        MODIFY COLUMN `class` varchar(100) COMMENT 'Link class, freely defined by client'
+      SQL
+    );
+
+    return TRUE;
+  }
+
   /**
    * Helper for replacing deprecated core method
    */

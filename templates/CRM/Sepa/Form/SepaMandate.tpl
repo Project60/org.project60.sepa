@@ -12,9 +12,11 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="sepa">
       <div class="crm-accordion-header">
-        {ts domain="org.project60.sepa"}Sepa Mandate{/ts}
+        {ts}Sepa Mandate{/ts}
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
@@ -51,4 +53,4 @@ cj(function($) {
 </script>
 {/literal}
 
-
+{/crmScope}

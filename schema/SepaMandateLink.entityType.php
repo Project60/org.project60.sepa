@@ -80,7 +80,7 @@ return [
     ],
     'class' => [
       'title' => E::ts('Link Class'),
-      'sql_type' => 'varchar(16)',
+      'sql_type' => 'varchar(100)',
       'input_type' => 'Text',
       'description' => E::ts('Link class, freely defined by client'),
     ],
