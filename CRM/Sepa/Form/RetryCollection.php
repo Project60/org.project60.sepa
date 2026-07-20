@@ -101,7 +101,7 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
         'datepicker',
         'collection_date',
         E::ts('Collection Date'),
-        ['formatType' => 'activityDate'],
+        NULL,
         TRUE,
         ['time' => FALSE]
     );
@@ -137,9 +137,6 @@ class CRM_Sepa_Form_RetryCollection extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-
-    // format some values
-    $values['collection_date'] = CRM_Utils_Date::processDate($values['collection_date'], NULL, FALSE, 'YmdHis');
 
     // process from-to dates
     if ($values['date_range'] != 'custom') {
