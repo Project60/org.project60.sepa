@@ -1494,12 +1494,6 @@ parameters:
 			path: CRM/Sepa/Logic/Queue/Update.php
 
 		-
-			message: '#^Method CRM_Sepa_Logic_Queue_Update\:\:__construct\(\) has parameter \$creditorId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: CRM/Sepa/Logic/Queue/Update.php
-
-		-
 			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
 			identifier: argument.type
 			count: 1

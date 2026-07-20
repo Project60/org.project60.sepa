@@ -18,6 +18,7 @@ declare(strict_types = 1);
 
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
+use Webmozart\Assert\Assert;
 
 /**
  * Queue Item for updating a sepa group
@@ -33,7 +34,7 @@ class CRM_Sepa_Logic_Queue_Update {
    * @var 'FRST'|'RCUR'|'OOFF'
    */
   private string $mode;
-  private int $creditorId;
+  private ?int $creditorId;
   private ?int $offset;
   private ?int $limit;
 
@@ -101,7 +102,7 @@ class CRM_Sepa_Logic_Queue_Update {
     string $cmd,
     string $mode,
     string $asyncLockId,
-    $creditorId = NULL,
+    ?int $creditorId = NULL,
     ?int $offset = NULL,
     ?int $limit = NULL
   ) {
@@ -123,6 +124,7 @@ class CRM_Sepa_Logic_Queue_Update {
         break;
 
       case 'UPDATE':
+        Assert::notNull($this->creditorId, 'Creditor ID is required for "UPDATE" command');
         $this->title = E::ts(
           'Process %1 mandates (%2-%3)',
           [1 => $this->mode, 2 => $this->offset, 3 => ($this->offset ?? 0) + ($this->limit ?? 0)]
@@ -157,6 +159,7 @@ class CRM_Sepa_Logic_Queue_Update {
         break;
 
       case 'UPDATE':
+        Assert::notNull($this->creditorId);
         if ($this->mode === 'OOFF') {
           CRM_Sepa_Logic_Batching::updateOOFF($this->creditorId, 'now', $this->offset, $this->limit);
         }
