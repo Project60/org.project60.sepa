@@ -19,12 +19,12 @@ declare(strict_types = 1);
 
 namespace Civi\Sepa\Api4\Action\SepaMandate;
 
-use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\Generic\AbstractBatchAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\SepaMandate;
 use Civi\Api4\SepaMandateLink;
+use Civi\Sepa\Contribution\CollectReceivableHelper;
 use Civi\Sepa\Contribution\PaymentInstrumentDeterminer;
 use Civi\Sepa\Mandate\MandateLinkClasses;
 use CRM_Sepa_ExtensionUtil as E;
@@ -45,6 +45,7 @@ class CollectReceivableAction extends AbstractBatchAction {
   protected function getSelect(): array {
     return [
       'id',
+      'reference',
       'creditor_id',
       'contact_id',
       'type',
@@ -62,6 +63,7 @@ class CollectReceivableAction extends AbstractBatchAction {
   private function doRun(Result $result): void {
     /** @var array{
      *   id: int,
+     *   reference: string,
      *   creditor_id: ?int,
      *   contact_id: ?int,
      *   type: string,
@@ -83,40 +85,9 @@ class CollectReceivableAction extends AbstractBatchAction {
         ->execute()
         ->single();
 
-      /** @var list<array{id: int, total_amount: float}> $contributions */
-      $contributions = Contribution::get(FALSE)
-        ->addSelect('id', 'total_amount')
-        ->addJoin(
-          'SepaMandateLink AS sepa_mandate_link',
-          'EXCLUDE',
-          NULL,
-          [
-            'sepa_mandate_link.entity_table',
-            '=',
-            '"civicrm_contribution"',
-          ],
-          [
-            'sepa_mandate_link.entity_id',
-            '=',
-            'id',
-          ],
-          [
-            'sepa_mandate_link.class',
-            '=',
-            '"' . MandateLinkClasses::RECEIVABLE . '"',
-          ]
-        )
-        ->addWhere('contribution_recur_id', '=', $mandate['entity_id'])
-        ->addWhere('contribution_status_id:name', '=', 'Pending')
-        ->addWhere('sepa_contribution.is_on_hold', '=', TRUE)
-        ->execute()
-        ->getArrayCopy();
-
-      $amount = array_reduce(
-        $contributions,
-        fn ($carry, array $contribution) => $carry + $contribution['total_amount'],
-        0.0
-      );
+      $collectReceivableHelper = new CollectReceivableHelper();
+      $contributions = $collectReceivableHelper->getReceivableContributions($mandate['entity_id']);
+      $amount = $collectReceivableHelper->getReceivableAmount($contributions);
 
       if (0.0 === $amount) {
         continue;
@@ -129,7 +100,7 @@ class CollectReceivableAction extends AbstractBatchAction {
         ->setValues([
           'creditor_id' => $creditorId,
           'type' => 'OOFF',
-          'source' => E::ts('Receivable (pending on hold) contributions of mandate %1', [1 => $mandate['id']]),
+          'source' => E::ts('Receivable (pending on hold) contributions of mandate %1', [1 => $mandate['reference']]),
           'contact_id' => $mandate['contact_id'],
           'financial_type_id' => $contributionRecur['financial_type_id'],
           'payment_instrument_id' => $paymentInstrumentDeterminer->determineCollectReceivablePaymentInstrument(

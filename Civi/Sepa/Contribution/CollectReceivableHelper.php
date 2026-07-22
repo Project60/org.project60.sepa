@@ -22,6 +22,7 @@ namespace Civi\Sepa\Contribution;
 
 use Civi\Api4\Contribution;
 use Civi\Sepa\Mandate\MandateLinkClasses;
+use Civi\Sepa\Util\CurrencyUtil;
 
 final class CollectReceivableHelper {
 
@@ -70,6 +71,62 @@ final class CollectReceivableHelper {
         ->addWhere('id', 'IN', $linkedPendingOnHoldContributionIds)
         ->execute();
     }
+  }
+
+  /**
+   * @return list<array{id: int, total_amount: float, currency: ?string}>
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getReceivableContributions(int $contributionRecurId): array {
+    /** @var list<array{id: int, total_amount: float, currency: ?string}> */
+    return Contribution::get(FALSE)
+      ->addSelect('id', 'total_amount', 'currency')
+      ->addJoin(
+        'SepaMandateLink AS sepa_mandate_link',
+        'EXCLUDE',
+        NULL,
+        [
+          'sepa_mandate_link.entity_table',
+          '=',
+          '"civicrm_contribution"',
+        ],
+        [
+          'sepa_mandate_link.entity_id',
+          '=',
+          'id',
+        ],
+        [
+          'sepa_mandate_link.class',
+          '=',
+          '"' . MandateLinkClasses::RECEIVABLE . '"',
+        ]
+      )
+      ->addWhere('contribution_recur_id', '=', $contributionRecurId)
+      ->addWhere('contribution_status_id:name', '=', 'Pending')
+      ->addWhere('sepa_contribution.is_on_hold', '=', TRUE)
+      ->execute()
+      ->getArrayCopy();
+  }
+
+  /**
+   * @param list<array{total_amount: float, currency: ?string}> $contributions
+   *   Contributions as returned by {@link getReceivableContributions()}.
+   */
+  public function getReceivableAmount(array $contributions): float {
+    if ([] === $contributions) {
+      return 0.0;
+    }
+
+    return round(
+      array_reduce(
+        $contributions,
+        fn($carry, array $contribution) => $carry + $contribution['total_amount'],
+        0.0
+      ),
+      // @phpstan-ignore argument.type
+      CurrencyUtil::getPrecision($contributions[0]['currency'] ?? \Civi::settings()->get('defaultCurrency'))
+    );
   }
 
 }

@@ -113,7 +113,7 @@ final class CollectReceivableActionTest extends AbstractSepaHeadlessTestCase {
     $ooffMandate = $result[$mandate['id']];
     static::assertIsArray($ooffMandate);
     static::assertSame(
-      "Receivable (pending on hold) contributions of mandate {$mandate['id']}",
+      "Receivable (pending on hold) contributions of mandate {$mandate['reference']}",
       $ooffMandate['source']
     );
     static::assertSame('OOFF', $ooffMandate['type']);

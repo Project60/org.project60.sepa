@@ -124,4 +124,92 @@ final class CollectReceivableHelperTest extends AbstractSepaHeadlessTestCase {
     static::assertSame($pendingOnHoldContributionId, $cancelledContributions->first()['id']);
   }
 
+  public function testGetReceivableContributions(): void {
+    $creditorId = SepaCreditorBuilder::createDefault();
+    $contactId = ContactBuilder::createDefault();
+    $financialTypeId = FinancialTypeBuilder::create();
+    $mandate = SepaMandate::createFull(FALSE)
+      ->setValues([
+        'creditor_id' => $creditorId,
+        'type' => 'RCUR',
+        'contact_id' => $contactId,
+        'financial_type_id' => $financialTypeId,
+        'iban' => 'DE02370501980001802057',
+        'bic' => 'BELADEBEXXX',
+        'amount' => 10.00,
+      ])
+      ->execute()
+      ->single();
+
+    $collectReceivableHelper = new CollectReceivableHelper();
+    static::assertSame([], $collectReceivableHelper->getReceivableContributions($mandate['entity_id']));
+
+    $pendingOnHoldContribution1Id = ContributionBuilder::createPendingForContact(
+      $contactId,
+      [
+        'contribution_recur_id' => $mandate['entity_id'],
+        'total_amount' => 1.1,
+        'currency' => 'EUR',
+        'sepa_contribution.is_on_hold' => TRUE,
+      ]
+    );
+
+    $pendingOnHoldContribution2Id = ContributionBuilder::createPendingForContact(
+      $contactId,
+      [
+        'contribution_recur_id' => $mandate['entity_id'],
+        'total_amount' => 2.2,
+        'currency' => 'EUR',
+        'sepa_contribution.is_on_hold' => TRUE,
+      ]
+    );
+
+    // Cancelled should be ignored.
+    ContributionBuilder::createCancelledForContact(
+      $contactId,
+      [
+        'contribution_recur_id' => $mandate['entity_id'],
+        'total_amount' => 100,
+        'sepa_contribution.is_on_hold' => TRUE,
+      ]
+    );
+
+    // Completed should be ignored.
+    ContributionBuilder::createCompletedForContact(
+      $contactId,
+      [
+        'contribution_recur_id' => $mandate['entity_id'],
+        'total_amount' => 100,
+        'sepa_contribution.is_on_hold' => TRUE,
+      ]
+    );
+
+    // Not on hold should be ignored.
+    ContributionBuilder::createPendingForContact(
+      $contactId,
+      [
+        'contribution_recur_id' => $mandate['entity_id'],
+        'total_amount' => 100,
+        'sepa_contribution.is_on_hold' => FALSE,
+      ]
+    );
+
+    static::assertEquals([
+      ['id' => $pendingOnHoldContribution1Id, 'total_amount' => 1.1, 'currency' => 'EUR'],
+      ['id' => $pendingOnHoldContribution2Id, 'total_amount' => 2.2, 'currency' => 'EUR'],
+    ], $collectReceivableHelper->getReceivableContributions($mandate['entity_id']));
+  }
+
+  public function testGetReceivableAmount(): void {
+    $collectReceivableHelper = new CollectReceivableHelper();
+    static::assertSame(0.0, $collectReceivableHelper->getReceivableAmount([]));
+    static::assertSame(
+      3.3,
+      $collectReceivableHelper->getReceivableAmount([
+        ['total_amount' => 1.1, 'currency' => 'EUR'],
+        ['total_amount' => 2.2, 'currency' => 'EUR'],
+      ])
+    );
+  }
+
 }

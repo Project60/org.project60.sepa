@@ -179,7 +179,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'source',
         E::ts('Source'),
-        ['placeholder' => E::ts('not required'), 'size' => '64']
+        ['placeholder' => E::ts('not required'), 'size' => '255']
     );
 
     // add bank account selector
