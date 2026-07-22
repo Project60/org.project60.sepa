@@ -16,7 +16,7 @@
 <div id="sdd-create-mandate">
 
   {* hidden fields *}
-  {$form.cid.html}
+  {if !empty($form.cid)}{$form.cid.html}{/if}
 
   {if $create_mode eq 'replace'}
   <div style="background-color: paleturquoise; padding: 1em; border-radius: 1em;">
