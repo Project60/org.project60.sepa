@@ -12,6 +12,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div id="payment_information">
 <fieldset class="billing_mode-group direct_debit_info-group">
 <legend>
@@ -49,5 +51,6 @@
 	<div class="clear"></div>
 </div>
 
-
 </div>
+
+{/crmScope}

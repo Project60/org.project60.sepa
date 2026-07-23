@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 {assign var='mandate_id' value=$sepa.id}
 
 {if not $deleted_mandate}
@@ -108,7 +110,7 @@
                     {if $sepa.status === 'ONHOLD' }
                       <br><label for="replace_collect_receivable">{ts}Collect receivable{/ts}</label>
                   <input type="checkbox" name="replace_collect_receivable" id="replace_collect_receivable" value="1" class="crm-form-checkbox"/>
-                  {ts}If checked, an OOFF mandate with the sum of the amounts of pending on hold contributions will be created.{/ts}
+                  {ts}If checked, a OOFF mandate with the sum of the amounts of pending on hold contributions will be created.{/ts}
                     {/if}
                 </td>
             </tr>{/if}{/if}
@@ -150,7 +152,7 @@
                   {ts}Reinstate this mandate.{/ts}<br>
                   <label for="collect_receivable">{ts}Collect receivable{/ts}</label>
                   <input type="checkbox" name="collect_receivable" id="collect_receivable" value="1" class="crm-form-checkbox"/>
-                  {ts}If checked, an OOFF mandate with the sum of the amounts of pending on hold contributions will be created.{/ts}
+                  {ts}If checked, a OOFF mandate with the sum of the amounts of pending on hold contributions will be created.{/ts}
                 </td>
               </tr>
             {/if}
@@ -284,3 +286,5 @@ cj('#end_date').datepicker(dateOptions);
 {else}
 <p>{ts domain="org.project60.sepa"}Mandate {$deleted_mandate} succesfully deleted.{/ts}
 {/if}
+
+{/crmScope}

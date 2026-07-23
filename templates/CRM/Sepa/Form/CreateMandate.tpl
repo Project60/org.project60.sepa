@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div id="sdd-create-mandate">
 
   {* hidden fields *}
@@ -172,3 +174,5 @@
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
+
+{/crmScope}

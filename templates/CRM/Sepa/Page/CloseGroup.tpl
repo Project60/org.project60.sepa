@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div class="crm-container" lang="de" xml:lang="de" >
 	<div class="crm-block crm-form-block crm-import-datasource-form-block">
 		{if $status eq "closed"}
@@ -113,3 +115,5 @@ cj("a.button").click(function() {
 });
 {/literal}
 </script>
+
+{/crmScope}

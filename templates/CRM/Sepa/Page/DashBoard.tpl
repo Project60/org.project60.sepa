@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div class="crm-actions-ribbon">
   <ul id="actions">
   {if $status eq 'closed'}
@@ -195,3 +197,5 @@ function mark_received(group_id) {
 }
 </script>
 {/literal}
+
+{/crmScope}
