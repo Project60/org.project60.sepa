@@ -89,7 +89,7 @@
 				<a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$txgid&status=closed"}" class="button button_export">{ts domain="org.project60.sepa"}Close it now{/ts}</a>
 			{/if}
 		{/if}
-		{if not $smarty.request.adjust}
+		{if empty($smarty.request.adjust)}
 		<a href="{crmURL p="civicrm/sepa/dashboard"}" class="button button_export">{ts domain="org.project60.sepa"}I changed my mind{/ts}</a>
 		{/if}
 	{/if}
