@@ -175,8 +175,8 @@ transaction groups again. Additionally, the on hold flag will be removed from
 the associated recurring contribution. Pending on hold contributions remain in
 that state.
 
-When reinstating or replacing suspended mandates it's possible to collect the
-receivable payments. This will create a one-off mandate with the sum of the
+When reinstating or replacing suspended mandates, receivable payments can be
+collected. This will create a one-off mandate with the sum of the
 amounts of the pending on hold contributions. When the transaction group such
 one-off mandate belongs to gets closed, the status of the contributions will be
 set to `Cancelled`. (The on hold flag is kept.)
