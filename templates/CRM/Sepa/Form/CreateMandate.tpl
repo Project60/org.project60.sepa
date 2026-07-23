@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div id="sdd-create-mandate">
 
   {* hidden fields *}
@@ -21,6 +23,7 @@
   {if $create_mode eq 'replace'}
   <div style="background-color: paleturquoise; padding: 1em; border-radius: 1em;">
     {$form.replace.html}
+    {$form.collect_receivable.html}
 
     <div style="text-align: left; font-size: large;">
       <span><strong>{ts 1=$replace_mandate_reference domain='org.project60.sepa'}You're replacing mandate %1{/ts}</strong></span>
@@ -171,3 +174,5 @@
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
+
+{/crmScope}

@@ -16,6 +16,7 @@
 
 declare(strict_types = 1);
 
+use Civi\Api4\SepaMandate;
 use Civi\Sepa\Util\ContributionUtil;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -36,6 +37,8 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
   protected array|null $old_mandate = NULL;
   protected array|null $old_contrib = NULL;
 
+  private bool $collectReceivable = FALSE;
+
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public function buildQuickForm() {
     // get parameters
@@ -51,6 +54,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       if ($this->replace_id) {
         $this->create_mode = 'replace';
         $mandate_id = $this->replace_id;
+        $this->collectReceivable = (bool) CRM_Utils_Request::retrieveValue('collect_receivable', 'Boolean', FALSE);
       }
       else {
         $this->create_mode = 'clone';
@@ -60,7 +64,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       // load mandate
       try {
         // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
-        $this->old_mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        $this->old_mandate = SepaMandate::get(TRUE)
           ->addWhere('id', '=', $mandate_id)
           ->execute()
           ->single();
@@ -175,7 +179,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         'text',
         'source',
         E::ts('Source'),
-        ['placeholder' => E::ts('not required'), 'size' => '64']
+        ['placeholder' => E::ts('not required'), 'size' => '255']
     );
 
     // add bank account selector
@@ -236,7 +240,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     // store ID of mandate to be replaced
     $this->add('hidden', 'replace', (string) $this->replace_id);
 
-    // add the replace date
+    $this->add('hidden', 'collect_receivable', $this->collectReceivable ? '1' : '0');
+
+    // add the replacement date
     $this->add('datepicker',
       'rpl_end_date',
       E::ts('Replacement Date'),
@@ -479,7 +485,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
    * Create the mandate
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public function postProcess() {
+  public function postProcess(): void {
     $values = $this->exportValues();
 
     // create a new mandate
@@ -507,26 +513,20 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'end_date' => empty($values['rcur_end_date']) ? '' : CRM_Utils_Date::processDate($values['rcur_end_date']),
     ];
 
+    $transaction = CRM_Core_Transaction::create();
     try {
+      /** @var array{id: int, ...} $mandate */
       $mandate = civicrm_api3('SepaMandate', 'createfull', $mandate_data);
-      $mandate = \Civi\Api4\SepaMandate::get(TRUE)
+      $mandate = SepaMandate::get(TRUE)
         ->addSelect('reference', 'id', 'type')
         ->addWhere('id', '=', $mandate['id'])
         ->execute()
         ->single();
 
-      // if we get here, everything went o.k.
-      CRM_Core_Session::setStatus(E::ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", [
-        1 => $mandate['reference'],
-        2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}"),
-        3 => $mandate['type'],
-      ]),
-          E::ts('Success'),
-          'info');
-
       // terminate old mandate, of requested
       if (!empty($values['replace'])) {
-        $rpl_mandate = \Civi\Api4\SepaMandate::get(TRUE)
+        // Validate mandate ID.
+        SepaMandate::get(TRUE)
           ->addWhere('id', '=', $values['replace'])
           ->execute()
           ->single();
@@ -542,11 +542,30 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           (int) $mandate['id'],
           CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d')
         );
+
+        if ((bool) $values['collect_receivable']) {
+          SepaMandate::collectReceivable(FALSE)
+            ->addWhere('id', '=', (int) $values['replace'])
+            ->execute();
+        }
       }
 
+      // if we get here, everything went o.k.
+      CRM_Core_Session::setStatus(
+        E::ts("'%3' SEPA Mandate <a href=\"%2\">%1</a> created.", [
+          1 => $mandate['reference'],
+          2 => CRM_Utils_System::url('civicrm/sepa/xmandate', "mid={$mandate['id']}"),
+          3 => $mandate['type'],
+        ]),
+        E::ts('Success'),
+        'info'
+      );
+
+      $transaction->commit();
     }
     catch (Exception $ex) {
       // @ignoreException
+      $transaction->rollback();
       // there was a problem: create error message
       CRM_Core_Session::setStatus(E::ts('Failed to create %1 mandate. Error was: %2', [
         1 => $type,
@@ -573,8 +592,6 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     if (!($_REQUEST['snippet'] ?? NULL)) {
       CRM_Utils_System::redirect(CRM_Core_Session::singleton()->readUserContext());
     }
-
-    parent::postProcess();
   }
 
   // ############################# HELPER FUNCTIONS #############################
@@ -676,7 +693,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
     // get data from SepaMandates
     // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
-    $mandates = \Civi\Api4\SepaMandate::get(TRUE)
+    $mandates = SepaMandate::get(TRUE)
       ->addSelect('iban', 'bic', 'reference')
       ->addWhere('contact_id', '=', $this->contact_id)
       ->addWhere('status', 'IN', ['RCUR', 'COMPLETE', 'SENT'])

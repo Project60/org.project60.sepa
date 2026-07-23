@@ -37,11 +37,10 @@
     <unique>unique</unique>
   </index>
 
-
   <field>
     <name>source</name>
     <type>varchar</type>
-    <length>64</length>
+    <length>255</length>
     <comment>Information about the source of registration of the mandate</comment>
     <html>
       <type>Text</type>

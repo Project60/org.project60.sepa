@@ -32,45 +32,41 @@ use CRM_Sepa_ExtensionUtil as E;
 class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
-  public function run() {
+  public function run(): void {
     CRM_Utils_System::setTitle(E::ts('Edit SEPA Mandate'));
 
-    if (!isset($_REQUEST['mid'])) {
-      die(E::ts("This page needs a mandate id ('mid') parameter."));
-    }
-    else {
-      $mandate_id = (int) $_REQUEST['mid'];
-    }
+    /** @var positive-int $mandateId */
+    $mandateId = CRM_Utils_Request::retrieveValue('mid', 'Positive', isRequired: TRUE);
 
     // Note: CRM_Utils_Request::retrieve() cannot be used because of its special handling for "action".
     if (isset($_REQUEST['action'])) {
       /** @var string $action */
       $action = $_REQUEST['action'];
       if ($action === 'delete') {
-        $this->deleteMandate($mandate_id);
-        $this->assign('deleted_mandate', $mandate_id);
+        $this->deleteMandate($mandateId);
+        $this->assign('deleted_mandate', $mandateId);
         parent::run();
         return;
       }
 
       if ($action === 'end') {
-        $this->endMandate($mandate_id);
+        $this->endMandate($mandateId);
       }
       elseif ($action === 'validate') {
-        $this->validateMandate($mandate_id);
+        $this->validateMandate($mandateId);
       }
       elseif ($action === 'cancel') {
-        $this->cancelMandate($mandate_id);
+        $this->cancelMandate($mandateId);
       }
       elseif ($action === 'adjustamount') {
-        $this->adjustAmount($mandate_id);
+        $this->adjustAmount($mandateId);
       }
       elseif ($action === 'changecyleday') {
-        $this->changecyleday($mandate_id);
+        $this->changeCycleDay($mandateId);
       }
       elseif ($action === 'suspend') {
         SepaMandate::suspend()
-          ->addWhere('id', '=', $mandate_id)
+          ->addWhere('id', '=', $mandateId)
           ->execute();
         CRM_Core_Session::setStatus(
           E::ts('The mandate has been suspended.'),
@@ -79,14 +75,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
         );
       }
       elseif ($action === 'reinstate') {
-        SepaMandate::reinstate()
-          ->addWhere('id', '=', $mandate_id)
-          ->execute();
-        CRM_Core_Session::setStatus(
-          E::ts('The mandate has been reinstated.'),
-          E::ts('Mandate reinstated'),
-          'info'
-        );
+        $this->reinstateMandate($mandateId);
       }
       else {
         CRM_Core_Session::setStatus(
@@ -101,13 +90,13 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     try {
       // API4 SepaMandate.get checks Financial ACLs for corresponding (recurring) contribution.
       $mandate = SepaMandate::get(TRUE)
-        ->addWhere('id', '=', $mandate_id)
+        ->addWhere('id', '=', $mandateId)
         ->execute()
         ->single();
     }
     catch (\CRM_Core_Exception $exception) {
       CRM_Core_Error::statusBounce(
-        E::ts("Cannot read mandate [%1]. Error was: '%2'", [1 => $mandate_id, 2 => $exception->getMessage()])
+        E::ts("Cannot read mandate [%1]. Error was: '%2'", [1 => $mandateId, 2 => $exception->getMessage()])
       );
     }
 
@@ -299,6 +288,24 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     parent::run();
   }
 
+  private function reinstateMandate(int $mandateId): void {
+    $transaction = \CRM_Core_Transaction::create();
+    $transaction->run(function () use ($mandateId) {
+      SepaMandate::reinstate()->addWhere('id', '=', $mandateId)->execute();
+
+      $collectReceivable = (bool) CRM_Utils_Request::retrieveValue('collect_receivable', 'Boolean', FALSE);
+      if ($collectReceivable) {
+        SepaMandate::collectReceivable()->addWhere('id', '=', $mandateId)->execute();
+      }
+
+      CRM_Core_Session::setStatus(
+        E::ts('The mandate has been reinstated.'),
+        E::ts('Mandate reinstated'),
+        'info'
+      );
+    });
+  }
+
   /**
    * Validate the given mandate (if in status PENDING), i.e.:
    *  - set status to FRST/INIT (depending on type)
@@ -307,7 +314,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
    * @throws Exception
    *   If anything is wrong.
    */
-  public function validateMandate(int $mandate_id): void {
+  private function validateMandate(int $mandate_id): void {
     // first, load the mandate
     $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id]);
 
@@ -344,12 +351,12 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
   }
 
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-  public function deleteMandate(int $mandate_id): void {
+  private function deleteMandate(int $mandateId): void {
     // first, load the mandate
-    $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandate_id]);
+    $mandate = civicrm_api3('SepaMandate', 'getsingle', ['id' => $mandateId]);
     if (isset($mandate['is_error']) && $mandate['is_error']) {
       CRM_Core_Session::setStatus(
-        sprintf(E::ts("Cannot read mandate [%s]. Error was: '%s'"), $mandate_id, $mandate['error_message']),
+        sprintf(E::ts("Cannot read mandate [%s]. Error was: '%s'"), $mandateId, $mandate['error_message']),
         E::ts('Error'),
         'error'
       );
@@ -358,7 +365,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
     if (!($mandate['status'] == 'INIT' || $mandate['status'] == 'OOFF' || $mandate['status'] == 'FRST')) {
       CRM_Core_Session::setStatus(
-        sprintf(E::ts('Mandate [%s] is already in use! It cannot be deleted.'), $mandate_id),
+        sprintf(E::ts('Mandate [%s] is already in use! It cannot be deleted.'), $mandateId),
         E::ts('Error'),
         'error'
       );
@@ -435,7 +442,7 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
 
     CRM_Core_Session::setStatus(sprintf(
       E::ts('Succesfully deleted mandate [%s] and %s associated contribution(s)'),
-      $mandate_id,
+      $mandateId,
       (count($contributions) + $rcontribution_count)
     ), E::ts('Mandate deleted'), 'info');
   }
@@ -455,22 +462,22 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
   }
 
-  public function cancelMandate(int $mandate_id): void {
+  private function cancelMandate(int $mandateId): void {
     $cancel_reason = (string) $_REQUEST['cancel_reason'];
     if ($cancel_reason) {
-      CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandate_id, date('Y-m-d'), $cancel_reason);
+      CRM_Sepa_BAO_SEPAMandate::terminateMandate($mandateId, date('Y-m-d'), $cancel_reason);
     }
     else {
       CRM_Core_Session::setStatus(E::ts('You need to provide a cancel reason.'), E::ts('Error'), 'error');
     }
   }
 
-  public function adjustAmount(int $mandate_id): void {
+  private function adjustAmount(int $mandateId): void {
     // check if we are allowed to...
     if (CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
       $adjusted_amount = (float) $_REQUEST['adjust_amount'];
       if ($adjusted_amount > 0) {
-        if (CRM_Sepa_BAO_SEPAMandate::modifyMandate($mandate_id, ['amount' => $adjusted_amount])) {
+        if (CRM_Sepa_BAO_SEPAMandate::modifyMandate($mandateId, ['amount' => $adjusted_amount])) {
           CRM_Core_Session::setStatus(
             E::ts('The amount of this mandate was modified. You should send out a new prenotification to the debtor.'),
             E::ts('Advice'),
@@ -492,10 +499,10 @@ class CRM_Sepa_Page_EditMandate extends CRM_Core_Page {
     }
   }
 
-  public function changecyleday(int $mandate_id): void {
+  private function changeCycleDay(int $mandateId): void {
     if (CRM_Sepa_Logic_Settings::getSetting('allow_mandate_modification')) {
       $new_cycle_day = $_REQUEST['new_cycle_day'];
-      $statuses = CRM_Sepa_BAO_SEPAMandate::modifyMandate($mandate_id, ['cycle_day' => $new_cycle_day]);
+      $statuses = CRM_Sepa_BAO_SEPAMandate::modifyMandate($mandateId, ['cycle_day' => $new_cycle_day]);
       foreach ($statuses as $status) {
         CRM_Core_Session::setStatus($status, '', 'info');
       }

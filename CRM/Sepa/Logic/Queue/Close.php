@@ -18,6 +18,7 @@ declare(strict_types = 1);
 
 define('SDD_CLOSE_RUNNER_BATCH_SIZE', 100);
 
+use Civi\Sepa\Contribution\CollectReceivableHelper;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -186,6 +187,9 @@ class CRM_Sepa_Logic_Queue_Close {
     }
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function run(): bool {
     if (!SepaBatchLockManager::getInstance()->acquire(10, $this->asyncLockId)) {
       throw new \RuntimeException('Unable to acquire lock');
@@ -232,6 +236,8 @@ class CRM_Sepa_Logic_Queue_Close {
   /**
    * will select the next batch of up to SDD_CLOSE_RUNNER_BATCH_SIZE
    * contributions and update their status
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function updateContributions(): void {
     $status_pending = (int) CRM_Core_PseudoConstant::getKey(
@@ -301,6 +307,7 @@ class CRM_Sepa_Logic_Queue_Close {
     }
 
     // collect the data
+    $mandateIds = [];
     $contributions = [];
     while ($query->fetch()) {
       $contributions[$query->contribution_id] = [
@@ -309,10 +316,11 @@ class CRM_Sepa_Logic_Queue_Close {
         'contribution_status_id' => $query->contribution_status_id,
         'mandate_status'         => $query->mandate_status,
       ];
+      $mandateIds[$query->mandate_id] = (int) $query->mandate_id;
     }
 
     // if there's nothing to do, stop right here
-    if (empty($contributions)) {
+    if ([] === $contributions) {
       return;
     }
 
@@ -320,10 +328,12 @@ class CRM_Sepa_Logic_Queue_Close {
     $this->updateContributionStatus($contributions);
 
     // then: update the mandate status
-    if ($this->txgroup['type'] == 'OOFF') {
+    if ($this->txgroup['type'] === 'OOFF') {
       $this->updateMandateStatus($contributions, 'SENT', 'OOFF');
+      $collectReceivableHelper = new CollectReceivableHelper();
+      $collectReceivableHelper->cancelLinkedOnHoldContributions($mandateIds);
     }
-    elseif ($this->txgroup['type'] == 'FRST') {
+    elseif ($this->txgroup['type'] === 'FRST') {
       // TODO: GET $collection_date
       $this->updateMandateStatus($contributions, 'RCUR', 'FRST');
     }

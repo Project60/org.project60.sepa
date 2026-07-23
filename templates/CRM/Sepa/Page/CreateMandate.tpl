@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 {literal}
 <style>
 .create_mandate td {
@@ -336,3 +338,5 @@ sepa_lookup_bic();
 {/literal}
 </script>
 {/if}
+
+{/crmScope}

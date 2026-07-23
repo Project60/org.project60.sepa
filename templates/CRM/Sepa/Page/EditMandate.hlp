@@ -13,6 +13,7 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
 
 {htxt id='id-template-help'}
     <p>{ts domain="org.project60.sepa"}Select the template that should be used to create this prenotification file.{/ts}</p>
@@ -22,3 +23,5 @@
 {htxt id='id-change-cycleday-help'}
     <p>{ts domain="org.project60.sepa"}When you change the cycle day be aware that you might end up collecting twice in the same month, or miss a collection altogether.{/ts}</p>
 {/htxt}
+
+{/crmScope}

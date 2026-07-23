@@ -13,6 +13,7 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
 
 <h3>{ts}Select the transaction groups of which you want to re-collect failed transactions{/ts}</h3>
 
@@ -97,3 +98,5 @@
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
+
+{/crmScope}

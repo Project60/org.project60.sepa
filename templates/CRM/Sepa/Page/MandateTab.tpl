@@ -12,6 +12,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 {literal}
 <style>
   tr.sepa-inactive td {
@@ -147,3 +149,5 @@
   });
   {/literal}
 </script>
+
+{/crmScope}

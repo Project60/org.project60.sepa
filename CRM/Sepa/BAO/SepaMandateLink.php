@@ -16,11 +16,23 @@
 
 declare(strict_types = 1);
 
+use Civi\Sepa\Mandate\MandateLinkClasses;
+
 class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
 
+  /**
+   * @var string
+   *
+   * @deprecated Use MandateLinkClasses::REPLACES instead.
+   */
+  public static string $LINK_CLASS_REPLACES = MandateLinkClasses::REPLACES;
 
-  public static string $LINK_CLASS_REPLACES    = 'REPLACES';
-  public static string $LINK_CLASS_MEMBERSHIP  = 'MEMBERSHIP';
+  /**
+   * @var string
+   *
+   * @deprecated Use MandateLinkClasses::MEMBERSHIP instead.
+   */
+  public static string $LINK_CLASS_MEMBERSHIP = MandateLinkClasses::MEMBERSHIP;
 
   /**
    * Create a new mandate link
@@ -40,7 +52,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
         $new_mandate_id,
         $old_mandate_id,
         'civicrm_sdd_mandate',
-        self::$LINK_CLASS_REPLACES,
+      MandateLinkClasses::REPLACES,
         TRUE,
         $replacement_date);
   }

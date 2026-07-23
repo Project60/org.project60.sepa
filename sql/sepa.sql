@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_sdd_creditor`(
 CREATE TABLE IF NOT EXISTS `civicrm_sdd_mandate` (
      `id`                    int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'ID',
      `reference`             varchar(35) NOT NULL                  COMMENT 'The unique mandate reference',
-     `source`                varchar(64)                           COMMENT 'Needed or coming from ContributionRecur? phoning/online/face 2 face....',
+     `source`                varchar(255)                          COMMENT 'Information about the source of registration of the mandate',
      `entity_table`          varchar(64)                           COMMENT 'physical tablename for entity being joined, eg contributionRecur or Membership',
      `entity_id`             int unsigned NOT NULL                 COMMENT 'FK to entity table specified in entity_table column.',
      `date`                  datetime NOT NULL                     COMMENT 'signature date, by default now()',

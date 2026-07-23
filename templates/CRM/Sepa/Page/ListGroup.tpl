@@ -13,10 +13,12 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <h3>{ts domain="org.project60.sepa"}Contributions for transaction group{/ts} '{$reference}'</h3>
 <table>
   <thead>
-    <th>{ts domain="org.project60.sepa"}#{/ts}</th>
+    <th>#</th>
     <th>{ts domain="org.project60.sepa"}ID{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Amount{/ts}</th>
     <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
@@ -74,3 +76,5 @@ function create_accounting_batch(group_id) {
 }
 {/literal}
 </script>
+
+{/crmScope}

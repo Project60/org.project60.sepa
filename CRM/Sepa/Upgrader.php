@@ -590,6 +590,18 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_11305(): bool {
+    $this->ctx->log->info('Increase length of database column civicrm_sdd_mandate.source');
+    // There is a foreign key constraint so there's no need for an additional index.
+    $this->executeSql(<<<SQL
+      ALTER TABLE civicrm_sdd_mandate
+        MODIFY COLUMN `source` varchar(255) COMMENT 'Information about the source of registration of the mandate'
+      SQL
+    );
+
+    return TRUE;
+  }
+
   /**
    * Helper for replacing deprecated core method
    */

@@ -13,6 +13,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 {capture assign=type_label}
 {if $txgroup.type eq "OOFF"}
 {ts domain="org.project60.sepa"}one-off direct debit payment{/ts}
@@ -327,3 +329,5 @@ cj(document).ready(function() {
 </div>
 
 {/if}
+
+{/crmScope}

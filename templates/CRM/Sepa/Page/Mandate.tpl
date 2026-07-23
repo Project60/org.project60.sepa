@@ -12,6 +12,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <table>
 <thead><tr>
 <th>recurring</th>
@@ -36,5 +38,5 @@
 {/foreach}
 </tbody>
 </table>
-{*
-*}
+
+{/crmScope}

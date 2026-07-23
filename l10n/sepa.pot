@@ -374,7 +374,7 @@ msgstr ""
 msgid "SEPAContribution Group"
 msgstr ""
 
-#: CRM/Sepa/DAO/SEPAContributionGroup.php CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php templates/CRM/Admin/Form/Setting/SepaSettings.tpl templates/CRM/Sepa/Page/ListGroup.tpl
+#: CRM/Sepa/DAO/SEPAContributionGroup.php CRM/Sepa/DAO/SEPACreditor.php CRM/Sepa/DAO/SEPAMandate.php CRM/Sepa/DAO/SEPASddFile.php CRM/Sepa/DAO/SEPATransactionGroup.php CRM/Sepa/DAO/SepaMandateLink.php templates/CRM/Admin/Form/Setting/SepaSettings.tpl templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "ID"
 msgstr ""
 
@@ -783,19 +783,71 @@ msgid "fk to SDD File Id"
 msgstr ""
 
 #: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Sepa Mandate Links"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Sepa Mandate Link"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Unique SepaMandateLink ID"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
 msgid "SepaMandate ID"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "FK to SepaMandate"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Physical table name for entity being linked, eg civicrm_membership"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "FK to entity table specified in entity_table column"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Link Class"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Link class, freely defined by client"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Is Active?"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Is this link still active?"
 msgstr ""
 
 #: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/Report/SepaMandateGeneric.php Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php
 msgid "Creation Date"
 msgstr ""
 
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Link creation date (default now())"
+msgstr ""
+
 #: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateRCUR.php Civi/Sepa/ActionProvider/Action/CreateRecurringMandate.php Civi/Sepa/ActionProvider/Action/FindMandate.php templates/CRM/Sepa/Page/CreateMandate.tpl templates/CRM/Sepa/Page/EditMandate.tpl templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "Start Date"
 msgstr ""
 
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "Start date of the link (optional)"
+msgstr ""
+
 #: CRM/Sepa/DAO/SepaMandateLink.php CRM/Sepa/Form/CreateMandate.php CRM/Sepa/Form/Report/SepaMandateRCUR.php templates/CRM/Sepa/Page/CreateMandate.tpl templates/CRM/Sepa/Page/EditMandate.tpl templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "End Date"
+msgstr ""
+
+#: CRM/Sepa/DAO/SepaMandateLink.php
+msgid "End date of the link (optional)"
 msgstr ""
 
 #: CRM/Sepa/Form/CreateMandate.php
@@ -972,10 +1024,6 @@ msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php Civi/Sepa/ActionProvider/Action/FindMandate.php templates/CRM/Sepa/Page/CreateMandate.tpl
 msgid "Recurring"
-msgstr ""
-
-#: CRM/Sepa/Form/Report/SepaMandateGeneric.php
-msgid "account_holder"
 msgstr ""
 
 #: CRM/Sepa/Form/Report/SepaMandateGeneric.php
@@ -1479,23 +1527,11 @@ msgid "Edit SEPA Mandate"
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
-msgid "This page needs a mandate id ('mid') parameter."
-msgstr ""
-
-#: CRM/Sepa/Page/EditMandate.php
 msgid "The mandate has been suspended."
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "Mandate suspended"
-msgstr ""
-
-#: CRM/Sepa/Page/EditMandate.php
-msgid "The mandate has been reinstated."
-msgstr ""
-
-#: CRM/Sepa/Page/EditMandate.php
-msgid "Mandate reinstated"
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
@@ -1516,6 +1552,14 @@ msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
 msgid "None"
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "The mandate has been reinstated."
+msgstr ""
+
+#: CRM/Sepa/Page/EditMandate.php
+msgid "Mandate reinstated"
 msgstr ""
 
 #: CRM/Sepa/Page/EditMandate.php
@@ -1780,6 +1824,18 @@ msgstr ""
 
 #: Civi/Sepa/ActionProvider/Action/TerminateMandate.php
 msgid "Cancel Reason (if no parameter)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/CollectReceivableAction.php
+msgid "Receivable (pending on hold) contributions of mandate %1"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "Receivable amount (only for RCUR)"
+msgstr ""
+
+#: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
+msgid "The sum of the amounts of receivable (pending on hold) contributions"
 msgstr ""
 
 #: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
@@ -3063,6 +3119,14 @@ msgid "Replace for the following reason:"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "Collect receivable"
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
+msgid "If checked, a OOFF mandate with the sum of the amounts of pending on hold contributions will be created."
+msgstr ""
+
+#: templates/CRM/Sepa/Page/EditMandate.tpl
 msgid "Change Cycle Day"
 msgstr ""
 
@@ -3136,10 +3200,6 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/ListGroup.tpl
 msgid "Contributions for transaction group"
-msgstr ""
-
-#: templates/CRM/Sepa/Page/ListGroup.tpl
-msgid "#"
 msgstr ""
 
 #: templates/CRM/Sepa/Page/ListGroup.tpl
