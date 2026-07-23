@@ -158,29 +158,32 @@ Some organizations set up automated retry schedules, while others prefer to revi
 
 ### Suspending and Reinstating Mandates
 
-In some cases it can be necessary to suspend mandates. When a
-mandates gets suspended all pending contributions in open
-transaction groups will be marked as on hold and removed from
-transaction groups. Also the recurring contribution associated
-to the mandate will be marked as on hold. The mandate itself
-gets the status `ONHOLD`.
+In some cases it can be necessary to suspend mandates. When a mandates gets
+suspended all pending contributions in open transaction groups will be marked as
+on hold and removed from transaction groups. Also the recurring contribution
+associated to the mandate will be marked as on hold. The mandate itself gets the
+status `ONHOLD`.
 
-While a mandate is suspended pending on hold contributions
-will be created during the calculation of transaction groups
-though they won't be added to a transaction group. The pending
-on hold contributions might be used to manually request
-outstanding payments.
+While a mandate is suspended pending on hold contributions will be created
+during the calculation of transaction groups though they won't be added to a
+transaction group. The pending on hold contributions might be used to request
+receivable payments later.
 
-When the mandate is ready again it can be reinstated. This
-brings the mandate back into status `RCUR` or `FRST` so
-contributions will be added to new transaction groups again.
-Additionally the on hold flag will be removed from the
-associated recurring contribution. Pending on hold
-contributions remain in that state.
+When the mandate is ready again it can be reinstated. This brings the mandate
+back into status `RCUR` or `FRST` so contributions will be added to new
+transaction groups again. Additionally, the on hold flag will be removed from
+the associated recurring contribution. Pending on hold contributions remain in
+that state.
 
-**Note:** Do not modify settings that change the collection date
-while mandates are suspended or shortly after reinstation as
-that can result in unjustified on hold contributions. 
+When reinstating or replacing suspended mandates it's possible to collect the
+receivable payments. This will create a one-off mandate with the sum of the
+amounts of the pending on hold contributions. When the transaction group such
+one-off mandate belongs to gets closed, the status of the contributions will be
+set to `Cancelled`. (The on hold flag is kept.)
+
+**Note:** Do not modify settings that change the collection date while mandates
+*are suspended or shortly after reinstation as that can result in unjustified on
+*hold contributions.
 
 ### Working with Multiple Creditors
 
