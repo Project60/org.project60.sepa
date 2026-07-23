@@ -2144,7 +2144,7 @@ msgstr "Ausstehende ausgesetzte Zuwendungen von Mandat %1"
 
 #: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
 msgid "Receivable amount (only for RCUR)"
-msgstr "Ausstehender Betrag (nur für RCUR)"
+msgstr "Ausstehender ausgesetzter Betrag (nur für RCUR)"
 
 #: Civi/Sepa/Api4/Action/SepaMandate/GetFieldsAction.php
 msgid "The sum of the amounts of receivable (pending on hold) contributions"
