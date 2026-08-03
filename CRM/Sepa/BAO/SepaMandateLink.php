@@ -181,7 +181,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     if ($link_id) {
       $link = new CRM_Sepa_BAO_SepaMandateLink();
       $link->id = $link_id;
-      $link->is_active = 0;
+      $link->is_active = FALSE;
       $link->end_date = date('YmdHis', strtotime($date));
       $link->save();
     }
@@ -228,7 +228,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
     $dao->copyValues($params);
     $dao->save();
 
-    CRM_Utils_Hook::post($hook, 'SepaMandateLink', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'SepaMandateLink', (int) $dao->id, $dao);
     /** @var \CRM_Sepa_BAO_SepaMandateLink $dao */
     return $dao;
   }

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<table>
+  <base>CRM/Sepa</base>
+  <class>SepaMandateLink</class>
+  <name>civicrm_sdd_entity_mandate</name>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique SepaMandateLink ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>mandate_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <title>SepaMandate ID</title>
+    <comment>FK to SepaMandate</comment>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>id</name>
+    <table>civicrm_sdd_mandate</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>entity_table</name>
+    <type>varchar</type>
+    <required>true</required>
+    <title>Entity Table</title>
+    <length>64</length>
+    <comment>Physical table name for entity being linked, eg civicrm_membership</comment>
+  </field>
+
+  <field>
+      <name>entity_id</name>
+      <type>int unsigned</type>
+      <title>Entity ID</title>
+      <required>true</required>
+      <comment>FK to entity table specified in entity_table column</comment>
+  </field>
+  <dynamicForeignKey>
+      <idColumn>entity_id</idColumn>
+      <typeColumn>entity_table</typeColumn>
+  </dynamicForeignKey>
+  <index>
+       <name>link</name>
+       <fieldName>entity_table</fieldName>
+       <fieldName>entity_id</fieldName>
+  </index>
+
+  <field>
+    <name>class</name>
+    <type>varchar</type>
+    <length>16</length>
+    <title>Link Class</title>
+    <comment>Link class, freely defined by client</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>class</name>
+    <fieldName>class</fieldName>
+  </index>
+
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <required>true</required>
+    <default>1</default>
+    <title>Is Active?</title>
+    <comment>Is this link still active?</comment>
+  </field>
+  <index>
+    <name>is_active</name>
+    <fieldName>is_active</fieldName>
+  </index>
+
+  <field>
+    <name>creation_date</name>
+    <title>Creation Date</title>
+    <type>datetime</type>
+    <required>true</required>
+    <comment>Link creation date (default now())</comment>
+    <default>now()</default>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+
+  <field>
+    <name>start_date</name>
+    <title>Start Date</title>
+    <type>datetime</type>
+    <comment>Start date of the link (optional)</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+  <index>
+    <name>start_date</name>
+    <fieldName>start_date</fieldName>
+  </index>
+
+  <field>
+    <name>end_date</name>
+    <title>End Date</title>
+    <type>datetime</type>
+    <comment>End date of the link (optional)</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+  <index>
+    <name>end_date</name>
+    <fieldName>end_date</fieldName>
+  </index>
+
+</table>
