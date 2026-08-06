@@ -240,7 +240,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $this->add('datepicker',
       'rpl_end_date',
       E::ts('Replacement Date'),
-      ['formatType' => 'activityDate'],
+      NULL,
       (bool) $this->replace_id,
       ['time' => FALSE]
     );
@@ -260,7 +260,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'datepicker',
       'ooff_date',
       E::ts('Collection Date'),
-      ['formatType' => 'activityDate'],
+      NULL,
       FALSE,
       ['time' => FALSE]
     );
@@ -270,7 +270,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $this->add('datepicker',
         'rcur_start_date',
         E::ts('Start Date'),
-        ['formatType' => 'activityDate'],
+        NULL,
         FALSE,
         ['time' => FALSE]
     );
@@ -299,7 +299,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
     $this->add('datepicker',
         'rcur_end_date',
         E::ts('End Date'),
-        ['formatType' => 'activityDate'],
+        NULL,
         FALSE,
         ['time' => FALSE]
     );
@@ -309,7 +309,7 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'datepicker',
       'sdd_converter',
       'just for date conversion',
-      ['formatType' => 'activityDate'],
+      NULL,
       FALSE,
       ['time' => FALSE]
     );
@@ -368,16 +368,14 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
         ]), E::ts('Warning'), 'warning');
       }
 
-      if ($this->create_mode == 'replace') {
+      if ($this->create_mode === 'replace') {
         // set start date for replace
         if (!empty($this->rpl_date)) {
-          $formatted_date = CRM_Utils_Date::setDateDefaults($this->rpl_date, 'activityDateTime');
-          $defaults['rcur_start_date'] = $formatted_date[0];
-          $defaults['rpl_end_date'] = $formatted_date[0];
+          $defaults['rcur_start_date'] = $this->rpl_date;
+          $defaults['rpl_end_date'] = $this->rpl_date;
         }
         else {
-          $formatted_date = CRM_Utils_Date::setDateDefaults(date('YmdHis'), 'activityDateTime');
-          $defaults['rpl_end_date'] = $formatted_date[0];
+          $defaults['rpl_end_date'] = date('Y-m-d');
         }
 
         // also set the replacement reason
@@ -502,9 +500,9 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
       'frequency_unit' => 'month',
       'reference' => $values['reference'],
       'source' => $values['source'],
-      'receive_date' => $type == 'OOFF' ? CRM_Utils_Date::processDate($values['ooff_date']) : '',
-      'start_date' => $type == 'RCUR' ? CRM_Utils_Date::processDate($values['rcur_start_date']) : '',
-      'end_date' => empty($values['rcur_end_date']) ? '' : CRM_Utils_Date::processDate($values['rcur_end_date']),
+      'receive_date' => $type == 'OOFF' ? $values['ooff_date'] : '',
+      'start_date' => $type == 'RCUR' ? $values['rcur_start_date'] : '',
+      'end_date' => empty($values['rcur_end_date']) ? '' : $values['rcur_end_date'],
     ];
 
     try {
@@ -533,14 +531,14 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
 
         CRM_Sepa_BAO_SEPAMandate::terminateMandate(
           (int) $values['replace'],
-          CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d'),
+          $values['rpl_end_date'],
           $values['rpl_cancel_reason']
         );
 
         CRM_Sepa_BAO_SepaMandateLink::addReplaceMandateLink(
           (int) $values['replace'],
           (int) $mandate['id'],
-          CRM_Utils_Date::processDate($values['rpl_end_date'], NULL, FALSE, 'Y-m-d')
+          $values['rpl_end_date']
         );
       }
 
