@@ -108,25 +108,25 @@
     </td>
     <td style="white-space:nowrap;">{$group.total|crmMoney:$group.currency}</td>
     <td class="sepa_actions">
-      {crmButton href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button_view" title="test" icon="fa-info"}{ts domain="org.project60.sepa"}Contributions{/ts}{/crmButton}
+      {crmButton p="civicrm/sepa/listgroup" q="group_id=$group_id" class="button_view" title="test" icon="fa-info"}{ts domain="org.project60.sepa"}Contributions{/ts}{/crmButton}
       {if $group.status == 'open'}
         {if $can_batch}
           {if $group.submit == 'missed'}
-            {crmButton href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id&status=missed"}" class="button_close" title="{ts domain="org.project60.sepa"}Close and Submit{/ts}" icon="fa-paper-plane"}{ts domain="org.project60.sepa"}Close and Submit{/ts}{/crmButton}
+            {crmButton p="civicrm/sepa/closegroup" q="group_id=$group_id&status=missed" class="button_close" title="{ts domain="org.project60.sepa"}Close and Submit{/ts}" icon="fa-paper-plane"}{ts domain="org.project60.sepa"}Close and Submit{/ts}{/crmButton}
           {else}
-            {crmButton href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button_close" title="{ts domain="org.project60.sepa"}Close and Submit{/ts}" icon="fa-paper-plane"}{ts domain="org.project60.sepa"}Close and Submit{/ts}{/crmButton}
+            {crmButton p="civicrm/sepa/closegroup" q="group_id=$group_id" class="button_close" title="{ts domain="org.project60.sepa"}Close and Submit{/ts}" icon="fa-paper-plane"}{ts domain="org.project60.sepa"}Close and Submit{/ts}{/crmButton}
           {/if}
         {/if}
       {else}
-        {crmButton href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" class="button_export" title="{ts domain="org.project60.sepa"}Download Again{/ts}" icon=""}{ts domain="org.project60.sepa"}Download Again{/ts}{/crmButton}
+        {crmButton p="civicrm/sepa/xml" q="id=$file_id" class="button_export" title="{ts domain="org.project60.sepa"}Download Again{/ts}" icon=""}{ts domain="org.project60.sepa"}Download Again{/ts}{/crmButton}
         {if $closed_status_id eq $group.status_id}
           {if not $group.collection_date_in_future}
-            {crmButton href="{crmURL p="civicrm/sepa/mark_received" q="group_id=$group_id"}" class="button_received" title="{ts domain="org.project60.sepa"}Mark Received{/ts}" icon=""}{ts domain="org.project60.sepa"}Mark Received{/ts}{/crmButton}
+            {crmButton p="civicrm/sepa/mark_received" q="group_id=$group_id" class="button_received" title="{ts domain="org.project60.sepa"}Mark Received{/ts}" icon=""}{ts domain="org.project60.sepa"}Mark Received{/ts}{/crmButton}
           {/if}
         {/if}
       {/if}
       {if $can_delete}
-        {crmButton href="{crmURL p="civicrm/sepa/deletegroup" q="group_id=$group_id"}" class="button_view" title="{ts domain="org.project60.sepa"}Delete{/ts}" icon="fa-trash-can"}{ts domain="org.project60.sepa"}Delete{/ts}{/crmButton}
+        {crmButton p="civicrm/sepa/deletegroup" q="group_id=$group_id" class="button_view" title="{ts domain="org.project60.sepa"}Delete{/ts}" icon="fa-trash-can"}{ts domain="org.project60.sepa"}Delete{/ts}{/crmButton}
       {/if}
     </td>
   </tr>
