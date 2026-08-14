@@ -361,18 +361,7 @@ parameters:
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
-			count: 9
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Do not throw the \\Exception base class\.$#'
-			count: 4
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
-			identifier: equal.notAllowed
-			count: 1
+			count: 3
 			path: CRM/Sepa/BAO/SepaMandateLink.php
 
 		-
@@ -406,27 +395,9 @@ parameters:
 			path: CRM/Sepa/BAO/SepaMandateLink.php
 
 		-
-			message: '#^Parameter \#1 \$string of function strtoupper expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
 			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
 			identifier: argument.type
 			count: 4
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Parameter \#3 \$id of static method CRM_Utils_Hook\:\:pre\(\) expects int\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Parameter &\$params by\-ref type of method CRM_Sepa_BAO_SepaMandateLink\:\:add\(\) expects array\<string, mixed\>, array given\.$#'
-			identifier: parameterByRef.type
-			count: 1
 			path: CRM/Sepa/BAO/SepaMandateLink.php
 
 		-

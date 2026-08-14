@@ -64,7 +64,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
    * @param int $mandate_id            the mandate to link
    * @param int $entity_id             the ID of the entity to link to
    * @param string $entity_table       table name of the entity to link to
-   * @param string $class              link class, max 16 characters
+   * @param string $class              link class
    * @param bool $is_active            is the link active? default is YES
    * @param string $start_date         start date of the link, default NOW
    * @param string|null $end_date           end date of the link, default is NONE
@@ -96,7 +96,7 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
       $params['end_date'] = date('YmdHis', strtotime($end_date));
     }
 
-    return self::add($params);
+    return self::writeRecord($params);
   }
 
   /**
@@ -203,47 +203,22 @@ class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
   /**
    * Create/edit a SepaMandateLink entry
    *
-   * @param array<string, mixed> $params
+   * @param array{class?: ?string, ...} $record
    *
-   * @access public
-   * @static
-   * @throws Exception if mandatory parameters not set
+   * @throws \CRM_Core_Exception
+   *
+   * @phpstan-ignore method.childParameterType
    */
-  public static function add(array &$params): self {
-    // class should always be upper case
-    if (!empty($params['class'])) {
-      $params['class'] = strtoupper($params['class']);
+  public static function writeRecord(array $record): self {
+    if (isset($record['class'])) {
+      $upperCasedClass = strtoupper($record['class']);
+      if ($upperCasedClass !== $record['class']) {
+        CRM_Core_Error::deprecatedWarning('Automatic conversion of mandate link classes to upper case is deprecated.');
+        $record['class'] = $upperCasedClass;
+      }
     }
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    if ($hook == 'create') {
-      // check mandatory fields
-      if (empty($params['mandate_id'])) {
-        throw new Exception('Field mandate_id is mandatory.');
-      }
-      if (empty($params['entity_id'])) {
-        throw new Exception('Field entity_id is mandatory.');
-      }
-      if (empty($params['entity_table'])) {
-        throw new Exception('Field entity_table is mandatory.');
-      }
-      if (empty($params['class'])) {
-        throw new Exception('Field class is mandatory.');
-      }
-
-      // set create date
-      $params['creation_date'] = date('YmdHis');
-    }
-
-    CRM_Utils_Hook::pre($hook, 'SepaMandateLink', $params['id'] ?? NULL, $params);
-
-    $dao = new CRM_Sepa_BAO_SepaMandateLink();
-    $dao->copyValues($params);
-    $dao->save();
-
-    CRM_Utils_Hook::post($hook, 'SepaMandateLink', (int) $dao->id, $dao);
-    /** @var \CRM_Sepa_BAO_SepaMandateLink $dao */
-    return $dao;
+    return parent::writeRecord($record);
   }
 
 }
