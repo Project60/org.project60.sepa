@@ -197,11 +197,6 @@ function sepa_civicrm_config(CRM_Core_Config $config): void {
  * Implements hook_civicrm_install().
  */
 function sepa_civicrm_install(): void {
-  $config = CRM_Core_Config::singleton();
-  //create the tables
-  $sqlfile = dirname(__FILE__) . '/sql/sepa.sql';
-  CRM_Utils_File::sourceSQLFile($config->dsn, $sqlfile, NULL, FALSE);
-
   _sepa_civix_civicrm_install();
 }
 
@@ -330,8 +325,7 @@ function sepa_civicrm_pre(string $op, string $objectName, ?int $id, array $param
 }
 
 /**
- * CiviCRM POST event: make sure the next collection date
- *   is adjusted according to the change
+ * Implements hook_civicrm_post().
  */
 function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
   if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
@@ -345,47 +339,6 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
     }
   }
 }
-
-/**
- * totten's addition
- */
-function sepa_civicrm_entityTypes(&$entityTypes): void {
-  // add my DAO's
-  $entityTypes[] = [
-    'name' => 'SepaMandate',
-    'class' => 'CRM_Sepa_DAO_SEPAMandate',
-    'table' => 'civicrm_sdd_mandate',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaCreditor',
-    'class' => 'CRM_Sepa_DAO_SEPACreditor',
-    'table' => 'civicrm_sdd_creditor',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaTransactionGroup',
-    'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
-    'table' => 'civicrm_sdd_txgroup',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaSddFile',
-    'class' => 'CRM_Sepa_DAO_SEPASddFile',
-    'table' => 'civicrm_sdd_file',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaContributionGroup',
-    'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
-    'table' => 'civicrm_sdd_contribution_txgroup',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaMandateLink',
-    'class' => 'CRM_Sepa_DAO_SepaMandateLink',
-    'table' => 'civicrm_sdd_entity_mandate',
-  ];
-}
-
-/**
- * Implements hook_civicrm_config().
- */
 
 /**
  * Implements hook_civicrm_navigationMenu().

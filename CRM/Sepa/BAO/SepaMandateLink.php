@@ -18,7 +18,6 @@ declare(strict_types = 1);
 
 class CRM_Sepa_BAO_SepaMandateLink extends CRM_Sepa_DAO_SepaMandateLink {
 
-
   public static string $LINK_CLASS_REPLACES    = 'REPLACES';
   public static string $LINK_CLASS_MEMBERSHIP  = 'MEMBERSHIP';
 

@@ -3882,12 +3882,6 @@ parameters:
 			path: sepa.php
 
 		-
-			message: '#^Function sepa_civicrm_entityTypes\(\) has parameter \$entityTypes with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: sepa.php
-
-		-
 			message: '#^Function sepa_civicrm_links\(\) has parameter \$links with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
