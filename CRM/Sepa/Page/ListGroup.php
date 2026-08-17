@@ -19,6 +19,7 @@ declare(strict_types = 1);
 use CRM_Sepa_ExtensionUtil as E;
 use Civi\Api4\SepaTransactionGroup;
 use Civi\Api4\Contribution;
+use Civi\Api4\SepaMandate;
 
 /**
  * back office sepa group content viewer
@@ -36,6 +37,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         ->selectRowCount()
         ->addSelect(
           'id',
+          'type',
           'reference',
           'status_id',
           'COUNT(DISTINCT contribution.id) AS total_count',
@@ -63,7 +65,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
       );
     }
 
-    $result = Contribution::get()
+    $contributionApi = Contribution::get()
       ->selectRowCount()
       ->addSelect(
         'contact_id.display_name',
@@ -75,14 +77,41 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         'financial_type_id',
         'financial_type_id:label',
         'campaign_id.title',
-        'contribution_status_id:label'
+        'contribution_status_id:label',
+        'mandate.reference',
+        'mandate.iban',
       )
-      ->addJoin('SepaTransactionGroup AS sepa_transaction_group', 'INNER', 'SepaContributionGroup')
+      ->addJoin('SepaTransactionGroup AS sepa_transaction_group', 'INNER', 'SepaContributionGroup');
+    if ($txGroup['type'] !== 'OOFF') {
+      // This is a recurring a group.
+      $contributionApi->addJoin('SepaMandate AS mandate', 'LEFT', NULL,
+        ['mandate.entity_table', '=', 'civicrm_contribution_recur', FALSE],
+        ['mandate.entity_id', '=', 'contribution_recur_id', TRUE]
+      );
+    }
+    $result = $contributionApi
       ->addWhere('sepa_transaction_group.id', '=', $groupId)
       ->execute();
     $statusStats = [];
     $contributions = [];
     foreach ($result as $contribution) {
+      if ($txGroup['type'] === 'OOFF') {
+        // For one off's we have to fetch the mandate per contribution
+        // There is an issue with Join between Contribution and Sepa Mandate
+        // CiviCRM core adds a join on first_contribution_id as well.
+        try {
+          $mandate = SepaMandate::get(FALSE)
+            ->addWhere('entity_table', '=', 'civicrm_contribution')
+            ->addWhere('entity_id', '=', $contribution['id'])
+            ->execute()
+            ->single();
+          $contribution['mandate.reference'] = $mandate['reference'];
+          $contribution['mandate.iban'] = $mandate['iban'];
+        }
+        catch (\Exception $e) {
+          // @ignoreException
+        }
+      }
       $contributions[] = [
         'contact_display_name' => $contribution['contact_id.display_name'],
         'contact_type' => $contribution['contact_id.contact_type'],
@@ -105,6 +134,8 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         'financial_type_id' => $contribution['financial_type_id'],
         'financial_type' => $contribution['financial_type_id:label'],
         'campaign' => $contribution['campaign_id.title'],
+        'reference' => $contribution['mandate.reference'],
+        'iban' => $contribution['mandate.iban'],
       ];
       $statusStats[$contribution['contribution_status_id:label']] =
         1 + ($statusStats[$contribution['contribution_status_id:label']] ?? 0);
