@@ -361,18 +361,7 @@ parameters:
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
-			count: 9
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Do not throw the \\Exception base class\.$#'
-			count: 4
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
-			identifier: equal.notAllowed
-			count: 1
+			count: 3
 			path: CRM/Sepa/BAO/SepaMandateLink.php
 
 		-
@@ -406,27 +395,9 @@ parameters:
 			path: CRM/Sepa/BAO/SepaMandateLink.php
 
 		-
-			message: '#^Parameter \#1 \$string of function strtoupper expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
 			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
 			identifier: argument.type
 			count: 4
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Parameter \#3 \$id of static method CRM_Utils_Hook\:\:pre\(\) expects int\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: CRM/Sepa/BAO/SepaMandateLink.php
-
-		-
-			message: '#^Parameter &\$params by\-ref type of method CRM_Sepa_BAO_SepaMandateLink\:\:add\(\) expects array\<string, mixed\>, array given\.$#'
-			identifier: parameterByRef.type
-			count: 1
 			path: CRM/Sepa/BAO/SepaMandateLink.php
 
 		-
@@ -445,12 +416,6 @@ parameters:
 			message: '#^Cannot access offset ''iban'' on mixed\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 2
-			path: CRM/Sepa/Form/CreateMandate.php
-
-		-
-			message: '#^Cannot access offset ''id'' on array\|int\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
 			path: CRM/Sepa/Form/CreateMandate.php
 
 		-
@@ -556,12 +521,6 @@ parameters:
 
 		-
 			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:getKnownBankAccounts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: CRM/Sepa/Form/CreateMandate.php
-
-		-
-			message: '#^Method CRM_Sepa_Form_CreateMandate\:\:postProcess\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: CRM/Sepa/Form/CreateMandate.php
@@ -1437,7 +1396,7 @@ parameters:
 		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
-			count: 2
+			count: 1
 			path: CRM/Sepa/Logic/Queue/Close.php
 
 		-
@@ -1448,7 +1407,7 @@ parameters:
 		-
 			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
 			identifier: equal.notAllowed
-			count: 14
+			count: 12
 			path: CRM/Sepa/Logic/Queue/Close.php
 
 		-
@@ -2090,12 +2049,6 @@ parameters:
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-
-			message: '#^Cannot cast mixed to int\.$#'
-			identifier: cast.int
-			count: 1
-			path: CRM/Sepa/Page/EditMandate.php
-
-		-
 			message: '#^Cannot cast mixed to string\.$#'
 			identifier: cast.string
 			count: 3
@@ -2123,7 +2076,7 @@ parameters:
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-
-			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:changecyleday", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
+			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:changeCycleDay", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
 			count: 1
 			path: CRM/Sepa/Page/EditMandate.php
 
@@ -2134,7 +2087,7 @@ parameters:
 
 		-
 			message: '#^In method "CRM_Sepa_Page_EditMandate\:\:run", you should not use the \$_REQUEST superglobal\. You should instead rely on your framework that provides you with a "request" object \(for instance a PSR\-7 RequestInterface or a Symfony Request\)\. More info\: http\://bit\.ly/nosuperglobals$#'
-			count: 4
+			count: 2
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-
@@ -2147,12 +2100,6 @@ parameters:
 			message: '#^Loose comparison via "\=\=" is not allowed\.$#'
 			identifier: equal.notAllowed
 			count: 9
-			path: CRM/Sepa/Page/EditMandate.php
-
-		-
-			message: '#^Method CRM_Sepa_Page_EditMandate\:\:run\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-

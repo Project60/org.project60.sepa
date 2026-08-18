@@ -50,7 +50,7 @@ return [
     ],
     'source' => [
       'title' => E::ts('Source'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => E::ts('Information about the source of registration of the mandate'),
     ],

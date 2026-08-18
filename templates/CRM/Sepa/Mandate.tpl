@@ -12,10 +12,12 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div id="payment_information">
 <fieldset class="billing_mode-group direct_debit_info-group">
 <legend>
-{ts domain="org.project60.sepa"}Direct Debit Information{/ts}
+{ts}Direct Debit Information{/ts}
 </legend>
 
 <div class="crm-section {$form.account_holder.name}-section">
@@ -49,5 +51,6 @@
 	<div class="clear"></div>
 </div>
 
-
 </div>
+
+{/crmScope}

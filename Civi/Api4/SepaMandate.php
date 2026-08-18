@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Civi\Api4;
 
+use Civi\Sepa\Api4\Action\SepaMandate\CollectOutstandingAction;
 use Civi\Sepa\Api4\Action\SepaMandate\CreateFullAction;
 use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
 use Civi\Sepa\Api4\Action\SepaMandate\GetFieldsAction;
@@ -18,6 +19,11 @@ use Civi\Sepa\Api4\Action\SepaMandate\ReinstateAction;
  * @package Civi\Api4
  */
 class SepaMandate extends Generic\DAOEntity {
+
+  public static function collectOutstanding(bool $checkPermissions = TRUE): CollectOutstandingAction {
+    return (new CollectOutstandingAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
   public static function createFull(bool $checkPermissions = TRUE): CreateFullAction {
     return (new CreateFullAction(static::getEntityName(), __FUNCTION__))

@@ -579,6 +579,27 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_11305(): bool {
+    $this->ctx->log->info('Update database schema');
+
+    E::schema()->alterSchemaField('SepaMandate', 'source', [
+      'sql_type' => 'varchar(255)',
+    ], NULL);
+
+    E::schema()->alterSchemaField('SepaMandateLink', 'class', [
+      'sql_type' => 'varchar(100)',
+      'required' => TRUE,
+    ], NULL);
+
+    E::schema()->alterSchemaField('SepaMandateLink', 'creation_date', [
+      'sql_type' => 'datetime',
+      'required' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP',
+    ], NULL);
+
+    return TRUE;
+  }
+
   /**
    * Helper for replacing deprecated core method
    */

@@ -218,31 +218,31 @@ function _civicrm_api3_sepa_mandate_createfull_spec(array &$params): void {
     'name'         => 'start_date',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-    'title'        => 'Start of collection (only for RCUR)',
+    'title'        => 'Start of collection (for RCUR mandates only)',
   ];
   $params['end_date'] = [
     'name'         => 'end_date',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-    'title'        => 'End of collection (only for RCUR)',
+    'title'        => 'End of collection (for RCUR mandates only)',
   ];
   $params['frequency_interval'] = [
     'name'         => 'frequency_interval',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
-    'title'        => 'Collection interval (together with frequency_unit, only for RCUR)',
+    'title'        => 'Collection interval (together with frequency_unit, for RCUR mandates only)',
   ];
   $params['frequency_unit'] = [
     'name'         => 'frequency_unit',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_STRING,
-    'title'        => 'Collection interval unit (together with frequency_interval, only for RCUR)',
+    'title'        => 'Collection interval unit (together with frequency_interval, for RCUR mandates only)',
   ];
   $params['cycle_day'] = [
     'name'         => 'cycle_day',
     'api.required' => 0,
     'type'         => CRM_Utils_Type::T_INT,
-    'title'        => 'Day of the month (for collection, only for RCUR)',
+    'title'        => 'Day of the month (for collection, for RCUR mandates only)',
   ];
 }
 

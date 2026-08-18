@@ -80,9 +80,12 @@ return [
     ],
     'class' => [
       'title' => E::ts('Link Class'),
-      'sql_type' => 'varchar(16)',
+      'sql_type' => 'varchar(100)',
       'input_type' => 'Text',
-      'description' => E::ts('Link class, freely defined by client'),
+      'description' => E::ts(
+        'Link class (freely defined). Automatically converted to upper case, though this conversion is deprecated.'
+      ),
+      'required' => TRUE,
     ],
     'is_active' => [
       'title' => E::ts('Is Active?'),
@@ -97,6 +100,7 @@ return [
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'required' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP',
       'description' => E::ts('Link creation date (default now())'),
       'input_attrs' => [
         'format_type' => 'activityDateTime',

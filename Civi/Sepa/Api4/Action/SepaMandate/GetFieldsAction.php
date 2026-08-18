@@ -22,7 +22,10 @@ namespace Civi\Sepa\Api4\Action\SepaMandate;
 
 use Civi\Api4\Extension;
 use Civi\Api4\Generic\DAOGetFieldsAction;
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\SpecFormatter;
+use Civi\Sepa\Api4\Util\SqlRendererUtil;
+use Civi\Sepa\Contribution\CollectOutstandingHelper;
 use CRM_Sepa_ExtensionUtil as E;
 
 /**
@@ -44,7 +47,36 @@ final class GetFieldsAction extends DAOGetFieldsAction {
     $fields['date']['required'] = FALSE;
     $fields['reference']['required'] = FALSE;
 
-    if ('createFull' === $this->getAction()) {
+    if ('get' === $this->getAction()) {
+      $fields['outstanding_amount'] = [
+        'type' => 'Extra',
+        'name' => 'outstanding_amount',
+        'data_type' => 'Money',
+        'nullable' => FALSE,
+        'title' => E::ts('Outstanding amount (for RCUR mandates only)'),
+        'description' => E::ts('The sum of the amounts of suspended contributions'),
+        'operators' => [],
+        'sql_renderer' => fn (array $field, Api4SelectQuery $query) => sprintf(
+          'CONCAT(%s, ":", %s)',
+          SqlRendererUtil::getFieldSqlName($field, $query, 'type'),
+          SqlRendererUtil::getFieldSqlName($field, $query, 'entity_id')
+        ),
+        'output_formatters' => [
+          function (&$value, array $row, array $field): void {
+            [$type, $entityId] = explode(':', $value, 2) + [NULL, NULL];
+            if ('RCUR' === $type && is_numeric($entityId)) {
+              static $collectOutstandingHelper = new CollectOutstandingHelper();
+              $contributions = $collectOutstandingHelper->getOutstandingContributions((int) $entityId);
+              $value = $collectOutstandingHelper->getOutstandingAmount($contributions);
+            }
+            else {
+              $value = 0.0;
+            }
+          },
+        ],
+      ];
+    }
+    elseif ('createFull' === $this->getAction()) {
       unset($fields['entity_id']);
       unset($fields['entity_table']);
 
@@ -169,7 +201,7 @@ final class GetFieldsAction extends DAOGetFieldsAction {
         'required' => FALSE,
         'nullable' => FALSE,
         'name' => 'start_date',
-        'title' => E::ts('Start of collection (only for RCUR)'),
+        'title' => E::ts('Start of collection (for RCUR mandates only)'),
         'data_type' => 'Timestamp',
         'input_type' => 'Date',
         'input_attrs' => [
@@ -186,7 +218,7 @@ final class GetFieldsAction extends DAOGetFieldsAction {
         'required' => FALSE,
         'nullable' => TRUE,
         'name' => 'end_date',
-        'title' => E::ts('End of collection (only for RCUR)'),
+        'title' => E::ts('End of collection (for RCUR mandates only)'),
         'data_type' => 'Timestamp',
         'input_type' => 'Date',
         'input_attrs' => [
@@ -204,7 +236,7 @@ final class GetFieldsAction extends DAOGetFieldsAction {
         'required' => FALSE,
         'nullable' => FALSE,
         'name' => 'frequency_interval',
-        'title' => E::ts('Collection interval (together with frequency_unit, only for RCUR)'),
+        'title' => E::ts('Collection interval (together with frequency_unit, for RCUR mandates only)'),
         'data_type' => 'Integer',
         'input_type' => 'Text',
       ];
@@ -216,7 +248,7 @@ final class GetFieldsAction extends DAOGetFieldsAction {
         'required' => FALSE,
         'nullable' => TRUE,
         'name' => 'frequency_unit',
-        'title' => E::ts('Collection interval unit (together with frequency_interval, only for RCUR)'),
+        'title' => E::ts('Collection interval unit (together with frequency_interval, for RCUR mandates only)'),
         'data_type' => 'String',
         'options' => TRUE,
         'suffixes' => [
@@ -235,7 +267,7 @@ final class GetFieldsAction extends DAOGetFieldsAction {
         'required' => FALSE,
         'nullable' => FALSE,
         'name' => 'cycle_day',
-        'title' => E::ts('Day of the month (for collection, only for RCUR)'),
+        'title' => E::ts('Day of the month (for collection, for RCUR mandates only)'),
         'data_type' => 'Integer',
         'input_type' => 'Text',
       ];
