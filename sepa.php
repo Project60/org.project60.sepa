@@ -561,3 +561,52 @@ function sepa_civicrm_xmlMenu(array &$files): void {
     $files[] = $file;
   }
 }
+
+/**
+ * Implements hook_civicrm_check().
+ *
+ * Warns about open transaction groups whose submission deadline has passed.
+ *
+ * @phpstan-param list<CRM_Utils_Check_Message> $messages
+ */
+function sepa_civicrm_check(array &$messages): void {
+  $groupStatusIdOpen = (int) CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
+  /** @var list<array{id: int, reference: string, collection_date: string}> $overdueGroups */
+  $overdueGroups = \Civi\Api4\SepaTransactionGroup::get(FALSE)
+    ->addSelect('id', 'reference', 'collection_date')
+    // empty groups are removed by the batching cleanup, nothing to act on
+    ->addJoin('SepaContributionGroup AS ctxg', 'INNER', NULL, ['ctxg.txgroup_id', '=', 'id'])
+    ->addWhere('status_id', '=', $groupStatusIdOpen)
+    ->addWhere('latest_submission_date', '<', date('Y-m-d'))
+    ->addGroupBy('id')
+    ->addOrderBy('collection_date')
+    ->execute()
+    ->getArrayCopy();
+  if ([] === $overdueGroups) {
+    return;
+  }
+  $items = [];
+  foreach ($overdueGroups as $group) {
+    $items[] = sprintf(
+      '<a href="%s">%s</a> (%s)',
+      CRM_Utils_System::url('civicrm/sepa/listgroup', "group_id={$group['id']}"),
+      htmlspecialchars($group['reference'], ENT_QUOTES, 'UTF-8'),
+      CRM_Utils_Date::customFormat($group['collection_date'])
+    );
+  }
+  $messages[] = new CRM_Utils_Check_Message(
+    'sepa_overdue_open_groups',
+    E::ts(
+      '%1 SEPA transaction group(s) are still open although their submission deadline has passed: %2. '
+      . 'Close and submit them with a new collection date, or delete them. Do not run the batching update '
+      . 'while they are open, or the affected mandates may be collected twice.',
+      [
+        1 => count($items),
+        2 => implode(', ', $items),
+      ]
+    ),
+    E::ts('Overdue open SEPA transaction groups'),
+    \Psr\Log\LogLevel::WARNING,
+    'fa-bank'
+  );
+}
