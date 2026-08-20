@@ -600,6 +600,20 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_11306(): bool {
+    $this->ctx->log->info('Update database schema');
+
+    E::schema()->alterSchemaField('SepaCreditor', 'payment_processor_id', [
+      'sql_type' => 'int unsigned',
+      'entity_reference' => [
+        'entity' => 'PaymentProcessor',
+        'key' => 'id',
+      ],
+    ], NULL);
+
+    return TRUE;
+  }
+
   /**
    * Helper for replacing deprecated core method
    */
