@@ -13,17 +13,20 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div id="sdd-create-mandate">
 
   {* hidden fields *}
-  {$form.cid.html}
+  {if !empty($form.cid)}{$form.cid.html}{/if}
 
   {if $create_mode eq 'replace'}
   <div style="background-color: paleturquoise; padding: 1em; border-radius: 1em;">
     {$form.replace.html}
+    {$form.collect_outstanding.html}
 
     <div style="text-align: left; font-size: large;">
-      <span><strong>{ts 1=$replace_mandate_reference domain='org.project60.sepa'}You're replacing mandate %1{/ts}</strong></span>
+      <span><strong>{ts 1=$replace_mandate_reference}You're replacing mandate %1{/ts}</strong></span>
     </div>
     <br/>
 
@@ -171,3 +174,5 @@
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
+
+{/crmScope}

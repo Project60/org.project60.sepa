@@ -156,6 +156,36 @@ Some organizations set up automated retry schedules, while others prefer to revi
 
 ## Specialized Scenarios and Advanced Features
 
+### Suspending and Reinstating Mandates
+
+In some cases it can be necessary to suspend mandates. When a mandate gets
+suspended all pending contributions in open transaction groups will be marked as
+on hold and removed from transaction groups. Also the recurring contribution
+associated with the mandate will be marked as on hold. The mandate itself gets
+the status on hold (`ONHOLD`).
+
+While a mandate is on hold suspended contributions will be created during the
+calculation of transaction groups. They won't be added to a transaction group,
+though. The suspended contributions might be used to request outstanding amounts
+later. Suspended contributions have the status `Pending` and the `Is On Hold`
+flag is enabled.
+
+When the mandate is ready again it can be reinstated. This brings the mandate
+back into status `RCUR` or `FRST` so contributions will be added to new
+transaction groups again. Additionally, the on hold flag will be removed from
+the associated recurring contribution. Suspended contributions remain in that
+state.
+
+When reinstating or replacing suspended mandates, outstanding amounts can be
+collected if desired. This will create a one-off mandate with the sum of the
+amounts of the suspended contributions. When the transaction group such one-off
+mandate belongs to gets closed, the status of the contributions will be set to
+`Cancelled`. (The on hold flag is kept.)
+
+**Note:** Do not modify settings that change the collection date while mandates
+are suspended or shortly after reinstation as that can result in unjustified
+suspended contributions.
+
 ### Working with Multiple Creditors
 
 Larger organizations sometimes need to manage multiple SEPA creditor arrangements. This might be because you have multiple legal entities, separate bank accounts for different purposes, or international operations across different countries.

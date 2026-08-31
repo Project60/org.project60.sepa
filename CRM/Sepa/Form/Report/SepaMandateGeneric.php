@@ -121,7 +121,7 @@ class CRM_Sepa_Form_Report_SepaMandateGeneric extends CRM_Report_Form {
             'name' => 'account_holder',
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_STRING,
-            'title' => E::ts('account_holder'),
+            'title' => E::ts('Account Holder'),
           ],
           'iban' => [
             'name' => 'iban',

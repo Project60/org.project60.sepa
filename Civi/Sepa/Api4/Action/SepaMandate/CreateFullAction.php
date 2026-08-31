@@ -83,7 +83,8 @@ final class CreateFullAction extends AbstractCreateAction {
     $values['creditor_id'] = (int) $values['creditor_id'];
 
     $values['status'] ??= MandateStatusDeterminer::determineMandateStatus(
-      $values['type'], $values['first_contribution_id'] ?? NULL
+      $values['type'],
+      isset($values['first_contribution_id']) ? (int) $values['first_contribution_id'] : NULL
     );
 
     $paymentInstrumentDeterminer = new PaymentInstrumentDeterminer();

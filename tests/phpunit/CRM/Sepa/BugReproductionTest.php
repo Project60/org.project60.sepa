@@ -16,8 +16,6 @@ declare(strict_types = 1);
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-use CRM_Sepa_ExtensionUtil as E;
-
 /**
  * Bug reproduction tests.
  *

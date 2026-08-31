@@ -51,7 +51,7 @@ class CRM_Sepa_Logic_Status {
         return ($localise ? E::ts('Completed') : 'Completed');
 
       case 'ONHOLD':
-        return ($localise ? E::ts('Suspended') : 'Suspended');
+        return ($localise ? E::ts('On hold') : 'On hold');
 
       case 'PARTIAL':
         return ($localise ? E::ts('Incomplete Donation') : 'Incomplete Donation');
@@ -63,7 +63,7 @@ class CRM_Sepa_Logic_Status {
   }
 
   /**
-   * Translates human readable status to the ones used in the DB
+   * Translates human-readable status to the ones used in the DB
    * CAUTION: This only works for UNLOCALISED strings
    *
    * @param string $status       the status as in the DB
@@ -104,7 +104,7 @@ class CRM_Sepa_Logic_Status {
       case 'Completed':
         return ($mandate_type ? 'COMPLETE' : ['COMPLETE']);
 
-      case 'Suspended':
+      case 'On hold':
         return ($mandate_type ? 'ONHOLD' : ['ONHOLD']);
 
       case 'Incomplete Donation':
@@ -117,19 +117,19 @@ class CRM_Sepa_Logic_Status {
   }
 
   /**
-   * get a mapping of the not localised human readable status
+   * get a mapping of the not localised human-readable status
    * to the localised one, as can be used by dropdowns
    *
    * @return array<string, string>
    */
   public static function getStatusSelectorOptions(bool $excludePartials = FALSE): array {
     $list = [
-      'Not activated'       => E::ts('Not activated'),
-      'Ready'               => E::ts('Ready'),
-      'In Use'              => E::ts('In Use'),
-      'Completed'           => E::ts('Completed'),
-      'Suspended'           => E::ts('Suspended'),
-      'Error'               => E::ts('Error'),
+      'Not activated' => E::ts('Not activated'),
+      'Ready' => E::ts('Ready'),
+      'In Use' => E::ts('In Use'),
+      'Completed' => E::ts('Completed'),
+      'On hold' => E::ts('On hold'),
+      'Error' => E::ts('Error'),
     ];
 
     if (!$excludePartials) {
