@@ -1,4 +1,4 @@
-.sepa_dashboard str.submit_missed td {
+.sepa_dashboard tr.submit_missed td {
   background-color: var(--crm-danger-light-color, #EE0000AA);
 }
 
@@ -18,7 +18,7 @@
   background-color: var(--crm-layer2-bg-color, #00830033);
 }
 
-.sepa_dashboard .sepa_actions {
+.sepa_dashboard .sepa_dashboard__button_group {
   display: flex;
   justify-content: end;
 }
