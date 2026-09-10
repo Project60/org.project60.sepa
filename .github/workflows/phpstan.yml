@@ -1,5 +1,7 @@
 name: PHPStan
 
+permissions: {}
+
 on:
   workflow_dispatch:
     inputs:
@@ -24,18 +26,26 @@ concurrency:
 jobs:
   phpstan:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['8.1', '8.4']
+        php-versions: ['8.1', '8.5']
         prefer: ['prefer-stable', 'prefer-lowest']
+        experimental: [false]
+        include:
+          - php-versions: 8.6
+            prefer: prefer-source
+            experimental: true
     name: PHPStan with PHP ${{ matrix.php-versions }} ${{ matrix.prefer }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-versions }}
           coverage: none
@@ -47,7 +57,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ matrix.prefer }}-${{ hashFiles('**/composer.json') }}
@@ -56,10 +66,25 @@ jobs:
       - name: Install dependencies
         env:
           COMPOSER_COMPILE: all
+          INPUTS_CIVICRM_VERSION: ${{ inputs.civicrm-version }}
+          MATRIX_EXPERIMENTAL: ${{ matrix.experimental }}
+          MATRIX_PREFER: ${{ matrix.prefer }}
         run: |
-          if [ "${{ matrix.prefer }}" = "prefer-lowest" ]; then
+          if [ "${MATRIX_PREFER}" = "prefer-lowest" ]; then
             # Actually test with lowest possible versions.
-            export COMPOSER_NO_SECURITY_BLOCKING=1
+            export COMPOSER_NO_BLOCKING=1
+          fi
+
+          # Don't enforce all extensions to be installed.
+          export COMPOSER_IGNORE_PLATFORM_REQ="ext-*"
+
+          if [ "${MATRIX_EXPERIMENTAL}" == "true" ]; then
+            sed -E -i composer.json \
+              -e 's/"minimum-stability":[^,]*/"minimum-stability": "dev"/' \
+              -e 's/"prefer-stable":[^,]*/"prefer-stable": false/'
+            # Ignore upper bound of php requirement to test with development
+            # version of PHP, even if not allowed by some composer.json.
+            export COMPOSER_IGNORE_PLATFORM_REQ+=",php+"
           fi
 
           composer config --no-plugins allow-plugins.civicrm/composer-compile-plugin false
@@ -68,16 +93,16 @@ jobs:
           composer config --no-plugins allow-plugins.cweagans/composer-patches true
 
           composer config --json "extra.installer-paths.$(dirname $PWD)/{\$name}" '["type:civicrm-ext"]'
-          composer require --ignore-platform-reqs --no-progress composer/installers
+          composer require --no-progress composer/installers
 
-          if [ -n "${{ inputs.civicrm-version }}" ]; then
-            composer require --no-update "civicrm/civicrm-core:${{ inputs.civicrm-version }}" \
-              "civicrm/civicrm-packages:${{ inputs.civicrm-version }}"
+          if [ -n "${INPUTS_CIVICRM_VERSION}" ]; then
+            composer require --no-update "civicrm/civicrm-core:${INPUTS_CIVICRM_VERSION}" \
+              "civicrm/civicrm-packages:${INPUTS_CIVICRM_VERSION}"
           fi
 
           # Run with --no-scripts so ComposerHelper doesn't prevent installation
           # of civicrm packages.
-          composer update --no-scripts --no-progress --${{ matrix.prefer }} --optimize-autoloader --ignore-platform-reqs
+          composer update --no-scripts --no-progress --${MATRIX_PREFER} --optimize-autoloader
           composer composer-phpunit -- update --no-progress --optimize-autoloader
           composer composer-phpstan -- update --no-progress --optimize-autoloader
 
