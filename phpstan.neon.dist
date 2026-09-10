@@ -2,6 +2,18 @@ includes:
 	- phpstan-baseline.neon
 
 parameters:
+	civicrm:
+		# The class \CRM_Core_Smarty provides various methods. Methods that are
+		# not explicitly defined are delegated to the actual Smarty object via
+		# __call(). In many cases explicit methods like fetchWith() (or
+		# \CRM_Utils_String::parseOneOffStringThroughSmarty()) should be enough.
+		# Though if one of the implicit methods is used, this option has to be
+		# enabled. Obsolete with CiviCRM 6.20.
+		# https://github.com/civicrm/civicrm-core/pull/36493
+		implicitSmartyMethodsUsed: true
+		optionalExtensions:
+			- action-provider
+			- dataprocessor
 	paths:
 		- api
 		- Civi
@@ -14,6 +26,7 @@ parameters:
 		analyse:
 			- CRM/Sepa/DAO/*
 			- tests/phpunit/bootstrap.php
+			# TODO: Don't exclude tests.
 			- tests/*
 	stubFiles:
 		- stubs/TokenRow.stub
@@ -26,8 +39,6 @@ parameters:
 		- mixin
 		- packages
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/src/Framework
-		- ../action-provider
-		- ../dataprocessor
 	bootstrapFiles:
 		- tools/phpunit/vendor/bin/.phpunit/phpunit/vendor/autoload.php
 		- phpstanBootstrap.php
@@ -59,5 +70,11 @@ parameters:
 	ignoreErrors:
 		# Note paths are prefixed with "*/" to work with inspections in PHPStorm because of:
 		# https://youtrack.jetbrains.com/issue/WI-63891/PHPStan-ignoreErrors-configuration-isnt-working-with-inspections
-
 	tmpDir: .phpstan
+
+parametersSchema:
+	civicrm: structure([
+		implicitSmartyMethodsUsed: bool()
+		# Optional extensions (i.e. not required in info.xml) that should be added to class loader.
+		?optionalExtensions: listOf(string())
+	])
