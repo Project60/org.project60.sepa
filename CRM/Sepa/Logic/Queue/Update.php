@@ -16,6 +16,7 @@
 
 declare(strict_types = 1);
 
+use Civi\Api4\SepaCreditor;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 use Webmozart\Assert\Assert;
@@ -66,16 +67,20 @@ class CRM_Sepa_Logic_Queue_Update {
     $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLOSE', $mode, $asyncLockId));
 
     // then iterate through all creditors
-    $creditors = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
-    foreach ($creditors['values'] as $creditor) {
-      $sdd_modes = ($mode == 'RCUR') ? ['FRST', 'RCUR'] : ['OOFF'];
+    /** @var list<int> $creditorIds */
+    $creditorIds = SepaCreditor::get(TRUE)
+      ->addSelect('id')
+      ->execute()
+      ->column('id');
+    foreach ($creditorIds as $creditorId) {
+      $sdd_modes = $mode === 'RCUR' ? ['FRST', 'RCUR'] : ['OOFF'];
       foreach ($sdd_modes as $sdd_mode) {
         // safety margin
-        $count = self::getMandateCount((int) $creditor['id'], $sdd_mode) + self::BATCH_SIZE;
+        $count = self::getMandateCount($creditorId, $sdd_mode) + self::BATCH_SIZE;
         for ($offset = 0; $offset < $count; $offset += self::BATCH_SIZE) {
           // add an item for each batch
           $queue->createItem(new CRM_Sepa_Logic_Queue_Update(
-            'UPDATE', $sdd_mode, $asyncLockId, $creditor['id'], $offset, self::BATCH_SIZE
+            'UPDATE', $sdd_mode, $asyncLockId, $creditorId, $offset, self::BATCH_SIZE
           ));
         }
         $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLEANUP', $sdd_mode, $asyncLockId));
