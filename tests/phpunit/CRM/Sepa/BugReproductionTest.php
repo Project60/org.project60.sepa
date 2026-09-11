@@ -173,4 +173,141 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
     );
   }
 
+  /**
+   * A FRST group left open past its collection date must not lead to a second
+   * first installment when batching runs again; the pending one is moved.
+   */
+  public function testOverdueOpenFrstGroupIsNotDuplicated() {
+    $this->setSepaConfiguration('exclude_weekends', '0');
+    $this->setCreditorConfiguration('batching.RCUR.horizon', 30);
+    $this->setCreditorConfiguration('batching.FRST.notice', 2);
+    $this->setCreditorConfiguration('batching.RCUR.notice', 2);
+
+    $mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], 'now + 5 days');
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $firstInstallment = $this->getLatestContributionForMandate($mandate);
+    $firstGroup = $this->getTransactionGroupForContribution($firstInstallment);
+
+    // the group is never closed; four weeks later somebody runs the batching again
+    $this->executeBatching(self::MANDATE_TYPE_FRST, 'now + 28 days');
+
+    $installments = $this->callAPISuccess('Contribution', 'get', [
+      'contribution_recur_id' => $mandate['entity_id'],
+      'options' => ['limit' => 0],
+    ])['values'];
+    $this->assertCount(1, $installments, 'A second first installment was created for the overdue open group.');
+    $installment = reset($installments);
+    $this->assertSame($firstInstallment['id'], $installment['id'], 'The pending first installment was not reused.');
+
+    $newGroup = $this->getTransactionGroupForContribution($installment);
+    $this->assertNotSame($firstGroup['id'], $newGroup['id'], 'The installment was not moved to the new group.');
+    $this->assertSameDate(
+      $newGroup['collection_date'],
+      $installment['receive_date'],
+      'receive_date was not moved to the new collection date.'
+    );
+    $this->assertCount(
+      1,
+      $this->getActiveTransactionGroups(self::MANDATE_TYPE_FRST),
+      'The emptied overdue group was not cleaned up.'
+    );
+
+    // a third run must be idempotent
+    $this->executeBatching(self::MANDATE_TYPE_FRST, 'now + 28 days');
+    $this->assertSame(1, $this->callAPISuccess('Contribution', 'getcount', [
+      'contribution_recur_id' => $mandate['entity_id'],
+    ]));
+    $mandate = $this->getMandate($mandate['id']);
+    $this->assertSame('FRST', $mandate['status']);
+    $this->assertEmpty($mandate['first_contribution_id'] ?? NULL);
+  }
+
+  /**
+   * Several pending first installments for one mandate are ambiguous: the batching must
+   * neither pick one nor add another one.
+   */
+  public function testAmbiguousPendingFirstInstallmentsAreSkipped() {
+    $this->setSepaConfiguration('exclude_weekends', '0');
+    $this->setCreditorConfiguration('batching.RCUR.horizon', 30);
+    $this->setCreditorConfiguration('batching.FRST.notice', 2);
+
+    $mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], 'now + 5 days');
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $installment = $this->getLatestContributionForMandate($mandate);
+    $group = $this->getTransactionGroupForContribution($installment);
+
+    // fake a second pending first installment in another open group
+    $duplicate = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $installment['contact_id'],
+      'contribution_recur_id' => $mandate['entity_id'],
+      'financial_type_id' => $installment['financial_type_id'],
+      'payment_instrument_id' => $installment['payment_instrument_id'],
+      'total_amount' => $installment['total_amount'],
+      'receive_date' => date('Y-m-d', strtotime('now + 10 days')),
+      'contribution_status_id' => self::CONTRIBUTION_STATUS_PENDING,
+    ]);
+    $otherGroup = $this->callAPISuccess('SepaTransactionGroup', 'create', [
+      'reference' => 'TXG-TEST-FRST-AMBIGUOUS',
+      'type' => self::MANDATE_TYPE_FRST,
+      'collection_date' => date('Y-m-d', strtotime('now + 10 days')),
+      'latest_submission_date' => date('Y-m-d', strtotime('now + 8 days')),
+      'created_date' => date('Y-m-d'),
+      'status_id' => $group['status_id'],
+      'sdd_creditor_id' => $group['sdd_creditor_id'],
+    ]);
+    $this->callAPISuccess('SepaContributionGroup', 'create', [
+      'contribution_id' => $duplicate['id'],
+      'txgroup_id' => $otherGroup['id'],
+    ]);
+
+    $this->executeBatching(self::MANDATE_TYPE_FRST, 'now + 28 days');
+
+    $this->assertSame(2, $this->callAPISuccess('Contribution', 'getcount', [
+      'contribution_recur_id' => $mandate['entity_id'],
+    ]), 'A third installment was created despite the ambiguity.');
+    $this->assertSame(
+      (int) $group['id'],
+      (int) $this->getTransactionGroupForContribution($installment)['id'],
+      'The ambiguous installment was moved although it should have been skipped.'
+    );
+  }
+
+  /**
+   * The system status must warn about open groups past their submission deadline.
+   */
+  public function testOverdueOpenGroupStatusCheck() {
+    $this->setSepaConfiguration('exclude_weekends', '0');
+    $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], 'now + 5 days');
+    $this->executeBatching(self::MANDATE_TYPE_FRST);
+    $group = $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST);
+
+    $messages = [];
+    sepa_civicrm_check($messages);
+    $this->assertSame([], $this->filterCheckMessages($messages), 'Check fired for a group that is not overdue.');
+
+    $this->callAPISuccess('SepaTransactionGroup', 'create', [
+      'id' => $group['id'],
+      'latest_submission_date' => date('Y-m-d', strtotime('yesterday')),
+    ]);
+    $messages = [];
+    sepa_civicrm_check($messages);
+    $this->assertCount(1, $this->filterCheckMessages($messages), 'Check did not fire for an overdue open group.');
+
+    // an emptied group is left to the batching cleanup and must not be reported
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_sdd_contribution_txgroup WHERE txgroup_id = %1', [
+      1 => [$group['id'], 'Integer'],
+    ]);
+    $messages = [];
+    sepa_civicrm_check($messages);
+    $this->assertSame([], $this->filterCheckMessages($messages), 'Check fired for an empty group.');
+  }
+
+  /**
+   * @param list<CRM_Utils_Check_Message> $messages
+   * @return list<CRM_Utils_Check_Message>
+   */
+  private function filterCheckMessages(array $messages): array {
+    return array_values(array_filter($messages, fn($m) => $m->getName() === 'sepa_overdue_open_groups'));
+  }
+
 }
