@@ -62,6 +62,13 @@
         </DbtrAgt>
         <Dbtr>
           <Nm>{$contribution.display_name}</Nm>
+          {if $contribution.ctry eq 'CH'}
+           <PstlAdr>
+            <Ctry>{$contribution.ctry}</Ctry>
+            <AdrLine>{$contribution.street_address}</AdrLine>
+            <AdrLine>{$contribution.postal_code} {$contribution.city}</AdrLine>
+           </PstlAdr>
+          {/if}
         </Dbtr>
         <DbtrAcct>
           <Id>
