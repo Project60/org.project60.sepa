@@ -16,6 +16,9 @@ declare(strict_types = 1);
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
+use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
+
 /**
  * Bug reproduction tests.
  *
@@ -67,43 +70,39 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
    *  3. When such a group is closed, it would be falsely regenerated, because the
    *      existing contributions for the same date are not found due to the wrong payment instruments
    *
-   * @return void
-   *
    * @see https://github.com/Project60/org.project60.sepa/issues/629
    */
-  public function testBug629() {
+  public function testBug629(): void {
     $this->setSepaConfiguration('exclude_weekends', '0');
     $this->setCreditorConfiguration('batching.RCUR.grace', 5);
     $this->setCreditorConfiguration('batching.RCUR.horizon', 20);
     $this->setCreditorConfiguration('batching.RCUR.notice', 2);
     $this->setCreditorConfiguration('batching.FRST.notice', 2);
 
-    // create a recurring mandate
-    $mandateDate = 'now - 65 days';
-    $monthly_mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], $mandateDate);
+    // create a recurring mandate old enough for the batching time frame used in this test.
+    $monthly_mandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR], 'now - 1 months');
 
     // NOW mess up the recurring contribution in a way that likely caused #629:
-    //  give the recurring contribution the FRST payment instrument
-    $recurring_contribution = civicrm_api3('ContributionRecur', 'getsingle', [
-      'id' => $monthly_mandate['entity_id'],
-    ]);
-    $pi_mapping_reversed = array_flip(
-      CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping((int) $monthly_mandate['creditor_id'])
-    );
-    $wrong_payment_instrument_id = $pi_mapping_reversed[$recurring_contribution['payment_instrument_id']];
+    // give the recurring contribution the FRST payment instrument
+    $frst2RcurMapping
+      = CRM_Sepa_Logic_PaymentInstruments::getFrst2RcurMapping((int) $monthly_mandate['creditor_id']);
+    /** @var int $frstPaymentInstrumentId */
+    $frstPaymentInstrumentId = key($frst2RcurMapping);
+    $rcurPaymentInstrumentId = $frst2RcurMapping[$frstPaymentInstrumentId];
 
-    civicrm_api3('ContributionRecur', 'create', [
-      'id' => $monthly_mandate['entity_id'],
-      'payment_instrument_id' => $wrong_payment_instrument_id,
-      'contribution_status_id' => self::CONTRIBUTION_STATUS_PENDING,
-    ]);
+    ContributionRecur::update(FALSE)
+      // Should normally be $rcurPaymentInstrumentId.
+      // Deliberately set to wrong payment instrument.
+      ->addValue('payment_instrument_id', $frstPaymentInstrumentId)
+      ->addWhere('id', '=', $monthly_mandate['entity_id'])
+      ->execute();
 
-    // now generate and close three groups
+    // now generate and close two groups
     $group_type = self::MANDATE_TYPE_FRST;
     $contributions = [];
-    foreach (['-60', '-30', '+0'] as $batch_time_offset) {
-      // run batching and close the groups
-      $this->executeBatching($group_type, "now {$batch_time_offset} days");
+    foreach (['-1', '+0'] as $batch_time_offset) {
+      $now = "now {$batch_time_offset} months";
+      $this->executeBatching($group_type, $now);
 
       $contribution = $this->getLatestContributionForMandate($monthly_mandate);
       $tx_group = $this->getTransactionGroupForContribution($contribution);
@@ -111,28 +110,51 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
 
       // reload after group was closed
       $contribution = $this->getLatestContributionForMandate($monthly_mandate);
+      static::assertNotNull($contribution);
 
       // make sure this is a new one.
-      $this->assertFalse(isset($contributions[$contribution['id']]), "The same contribution was 'generated' again.");
+      static::assertArrayNotHasKey(
+        $contribution['id'],
+        $contributions,
+        "The same contribution was 'generated' again."
+      );
       $contributions[$contribution['id']] = $contribution;
 
-      // now, to reproduce, the contribution needs to be PI=FRST and STATUS=Pending
-      $this->callAPISuccess('Contribution', 'create', [
-        'id' => $contribution['id'],
-        'payment_instrument_id' => self::PAYMENT_INSTRUMENT_FRST,
-        'financial_type_id' => $contribution['financial_type_id'],
-      ]);
+      if ($group_type === self::MANDATE_TYPE_FRST) {
+        static::assertSame(self::PAYMENT_INSTRUMENT_FRST, $contribution['payment_instrument_id']);
+      }
+      else {
+        static::assertSame(self::PAYMENT_INSTRUMENT_RCUR, $contribution['payment_instrument_id']);
+
+        // now, to reproduce, the contribution needs to be PI=FRST and STATUS=Pending
+        Contribution::update(FALSE)
+          ->addValue('payment_instrument_id', self::PAYMENT_INSTRUMENT_FRST)
+          // CiviCRM (at least 6.13.0) expects financial_type_id to be set on update, even though it's not changed.
+          ->addValue('financial_type_id', $contribution['financial_type_id'])
+          ->addWhere('id', '=', $contribution['id'])
+          ->execute();
+      }
+
+      // now, run the last one again, and we will get ANOTHER contribution if the bug is present
+      $this->executeBatching($group_type, $now);
+      $contribution = $this->getLatestContributionForMandate($monthly_mandate);
+      static::assertNotNull($contribution);
+      static::assertArrayHasKey(
+          $contribution['id'],
+          $contributions,
+          "A new contribution was generated, but it shouldn't have."
+      );
 
       // for the next iteration, batch type is RCUR
       $group_type = self::MANDATE_TYPE_RCUR;
     }
 
-    // now, run the last one again, and we will get ANOTHER contribution if the bug is present
-    $this->executeBatching($group_type);
-    $contribution = $this->getLatestContributionForMandate($monthly_mandate);
-    $this->assertTrue(
-      isset($contributions[$contribution['id']]),
-      "A new contribution was generated, but it shouldn't have."
+    // Payment instrument ID should have been corrected.
+    static::assertSame($rcurPaymentInstrumentId, ContributionRecur::get(FALSE)
+      ->addSelect('payment_instrument_id')
+      ->addWhere('id', '=', $monthly_mandate['entity_id'])
+      ->execute()
+      ->single()['payment_instrument_id']
     );
   }
 
@@ -140,12 +162,10 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
    * Verify that but #632 is fixed:
    *  The status CONTRIBUTION_STATUS_PENDING is not shipped with the CiviCRM 5.54+ (?)
    *
-   * @return void
-   *
    * @see https://github.com/Project60/org.project60.sepa/issues/632
    * @see https://lab.civicrm.org/dev/financial/-/issues/201
    */
-  public function testBug632() {
+  public function testBug632(): void {
     $mandate = $this->createMandate(
       [
         'type' => self::MANDATE_TYPE_OOFF,
