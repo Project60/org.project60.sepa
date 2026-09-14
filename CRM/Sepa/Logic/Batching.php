@@ -123,6 +123,7 @@ class CRM_Sepa_Logic_Batching {
     // Note: contribution_recur.financial_type_id and contribution_recur.payment_instrument_id could be NULL according
     // to the database schema, though they are set, when the recurring contribution is created and there's no UI to edit
     // recurring contributions.
+    /** See {@link \CRM_Sepa_Logic_Queue_Update::getMandateCount()} */
     $relevantMandates = SepaMandate::get(TRUE)
       ->addSelect(
         'id',
@@ -356,6 +357,7 @@ class CRM_Sepa_Logic_Batching {
     // step 1: find all active/pending OOFF mandates within the horizon that are NOT in a closed batch and that have a
     // corresponding contribution of a financial type the user has access to (implicit condition added by Financial ACLs
     // extension if enabled).
+    /** See {@link \CRM_Sepa_Logic_Queue_Update::getMandateCount()} */
     /** @var list<array<string, mixed>> $relevant_mandates */
     $relevant_mandates = SepaMandate::get(TRUE)
       ->addSelect('id', 'contact_id', 'entity_id', 'contribution.receive_date', 'contribution.financial_type_id')

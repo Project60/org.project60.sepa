@@ -813,6 +813,7 @@ class CRM_Sepa_CustomData {
     // look for all group names in all variables
     foreach ($group_names as $group_name) {
       foreach (array_keys($params) as $key) {
+        /** @var string $new_key */
         $new_key = preg_replace("#^{$group_name}_#", "{$group_name}.", $key);
         if ($new_key !== $key) {
           $params[$new_key] = $params[$key];

@@ -16,6 +16,8 @@
 
 declare(strict_types = 1);
 
+use Civi\Api4\SepaCreditor;
+use Civi\Api4\SepaMandate;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 use Webmozart\Assert\Assert;
@@ -66,16 +68,20 @@ class CRM_Sepa_Logic_Queue_Update {
     $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLOSE', $mode, $asyncLockId));
 
     // then iterate through all creditors
-    $creditors = civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
-    foreach ($creditors['values'] as $creditor) {
-      $sdd_modes = ($mode == 'RCUR') ? ['FRST', 'RCUR'] : ['OOFF'];
+    /** @var list<int> $creditorIds */
+    $creditorIds = SepaCreditor::get(TRUE)
+      ->addSelect('id')
+      ->execute()
+      ->column('id');
+    foreach ($creditorIds as $creditorId) {
+      $sdd_modes = $mode === 'RCUR' ? ['FRST', 'RCUR'] : ['OOFF'];
       foreach ($sdd_modes as $sdd_mode) {
         // safety margin
-        $count = self::getMandateCount((int) $creditor['id'], $sdd_mode) + self::BATCH_SIZE;
+        $count = self::getMandateCount($creditorId, $sdd_mode) + self::BATCH_SIZE;
         for ($offset = 0; $offset < $count; $offset += self::BATCH_SIZE) {
           // add an item for each batch
           $queue->createItem(new CRM_Sepa_Logic_Queue_Update(
-            'UPDATE', $sdd_mode, $asyncLockId, $creditor['id'], $offset, self::BATCH_SIZE
+            'UPDATE', $sdd_mode, $asyncLockId, $creditorId, $offset, self::BATCH_SIZE
           ));
         }
         $queue->createItem(new CRM_Sepa_Logic_Queue_Update('CLEANUP', $sdd_mode, $asyncLockId));
@@ -187,28 +193,47 @@ class CRM_Sepa_Logic_Queue_Update {
   /**
    * determine the count of mandates to be investigated
    */
-  protected static function getMandateCount(int $creditor_id, string $sdd_mode): int {
-    if ($sdd_mode == 'OOFF') {
+  protected static function getMandateCount(int $creditorId, string $mode): int {
+    if ($mode === 'OOFF') {
       // @phpstan-ignore cast.int
-      $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditor_id);
+      $horizon = (int) CRM_Sepa_Logic_Settings::getSetting('batching.OOFF.horizon', $creditorId);
       $date_limit = date('Y-m-d', strtotime("+$horizon days"));
-      return (int) CRM_Core_DAO::singleValueQuery("
-        SELECT COUNT(mandate.id)
-        FROM civicrm_sdd_mandate AS mandate
-        INNER JOIN civicrm_contribution AS contribution  ON mandate.entity_id = contribution.id
-        WHERE contribution.receive_date <= DATE('$date_limit')
-          AND mandate.type = 'OOFF'
-          AND mandate.status = 'OOFF'
-          AND mandate.creditor_id = $creditor_id;");
+
+      /** See {@link \CRM_Sepa_Logic_Batching::updateOOFF()} */
+      return SepaMandate::get(TRUE)
+        ->selectRowCount()
+        ->addJoin(
+          'Contribution AS contribution',
+          'INNER',
+          NULL,
+          ['entity_table', '=', "'civicrm_contribution'"],
+          ['entity_id', '=', 'contribution.id']
+        )
+        ->addWhere('contribution.receive_date', '<=', $date_limit)
+        ->addWhere('type', '=', 'OOFF')
+        ->addWhere('status', '=', 'OOFF')
+        ->addWhere('creditor_id', '=', $creditorId)
+        ->execute()
+        ->countMatched();
     }
     else {
-      return (int) CRM_Core_DAO::singleValueQuery("
-        SELECT
-          COUNT(mandate.id)
-        FROM civicrm_sdd_mandate AS mandate
-        WHERE mandate.type = 'RCUR'
-          AND mandate.status = '$sdd_mode'
-          AND mandate.creditor_id = $creditor_id;");
+      /** See {@link \CRM_Sepa_Logic_Batching::updateRCUR()} */
+      return SepaMandate::get(TRUE)
+        ->selectRowCount()
+        ->addWhere('type', '=', 'RCUR')
+        ->addClause(
+          'OR',
+          ['status', '=', $mode],
+          [
+            'AND', [
+              ['status', '=', 'ONHOLD'],
+              ['first_contribution_id', 'FRST' === $mode ? 'IS NULL' : 'IS NOT NULL'],
+            ],
+          ],
+        )
+        ->addWhere('creditor_id', '=', $creditorId)
+        ->execute()
+        ->countMatched();
     }
   }
 
