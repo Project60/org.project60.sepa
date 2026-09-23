@@ -19,6 +19,7 @@ parameters:
 		- Civi
 		- CRM
 		- templates/Sepa/Formats
+		- settings
 		- tests
 		- sepa.php
 		- org.project60.sepacustom/sepacustom.php
