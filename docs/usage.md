@@ -26,6 +26,8 @@ When you click "Update One-Off" or "Update Recurring," CiviSEPA looks ahead base
 
 The "Close Group" action is your way of saying "this batch is ready to go to the bank." Once closed, the system generates the XML file your bank needs and locks the group to prevent accidental changes.
 
+Do not leave a group open past its submission deadline. The dashboard marks such groups as "missed", and CiviCRM's system status shows a warning listing them. Close and submit them with a new collection date, or delete them, before you run the update again. If the update does run while an overdue group is still open, a pending first collection is moved to the new collection date rather than being created a second time.
+
 ## Creating and Managing SEPA Mandates
 
 A SEPA mandate is essentially a permission slip from your supporter, allowing you to collect payments directly from their bank account. Think of it as a more sophisticated version of a standing order, but with better legal protections for both parties.
