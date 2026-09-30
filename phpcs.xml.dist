@@ -7,6 +7,7 @@
     <file>Civi</file>
     <file>CRM</file>
     <file>templates/Sepa/Formats</file>
+    <file>settings</file>
     <file>tests</file>
     <file>sepa.php</file>
     <file>org.project60.sepacustom/sepacustom.php</file>
