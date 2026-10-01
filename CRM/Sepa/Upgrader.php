@@ -622,6 +622,22 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_11308(): bool {
+    $this->ctx->log->info('Applying database migration 11308');
+    E::schema()->alterSchemaField(
+      'SepaMandate',
+      'is_enabled',
+      [
+        'sql_type' => 'boolean',
+        'required' => TRUE,
+        'default' => TRUE,
+      ],
+      'AFTER status'
+    );
+
+    return TRUE;
+  }
+
   /**
    * Helper for replacing deprecated core method
    */

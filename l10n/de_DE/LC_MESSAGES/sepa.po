@@ -2180,6 +2180,14 @@ msgid ""
 msgstr ""
 
 #: schema/SEPAMandate.entityType.php
+msgid "Is Enabled?"
+msgstr "Ist aktiviert?"
+
+#: schema/SEPAMandate.entityType.php
+msgid "If the mandate has been validated"
+msgstr "Wenn das Mandat validiert wurde"
+
+#: schema/SEPAMandate.entityType.php
 msgid "creation date"
 msgstr "Erstellungsdatum"
 
