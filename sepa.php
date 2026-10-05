@@ -18,11 +18,18 @@ declare(strict_types = 1);
 require_once 'sepa.civix.php';
 // phpcs:enable
 
+use Civi\Core\ClassScanner;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+function _sepa_composer_autoload(): void {
+  if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+  }
+}
 
 /**
  * Implements hook_civicrm_container().
@@ -30,6 +37,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_container/
  */
 function sepa_civicrm_container(ContainerBuilder $container): void {
+  _sepa_composer_autoload();
+
   if (class_exists('\Civi\Sepa\ContainerSpecs')) {
     $container->addCompilerPass(new \Civi\Sepa\ContainerSpecs(), PassConfig::TYPE_OPTIMIZE);
   }
@@ -43,6 +52,14 @@ function sepa_civicrm_container(ContainerBuilder $container): void {
     ->setPublic(TRUE);
 
   $container->autowire(SepaBatchLockManager::class)->setPublic(TRUE);
+}
+
+/**
+ * @param list<string> $classes
+ */
+function sepa_civicrm_scanClasses(array &$classes): void {
+  // @phpstan-ignore parameterByRef.type
+  ClassScanner::scanFolders($classes, __DIR__, 'Civi/Sepa/SpecProvider', '\\');
 }
 
 // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
@@ -146,7 +163,7 @@ function sepa_civicrm_pageRun(object $page): void {
         /** @var \CRM_Core_DAO $mandate_note_query */
         $mandate_note_query = CRM_Core_DAO::executeQuery(
           "SELECT note FROM civicrm_note
-            WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur' 
+            WHERE entity_id = {$contribution_recur_id} AND entity_table = 'civicrm_contribution_recur'
             ORDER BY modified_date DESC;"
         );
         while ($mandate_note_query->fetch()) {
@@ -172,6 +189,7 @@ function sepa_civicrm_buildForm(string $formName, object $form): void {
  * Implements hook_civicrm_config().
  */
 function sepa_civicrm_config(CRM_Core_Config $config): void {
+  _sepa_composer_autoload();
   _sepa_civix_civicrm_config($config);
 }
 
@@ -179,11 +197,6 @@ function sepa_civicrm_config(CRM_Core_Config $config): void {
  * Implements hook_civicrm_install().
  */
 function sepa_civicrm_install(): void {
-  $config = CRM_Core_Config::singleton();
-  //create the tables
-  $sqlfile = dirname(__FILE__) . '/sql/sepa.sql';
-  CRM_Utils_File::sourceSQLFile($config->dsn, $sqlfile, NULL, FALSE);
-
   _sepa_civix_civicrm_install();
 }
 
@@ -312,8 +325,7 @@ function sepa_civicrm_pre(string $op, string $objectName, ?int $id, array $param
 }
 
 /**
- * CiviCRM POST event: make sure the next collection date
- *   is adjusted according to the change
+ * Implements hook_civicrm_post().
  */
 function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
   if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
@@ -327,47 +339,6 @@ function sepa_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
     }
   }
 }
-
-/**
- * totten's addition
- */
-function sepa_civicrm_entityTypes(&$entityTypes): void {
-  // add my DAO's
-  $entityTypes[] = [
-    'name' => 'SepaMandate',
-    'class' => 'CRM_Sepa_DAO_SEPAMandate',
-    'table' => 'civicrm_sdd_mandate',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaCreditor',
-    'class' => 'CRM_Sepa_DAO_SEPACreditor',
-    'table' => 'civicrm_sdd_creditor',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaTransactionGroup',
-    'class' => 'CRM_Sepa_DAO_SEPATransactionGroup',
-    'table' => 'civicrm_sdd_txgroup',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaSddFile',
-    'class' => 'CRM_Sepa_DAO_SEPASddFile',
-    'table' => 'civicrm_sdd_file',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaContributionGroup',
-    'class' => 'CRM_Sepa_DAO_SEPAContributionGroup',
-    'table' => 'civicrm_sdd_contribution_txgroup',
-  ];
-  $entityTypes[] = [
-    'name' => 'SepaMandateLink',
-    'class' => 'CRM_Sepa_DAO_SepaMandateLink',
-    'table' => 'civicrm_sdd_entity_mandate',
-  ];
-}
-
-/**
- * Implements hook_civicrm_config().
- */
 
 /**
  * Implements hook_civicrm_navigationMenu().

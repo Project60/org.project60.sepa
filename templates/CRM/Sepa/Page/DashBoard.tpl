@@ -13,48 +13,50 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 <div class="crm-actions-ribbon">
   <ul id="actions">
   {if $status eq 'closed'}
     <li>
-      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}show active groups{/ts}" class="search button" href="{$show_open_url}">
+      <a title="{ts escape='htmlattribute'}show active groups{/ts}" class="search button" href="{$show_open_url}">
         <span>
           <div class="icon inform-icon"></div>
-          {ts domain="org.project60.sepa"}show active groups{/ts}
+          {ts}show active groups{/ts}
         </span>
       </a>
     </li>
   {else}
     <li>
-      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
+      <a title="{ts escape='htmlattribute'}show closed groups{/ts}" class="search button" href="{$show_closed_url}">
         <span>
           <div class="icon inform-icon"></div>
-          {ts domain="org.project60.sepa"}show closed groups{/ts}
+          {ts}show closed groups{/ts}
         </span>
       </a>
     <li>
     {if $can_batch}
     <li>
-      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
+      <a title="{ts escape='htmlattribute'}update one-off{/ts}" class="refresh button" href="{$batch_ooff}">
         <span>
           <div class="icon refresh-icon ui-icon-refresh"></div>
-          {ts domain="org.project60.sepa"}update one-off{/ts}
+          {ts}update one-off{/ts}
         </span>
       </a>
     </li>
     <li>
-      <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
+      <a title="{ts escape='htmlattribute'}update recurring{/ts}" class="refresh button" href="{$batch_recur}">
         <span>
           <div class="icon refresh-icon ui-icon-refresh"></div>
-          {ts domain="org.project60.sepa"}update recurring{/ts}
+          {ts}update recurring{/ts}
         </span>
       </a>
     </li>
       <li>
-        <a title="{ts escape='htmlattribute' domain="org.project60.sepa"}retry collection{/ts}" class="refresh button" href="{$batch_retry}">
+        <a title="{ts escape='htmlattribute'}retry collection{/ts}" class="refresh button" href="{$batch_retry}">
         <span>
           <div class="icon refresh-icon  ui-icon-circle-plus"></div>
-          {ts domain="org.project60.sepa"}retry collection{/ts}
+          {ts}retry collection{/ts}
         </span>
         </a>
       </li>
@@ -72,13 +74,13 @@
 
 <table>
   <tr>
-    <th>{ts domain="org.project60.sepa"}Group Name{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Type{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Submission{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Collection{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Transactions{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Total{/ts}</th>
+    <th>{ts}Group Name{/ts}</th>
+    <th>{ts}Status{/ts}</th>
+    <th>{ts}Type{/ts}</th>
+    <th>{ts}Submission{/ts}</th>
+    <th>{ts}Collection{/ts}</th>
+    <th>{ts}Transactions{/ts}</th>
+    <th>{ts}Total{/ts}</th>
     <th></th>
   </tr>
   {foreach from=$groups item=group}
@@ -87,8 +89,8 @@
   <tr bgcolor="#FF0000" class="status_{$group.status_id} submit_{$group.submit}" data-id="{$group.id}" data-type="{$group.type}">
     <td title="id {$group.id}" class="nb_contrib">
       {$group.reference}
-      {if $group.transaction_message}<span class="crm-i fa-envelope-o" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Custom Transaction Message:{/ts} {$group.transaction_message}"></span>{/if}
-      {if $group.transaction_note}<span class="crm-i fa-sticky-note" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Note:{/ts} {$group.transaction_note}"></span>{/if}
+      {if $group.transaction_message}<span class="crm-i fa-envelope-o" title="{ts escape='htmlattribute'}Custom Transaction Message:{/ts} {$group.transaction_message}"></span>{/if}
+      {if $group.transaction_note}<span class="crm-i fa-sticky-note" title="{ts escape='htmlattribute'}Note:{/ts} {$group.transaction_note}"></span>{/if}
     </td>
     <td>
       {$group.status_label}
@@ -106,7 +108,7 @@
     </td>
     <td style="white-space:nowrap;">{$group.total|crmMoney:$group.currency}</td>
     <td>
-      <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Contributions{/ts}</a>
+      <a href="{crmURL p="civicrm/sepa/listgroup" q="group_id=$group_id"}" class="button button_view">{ts}Contributions{/ts}</a>
       {if $group.status == 'open'}
         {if $can_batch}
           {if $group.submit == 'missed'}
@@ -114,18 +116,18 @@
           {else}
             <a href="{crmURL p="civicrm/sepa/closegroup" q="group_id=$group_id"}" class="button button_close">
           {/if}
-          {ts domain="org.project60.sepa"}Close and Submit{/ts}</a>
+          {ts}Close and Submit{/ts}</a>
         {/if}
       {else}
-        <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}" class="button button_export">{ts domain="org.project60.sepa"}Download Again{/ts}</a>
+        <a href="{crmURL p="civicrm/sepa/xml" q="id=$file_id"}" download="{$group.file}" class="button button_export">{ts}Download Again{/ts}</a>
         {if $closed_status_id eq $group.status_id}
           {if not $group.collection_date_in_future}
-            <a href="{crmURL p="civicrm/sepa/mark_received" q="group_id=$group_id"}" class="button button_received">{ts domain="org.project60.sepa"}Mark Received{/ts}</a>
+            <a href="{crmURL p="civicrm/sepa/mark_received" q="group_id=$group_id"}" class="button button_received">{ts}Mark Received{/ts}</a>
           {/if}
         {/if}
       {/if}
       {if $can_delete}
-      <a href="{crmURL p="civicrm/sepa/deletegroup" q="group_id=$group_id"}" class="button button_view">{ts domain="org.project60.sepa"}Delete{/ts}</a>
+      <a href="{crmURL p="civicrm/sepa/deletegroup" q="group_id=$group_id"}" class="button button_view">{ts}Delete{/ts}</a>
       {/if}
     </td>
   </tr>
@@ -135,30 +137,30 @@
 {* legend by @scardinius *}
 <br/>
 <table>
-  <caption>{ts domain="org.project60.sepa"}Legend{/ts}</caption>
+  <caption>{ts}Legend{/ts}</caption>
   <tr>
-    <th>{ts domain="org.project60.sepa"}Status{/ts}</th>
-    <th>{ts domain="org.project60.sepa"}Description{/ts}</th>
+    <th>{ts}Status{/ts}</th>
+    <th>{ts}Description{/ts}</th>
   </tr>
   <tr class="submit_missed">
-    <td>{ts domain="org.project60.sepa"}Missed{/ts}</td>
-    <td>{ts domain="org.project60.sepa"}Submission date has passed!{/ts}</td>
+    <td>{ts}Missed{/ts}</td>
+    <td>{ts}Submission date has passed!{/ts}</td>
   </tr>
   <tr class="submit_urgently">
-    <td>{ts domain="org.project60.sepa"}Urgent{/ts}</td>
-    <td>{ts domain="org.project60.sepa"}Submission date is immanent, you have to close group and upload file to creditor today!{/ts}</td>
+    <td>{ts}Urgent{/ts}</td>
+    <td>{ts}Submission date is immanent, you have to close group and upload file to creditor today!{/ts}</td>
   </tr>
   <tr class="submit_soon">
-    <td>{ts domain="org.project60.sepa"}Soon{/ts}</td>
-    <td>{ts domain="org.project60.sepa"}Submission within 6 days or OOFF (submission not enforced){/ts}</td>
+    <td>{ts}Soon{/ts}</td>
+    <td>{ts}Submission within 6 days or OOFF (submission not enforced){/ts}</td>
   </tr>
   <tr class="submit_later">
-    <td>{ts domain="org.project60.sepa"}Upcoming{/ts}</td>
-    <td>{ts domain="org.project60.sepa"}Submission date more than 6 days from now{/ts}</td>
+    <td>{ts}Upcoming{/ts}</td>
+    <td>{ts}Submission date more than 6 days from now{/ts}</td>
   </tr>
   <tr class="submit_closed">
-    <td>{ts domain="org.project60.sepa"}Closed{/ts}</td>
-    <td>{ts domain="org.project60.sepa"}The group is closed and uploaded to creditor, submission date is in the past.{/ts}</td>
+    <td>{ts}Closed{/ts}</td>
+    <td>{ts}The group is closed and uploaded to creditor, submission date is in the past.{/ts}</td>
   </tr>
 </table>
 
@@ -173,7 +175,7 @@
 {/literal}
 
 <script type="text/javascript">
-let received_confirmation_message = `{ts domain="org.project60.sepa"}Do you really want to mark this groups as 'payment received'?{/ts}`;
+let received_confirmation_message = `{ts}Do you really want to mark this groups as 'payment received'?{/ts}`;
 
 {literal}
 function mark_received(group_id) {
@@ -195,3 +197,5 @@ function mark_received(group_id) {
 }
 </script>
 {/literal}
+
+{/crmScope}

@@ -2,12 +2,6 @@ includes:
 	- phpstan.neon.dist
 
 parameters:
-	scanDirectories:
-		- vendor/civicrm/civicrm-core/api
-		- vendor/civicrm/civicrm-core/CRM
-		- vendor/civicrm/civicrm-packages/HTML
-	scanFiles:
-		- vendor/civicrm/civicrm-packages/DB/DataObject.php
 	bootstrapFiles:
 		- vendor/autoload.php
 	# Because we test with different versions in CI we may have unmatched errors.

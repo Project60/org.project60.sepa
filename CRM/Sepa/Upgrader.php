@@ -24,13 +24,6 @@ use CRM_Sepa_ExtensionUtil as E;
 class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
-   * Installation
-   */
-  public function install(): void {
-    $this->executeSqlFile('sql/sepa.sql');
-  }
-
-  /**
    * Example: Work with entities usually not available during the install step.
    *
    * This method can be used for any post-install tasks. For example, if a step
@@ -578,6 +571,45 @@ class CRM_Sepa_Upgrader extends CRM_Extension_Upgrader_Base {
     $this->ctx->log->info('SIX Interbank pain.008.001.02 CH-TA LSV+ format');
     $customData = new CRM_Sepa_CustomData(E::LONG_NAME);
     $customData->syncOptionGroup(E::path('resources/formats_option_group.json'));
+
+    return TRUE;
+  }
+
+  public function upgrade_11304(): bool {
+    return TRUE;
+  }
+
+  public function upgrade_11305(): bool {
+    $this->ctx->log->info('Update database schema');
+
+    E::schema()->alterSchemaField('SepaMandate', 'source', [
+      'sql_type' => 'varchar(255)',
+    ], NULL);
+
+    E::schema()->alterSchemaField('SepaMandateLink', 'class', [
+      'sql_type' => 'varchar(100)',
+      'required' => TRUE,
+    ], NULL);
+
+    E::schema()->alterSchemaField('SepaMandateLink', 'creation_date', [
+      'sql_type' => 'datetime',
+      'required' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP',
+    ], NULL);
+
+    return TRUE;
+  }
+
+  public function upgrade_11306(): bool {
+    $this->ctx->log->info('Update database schema');
+
+    E::schema()->alterSchemaField('SepaCreditor', 'payment_processor_id', [
+      'sql_type' => 'int unsigned',
+      'entity_reference' => [
+        'entity' => 'PaymentProcessor',
+        'key' => 'id',
+      ],
+    ], NULL);
 
     return TRUE;
   }

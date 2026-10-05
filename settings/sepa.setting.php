@@ -12,12 +12,13 @@
 | written permission from the original author(s).        |
 +--------------------------------------------------------*/
 
-/*
-* Settings metadata file
-*/
+declare(strict_types = 1);
 
-return array(
-  'allow_mandate_modification' => array(
+/*
+ * Settings metadata file
+ */
+return [
+  'allow_mandate_modification' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'allow_mandate_modification',
@@ -29,10 +30,10 @@ return array(
     'title' => 'allow SEPA mandate modifications',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => "Set this value to Yes if you want want to allow SEPA mandate modifications",
-    'help_text' => "Set this value to Yes if you want want to allow SEPA mandate modifications",
-  ),
-  'batching_default_creditor' => array(
+    'description' => 'Set this value to Yes if you want want to allow SEPA mandate modifications',
+    'help_text' => 'Set this value to Yes if you want want to allow SEPA mandate modifications',
+  ],
+  'batching_default_creditor' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_default_creditor',
@@ -44,212 +45,212 @@ return array(
     'is_contact' => 0,
     'description' => 'Default Creditor',
     'help_text' => 'This creditor will be used when no other creditor is explicitely set',
-  ),
-  'batching_OOFF_horizon_override' => array(
+  ],
+  'batching_OOFF_horizon_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_OOFF_horizon_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'OOFF Horizon override',
     'help_text' => 'OOFF horizon override',
-  ),
-  'cycledays_override' => array(
+  ],
+  'cycledays_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'cycledays_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'cycle days override',
     'help_text' => 'cycle days override',
-  ),
-  'cycledays' => array(
+  ],
+  'cycledays' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'cycledays',
     'type' => 'String',
-    'default' => "",
+    'default' => '',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'cycle days override',
     'help_text' => 'cycle days override',
-  ),
-  'batching_OOFF_notice_override' => array(
+  ],
+  'batching_OOFF_notice_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_OOFF_notice_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'OOFF Notice override',
     'help_text' => 'OOFF notice override',
-  ),
-  'batching_RCUR_horizon_override' => array(
+  ],
+  'batching_RCUR_horizon_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_RCUR_horizon_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'RCUR horizon override',
     'help_text' => 'RCUR horizon override',
-  ),
-  'batching_RCUR_grace_override' => array(
+  ],
+  'batching_RCUR_grace_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_RCUR_grace_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'RCUR grace override',
     'help_text' => 'RCUR grace override',
-  ),
-  'batching_RCUR_notice_override' => array(
+  ],
+  'batching_RCUR_notice_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_RCUR_notice_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'RCUR notice override',
     'help_text' => 'RCUR notice override',
-  ),
-  'batching_FRST_notice_override' => array(
+  ],
+  'batching_FRST_notice_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_FRST_notice_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'FRST notice override',
     'help_text' => 'FRST notice override',
-  ),
-  'batching_OOFF_horizon' => array(
+  ],
+  'batching_OOFF_horizon' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_OOFF_horizon',
     'type' => 'String',
-    'default' => "30",
+    'default' => '30',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'OOFF Horizon',
     'help_text' => 'OOFF horizon',
-  ),
-  'batching_OOFF_notice' => array(
+  ],
+  'batching_OOFF_notice' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_OOFF_notice',
     'type' => 'String',
-    'default' => "6",
+    'default' => '6',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'OOFF Notice',
     'help_text' => 'OOFF notice',
-  ),
-  'batching_RCUR_horizon' => array(
+  ],
+  'batching_RCUR_horizon' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_RCUR_horizon',
     'type' => 'String',
-    'default' => "30",
+    'default' => '30',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'RCUR horizon',
     'help_text' => 'RCUR horizon',
-  ),
-  'batching_RCUR_grace' => array(
+  ],
+  'batching_RCUR_grace' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_RCUR_grace',
     'type' => 'String',
-    'default' => "14",
+    'default' => '14',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'RCUR grace',
     'help_text' => 'RCUR grace',
-  ),
-  'batching_RCUR_notice' => array(
+  ],
+  'batching_RCUR_notice' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_RCUR_notice',
     'type' => 'String',
-    'default' => "6",
+    'default' => '6',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'RCUR notice',
     'help_text' => 'RCUR notice',
-  ),
-  'batching_FRST_notice' => array(
+  ],
+  'batching_FRST_notice' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_FRST_notice',
     'type' => 'String',
-    'default' => "6",
+    'default' => '6',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'FRST notice',
     'help_text' => 'FRST notice',
-  ),
-  'batching_UPDATE_lock_timeout' => array(
+  ],
+  'batching_UPDATE_lock_timeout' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'batching_UPDATE_lock_timeout',
     'type' => 'String',
-    'default' => "180",
+    'default' => '180',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'UPDATE lock timeout',
     'help_text' => 'UPDATE lock timeout',
-  ),
-  'custom_txmsg' => array(
+  ],
+  'custom_txmsg' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'custom_txmsg',
     'type' => 'String',
-    'default' => "Thank you.",
+    'default' => 'Thank you.',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Transaction message',
     'help_text' => 'Transaction message',
-  ),
-  'custom_txmsg_override' => array(
+  ],
+  'custom_txmsg_override' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'custom_txmsg_override',
     'type' => 'String',
-    'default' => "undefined",
+    'default' => 'undefined',
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Transaction message override',
     'help_text' => 'Transaction message override',
-  ),
-  'exclude_weekends' => array(
+  ],
+  'exclude_weekends' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'exclude_weekends',
@@ -261,8 +262,8 @@ return array(
     'is_contact' => 0,
     'description' => 'Exclude weekends',
     'help_text' => 'Exclude weekends',
-  ),
-  'sdd_async_batching' => array(
+  ],
+  'sdd_async_batching' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'sdd_async_batching',
@@ -272,8 +273,8 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Enables asychronous batching',
-  ),
-  'sdd_financial_type_grouping' => array(
+  ],
+  'sdd_financial_type_grouping' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'sdd_financial_type_grouping',
@@ -283,8 +284,8 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Groups by Financial Types.',
-  ),
-  'sdd_skip_closed' => array(
+  ],
+  'sdd_skip_closed' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'sdd_skip_closed',
@@ -294,8 +295,8 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Skip status closed for SEPA collection groups',
-  ),
-  'sdd_no_draft_xml' => array(
+  ],
+  'sdd_no_draft_xml' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'sdd_no_draft_xml',
@@ -305,8 +306,8 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => "Don't allow XML download unless the group is closed",
-  ),
-  'pp_buffer_days' => array(
+  ],
+  'pp_buffer_days' => [
     'group_name' => 'SEPA Direct Debit Preferences',
     'group' => 'org.project60',
     'name' => 'pp_buffer_days',
@@ -316,7 +317,7 @@ return array(
     'add' => '4.3',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => "Contribution page buffer (in days) before debit needs to be collected",
-    'help_text' => "Contribution page buffer (in days) before debit needs to be collected",
-  )
- );
+    'description' => 'Contribution page buffer (in days) before debit needs to be collected',
+    'help_text' => 'Contribution page buffer (in days) before debit needs to be collected',
+  ],
+];

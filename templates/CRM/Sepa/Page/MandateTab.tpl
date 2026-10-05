@@ -12,6 +12,8 @@
 | written permission from the original author(s).        |
 +-------------------------------------------------------*}
 
+{crmScope extensionKey='org.project60.sepa'}
+
 {literal}
 <style>
   tr.sepa-inactive td {
@@ -23,26 +25,26 @@
 {* add new mandate button *}
 {if $permissions.create}
   <div>
-    <a id="sepa_payment_extra_button" class="button crm-popup" href="{crmURL p="civicrm/sepa/createmandate" q="action=update&cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts domain="org.project60.sepa"}Add new SEPA Mandate{/ts}</span></a>
+    <a id="sepa_payment_extra_button" class="button crm-popup" href="{crmURL p="civicrm/sepa/createmandate" q="action=update&cid=$contact_id"}"><span><div class="icon add-icon ui-icon-circle-plus"></div>{ts}Add new SEPA Mandate{/ts}</span></a>
     <br/>
     <br/>
   </div>
 {/if}
 
 {if $rcurs}
-<h3>{ts domain="org.project60.sepa"}Recurring SEPA Mandates{/ts}</h3>
+<h3>{ts}Recurring SEPA Mandates{/ts}</h3>
 <table>
   <thead>
     <tr class="columnheader">
-      <td>{ts domain="org.project60.sepa"}Start Date{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Status{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Type{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Reference{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Installs{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Annual Amount{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Last Collection{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Next Collection{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}End Date{/ts}</td>
+      <td>{ts}Start Date{/ts}</td>
+      <td>{ts}Status{/ts}</td>
+      <td>{ts}Type{/ts}</td>
+      <td>{ts}Reference{/ts}</td>
+      <td>{ts}Installs{/ts}</td>
+      <td>{ts}Annual Amount{/ts}</td>
+      <td>{ts}Last Collection{/ts}</td>
+      <td>{ts}Next Collection{/ts}</td>
+      <td>{ts}End Date{/ts}</td>
       <td></td>
     </tr>
   </thead>
@@ -69,10 +71,10 @@
       <td>
         <span>
           {if $permissions.view}
-            <a href="{$rcur.view_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute' domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
+            <a href="{$rcur.view_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute'}View Mandate{/ts}">{ts}View{/ts}</a>
           {/if}
           {if $permissions.edit && $rcur.edit_link}
-            <a href="{$rcur.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+            <a href="{$rcur.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute'}Edit Mandate{/ts}">{ts}Edit{/ts}</a>
           {/if}
         </span>
       </td>
@@ -82,23 +84,23 @@
 </table>
 {else}
 <div id="help">
-{ts domain="org.project60.sepa"}This contact has no recorded recurring mandates.{/ts}
+{ts}This contact has no recorded recurring mandates.{/ts}
 {if $financialacls}
-  {ts domain="org.project60.sepa"}Note that only mandates associated with contributions of authorized financial types are being displayed.{/ts}
+ {ts}Note that only mandates associated with contributions of authorized financial types are being displayed.{/ts}
 {/if}
 </div>
 {/if}
 
 {if $ooffs}
-<h3>{ts domain="org.project60.sepa"}One-Off SEPA Mandates{/ts}</h3>
+<h3>{ts}One-Off SEPA Mandates{/ts}</h3>
 <table>
   <thead>
     <tr class="columnheader">
-      <td>{ts domain="org.project60.sepa"}Collection Date{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Status{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Type{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Reference{/ts}</td>
-      <td>{ts domain="org.project60.sepa"}Amount{/ts}</td>
+      <td>{ts}Collection Date{/ts}</td>
+      <td>{ts}Status{/ts}</td>
+      <td>{ts}Type{/ts}</td>
+      <td>{ts}Reference{/ts}</td>
+      <td>{ts}Amount{/ts}</td>
       <td></td>
     </tr>
   </thead>
@@ -114,10 +116,10 @@
       <td>
         <span>
           {if $permissions.view}
-            <a href="{$ooff.view_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute' domain="org.project60.sepa"}View Mandate{/ts}">{ts domain="org.project60.sepa"}View{/ts}</a>
+            <a href="{$ooff.view_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute'}View Mandate{/ts}">{ts}View{/ts}</a>
           {/if}
           {if $permissions.edit && $ooff.edit_link}
-            <a href="{$ooff.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute' domain="org.project60.sepa"}Edit Mandate{/ts}">{ts domain="org.project60.sepa"}Edit{/ts}</a>
+            <a href="{$ooff.edit_link}" class="action-item crm-hover-button crm-popup" title="{ts escape='htmlattribute'}Edit Mandate{/ts}">{ts}Edit{/ts}</a>
           {/if}
         </span>
       </td>
@@ -127,9 +129,9 @@
 </table>
 {else}
 <div id="help">
-{ts domain="org.project60.sepa"}This contact has no recorded one-off mandates.{/ts}
+{ts}This contact has no recorded one-off mandates.{/ts}
 {if $financialacls}
-  {ts domain="org.project60.sepa"}Note that only mandates associated with contributions of authorized financial types are being displayed.{/ts}
+ {ts}Note that only mandates associated with contributions of authorized financial types are being displayed.{/ts}
 {/if}
 </div>
 {/if}
@@ -147,3 +149,5 @@
   });
   {/literal}
 </script>
+
+{/crmScope}

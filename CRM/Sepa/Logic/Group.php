@@ -16,6 +16,8 @@
 
 declare(strict_types = 1);
 
+use Civi\Api4\SepaMandate;
+use Civi\Sepa\Contribution\CollectOutstandingHelper;
 use Civi\Sepa\Lock\SepaBatchLockManager;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -29,6 +31,7 @@ class CRM_Sepa_Logic_Group {
    * and perform the necessary logical changes to the mandates contained
    *
    * @return null|string error message, unless successful
+   * @throws \CRM_Core_Exception
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   public static function close(int $txgroup_id): ?string {
@@ -63,19 +66,33 @@ class CRM_Sepa_Logic_Group {
     }
 
     // step 2: update the mandates
-    if ($txgroup['type'] == 'OOFF') {
-      // OOFFs get new status 'SENT'
-      $sql = "
-      UPDATE civicrm_sdd_mandate AS mandate
-      SET status='SENT'
-      WHERE mandate.entity_table = 'civicrm_contribution'
-        AND mandate.entity_id IN (SELECT contribution_id
-                                  FROM civicrm_sdd_contribution_txgroup
-                                  WHERE txgroup_id=$txgroup_id);";
-      CRM_Core_DAO::executeQuery($sql);
+    if ($txgroup['type'] === 'OOFF') {
+      /** @var list<int> $mandateIds */
+      $mandateIds = SepaMandate::get(FALSE)
+        ->addSelect('id')
+        ->addJoin(
+          'SepaContributionGroup AS sepa_contribution_group',
+          'INNER',
+          NULL,
+          ['sepa_contribution_group.txgroup_id', '=', $txgroup_id],
+          ['sepa_contribution_group.contribution_id', '=', 'entity_id']
+        )
+        ->addWhere('entity_table', '=', 'civicrm_contribution')
+        ->execute()
+        ->column('id');
 
+      if ([] !== $mandateIds) {
+        // OOFFs get new status 'SENT'
+        SepaMandate::update(FALSE)
+          ->addValue('status', 'SENT')
+          ->addWhere('id', 'IN', $mandateIds)
+          ->execute();
+
+        $collectOutstandingHelper = new CollectOutstandingHelper();
+        $collectOutstandingHelper->cancelLinkedOutstandingContributions($mandateIds);
+      }
     }
-    elseif ($txgroup['type'] == 'FRST') {
+    elseif ($txgroup['type'] === 'FRST') {
       // update first_contribution and status
       $sql = "
         UPDATE civicrm_sdd_mandate
@@ -111,14 +128,13 @@ class CRM_Sepa_Logic_Group {
               AND civicrm_sdd_contribution_txgroup.txgroup_id = {$txgroup_id}";
         CRM_Core_DAO::executeQuery($sql);
       }
-
     }
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedElseif
-    elseif ($txgroup['type'] == 'RCUR') {
+    elseif ($txgroup['type'] === 'RCUR') {
       // AFAIK there's nothing to do for RCURs...
     }
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedElseif
-    elseif ($txgroup['type'] == 'RTRY') {
+    elseif ($txgroup['type'] === 'RTRY') {
       // AFAIK there's nothing to do for RTRYs...
     }
     else {
