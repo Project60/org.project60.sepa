@@ -19,7 +19,6 @@ declare(strict_types = 1);
 use CRM_Sepa_ExtensionUtil as E;
 use Civi\Api4\SepaTransactionGroup;
 use Civi\Api4\Contribution;
-use Civi\Api4\SepaMandate;
 
 /**
  * back office sepa group content viewer
@@ -82,8 +81,15 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         'mandate.iban',
       )
       ->addJoin('SepaTransactionGroup AS sepa_transaction_group', 'INNER', 'SepaContributionGroup');
-    if ($txGroup['type'] !== 'OOFF') {
-      // This is a recurring a group.
+    if ($txGroup['type'] === 'OOFF') {
+      // This is a ONE-OFF group.
+      $contributionApi->addJoin('SepaMandate AS mandate', 'LEFT', NULL,
+        ['mandate.entity_table', '=', 'civicrm_contribution', FALSE],
+        ['mandate.entity_id', '=', 'id', TRUE]
+      );
+    }
+    else {
+      // This is a recurring group.
       $contributionApi->addJoin('SepaMandate AS mandate', 'LEFT', NULL,
         ['mandate.entity_table', '=', 'civicrm_contribution_recur', FALSE],
         ['mandate.entity_id', '=', 'contribution_recur_id', TRUE]
@@ -95,23 +101,6 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
     $statusStats = [];
     $contributions = [];
     foreach ($result as $contribution) {
-      if ($txGroup['type'] === 'OOFF') {
-        // For one off's we have to fetch the mandate per contribution
-        // There is an issue with Join between Contribution and Sepa Mandate
-        // CiviCRM core adds a join on first_contribution_id as well.
-        try {
-          $mandate = SepaMandate::get(FALSE)
-            ->addWhere('entity_table', '=', 'civicrm_contribution')
-            ->addWhere('entity_id', '=', $contribution['id'])
-            ->execute()
-            ->single();
-          $contribution['mandate.reference'] = $mandate['reference'];
-          $contribution['mandate.iban'] = $mandate['iban'];
-        }
-        catch (\Exception $e) {
-          // @ignoreException
-        }
-      }
       $contributions[] = [
         'contact_display_name' => $contribution['contact_id.display_name'],
         'contact_type' => $contribution['contact_id.contact_type'],
