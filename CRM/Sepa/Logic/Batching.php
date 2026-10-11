@@ -240,8 +240,8 @@ class CRM_Sepa_Logic_Batching {
         if ([] === $unmatchedRecurIds) {
           continue;
         }
-        /** @var list<array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool, "txg.id": int}> $pendingInstallments */
-        $pendingInstallments = Contribution::get(FALSE)
+        /** @var list<array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool, "txg.id": int}> $pendingFrstInstallments */
+        $pendingFrstInstallments = Contribution::get(FALSE)
           ->addSelect('id', 'contribution_recur_id', 'sepa_contribution.is_on_hold', 'txg.id')
           ->addJoin('SepaContributionGroup AS ctxg', 'INNER', NULL, ['ctxg.contribution_id', '=', 'id'])
           ->addJoin('SepaTransactionGroup AS txg', 'INNER', NULL, ['txg.id', '=', 'ctxg.txgroup_id'])
@@ -255,30 +255,30 @@ class CRM_Sepa_Logic_Batching {
           ->addOrderBy('id')
           ->execute()
           ->getArrayCopy();
-        /** @var array<int, list<array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool, "txg.id": int}>> $pendingByRecurId */
-        $pendingByRecurId = [];
-        foreach ($pendingInstallments as $installment) {
-          $pendingByRecurId[$installment['contribution_recur_id']][] = $installment;
+        /** @var array<int, list<array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool, "txg.id": int}>> $pendingFrstInstallmentsByRecurId */
+        $pendingFrstInstallmentsByRecurId = [];
+        foreach ($pendingFrstInstallments as $installment) {
+          $pendingFrstInstallmentsByRecurId[$installment['contribution_recur_id']][] = $installment;
         }
-        foreach ($pendingByRecurId as $recurId => $installments) {
+        foreach ($pendingFrstInstallmentsByRecurId as $recurId => $installments) {
           if (count($installments) > 1) {
             // ambiguous: neither guess nor add another one
             $where = implode(', ', array_map(
-              fn(array $i) => "contribution {$i['id']} in group {$i['txg.id']}",
+              fn(array $installment) => "contribution {$installment['id']} in group {$installment['txg.id']}",
               $installments
             ));
             Civi::log()->warning(
               "org.project60.sepa: batching: recurring contribution $recurId has several pending first "
               . "installments in open groups ($where), skipped."
             );
-            foreach ($mandatesByCollectionDateAndFinancialTypeId[$collectionDate] as &$mandates) {
-              $mandates = array_values(array_filter(
+            $mandatesByCollectionDateAndFinancialTypeId[$collectionDate] = array_map(
+              fn(array $mandates) => array_values(array_filter(
                 $mandates,
-                /** @param array<string, mixed> $m */
-                fn(array $m) => $m['entity_id'] !== $recurId
-              ));
-            }
-            unset($mandates);
+                /** @param array<string, mixed> $mandate */
+                fn(array $mandate) => $mandate['entity_id'] !== $recurId
+              )),
+              $mandatesByCollectionDateAndFinancialTypeId[$collectionDate]
+            );
             continue;
           }
           $installment = $installments[0];
