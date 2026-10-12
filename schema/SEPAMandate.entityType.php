@@ -147,6 +147,14 @@ return [
       'description' => E::ts('Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, ONHOLD)'),
       'default' => 'INIT',
     ],
+    'is_enabled' => [
+      'title' => E::ts('Is Enabled?'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'default' => TRUE,
+      'description' => E::ts('If the mandate has been validated'),
+    ],
     'creation_date' => [
       'title' => E::ts('creation date'),
       'sql_type' => 'datetime',

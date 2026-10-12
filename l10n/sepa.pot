@@ -1851,6 +1851,14 @@ msgid "Status of the mandate (INIT, OOFF, FRST, RCUR, SENT, INVALID, COMPLETE, O
 msgstr ""
 
 #: schema/SEPAMandate.entityType.php
+msgid "Is Enabled?"
+msgstr ""
+
+#: schema/SEPAMandate.entityType.php
+msgid "If the mandate has been validated"
+msgstr ""
+
+#: schema/SEPAMandate.entityType.php
 msgid "creation date"
 msgstr ""
 

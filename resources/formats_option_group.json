@@ -155,6 +155,15 @@
       "filter": "0",
       "is_reserved": "1",
       "is_active": "1"
+    },
+    {
+      "_lookup": ["name"],
+      "_translate": ["label"],
+      "label": "pain.008.001.08 (ISO 20022/official SEPA guidelines)",
+      "name": "pain.008.001.08",
+      "filter": "0",
+      "is_reserved": "1",
+      "is_active": "1"
     }
   ]
 }
