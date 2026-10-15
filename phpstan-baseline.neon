@@ -121,12 +121,6 @@ parameters:
 			path: CRM/Sepa/BAO/SEPAMandate.php
 
 		-
-			message: '#^Cannot access offset ''error_message'' on array\|int\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: CRM/Sepa/BAO/SEPAMandate.php
-
-		-
 			message: '#^Cannot access offset ''title'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 2
@@ -158,7 +152,7 @@ parameters:
 
 		-
 			message: '#^Do not throw the \\Exception base class\.$#'
-			count: 9
+			count: 8
 			path: CRM/Sepa/BAO/SEPAMandate.php
 
 		-
