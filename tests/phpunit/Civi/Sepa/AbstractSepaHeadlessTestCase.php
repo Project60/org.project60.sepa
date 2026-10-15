@@ -27,6 +27,17 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractSepaHeadlessTestCase extends TestCase implements HeadlessInterface, TransactionalInterface {
 
+  public static function setUpBeforeClass(): void {
+    parent::setUpBeforeClass();
+    /** @see \CRM_Utils_Time */
+    putenv('TIME_FUNC=frozen');
+  }
+
+  public static function tearDownAfterClass(): void {
+    parent::tearDownAfterClass();
+    \CRM_Utils_Time::resetTime();
+  }
+
   public function setUpHeadless(): CiviEnvBuilder {
     return Test::headless()
       ->installMe(__DIR__)

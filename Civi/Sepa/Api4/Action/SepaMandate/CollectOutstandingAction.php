@@ -34,6 +34,22 @@ use CRM_Sepa_ExtensionUtil as E;
  * on hold contributions that aren't associated with a OOFF
  * mandate created this way. If there are no such contributions no
  * mandate will be created.
+ *
+ * If there's a replacement mandate its bank account will be used,
+ * otherwise the bank account of the mandate with the outstanding
+ * amounts.
+ *
+ * @phpstan-type mandateT array{
+ *   id: int,
+ *   reference: string,
+ *   creditor_id: ?int,
+ *   contact_id: ?int,
+ *   type: string,
+ *   entity_id: ?int,
+ *   account_holder: ?string,
+ *   iban: ?string,
+ *   bic: ?string,
+ * }
  */
 class CollectOutstandingAction extends AbstractBatchAction {
 
@@ -61,29 +77,11 @@ class CollectOutstandingAction extends AbstractBatchAction {
    * @throws \CRM_Core_Exception
    */
   private function doRun(Result $result): void {
-    /** @var array{
-     *   id: int,
-     *   reference: string,
-     *   creditor_id: ?int,
-     *   contact_id: ?int,
-     *   type: string,
-     *   entity_id: ?int,
-     *   account_holder: ?string,
-     *   iban: ?string,
-     *   bic: ?string,
-     * } $mandate
-     */
+    /** @phpstan-var mandateT $mandate */
     foreach ($this->getBatchRecords() as $mandate) {
       if ('RCUR' !== $mandate['type'] || NULL === $mandate['entity_id']) {
         continue;
       }
-
-      /** @var array{financial_type_id: positive-int, payment_instrument_id: positive-int, campaign_id?: ?positive-int} $contributionRecur */
-      $contributionRecur = ContributionRecur::get(FALSE)
-        ->addSelect('financial_type_id', 'payment_instrument_id', 'campaign_id')
-        ->addWhere('id', '=', $mandate['entity_id'])
-        ->execute()
-        ->single();
 
       $collectOutstandingHelper = new CollectOutstandingHelper();
       $contributions = $collectOutstandingHelper->getOutstandingContributions($mandate['entity_id']);
@@ -93,27 +91,8 @@ class CollectOutstandingAction extends AbstractBatchAction {
         continue;
       }
 
-      $creditorId = $mandate['creditor_id'] ?? $this->getDefaultCreditorId();
-      $paymentInstrumentDeterminer = new PaymentInstrumentDeterminer();
-
-      $ooffMandate = SepaMandate::createFull(FALSE)
-        ->setValues([
-          'creditor_id' => $creditorId,
-          'type' => 'OOFF',
-          'source' => E::ts('Outstanding amounts of mandate %1', [1 => $mandate['reference']]),
-          'contact_id' => $mandate['contact_id'],
-          'financial_type_id' => $contributionRecur['financial_type_id'],
-          'payment_instrument_id' => $paymentInstrumentDeterminer->determineCollectOutstandingPaymentInstrument(
-            $creditorId,
-            $contributionRecur['payment_instrument_id']
-          ),
-          'account_holder' => $mandate['account_holder'],
-          'iban' => $mandate['iban'],
-          'bic' => $mandate['bic'],
-          'amount' => $amount,
-        ])
-        ->execute()
-        ->single();
+      $replacementMandate = $this->getReplacementMandate($mandate['id']);
+      $ooffMandate = $this->createOoffMandate($mandate['reference'], $replacementMandate ?? $mandate, $amount);
 
       $now = date('Y-m-d H:i:s');
       SepaMandateLink::create(FALSE)
@@ -146,6 +125,48 @@ class CollectOutstandingAction extends AbstractBatchAction {
     }
   }
 
+  /**
+   * @param string $mandateReference
+   *   The reference of the mandate with the outstanding amounts.
+   * @phpstan-param mandateT $mandate
+   *   The mandate that is used as basis for the new OOFF mandate.
+   *
+   * @phpstan-return mandateT
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function createOoffMandate(string $mandateReference, array $mandate, float $amount): array {
+    $creditorId = $mandate['creditor_id'] ?? $this->getDefaultCreditorId();
+    /** @var array{financial_type_id: positive-int, payment_instrument_id: positive-int} $contributionRecur */
+    $contributionRecur = ContributionRecur::get(FALSE)
+      ->addSelect('financial_type_id', 'payment_instrument_id')
+      ->addWhere('id', '=', $mandate['entity_id'])
+      ->execute()
+      ->single();
+
+    $paymentInstrumentDeterminer = new PaymentInstrumentDeterminer();
+
+    /** @var mandateT */
+    return SepaMandate::createFull(FALSE)
+      ->setValues([
+        'creditor_id' => $creditorId,
+        'type' => 'OOFF',
+        'source' => E::ts('Outstanding amounts of mandate %1', [1 => $mandateReference]),
+        'contact_id' => $mandate['contact_id'],
+        'financial_type_id' => $contributionRecur['financial_type_id'],
+        'payment_instrument_id' => $paymentInstrumentDeterminer->determineCollectOutstandingPaymentInstrument(
+          $creditorId,
+          $contributionRecur['payment_instrument_id']
+        ),
+        'account_holder' => $mandate['account_holder'],
+        'iban' => $mandate['iban'],
+        'bic' => $mandate['bic'],
+        'amount' => $amount,
+      ])
+      ->execute()
+      ->single();
+  }
+
   private function getDefaultCreditorId(): int {
     $defaultCreditor = \CRM_Sepa_Logic_Settings::defaultCreditor();
     if ($defaultCreditor === NULL) {
@@ -153,6 +174,32 @@ class CollectOutstandingAction extends AbstractBatchAction {
     }
 
     return (int) $defaultCreditor->id;
+  }
+
+  /**
+   * @phpstan-return mandateT|null
+   */
+  private function getReplacementMandate(int $mandateId): ?array {
+    $replacementMandateId = SepaMandateLink::get(FALSE)
+      ->addSelect('mandate_id')
+      ->addWhere('entity_id', '=', $mandateId)
+      ->addWhere('entity_table', '=', 'civicrm_sdd_mandate')
+      ->addWhere('class', '=', MandateLinkClasses::REPLACES)
+      ->addWhere('is_active', '=', TRUE)
+      ->setLimit(1)
+      ->execute()
+      ->first()['mandate_id'] ?? NULL;
+
+    if (NULL === $replacementMandateId) {
+      return NULL;
+    }
+
+    /** @phpstan-var mandateT */
+    return SepaMandate::get(FALSE)
+      ->setSelect($this->getSelect())
+      ->addWhere('id', '=', $replacementMandateId)
+      ->execute()
+      ->single();
   }
 
 }

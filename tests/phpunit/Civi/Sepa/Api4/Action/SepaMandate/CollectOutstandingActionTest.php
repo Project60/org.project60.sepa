@@ -177,4 +177,106 @@ final class CollectOutstandingActionTest extends AbstractSepaHeadlessTestCase {
     );
   }
 
+  public function testWithReplacementMandate(): void {
+    $creditorId = SepaCreditorBuilder::createDefault([
+      'pi_ooff' => '1',
+      'pi_rcur' => '2',
+    ]);
+    $contactId = ContactBuilder::createDefault();
+    $financialTypeId = FinancialTypeBuilder::create();
+    $mandate = SepaMandate::createFull(FALSE)
+      ->setValues([
+        'creditor_id' => $creditorId,
+        'type' => 'RCUR',
+        'contact_id' => $contactId,
+        'financial_type_id' => $financialTypeId,
+        'iban' => 'DE02370501980001802057',
+        'bic' => 'BELADEBEXXX',
+        'amount' => 10.00,
+      ])
+      ->execute()
+      ->single();
+
+    $replacementMandate = SepaMandate::createFull(FALSE)
+      ->setValues([
+        'creditor_id' => $creditorId,
+        'type' => 'RCUR',
+        'contact_id' => $contactId,
+        'financial_type_id' => $financialTypeId,
+        'iban' => 'DE89370400440532013000',
+        'bic' => 'DEUTDEFF',
+        'account_holder' => 'Replacement',
+        'amount' => 10.00,
+      ])
+      ->execute()
+      ->single();
+    SepaMandate::replaceWith(FALSE)
+      ->setId($mandate['id'])
+      ->setReplacementId($replacementMandate['id'])
+      ->execute();
+
+    $pendingOnHoldContributionId = ContributionBuilder::createPendingForContact(
+      $contactId,
+      [
+        'contribution_recur_id' => $mandate['entity_id'],
+        'total_amount' => 1.1,
+        'sepa_contribution.is_on_hold' => TRUE,
+      ]
+    );
+
+    $result = SepaMandate::collectOutstanding()
+      ->addWhere('id', '=', $mandate['id'])
+      ->execute();
+
+    $ooffMandate = $result[$mandate['id']];
+    static::assertIsArray($ooffMandate);
+    static::assertSame(
+      "Outstanding amounts of mandate {$mandate['reference']}",
+      $ooffMandate['source']
+    );
+    static::assertSame('OOFF', $ooffMandate['type']);
+    // Account from replacement mandate should be used.
+    static::assertSame($replacementMandate['iban'], $ooffMandate['iban']);
+    static::assertSame($replacementMandate['bic'], $ooffMandate['bic']);
+    static::assertSame($replacementMandate['account_holder'], $ooffMandate['account_holder']);
+
+    $ooffContribution = Contribution::get(FALSE)
+      ->addSelect('id', 'total_amount', 'payment_instrument_id', 'financial_type_id')
+      ->addWhere('id', '=', $ooffMandate['entity_id'])
+      ->execute()
+      ->single();
+
+    static::assertEquals(
+      [
+        'id' => $ooffMandate['entity_id'],
+        'total_amount' => 1.1,
+        'payment_instrument_id' => 1,
+        'financial_type_id' => $financialTypeId,
+      ],
+      $ooffContribution
+    );
+
+    // Link to RCUR mandate should exist.
+    static::assertSame(1, SepaMandateLink::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('mandate_id', '=', $ooffMandate['id'])
+      ->addWhere('class', '=', MandateLinkClasses::COLLECT_OUTSTANDING)
+      ->addWhere('entity_table', '=', 'civicrm_sdd_mandate')
+      ->addWhere('entity_id', '=', $mandate['id'])
+      ->execute()
+      ->countMatched()
+    );
+
+    // Link to RCUR pending on hold contribution should exist.
+    static::assertSame(1, SepaMandateLink::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('mandate_id', '=', $ooffMandate['id'])
+      ->addWhere('class', '=', MandateLinkClasses::COLLECT_OUTSTANDING)
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addWhere('entity_id', '=', $pendingOnHoldContributionId)
+      ->execute()
+      ->countMatched()
+    );
+  }
+
 }

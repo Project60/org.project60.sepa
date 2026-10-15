@@ -529,17 +529,12 @@ class CRM_Sepa_Form_CreateMandate extends CRM_Core_Form {
           ->execute()
           ->single();
 
-        CRM_Sepa_BAO_SEPAMandate::terminateMandate(
-          (int) $values['replace'],
-          $values['rpl_end_date'],
-          $values['rpl_cancel_reason']
-        );
-
-        CRM_Sepa_BAO_SepaMandateLink::addReplaceMandateLink(
-          (int) $values['replace'],
-          (int) $mandate['id'],
-          $values['rpl_end_date']
-        );
+        SepaMandate::replaceWith()
+          ->setId((int) $values['replace'])
+          ->setReplacementId($mandate['id'])
+          ->setDate($values['rpl_end_date'])
+          ->setReason($values['rpl_cancel_reason'])
+          ->execute();
 
         if ((bool) $values['collect_outstanding']) {
           SepaMandate::collectOutstanding(FALSE)
