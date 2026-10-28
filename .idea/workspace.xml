@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ed30552e-4bdc-46dd-b21b-d67de4ae6e5b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/sepa.php" beforeDir="false" afterPath="$PROJECT_DIR$/sepa.php" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerConfigs">
+    <option name="configs">
+      <option value="$PROJECT_DIR$/tools/phpcs/composer.json" />
+      <option value="$PROJECT_DIR$/tools/phpunit/composer.json" />
+      <option value="$PROJECT_DIR$/tools/phpstan/composer.json" />
+    </option>
+  </component>
+  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution>
+      <execution>
+        <execution>
+          <execution>
+            <execution>
+              <execution>
+                <execution>
+                  <execution>
+                    <execution />
+                  </execution>
+                </execution>
+              </execution>
+            </execution>
+          </execution>
+        </execution>
+      </execution>
+    </execution>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="326" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.1377381394845765" />
+      <entry key="MS500" value="1.6732990156381682" />
+      <entry key="S2" value="2.100065549469179" />
+      <entry key="S5" value="2.8446212490778415" />
+      <entry key="S10" value="4.139930465813421" />
+      <entry key="S30" value="12.202610117143074" />
+      <entry key="S60" value="30.676561638476507" />
+      <entry key="M2" value="75.64815852022942" />
+      <entry key="M5" value="178.86690669800814" />
+      <entry key="M10" value="276.68195235043606" />
+      <entry key="M15" value="351.18296846019257" />
+      <entry key="M30" value="530.1778928846152" />
+      <entry key="H1" value="741.5135020978654" />
+      <entry key="H2" value="932.4864345895597" />
+      <entry key="H4" value="1077.1254594479367" />
+      <entry key="D1" value="1246.8761540217013" />
+      <entry key="W1" value="1282.7744138475932" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="6.725495092020327E-5" />
+      <entry key="MS500" value="0.14640127265235123" />
+      <entry key="S2" value="0.6185662393435861" />
+      <entry key="S5" value="0.825191004819298" />
+      <entry key="S10" value="0.9084002448366568" />
+      <entry key="S30" value="0.9684839195403787" />
+      <entry key="S60" value="0.9841161195261617" />
+      <entry key="M2" value="0.9928143084314651" />
+      <entry key="M5" value="1.0847620370433158" />
+      <entry key="M10" value="1.4759924633331198" />
+      <entry key="M15" value="1.9464288064490007" />
+      <entry key="M30" value="3.2732827874809995" />
+      <entry key="H1" value="5.32193852038156" />
+      <entry key="H2" value="8.076666284271294" />
+      <entry key="H4" value="10.88699971137532" />
+      <entry key="D1" value="14.903780576036535" />
+      <entry key="W1" value="15.835814944519532" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.0239065106410286" />
+      <entry key="MS500" value="1.6526688541470098" />
+      <entry key="S2" value="2.485851118098418" />
+      <entry key="S5" value="3.472420646388702" />
+      <entry key="S10" value="4.901275525923606" />
+      <entry key="S30" value="13.07860936542458" />
+      <entry key="S60" value="31.585015332147947" />
+      <entry key="M2" value="76.5825023263692" />
+      <entry key="M5" value="179.91564372894683" />
+      <entry key="M10" value="278.1340400760443" />
+      <entry key="M15" value="353.1102104595713" />
+      <entry key="M30" value="533.4370702196836" />
+      <entry key="H1" value="746.8243993890342" />
+      <entry key="H2" value="940.55449551103" />
+      <entry key="H4" value="1088.0064452195472" />
+      <entry key="D1" value="1261.778501550071" />
+      <entry key="W1" value="1298.6100094027397" />
+    </decayedShown>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/usr/bin/php" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3GJA8UWTQk4Zv3U2KhpuAtDHplQ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/chloe/Projects/org.project60.sepa",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PS-262.10968.76" />
+        <option value="bundled-php-predefined-a98d8de5180a-9522f28f0b20-com.jetbrains.php.sharedIndexes-PS-262.10968.76" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ed30552e-4bdc-46dd-b21b-d67de4ae6e5b" name="Changes" comment="" />
+      <created>1783679138622</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1783679138622</updated>
+      <workItem from="1783679140015" duration="14000" />
+      <workItem from="1783679972933" duration="3338000" />
+      <workItem from="1784033013112" duration="4469000" />
+      <workItem from="1784547262533" duration="9566000" />
+      <workItem from="1785151333758" duration="66000" />
+      <workItem from="1785151456735" duration="25000" />
+      <workItem from="1785761154714" duration="3847000" />
+      <workItem from="1785767652096" duration="1326000" />
+      <workItem from="1786006979989" duration="646000" />
+      <workItem from="1786368814222" duration="1306000" />
+      <workItem from="1786714734454" duration="2206000" />
+      <workItem from="1787660818763" duration="71000" />
+      <workItem from="1788178026977" duration="4618000" />
+      <workItem from="1793205023034" duration="475000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

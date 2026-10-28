@@ -563,12 +563,9 @@ function sepa_civicrm_xmlMenu(array &$files): void {
 }
 
 /**
- * @param array $list
- * @param string $region
+ * @param CRM_Core_Resources_Bundle $bundle
  * @return void
  */
-function sepa_civicrm_coreResourceList(array &$list, string $region): void {
-  if ($region === 'html-header') {
-    Civi::resources()->addStyleFile('org.project60.sepa', 'css/sepa.css');
-  }
+function sepa_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle): void {
+  $bundle->addStyleFile('org.project60.sepa', 'css/sepa.css');
 }
