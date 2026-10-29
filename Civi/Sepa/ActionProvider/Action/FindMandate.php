@@ -18,16 +18,13 @@ declare(strict_types = 1);
 +--------------------------------------------------------*/
 namespace Civi\Sepa\ActionProvider\Action;
 
-use Civi\ActionProvider\Action\AbstractAction;
 use Civi\ActionProvider\Parameter\ParameterBagInterface;
 use Civi\ActionProvider\Parameter\Specification;
 use Civi\ActionProvider\Parameter\SpecificationBag;
-
-use Civi\Api4\SepaCreditor;
 use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
-class FindMandate extends AbstractAction {
+class FindMandate extends AbstractSepaActionProviderAction {
 
   /**
    * Returns the specification of the configuration options for the actual action.
@@ -212,22 +209,6 @@ class FindMandate extends AbstractAction {
           break;
       }
     }
-  }
-
-  /**
-   * Get a list of all creditors
-   *
-   * @return array<int, string>
-   *   Mapping of creditor ID to creditor name.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function getCreditors(): array {
-    return SepaCreditor::get(FALSE)
-      ->addSelect('id', 'name')
-      ->execute()
-      ->indexBy('id')
-      ->column('name');
   }
 
 }
