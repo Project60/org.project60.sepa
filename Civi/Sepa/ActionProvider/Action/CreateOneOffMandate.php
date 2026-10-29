@@ -24,6 +24,7 @@ use Civi\ActionProvider\Parameter\ParameterBagInterface;
 use Civi\ActionProvider\Parameter\Specification;
 use Civi\ActionProvider\Parameter\SpecificationBag;
 
+use Civi\Api4\SepaCreditor;
 use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
@@ -189,14 +190,18 @@ class CreateOneOffMandate extends AbstractAction {
 
   /**
    * Get a list of all creditors
+   *
+   * @return array<int, string>
+   *   Mapping of creditor ID to creditor name.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getCreditors(): array {
-    $creditor_list = [];
-    $creditor_query = \civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
-    foreach ($creditor_query['values'] as $creditor) {
-      $creditor_list[$creditor['id']] = $creditor['name'];
-    }
-    return $creditor_list;
+    return SepaCreditor::get(FALSE)
+      ->addSelect('id', 'name')
+      ->execute()
+      ->indexBy('id')
+      ->column('name');
   }
 
   /**

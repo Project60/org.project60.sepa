@@ -2943,7 +2943,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''values'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 3
+			count: 2
 			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
 
 		-
@@ -2954,12 +2954,6 @@ parameters:
 
 		-
 			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateOneOffMandate\:\:getCampaigns\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
-
-		-
-			message: '#^Method Civi\\Sepa\\ActionProvider\\Action\\CreateOneOffMandate\:\:getCreditors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: Civi/Sepa/ActionProvider/Action/CreateOneOffMandate.php
