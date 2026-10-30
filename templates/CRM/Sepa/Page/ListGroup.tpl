@@ -26,6 +26,8 @@
     <th>{ts}Contact{/ts}</th>
     <th>{ts}Financial Type{/ts}</th>
     <th>{ts}Campaign{/ts}</th>
+    <th>{ts}Reference{/ts}</th>
+    <th>{ts}IBAN{/ts}</th>
   </thead>
   <tbody>
     {foreach from=$contributions item=contribution}
@@ -38,6 +40,8 @@
       <td><a href="{$contribution.contact_link}"><div class="icon crm-icon {$contribution.contact_type}-icon"></div>{$contribution.contact_display_name}</a></td>
       <td>{$contribution.financial_type}</td>
       <td>{$contribution.campaign}</td>
+      <td>{$contribution.reference}</td>
+      <td>{$contribution.iban}</td>
     </tr>
     {/foreach}
   </tbody>
