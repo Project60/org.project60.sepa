@@ -261,24 +261,8 @@ class CRM_Sepa_Logic_Batching {
           $pendingFrstInstallmentsByRecurId[$installment['contribution_recur_id']][] = $installment;
         }
         foreach ($pendingFrstInstallmentsByRecurId as $recurId => $installments) {
-          if (count($installments) > 1) {
-            // ambiguous: neither guess nor add another one
-            $where = implode(', ', array_map(
-              fn(array $installment) => "contribution {$installment['id']} in group {$installment['txg.id']}",
-              $installments
-            ));
-            Civi::log()->warning(
-              "org.project60.sepa: batching: recurring contribution $recurId has several pending first "
-              . "installments in open groups ($where), skipped."
-            );
-            $mandatesByCollectionDateAndFinancialTypeId[$collectionDate] = array_map(
-              fn(array $mandates) => array_values(array_filter(
-                $mandates,
-                /** @param array<string, mixed> $mandate */
-                fn(array $mandate) => $mandate['entity_id'] !== $recurId
-              )),
-              $mandatesByCollectionDateAndFinancialTypeId[$collectionDate]
-            );
+          // with several pending first installments none is reused, STEP 4 creates a new one
+          if (count($installments) !== 1) {
             continue;
           }
           $installment = $installments[0];

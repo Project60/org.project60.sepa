@@ -243,10 +243,10 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
   }
 
   /**
-   * Several pending first installments for one mandate are ambiguous: the batching must
-   * neither pick one nor add another one.
+   * Of several pending first installments for one mandate none is reused: the batching
+   * creates a new one and leaves the existing ones where they are.
    */
-  public function testAmbiguousPendingFirstInstallmentsAreSkipped() {
+  public function testSeveralPendingFirstInstallmentsAreNotReused() {
     $this->setSepaConfiguration('exclude_weekends', '0');
     $this->setCreditorConfiguration('batching.RCUR.horizon', 30);
     $this->setCreditorConfiguration('batching.FRST.notice', 2);
@@ -282,13 +282,13 @@ class CRM_Sepa_BugReproductionTest extends CRM_Sepa_TestBase {
 
     $this->executeBatching(self::MANDATE_TYPE_FRST, 'now + 28 days');
 
-    $this->assertSame(2, $this->callAPISuccess('Contribution', 'getcount', [
+    $this->assertSame(3, $this->callAPISuccess('Contribution', 'getcount', [
       'contribution_recur_id' => $mandate['entity_id'],
-    ]), 'A third installment was created despite the ambiguity.');
+    ]), 'No new installment was created.');
     $this->assertSame(
       (int) $group['id'],
       (int) $this->getTransactionGroupForContribution($installment)['id'],
-      'The ambiguous installment was moved although it should have been skipped.'
+      'An existing installment was moved although none should be reused.'
     );
   }
 

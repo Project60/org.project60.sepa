@@ -26,7 +26,7 @@ When you click "Update One-Off" or "Update Recurring," CiviSEPA looks ahead base
 
 The "Close Group" action is your way of saying "this batch is ready to go to the bank." Once closed, the system generates the XML file your bank needs and locks the group to prevent accidental changes.
 
-Do not leave a group open past its submission deadline. The dashboard marks such groups as "missed", and CiviCRM's system status shows a warning listing them. Close and submit them with a new collection date, or delete them, before you run the update again. If the update does run while an overdue group is still open, a pending first collection is moved to the new collection date rather than being created a second time.
+Do not leave a group open past its submission deadline. The dashboard marks such groups as "missed", and CiviCRM's system status shows a warning listing them. Close and submit them with a new collection date, or delete them, before you run the update again. If the update does run while an overdue group is still open, a pending first collection is moved to the new collection date rather than being created a second time. Earlier versions created a second first collection in this case, so both groups collected the first payment. If a mandate already has several pending first collections in open groups, none of them is moved and a new one is created as before; delete the surplus contributions or groups before closing them.
 
 ## Creating and Managing SEPA Mandates
 
