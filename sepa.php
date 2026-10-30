@@ -561,3 +561,11 @@ function sepa_civicrm_xmlMenu(array &$files): void {
     $files[] = $file;
   }
 }
+
+/**
+ * @param CRM_Core_Resources_Bundle $bundle
+ * @return void
+ */
+function sepa_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle): void {
+  $bundle->addStyleFile('org.project60.sepa', 'css/sepa.css');
+}
