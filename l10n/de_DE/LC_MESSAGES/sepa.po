@@ -4057,7 +4057,7 @@ msgstr ""
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "One-Off SEPA Mandates"
-msgstr "Einmalige SEPA-Latschriften"
+msgstr "Einmalige SEPA-Lastschriften"
 
 #: templates/CRM/Sepa/Page/MandateTab.tpl
 msgid "This contact has no recorded one-off mandates."
