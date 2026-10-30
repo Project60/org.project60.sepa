@@ -228,7 +228,7 @@ function civicrm_api3_sepa_logic_update(array $params): array {
     $creditors = [];
     foreach ($creditor_query['values'] as $creditor) {
       if ($creditor['mandate_active']) {
-        $creditors[] = $creditor['id'];
+        $creditors[] = (int) $creditor['id'];
       }
     }
   }

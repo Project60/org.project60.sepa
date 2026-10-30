@@ -97,7 +97,7 @@ function civicrm_api3_sepa_mandate_createfull(array $params): array {
   unset($values['check_permissions']);
   unset($values['debug']);
   unset($values['version']);
-  $result = SepaMandate::createFull($params['check_permissions'] ?? FALSE)
+  $result = SepaMandate::createFull((bool) ($params['check_permissions'] ?? FALSE))
     ->setValues($values)
     ->execute()
     ->indexBy('id')
