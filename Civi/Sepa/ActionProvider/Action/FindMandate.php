@@ -21,11 +21,10 @@ namespace Civi\Sepa\ActionProvider\Action;
 use Civi\ActionProvider\Parameter\ParameterBagInterface;
 use Civi\ActionProvider\Parameter\Specification;
 use Civi\ActionProvider\Parameter\SpecificationBag;
-
 use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
-class FindMandate extends CreateRecurringMandate {
+class FindMandate extends AbstractSepaActionProviderAction {
 
   /**
    * Returns the specification of the configuration options for the actual action.
@@ -116,7 +115,6 @@ class FindMandate extends CreateRecurringMandate {
    */
   // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
   protected function doAction(ParameterBagInterface $parameters, ParameterBagInterface $output) {
-    // compile search query
     $mandatesQuery = SepaMandate::get(TRUE);
     if (!empty($this->configuration->getParameter('creditor_id'))) {
       $mandatesQuery->addWhere('creditor_id', 'IN', $this->configuration->getParameter('creditor_id'));
@@ -141,13 +139,15 @@ class FindMandate extends CreateRecurringMandate {
     }
 
     // add order
-    $mandatesQuery->addOrderBy($this->configuration->getParameter('pick'));
+    [$orderField, $direction] = explode(' ', $this->configuration->getParameter('pick'));
+    $mandatesQuery->addOrderBy($orderField, strtoupper($direction));
+
     // TODO: Shouldn't this use single()?
     $mandatesQuery->setLimit(1);
 
     // search mandate
     $mandate = $mandatesQuery->execute()->first();
-    if (isset($mandate)) {
+    if (NULL !== $mandate) {
       $output->setParameter('id', $mandate['id']);
       $output->setParameter('reference', $mandate['reference']);
       $output->setParameter('type', $mandate['type']);
