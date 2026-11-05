@@ -75,12 +75,14 @@ class CRM_Utils_SepaTokensDeprecated {
 
       // format dates
       if (!empty($values[$contactId]["$prefix.first_collection"])) {
-        $values[$contactId]["$prefix.first_collection_text"] = CRM_Utils_Date::customFormat(
+        $values[$contactId]["$prefix.first_collection_text"] = CRM_Utils_Date::formatDateOnlyLong(
           $values[$contactId]["$prefix.first_collection"]
         );
       }
       if (!empty($values[$contactId]["$prefix.date"])) {
-        $values[$contactId]["$prefix.date_text"] = CRM_Utils_Date::customFormat($values[$contactId]["$prefix.date"]);
+        $values[$contactId]["$prefix.date_text"] = CRM_Utils_Date::formatDateOnlyLong(
+          $values[$contactId]["$prefix.date"]
+        );
       }
     }
     catch (Exception $e) {
