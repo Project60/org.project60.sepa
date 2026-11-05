@@ -80,7 +80,9 @@ class CRM_Utils_SepaTokensDeprecated {
         );
       }
       if (!empty($values[$contactId]["$prefix.date"])) {
-        $values[$contactId]["$prefix.date_text"] = CRM_Utils_Date::formatDateOnlyLong($values[$contactId]["$prefix.date"]);
+        $values[$contactId]["$prefix.date_text"] = CRM_Utils_Date::formatDateOnlyLong(
+          $values[$contactId]["$prefix.date"]
+        );
       }
     }
     catch (Exception $e) {
