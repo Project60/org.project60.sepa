@@ -448,7 +448,7 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
 
     // first, load the mandate
     try {
-      $mandate = SepaMandate::get(TRUE)
+      $mandate = SepaMandate::get(FALSE)
         ->addWhere('id', '=', $mandate_id)
         ->execute()
         ->single();
@@ -505,21 +505,18 @@ class CRM_Sepa_BAO_SEPAMandate extends CRM_Sepa_DAO_SEPAMandate implements HookI
     }
 
     // check the date
-    $today = strtotime('today');
+    $today = strtotime(CRM_Utils_Time::date('Y-m-d'));
     $new_end_date = strtotime($new_end_date_str);
+    Assert::integer($new_end_date);
 
     if ($new_end_date < $today) {
-      $error_message = sprintf(
-        E::ts('You cannot set an end date in the past.'),
-        $contribution_id,
-        $contribution['error_message']
-      );
+      $error_message = E::ts('You cannot set an end date in the past.');
       if ($error_to_ui) {
         CRM_Core_Session::setStatus($error_message, E::ts('Error'), 'error');
         return FALSE;
       }
       else {
-        throw new Exception($error_message);
+        throw new CRM_Core_Exception($error_message);
       }
     }
 

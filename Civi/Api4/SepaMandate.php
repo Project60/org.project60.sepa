@@ -8,6 +8,7 @@ use Civi\Sepa\Api4\Action\SepaMandate\CollectOutstandingAction;
 use Civi\Sepa\Api4\Action\SepaMandate\CreateFullAction;
 use Civi\Sepa\Api4\Action\SepaMandate\GetAction;
 use Civi\Sepa\Api4\Action\SepaMandate\GetFieldsAction;
+use Civi\Sepa\Api4\Action\SepaMandate\ReplaceWithAction;
 use Civi\Sepa\Api4\Action\SepaMandate\SuspendAction;
 use Civi\Sepa\Api4\Action\SepaMandate\ReinstateAction;
 
@@ -47,6 +48,11 @@ class SepaMandate extends Generic\DAOEntity {
 
   public static function reinstate(bool $checkPermissions = TRUE): ReinstateAction {
     return (new ReinstateAction(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function replaceWith(bool $checkPermissions = TRUE): ReplaceWithAction {
+    return (new ReplaceWithAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

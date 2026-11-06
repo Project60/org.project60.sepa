@@ -47,7 +47,7 @@ class FindMandate extends CreateRecurringMandate {
     return new SpecificationBag([
       new Specification('creditor_id', 'Integer', E::ts('Creditor'), FALSE, NULL, NULL, $this->getCreditors(), TRUE),
       new Specification('type', 'String', E::ts('Mandate Type'), FALSE, NULL, NULL, $mandate_types, FALSE),
-      new Specification('active', 'Boolean', E::ts('Still Active'), FALSE, NULL, NULL, $pick_types, FALSE),
+      new Specification('active', 'Boolean', E::ts('Still Active'), FALSE, NULL, NULL, NULL, FALSE),
       new Specification('pick', 'String', E::ts('Pick (if multiple results)'), TRUE, NULL, NULL, $pick_types, FALSE),
     ]);
   }
