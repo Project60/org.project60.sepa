@@ -1,0 +1,24 @@
+.sepa_dashboard tr.submit_missed td {
+  background-color: var(--crm-danger-light-color, #EE0000AA);
+}
+
+.sepa_dashboard tr.submit_urgently td {
+  background-color: var(--crm-warning-light-color, #AC6700AA);
+}
+
+.sepa_dashboard tr.submit_soon td {
+  background-color: var(--crm-info-light-color, #0165FFAA);
+}
+
+.sepa_dashboard tr.submit_later td {
+  background-color: var(--crm-success-light-color, #008300AA);
+}
+
+.sepa_dashboard tr.submit_closed td {
+  background-color: var(--crm-layer2-bg-color, #00830033);
+}
+
+.sepa_dashboard .sepa_dashboard__button_group {
+  display: flex;
+  justify-content: end;
+}
