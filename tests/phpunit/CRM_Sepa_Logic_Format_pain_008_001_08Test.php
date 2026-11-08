@@ -34,26 +34,22 @@ use Systopia\TestFixtures\Fixtures\Builders\SepaCreditorBuilder;
  */
 final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase {
 
-  public function test(): void {
+  private function createTestSddFile(array $creditorData, array $mandateData): array {
     $contactId = ContactBuilder::createDefault();
-    $creditorId = SepaCreditorBuilder::createDefault([
-      'pi_ooff' => '1',
-      'sepa_file_format_id:name' => 'pain.008.001.08',
-      'iban' => 'DE12500105170648489890',
-      'bic' => 'TESTDEFFXXX',
-    ]);
-
     $financialTypeId = FinancialTypeBuilder::create();
+
+    $fullCreditorData = [...$creditorData, ...[
+      'pi_ooff' => '1',
+    ]];
+    $creditorId = SepaCreditorBuilder::createDefault($fullCreditorData);
+    
+    $fullMandateData = [...$mandateData, ...[
+      'creditor_id' => $creditorId,
+      'contact_id' => $contactId,
+      'financial_type_id' => $financialTypeId,
+    ]];
     $mandate = SepaMandate::createFull(FALSE)
-      ->setValues([
-        'creditor_id' => $creditorId,
-        'type' => 'OOFF',
-        'contact_id' => $contactId,
-        'financial_type_id' => $financialTypeId,
-        'iban' => 'DE02370501980001802057',
-        'bic' => 'BELADEBEXXX',
-        'amount' => 10.00,
-      ])
+      ->setValues($fullMandateData)
       ->execute()
       ->single();
 
@@ -85,6 +81,23 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
       ])
       ->execute();
 
+    return $sepaSddFile;
+  }
+
+  public function testStandardFormat(): void {
+    $creditorData = [
+      'sepa_file_format_id:name' => 'pain.008.001.08',
+      'iban' => 'DE12500105170648489890',
+      'bic' => 'TESTDEFFXXX',
+    ];
+    $mandateData = [
+      'type' => 'OOFF',
+      'iban' => 'DE02370501980001802057',
+      'bic' => 'BELADEBEXXX',
+      'amount' => 10.00,
+    ];
+    $sepaSddFile = $this->createTestSddFile($creditorData, $mandateData);
+
     $xml = (new CRM_Sepa_BAO_SEPASddFile())->generatexml($sepaSddFile['id']);
 
     static::assertStringContainsString('<IBAN>DE12500105170648489890</IBAN>', $xml);
@@ -94,6 +107,104 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
 
     static::assertStringContainsString('<IBAN>DE02370501980001802057</IBAN>', $xml);
     static::assertStringContainsString('<BICFI>BELADEBEXXX</BICFI>', $xml);
+    static::assertStringContainsString('<InstdAmt Ccy="EUR">10.00</InstdAmt>', $xml);
+
+    $doc = new DOMDocument();
+    $doc->loadXML($xml);
+    static::assertTrue($doc->schemaValidate(E::path('templates/Sepa/Formats/pain_008_001_08/pain.008.001.08.xsd')));
+  }
+
+  public function testStandardFormatWithoutMandateBIC(): void {
+    $creditorData = [
+      'sepa_file_format_id:name' => 'pain.008.001.08',
+      'iban' => 'DE12500105170648489890',
+      'bic' => 'TESTDEFFXXX',
+      'uses_bic' => false
+    ];
+    $mandateData = [
+      'type' => 'OOFF',
+      'iban' => 'DE02370501980001802057',
+      'bic' => '',
+      'amount' => 10.00,
+    ];
+    $sepaSddFile = $this->createTestSddFile($creditorData, $mandateData);
+
+    $xml = (new CRM_Sepa_BAO_SEPASddFile())->generatexml($sepaSddFile['id']);
+
+    static::assertStringContainsString('<IBAN>DE12500105170648489890</IBAN>', $xml);
+    static::assertStringContainsString('<BICFI>TESTDEFFXXX</BICFI>', $xml);
+
+    static::assertStringContainsString('<NbOfTxs>1</NbOfTxs>', $xml);
+
+    static::assertStringContainsString('<IBAN>DE02370501980001802057</IBAN>', $xml);
+    // Must not contain BIC!
+    static::assertStringNotContainsString('<BICFI>BELADEBEXXX</BICFI>', $xml);
+    static::assertMatchesRegularExpression('/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i', str_replace('\n', '', $xml));
+    static::assertStringContainsString('<InstdAmt Ccy="EUR">10.00</InstdAmt>', $xml);
+
+    $doc = new DOMDocument();
+    $doc->loadXML($xml);
+    static::assertTrue($doc->schemaValidate(E::path('templates/Sepa/Formats/pain_008_001_08/pain.008.001.08.xsd')));
+  }
+
+  public function testNOBICFormat(): void {
+    $creditorData = [
+      'sepa_file_format_id:name' => 'pain.008.001.08_NOBIC',
+      'iban' => 'DE12500105170648489890',
+      'bic' => 'TESTDEFFXXX',
+    ];
+    $mandateData = [
+      'type' => 'OOFF',
+      'iban' => 'DE02370501980001802057',
+      'bic' => 'BELADEBEXXX',
+      'amount' => 10.00,
+    ];
+    $sepaSddFile = $this->createTestSddFile($creditorData, $mandateData);
+
+    $xml = (new CRM_Sepa_BAO_SEPASddFile())->generatexml($sepaSddFile['id']);
+
+    static::assertStringContainsString('<IBAN>DE12500105170648489890</IBAN>', $xml);
+    static::assertStringContainsString('<BICFI>TESTDEFFXXX</BICFI>', $xml);
+
+    static::assertStringContainsString('<NbOfTxs>1</NbOfTxs>', $xml);
+
+    static::assertStringContainsString('<IBAN>DE02370501980001802057</IBAN>', $xml);
+    // Must not contain BIC!
+    static::assertStringNotContainsString('<BICFI>BELADEBEXXX</BICFI>', $xml);
+    static::assertMatchesRegularExpression('/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i', str_replace('\n', '', $xml));
+    static::assertStringContainsString('<InstdAmt Ccy="EUR">10.00</InstdAmt>', $xml);
+
+    $doc = new DOMDocument();
+    $doc->loadXML($xml);
+    static::assertTrue($doc->schemaValidate(E::path('templates/Sepa/Formats/pain_008_001_08/pain.008.001.08.xsd')));
+  }
+
+  public function testNOBICFormatWithoutMandateBIC(): void {
+    $creditorData = [
+      'sepa_file_format_id:name' => 'pain.008.001.08_NOBIC',
+      'iban' => 'DE12500105170648489890',
+      'bic' => 'TESTDEFFXXX',
+      'uses_bic' => false
+    ];
+    $mandateData = [
+      'type' => 'OOFF',
+      'iban' => 'DE02370501980001802057',
+      'bic' => '',
+      'amount' => 10.00,
+    ];
+    $sepaSddFile = $this->createTestSddFile($creditorData, $mandateData);
+
+    $xml = (new CRM_Sepa_BAO_SEPASddFile())->generatexml($sepaSddFile['id']);
+
+    static::assertStringContainsString('<IBAN>DE12500105170648489890</IBAN>', $xml);
+    static::assertStringContainsString('<BICFI>TESTDEFFXXX</BICFI>', $xml);
+
+    static::assertStringContainsString('<NbOfTxs>1</NbOfTxs>', $xml);
+
+    static::assertStringContainsString('<IBAN>DE02370501980001802057</IBAN>', $xml);
+    // Must not contain BIC!
+    static::assertStringNotContainsString('<BICFI>BELADEBEXXX</BICFI>', $xml);
+    static::assertMatchesRegularExpression('/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i', str_replace('\n', '', $xml));
     static::assertStringContainsString('<InstdAmt Ccy="EUR">10.00</InstdAmt>', $xml);
 
     $doc = new DOMDocument();

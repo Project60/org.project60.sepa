@@ -55,7 +55,13 @@
         </DrctDbtTx>
         <DbtrAgt>
           <FinInstnId>
-            <BICFI>{$contribution.bic}</BICFI>
+            {if $contribution.bic && $contribution.bic != "NOTPROVIDED"}
+              <BICFI>{$contribution.bic}</BICFI>
+            {else}
+              <Othr>
+                <Id>NOTPROVIDED</Id>
+              </Othr>
+            {/if}
           </FinInstnId>
         </DbtrAgt>
         <Dbtr>
