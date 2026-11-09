@@ -284,4 +284,21 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     );
   }
 
+  /**
+   * Deleting a mandate's contribution through APIv4 is refused.
+   */
+  public function testOOFFContributionDeleteApi4() {
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+      ]
+    );
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('connected to SEPA mandate');
+    \Civi\Api4\Contribution::delete(FALSE)
+      ->addWhere('id', '=', $mandate['entity_id'])
+      ->execute();
+  }
+
 }

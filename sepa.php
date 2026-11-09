@@ -250,8 +250,8 @@ function sepa_civicrm_merge(string $type, array &$data, $mainId = NULL, $otherId
  * Implements hook_civicrm_apiWrappers().
  */
 function sepa_civicrm_apiWrappers(array &$wrappers, $apiRequest): void {
-  // add a wrapper for Contact.getlist (used e.g. for AJAX lookups)
-  if ($apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'delete') {
+  // APIv4 deletes carry no "id" parameter; sepa_civicrm_pre() protects them.
+  if ($apiRequest['version'] == 3 && $apiRequest['entity'] == 'Contribution' && $apiRequest['action'] == 'delete') {
     $wrappers[] = new CRM_Sepa_Logic_ContributionProtector();
   }
 }
