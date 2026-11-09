@@ -284,4 +284,34 @@ class CRM_Sepa_MandateTest extends CRM_Sepa_TestBase {
     );
   }
 
+  /**
+   * Test that SepaLogic.update batches OOFF and RCUR mandates.
+   */
+  public function testSepaLogicUpdate() {
+    $ooffMandate = $this->createMandate(['type' => self::MANDATE_TYPE_OOFF]);
+    $rcurMandate = $this->createMandate(['type' => self::MANDATE_TYPE_RCUR]);
+
+    $this->callAPISuccess('SepaLogic', 'update', ['type' => self::MANDATE_TYPE_OOFF]);
+    $this->callAPISuccess('SepaLogic', 'update', ['type' => self::MANDATE_TYPE_FRST]);
+
+    $this->assertSame(self::MANDATE_TYPE_OOFF, $this->getMandate($ooffMandate['id'])['status']);
+    $this->assertSame(self::MANDATE_TYPE_FRST, $this->getMandate($rcurMandate['id'])['status']);
+    $this->assertSame(self::BATCH_STATUS_OPEN, $this->getActiveTransactionGroup(self::MANDATE_TYPE_OOFF)['status_id']);
+    $this->assertSame(self::BATCH_STATUS_OPEN, $this->getActiveTransactionGroup(self::MANDATE_TYPE_FRST)['status_id']);
+  }
+
+  /**
+   * Test that SepaMandate.createfull accepts check_permissions as an integer.
+   */
+  public function testCreateFullWithIntegerCheckPermissions() {
+    $mandate = $this->createMandate(
+      [
+        'type' => self::MANDATE_TYPE_OOFF,
+        'check_permissions' => 0,
+      ]
+    );
+
+    $this->assertSame(self::MANDATE_TYPE_OOFF, $mandate['status']);
+  }
+
 }
