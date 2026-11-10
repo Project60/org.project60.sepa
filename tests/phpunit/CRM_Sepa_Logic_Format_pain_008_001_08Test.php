@@ -38,16 +38,22 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
     $contactId = ContactBuilder::createDefault();
     $financialTypeId = FinancialTypeBuilder::create();
 
-    $fullCreditorData = [...$creditorData, ...[
-      'pi_ooff' => '1',
-    ]];
+    $fullCreditorData = [
+      ...$creditorData,
+      ...[
+        'pi_ooff' => '1',
+      ],
+    ];
     $creditorId = SepaCreditorBuilder::createDefault($fullCreditorData);
-    
-    $fullMandateData = [...$mandateData, ...[
-      'creditor_id' => $creditorId,
-      'contact_id' => $contactId,
-      'financial_type_id' => $financialTypeId,
-    ]];
+
+    $fullMandateData = [
+      ...$mandateData,
+      ...[
+        'creditor_id' => $creditorId,
+        'contact_id' => $contactId,
+        'financial_type_id' => $financialTypeId,
+      ],
+    ];
     $mandate = SepaMandate::createFull(FALSE)
       ->setValues($fullMandateData)
       ->execute()
@@ -119,7 +125,7 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
       'sepa_file_format_id:name' => 'pain.008.001.08',
       'iban' => 'DE12500105170648489890',
       'bic' => 'TESTDEFFXXX',
-      'uses_bic' => false
+      'uses_bic' => FALSE,
     ];
     $mandateData = [
       'type' => 'OOFF',
@@ -139,7 +145,10 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
     static::assertStringContainsString('<IBAN>DE02370501980001802057</IBAN>', $xml);
     // Must not contain BIC!
     static::assertStringNotContainsString('<BICFI>BELADEBEXXX</BICFI>', $xml);
-    static::assertMatchesRegularExpression('/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i', str_replace('\n', '', $xml));
+    static::assertMatchesRegularExpression(
+      '/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i',
+      str_replace('\n', '', $xml)
+    );
     static::assertStringContainsString('<InstdAmt Ccy="EUR">10.00</InstdAmt>', $xml);
 
     $doc = new DOMDocument();
@@ -171,7 +180,10 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
     static::assertStringContainsString('<IBAN>DE02370501980001802057</IBAN>', $xml);
     // Must not contain BIC!
     static::assertStringNotContainsString('<BICFI>BELADEBEXXX</BICFI>', $xml);
-    static::assertMatchesRegularExpression('/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i', str_replace('\n', '', $xml));
+    static::assertMatchesRegularExpression(
+      '/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i',
+      str_replace('\n', '', $xml)
+    );
     static::assertStringContainsString('<InstdAmt Ccy="EUR">10.00</InstdAmt>', $xml);
 
     $doc = new DOMDocument();
@@ -184,7 +196,7 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
       'sepa_file_format_id:name' => 'pain.008.001.08_NOBIC',
       'iban' => 'DE12500105170648489890',
       'bic' => 'TESTDEFFXXX',
-      'uses_bic' => false
+      'uses_bic' => FALSE,
     ];
     $mandateData = [
       'type' => 'OOFF',
@@ -204,7 +216,10 @@ final class CRM_Sepa_Logic_Format_pain_008_001_08Test extends CRM_Sepa_TestBase 
     static::assertStringContainsString('<IBAN>DE02370501980001802057</IBAN>', $xml);
     // Must not contain BIC!
     static::assertStringNotContainsString('<BICFI>BELADEBEXXX</BICFI>', $xml);
-    static::assertMatchesRegularExpression('/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i', str_replace('\n', '', $xml));
+    static::assertMatchesRegularExpression(
+      '/<FinInstnId>\s*<Othr>\s*<Id>NOTPROVIDED<\/Id>\s*<\/Othr>\s*<\/FinInstnId>/i',
+      str_replace('\n', '', $xml)
+    );
     static::assertStringContainsString('<InstdAmt Ccy="EUR">10.00</InstdAmt>', $xml);
 
     $doc = new DOMDocument();
