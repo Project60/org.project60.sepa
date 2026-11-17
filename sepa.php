@@ -290,7 +290,8 @@ function sepa_civicrm_links(
  *  2) prevent users from deleting contributions/recurring contributions
  *     if they are part of a mandate
  */
-function sepa_civicrm_pre(string $op, string $objectName, ?int $id, array $params): void {
+function sepa_civicrm_pre(string $op, string $objectName, int|string|NULL $id, array $params): void {
+  $id = ($id !== '' && $id !== NULL) ? (int) $id : NULL;
   // adjust next collection date
   if ($objectName == 'ContributionRecur' || $objectName == 'SepaMandate') {
     if ($op == 'create' || $op == 'edit') {
