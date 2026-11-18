@@ -301,4 +301,29 @@ class CRM_Sepa_HookTest extends CRM_Sepa_TestBase {
     );
   }
 
+  /**
+   * Test that sepa_civicrm_pre accepts string, int, and null for $id without throwing a TypeError.
+   */
+  public function testSepaCivicrmPreAcceptsStringOrNullId(): void {
+    sepa_civicrm_pre('create', 'MessageTemplate', '', []);
+    sepa_civicrm_pre('create', 'MessageTemplate', NULL, []);
+    sepa_civicrm_pre('edit', 'MessageTemplate', '999', []);
+    sepa_civicrm_pre('edit', 'MessageTemplate', 999, []);
+    static::assertTrue(TRUE);
+  }
+
+  /**
+   * Test creating a MessageTemplate which triggers hook_civicrm_pre with an empty string ID.
+   */
+  public function testCreateMessageTemplateDoesNotFailInSepaHook(): void {
+    $result = $this->callAPISuccess('MessageTemplate', 'create', [
+      'msg_title' => uniqid('HookTest_Message_Template_', TRUE),
+      'msg_subject' => 'Test Subject',
+      'msg_html' => '<p>Test Message</p>',
+    ]);
+    static::assertArrayHasKey('id', $result);
+    static::assertNotNull($result['id']);
+    $this->callAPISuccess('MessageTemplate', 'delete', ['id' => $result['id']]);
+  }
+
 }
