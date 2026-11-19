@@ -18,16 +18,14 @@ declare(strict_types = 1);
 +--------------------------------------------------------*/
 namespace Civi\Sepa\ActionProvider\Action;
 
-use Civi\ActionProvider\Action\AbstractAction;
 use Civi\ActionProvider\Exception\ExecutionException;
 use Civi\ActionProvider\Parameter\ParameterBagInterface;
 use Civi\ActionProvider\Parameter\Specification;
 use Civi\ActionProvider\Parameter\SpecificationBag;
-
 use Civi\Api4\SepaMandate;
 use CRM_Sepa_ExtensionUtil as E;
 
-class CreateOneOffMandate extends AbstractAction {
+class CreateOneOffMandate extends AbstractSepaActionProviderAction {
 
   /**
    * Returns the specification of the configuration options for the actual action.
@@ -185,18 +183,6 @@ class CreateOneOffMandate extends AbstractAction {
       $output->setParameter('mandate_reference', '');
       $output->setParameter('error', $ex->getMessage());
     }
-  }
-
-  /**
-   * Get a list of all creditors
-   */
-  protected function getCreditors(): array {
-    $creditor_list = [];
-    $creditor_query = \civicrm_api3('SepaCreditor', 'get', ['option.limit' => 0]);
-    foreach ($creditor_query['values'] as $creditor) {
-      $creditor_list[$creditor['id']] = $creditor['name'];
-    }
-    return $creditor_list;
   }
 
   /**
