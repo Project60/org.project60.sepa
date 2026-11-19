@@ -36,6 +36,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         ->selectRowCount()
         ->addSelect(
           'id',
+          'type',
           'reference',
           'status_id',
           'COUNT(DISTINCT contribution.id) AS total_count',
@@ -63,7 +64,7 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
       );
     }
 
-    $result = Contribution::get()
+    $contributionApi = Contribution::get()
       ->selectRowCount()
       ->addSelect(
         'contact_id.display_name',
@@ -75,9 +76,26 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         'financial_type_id',
         'financial_type_id:label',
         'campaign_id.title',
-        'contribution_status_id:label'
+        'contribution_status_id:label',
+        'mandate.reference',
+        'mandate.iban',
       )
-      ->addJoin('SepaTransactionGroup AS sepa_transaction_group', 'INNER', 'SepaContributionGroup')
+      ->addJoin('SepaTransactionGroup AS sepa_transaction_group', 'INNER', 'SepaContributionGroup');
+    if ($txGroup['type'] === 'OOFF') {
+      // This is a ONE-OFF group.
+      $contributionApi->addJoin('SepaMandate AS mandate', 'LEFT', NULL,
+        ['mandate.entity_table', '=', 'civicrm_contribution', FALSE],
+        ['mandate.entity_id', '=', 'id', TRUE]
+      );
+    }
+    else {
+      // This is a recurring group.
+      $contributionApi->addJoin('SepaMandate AS mandate', 'LEFT', NULL,
+        ['mandate.entity_table', '=', 'civicrm_contribution_recur', FALSE],
+        ['mandate.entity_id', '=', 'contribution_recur_id', TRUE]
+      );
+    }
+    $result = $contributionApi
       ->addWhere('sepa_transaction_group.id', '=', $groupId)
       ->execute();
     $statusStats = [];
@@ -105,6 +123,8 @@ class CRM_Sepa_Page_ListGroup extends CRM_Core_Page {
         'financial_type_id' => $contribution['financial_type_id'],
         'financial_type' => $contribution['financial_type_id:label'],
         'campaign' => $contribution['campaign_id.title'],
+        'reference' => $contribution['mandate.reference'],
+        'iban' => $contribution['mandate.iban'],
       ];
       $statusStats[$contribution['contribution_status_id:label']] =
         1 + ($statusStats[$contribution['contribution_status_id:label']] ?? 0);
