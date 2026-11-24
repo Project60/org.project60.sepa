@@ -270,12 +270,6 @@ parameters:
 			path: CRM/Sepa/BAO/SEPATransactionGroup.php
 
 		-
-			message: '#^Cannot access offset ''sdd_creditor_id'' on array\|int\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 1
-			path: CRM/Sepa/BAO/SEPATransactionGroup.php
-
-		-
 			message: '#^Cannot access offset ''type'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
@@ -2003,7 +1997,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''status'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 4
+			count: 2
 			path: CRM/Sepa/Page/EditMandate.php
 
 		-
@@ -2847,7 +2841,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''entity_table'' on non\-empty\-array\|true\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
+			count: 1
 			path: CRM/Utils/SepaTokensDeprecated.php
 
 		-
@@ -3033,7 +3027,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''amount'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
+			count: 1
 			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
 
 		-
@@ -3057,7 +3051,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''frequency_unit'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 3
+			count: 1
 			path: Civi/Sepa/ActionProvider/Action/FindMandate.php
 
 		-
@@ -3597,7 +3591,7 @@ parameters:
 		-
 			message: '#^Cannot access offset ''frequency_unit'' on array\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
+			count: 1
 			path: org.project60.sepacustom/sepacustom.php
 
 		-
