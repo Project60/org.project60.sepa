@@ -20,8 +20,8 @@
     },
     "require": {
         "php": "^8.1",
-        "civicrm/civicrm-core": ">=6.13",
-        "civicrm/civicrm-packages": ">=6.13",
+        "civicrm/civicrm-core": ">=6.14",
+        "civicrm/civicrm-packages": ">=6.14",
         "webmozart/assert": "^1 || ^2"
     },
     "require-dev": {
