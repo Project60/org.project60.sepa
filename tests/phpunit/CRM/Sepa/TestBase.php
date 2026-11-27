@@ -20,6 +20,14 @@ use Civi\Test\Api3TestTrait;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
+use Civi\Api4\SepaContributionGroup;
+use Civi\Api4\SepaMandate;
+use Civi\Api4\SepaSddFile;
+use Civi\Api4\SepaTransactionGroup;
+
+use Systopia\TestFixtures\Fixtures\Builders\ContactBuilder;
+use Systopia\TestFixtures\Fixtures\Builders\FinancialTypeBuilder;
+use Systopia\TestFixtures\Fixtures\Builders\SepaCreditorBuilder;
 
 use CRM_Sepa_ExtensionUtil as E;
 use PHPUnit\Framework\TestCase;
@@ -636,6 +644,72 @@ class CRM_Sepa_TestBase extends TestCase implements HeadlessInterface, HookInter
     $group = $this->getTransactionGroup($groupId);
 
     return $group;
+  }
+
+  #endregion
+
+  #region Format helpers
+
+  /**
+   * Creates a SepaSddFile (along with other required entities) that is ready to generate a Sepa XML file
+   * @param array $creditorParams The params to be passed into SepaCreditorBuilder::createDefault to create the creditor
+   * @param array $mandateParams The params to be passed into SepaMandate::createFull to create the Sepa mandate
+   * @return array The SepaSddFile
+   */
+  protected function prepareSddFileForXmlGeneration(array $creditorParams, array $mandateParams): array {
+    $contactId = ContactBuilder::createDefault();
+    $financialTypeId = FinancialTypeBuilder::create();
+
+    $fullCreditorParams = [
+      ...$creditorParams,
+      ...[
+        'pi_ooff' => '1',
+      ],
+    ];
+    $creditorId = SepaCreditorBuilder::createDefault($fullCreditorParams);
+
+    $fullMandateParams = [
+      ...$mandateParams,
+      ...[
+        'creditor_id' => $creditorId,
+        'contact_id' => $contactId,
+        'financial_type_id' => $financialTypeId,
+      ],
+    ];
+    $mandate = SepaMandate::createFull(FALSE)
+      ->setValues($fullMandateParams)
+      ->execute()
+      ->single();
+
+    $sepaSddFile = SepaSddFile::create(FALSE)
+      ->setValues([
+        'reference' => 'test',
+        'status_id:name' => 'Closed',
+        'created_date' => '2026-10-01 01:02:03',
+      ])
+      ->execute()
+      ->single();
+
+    $transactionGroup = SepaTransactionGroup::create(FALSE)
+      ->setValues([
+        'reference' => 'test',
+        'type' => 'OOFF',
+        'status_id:name' => 'Closed',
+        'sdd_creditor_id' => $creditorId,
+        'sdd_file_id' => $sepaSddFile['id'],
+        'collection_date' => '2026-10-01',
+      ])
+      ->execute()
+      ->single();
+
+    SepaContributionGroup::create(FALSE)
+      ->setValues([
+        'contribution_id' => $mandate['entity_id'],
+        'txgroup_id' => $transactionGroup['id'],
+      ])
+      ->execute();
+
+    return $sepaSddFile;
   }
 
   #endregion
