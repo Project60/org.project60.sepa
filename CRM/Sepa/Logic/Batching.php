@@ -232,6 +232,56 @@ class CRM_Sepa_Logic_Batching {
       /** @var array<int, array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool}> $existingContributionsByRecurId */
     }
 
+    // FRST-STEP 3b: reuse a pending first installment sitting in an open group with
+    // another date (e.g. an overdue group) instead of creating a second one.
+    if ('FRST' === $mode) {
+      foreach ($rcontribIdsByCollectionDate as $collectionDate => $rcontribIds) {
+        $unmatchedRecurIds = array_values(array_diff($rcontribIds, array_keys($existingContributionsByRecurId)));
+        if ([] === $unmatchedRecurIds) {
+          continue;
+        }
+        /** @var list<array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool, "txg.id": int}> $pendingFrstInstallments */
+        $pendingFrstInstallments = Contribution::get(FALSE)
+          ->addSelect('id', 'contribution_recur_id', 'sepa_contribution.is_on_hold', 'txg.id')
+          ->addJoin('SepaContributionGroup AS ctxg', 'INNER', NULL, ['ctxg.contribution_id', '=', 'id'])
+          ->addJoin('SepaTransactionGroup AS txg', 'INNER', NULL, ['txg.id', '=', 'ctxg.txgroup_id'])
+          ->addWhere('contribution_recur_id', 'IN', $unmatchedRecurIds)
+          ->addWhere('contribution_status_id:name', '=', 'Pending')
+          ->addWhere('payment_instrument_id', 'IN', $paymentInstrumentIds)
+          ->addWhere('txg.type', '=', 'FRST')
+          ->addWhere('txg.sdd_creditor_id', '=', $creditorId)
+          ->addWhere('txg.status_id', '=', $groupStatusIdOpen)
+          ->addWhere('is_test', 'IS NOT NULL')
+          ->addOrderBy('id')
+          ->execute()
+          ->getArrayCopy();
+        /** @var array<int, list<array{id: int, contribution_recur_id: int, "sepa_contribution.is_on_hold": ?bool, "txg.id": int}>> $pendingFrstInstallmentsByRecurId */
+        $pendingFrstInstallmentsByRecurId = [];
+        foreach ($pendingFrstInstallments as $installment) {
+          $pendingFrstInstallmentsByRecurId[$installment['contribution_recur_id']][] = $installment;
+        }
+        foreach ($pendingFrstInstallmentsByRecurId as $recurId => $installments) {
+          // with several pending first installments none is reused, STEP 4 creates a new one
+          if (count($installments) !== 1) {
+            continue;
+          }
+          $installment = $installments[0];
+          // on-hold installments are kept out of groups by STEP 4 anyway, so leave them alone
+          if (TRUE !== $installment['sepa_contribution.is_on_hold']) {
+            Contribution::update(FALSE)
+              ->addWhere('id', '=', $installment['id'])
+              ->addValue('receive_date', $collectionDate)
+              ->execute();
+            Civi::log()->info(
+              "org.project60.sepa: batching: moved pending first installment {$installment['id']} of recurring "
+              . "contribution $recurId to $collectionDate instead of creating a duplicate."
+            );
+          }
+          $existingContributionsByRecurId[$recurId] = $installment;
+        }
+      }
+    }
+
     // RCUR-STEP 4: Create the missing contributions. Store contribution IDs
     // (existing and created) in $mandate['mandate_entity_id']. Remove mandates
     // in status "ONHOLD" so contribution won't be added to transaction group.
